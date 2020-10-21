@@ -212,10 +212,10 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 								Object v = an.values.get(i+1);
 								if (k.equals("config")) {
 									if (!isEnabled((String)v)) {
-										log.debug("  ❌ Required config setting "+v+" is disabled "+(config.get(k) == Trilean.FALSE ? "explicitly" : "by default"));
+										log.debug("  ❌ Required config setting "+v+" is disabled "+(config.get(v) == Trilean.FALSE ? "explicitly" : "by default"));
 										eligible = false;
 									} else {
-										log.debug("  ✅ Required config setting "+v+" is enabled "+(config.get(k) == Trilean.TRUE ? "explicitly" : "by default"));
+										log.debug("  ✅ Required config setting "+v+" is enabled "+(config.get(v) == Trilean.TRUE ? "explicitly" : "by default"));
 									}
 								} else if (k.equals("env")) {
 									String[] arr = (String[])v;
