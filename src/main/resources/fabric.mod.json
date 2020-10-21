@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "fabrication",
+  "version": "${version}",
+
+  "name": "Fabrication",
+  "description": "A bunch of mixins in a trenchcoat.",
+  "authors": [
+    "unascribed"
+  ],
+  "contact": {
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/fabrication",
+    "source": "https://github.com/unascribed/Fabrication",
+    "issues": "https://github.com/unascribed/Fabrication/issues"
+  },
+
+  "license": "MIT",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.unascribed.fabrication.FabricationMod"
+    ]
+  },
+  "mixins": [
+    "fabrication.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "minecraft": ">=1.16"
+  },
+  "suggests": {
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.unascribed.fabrication.mixin",
+  "plugin": "com.unascribed.fabrication.support.MixinConfigPlugin",
+  "compatibilityLevel": "JAVA_8",
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
