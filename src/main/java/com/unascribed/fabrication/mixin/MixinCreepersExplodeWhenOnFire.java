@@ -4,6 +4,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 import com.unascribed.fabrication.support.OnlyIf;
+import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.CreeperEntity;
@@ -21,7 +22,7 @@ public abstract class MixinCreepersExplodeWhenOnFire extends HostileEntity {
 	@Override
 	public void setFireTicks(int ticks) {
 		super.setFireTicks(ticks);
-		if (ticks > 0) {
+		if (RuntimeChecks.check("tweaks.creepers_explode_when_on_fire") && ticks > 0) {
 			ignite();
 		}
 	}

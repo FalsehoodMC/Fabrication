@@ -25,6 +25,8 @@ import com.unascribed.fabrication.QDIni.IniTransformer;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -40,10 +42,17 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 
 	private static final Logger log = LogManager.getLogger("Fabrication");
 	
-	private static final Map<String, Boolean> defaults;
+	public static final class RuntimeChecks {
+		public static final boolean ENABLED = MixinConfigPlugin.isEnabled("general.runtime_checks");
+		public static boolean check(String cfg) {
+			return !ENABLED || MixinConfigPlugin.isEnabled(cfg);
+		}
+	}
+	
+	private static final ImmutableMap<String, Boolean> defaults;
 	static {
 		try (InputStream is = MixinConfigPlugin.class.getClassLoader().getResourceAsStream("defaults.ini")) {
-			defaults = Maps.transformValues(QDIni.load(is), Boolean::parseBoolean);
+			defaults = ImmutableMap.copyOf(Maps.transformValues(QDIni.load(is), Boolean::parseBoolean));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -58,8 +67,70 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		return config.get(configKey).resolve(defaults.get(configKey));
 	}
 	
-	@Override
-	public void onLoad(String mixinPackage) {
+	public static Trilean getValue(String configKey) {
+		return config.getOrDefault(configKey, Trilean.UNSET);
+	}
+	
+	public static boolean isValid(String configKey) {
+		return defaults.containsKey(configKey);
+	}
+	
+	public static boolean getDefault(String configKey) {
+		return defaults.get(configKey);
+	}
+	
+	public static ImmutableSet<String> getAllKeys() {
+		return defaults.keySet();
+	}
+	
+	public static void set(String configKey, Trilean trilean) {
+		config.put(configKey, trilean);
+		Path configFile = FabricLoader.getInstance().getConfigDir().resolve("fabrication.ini");
+		StringWriter sw = new StringWriter();
+		try (InputStream is = Files.newInputStream(configFile)) {
+			 QDIni.loadAndTransform(new InputStreamReader(is, Charsets.UTF_8), new IniTransformer() {
+				 
+				boolean found = false;
+				
+				@Override
+				public String transformLine(String path, String line) {
+					if (line == null || line.equals("; Notices: (Do not edit anything past this line; it will be overwritten)")) {
+						if (!found) {
+							found = true;
+							return "; Added by /fabrication config as a last resort as this key could\r\n"
+									+ "; not be found elsewhere in the file.\r\n"
+									+ configKey+"="+trilean.toString().toLowerCase(Locale.ROOT)+"\r\n"+(line == null ? "" : "\r\n"+line);
+						}
+					}
+					return line;
+				}
+
+				@Override
+				public String transformValueComment(String key, String value, String comment) {
+					return comment;
+				}
+				
+				@Override
+				public String transformValue(String key, String value) {
+					if (configKey.equals(key)) {
+						found = true;
+						return trilean.toString().toLowerCase(Locale.ROOT);
+					}
+					return value;
+				}
+				
+			}, sw);
+		} catch (IOException e) {
+			log.warn("Failed to update configuration file", e);
+		}
+		try {
+			Files.write(configFile, sw.toString().getBytes(Charsets.UTF_8));
+		} catch (IOException e) {
+			log.warn("Failed to update configuration file", e);
+		}
+	}
+	
+	public static void reload() {
 		Path configFile = FabricLoader.getInstance().getConfigDir().resolve("fabrication.ini");
 		if (!Files.exists(configFile)) {
 			Path configFileOld = FabricLoader.getInstance().getConfigDir().resolve("fabrication.ini.old");
@@ -69,7 +140,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 					try (InputStream is = Files.newInputStream(configFileOld)) {
 						currentValues = QDIni.load(is);
 					}
-					try (InputStream is = getClass().getClassLoader().getResourceAsStream("default_config.ini");
+					try (InputStream is = MixinConfigPlugin.class.getClassLoader().getResourceAsStream("default_config.ini");
 							OutputStreamWriter osw = new OutputStreamWriter(Files.newOutputStream(configFile), Charsets.UTF_8)) {
 						QDIni.loadAndTransform(new InputStreamReader(is, Charsets.UTF_8), new IniTransformer() {
 	
@@ -96,7 +167,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 				}
 			} else {
 				try {
-					Resources.asByteSource(getClass().getClassLoader().getResource("default_config.ini")).copyTo(MoreFiles.asByteSink(configFile));
+					Resources.asByteSource(MixinConfigPlugin.class.getClassLoader().getResource("default_config.ini")).copyTo(MoreFiles.asByteSink(configFile));
 				} catch (IOException e) {
 					throw new RuntimeException("Failed to write default config", e);
 				}
@@ -104,7 +175,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		}
 		StringWriter sw = new StringWriter();
 		try (InputStream is = Files.newInputStream(configFile)) {
-			config = Maps.transformValues(QDIni.loadAndTransform(new InputStreamReader(is, Charsets.UTF_8), new IniTransformer() {
+			config = Maps.newHashMap(Maps.transformValues(QDIni.loadAndTransform(new InputStreamReader(is, Charsets.UTF_8), new IniTransformer() {
 
 				final String NOTICES_HEADER = "; Notices: (Do not edit anything past this line; it will be overwritten)";
 				
@@ -158,7 +229,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 					return value;
 				}
 				
-			}, sw), Trilean::parseTrilean);
+			}, sw), Trilean::parseTrilean));
 		} catch (IOException e) {
 			log.warn("Failed to load configuration file; will assume defaults", e);
 			config = Maps.transformValues(defaults, v -> Trilean.UNSET);
@@ -168,6 +239,11 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		} catch (IOException e) {
 			log.warn("Failed to transform configuration file", e);
 		}
+	}
+	
+	@Override
+	public void onLoad(String mixinPackage) {
+		reload();
 	}
 
 	@Override
@@ -211,7 +287,9 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 								String k = (String)an.values.get(i);
 								Object v = an.values.get(i+1);
 								if (k.equals("config")) {
-									if (!isEnabled((String)v)) {
+									if (RuntimeChecks.ENABLED) {
+										log.debug("  ⭕​ Runtime checks is enabled, ignoring required config key "+v);
+									} else if (!isEnabled((String)v)) {
 										log.debug("  ❌ Required config setting "+v+" is disabled "+(config.get(v) == Trilean.FALSE ? "explicitly" : "by default"));
 										eligible = false;
 									} else {

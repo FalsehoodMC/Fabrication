@@ -5,6 +5,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.unascribed.fabrication.support.OnlyIf;
+import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
 
 import net.minecraft.entity.LivingEntity;
 
@@ -14,6 +15,7 @@ public class MixinSoulSpeedDoesntDamageBoots {
 
 	@Inject(at=@At(value="INVOKE", target="net/minecraft/item/ItemStack.damage(ILnet/minecraft/entity/LivingEntity;Ljava/util/function/Consumer;)V"), method="addSoulSpeedBoostIfNeeded()V", cancellable=true)
 	protected void addSoulSpeedBoostIfNeeded(CallbackInfo ci) {
+		if (!RuntimeChecks.check("tweaks.soul_speed_doesnt_damage_boots")) return;
 		ci.cancel();
 	}
 	

@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.OnlyIf;
+import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
 
 import net.minecraft.enchantment.ProtectionEnchantment;
 
@@ -15,6 +16,7 @@ public class MixinFeatherFallingFiveEnchantment {
 
 	@Inject(at=@At("RETURN"), method="getMaxLevel()I", cancellable=true)
 	public void getMaxLevel(CallbackInfoReturnable<Integer> cir) {
+		if (!RuntimeChecks.check("tweaks.feather_falling_five")) return;
 		if (cir.getReturnValueI() < 5) {
 			cir.setReturnValue(5);
 		}
