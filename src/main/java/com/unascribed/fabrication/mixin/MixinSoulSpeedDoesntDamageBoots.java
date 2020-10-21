@@ -12,7 +12,7 @@ import net.minecraft.entity.LivingEntity;
 @OnlyIf(config="tweaks.soul_speed_doesnt_damage_boots")
 public class MixinSoulSpeedDoesntDamageBoots {
 
-	@Inject(at=@At(value="INVOKE", target="damage(ILnet/minecraft/entity/LivingEntity;Ljava/util/function/Consumer;)V"), method="addSoulSpeedBoostIfNeeded()V", cancellable=true)
+	@Inject(at=@At(value="INVOKE", target="net/minecraft/item/ItemStack.damage(ILnet/minecraft/entity/LivingEntity;Ljava/util/function/Consumer;)V"), method="addSoulSpeedBoostIfNeeded()V", cancellable=true)
 	protected void addSoulSpeedBoostIfNeeded(CallbackInfo ci) {
 		ci.cancel();
 	}
