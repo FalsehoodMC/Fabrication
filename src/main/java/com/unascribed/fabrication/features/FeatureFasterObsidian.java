@@ -37,6 +37,7 @@ public class FeatureFasterObsidian implements Feature {
 			}
 		}
 		FieldUtils.removeFinalModifier(f, true);
+		f.setAccessible(true);
 		for (BlockState bs : Blocks.OBSIDIAN.getStateManager().getStates()) {
 			try {
 				f.set(bs, ((float)f.get(bs))*m);
