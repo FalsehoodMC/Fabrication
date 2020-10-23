@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.OnlyIf;
+import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
 
 import net.minecraft.client.MinecraftClient;
@@ -16,12 +16,12 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffects;
 
 @Mixin(InGameOverlayRenderer.class)
-@OnlyIf(config="client.less_annoying_fire", env=Env.CLIENT)
+@EligibleIf(configEnabled="*.less_annoying_fire", envMatches=Env.CLIENT)
 public class MixinLessAnnoyingFire {
 
 	@Inject(at=@At("HEAD"), method="renderFireOverlay(Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/util/math/MatrixStack;)V", cancellable=true)
 	private static void renderFireOverlayHead(MinecraftClient client, MatrixStack stack, CallbackInfo ci) {
-		if (!RuntimeChecks.check("client.less_annoying_fire")) return;
+		if (!RuntimeChecks.check("*.less_annoying_fire")) return;
 		if (client.player.isInvulnerableTo(DamageSource.ON_FIRE) || client.player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE)) {
 			ci.cancel();
 		} else {
@@ -32,7 +32,7 @@ public class MixinLessAnnoyingFire {
 	
 	@Inject(at=@At("TAIL"), method="renderFireOverlay(Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/util/math/MatrixStack;)V", cancellable=true)
 	private static void renderFireOverlayTail(MinecraftClient client, MatrixStack stack, CallbackInfo ci) {
-		if (!RuntimeChecks.check("client.less_annoying_fire")) return;
+		if (!RuntimeChecks.check("*.less_annoying_fire")) return;
 		stack.pop();
 	}
 	

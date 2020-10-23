@@ -4,7 +4,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
-import com.unascribed.fabrication.support.OnlyIf;
+import com.unascribed.fabrication.support.EligibleIf;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
@@ -18,7 +18,7 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.util.Formatting;
 
-@OnlyIf(config="utility.mods_command", dependencies="fabric")
+@EligibleIf(configEnabled="*.mods_command", modLoaded="fabric")
 public class FeatureModsCommand implements Feature {
 	
 	private boolean applied = false;
@@ -29,7 +29,7 @@ public class FeatureModsCommand implements Feature {
 		applied = true;
 		CommandRegistrationCallback.EVENT.register((dispatcher, dedi) -> {
 			dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("mods")
-					.requires(s -> MixinConfigPlugin.isEnabled("utility.mods_command"))
+					.requires(s -> MixinConfigPlugin.isEnabled("*.mods_command"))
 					.then(LiteralArgumentBuilder.<ServerCommandSource>literal("all")
 							.executes((c) -> {
 								sendMods(c, true);
@@ -96,7 +96,7 @@ public class FeatureModsCommand implements Feature {
 
 	@Override
 	public String getConfigKey() {
-		return "utility.mods_command";
+		return "*.mods_command";
 	}
 
 }

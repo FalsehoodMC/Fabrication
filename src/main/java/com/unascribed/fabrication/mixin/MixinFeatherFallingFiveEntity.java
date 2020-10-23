@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.MixinConfigPlugin;
-import com.unascribed.fabrication.support.OnlyIf;
+import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
 
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -17,16 +17,16 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ItemStack;
 
 @Mixin(LivingEntity.class)
-@OnlyIf(config="tweaks.feather_falling_five")
+@EligibleIf(configEnabled="*.feather_falling_five")
 public class MixinFeatherFallingFiveEntity {
 
 	@Inject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", cancellable=true)
 	public void damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-		if (!RuntimeChecks.check("tweaks.feather_falling_five")) return;
+		if (!RuntimeChecks.check("*.feather_falling_five")) return;
 		LivingEntity self = ((LivingEntity)(Object)this);
 		ItemStack boots = self.getEquippedStack(EquipmentSlot.FEET);
 		if (source == DamageSource.FALL && EnchantmentHelper.getLevel(Enchantments.FEATHER_FALLING, boots) >= 5) {
-			if (MixinConfigPlugin.isEnabled("tweaks.feather_falling_five_damages_boots") && amount >= 2) {
+			if (MixinConfigPlugin.isEnabled("*.feather_falling_five_damages_boots") && amount >= 2) {
 				boots.damage((int)(amount/2), self, (e) -> {
 					e.sendEquipmentBreakStatus(EquipmentSlot.FEET);
 				});

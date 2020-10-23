@@ -3,7 +3,7 @@ package com.unascribed.fabrication.mixin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-import com.unascribed.fabrication.support.OnlyIf;
+import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
 
 import net.minecraft.entity.EntityType;
@@ -12,7 +12,7 @@ import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.world.World;
 
 @Mixin(CreeperEntity.class)
-@OnlyIf(config="tweaks.creepers_explode_when_on_fire")
+@EligibleIf(configEnabled="*.creepers_explode_when_on_fire")
 public abstract class MixinCreepersExplodeWhenOnFire extends HostileEntity {
 	
 	protected MixinCreepersExplodeWhenOnFire(EntityType<? extends HostileEntity> entityType, World world) {
@@ -22,7 +22,7 @@ public abstract class MixinCreepersExplodeWhenOnFire extends HostileEntity {
 	@Override
 	public void setFireTicks(int ticks) {
 		super.setFireTicks(ticks);
-		if (RuntimeChecks.check("tweaks.creepers_explode_when_on_fire") && ticks > 0) {
+		if (RuntimeChecks.check("*.creepers_explode_when_on_fire") && ticks > 0) {
 			ignite();
 		}
 	}

@@ -5,15 +5,24 @@ import java.lang.reflect.Field;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
 import com.unascribed.fabrication.support.Feature;
-import com.unascribed.fabrication.support.OnlyIf;
+
+import com.google.common.collect.ImmutableList;
+
+import com.unascribed.fabrication.support.EligibleIf;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.AbstractBlock.AbstractBlockState;
+import net.minecraft.block.Block;
 
-@OnlyIf(config="tweaks.faster_obsidian")
+@EligibleIf(configEnabled="*.faster_obsidian")
 public class FeatureFasterObsidian implements Feature {
 
+	private final ImmutableList<Block> BLOCKS = ImmutableList.of(
+			Blocks.OBSIDIAN,
+			Blocks.CRYING_OBSIDIAN
+		);
+	
 	@Override
 	public void apply() {
 		amendHardness(1/3f);
@@ -38,18 +47,20 @@ public class FeatureFasterObsidian implements Feature {
 		}
 		FieldUtils.removeFinalModifier(f, true);
 		f.setAccessible(true);
-		for (BlockState bs : Blocks.OBSIDIAN.getStateManager().getStates()) {
-			try {
-				f.set(bs, ((float)f.get(bs))*m);
-			} catch (Exception e) {
-				throw new RuntimeException("Can't update hardness", e);
+		for (Block b : BLOCKS) {
+			for (BlockState bs : b.getStateManager().getStates()) {
+				try {
+					f.set(bs, ((float)f.get(bs))*m);
+				} catch (Exception e) {
+					throw new RuntimeException("Can't update hardness", e);
+				}
 			}
 		}
 	}
 
 	@Override
 	public String getConfigKey() {
-		return "tweaks.faster_obsidian";
+		return "*.faster_obsidian";
 	}
 
 }
