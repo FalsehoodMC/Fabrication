@@ -3,7 +3,6 @@ package com.unascribed.fabrication;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;

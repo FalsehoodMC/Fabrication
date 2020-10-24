@@ -52,7 +52,19 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 }
 
 jar {
+	doFirst {
+		StringBuilder bldr = new StringBuilder();
+		File dir = file('build/classes/java/main');
+		dir.eachFileRecurse(groovy.io.FileType.FILES, {
+			if (it.name.endsWith(".class")) {
+				bldr.append(it.getAbsolutePath().substring(dir.getAbsolutePath().length()+1))
+				bldr.append("\n")
+			}
+		})
+		file('build/tmp/classes.txt').text = bldr.toString();
+	}
 	from "LICENSE"
+	from "build/tmp/classes.txt"
 }
 
 // configure the maven publication

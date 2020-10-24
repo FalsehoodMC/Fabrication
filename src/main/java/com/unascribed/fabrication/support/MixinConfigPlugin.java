@@ -1,10 +1,12 @@
 package com.unascribed.fabrication.support;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Constructor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -350,7 +352,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			int enabled = 0;
 			int skipped = 0;
 			List<String> rtrn = Lists.newArrayList();
-			for (ClassInfo ci : ClassPath.from(MixinConfigPlugin.class.getClassLoader()).getTopLevelClassesRecursive(pkg)) {
+			for (ClassInfo ci : getClassesInPackage(pkg)) {
 				count++;
 				String truncName = ci.getName().substring(pkg.length()+1);
 				log.info("--");
@@ -488,6 +490,33 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			}
 			log.info("Discovery pass complete. Found "+count+" candidates, enabled "+enabled+", skipped "+skipped+".");
 			return rtrn;
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private static Iterable<ClassInfo> getClassesInPackage(String pkg) {
+		try (InputStream is = MixinConfigPlugin.class.getClassLoader().getResourceAsStream("classes.txt")) {
+			if (is != null) {
+				Constructor<ClassInfo> cons = ClassInfo.class.getDeclaredConstructor(String.class, ClassLoader.class);
+				cons.setAccessible(true);
+				List<ClassInfo> rtrn = Lists.newArrayList();
+				BufferedReader br = new BufferedReader(new InputStreamReader(is, Charsets.UTF_8));
+				String prefix = pkg.replace('.', '/')+"/";
+				while (true) {
+					String line = br.readLine();
+					if (line == null) break;
+					if (line.startsWith(prefix)) {
+						rtrn.add(cons.newInstance(line, MixinConfigPlugin.class.getClassLoader()));
+					}
+				}
+				return rtrn;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			return ClassPath.from(MixinConfigPlugin.class.getClassLoader()).getTopLevelClassesRecursive(pkg);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
