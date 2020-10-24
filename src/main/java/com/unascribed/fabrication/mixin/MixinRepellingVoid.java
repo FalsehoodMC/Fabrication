@@ -65,8 +65,8 @@ public abstract class MixinRepellingVoid extends LivingEntity {
 				((ServerWorld)world).spawnParticles((ServerPlayerEntity)self, ParticleTypes.PORTAL, true, pos.x, pos.y+(box.getYLength()/2), pos.z, 32, box.getXLength()/2, box.getYLength()/2, box.getZLength()/2, 0.2);
 				((ServerWorld)world).spawnParticles(ParticleTypes.PORTAL, pos.x, pos.y+(box.getYLength()/2), pos.z, 32, box.getXLength()/2, box.getYLength()/2, box.getZLength()/2, 0.2);
 				for (Vec3d vec : fabrication$voidFallTrail) {
-					((ServerWorld)world).spawnParticles((ServerPlayerEntity)self, ParticleTypes.WITCH, true, vec.x, vec.y, vec.z, 0, 1, 0, 1, 0.2);
-					((ServerWorld)world).spawnParticles(ParticleTypes.WITCH, vec.x, vec.y, vec.z, 0, 1, 0, 1, 0.2);
+					((ServerWorld)world).spawnParticles((ServerPlayerEntity)self, ParticleTypes.CLOUD, true, vec.x, vec.y, vec.z, 0, 0, 1, 0, 0.05);
+					((ServerWorld)world).spawnParticles(ParticleTypes.CLOUD, vec.x, vec.y, vec.z, 0, 0, 1, 0, 0.05);
 				}
 			}
 			damage(DamageSource.OUT_OF_WORLD, 12);
