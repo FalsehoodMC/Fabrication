@@ -98,7 +98,6 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 				}
 			}
 			starMap = starMapBldr.build();
-			System.out.println(starMap);
 			ImmutableMap.Builder<Profile, ImmutableMap<String, Boolean>> profilesBuilder = ImmutableMap.builder();
 			for (Profile p : Profile.values()) {
 				ImmutableMap.Builder<String, Boolean> defaultsBuilder = ImmutableMap.builder();
