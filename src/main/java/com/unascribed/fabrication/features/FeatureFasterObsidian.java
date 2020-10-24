@@ -51,7 +51,9 @@ public class FeatureFasterObsidian implements Feature {
 		for (Block b : BLOCKS) {
 			for (BlockState bs : b.getStateManager().getStates()) {
 				try {
-					f.set(bs, ((float)f.get(bs))*m);
+					float base = (float)f.get(bs);
+					float nw = base*m;
+					f.set(bs, nw);
 				} catch (Exception e) {
 					throw new RuntimeException("Can't update hardness", e);
 				}
