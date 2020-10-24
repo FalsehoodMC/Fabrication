@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
 
 import io.netty.buffer.Unpooled;
@@ -45,6 +46,9 @@ public abstract class MixinSyncAttackerYawEntity extends Entity {
 	@Inject(at=@At("RETURN"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z")
 	public void damageReturn(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
 		if (!RuntimeChecks.check("*.sync_attacker_yaw")) return;
+		if (source == DamageSource.OUT_OF_WORLD && MixinConfigPlugin.isEnabled("*.repelling_void")) {
+			knockbackVelocity = yaw;
+		}
 		if (knockbackVelocity != fabrication$lastAttackerYaw && !world.isClient) {
 			PacketByteBuf data = new PacketByteBuf(Unpooled.buffer(4));
 			data.writeInt(getEntityId());
