@@ -20,7 +20,8 @@ public class FeatureFasterObsidian implements Feature {
 
 	private final ImmutableList<Block> BLOCKS = ImmutableList.of(
 			Blocks.OBSIDIAN,
-			Blocks.CRYING_OBSIDIAN
+			Blocks.CRYING_OBSIDIAN,
+			Blocks.ENDER_CHEST
 		);
 	
 	@Override

@@ -10,6 +10,8 @@ import com.unascribed.fabrication.support.MixinConfigPlugin.Profile;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
 
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
 
@@ -20,7 +22,19 @@ public class FeatureFabricationCommand implements Feature {
 	public void apply() {
 		CommandRegistrationCallback.EVENT.register((dispatcher, dedi) -> {
 			LiteralArgumentBuilder<ServerCommandSource> root = LiteralArgumentBuilder.<ServerCommandSource>literal("fabrication");
-			root.requires(scs -> scs.hasPermissionLevel(4));
+			root.requires(scs -> {
+				if (scs.hasPermissionLevel(4)) return true;
+				if (scs.getMinecraftServer().isSinglePlayer() && scs.getEntity() != null) {
+					Entity e = scs.getEntity();
+					if (e instanceof PlayerEntity) {
+						if (scs.getMinecraftServer().getUserName().equals(((PlayerEntity)e).getGameProfile().getName())) {
+							// always allow in singleplayer, even if cheats are off
+							return true;
+						}
+					}
+				}
+				return false;
+			});
 			LiteralArgumentBuilder<ServerCommandSource> config = LiteralArgumentBuilder.<ServerCommandSource>literal("config");
 			LiteralArgumentBuilder<ServerCommandSource> get = LiteralArgumentBuilder.<ServerCommandSource>literal("get");
 			for (String s : MixinConfigPlugin.getAllKeys()) {

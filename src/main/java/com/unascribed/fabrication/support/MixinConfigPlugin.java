@@ -118,6 +118,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		}
 	}
 	
+	private static Profile profile;
 	private static Map<String, String> rawConfig;
 	private static Map<String, Trilean> config;
 	
@@ -303,7 +304,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 				}
 				
 			}, sw);
-			Profile profile = Profile.valueOf(rawConfig.getOrDefault("general.profile", "light").toUpperCase(Locale.ROOT));
+			profile = Profile.valueOf(rawConfig.getOrDefault("general.profile", "light").toUpperCase(Locale.ROOT));
 			defaults = defaultsByProfile.get(profile);
 			config = Maps.transformValues(Maps.filterKeys(rawConfig, MixinConfigPlugin::isTrilean), Trilean::parseTrilean);
 		} catch (IOException e) {
@@ -339,6 +340,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 
 	@Override
 	public List<String> getMixins() {
+		log.info("☕ Profile: "+profile.name().toLowerCase(Locale.ROOT));
 		return discoverClassesInPackage("com.unascribed.fabrication.mixin", true);
 	}
 
