@@ -45,7 +45,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	private static final Logger log = LogManager.getLogger("Fabrication");
 	
 	private static final ImmutableSet<String> VIENNA_EXCEPTIONS = ImmutableSet.of(
-			"balance.infinity_mending"
+			"balance.infinity_mending",
+			"tweaks.ghost_chest_woo_woo"
 	);
 	private static final ImmutableSet<String> NON_TRILEANS = ImmutableSet.of(
 			"general.profile"
