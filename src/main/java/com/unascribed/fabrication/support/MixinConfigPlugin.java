@@ -82,6 +82,14 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	
 	public static final class RuntimeChecks {
 		public static final boolean ENABLED = MixinConfigPlugin.isEnabled("general.runtime_checks");
+		/**
+		 * <b>Warning:</b> If runtime_checks is disabled, this method <i>always returns true</i> to
+		 * allow JIT simplification and removal of branches. If you have a mixin that uses
+		 * anyConfigEnabled, you need to use {@link MixinConfigPlugin#isEnabled isEnabled} directly.
+		 * <p>
+		 * In other words, only use this method in code that <i>will not be present at all</i> if
+		 * the option in question is disabled and runtime_checks is off.
+		 */
 		public static boolean check(String cfg) {
 			return !ENABLED || MixinConfigPlugin.isEnabled(cfg);
 		}

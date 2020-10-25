@@ -15,7 +15,7 @@ import net.minecraft.world.explosion.Explosion.DestructionType;
 @EligibleIf(configEnabled="*.environmentally_friendly_creepers")
 public class MixinEnvironmentallyFriendlyCreepers {
 
-	@Redirect(at=@At(value="FIELD", opcode=Opcodes.GETSTATIC, target="net/minecraft/world/explosion/Explosion$DestructionType.DESTROY"),
+	@Redirect(at=@At(value="FIELD", opcode=Opcodes.GETSTATIC, target="net/minecraft/world/explosion/Explosion$DestructionType.DESTROY:Lnet/minecraft/world/explosion/Explosion$DestructionType;"),
 			method="explode()V")
 	public DestructionType nonMobGriefingDestructionType() {
 		return RuntimeChecks.check("*.environmentally_friendly_creepers") ? DestructionType.NONE : DestructionType.DESTROY;
