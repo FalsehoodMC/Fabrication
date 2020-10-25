@@ -1,29 +1,37 @@
 package com.unascribed.fabrication.mixin;
 
+import java.util.Set;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.unascribed.fabrication.FabricationMod;
+import com.unascribed.fabrication.interfaces.SetAttackerYawAware;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
 
 import io.netty.buffer.Unpooled;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.server.world.ThreadedAnvilChunkStorage;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
 @Mixin(LivingEntity.class)
 @EligibleIf(configEnabled="*.sync_attacker_yaw")
-public abstract class MixinSyncAttackerYawEntity extends Entity {
+public abstract class MixinSyncAttackerYawEntity extends Entity implements SetAttackerYawAware {
 
 	public MixinSyncAttackerYawEntity(EntityType<?> type, World world) {
 		super(type, world);
@@ -32,6 +40,7 @@ public abstract class MixinSyncAttackerYawEntity extends Entity {
 	private static final Identifier FABRICATION$ATTACKER_YAW = new Identifier("fabrication", "attacker_yaw");
 		
 	private float fabrication$lastAttackerYaw;
+	private boolean fabrication$attackerYawAware;
 	
 	// actually attackerYaw. has the wrong name in this version of yarn
 	@Shadow
@@ -53,8 +62,36 @@ public abstract class MixinSyncAttackerYawEntity extends Entity {
 			PacketByteBuf data = new PacketByteBuf(Unpooled.buffer(4));
 			data.writeInt(getEntityId());
 			data.writeFloat(knockbackVelocity);
-			((ServerWorld)world).getChunkManager().sendToNearbyPlayers(this, new CustomPayloadS2CPacket(FABRICATION$ATTACKER_YAW, data));
+			// Here we go now
+			ServerChunkManager cm = ((ServerWorld)world).getChunkManager();
+			ThreadedAnvilChunkStorage tacs = cm.threadedAnvilChunkStorage;
+			Int2ObjectMap<?> entityTrackers = FabricationMod.snag(ThreadedAnvilChunkStorage.class, tacs, "field_18242", "entityTrackers");
+			Object tracker = entityTrackers.get(getEntityId());
+			Set<ServerPlayerEntity> playersTracking = FabricationMod.snag(tracker.getClass(), tracker, "field_18250", "playersTracking");
+			CustomPayloadS2CPacket pkt = new CustomPayloadS2CPacket(FABRICATION$ATTACKER_YAW, data);
+			Object self = this;
+			if (self instanceof ServerPlayerEntity) {
+				ServerPlayerEntity spe = (ServerPlayerEntity)self;
+				if (spe instanceof SetAttackerYawAware && ((SetAttackerYawAware) spe).fabrication$isAttackerYawAware()) {
+					spe.networkHandler.sendPacket(pkt);
+				}
+			}
+			for (ServerPlayerEntity spe : playersTracking) {
+				if (spe instanceof SetAttackerYawAware && ((SetAttackerYawAware) spe).fabrication$isAttackerYawAware()) {
+					spe.networkHandler.sendPacket(pkt);
+				}
+			}
 		}
+	}
+	
+	@Override
+	public boolean fabrication$isAttackerYawAware() {
+		return fabrication$attackerYawAware;
+	}
+	
+	@Override
+	public void fabrication$setAttackerYawAware(boolean aware) {
+		fabrication$attackerYawAware = aware;
 	}
 	
 }

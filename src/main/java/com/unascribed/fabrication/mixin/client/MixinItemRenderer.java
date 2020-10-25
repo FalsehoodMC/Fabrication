@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.google.common.collect.Lists;
 
@@ -30,7 +31,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 @Mixin(ItemRenderer.class)
-@EligibleIf(anyConfigEnabled={"*.books_show_enchants", "*.tools_show_important_enchant"})
+@EligibleIf(anyConfigEnabled={"*.books_show_enchants", "*.tools_show_important_enchant"}, envMatches=Env.CLIENT)
 public class MixinItemRenderer {
 
 	@Shadow

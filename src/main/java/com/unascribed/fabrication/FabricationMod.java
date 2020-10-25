@@ -1,5 +1,7 @@
 package com.unascribed.fabrication;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,6 +60,36 @@ public class FabricationMod implements ModInitializer {
 				enabledFeatures.remove(configKey);
 			}
 			return b;
+		}
+	}
+	
+	public static <T> T snag(Class<?> clazz, Object inst, String intermediateName, String yarnName) {
+		try {
+			Field f;
+			try {
+				f = clazz.getDeclaredField(intermediateName);
+			} catch (NoSuchFieldException e) {
+				f = clazz.getDeclaredField(yarnName);
+			}
+			f.setAccessible(true);
+			return (T)f.get(inst);
+		} catch (Throwable e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public static <T> T twiddle(Class<?> clazz, Object inst, String intermediateName, String yarnName, Class<?>[] argTypes, Object... args) {
+		try {
+			Method m;
+			try {
+				m = clazz.getDeclaredMethod(intermediateName, argTypes);
+			} catch (NoSuchMethodException e) {
+				m = clazz.getDeclaredMethod(yarnName, argTypes);
+			}
+			m.setAccessible(true);
+			return (T)m.invoke(inst, args);
+		} catch (Throwable e) {
+			throw new RuntimeException(e);
 		}
 	}
 	
