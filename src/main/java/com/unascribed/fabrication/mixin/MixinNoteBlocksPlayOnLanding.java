@@ -12,7 +12,9 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.NoteBlock;
 import net.minecraft.block.ObserverBlock;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.stat.Stats;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -34,6 +36,9 @@ public abstract class MixinNoteBlocksPlayOnLanding extends Block {
 		if (!world.isClient && RuntimeChecks.check("*.note_blocks_play_on_landing")) {
 			for (int i = 0; i < Math.min(8, Math.ceil(distance/2)); i++) {
 				playNote(world, pos);
+			}
+			if (entity instanceof PlayerEntity) {
+				((PlayerEntity)entity).incrementStat(Stats.PLAY_NOTEBLOCK);
 			}
 			for (Direction dir : Direction.values()) {
 				BlockPos theirPos = pos.offset(dir);

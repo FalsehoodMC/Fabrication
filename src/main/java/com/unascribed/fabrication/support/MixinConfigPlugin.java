@@ -52,17 +52,18 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			"general.profile"
 	);
 	private static final ImmutableSet<String> RUNTIME_CONFIGURABLE = ImmutableSet.of(
-			"minor_mechanics.feather_falling_five_damages_boots"
+			"minor_mechanics.feather_falling_five_damages_boots",
+			"minor_mechanics.observers_see_entities_living_only"
 	);
 	
 	
 	public enum Profile {
-		GREEN(),
-		BLONDE("fixes", "utility"),
-		LIGHT("fixes", "utility", "tweaks"),
-		MEDIUM("fixes", "utility", "tweaks", "minor_mechanics"),
-		DARK("fixes", "utility", "tweaks", "minor_mechanics", "mechanics"),
-		VIENNA("fixes", "utility", "tweaks", "minor_mechanics", "mechanics", "balance", "weird_tweaks"),
+		GREEN("general"),
+		BLONDE("general", "fixes", "utility"),
+		LIGHT("general", "fixes", "utility", "tweaks"),
+		MEDIUM("general", "fixes", "utility", "tweaks", "minor_mechanics"),
+		DARK("general", "fixes", "utility", "tweaks", "minor_mechanics", "mechanics"),
+		VIENNA("general", "fixes", "utility", "tweaks", "minor_mechanics", "mechanics", "balance", "weird_tweaks"),
 		BURNT("*")
 		;
 		public final ImmutableSet<String> sections;
