@@ -18,9 +18,8 @@
 
   "environment": "*",
   "entrypoints": {
-    "main": [
-      "com.unascribed.fabrication.FabricationMod"
-    ]
+    "main": ["com.unascribed.fabrication.FabricationMod"],
+    "cotton-client-commands": ["com.unascribed.fabrication.FabricationClientCommands"]
   },
   "mixins": [
     "fabrication.mixins.json"
@@ -31,5 +30,7 @@
     "minecraft": ">=1.16"
   },
   "suggests": {
+    "cotton-client-commands": "^1.0.0",
+    "fabric": "*"
   }
 }

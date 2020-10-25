@@ -64,7 +64,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		MEDIUM("general", "fixes", "utility", "tweaks", "minor_mechanics"),
 		DARK("general", "fixes", "utility", "tweaks", "minor_mechanics", "mechanics"),
 		VIENNA("general", "fixes", "utility", "tweaks", "minor_mechanics", "mechanics", "balance", "weird_tweaks"),
-		BURNT("*")
+		BURNT("*", "!situational")
 		;
 		public final ImmutableSet<String> sections;
 		Profile(String... sections) {
@@ -116,7 +116,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 				for (String key : keys) {
 					int dot = key.indexOf('.');
 					String section = dot != -1 ? key.substring(0, dot) : "";
-					boolean enabled = p.sections.contains("*") || p.sections.contains(section)
+					boolean enabled = (p.sections.contains("*") && !p.sections.contains("!"+section)) || p.sections.contains(section)
 							&& (p != Profile.VIENNA || !VIENNA_EXCEPTIONS.contains(key));
 					defaultsBuilder.put(key, enabled);
 				}
@@ -133,7 +133,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	private static Map<String, String> rawConfig;
 	private static Map<String, Trilean> config;
 	
-	private static String remap(String configKey) {
+	public static String remap(String configKey) {
 		return starMap.getOrDefault(configKey, configKey);
 	}
 	

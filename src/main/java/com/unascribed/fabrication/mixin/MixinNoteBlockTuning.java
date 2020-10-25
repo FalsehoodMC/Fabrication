@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
@@ -122,14 +123,21 @@ public class MixinNoteBlockTuning {
 		}
 	}
 	
-	@Inject(at=@At("RETURN"), method= "onUse(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;", cancellable=true)
+	@Inject(at=@At("RETURN"), method="onUse(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;", cancellable=true)
 	public void onUseReturn(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, CallbackInfoReturnable<ActionResult> ci) {
 		fabrication$informNote(player, world.getBlockState(pos));
+	}
+	
+	@Inject(at=@At("HEAD"), method="onBlockBreakStart(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/player/PlayerEntity;)V")
+	public void onBlockBreakStart(BlockState state, World world, BlockPos pos, PlayerEntity player, CallbackInfo ci) {
+		fabrication$informNote(player, state);
 	}
 
 	private void fabrication$informNote(PlayerEntity player, BlockState state) {
 		if (!player.world.isClient && MixinConfigPlugin.isEnabled("*.note_block_notes")) {
-			player.sendMessage(new LiteralText(FABRICATION$NOTES.get(state.get(NoteBlock.NOTE))+" "+FABRICATION$INSTRUMENTS.get(state.get(NoteBlock.INSTRUMENT))), true);
+			player.sendMessage(new LiteralText(FABRICATION$NOTES.get(state.get(NoteBlock.NOTE))
+					+" "+FABRICATION$INSTRUMENTS.get(state.get(NoteBlock.INSTRUMENT))
+					+" ("+state.get(NoteBlock.NOTE)+")"), true);
 		}
 	}
 	

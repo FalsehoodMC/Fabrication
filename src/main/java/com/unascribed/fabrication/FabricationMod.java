@@ -26,14 +26,15 @@ public class FabricationMod implements ModInitializer {
 		for (String s : MixinConfigPlugin.discoverClassesInPackage("com.unascribed.fabrication.features", false)) {
 			try {
 				Feature r = (Feature)Class.forName(s).newInstance();
-				if (r.getConfigKey() == null || RuntimeChecks.check(r.getConfigKey())) {
+				String key = MixinConfigPlugin.remap(r.getConfigKey());
+				if (key == null || RuntimeChecks.check(key)) {
 					r.apply();
-					if (r.getConfigKey() != null) {
-						enabledFeatures.add(r.getConfigKey());
+					if (key != null) {
+						enabledFeatures.add(key);
 					}
 				}
-				if (r.getConfigKey() != null) {
-					features.put(r.getConfigKey(), r);
+				if (key != null) {
+					features.put(key, r);
 				} else {
 					unconfigurableFeatures.add(r);
 				}
@@ -44,10 +45,11 @@ public class FabricationMod implements ModInitializer {
 	}
 	
 	public static boolean isAvailableFeature(String configKey) {
-		return features.containsKey(configKey);
+		return features.containsKey(MixinConfigPlugin.remap(configKey));
 	}
 	
 	public static boolean updateFeature(String configKey) {
+		configKey = MixinConfigPlugin.remap(configKey);
 		boolean enabled = MixinConfigPlugin.isEnabled(configKey);
 		if (enabledFeatures.contains(configKey) == enabled) return true;
 		if (enabled) {
