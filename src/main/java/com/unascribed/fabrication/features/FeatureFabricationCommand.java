@@ -20,7 +20,6 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
 
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
-import net.minecraft.client.network.ClientCommandSource;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
@@ -103,7 +102,7 @@ public class FeatureFabricationCommand implements Feature {
 		LiteralArgumentBuilder<T> config = LiteralArgumentBuilder.<T>literal("config");
 		config.requires(s -> {
 			// always allow a client to reconfigure itself
-			if (s instanceof ClientCommandSource) return true;
+			if (!(s instanceof ServerCommandSource)) return true;
 			
 			ServerCommandSource scs = (ServerCommandSource)s;
 			if (scs.hasPermissionLevel(4)) return true;
