@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.interfaces.SetSlippery;
 import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.HostileEntity;
@@ -34,7 +35,7 @@ public abstract class MixinSpidersCantClimbGlazedSpider extends HostileEntity im
 	
 	@Inject(at=@At("TAIL"), method="tick()V")
 	public void tickTail(CallbackInfo ci) {
-		if (!world.isClient) {
+		if (RuntimeChecks.check("*.spiders_cant_climb_glazed_terracotta") && !world.isClient) {
 			setClimbingWall(horizontalCollision && !fabrication$slippery);
 		}
 	}
