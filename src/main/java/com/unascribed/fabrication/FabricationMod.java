@@ -67,6 +67,14 @@ public class FabricationMod implements ModInitializer {
 	
 	public static <T> T snag(Class<?> clazz, Object inst, String intermediateName, String yarnName) {
 		try {
+			return (T)snagField(clazz, intermediateName, yarnName).get(inst);
+		} catch (Throwable e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public static Field snagField(Class<?> clazz, String intermediateName, String yarnName) {
+		try {
 			Field f;
 			try {
 				f = clazz.getDeclaredField(intermediateName);
@@ -74,7 +82,7 @@ public class FabricationMod implements ModInitializer {
 				f = clazz.getDeclaredField(yarnName);
 			}
 			f.setAccessible(true);
-			return (T)f.get(inst);
+			return f;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
 		}

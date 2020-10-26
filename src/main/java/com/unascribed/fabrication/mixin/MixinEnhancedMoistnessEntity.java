@@ -35,6 +35,8 @@ public abstract class MixinEnhancedMoistnessEntity implements MarkWet {
 	
 	@Shadow
 	public abstract boolean isWet();
+	@Shadow
+	public abstract boolean isInLava();
 	
 	@Shadow
 	public abstract SoundCategory getSoundCategory();
@@ -46,22 +48,26 @@ public abstract class MixinEnhancedMoistnessEntity implements MarkWet {
 	@Inject(at=@At("TAIL"), method="baseTick()V")
 	public void baseTick(CallbackInfo ci) {
 		if (!RuntimeChecks.check("*.enhanced_moistness") || world.isClient) return;
-		try {
-			fabrication$checkingOriginalWetness = true;
-			if (isWet()) {
-				fabrication$wetTimer = 100;
-			} else if (fabrication$wetTimer > 0) {
-				fabrication$wetTimer--;
-				if (world.random.nextInt(20) == 0) {
-					world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_DROWNED_SWIM, getSoundCategory(), 0.1f, 2f);
+		if (isInLava()) {
+			fabrication$wetTimer = 0;
+		} else {
+			try {
+				fabrication$checkingOriginalWetness = true;
+				if (isWet()) {
+					fabrication$wetTimer = 100;
+				} else if (fabrication$wetTimer > 0) {
+					fabrication$wetTimer--;
+					if (world.random.nextInt(20) == 0) {
+						world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_DROWNED_SWIM, getSoundCategory(), 0.1f, 2f);
+					}
+					if (fabrication$wetTimer%4 == 0) {
+						Box box = getBoundingBox();
+						((ServerWorld)world).spawnParticles(ParticleTypes.DRIPPING_WATER, pos.x, pos.y+(box.getYLength()/2), pos.z, 1, box.getXLength()/3, box.getYLength()/4, box.getZLength()/3, 0);
+					}
 				}
-				if (fabrication$wetTimer%4 == 0) {
-					Box box = getBoundingBox();
-					((ServerWorld)world).spawnParticles(ParticleTypes.DRIPPING_WATER, pos.x, pos.y+(box.getYLength()/2), pos.z, 1, box.getXLength()/3, box.getYLength()/4, box.getZLength()/3, 0);
-				}
+			} finally {
+				fabrication$checkingOriginalWetness = false;
 			}
-		} finally {
-			fabrication$checkingOriginalWetness = false;
 		}
 	}
 	
