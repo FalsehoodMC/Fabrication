@@ -36,6 +36,7 @@ public abstract class MixinRepellingVoid extends LivingEntity {
 
 	private Vec3d fabrication$lastGroundPos;
 	private final List<Vec3d> fabrication$voidFallTrail = Lists.newArrayList();
+	private boolean fabrication$debted;
 	
 	@Inject(at=@At("TAIL"), method="tick()V")
 	public void tick(CallbackInfo ci) {
@@ -45,6 +46,10 @@ public abstract class MixinRepellingVoid extends LivingEntity {
 			fabrication$voidFallTrail.clear();
 		} else if (fabrication$voidFallTrail.size() < 20) {
 			fabrication$voidFallTrail.add(getPos());
+		}
+		if (fabrication$debted) {
+			fabrication$debted = false;
+			damage(DamageSource.OUT_OF_WORLD, 12);
 		}
 	}
 	
@@ -69,7 +74,7 @@ public abstract class MixinRepellingVoid extends LivingEntity {
 					((ServerWorld)world).spawnParticles(ParticleTypes.CLOUD, vec.x, vec.y, vec.z, 0, 0, 1, 0, 0.05);
 				}
 			}
-			damage(DamageSource.OUT_OF_WORLD, 12);
+			fabrication$debted = true;
 		} else {
 			super.destroy();
 		}
@@ -83,6 +88,7 @@ public abstract class MixinRepellingVoid extends LivingEntity {
 			tag.putDouble("fabrication:LastGroundPosY", pos.y);
 			tag.putDouble("fabrication:LastGroundPosZ", pos.z);
 		}
+		tag.putBoolean("fabrication:Debted", fabrication$debted);
 	}
 	
 	@Inject(at = @At("TAIL"), method = "readCustomDataFromTag(Lnet/minecraft/nbt/CompoundTag;)V")
@@ -94,6 +100,7 @@ public abstract class MixinRepellingVoid extends LivingEntity {
 					tag.getDouble("fabrication:LastGroundPosZ")
 			);
 		}
+		fabrication$debted = tag.getBoolean("fabrication:Debted");
 	}
 	
 }
