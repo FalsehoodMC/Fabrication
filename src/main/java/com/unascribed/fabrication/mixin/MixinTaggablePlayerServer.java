@@ -83,10 +83,10 @@ public abstract class MixinTaggablePlayerServer extends PlayerEntity implements 
 				setAir(getMaxAir());
 			}
 			if (fabrication$tags.contains(PlayerTag.PERMANENT_DOLPHINS_GRACE) && !hasStatusEffect(StatusEffects.DOLPHINS_GRACE)) {
-				addStatusEffect(new StatusEffectInstance(StatusEffects.DOLPHINS_GRACE, Integer.MAX_VALUE, 0, false, false));
+				addStatusEffect(new StatusEffectInstance(StatusEffects.DOLPHINS_GRACE, Integer.MAX_VALUE, 0, true, false));
 			}
 			if (fabrication$tags.contains(PlayerTag.PERMANENT_CONDUIT_POWER) && !hasStatusEffect(StatusEffects.CONDUIT_POWER)) {
-				addStatusEffect(new StatusEffectInstance(StatusEffects.CONDUIT_POWER, Integer.MAX_VALUE, 0, false, false));
+				addStatusEffect(new StatusEffectInstance(StatusEffects.CONDUIT_POWER, Integer.MAX_VALUE, 0, true, false));
 			}
 		}
 	}
