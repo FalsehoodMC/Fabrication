@@ -12,6 +12,7 @@ import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
 
 import com.google.common.collect.Lists;
 
+import net.minecraft.block.SideShapeType;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -22,7 +23,9 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -58,7 +61,26 @@ public abstract class MixinRepellingVoid extends LivingEntity {
 	protected void destroy() {
 		Vec3d pos = fabrication$lastGroundPos;
 		if (RuntimeChecks.check("*.repelling_void") && pos != null) {
-			teleport(pos.x, pos.y, pos.z);
+			BlockPos bp = new BlockPos(pos).down();
+			if (!world.getBlockState(bp).isSideSolid(world, bp, Direction.UP, SideShapeType.CENTER)) {
+				boolean foundOne = false;
+				out: for (int d = 1; d <= 3; d++) {
+					for (int x = -d; x <= d; x++) {
+						for (int z = -d; z <= d; z++) {
+							bp = new BlockPos(pos).add(x, -1, z);
+							if (world.getBlockState(bp).isSideSolid(world, bp, Direction.UP, SideShapeType.CENTER)) {
+								foundOne = true;
+								break out;
+							}
+						}
+					}
+				}
+				if (!foundOne) {
+					// sorry, we tried...
+					bp = new BlockPos(pos).down();
+				}
+			}
+			teleport(bp.getX()+0.5, bp.getY()+1, bp.getZ()+0.5);
 			fallDistance = 0;
 			world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1, 0.5f);
 			world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.BLOCK_SHROOMLIGHT_PLACE, SoundCategory.PLAYERS, 1, 0.5f);
