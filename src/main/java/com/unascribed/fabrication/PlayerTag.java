@@ -9,6 +9,8 @@ public enum PlayerTag {
 	CAN_BREATHE_WATER,
 	PERMANENT_DOLPHINS_GRACE,
 	PERMANENT_CONDUIT_POWER,
+	SCARES_CREEPERS,
+	NO_PHANTOMS,
 	;
 	
 	public String lowerName() {

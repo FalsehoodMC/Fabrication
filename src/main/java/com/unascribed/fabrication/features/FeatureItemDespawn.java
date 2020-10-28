@@ -62,7 +62,6 @@ public class FeatureItemDespawn implements Feature {
 	public static void parseConfig() {
 		clearConfig();
 		for (Map.Entry<String, String> en : MixinConfigPlugin.rawItemDespawnConfig.entrySet()) {
-			System.out.println(en.getKey()+"="+en.getValue());
 			ParsedTime time = ParsedTime.parse(en.getValue());
 			if (time == ParsedTime.UNSET) continue;
 			if (en.getKey().startsWith("@enchantments.")) {
