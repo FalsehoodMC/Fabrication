@@ -107,12 +107,15 @@ public abstract class MixinItemDespawnItem extends Entity implements SetFromPlay
 					if (FeatureItemDespawn.curseDespawn.overshadows(time)) {
 						time = FeatureItemDespawn.curseDespawn;
 					}
-				} else if (e.isTreasure()) {
-					if (FeatureItemDespawn.treasureDespawn.overshadows(time)) {
-						time = FeatureItemDespawn.treasureDespawn;
+				} else {
+					if (FeatureItemDespawn.normalEnchDespawn.overshadows(time)) {
+						time = FeatureItemDespawn.normalEnchDespawn;
 					}
-				} else if (FeatureItemDespawn.normalEnchDespawn.overshadows(time)) {
-					time = FeatureItemDespawn.normalEnchDespawn;
+					if (e.isTreasure()) {
+						if (FeatureItemDespawn.treasureDespawn.overshadows(time)) {
+							time = FeatureItemDespawn.treasureDespawn;
+						}
+					}
 				}
 				ParsedTime enchTime = FeatureItemDespawn.enchDespawns.get(Resolvable.mapKey(e, Registry.ENCHANTMENT));
 				if (enchTime != null && enchTime.overshadows(time)) {

@@ -377,12 +377,12 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 
 	@Override
 	public List<String> getMixins() {
-		log.info("☕ Profile: "+profile.name().toLowerCase(Locale.ROOT));
+		log.debug("☕ Profile: "+profile.name().toLowerCase(Locale.ROOT));
 		return discoverClassesInPackage("com.unascribed.fabrication.mixin", true);
 	}
 
 	public static List<String> discoverClassesInPackage(String pkg, boolean truncate) {
-		log.info("Starting discovery pass...");
+		log.debug("Starting discovery pass...");
 		try {
 			int count = 0;
 			int enabled = 0;
@@ -391,8 +391,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			for (ClassInfo ci : getClassesInPackage(pkg)) {
 				count++;
 				String truncName = ci.getName().substring(pkg.length()+1);
-				log.info("--");
-				log.info((Math.random() < 0.01 ? "👅" : "👀")+" Considering "+truncName);
+				log.debug("--");
+				log.debug((Math.random() < 0.01 ? "👅" : "👀")+" Considering "+truncName);
 				ClassReader cr = new ClassReader(ci.asByteSource().read());
 				ClassNode cn = new ClassNode();
 				cr.accept(cn, ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
@@ -535,24 +535,24 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 					eligibilityNotes.add("No restrictions on eligibility");
 				}
 				for (String s : eligibilityNotes) {
-					log.info("  ℹ️ "+s);
+					log.debug("  ℹ️ "+s);
 				}
 				for (String s : eligibilitySuccesses) {
-					log.info("  ✅ "+s);
+					log.debug("  ✅ "+s);
 				}
 				for (String s : eligibilityFailures) {
-					log.info("  ❌ "+s);
+					log.debug("  ❌ "+s);
 				}
 				if (eligible) {
 					enabled++;
-					log.info("👍 Eligibility requirements met. Applying "+truncName);
+					log.debug("👍 Eligibility requirements met. Applying "+truncName);
 					rtrn.add(truncate ? truncName : ci.getName());
 				} else {
 					skipped++;
-					log.info("✋ Eligibility requirements not met. Skipping "+truncName);
+					log.debug("✋ Eligibility requirements not met. Skipping "+truncName);
 				}
 			}
-			log.info("Discovery pass complete. Found "+count+" candidates, enabled "+enabled+", skipped "+skipped+".");
+			log.debug("Discovery pass complete. Found "+count+" candidates, enabled "+enabled+", skipped "+skipped+".");
 			return rtrn;
 		} catch (IOException e) {
 			throw new RuntimeException(e);

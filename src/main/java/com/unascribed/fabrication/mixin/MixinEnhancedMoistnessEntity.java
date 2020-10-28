@@ -62,7 +62,7 @@ public abstract class MixinEnhancedMoistnessEntity implements MarkWet {
 					}
 					if (fabrication$wetTimer%4 == 0) {
 						Box box = getBoundingBox();
-						((ServerWorld)world).spawnParticles(ParticleTypes.DRIPPING_WATER, pos.x, pos.y+(box.getYLength()/2), pos.z, 1, box.getXLength()/3, box.getYLength()/4, box.getZLength()/3, 0);
+						((ServerWorld)world).spawnParticles(ParticleTypes.RAIN, pos.x, pos.y+(box.getYLength()/2), pos.z, 1, box.getXLength()/3, box.getYLength()/4, box.getZLength()/3, 0);
 					}
 				}
 			} finally {
