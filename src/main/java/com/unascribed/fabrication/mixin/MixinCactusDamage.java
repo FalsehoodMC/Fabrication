@@ -17,15 +17,25 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 @Mixin(CactusBlock.class)
-@EligibleIf(configEnabled="*.cactus_walk_doesnt_hurt_with_boots")
-public class MixinCactusWalkDoesntHurtWithBoots {
+@EligibleIf(anyConfigEnabled={"*.cactus_walk_doesnt_hurt_with_boots", "*.cactus_brush_doesnt_hurt_with_chest"})
+public class MixinCactusDamage {
 
 	@Inject(at=@At("HEAD"), method="onEntityCollision(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/Entity;)V", cancellable=true)
 	public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity, CallbackInfo ci) {
-		if (RuntimeChecks.check("*.cactus_walk_doesnt_hurt_with_boots") && entity instanceof LivingEntity && (int)(entity.getPos().y+0.075) > pos.getY()) {
-			LivingEntity le = (LivingEntity)entity;
-			if (!le.getEquippedStack(EquipmentSlot.FEET).isEmpty()) {
-				ci.cancel();
+		if (!(entity instanceof LivingEntity)) return;
+		LivingEntity le = (LivingEntity)entity;
+		boolean touchedTop = (int)(entity.getPos().y+0.075) > pos.getY();
+		if (touchedTop) {
+			if (RuntimeChecks.check("*.cactus_walk_doesnt_hurt_with_boots")) {
+				if (!le.getEquippedStack(EquipmentSlot.FEET).isEmpty()) {
+					ci.cancel();
+				}
+			}
+		} else {
+			if (RuntimeChecks.check("*.cactus_brush_doesnt_hurt_with_chest")) {
+				if (!le.getEquippedStack(EquipmentSlot.CHEST).isEmpty()) {
+					ci.cancel();
+				}
 			}
 		}
 	}
