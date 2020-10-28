@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -21,6 +22,7 @@ import com.google.common.base.Enums;
 import com.google.common.collect.ImmutableSet;
 
 import net.fabricmc.fabric.api.util.NbtType;
+import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
@@ -57,9 +59,9 @@ public abstract class MixinTaggablePlayerServer extends PlayerEntity implements 
 			fabrication$tags.add(tag);
 		} else {
 			if (fabrication$tags.remove(tag)) {
-				if (tag == PlayerTag.PERMANENT_DOLPHINS_GRACE) {
+				if (tag == PlayerTag.PERMANENT_DOLPHINS_GRACE && !needsReplacing(StatusEffects.DOLPHINS_GRACE)) {
 					removeStatusEffect(StatusEffects.DOLPHINS_GRACE);
-				} else if (tag == PlayerTag.PERMANENT_CONDUIT_POWER) {
+				} else if (tag == PlayerTag.PERMANENT_CONDUIT_POWER && !needsReplacing(StatusEffects.CONDUIT_POWER)) {
 					removeStatusEffect(StatusEffects.CONDUIT_POWER);
 				}
 			}
@@ -82,13 +84,18 @@ public abstract class MixinTaggablePlayerServer extends PlayerEntity implements 
 			if (fabrication$tags.contains(PlayerTag.CAN_BREATHE_WATER)) {
 				setAir(getMaxAir());
 			}
-			if (fabrication$tags.contains(PlayerTag.PERMANENT_DOLPHINS_GRACE) && !hasStatusEffect(StatusEffects.DOLPHINS_GRACE)) {
+			if (fabrication$tags.contains(PlayerTag.PERMANENT_DOLPHINS_GRACE) && needsReplacing(StatusEffects.DOLPHINS_GRACE)) {
 				addStatusEffect(new StatusEffectInstance(StatusEffects.DOLPHINS_GRACE, Integer.MAX_VALUE, 0, true, false));
 			}
-			if (fabrication$tags.contains(PlayerTag.PERMANENT_CONDUIT_POWER) && !hasStatusEffect(StatusEffects.CONDUIT_POWER)) {
+			if (fabrication$tags.contains(PlayerTag.PERMANENT_CONDUIT_POWER) && needsReplacing(StatusEffects.CONDUIT_POWER)) {
 				addStatusEffect(new StatusEffectInstance(StatusEffects.CONDUIT_POWER, Integer.MAX_VALUE, 0, true, false));
 			}
 		}
+	}
+
+	@Unique
+	private boolean needsReplacing(StatusEffect se) {
+		return !hasStatusEffect(se) || !getStatusEffect(se).isAmbient() || getStatusEffect(se).shouldShowIcon() || getStatusEffect(se).shouldShowParticles();
 	}
 
 	@Inject(at=@At("HEAD"), method="copyFrom(Lnet/minecraft/server/network/ServerPlayerEntity;Z)V", cancellable=true)
