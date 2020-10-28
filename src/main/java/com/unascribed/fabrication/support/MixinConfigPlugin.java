@@ -46,7 +46,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	
 	private static final ImmutableSet<String> VIENNA_EXCEPTIONS = ImmutableSet.of(
 			"balance.infinity_mending",
-			"tweaks.ghost_chest_woo_woo"
+			"tweaks.ghost_chest_woo_woo",
+			"balance.anvil_damage_only_on_fall"
 	);
 	private static final ImmutableSet<String> NON_TRILEANS = ImmutableSet.of(
 			"general.profile"
