@@ -15,7 +15,6 @@ import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin.Profile;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
 import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
 
@@ -156,7 +155,8 @@ public class FeatureFabricationCommand implements Feature {
 			config.then(LiteralArgumentBuilder.<T>literal("reload")
 				.executes((c) -> {
 					MixinConfigPlugin.reload();
-					sendFeedback(c, new LiteralText("fabrication.ini reloaded"), true);
+					FeatureItemDespawn.parseConfig();
+					sendFeedback(c, new LiteralText("Fabrication configuration reloaded"), true);
 					sendFeedback(c, new LiteralText("§eYou may need to restart the game for the changes to take effect."), false);
 					return 1;
 				})

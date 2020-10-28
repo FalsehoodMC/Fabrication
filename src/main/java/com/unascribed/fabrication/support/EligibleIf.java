@@ -46,4 +46,8 @@ public @interface EligibleIf {
 	 * Only apply this if none of the listed classes are present.
 	 */
 	String[] classNotPresent() default {};
+	/**
+	 * Only apply this if all of the given special eligibility conditions are met.
+	 */
+	SpecialEligibility[] specialConditions() default {};
 }

@@ -5,6 +5,8 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
+
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
@@ -13,7 +15,14 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.fabricmc.api.ModInitializer;
+import net.minecraft.entity.Entity;
+import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerChunkManager;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.server.world.ThreadedAnvilChunkStorage;
 
 public class FabricationMod implements ModInitializer {
 	
@@ -100,6 +109,26 @@ public class FabricationMod implements ModInitializer {
 			return (T)m.invoke(inst, args);
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	public static void sendToTrackersMatching(Entity entity, CustomPayloadS2CPacket pkt, Predicate<ServerPlayerEntity> predicate) {
+		if (entity.world.isClient) return;
+		ServerChunkManager cm = ((ServerWorld)entity.world).getChunkManager();
+		ThreadedAnvilChunkStorage tacs = cm.threadedAnvilChunkStorage;
+		Int2ObjectMap<?> entityTrackers = FabricationMod.snag(ThreadedAnvilChunkStorage.class, tacs, "field_18242", "entityTrackers");
+		Object tracker = entityTrackers.get(entity.getEntityId());
+		Set<ServerPlayerEntity> playersTracking = FabricationMod.snag(tracker.getClass(), tracker, "field_18250", "playersTracking");
+		if (entity instanceof ServerPlayerEntity) {
+			ServerPlayerEntity spe = (ServerPlayerEntity)entity;
+			if (predicate.test(spe)) {
+				spe.networkHandler.sendPacket(pkt);
+			}
+		}
+		for (ServerPlayerEntity spe : playersTracking) {
+			if (predicate.test(spe)) {
+				spe.networkHandler.sendPacket(pkt);
+			}
 		}
 	}
 	

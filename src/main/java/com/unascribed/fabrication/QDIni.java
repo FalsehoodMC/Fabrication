@@ -107,6 +107,9 @@ public class QDIni {
 					if (path.contains("[") || path.contains("]")) {
 						throw new IOException("Malformed section header at line "+lineNum);
 					}
+					if (!(path.endsWith(":") || path.endsWith("."))) {
+						path += ".";
+					}
 				} else {
 					throw new IOException("Malformed section header at line "+lineNum);
 				}
@@ -118,7 +121,7 @@ public class QDIni {
 				}
 				trunc = trunc.trim();
 				Iterator<String> splitter = EQUALS_SPLITTER.split(trunc).iterator();
-				String key = path+(path.isEmpty() ? "" : ".")+splitter.next();
+				String key = path+splitter.next();
 				String value = splitter.next();
 				if (transformer != null) {
 					String newValue = transformer.transformValue(key, value);

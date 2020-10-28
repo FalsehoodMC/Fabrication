@@ -133,6 +133,10 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	private static Map<String, String> rawConfig;
 	private static Map<String, Trilean> config;
 	
+	private static final Set<SpecialEligibility> metSpecialEligibility = Sets.newHashSet();
+	
+	public static Map<String, String> rawItemDespawnConfig = null;
+	
 	public static String remap(String configKey) {
 		return starMap.getOrDefault(configKey, configKey);
 	}
@@ -195,7 +199,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 					}
 					return line;
 				}
-
+				
 				@Override
 				public String transformValueComment(String key, String value, String comment) {
 					return comment;
@@ -223,47 +227,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	
 	public static void reload() {
 		Path configFile = FabricLoader.getInstance().getConfigDir().resolve("fabrication.ini");
-		if (!Files.exists(configFile)) {
-			Path configFileOld = FabricLoader.getInstance().getConfigDir().resolve("fabrication.ini.old");
-			if (Files.exists(configFileOld)) {
-				try {
-					Map<String, String> currentValues;
-					try (InputStream is = Files.newInputStream(configFileOld)) {
-						currentValues = QDIni.load(is);
-					}
-					try (InputStream is = MixinConfigPlugin.class.getClassLoader().getResourceAsStream("default_config.ini");
-							OutputStreamWriter osw = new OutputStreamWriter(Files.newOutputStream(configFile), Charsets.UTF_8)) {
-						QDIni.loadAndTransform(new InputStreamReader(is, Charsets.UTF_8), new IniTransformer() {
-	
-							@Override
-							public String transformLine(String path, String line) {
-								return line;
-							}
-	
-							@Override
-							public String transformValueComment(String key, String value, String comment) {
-								return comment;
-							}
-							
-							@Override
-							public String transformValue(String key, String value) {
-								return currentValues.getOrDefault(key, value);
-							}
-							
-						}, osw);
-					}
-					Files.delete(configFileOld);
-				} catch (IOException e) {
-					throw new RuntimeException("Failed to upgrade config", e);
-				}
-			} else {
-				try {
-					Resources.asByteSource(MixinConfigPlugin.class.getClassLoader().getResource("default_config.ini")).copyTo(MoreFiles.asByteSink(configFile));
-				} catch (IOException e) {
-					throw new RuntimeException("Failed to write default config", e);
-				}
-			}
-		}
+		checkForAndSaveDefaultsOrUpgrade(configFile, "default_config.ini");
 		StringWriter sw = new StringWriter();
 		try (InputStream is = Files.newInputStream(configFile)) {
 			rawConfig = QDIni.loadAndTransform(new InputStreamReader(is, Charsets.UTF_8), new IniTransformer() {
@@ -327,8 +291,70 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		} catch (IOException e) {
 			log.warn("Failed to transform configuration file", e);
 		}
+		Path despawnConfigFile = FabricLoader.getInstance().getConfigDir().resolve("fabrication_item_despawn.ini");
+		checkForAndSaveDefaultsOrUpgrade(despawnConfigFile, "default_item_despawn_config.ini");
+		try (InputStream is = Files.newInputStream(despawnConfigFile)) {
+			rawItemDespawnConfig = QDIni.load(is);
+			boolean unmet = true;
+			for (String s : rawItemDespawnConfig.values()) {
+				if (!("unset".equals(s) || "unset!".equals(s))) {
+					metSpecialEligibility.add(SpecialEligibility.ITEM_DESPAWN_NOT_ALL_UNSET);
+					unmet = false;
+					break;
+				}
+			}
+			if (unmet) {
+				metSpecialEligibility.remove(SpecialEligibility.ITEM_DESPAWN_NOT_ALL_UNSET);
+			}
+		} catch (IOException e) {
+			log.warn("Failed to load item despawn configuration file", e);
+		}
 	}
 	
+	private static void checkForAndSaveDefaultsOrUpgrade(Path configFile, String defaultName) {
+		if (!Files.exists(configFile)) {
+			Path configFileOld = configFile.resolveSibling(configFile.getFileName()+".old");
+			if (Files.exists(configFileOld)) {
+				try {
+					Map<String, String> currentValues;
+					try (InputStream is = Files.newInputStream(configFileOld)) {
+						currentValues = QDIni.load(is);
+					}
+					try (InputStream is = MixinConfigPlugin.class.getClassLoader().getResourceAsStream(defaultName);
+							OutputStreamWriter osw = new OutputStreamWriter(Files.newOutputStream(configFile), Charsets.UTF_8)) {
+						QDIni.loadAndTransform(new InputStreamReader(is, Charsets.UTF_8), new IniTransformer() {
+	
+							@Override
+							public String transformLine(String path, String line) {
+								return line;
+							}
+	
+							@Override
+							public String transformValueComment(String key, String value, String comment) {
+								return comment;
+							}
+							
+							@Override
+							public String transformValue(String key, String value) {
+								return currentValues.getOrDefault(key, value);
+							}
+							
+						}, osw);
+					}
+					Files.delete(configFileOld);
+				} catch (IOException e) {
+					throw new RuntimeException("Failed to upgrade config", e);
+				}
+			} else {
+				try {
+					Resources.asByteSource(MixinConfigPlugin.class.getClassLoader().getResource(defaultName)).copyTo(MoreFiles.asByteSink(configFile));
+				} catch (IOException e) {
+					throw new RuntimeException("Failed to write default config", e);
+				}
+			}
+		}
+	}
+
 	@Override
 	public void onLoad(String mixinPackage) {
 		reload();
@@ -468,6 +494,34 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 										if (!foundAny) {
 											eligibilitySuccesses.add("None of the relevant config settings are enabled");
 											eligible = false;
+										}
+									}
+								} else if (k.equals("specialConditions")) {
+									if (RuntimeChecks.ENABLED) {
+										eligibilityNotes.add("Runtime checks is enabled, ignoring special conditions");
+									} else {
+										List<String[]> li = (List<String[]>)v;
+										if (li.isEmpty()) {
+											eligibilityNotes.add("Special conditions is present but empty - ignoring");
+										} else {
+											for (String[] e : li) {
+												if (!"Lcom/unascribed/fabrication/support/SpecialEligibility;".equals(e[0])) {
+													eligibilityNotes.add("Unknown special condition type "+e[0]+" - ignoring");
+												} else {
+													try {
+														SpecialEligibility se = SpecialEligibility.valueOf(e[1]);
+														if (metSpecialEligibility.contains(se)) {
+															eligibilitySuccesses.add("Special condition "+se+" is met");
+														} else {
+															eligibilityFailures.add("Special condition "+se+" is not met");
+															eligible = false;
+														}
+													} catch (IllegalArgumentException ex) {
+														eligibilityFailures.add("Unknown special condition "+e[1]);
+														eligible = false;
+													}
+												}
+											}
 										}
 									}
 								} else {

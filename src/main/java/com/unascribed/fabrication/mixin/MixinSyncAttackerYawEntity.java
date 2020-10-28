@@ -1,7 +1,5 @@
 package com.unascribed.fabrication.mixin;
 
-import java.util.Set;
-
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,17 +13,12 @@ import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
 
 import io.netty.buffer.Unpooled;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerChunkManager;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.world.ThreadedAnvilChunkStorage;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
@@ -59,28 +52,10 @@ public abstract class MixinSyncAttackerYawEntity extends Entity implements SetAt
 			knockbackVelocity = yaw;
 		}
 		if (knockbackVelocity != fabrication$lastAttackerYaw && !world.isClient) {
-			PacketByteBuf data = new PacketByteBuf(Unpooled.buffer(4));
+			PacketByteBuf data = new PacketByteBuf(Unpooled.buffer(8));
 			data.writeInt(getEntityId());
 			data.writeFloat(knockbackVelocity);
-			// Here we go now
-			ServerChunkManager cm = ((ServerWorld)world).getChunkManager();
-			ThreadedAnvilChunkStorage tacs = cm.threadedAnvilChunkStorage;
-			Int2ObjectMap<?> entityTrackers = FabricationMod.snag(ThreadedAnvilChunkStorage.class, tacs, "field_18242", "entityTrackers");
-			Object tracker = entityTrackers.get(getEntityId());
-			Set<ServerPlayerEntity> playersTracking = FabricationMod.snag(tracker.getClass(), tracker, "field_18250", "playersTracking");
-			CustomPayloadS2CPacket pkt = new CustomPayloadS2CPacket(FABRICATION$ATTACKER_YAW, data);
-			Object self = this;
-			if (self instanceof ServerPlayerEntity) {
-				ServerPlayerEntity spe = (ServerPlayerEntity)self;
-				if (spe instanceof SetAttackerYawAware && ((SetAttackerYawAware) spe).fabrication$isAttackerYawAware()) {
-					spe.networkHandler.sendPacket(pkt);
-				}
-			}
-			for (ServerPlayerEntity spe : playersTracking) {
-				if (spe instanceof SetAttackerYawAware && ((SetAttackerYawAware) spe).fabrication$isAttackerYawAware()) {
-					spe.networkHandler.sendPacket(pkt);
-				}
-			}
+			FabricationMod.sendToTrackersMatching(this, new CustomPayloadS2CPacket(FABRICATION$ATTACKER_YAW, data), spe -> spe instanceof SetAttackerYawAware && ((SetAttackerYawAware) spe).fabrication$isAttackerYawAware());
 		}
 	}
 	
