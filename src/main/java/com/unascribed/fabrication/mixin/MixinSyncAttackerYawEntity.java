@@ -51,7 +51,7 @@ public abstract class MixinSyncAttackerYawEntity extends Entity implements SetAt
 		if (source == DamageSource.OUT_OF_WORLD && MixinConfigPlugin.isEnabled("*.repelling_void")) {
 			knockbackVelocity = yaw;
 		}
-		if (knockbackVelocity != fabrication$lastAttackerYaw && !world.isClient) {
+		if (knockbackVelocity != fabrication$lastAttackerYaw && world != null && !world.isClient) {
 			PacketByteBuf data = new PacketByteBuf(Unpooled.buffer(8));
 			data.writeInt(getEntityId());
 			data.writeFloat(knockbackVelocity);
