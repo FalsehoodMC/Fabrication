@@ -1,6 +1,9 @@
 package com.unascribed.fabrication.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
@@ -23,15 +26,19 @@ public class MixinTridentsAcceptSharpnessEnchantment extends Enchantment {
 		super(weight, type, slotTypes);
 	}
 
-	@Override
-	public boolean canAccept(Enchantment other) {
-		return !(other instanceof PowerEnchantment || other instanceof ImpalingEnchantment) && super.canAccept(other);
+	@Inject(at=@At("HEAD"), method="canAccept(Lnet/minecraft/enchantment/Enchantment;)Z", cancellable=true)
+	public void canAccept(Enchantment other, CallbackInfoReturnable<Boolean> ci) {
+		if (!RuntimeChecks.check("*.tridents_accept_sharpness")) return;
+		if (other instanceof PowerEnchantment || other instanceof ImpalingEnchantment) {
+			ci.setReturnValue(false);
+		}
 	}
 	
-	@Override
-	public boolean isAcceptableItem(ItemStack stack) {
-		return (RuntimeChecks.check("*.tridents_accept_sharpness") && this == Enchantments.SHARPNESS && stack.getItem() == Items.TRIDENT)
-				|| super.isAcceptableItem(stack);
+	@Inject(at=@At("HEAD"), method="isAcceptableItem(Lnet/minecraft/item/ItemStack;)Z", cancellable=true)
+	public void isAcceptableItem(ItemStack stack, CallbackInfoReturnable<Boolean> ci) {
+		if (RuntimeChecks.check("*.tridents_accept_sharpness") && this == Enchantments.SHARPNESS && stack.getItem() == Items.TRIDENT) {
+			ci.setReturnValue(true);
+		}
 	}
 	
 }
