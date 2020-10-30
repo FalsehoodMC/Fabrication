@@ -1,0 +1,80 @@
+package com.unascribed.fabrication.mixin;
+
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import com.unascribed.fabrication.interfaces.SetInvisNoGravReversible;
+import com.unascribed.fabrication.support.EligibleIf;
+import net.minecraft.entity.Entity;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.World;
+
+@Mixin(Entity.class)
+@EligibleIf(anyConfigEnabled={"*.invisibility_splash_on_inanimates", "*.slowfall_splash_on_inanimates"})
+public abstract class MixinPotionsOnInanimatesEntity implements SetInvisNoGravReversible {
+
+	private boolean fabrication$invisibilityReversible;
+	private boolean fabrication$noGravityReversible;
+	
+	@Shadow
+	public World world;
+	
+	@Shadow
+	public abstract boolean isWet();
+	
+	@Shadow
+	public abstract void setInvisible(boolean invisible);
+	@Shadow
+	public abstract void setNoGravity(boolean noGravity);
+	
+	@Inject(at=@At("TAIL"), method="baseTick()V")
+	public void baseTick(CallbackInfo ci) {
+		if (!world.isClient && isWet()) {
+			if (fabrication$invisibilityReversible) {
+				setInvisible(false);
+				fabrication$invisibilityReversible = false;
+			}
+			if (fabrication$noGravityReversible) {
+				setNoGravity(false);
+				fabrication$noGravityReversible = false;
+			}
+		}
+	}
+	
+	@Override
+	public boolean fabrication$isInvisibilityReversible() {
+		return fabrication$invisibilityReversible;
+	}
+	
+	@Override
+	public boolean fabrication$isNoGravityReversible() {
+		return fabrication$noGravityReversible;
+	}
+	
+	@Override
+	public void fabrication$setInvisibilityReversible(boolean reversible) {
+		fabrication$invisibilityReversible = reversible;
+	}
+	
+	@Override
+	public void fabrication$setNoGravityReversible(boolean reversible) {
+		fabrication$noGravityReversible = reversible;
+	}
+	
+	@Inject(at=@At("TAIL"), method="toTag(Lnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/nbt/CompoundTag;")
+	public void toTag(CompoundTag tag, CallbackInfoReturnable<CompoundTag> ci) {
+		tag.putBoolean("fabrication:InvisibilityReversible", fabrication$invisibilityReversible);
+		tag.putBoolean("fabrication:NoGravityReversible", fabrication$noGravityReversible);
+	}
+	
+	@Inject(at=@At("TAIL"), method="fromTag(Lnet/minecraft/nbt/CompoundTag;)V")
+	public void fromTag(CompoundTag tag, CallbackInfo ci) {
+		fabrication$invisibilityReversible = tag.getBoolean("fabrication:InvisibilityReversible");
+		fabrication$noGravityReversible = tag.getBoolean("fabrication:NoGravityReversible");
+	}
+	
+}
