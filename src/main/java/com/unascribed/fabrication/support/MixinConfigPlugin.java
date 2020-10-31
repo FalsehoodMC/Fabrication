@@ -42,6 +42,7 @@ import net.fabricmc.loader.api.FabricLoader;
 
 public class MixinConfigPlugin implements IMixinConfigPlugin {
 
+	private static final boolean DEBUG = Boolean.getBoolean("com.unascribed.fabrication.debug");
 	private static final Logger log = LogManager.getLogger("Fabrication");
 	
 	private static final ImmutableSet<String> VIENNA_EXCEPTIONS = ImmutableSet.of(
@@ -378,12 +379,12 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 
 	@Override
 	public List<String> getMixins() {
-		log.debug("☕ Profile: "+profile.name().toLowerCase(Locale.ROOT));
+		if (DEBUG) log.info("☕ Profile: "+profile.name().toLowerCase(Locale.ROOT));
 		return discoverClassesInPackage("com.unascribed.fabrication.mixin", true);
 	}
 
 	public static List<String> discoverClassesInPackage(String pkg, boolean truncate) {
-		log.debug("Starting discovery pass...");
+		if (DEBUG) log.info("Starting discovery pass...");
 		try {
 			int count = 0;
 			int enabled = 0;
@@ -392,15 +393,17 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			for (ClassInfo ci : getClassesInPackage(pkg)) {
 				count++;
 				String truncName = ci.getName().substring(pkg.length()+1);
-				log.debug("--");
-				log.debug((Math.random() < 0.01 ? "👅" : "👀")+" Considering "+truncName);
+				if (DEBUG) {
+					log.info("--");
+					log.info((Math.random() < 0.01 ? "👅" : "👀")+" Considering "+truncName);
+				}
 				ClassReader cr = new ClassReader(ci.asByteSource().read());
 				ClassNode cn = new ClassNode();
 				cr.accept(cn, ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
 				boolean eligible = true;
-				List<String> eligibilityFailures = Lists.newArrayList();
-				List<String> eligibilityNotes = Lists.newArrayList();
-				List<String> eligibilitySuccesses = Lists.newArrayList();
+				List<String> eligibilityFailures = DEBUG ? Lists.newArrayList() : BlackHoleList.getInstance();
+				List<String> eligibilityNotes = DEBUG ? Lists.newArrayList() : BlackHoleList.getInstance();
+				List<String> eligibilitySuccesses = DEBUG ? Lists.newArrayList() : BlackHoleList.getInstance();
 				boolean anyRestrictions = false;
 				if (cn.visibleAnnotations != null) {
 					out: for (AnnotationNode an : cn.visibleAnnotations) {
@@ -535,25 +538,27 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 				if (!anyRestrictions) {
 					eligibilityNotes.add("No restrictions on eligibility");
 				}
-				for (String s : eligibilityNotes) {
-					log.debug("  ℹ️ "+s);
-				}
-				for (String s : eligibilitySuccesses) {
-					log.debug("  ✅ "+s);
-				}
-				for (String s : eligibilityFailures) {
-					log.debug("  ❌ "+s);
+				if (DEBUG) {
+					for (String s : eligibilityNotes) {
+						log.info("  ℹ️ "+s);
+					}
+					for (String s : eligibilitySuccesses) {
+						log.info("  ✅ "+s);
+					}
+					for (String s : eligibilityFailures) {
+						log.info("  ❌ "+s);
+					}
 				}
 				if (eligible) {
 					enabled++;
-					log.debug("👍 Eligibility requirements met. Applying "+truncName);
+					if (DEBUG) log.info("👍 Eligibility requirements met. Applying "+truncName);
 					rtrn.add(truncate ? truncName : ci.getName());
 				} else {
 					skipped++;
-					log.debug("✋ Eligibility requirements not met. Skipping "+truncName);
+					if (DEBUG) log.info("✋ Eligibility requirements not met. Skipping "+truncName);
 				}
 			}
-			log.debug("Discovery pass complete. Found "+count+" candidates, enabled "+enabled+", skipped "+skipped+".");
+			if (DEBUG) log.info("Discovery pass complete. Found "+count+" candidates, enabled "+enabled+", skipped "+skipped+".");
 			return rtrn;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
