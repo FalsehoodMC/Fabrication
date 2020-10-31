@@ -396,6 +396,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			int skipped = 0;
 			List<String> rtrn = Lists.newArrayList();
 			for (ClassInfo ci : getClassesInPackage(pkg)) {
+				// we want nothing to do with inner classes and the like
+				if (ci.getName().contains("$")) continue;
 				count++;
 				String truncName = ci.getName().substring(pkg.length()+1);
 				if (DEBUG) {
