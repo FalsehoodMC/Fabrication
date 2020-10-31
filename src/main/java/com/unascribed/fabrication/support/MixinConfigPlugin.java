@@ -22,7 +22,6 @@ import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
-import com.sun.jna.Platform;
 import com.unascribed.fabrication.QDIni;
 import com.unascribed.fabrication.QDIni.IniTransformer;
 
@@ -132,9 +131,6 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			defaultsByProfile = profilesBuilder.build();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
-		}
-		if (!Platform.isMac()) {
-			metSpecialEligibility.add(SpecialEligibility.NOT_MAC);
 		}
 	}
 	
