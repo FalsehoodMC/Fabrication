@@ -22,6 +22,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
+import com.sun.jna.Platform;
 import com.unascribed.fabrication.QDIni;
 import com.unascribed.fabrication.QDIni.IniTransformer;
 
@@ -101,6 +102,9 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	private static final ImmutableSet<String> validKeys;
 	private static final ImmutableMap<String, String> starMap;
 	private static ImmutableMap<String, Boolean> defaults;
+	
+	private static final Set<SpecialEligibility> metSpecialEligibility = Sets.newHashSet();
+	
 	static {
 		try (InputStream is = MixinConfigPlugin.class.getClassLoader().getResourceAsStream("default_config.ini")) {
 			Set<String> keys = QDIni.load(is).keySet();
@@ -129,13 +133,14 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+		if (!Platform.isMac()) {
+			metSpecialEligibility.add(SpecialEligibility.NOT_MAC);
+		}
 	}
 	
 	private static Profile profile;
 	private static Map<String, String> rawConfig;
 	private static Map<String, Trilean> config;
-	
-	private static final Set<SpecialEligibility> metSpecialEligibility = Sets.newHashSet();
 	
 	public static Map<String, String> rawItemDespawnConfig = null;
 	

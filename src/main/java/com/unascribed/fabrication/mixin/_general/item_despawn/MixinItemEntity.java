@@ -18,16 +18,23 @@ import com.unascribed.fabrication.interfaces.SetFromPlayerDeath;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.SpecialEligibility;
 
+import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.EntityPositionS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.tag.BlockTags;
+import net.minecraft.tag.ItemTags;
+import net.minecraft.tag.Tag;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
@@ -120,6 +127,23 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 				ParsedTime enchTime = FeatureItemDespawn.enchDespawns.get(Resolvable.mapKey(e, Registry.ENCHANTMENT));
 				if (enchTime != null && enchTime.overshadows(time)) {
 					time = enchTime;
+				}
+			}
+			for (Map.Entry<Identifier, ParsedTime> en : FeatureItemDespawn.tagDespawns.entrySet()) {
+				Tag<Item> itemTag = ItemTags.getTagGroup().getTag(en.getKey());
+				if (itemTag != null && itemTag.contains(stack.getItem())) {
+					if (en.getValue().overshadows(time)) {
+						time = en.getValue();
+					}
+				}
+				if (stack.getItem() instanceof BlockItem) {
+					BlockItem bi = (BlockItem)stack.getItem();
+					Tag<Block> blockTag = BlockTags.getTagGroup().getTag(en.getKey());
+					if (blockTag != null && blockTag.contains(bi.getBlock())) {
+						if (en.getValue().overshadows(time)) {
+							time = en.getValue();
+						}
+					}
 				}
 			}
 			if (stack.hasTag()) {

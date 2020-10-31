@@ -1,6 +1,7 @@
 package com.unascribed.fabrication;
 
-import com.ibm.icu.math.BigDecimal;
+
+import java.math.BigDecimal;
 
 import com.google.common.base.Preconditions;
 

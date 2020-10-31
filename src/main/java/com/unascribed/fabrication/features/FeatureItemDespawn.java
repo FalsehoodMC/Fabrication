@@ -21,6 +21,7 @@ public class FeatureItemDespawn implements Feature {
 
 	public static final Map<Resolvable<Item>, ParsedTime> itemDespawns = Maps.newHashMap();
 	public static final Map<Resolvable<Enchantment>, ParsedTime> enchDespawns = Maps.newHashMap();
+	public static final Map<Identifier, ParsedTime> tagDespawns = Maps.newHashMap();
 	public static final Map<String, ParsedTime> nbtBools = Maps.newHashMap();
 	
 	public static ParsedTime curseDespawn = ParsedTime.UNSET;
@@ -50,6 +51,7 @@ public class FeatureItemDespawn implements Feature {
 	public static void clearConfig() {
 		itemDespawns.clear();
 		enchDespawns.clear();
+		tagDespawns.clear();
 		nbtBools.clear();
 		curseDespawn = ParsedTime.UNSET;
 		normalEnchDespawn = ParsedTime.UNSET;
@@ -77,6 +79,9 @@ public class FeatureItemDespawn implements Feature {
 				} else {
 					enchDespawns.put(Resolvable.of(new Identifier(id), Registry.ENCHANTMENT), time);
 				}
+			} else if (en.getKey().startsWith("@tags.")) {
+				String id = en.getKey().substring(6);
+				tagDespawns.put(new Identifier(id), time);
 			} else if (en.getKey().startsWith("@special.")) {
 				String id = en.getKey().substring(9);
 				if ("default".equals(id)) {
