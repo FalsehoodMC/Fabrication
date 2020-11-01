@@ -219,7 +219,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 					if (line == null || line.equals("; Notices: (Do not edit anything past this line; it will be overwritten)")) {
 						if (!found) {
 							found = true;
-							return (foundEmptySection ? "" : "[]\r\n")+"; Added by /fabrication config as a last resort as this key could\r\n"
+							return (foundEmptySection ? "" : "[]\r\n")+"; Added by runtime reconfiguration as a last resort as this key could\r\n"
 									+ "; not be found elsewhere in the file.\r\n"
 									+ configKey+"="+newValue+"\r\n"+(line == null ? "" : "\r\n"+line);
 						}

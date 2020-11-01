@@ -107,7 +107,7 @@ public class QDIni {
 					if (path.contains("[") || path.contains("]")) {
 						throw new IOException("Malformed section header at line "+lineNum);
 					}
-					if (!(path.endsWith(":") || path.endsWith("."))) {
+					if (!(path.isEmpty() || path.endsWith(":") || path.endsWith("."))) {
 						path += ".";
 					}
 				} else {
