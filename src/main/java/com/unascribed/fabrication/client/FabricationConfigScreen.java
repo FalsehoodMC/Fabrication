@@ -133,6 +133,7 @@ public class FabricationConfigScreen extends Screen {
 			double scaleFactor = client.getWindow().getScaleFactor();
 			if (scaleFactor <= 1) {
 				// nothing we can do...
+				scaleCompensation = 1;
 				return;
 			}
 			double newScaleFactor = client.getWindow().getScaleFactor()-1;
