@@ -16,6 +16,7 @@ import com.unascribed.fabrication.support.MixinConfigPlugin.Profile;
 import com.unascribed.fabrication.support.ResolvedTrilean;
 import com.unascribed.fabrication.support.Trilean;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -25,6 +26,7 @@ import com.google.common.collect.Sets;
 
 import io.netty.buffer.Unpooled;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.render.BufferBuilder;
@@ -40,6 +42,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Matrix4f;
 
@@ -81,6 +84,11 @@ public class FabricationConfigScreen extends Screen {
 	private static final Identifier BG = new Identifier("fabrication", "bg.png");
 	
 	private final Screen parent;
+	
+	private int realWidth;
+	private int realHeight;
+	private double scaleCompensation = 1;
+	
 	private float timeExisted;
 	private boolean leaving = false;
 	private float timeLeaving;
@@ -90,8 +98,6 @@ public class FabricationConfigScreen extends Screen {
 	private float sidebarHeight;
 	
 	private boolean didClick;
-	private float lastClickX;
-	private float lastClickY;
 	private float selectTime;
 	private String selectedSection;
 	private String prevSelectedSection;
@@ -106,6 +112,8 @@ public class FabricationConfigScreen extends Screen {
 	
 	private final Map<String, Trilean> optionPreviousValues = Maps.newHashMap();
 	private final Map<String, Float> optionAnimationTime = Maps.newHashMap();
+	private final Map<String, Float> disabledAnimationTime = Maps.newHashMap();
+	private final Set<String> knownDisabled = Sets.newHashSet();
 	
 	private boolean bufferTooltips = false;
 	private final List<Runnable> bufferedTooltips = Lists.newArrayList();
@@ -113,6 +121,58 @@ public class FabricationConfigScreen extends Screen {
 	public FabricationConfigScreen(Screen parent) {
 		super(new LiteralText("Fabrication configuration"));
 		this.parent = parent;
+	}
+	
+	@Override
+	public void init(MinecraftClient client, int width, int height) {
+		super.init(client, width, height);
+		realWidth = width;
+		realHeight = height;
+		float ratio = width/(float)height;
+		if (ratio < 13.5/9f) {
+			double scaleFactor = client.getWindow().getScaleFactor();
+			if (scaleFactor <= 1) {
+				// nothing we can do...
+				return;
+			}
+			double newScaleFactor = client.getWindow().getScaleFactor()-1;
+			this.width = (int)(client.getWindow().getFramebufferWidth()/newScaleFactor);
+			this.height = (int)(client.getWindow().getFramebufferHeight()/newScaleFactor);
+			scaleCompensation = newScaleFactor/scaleFactor;
+		} else {
+			scaleCompensation = 1;
+		}
+	}
+	
+	@Override
+	protected void init() {
+		super.init();
+		if (client.world == null) {
+			whyCantConfigureServer = "You're not connected to a server.";
+		} else if (client.getServer() != null) {
+			whyCantConfigureServer = "The singleplayer server shares the client settings.";
+		} else {
+			CommandDispatcher<?> disp = client.player.networkHandler.getCommandDispatcher();
+			if (disp.getRoot().getChild("fabrication") == null) {
+				whyCantConfigureServer = "This server doesn't have Fabrication.";
+			} else if (disp.getRoot().getChild("fabrication").getChild("config") == null) {
+				whyCantConfigureServer = "You don't have permission to configure Fabrication.";
+			} else {
+				ClientPlayNetworkHandler cpnh = client.getNetworkHandler();
+				if (cpnh instanceof GetServerConfig) {
+					GetServerConfig gsc = (GetServerConfig)cpnh;
+					if (!gsc.fabrication$hasHandshook()) {
+						whyCantConfigureServer = "This server's version of Fabrication is too old.";
+					} else {
+						serverKnownConfigKeys.clear();
+						serverKnownConfigKeys.addAll(gsc.fabrication$getServerTrileanConfig().keySet());
+						serverKnownConfigKeys.addAll(gsc.fabrication$getServerStringConfig().keySet());
+					}
+				} else {
+					whyCantConfigureServer = "An internal error prevented initialization of the syncer.";
+				}
+			}
+		}
 	}
 
 	@Override
@@ -128,31 +188,42 @@ public class FabricationConfigScreen extends Screen {
 		if (parent != null && (leaving || timeExisted < 10) && !MixinConfigPlugin.isEnabled("*.reduced_motion")) {
 			float a = sCurve5((leaving ? Math.max(0, 10-timeLeaving) : timeExisted)/10);
 			GlStateManager.pushMatrix();
-			GlStateManager.translatef(width/2f, height, 0);
-			GlStateManager.rotatef(a*(leaving ? -180 : 180), 0, 0, 1);
-			GlStateManager.translatef(-width/2, -height, 0);
-			GlStateManager.pushMatrix();
-			GlStateManager.translatef(0, height, 0);
-			GlStateManager.translatef(width/2f, height/2f, 0);
-			GlStateManager.rotatef(180, 0, 0, 1);
-			GlStateManager.translatef(-width/2f, -height/2f, 0);
-			fill(matrices, -width, -height, width*2, 0, 0xFF2196F3);
-			drawBackground(matrices, -200, -200, delta);
-			drawForeground(matrices, -200, -200, delta);
-			GlStateManager.popMatrix();
-			for (int x = -1; x <= 1; x++) {
-				for (int y = -1; y <= 0; y++) {
+//				GlStateManager.clear(GL11.GL_COLOR_BUFFER_BIT, false);
+//				GlStateManager.translatef(realWidth/2f, realHeight/2f, 0);
+//				GlStateManager.scalef(0.5f, 0.5f, 0.5f);
+//				GlStateManager.translatef(-realWidth/2f, -realHeight/2f, 0);
+				GlStateManager.translatef(realWidth/2f, realHeight, 0);
+				GlStateManager.rotatef(a*(leaving ? -180 : 180), 0, 0, 1);
+				GlStateManager.translatef(-realWidth/2, -realHeight, 0);
+				GlStateManager.pushMatrix();
+					GlStateManager.translatef(0, realHeight, 0);
+					GlStateManager.translatef(realWidth/2f, realHeight/2f, 0);
+					GlStateManager.rotatef(180, 0, 0, 1);
+					GlStateManager.translatef(-realWidth/2f, -realHeight/2f, 0);
+					fill(matrices, -realWidth, -realHeight, realWidth*2, 0, 0xFF2196F3);
 					GlStateManager.pushMatrix();
-					GlStateManager.translatef(width*x, height*y, 0);
-					renderBackgroundTexture(0);
+						GlStateManager.scaled(scaleCompensation, scaleCompensation, 1);
+						drawBackground(matrices, -200, -200, delta);
+						drawForeground(matrices, -200, -200, delta);
 					GlStateManager.popMatrix();
+				GlStateManager.popMatrix();
+				for (int x = -1; x <= 1; x++) {
+					for (int y = -1; y <= 0; y++) {
+						if (x == 0 && y == 0) continue;
+						GlStateManager.pushMatrix();
+						GlStateManager.translatef(realWidth*x, realHeight*y, 0);
+						parent.renderBackgroundTexture(0);
+						GlStateManager.popMatrix();
+					}
 				}
-			}
-			parent.render(matrices, -200, -200, delta);
+				parent.render(matrices, -200, -200, delta);
 			GlStateManager.popMatrix();
 		} else {
-			drawBackground(matrices, -200, -200, delta);
-			drawForeground(matrices, mouseX, mouseY, delta);
+			GlStateManager.pushMatrix();
+			GlStateManager.scaled(scaleCompensation, scaleCompensation, 1);
+			drawBackground(matrices, (int)(mouseX/scaleCompensation), (int)(mouseY/scaleCompensation), delta);
+			drawForeground(matrices, (int)(mouseX/scaleCompensation), (int)(mouseY/scaleCompensation), delta);
+			GlStateManager.popMatrix();
 		}
 		if (leaving && timeLeaving > 10) {
 			client.openScreen(parent);
@@ -169,13 +240,15 @@ public class FabricationConfigScreen extends Screen {
 		float w = height*ratio;
 		float brk = Math.min(width-w, (width*2/3f)-(w/3));
 		float brk2 = brk+w;
-		float border = (float)(20/client.getWindow().getScaleFactor());
+		float border = (float)(20/(client.getWindow().getScaleFactor()*scaleCompensation));
 		
 		Matrix4f mat = matrices.peek().getModel();
 		
 		GlStateManager.enableBlend();
 		RenderSystem.defaultBlendFunc();
-		GlStateManager.color4f(1, 1, 1, 0.5f);
+		float time = selectedSection == null ? 10-selectTime : prevSelectedSection == null ? selectTime : 0;
+		float a = sCurve5(time/10f);
+		GlStateManager.color4f(1, 1, 1, 0.3f+(a*0.7f));
 		
 		GlStateManager.disableCull();
 		BufferBuilder bb = Tessellator.getInstance().getBuffer();
@@ -221,6 +294,7 @@ public class FabricationConfigScreen extends Screen {
 		if (configuringServer) {
 			a = 1-a;
 		}
+		GlStateManager.pushMatrix();
 		GlStateManager.disableDepthTest();
 		fill(matrices, width-120, 0, width*2, 16, 0x33000000);
 		GlStateManager.pushMatrix();
@@ -231,10 +305,10 @@ public class FabricationConfigScreen extends Screen {
 				if (h < 0) {
 					h = 1+h;
 				}
-				matrices.push();
-				matrices.translate(0, 0, 400);
-				fill(matrices, -60, -8, 0, 8, MathHelper.hsvToRgb(h, 0.9f, 0.9f)|0xFF000000);
-				matrices.pop();
+				GlStateManager.pushMatrix();
+					GlStateManager.scalef((float)(1-(Math.abs(Math.sin(a*Math.PI))/2)), 1, 1);
+					fill(matrices, -60, -8, 0, 8, MathHelper.hsvToRgb(h, 0.9f, 0.9f)|0xFF000000);
+				GlStateManager.popMatrix();
 				GlStateManager.pushMatrix();
 					GlStateManager.rotatef(45, 0, 0, 1);
 					// 8 / sqrt(2)
@@ -264,8 +338,8 @@ public class FabricationConfigScreen extends Screen {
 		float y = 8-scroll;
 		int newHeight = 8;
 		int i = 0;
-		float selectedChoiceY = 0;
-		float prevSelectedChoiceY = 0;
+		float selectedChoiceY = -60;
+		float prevSelectedChoiceY = -60;
 		for (String s : options.keySet()) {
 			float selectA;
 			if (s.equals(selectedSection)) {
@@ -313,24 +387,18 @@ public class FabricationConfigScreen extends Screen {
 				textRenderer.draw(matrices, "§l"+formatTitleCase(s), 4, y, -1);
 			}
 			String desc = SECTION_DESCRIPTIONS.getOrDefault(s, "No description available");
-			List<OrderedText> lines = textRenderer.wrapLines(new LiteralText(desc), 116);
 			y += 12;
 			newHeight += 12;
-			for (OrderedText ot : lines) {
-				if (y >= -12 && y < height) {
-					textRenderer.draw(matrices, ot, 8, y, -1);
-				}
-				y += 12;
-				newHeight += 12;
-			}
+			int textHeight = drawWrappedText(matrices, 8, y, desc, 116, -1, false);
+			y += textHeight;
+			newHeight += textHeight;
 			if (didClick) {
-				if (lastClickX >= 0 && lastClickX <= 130 && lastClickY > startY-4 && lastClickY < y) {
-					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_BELL, 0.6f+(i*0.1f), 1f));
-					if (!s.equals(selectedSection)) {
-						prevSelectedSection = selectedSection;
-						selectedSection = s;
-						selectTime = 10-selectTime;
-					}
+				if (mouseX >= 0 && mouseX <= 130 && mouseY > startY-4 && mouseY < y) {
+					boolean deselect = s.equals(selectedSection);
+					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_BELL, deselect ? 0.5f : 0.6f+(i*0.1f), 1f));
+					prevSelectedSection = selectedSection;
+					selectedSection = deselect ? null : s;
+					selectTime = 10-selectTime;
 				}
 			}
 			y += 8;
@@ -346,14 +414,17 @@ public class FabricationConfigScreen extends Screen {
 		
 		bufferTooltips = true;
 		drawSection(matrices, selectedSection, mouseX, mouseY, selectedChoiceY, sCurve5((10-selectTime)/10f));
-		if (prevSelectedSection != null) {
+		if (!Objects.equal(selectedSection, prevSelectedSection)) {
 			drawSection(matrices, prevSelectedSection, -200, -200, prevSelectedChoiceY, sCurve5(selectTime/10f));
 		}
 		
-		if (didClick) didClick = false;
 		
-		textRenderer.draw(matrices, "Config changes are applied in real", 136, height-20, -1);
-		textRenderer.draw(matrices, "time and do not need to be saved.", 136, height-10, -1);
+		drawWrappedText(matrices, 136, height, "Config changes are applied in real time and do not need to be saved.", width-250, -1, true);
+		
+		if (drawButton(matrices, width-100, height-20, 100, 20, "Done", mouseX, mouseY)) {
+			onClose();
+		}
+		if (didClick) didClick = false;
 		
 		super.render(matrices, mouseX, mouseY, delta);
 		
@@ -384,8 +455,24 @@ public class FabricationConfigScreen extends Screen {
 			renderTooltip(matrices, Lists.transform(Lists.newArrayList(msg.split("\n")),
 					s -> new LiteralText(s)), mouseX+10, 20+mouseY);
 		}
+		GlStateManager.popMatrix();
 	}
 	
+	private int drawWrappedText(MatrixStack matrices, float x, float y, String str, int width, int color, boolean fromBottom) {
+		int height = 0;
+		List<OrderedText> lines = textRenderer.wrapLines(new LiteralText(str), width);
+		if (fromBottom) {
+			y -= 12;
+			lines = Lists.reverse(lines);
+		}
+		for (OrderedText ot : lines) {
+			textRenderer.draw(matrices, ot, x, y, color);
+			y += (fromBottom ? -12 : 12);
+			height += 12;
+		}
+		return height;
+	}
+
 	private void drawSection(MatrixStack matrices, String section, float mouseX, float mouseY, float choiceY, float a) {
 		if (a <= 0) return;
 		// jesus fucking christ
@@ -396,8 +483,14 @@ public class FabricationConfigScreen extends Screen {
 		int y = 16;
 		if (section == null) {
 			String v = FabricLoader.getInstance().getModContainer("fabrication").get().getMetadata().getVersion().getFriendlyString();
-			textRenderer.drawWithShadow(matrices, "§lFabrication v"+v+" §rby unascribed", 142, 42, -1);
-			textRenderer.drawWithShadow(matrices, "Click a category on the left to change settings.", 142, 54, -1);
+			String blurb = "§lFabrication v"+v+" §rby unascribed\n"
+					+ "Click a category on the left to change settings.\n\n"
+					+ "Detail offered by tooltips here is somewhat sparse. For additional detail and demonstration videos, please check the wiki.";
+			int height = drawWrappedText(matrices, 140, 20, blurb, width-130, -1, false);
+			if (drawButton(matrices, 140, 20+height+8, 100, 20, "Take me to the wiki", mouseX, mouseY)) {
+				Util.getOperatingSystem().open("https://github.com/unascribed/Fabrication/wiki");
+			}
+			
 		} else {
 			GlStateManager.enableBlend();
 			RenderSystem.defaultBlendFunc();
@@ -426,7 +519,7 @@ public class FabricationConfigScreen extends Screen {
 					if (mouseX >= 134+x && mouseX <= 134+x+16 && mouseY >= 18 && mouseY <= 18+16) {
 						hovered = p;
 					}
-					if (didClick && lastClickX >= 134+x && lastClickX <= 134+x+16 && lastClickY >= 18 && lastClickY <= 18+16) {
+					if (didClick && mouseX >= 134+x && mouseX <= 134+x+16 && mouseY >= 18 && mouseY <= 18+16) {
 						if (p == Profile.BURNT) {
 							client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.ITEM_FLINTANDSTEEL_USE, 1f));
 							client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_FIRE_AMBIENT, 1f, 1f));
@@ -699,17 +792,37 @@ public class FabricationConfigScreen extends Screen {
 		GlStateManager.popMatrix();
 	}
 
+	private boolean drawButton(MatrixStack matrices, int x, int y, int w, int h, String text, float mouseX, float mouseY) {
+		boolean click = false;
+		boolean hover = mouseX >= x && mouseX <= x+w && mouseY >= y && mouseY <= y+h;
+		fill(matrices, x, y, x+w, y+h, 0x55000000);
+		if (hover) {
+			fill(matrices, x, y, x+w, y+1, -1);
+			fill(matrices, x, y, x+1, y+h, -1);
+			fill(matrices, x, y+h-1, x+w, y+h, -1);
+			fill(matrices, x+w-1, y, x+w, y+h, -1);
+			if (didClick) {
+				client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1f));
+				click = true;
+			}
+		}
+		int textWidth = textRenderer.getWidth(text);
+		textRenderer.draw(matrices, text, x+((w-textWidth)/2), y+((h-8)/2), -1);
+		return click;
+	}
+
 	private int drawTrilean(MatrixStack matrices, String key, String title, String desc, int y, float mouseX, float mouseY, boolean clientOnly) {
 		boolean disabled = (configuringServer && clientOnly) || !isValid(key);
-		boolean noUnset = key.startsWith("general.") || key.startsWith("situational.") || key.startsWith("pedantry.") || "tweaks.ghost_chest_woo_woo".equals(key);
-		Trilean currentValue = noUnset ? (isEnabled(key) ? Trilean.TRUE : Trilean.FALSE) : getValue(key);
-		boolean keyEnabled = isEnabled(key);
-		Trilean prevValue = optionPreviousValues.getOrDefault(key, currentValue);
-		int prevX = prevValue == Trilean.FALSE ? 0 : prevValue == Trilean.TRUE ? noUnset ? 23 : 30 : 15;
-		int prevHue = prevValue == Trilean.FALSE ? 0 : prevValue == Trilean.TRUE ? 120 : 55;
-		int curX = currentValue == Trilean.FALSE ? 0 : currentValue == Trilean.TRUE ? noUnset ? 23 : 30 : 15;
-		int curHue = currentValue == Trilean.FALSE ? 0 : currentValue == Trilean.TRUE ? 120 : 55;
 		float time = optionAnimationTime.getOrDefault(key, 0f);
+		float disabledTime = disabledAnimationTime.getOrDefault(key, 0f);
+		boolean animateDisabled = disabledTime > 0;
+		if (disabled && !knownDisabled.contains(key)) {
+			disabledTime = disabledAnimationTime.compute(key, (k, f) -> 5 - (f == null ? 0 : f));
+			knownDisabled.add(key);
+		} else if (!disabled && knownDisabled.contains(key)) {
+			disabledTime = disabledAnimationTime.compute(key, (k, f) -> 5 - (f == null ? 0 : f));
+			knownDisabled.remove(key);
+		}
 		if (time > 0) {
 			time -= client.getLastFrameDuration();
 			if (time <= 0) {
@@ -719,7 +832,28 @@ public class FabricationConfigScreen extends Screen {
 				optionAnimationTime.put(key, time);
 			}
 		}
+		if (disabledTime > 0) {
+			disabledTime -= client.getLastFrameDuration();
+			if (disabledTime <= 0) {
+				disabledAnimationTime.remove(key);
+				disabledTime = 0;
+			} else {
+				disabledAnimationTime.put(key, disabledTime);
+			}
+		}
+		boolean noUnset = key.startsWith("general.") || key.startsWith("situational.") || "tweaks.ghost_chest_woo_woo".equals(key);
+		Trilean currentValue = noUnset ? (isEnabled(key) ? Trilean.TRUE : Trilean.FALSE) : getValue(key);
+		boolean keyEnabled = isEnabled(key);
+		Trilean prevValue = animateDisabled ? currentValue : optionPreviousValues.getOrDefault(key, currentValue);
+		int prevX = prevValue == Trilean.FALSE ? 0 : prevValue == Trilean.TRUE ? noUnset ? 23 : 30 : 15;
+		int prevHue = prevValue == Trilean.FALSE ? 0 : prevValue == Trilean.TRUE ? 120 : 55;
+		int curX = currentValue == Trilean.FALSE ? 0 : currentValue == Trilean.TRUE ? noUnset ? 23 : 30 : 15;
+		int curHue = currentValue == Trilean.FALSE ? 0 : currentValue == Trilean.TRUE ? 120 : 55;
 		float a = sCurve5((5-time)/5f);
+		float da = sCurve5((5-disabledTime)/5f);
+		if (!disabled) {
+			da = 1-da;
+		}
 		if (clientOnly) {
 			fill(matrices, 133, y, 134+46, y+11, 0xFFFFAA00);
 		} else {
@@ -727,19 +861,18 @@ public class FabricationConfigScreen extends Screen {
 		}
 		fill(matrices, 134, y+1, 134+45, y+10, 0x66000000);
 		if (!noUnset) fill(matrices, 134+15, y+1, 134+15+15, y+10, 0x33000000);
-		if (!disabled) {
-			GlStateManager.pushMatrix();
-			GlStateManager.translatef(134+(prevX+((curX-prevX)*a)), 0, 0);
-			fill(matrices, 0, y+1, noUnset ? 22 : 15, y+10, MathHelper.hsvToRgb((prevHue+((curHue-prevHue)*a))/360f, 0.9f, 0.8f)|0xFF000000);
-			if (!noUnset && a >= 1 && currentValue == Trilean.UNSET) {
-				fill(matrices, keyEnabled ? 15 : -1, y+1, keyEnabled ? 16 : 0, y+10, MathHelper.hsvToRgb((keyEnabled ? 120 : 0)/360f, 0.9f, 0.8f)|0xFF000000);
-			}
-			GlStateManager.popMatrix();
+		GlStateManager.pushMatrix();
+		GlStateManager.translatef(134+(prevX+((curX-prevX)*a)), 0, 0);
+		int knobAlpha = ((int)((1-da) * 255))<<24;
+		fill(matrices, 0, y+1, noUnset ? 22 : 15, y+10, MathHelper.hsvToRgb((prevHue+((curHue-prevHue)*a))/360f, 0.9f, 0.8f)|knobAlpha);
+		if (!noUnset && a >= 1 && currentValue == Trilean.UNSET) {
+			fill(matrices, keyEnabled ? 15 : -1, y+1, keyEnabled ? 16 : 0, y+10, MathHelper.hsvToRgb((keyEnabled ? 120 : 0)/360f, 0.9f, 0.8f)|knobAlpha);
 		}
+		GlStateManager.popMatrix();
 		GlStateManager.enableBlend();
 		RenderSystem.defaultBlendFunc();
 		client.getTextureManager().bindTexture(new Identifier("fabrication", "trilean.png"));
-		GlStateManager.color4f(1, 1, 1, disabled ? 0.3f : 1);
+		GlStateManager.color4f(1, 1, 1, 0.3f+((1-da)*0.7f));
 		GlStateManager.enableTexture();
 		if (noUnset) {
 			drawTexture(matrices, 134+3, y+1, 0, 0, 15, 9, 45, 9);
@@ -749,16 +882,17 @@ public class FabricationConfigScreen extends Screen {
 		}
 		GlStateManager.disableTexture();
 		if (didClick) {
-			if (lastClickX >= 134 && lastClickX <= 134+45 && lastClickY >= y+1 && lastClickY <= y+10) {
+			if (mouseX >= 134 && mouseX <= 134+45 && mouseY >= y+1 && mouseY <= y+10) {
+				float pitch = y*0.005f;
 				if (disabled) {
 					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO, 0.8f, 1));
 					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO, 0.7f, 1));
 					tooltipBlinkTicks = 20;
 				} else {
-					int clickedIndex = (int)((lastClickX-134)/(noUnset ? 22 : 15));
+					int clickedIndex = (int)((mouseX-134)/(noUnset ? 22 : 15));
 					Trilean newValue = clickedIndex == 0 ? Trilean.FALSE : clickedIndex == 1 && !noUnset ? Trilean.UNSET : Trilean.TRUE;
 					if (newValue != currentValue) {
-						client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_FLUTE, 0.7f+((clickedIndex*(noUnset?2:1))*0.27f), 1f));
+						client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_FLUTE, 0.6f+pitch+((clickedIndex*(noUnset?2:1))*0.18f), 1f));
 						optionPreviousValues.put(key, currentValue);
 						optionAnimationTime.compute(key, (k, f) -> 5 - (f == null ? 0 : f));
 						setValue(key, newValue.toString().toLowerCase(Locale.ROOT));
@@ -766,8 +900,9 @@ public class FabricationConfigScreen extends Screen {
 				}
 			}
 		}
+		int textAlpha = ((int)((0.5f+((1-da)*0.5f)) * 255))<<24;
 		int startX = 136+50;
-		int endX = textRenderer.draw(matrices, title, startX, y+2, disabled ? 0x88FFFFFF : 0xFFFFFFFF);
+		int endX = textRenderer.draw(matrices, title, startX, y+2, 0xFFFFFF | textAlpha);
 		if (mouseX >= startX && mouseX <= endX && mouseY >= y && mouseY <= y+10) {
 			renderOrderedTooltip(matrices, textRenderer.wrapLines(new LiteralText((clientOnly ? "§6Client Only§r\n" : "")+desc), width/3), (int)(mouseX+10), (int)(20+mouseY));
 		} else if (mouseX >= 134 && mouseX <= 134+45 && mouseY >= y && mouseY <= y+10) {
@@ -826,40 +961,6 @@ public class FabricationConfigScreen extends Screen {
 	}
 
 	@Override
-	protected void init() {
-		super.init();
-		if (client.world == null) {
-			whyCantConfigureServer = "You're not connected to a server.";
-		} else if (client.getServer() != null) {
-			whyCantConfigureServer = "The singleplayer server shares the client settings.";
-		} else {
-			CommandDispatcher<?> disp = client.player.networkHandler.getCommandDispatcher();
-			if (disp.getRoot().getChild("fabrication") == null) {
-				whyCantConfigureServer = "This server doesn't have Fabrication.";
-			} else if (disp.getRoot().getChild("fabrication").getChild("config") == null) {
-				whyCantConfigureServer = "You don't have permission to configure Fabrication.";
-			} else {
-				ClientPlayNetworkHandler cpnh = client.getNetworkHandler();
-				if (cpnh instanceof GetServerConfig) {
-					GetServerConfig gsc = (GetServerConfig)cpnh;
-					if (!gsc.fabrication$hasHandshook()) {
-						whyCantConfigureServer = "This server's version of Fabrication is too old.";
-					} else {
-						serverKnownConfigKeys.clear();
-						serverKnownConfigKeys.addAll(gsc.fabrication$getServerTrileanConfig().keySet());
-						serverKnownConfigKeys.addAll(gsc.fabrication$getServerStringConfig().keySet());
-					}
-				} else {
-					whyCantConfigureServer = "An internal error prevented initialization of the syncer.";
-				}
-			}
-		}
-		addButton(new ColorButtonWidget(width-100, height-20, 100, 20, 0x66000000, new LiteralText("Done"), (w) -> {
-			onClose();
-		}));
-	}
-	
-	@Override
 	public void onClose() {
 		if (!MixinConfigPlugin.isEnabled("*.reduced_motion")) {
 			leaving = true;
@@ -895,7 +996,7 @@ public class FabricationConfigScreen extends Screen {
 	
 	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		if (mouseX <= 120) {
+		if (mouseX <= 120*scaleCompensation) {
 			boolean dampen;
 			if (amount < 0) {
 				dampen = sidebarScroll < 0;
@@ -911,14 +1012,14 @@ public class FabricationConfigScreen extends Screen {
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		if (button == 0) {
 			if (configuringServer) {
-				if (mouseX > width-120 && mouseY < 16) {
+				if (mouseX > (width-120)*scaleCompensation && mouseY < 16*scaleCompensation) {
 					hasClonked = false;
 					serverAnimateTime = 10-serverAnimateTime;
 					configuringServer = false;
 					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_XYLOPHONE, 0.8f, 1));
 				}
 			} else {
-				if (mouseX > width-120 && mouseY < 16) {
+				if (mouseX > (width-120)*scaleCompensation && mouseY < 16*scaleCompensation) {
 					if (whyCantConfigureServer == null) {
 						hasClonked = false;
 						serverAnimateTime = 10-serverAnimateTime;
@@ -932,8 +1033,6 @@ public class FabricationConfigScreen extends Screen {
 				}
 			}
 			didClick = true;
-			lastClickX = (float)mouseX;
-			lastClickY = (float)mouseY;
 		}
 		return super.mouseClicked(mouseX, mouseY, button);
 	}
