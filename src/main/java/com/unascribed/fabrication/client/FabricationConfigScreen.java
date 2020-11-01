@@ -453,9 +453,10 @@ public class FabricationConfigScreen extends Screen {
 				}
 				y = 40;
 				y = drawTrilean(matrices, "general.runtime_checks", "Runtime Checks",
-						"Causes all mixins to be applied, even if the option is not enabled, and checks "
-						+ "if the feature is enabled before deciding what to do. Allows changing options "
-						+ "on the fly, but is less compatible and slightly slower.", y, mouseX, mouseY, false);
+						"Allows changing settings arbitrarily on-the-fly, but is very slightly\n" +
+						"slower and a fair bit less compatible, as it applies all mixins regardless\n" +
+						"of if the feature is enabled or not.\n" +
+						"§cIf this is disabled, you must restart the game for changes made here to apply.", y, mouseX, mouseY, false);
 				y = drawTrilean(matrices, "general.reduced_motion", "Reduced Motion",
 						"Disable high-motion GUI animations.", y, mouseX, mouseY, true);
 				y = drawTrilean(matrices, "general.taggable_players", "Taggable Players",
