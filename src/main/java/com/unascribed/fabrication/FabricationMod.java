@@ -7,22 +7,28 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import com.unascribed.fabrication.interfaces.SetFabricationConfigAware;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
+import com.unascribed.fabrication.support.ResolvedTrilean;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.entity.Entity;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage;
+import net.minecraft.util.Identifier;
 
 public class FabricationMod implements ModInitializer {
 	
@@ -131,6 +137,50 @@ public class FabricationMod implements ModInitializer {
 				spe.networkHandler.sendPacket(pkt);
 			}
 		}
+	}
+
+	public static void sendConfigUpdate(MinecraftServer server, String key) {
+		for (ServerPlayerEntity spe : server.getPlayerManager().getPlayerList()) {
+			if (spe instanceof SetFabricationConfigAware && ((SetFabricationConfigAware)spe).fabrication$isConfigAware()) {
+				sendConfigUpdate(server, key, spe);
+			}
+		}
+	}
+	
+	private static final Identifier CONFIG = new Identifier("fabrication", "config");
+
+	public static void sendConfigUpdate(MinecraftServer server, String key, ServerPlayerEntity spe) {
+		if ("general.profile".equals(key)) key = null;
+		PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
+		if (key == null) {
+			Map<String, ResolvedTrilean> trileans = Maps.newHashMap();
+			Map<String, String> strings = Maps.newHashMap();
+			for (String k : MixinConfigPlugin.getAllKeys()) {
+				if (MixinConfigPlugin.isTrilean(k)) {
+					trileans.put(k, MixinConfigPlugin.getResolvedValue(k));
+				} else {
+					strings.put(k, MixinConfigPlugin.getRawValue(k));
+				}
+			}
+			data.writeVarInt(trileans.size());
+			trileans.entrySet().forEach(en -> data.writeString(en.getKey()).writeByte(en.getValue().ordinal()));
+			data.writeVarInt(strings.size());
+			strings.entrySet().forEach(en -> data.writeString(en.getKey()).writeString(en.getValue()));
+		} else {
+			if (MixinConfigPlugin.isTrilean(key)) {
+				data.writeVarInt(1);
+				data.writeString(key);
+				data.writeByte(MixinConfigPlugin.getResolvedValue(key).ordinal());
+				data.writeVarInt(0);
+			} else {
+				data.writeVarInt(0);
+				data.writeVarInt(1);
+				data.writeString(key);
+				data.writeString(MixinConfigPlugin.getRawValue(key));
+			}
+		}
+		CustomPayloadS2CPacket pkt = new CustomPayloadS2CPacket(CONFIG, data);
+		spe.networkHandler.sendPacket(pkt);
 	}
 	
 }

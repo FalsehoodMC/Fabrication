@@ -26,6 +26,7 @@ import com.unascribed.fabrication.QDIni;
 import com.unascribed.fabrication.QDIni.IniTransformer;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Enums;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -156,6 +157,10 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		return config.getOrDefault(remap(configKey), Trilean.UNSET);
 	}
 	
+	public static ResolvedTrilean getResolvedValue(String configKey) {
+		return config.getOrDefault(remap(configKey), Trilean.UNSET).resolveSemantically(defaults == null ? false : defaults.get(configKey));
+	}
+	
 	public static boolean isTrilean(String s) {
 		return !NON_TRILEANS.contains(s);
 	}
@@ -182,20 +187,39 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	}
 	
 	public static void set(String configKey, String newValue) {
+		if (isTrilean(configKey)) {
+			switch (newValue) {
+				case "true": case "false": case "unset":
+					break;
+				default: throw new IllegalArgumentException("Trilean key "+configKey+" cannot be set to "+newValue);
+			}
+		} else if ("general.profile".equals(configKey)) {
+			if (!Enums.getIfPresent(Profile.class, newValue.toUpperCase(Locale.ROOT)).isPresent()) {
+				throw new IllegalArgumentException("Cannot set profile to "+newValue);
+			}
+		}
 		rawConfig.put(configKey, newValue);
+		if ("general.profile".equals(configKey)) {
+			profile = Profile.valueOf(rawConfig.getOrDefault("general.profile", "light").toUpperCase(Locale.ROOT));
+			defaults = defaultsByProfile.get(profile);
+		}
 		Path configFile = FabricLoader.getInstance().getConfigDir().resolve("fabrication.ini");
 		StringWriter sw = new StringWriter();
 		try (InputStream is = Files.newInputStream(configFile)) {
 			 QDIni.loadAndTransform(new InputStreamReader(is, Charsets.UTF_8), new IniTransformer() {
 				 
 				boolean found = false;
+				boolean foundEmptySection = false;
 				
 				@Override
 				public String transformLine(String path, String line) {
+					if (line != null && line.startsWith("[]")) {
+						foundEmptySection = true;
+					}
 					if (line == null || line.equals("; Notices: (Do not edit anything past this line; it will be overwritten)")) {
 						if (!found) {
 							found = true;
-							return "; Added by /fabrication config as a last resort as this key could\r\n"
+							return (foundEmptySection ? "" : "[]\r\n")+"; Added by /fabrication config as a last resort as this key could\r\n"
 									+ "; not be found elsewhere in the file.\r\n"
 									+ configKey+"="+newValue+"\r\n"+(line == null ? "" : "\r\n"+line);
 						}

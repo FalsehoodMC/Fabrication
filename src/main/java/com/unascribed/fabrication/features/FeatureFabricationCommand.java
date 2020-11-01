@@ -156,6 +156,9 @@ public class FeatureFabricationCommand implements Feature {
 				.executes((c) -> {
 					MixinConfigPlugin.reload();
 					FeatureItemDespawn.parseConfig();
+					if (c.getSource() instanceof ServerCommandSource) {
+						FabricationMod.sendConfigUpdate(((ServerCommandSource)c.getSource()).getMinecraftServer(), null);
+					}
 					sendFeedback(c, new LiteralText("Fabrication configuration reloaded"), true);
 					sendFeedback(c, new LiteralText("§eYou may need to restart the game for the changes to take effect."), false);
 					return 1;
@@ -221,6 +224,9 @@ public class FeatureFabricationCommand implements Feature {
 			sendFeedback(c, new LiteralText(key+" is already set to "+value+(tri ? " (default "+def+")" : "")), false);
 		} else {
 			MixinConfigPlugin.set(key, value);
+			if (c.getSource() instanceof ServerCommandSource) {
+				FabricationMod.sendConfigUpdate(((ServerCommandSource)c.getSource()).getMinecraftServer(), key);
+			}
 			sendFeedback(c, new LiteralText(key+" is now set to "+value+(tri ? " (default "+def+")" : "")), true);
 			if (FabricationMod.isAvailableFeature(key)) {
 				if (FabricationMod.updateFeature(key)) {

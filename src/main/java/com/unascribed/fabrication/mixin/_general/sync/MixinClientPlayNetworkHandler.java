@@ -1,0 +1,89 @@
+package com.unascribed.fabrication.mixin._general.sync;
+
+import java.util.Map;
+
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import com.unascribed.fabrication.interfaces.GetServerConfig;
+import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.Env;
+import com.unascribed.fabrication.support.ResolvedTrilean;
+
+import com.google.common.collect.Maps;
+
+import io.netty.buffer.Unpooled;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.network.ClientConnection;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
+import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
+import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
+import net.minecraft.util.Identifier;
+
+@Mixin(ClientPlayNetworkHandler.class)
+@EligibleIf(envMatches=Env.CLIENT)
+public class MixinClientPlayNetworkHandler implements GetServerConfig {
+	
+	@Shadow @Final
+	private ClientConnection connection;
+	
+	private boolean fabrication$hasHandshook = false;
+	private final Map<String, ResolvedTrilean> fabrication$serverTrileanConfig = Maps.newHashMap();
+	private final Map<String, String> fabrication$serverStringConfig = Maps.newHashMap();
+	
+	@Inject(at=@At("TAIL"), method="onGameJoin(Lnet/minecraft/network/packet/s2c/play/GameJoinS2CPacket;)V")
+	public void onGameJoin(GameJoinS2CPacket packet, CallbackInfo ci) {
+		PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
+		data.writeVarInt(0);
+		connection.send(new CustomPayloadC2SPacket(new Identifier("fabrication", "config"), data));
+	}
+	
+	@Inject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/s2c/play/CustomPayloadS2CPacket;)V", cancellable=true)
+	public void onCustomPayload(CustomPayloadS2CPacket packet, CallbackInfo ci) {
+		if (packet.getChannel().getNamespace().equals("fabrication") && packet.getChannel().getPath().equals("config")) {
+			try {
+				fabrication$hasHandshook = true;
+				PacketByteBuf buf = packet.getData();
+				int trileanKeys = buf.readVarInt();
+				for (int i = 0; i < trileanKeys; i++) {
+					String k = buf.readString(32767);
+					int v = buf.readUnsignedByte();
+//					System.out.println(k+" = "+v);
+					fabrication$serverTrileanConfig.put(k, ResolvedTrilean.values()[v]);
+				}
+				int stringKeys = buf.readVarInt();
+				for (int i = 0; i < stringKeys; i++) {
+					String k = buf.readString(32767);
+					String v = buf.readString(32767);
+//					System.out.println(k+" = "+v);
+					fabrication$serverStringConfig.put(k, v);
+				}
+				ci.cancel();
+			} catch (RuntimeException e) {
+				e.printStackTrace();
+				throw e;
+			}
+		}
+	}
+
+	@Override
+	public boolean fabrication$hasHandshook() {
+		return fabrication$hasHandshook;
+	}
+	
+	@Override
+	public Map<String, ResolvedTrilean> fabrication$getServerTrileanConfig() {
+		return fabrication$serverTrileanConfig;
+	}
+	
+	@Override
+	public Map<String, String> fabrication$getServerStringConfig() {
+		return fabrication$serverStringConfig;
+	}
+	
+}

@@ -8,14 +8,20 @@ public enum Trilean {
 	FALSE;
 	
 	public boolean resolve(boolean def) {
-		if(this == TRUE) return true;
-		if(this == FALSE) return false;
+		if (this == TRUE) return true;
+		if (this == FALSE) return false;
 		return def;
 	}
 	
+	public ResolvedTrilean resolveSemantically(boolean def) {
+		if (this == TRUE) return ResolvedTrilean.TRUE;
+		if (this == FALSE) return ResolvedTrilean.FALSE;
+		return def ? ResolvedTrilean.DEFAULT_TRUE : ResolvedTrilean.DEFAULT_FALSE;
+	}
+	
 	public Trilean not() {
-		if (this==TRUE) return FALSE;
-		if (this==FALSE) return TRUE;
+		if (this == TRUE) return FALSE;
+		if (this == FALSE) return TRUE;
 		return UNSET;
 	}
 	
