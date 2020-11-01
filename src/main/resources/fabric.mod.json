@@ -19,7 +19,8 @@
   "environment": "*",
   "entrypoints": {
     "main": ["com.unascribed.fabrication.FabricationMod"],
-    "cotton-client-commands": ["com.unascribed.fabrication.FabricationClientCommands"]
+    "cotton-client-commands": ["com.unascribed.fabrication.FabricationClientCommands"],
+    "modmenu": ["com.unascribed.fabrication.ModMenuInitializer"]
   },
   "mixins": [
     "fabrication.mixins.json"

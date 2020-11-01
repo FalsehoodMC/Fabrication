@@ -64,7 +64,7 @@ public class QDIni {
 
 	public static Map<String, String> loadAndTransform(Reader r, IniTransformer transformer, Writer w) throws IOException {
 		BufferedReader br = r instanceof BufferedReader ? (BufferedReader)r : new BufferedReader(r);
-		Map<String, String> rtrn = Maps.newHashMap();
+		Map<String, String> rtrn = Maps.newLinkedHashMap();
 		int lineNum = 1;
 		String path = "";
 		while (true) {
