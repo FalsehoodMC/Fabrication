@@ -1,4 +1,4 @@
-package com.unascribed.fabrication.mixin._general.taggable_players;
+package com.unascribed.fabrication.mixin.b_utility.taggable_players;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

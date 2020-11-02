@@ -1,0 +1,8 @@
+{
+	"levelup_long": {
+		"sounds": [
+			"fabrication:levelup_long"
+		],
+		"subtitle": "subtitles.entity.player.levelup"
+	}
+}

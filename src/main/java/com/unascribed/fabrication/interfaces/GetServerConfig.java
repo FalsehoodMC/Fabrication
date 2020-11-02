@@ -11,4 +11,6 @@ public interface GetServerConfig {
 	Map<String, ResolvedTrilean> fabrication$getServerTrileanConfig();
 	Map<String, String> fabrication$getServerStringConfig();
 	
+	long fabrication$getLaunchId();
+	
 }

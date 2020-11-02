@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 
 import com.unascribed.fabrication.interfaces.SetFabricationConfigAware;
@@ -28,13 +29,19 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 public class FabricationMod implements ModInitializer {
 	
 	private static final Map<String, Feature> features = Maps.newHashMap();
 	private static final List<Feature> unconfigurableFeatures = Lists.newArrayList();
 	private static final Set<String> enabledFeatures = Sets.newHashSet();
+	
+	public static final long LAUNCH_ID = ThreadLocalRandom.current().nextLong();
+	
+	public static SoundEvent LEVELUP_LONG;
 	
 	@Override
 	public void onInitialize() {
@@ -57,6 +64,7 @@ public class FabricationMod implements ModInitializer {
 				throw new RuntimeException("Failed to initialize feature "+s, e);
 			}
 		}
+		LEVELUP_LONG = Registry.register(Registry.SOUND_EVENT, new Identifier("fabrication", "levelup_long"), new SoundEvent(new Identifier("fabrication", "levelup_long")));
 	}
 	
 	public static boolean isAvailableFeature(String configKey) {
@@ -166,17 +174,20 @@ public class FabricationMod implements ModInitializer {
 			trileans.entrySet().forEach(en -> data.writeString(en.getKey()).writeByte(en.getValue().ordinal()));
 			data.writeVarInt(strings.size());
 			strings.entrySet().forEach(en -> data.writeString(en.getKey()).writeString(en.getValue()));
+			data.writeLong(LAUNCH_ID);
 		} else {
 			if (MixinConfigPlugin.isTrilean(key)) {
 				data.writeVarInt(1);
 				data.writeString(key);
 				data.writeByte(MixinConfigPlugin.getResolvedValue(key).ordinal());
 				data.writeVarInt(0);
+				data.writeLong(LAUNCH_ID);
 			} else {
 				data.writeVarInt(0);
 				data.writeVarInt(1);
 				data.writeString(key);
 				data.writeString(MixinConfigPlugin.getRawValue(key));
+				data.writeLong(LAUNCH_ID);
 			}
 		}
 		CustomPayloadS2CPacket pkt = new CustomPayloadS2CPacket(CONFIG, data);

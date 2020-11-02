@@ -35,6 +35,7 @@ public class MixinClientPlayNetworkHandler implements GetServerConfig {
 	private boolean fabrication$hasHandshook = false;
 	private final Map<String, ResolvedTrilean> fabrication$serverTrileanConfig = Maps.newHashMap();
 	private final Map<String, String> fabrication$serverStringConfig = Maps.newHashMap();
+	private long fabrication$launchId;
 	
 	@Inject(at=@At("TAIL"), method="onGameJoin(Lnet/minecraft/network/packet/s2c/play/GameJoinS2CPacket;)V")
 	public void onGameJoin(GameJoinS2CPacket packet, CallbackInfo ci) {
@@ -63,6 +64,11 @@ public class MixinClientPlayNetworkHandler implements GetServerConfig {
 //					System.out.println(k+" = "+v);
 					fabrication$serverStringConfig.put(k, v);
 				}
+				if (buf.isReadable(8)) {
+					fabrication$launchId = buf.readLong();
+				} else if (fabrication$launchId == 0) {
+					fabrication$launchId = hashCode()*31L;
+				}
 				ci.cancel();
 			} catch (RuntimeException e) {
 				e.printStackTrace();
@@ -84,6 +90,11 @@ public class MixinClientPlayNetworkHandler implements GetServerConfig {
 	@Override
 	public Map<String, String> fabrication$getServerStringConfig() {
 		return fabrication$serverStringConfig;
+	}
+	
+	@Override
+	public long fabrication$getLaunchId() {
+		return fabrication$launchId;
 	}
 	
 }

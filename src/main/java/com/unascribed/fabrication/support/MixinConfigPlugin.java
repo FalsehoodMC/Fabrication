@@ -51,10 +51,14 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			"tweaks.ghost_chest_woo_woo",
 			"balance.anvil_damage_only_on_fall"
 	);
+	private static final ImmutableSet<String> BURNT_EXCEPTIONS = ImmutableSet.of(
+			"tweaks.ghost_chest_woo_woo"
+	);
 	private static final ImmutableSet<String> NON_TRILEANS = ImmutableSet.of(
 			"general.profile"
 	);
 	private static final ImmutableSet<String> RUNTIME_CONFIGURABLE = ImmutableSet.of(
+			"general.reduced_motion",
 			"minor_mechanics.feather_falling_five_damages_boots",
 			"minor_mechanics.observers_see_entities_living_only"
 	);
@@ -123,7 +127,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 					int dot = key.indexOf('.');
 					String section = dot != -1 ? key.substring(0, dot) : "";
 					boolean enabled = (p.sections.contains("*") && !p.sections.contains("!"+section)) || p.sections.contains(section)
-							&& (p != Profile.VIENNA || !VIENNA_EXCEPTIONS.contains(key));
+							&& (p == Profile.VIENNA ? !VIENNA_EXCEPTIONS.contains(key) : p == Profile.BURNT ? !BURNT_EXCEPTIONS.contains(key) : true);
 					defaultsBuilder.put(key, enabled);
 				}
 				profilesBuilder.put(p, defaultsBuilder.build());
@@ -441,8 +445,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 								String k = (String)an.values.get(i);
 								Object v = an.values.get(i+1);
 								if (k.equals("configEnabled")) {
-									if (RuntimeChecks.ENABLED) {
-										eligibilityNotes.add("Runtime checks is enabled, ignoring required config key "+remap((String)v));
+									if (getValue((String)v) == Trilean.UNSET && RuntimeChecks.ENABLED) {
+										eligibilitySuccesses.add("Runtime checks is enabled and required config key "+remap((String)v)+" is unset");
 									} else if (!isEnabled((String)v)) {
 										eligibilityFailures.add("Required config setting "+remap((String)v)+" is disabled "+(config.get(v) == Trilean.FALSE ? "explicitly" : "by profile"));
 										eligible = false;
@@ -450,8 +454,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 										eligibilitySuccesses.add("Required config setting "+remap((String)v)+" is enabled "+(config.get(v) == Trilean.TRUE ? "explicitly" : "by profile"));
 									}
 								} else if (k.equals("configDisabled")) {
-									if (RuntimeChecks.ENABLED) {
-										eligibilityNotes.add("Runtime checks is enabled, ignoring required config key "+remap((String)v));
+									if (getValue((String)v) == Trilean.UNSET && RuntimeChecks.ENABLED) {
+										eligibilitySuccesses.add("Runtime checks is enabled and conflicting config key "+remap((String)v)+" is unset");
 									} else if (!isEnabled((String)v)) {
 										eligibilitySuccesses.add("Conflicting config setting "+remap((String)v)+" is disabled "+(config.get(v) == Trilean.FALSE ? "explicitly" : "by profile"));
 									} else {
@@ -510,20 +514,28 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 										}
 									}
 								} else if (k.equals("anyConfigEnabled")) {
-									if (RuntimeChecks.ENABLED) {
-										eligibilityNotes.add("Runtime checks is enabled, ignoring desired config keys");
-									} else {
-										boolean foundAny = false;
-										for (String s : (List<String>)v) {
-											if (isEnabled(s)) {
-												foundAny = true;
-												eligibilitySuccesses.add("Relevant config setting "+remap(s)+" is enabled "+(config.get(s) == Trilean.TRUE ? "explicitly" : "by profile"));
-											} else {
-												eligibilityNotes.add("Relevant config setting "+remap(s)+" is disabled "+(config.get(s) == Trilean.FALSE ? "explicitly" : "by profile"));
+									boolean allDisabled = true;
+									boolean foundAny = false;
+									for (String s : (List<String>)v) {
+										if (isEnabled(s)) {
+											foundAny = true;
+											allDisabled = false;
+											eligibilitySuccesses.add("Relevant config setting "+remap(s)+" is enabled "+(config.get(s) == Trilean.TRUE ? "explicitly" : "by profile"));
+										} else {
+											if (getValue(s) != Trilean.FALSE) {
+												allDisabled = false;
 											}
+											eligibilityNotes.add("Relevant config setting "+remap(s)+" is disabled "+(config.get(s) == Trilean.FALSE ? "explicitly" : "by profile"));
 										}
-										if (!foundAny) {
-											eligibilitySuccesses.add("None of the relevant config settings are enabled");
+									}
+									if (allDisabled) {
+										eligibilityFailures.add("All of the relevant config settings are explicitly disabled");
+										eligible = false;
+									} else if (!foundAny) {
+										if (RuntimeChecks.ENABLED) {
+											eligibilityNotes.add("None of the relevant config settings are enabled, but runtime checks is enabled");
+										} else {
+											eligibilityFailures.add("None of the relevant config settings are enabled");
 											eligible = false;
 										}
 									}

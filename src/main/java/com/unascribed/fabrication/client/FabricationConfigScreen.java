@@ -41,6 +41,7 @@ import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.OrderedText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
@@ -68,7 +69,7 @@ public class FabricationConfigScreen extends Screen {
 			.put(Profile.MEDIUM, "Light + Minor Mechanics.")
 			.put(Profile.DARK, "Medium + Mechanics. Recommended.")
 			.put(Profile.VIENNA, "Dark + Balance + Weird Tweaks.\nYou agree with all of Una's opinions.")
-			.put(Profile.BURNT, "Screw it, enable everything.")
+			.put(Profile.BURNT, "Screw it, enable everything.\n(Except Situational.)")
 			.build();
 	
 	private static final ImmutableMap<Profile, Integer> PROFILE_COLORS = ImmutableMap.<Profile, Integer>builder()
@@ -82,6 +83,20 @@ public class FabricationConfigScreen extends Screen {
 			.build();
 	
 	private static final Identifier BG = new Identifier("fabrication", "bg.png");
+	
+	private static long serverLaunchId = -1;
+	
+	private static final Set<String> newlyFalseKeysClient = Sets.newHashSet();
+	private static final Set<String> newlyFalseKeysServer = Sets.newHashSet();
+	
+	private static final Set<String> newlyNotFalseKeysClient = Sets.newHashSet();
+	private static final Set<String> newlyNotFalseKeysServer = Sets.newHashSet();
+	
+	private static final Map<String, String> changedKeysWithoutRuntimeChecksClient = Maps.newHashMap();
+	private static final Map<String, String> changedKeysWithoutRuntimeChecksServer = Maps.newHashMap();
+	
+	private static boolean runtimeChecksToggledClient;
+	private static boolean runtimeChecksToggledServer;
 	
 	private final Screen parent;
 	
@@ -117,6 +132,8 @@ public class FabricationConfigScreen extends Screen {
 	
 	private boolean bufferTooltips = false;
 	private final List<Runnable> bufferedTooltips = Lists.newArrayList();
+	
+	private int noteIndex = 0;
 	
 	public FabricationConfigScreen(Screen parent) {
 		super(new LiteralText("Fabrication configuration"));
@@ -415,12 +432,74 @@ public class FabricationConfigScreen extends Screen {
 		
 		bufferTooltips = true;
 		drawSection(matrices, selectedSection, mouseX, mouseY, selectedChoiceY, sCurve5((10-selectTime)/10f));
-		if (!Objects.equal(selectedSection, prevSelectedSection)) {
+		if (!MixinConfigPlugin.isEnabled("general.reduced_motion") && !Objects.equal(selectedSection, prevSelectedSection)) {
 			drawSection(matrices, prevSelectedSection, -200, -200, prevSelectedChoiceY, sCurve5(selectTime/10f));
 		}
 		
 		
-		drawWrappedText(matrices, 136, height, "Config changes are applied in real time and do not need to be saved.", width-250, -1, true);
+		List<String> notes = Lists.newArrayList();
+		
+		Set<String> newlyFalseKeys;
+		Set<String> newlyNotFalseKeys;
+		Map<String, String> changedKeysWithoutRuntimeChecks;
+		
+		boolean runtimeChecksToggled;
+		boolean hasYellowNote = false;
+		boolean hasRedNote = false;
+		
+		if (configuringServer) {
+			checkServerData();
+			newlyFalseKeys = newlyFalseKeysServer;
+			newlyNotFalseKeys = newlyNotFalseKeysServer;
+			changedKeysWithoutRuntimeChecks = changedKeysWithoutRuntimeChecksServer;
+			runtimeChecksToggled = runtimeChecksToggledServer;
+		} else {
+			newlyFalseKeys = newlyFalseKeysClient;
+			newlyNotFalseKeys = newlyNotFalseKeysClient;
+			changedKeysWithoutRuntimeChecks = changedKeysWithoutRuntimeChecksClient;
+			runtimeChecksToggled = runtimeChecksToggledClient;
+		}
+		if (!changedKeysWithoutRuntimeChecks.isEmpty()) {
+			notes.add("§c"+changedKeysWithoutRuntimeChecks.size()+" change"+(changedKeysWithoutRuntimeChecks.size() == 1 ? "" : "s")
+					+" made while Runtime Checks\n§cis disabled will not be applied until\n§cthe {} is restarted.");
+			hasRedNote = true;
+		}
+		if (!newlyNotFalseKeys.isEmpty()) {
+			notes.add("§c"+newlyNotFalseKeys.size()+" newly undisabled option"+(newlyNotFalseKeys.size() == 1 ? "" : "s")+" will\n§cnot activate until the {} is\n§crestarted.");
+			hasRedNote = true;
+		}
+		if (runtimeChecksToggled) {
+			notes.add("§eThe {} must be restarted for\n§echanges to Runtime Checks to apply.");
+			hasYellowNote = true;
+		}
+		if (!newlyFalseKeys.isEmpty()) {
+			notes.add(newlyFalseKeys.size()+" newly disabled option"+(newlyFalseKeys.size() == 1 ? "" : "s")+" will be\nentirely unloaded when the {} is\nrestarted.");
+		}
+		if (noteIndex < 0) {
+			noteIndex = 0;
+		}
+		if (noteIndex >= notes.size()) {
+			noteIndex = 0;
+		}
+		int textHeight = drawWrappedText(matrices, 136, height,
+				(hasRedNote ? "§c\u26A0 " : hasYellowNote ? "§e" : "")+notes.size()+" note"+(notes.size() == 1 ? "" : "s")+
+				(notes.isEmpty() ? " ☺" : " - hover to see "+(notes.size() == 1 ? "it" : "them")), width-250, -1, true);
+		if (mouseX >= 136 && mouseX <= width-100 && mouseY >= height-textHeight) {
+			if (!notes.isEmpty()) {
+				List<Text> lines = Lists.newArrayList();
+				for (String s : notes.get(noteIndex).replace("{}", configuringServer ? "server" : "client").split("\n")) {
+					lines.add(new LiteralText(s));
+				}
+				if (notes.size() > 1) {
+					lines.add(new LiteralText("§7Click to see other notes"));
+				}
+				renderTooltip(matrices, lines, mouseX, mouseY);
+				if (didClick && notes.size() > 1) {
+					noteIndex++;
+					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_LOOM_SELECT_PATTERN, 1f));
+				}
+			}
+		}
 		
 		if (drawButton(matrices, width-100, height-20, 100, 20, "Done", mouseX, mouseY)) {
 			onClose();
@@ -459,6 +538,20 @@ public class FabricationConfigScreen extends Screen {
 		GlStateManager.popMatrix();
 	}
 	
+	private void checkServerData() {
+		ClientPlayNetworkHandler cpnh = client.getNetworkHandler();
+		if (cpnh != null && cpnh instanceof GetServerConfig) {
+			long launchId = ((GetServerConfig)cpnh).fabrication$getLaunchId();
+			if (launchId != serverLaunchId) {
+				newlyFalseKeysServer.clear();
+				newlyNotFalseKeysServer.clear();
+				changedKeysWithoutRuntimeChecksServer.clear();
+				runtimeChecksToggledServer = false;
+				serverLaunchId = launchId;
+			}
+		}
+	}
+
 	private int drawWrappedText(MatrixStack matrices, float x, float y, String str, int width, int color, boolean fromBottom) {
 		int height = 0;
 		List<OrderedText> lines = textRenderer.wrapLines(new LiteralText(str), width);
@@ -476,6 +569,9 @@ public class FabricationConfigScreen extends Screen {
 
 	private void drawSection(MatrixStack matrices, String section, float mouseX, float mouseY, float choiceY, float a) {
 		if (a <= 0) return;
+		if (MixinConfigPlugin.isEnabled("general.reduced_motion")) {
+			a = 1;
+		}
 		// jesus fucking christ
 		GlStateManager.pushMatrix();
 		GlStateManager.translatef(60, choiceY+16, 0);
@@ -488,7 +584,7 @@ public class FabricationConfigScreen extends Screen {
 					+ "Click a category on the left to change settings.\n\n"
 					+ "Detail offered by tooltips here is somewhat sparse. For additional detail and demonstration videos, please check the wiki.";
 			int height = drawWrappedText(matrices, 140, 20, blurb, width-130, -1, false);
-			if (drawButton(matrices, 140, 20+height+8, 100, 20, "Take me to the wiki", mouseX, mouseY)) {
+			if (drawButton(matrices, 140, 20+height+8, 120, 20, "Take me to the wiki", mouseX, mouseY)) {
 				Util.getOperatingSystem().open("https://github.com/unascribed/Fabrication/wiki");
 			}
 			
@@ -547,14 +643,14 @@ public class FabricationConfigScreen extends Screen {
 				}
 				y = 40;
 				y = drawTrilean(matrices, "general.runtime_checks", "Runtime Checks",
-						"Allows changing settings arbitrarily on-the-fly, but is very slightly\n" +
-						"slower and a fair bit less compatible, as it applies all mixins regardless\n" +
-						"of if the feature is enabled or not.\n" +
+						"Allows changing settings arbitrarily on-the-fly, but is very slightly " +
+						"slower and a fair bit less compatible, as all options that are set to " +
+						"'unset' but not enabled by the profile will be initialized.\n" +
+						"You can still disable something completely if it's causing problems by setting it " +
+						"to false explicitly.\n" +
 						"§cIf this is disabled, you must restart the game for changes made here to apply.", y, mouseX, mouseY, false);
 				y = drawTrilean(matrices, "general.reduced_motion", "Reduced Motion",
 						"Disable high-motion GUI animations.", y, mouseX, mouseY, true);
-				y = drawTrilean(matrices, "general.taggable_players", "Taggable Players",
-						"Allows players to be tagged by ops with /fabrication tag.", y, mouseX, mouseY, false);
 			} else if ("fixes".equals(section)) {
 				y = drawTrilean(matrices, "fixes.sync_attacker_yaw", "Sync Attacker Yaw",
 						"Makes the last attacker yaw field sync properly when the player is damaged, instead "
@@ -586,11 +682,20 @@ public class FabricationConfigScreen extends Screen {
 				y = drawTrilean(matrices, "fixes.uncap_menu_fps", "Uncap Menu FPS",
 						"Allow the menu to render at your set frame limit instead of being " +
 						"locked to 60. (30 in older versions)", y, mouseX, mouseY, true);
+				y = drawTrilean(matrices, "fixes.adventure_tags_in_survival", "Adventure Tags In Survival",
+						"Makes the CanDestroy and CanPlaceOn tags be honored in survival mode " +
+						"instead of just adventure mode.\n" +
+						"Only needed on the server, but the experience is more seamless if it's also on the client.", y, mouseX, mouseY, false);
 			} else if ("utility".equals(section)) {
 				y = drawTrilean(matrices, "utility.mods_command", "/mods command",
 						"Adds a /mods command that anyone can run that lists installed mods. Lets " +
 						"players see what changes are present on a server at a glance.\n" +
 						"Requires Fabric API. Force disabled if Fabric API is not present.", y, mouseX, mouseY, false);
+				y = drawTrilean(matrices, "utility.taggable_players", "Taggable Players",
+						"Allows players to be tagged by ops with /fabrication tag. Allows " +
+						"making them not need to eat food, not be targeted by mobs, have " +
+						"permanent dolphin's grace or conduit power, able to breathe water, " +
+						"fireproof, scare creepers, or not have phantoms spawn.", y, mouseX, mouseY, false);
 				y = drawTrilean(matrices, "utility.legacy_command_syntax", "Legacy Command Syntax",
 						"Re-adds /toggledownfall and numeric arguments to /difficulty and /gamemode, as "
 						+ "well as capitalized arguments to /summon.\n" +
@@ -606,6 +711,14 @@ public class FabricationConfigScreen extends Screen {
 						"Items that are about to despawn blink.\n" +
 						"Needed on both sides. Server sends packets, client actually does the blinking.\n" +
 						"Will not break vanilla clients.", y, mouseX, mouseY, false);
+				y = drawTrilean(matrices, "utility.canhit", "CanHit",
+						"Adds a CanHit tag that only allows hitting entities matching given filters. Works for " +
+						"melee, bows, and tridents. Bows will also check the arrow they're firing " +
+						"and will only allow hitting entities that are in the bow's CanHit list as " +
+						"well as the arrow's.\n" +
+						"Honors Fixes > Adventure Tags In Survival.\n" +
+						"Only needed on server, but the experience is more seamless if it's " +
+						"also on the client.", y, mouseX, mouseY, false);
 			} else if ("tweaks".equals(section)) {
 				y = drawTrilean(matrices, "tweaks.creepers_explode_when_on_fire", "Creepers Explode When On Fire",
 						"Causes creepers to light their fuses when lit on fire. Just because.", y, mouseX, mouseY, false);
@@ -637,6 +750,11 @@ public class FabricationConfigScreen extends Screen {
 						"Sneaking while tuning a note block reduces its pitch rather than increases.", y, mouseX, mouseY, false);
 				y = drawTrilean(matrices, "tweaks.campfires_place_unlit", "Campfires Place Unlit",
 						"Campfires are unlit when placed and must be lit.", y, mouseX, mouseY, false);
+				y = drawTrilean(matrices, "tweaks.rainbow_experience", "Rainbow Experience",
+						"Makes experience rainbow instead of just lime green. "+
+						"Every orb picks two random colors to pulse between when spawning.", y, mouseX, mouseY, true);
+				y = drawTrilean(matrices, "tweaks.long_levelup_sound_at_30", "Long Level Up Sound At 30",
+						"Plays the old longer level up sound when you hit level 30.", y, mouseX, mouseY, true);
 				y = drawTrilean(matrices, "tweaks.ghost_chest_woo_woo", "Ghost Chest Woo Woo",
 						"?", y, mouseX, mouseY, true);
 			} else if ("minor_mechanics".equals(section)) {
@@ -750,6 +868,8 @@ public class FabricationConfigScreen extends Screen {
 						"broken. Assumes vanilla material costs. Doesn't use loot tables because I " +
 						"have never written a JSON file in my life. Broken Netherite gear " +
 						"drops all 4 of its constituent scrap.", y, mouseX, mouseY, false);
+				y = drawTrilean(matrices, "balance.drop_more_exp_on_death", "Drop More Experience On Death",
+						"Players drop 80% of their experience upon death instead of basically none.", y, mouseX, mouseY, false);
 			} else if ("weird_tweaks".equals(section)) {
 				y = drawTrilean(matrices, "weird_tweaks.endermen_dont_squeal", "Endermen Don't Squeal",
 						"Makes Endermen not make their growling or screeching sounds when angry.\n" +
@@ -767,6 +887,10 @@ public class FabricationConfigScreen extends Screen {
 				y = drawTrilean(matrices, "weird_tweaks.repelling_void", "Déjà Void (aka Repelling Void)",
 						"Players falling into the void teleports them back to the last place they " +
 						"were on the ground and deals 6 hearts of damage.", y, mouseX, mouseY, false);
+				y = drawTrilean(matrices, "weird_tweaks.drop_exp_with_keep_inventory", "Drop Experience With keepInventory",
+						"If keepInventory is enabled, players still drop their experience when " +
+						"dying, but do so losslessly. Incents returning to where you died even " +
+						"when keepInventory is enabled.", y, mouseX, mouseY, false);
 			} else if ("pedantry".equals(section)) {
 				y = drawTrilean(matrices, "pedantry.tnt_is_dynamite", "TNT Is Dynamite",
 						"TNT is renamed to Dynamite and doesn't say TNT on it. TNT is more stable " +
@@ -842,7 +966,7 @@ public class FabricationConfigScreen extends Screen {
 				disabledAnimationTime.put(key, disabledTime);
 			}
 		}
-		boolean noUnset = key.startsWith("general.") || key.startsWith("situational.") || "tweaks.ghost_chest_woo_woo".equals(key);
+		boolean noUnset = key.startsWith("general.");
 		Trilean currentValue = noUnset ? (isEnabled(key) ? Trilean.TRUE : Trilean.FALSE) : getValue(key);
 		boolean keyEnabled = isEnabled(key);
 		Trilean prevValue = animateDisabled ? currentValue : optionPreviousValues.getOrDefault(key, currentValue);
@@ -1057,7 +1181,7 @@ public class FabricationConfigScreen extends Screen {
 	
 	private ResolvedTrilean getResolvedValue(String key) {
 		if (configuringServer) {
-			return ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerTrileanConfig().get(key);
+			return ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerTrileanConfig().getOrDefault(key, ResolvedTrilean.DEFAULT_FALSE);
 		} else {
 			return MixinConfigPlugin.getResolvedValue(key);
 		}
@@ -1084,13 +1208,60 @@ public class FabricationConfigScreen extends Screen {
 	}
 	
 	private void setValue(String key, String value) {
+		Set<String> newlyFalseKeys;
+		Set<String> newlyNotFalseKeys;
+		Map<String, String> changedKeysWithoutRuntimeChecks;
+		
+		boolean runtimeChecksToggled;
+		
 		if (configuringServer) {
+			checkServerData();
+			newlyFalseKeys = newlyFalseKeysServer;
+			newlyNotFalseKeys = newlyNotFalseKeysServer;
+			changedKeysWithoutRuntimeChecks = changedKeysWithoutRuntimeChecksServer;
+			runtimeChecksToggled = runtimeChecksToggledServer;
+		} else {
+			newlyFalseKeys = newlyFalseKeysClient;
+			newlyNotFalseKeys = newlyNotFalseKeysClient;
+			changedKeysWithoutRuntimeChecks = changedKeysWithoutRuntimeChecksClient;
+			runtimeChecksToggled = runtimeChecksToggledClient;
+		}
+		String oldValue = getRawValue(key);
+		if ("general.runtime_checks".equals(key)) {
+			runtimeChecksToggled = !runtimeChecksToggled;
+		} else if (!MixinConfigPlugin.isRuntimeConfigurable(key)) {
+			if (value.equals("false")) {
+				if (newlyNotFalseKeys.contains(key)) {
+					newlyNotFalseKeys.remove(key);
+				} else {
+					newlyFalseKeys.add(key);
+				}
+			} else if (oldValue.equals("false")) {
+				if (newlyFalseKeys.contains(key)) {
+					newlyFalseKeys.remove(key);
+				} else {
+					newlyNotFalseKeys.add(key);
+				}
+			}
+		}
+		if (!"general.runtime_checks".equals(key) && !isEnabled("general.runtime_checks") && !runtimeChecksToggled && !MixinConfigPlugin.isRuntimeConfigurable(key)) {
+			if (changedKeysWithoutRuntimeChecks.containsKey(key)) {
+				if (changedKeysWithoutRuntimeChecks.get(key).equals(value)) {
+					changedKeysWithoutRuntimeChecks.remove(key);
+				}
+			} else {
+				changedKeysWithoutRuntimeChecks.put(key, oldValue);
+			}
+		}
+		if (configuringServer) {
+			runtimeChecksToggledServer = runtimeChecksToggled;
 			PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
 			data.writeVarInt(1);
 			data.writeString(key);
 			data.writeString(value);
 			client.getNetworkHandler().sendPacket(new CustomPayloadC2SPacket(new Identifier("fabrication", "config"), data));
 		} else {
+			runtimeChecksToggledClient = runtimeChecksToggled;
 			MixinConfigPlugin.set(key, value);
 			if (FabricationMod.isAvailableFeature(key)) {
 				FabricationMod.updateFeature(key);
