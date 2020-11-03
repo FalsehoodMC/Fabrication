@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.client;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -83,6 +84,9 @@ public class FabricationConfigScreen extends Screen {
 			.build();
 	
 	private static final Identifier BG = new Identifier("fabrication", "bg.png");
+	private static final Identifier PRIDETEX = new Identifier("fabrication", "pride.png");
+	
+	private static final boolean PRIDE = Calendar.getInstance().get(Calendar.MONTH) == Calendar.JUNE || Boolean.getBoolean("com.unascribed.fabrication.everyMonthIsPrideMonth");
 	
 	private static long serverLaunchId = -1;
 	
@@ -250,9 +254,6 @@ public class FabricationConfigScreen extends Screen {
 	
 	private void drawBackground(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		fillGradient(matrices, -width, 0, width*2, height, 0xFF2196F3, 0xFF009688);
-		client.getTextureManager().bindTexture(BG);
-		GlStateManager.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-		GlStateManager.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 		float ratio = 502/1080f;
 		
 		float w = height*ratio;
@@ -265,11 +266,43 @@ public class FabricationConfigScreen extends Screen {
 		GlStateManager.enableBlend();
 		RenderSystem.defaultBlendFunc();
 		float time = selectedSection == null ? 10-selectTime : prevSelectedSection == null ? selectTime : 0;
-		float a = sCurve5(time/10f);
-		GlStateManager.color4f(1, 1, 1, 0.3f+(a*0.7f));
+		GlStateManager.color4f(1, 1, 1, 1);
 		
 		GlStateManager.disableCull();
 		BufferBuilder bb = Tessellator.getInstance().getBuffer();
+
+		float top = (570/1080f)*height;
+		float bottom = (901/1080f)*height;
+		if (PRIDE) {
+			client.getTextureManager().bindTexture(PRIDETEX);
+			int flags = 21;
+			int flag = Math.abs(hashCode())%flags;
+			float minU = (flag/(float)flags)+(0.5f/flags);
+			float maxU = (flag/(float)flags)+(0.75f/flags);
+			bb.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE);
+			bb.vertex(mat, brk, top, 0).texture(minU, 0).next();
+			bb.vertex(mat, brk2, top, 0).texture(maxU, 0).next();
+			bb.vertex(mat, brk2, bottom, 0).texture(maxU, 1).next();
+			bb.vertex(mat, brk, bottom, 0).texture(minU, 1).next();
+			bb.end();
+			BufferRenderer.draw(bb);
+		} else {
+			GlStateManager.shadeModel(GL11.GL_SMOOTH);
+			GlStateManager.disableTexture();
+			bb.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
+			bb.vertex(mat, brk, top, 0).color(0.298f, 0.686f, 0.314f, 1).next();
+			bb.vertex(mat, brk2, top, 0).color(0.298f, 0.686f, 0.314f, 1).next();
+			bb.vertex(mat, brk2, bottom, 0).color(0.475f, 0.333f, 0.282f, 1).next();
+			bb.vertex(mat, brk, bottom, 0).color(0.475f, 0.333f, 0.282f, 1).next();
+			bb.end();
+			BufferRenderer.draw(bb);
+			GlStateManager.enableTexture();
+			GlStateManager.shadeModel(GL11.GL_FLAT);
+		}
+		
+		client.getTextureManager().bindTexture(BG);
+		GlStateManager.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+		GlStateManager.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 		bb.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE);
 		bb.vertex(mat, border, 0, 0).texture(0, 0).next();
 		bb.vertex(mat, brk, 0, 0).texture(0, 0).next();
@@ -287,8 +320,13 @@ public class FabricationConfigScreen extends Screen {
 		bb.vertex(mat, brk2, height, 0).texture(1, 1).next();
 		
 		bb.end();
-		RenderSystem.enableAlphaTest();
 		BufferRenderer.draw(bb);
+		
+		float a = 1-(0.3f+(sCurve5(time/10f)*0.7f));
+		if (a > 0) {
+			int ai = ((int)(a*255))<<24;
+			fillGradient(matrices, -width, 0, width*2, height, 0x2196F3|ai, 0x009688|ai);
+		}
 	}
 
 	private void drawForeground(MatrixStack matrices, int mouseX, int mouseY, float delta) {
