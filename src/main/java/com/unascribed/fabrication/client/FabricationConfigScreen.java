@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -101,6 +102,8 @@ public class FabricationConfigScreen extends Screen {
 	
 	private static boolean runtimeChecksToggledClient;
 	private static boolean runtimeChecksToggledServer;
+	
+	private final int random = ThreadLocalRandom.current().nextInt();
 	
 	private final Screen parent;
 	
@@ -276,7 +279,7 @@ public class FabricationConfigScreen extends Screen {
 		if (PRIDE) {
 			client.getTextureManager().bindTexture(PRIDETEX);
 			int flags = 21;
-			int flag = Math.abs(hashCode())%flags;
+			int flag = Math.abs(random)%flags;
 			float minU = (flag/(float)flags)+(0.5f/flags);
 			float maxU = (flag/(float)flags)+(0.75f/flags);
 			bb.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE);
