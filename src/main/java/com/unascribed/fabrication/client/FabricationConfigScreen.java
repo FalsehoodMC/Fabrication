@@ -128,9 +128,11 @@ public class FabricationConfigScreen extends Screen {
 	
 	private boolean configuringServer;
 	private boolean hasClonked = true;
+	private boolean isSingleplayer;
 	private float serverAnimateTime;
 	private String whyCantConfigureServer = null;
 	private Set<String> serverKnownConfigKeys = Sets.newHashSet();
+	private boolean serverReadOnly;
 	
 	private final Map<String, Trilean> optionPreviousValues = Maps.newHashMap();
 	private final Map<String, Float> optionAnimationTime = Maps.newHashMap();
@@ -172,16 +174,16 @@ public class FabricationConfigScreen extends Screen {
 	@Override
 	protected void init() {
 		super.init();
+		isSingleplayer = false;
 		if (client.world == null) {
 			whyCantConfigureServer = "You're not connected to a server.";
 		} else if (client.getServer() != null) {
 			whyCantConfigureServer = "The singleplayer server shares the client settings.";
+			isSingleplayer = true;
 		} else {
 			CommandDispatcher<?> disp = client.player.networkHandler.getCommandDispatcher();
 			if (disp.getRoot().getChild("fabrication") == null) {
 				whyCantConfigureServer = "This server doesn't have Fabrication.";
-			} else if (disp.getRoot().getChild("fabrication").getChild("config") == null) {
-				whyCantConfigureServer = "You don't have permission to configure Fabrication.";
 			} else {
 				ClientPlayNetworkHandler cpnh = client.getNetworkHandler();
 				if (cpnh instanceof GetServerConfig) {
@@ -189,6 +191,7 @@ public class FabricationConfigScreen extends Screen {
 					if (!gsc.fabrication$hasHandshook()) {
 						whyCantConfigureServer = "This server's version of Fabrication is too old.";
 					} else {
+						serverReadOnly = (disp.getRoot().getChild("fabrication").getChild("config") == null);
 						serverKnownConfigKeys.clear();
 						serverKnownConfigKeys.addAll(gsc.fabrication$getServerTrileanConfig().keySet());
 						serverKnownConfigKeys.addAll(gsc.fabrication$getServerStringConfig().keySet());
@@ -367,6 +370,9 @@ public class FabricationConfigScreen extends Screen {
 				GlStateManager.pushMatrix();
 					GlStateManager.scalef((float)(1-(Math.abs(Math.sin(a*Math.PI))/2)), 1, 1);
 					fill(matrices, -60, -8, 0, 8, MathHelper.hsvToRgb(h, 0.9f, 0.9f)|0xFF000000);
+					if (isSingleplayer) {
+						fill(matrices, 0, -8, 60, 8, MathHelper.hsvToRgb(0.833333f, 0.9f, 0.9f)|0xFF000000);
+					}
 				GlStateManager.popMatrix();
 				GlStateManager.pushMatrix();
 					GlStateManager.rotatef(45, 0, 0, 1);
@@ -375,13 +381,20 @@ public class FabricationConfigScreen extends Screen {
 					GlStateManager.scalef(f, f, 1);
 					fill(matrices, -1, -1, 1, 1, 0xFFFFFFFF);
 				GlStateManager.popMatrix();
-				fill(matrices, -6, -1, -2, 1, 0xFF000000);
+				if (!isSingleplayer) {
+					fill(matrices, -6, -1, -2, 1, 0xFF000000);
+				}
 			GlStateManager.popMatrix();
 			fill(matrices, -2, -2, 2, 2, 0xFF000000);
 		GlStateManager.popMatrix();
 		
 		textRenderer.draw(matrices, "CLIENT", width-115, 4, 0xFF000000);
-		textRenderer.draw(matrices, "SERVER", width-40, 4, whyCantConfigureServer == null ? 0xFF000000 : 0x44000000);
+		textRenderer.draw(matrices, "SERVER", width-40, 4, whyCantConfigureServer == null || isSingleplayer ? 0xFF000000 : 0x44000000);
+		if (serverReadOnly && whyCantConfigureServer == null) {
+			client.getTextureManager().bindTexture(new Identifier("fabrication", "lock.png"));
+			GlStateManager.color4f(0, 0, 0, 1);
+			drawTexture(matrices, width-49, 3, 0, 0, 0, 8, 8, 8, 8);
+		}
 		
 		fill(matrices, -width, -height, 130, height, 0x44000000);
 		// TODO cache this
@@ -513,7 +526,7 @@ public class FabricationConfigScreen extends Screen {
 			notes.add("§eThe {} must be restarted for\n§echanges to Runtime Checks to apply.");
 			hasYellowNote = true;
 		}
-		if (!newlyFalseKeys.isEmpty()) {
+		if (!newlyFalseKeys.isEmpty() && (isEnabled("general.runtime_checks") && !runtimeChecksToggled)) {
 			notes.add(newlyFalseKeys.size()+" newly disabled option"+(newlyFalseKeys.size() == 1 ? "" : "s")+" will be\nentirely unloaded when the {} is\nrestarted.");
 		}
 		if (noteIndex < 0) {
@@ -558,11 +571,11 @@ public class FabricationConfigScreen extends Screen {
 		if (mouseX > width-120 && mouseY < 16) {
 			String msg;
 			if (whyCantConfigureServer != null) {
-				msg = ((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "§e")+"§l"+whyCantConfigureServer;
+				msg = ((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "§e")+whyCantConfigureServer;
 			} else {
 				int srv = serverKnownConfigKeys.size();
 				int cli = MixinConfigPlugin.getAllKeys().size();
-				msg = "§d§lServer has Fabrication and is recognized.";
+				msg = "§dServer has Fabrication and is recognized.";
 				if (srv != cli) {
 					msg += "\n§oMismatch: Server has "+srv+" options. Client has "+cli+".";
 					if (srv > cli) {
@@ -572,7 +585,15 @@ public class FabricationConfigScreen extends Screen {
 					}
 				}
 			}
-			msg += "\n§fChanges will apply to the "+(configuringServer ? "§dSERVER" : "§6CLIENT")+"§f.";
+			if (serverReadOnly) {
+				msg += "\n§fYou cannot configure this server.";
+				if (configuringServer) {
+					msg += "\n§fChanges cannot be made.";
+				}
+			}
+			if (!isSingleplayer && (!serverReadOnly || !configuringServer)) {
+				msg += "\n§fChanges will apply to the "+(configuringServer ? "§dSERVER" : "§6CLIENT")+"§f.";
+			}
 			renderTooltip(matrices, Lists.transform(Lists.newArrayList(msg.split("\n")),
 					s -> new LiteralText(s)), mouseX+10, 20+mouseY);
 		}
@@ -978,7 +999,8 @@ public class FabricationConfigScreen extends Screen {
 	}
 
 	private int drawTrilean(MatrixStack matrices, String key, String title, String desc, int y, float mouseX, float mouseY, boolean clientOnly) {
-		boolean disabled = (configuringServer && clientOnly) || !isValid(key);
+		boolean disabled = (configuringServer && (serverReadOnly || clientOnly)) || !isValid(key);
+		boolean noValue = configuringServer && clientOnly || !isValid(key);
 		float time = optionAnimationTime.getOrDefault(key, 0f);
 		float disabledTime = disabledAnimationTime.getOrDefault(key, 0f);
 		boolean animateDisabled = disabledTime > 0;
@@ -1029,7 +1051,7 @@ public class FabricationConfigScreen extends Screen {
 		if (!noUnset) fill(matrices, 134+15, y+1, 134+15+15, y+10, 0x33000000);
 		GlStateManager.pushMatrix();
 		GlStateManager.translatef(134+(prevX+((curX-prevX)*a)), 0, 0);
-		int knobAlpha = ((int)((1-da) * 255))<<24;
+		int knobAlpha = ((int)((noValue ? 1-da : 1) * 255))<<24;
 		fill(matrices, 0, y+1, noUnset ? 22 : 15, y+10, MathHelper.hsvToRgb((prevHue+((curHue-prevHue)*a))/360f, 0.9f, 0.8f)|knobAlpha);
 		if (!noUnset && a >= 1 && currentValue == Trilean.UNSET) {
 			fill(matrices, keyEnabled ? 15 : -1, y+1, keyEnabled ? 16 : 0, y+10, MathHelper.hsvToRgb((keyEnabled ? 120 : 0)/360f, 0.9f, 0.8f)|knobAlpha);
@@ -1038,7 +1060,7 @@ public class FabricationConfigScreen extends Screen {
 		GlStateManager.enableBlend();
 		RenderSystem.defaultBlendFunc();
 		client.getTextureManager().bindTexture(new Identifier("fabrication", "trilean.png"));
-		GlStateManager.color4f(1, 1, 1, 0.3f+((1-da)*0.7f));
+		GlStateManager.color4f(1, 1, 1, 0.5f+((1-da)*0.5f));
 		GlStateManager.enableTexture();
 		if (noUnset) {
 			drawTexture(matrices, 134+3, y+1, 0, 0, 15, 9, 45, 9);
@@ -1066,14 +1088,18 @@ public class FabricationConfigScreen extends Screen {
 				}
 			}
 		}
-		int textAlpha = ((int)((0.5f+((1-da)*0.5f)) * 255))<<24;
+		int textAlpha = ((int)((0.7f+((1-da)*0.3f)) * 255))<<24;
 		int startX = 136+50;
 		int endX = textRenderer.draw(matrices, title, startX, y+2, 0xFFFFFF | textAlpha);
 		if (mouseX >= startX && mouseX <= endX && mouseY >= y && mouseY <= y+10) {
 			renderOrderedTooltip(matrices, textRenderer.wrapLines(new LiteralText((clientOnly ? "§6Client Only§r\n" : "")+desc), width/3), (int)(mouseX+10), (int)(20+mouseY));
 		} else if (mouseX >= 134 && mouseX <= 134+45 && mouseY >= y && mouseY <= y+10) {
 			if (disabled) {
-				renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"The server does not recognize this option"), (int)mouseX, (int)mouseY);
+				if (noValue) {
+					renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"The server does not recognize this option"), (int)mouseX, (int)mouseY);
+				} else {
+					renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"You cannot configure this server"), (int)mouseX, (int)mouseY);
+				}
 			} else {
 				int index = (int)((mouseX-134)/(noUnset ? 22 : 15));
 				if (index == 0) {
