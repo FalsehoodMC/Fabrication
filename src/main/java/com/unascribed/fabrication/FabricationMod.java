@@ -13,6 +13,7 @@ import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
 import com.unascribed.fabrication.support.ResolvedTrilean;
+import com.unascribed.fabrication.support.Trilean;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -21,6 +22,7 @@ import com.google.common.collect.Sets;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
@@ -64,7 +66,9 @@ public class FabricationMod implements ModInitializer {
 				throw new RuntimeException("Failed to initialize feature "+s, e);
 			}
 		}
-		LEVELUP_LONG = Registry.register(Registry.SOUND_EVENT, new Identifier("fabrication", "levelup_long"), new SoundEvent(new Identifier("fabrication", "levelup_long")));
+		if (MixinConfigPlugin.getValue("*.long_levelup_sound_at_30") != Trilean.FALSE && FabricLoader.getInstance().isModLoaded("fabric")) {
+			LEVELUP_LONG = Registry.register(Registry.SOUND_EVENT, new Identifier("fabrication", "levelup_long"), new SoundEvent(new Identifier("fabrication", "levelup_long")));
+		}
 	}
 	
 	public static boolean isAvailableFeature(String configKey) {

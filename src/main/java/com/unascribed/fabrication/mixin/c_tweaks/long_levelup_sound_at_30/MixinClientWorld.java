@@ -17,7 +17,7 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 
 @Mixin(ClientWorld.class)
-@EligibleIf(configEnabled="*.long_levelup_sound_at_30", envMatches=Env.CLIENT)
+@EligibleIf(configEnabled="*.long_levelup_sound_at_30", envMatches=Env.CLIENT, modLoaded="fabric")
 public class MixinClientWorld {
 
 	@Inject(at=@At("HEAD"), method="playSound(DDDLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FFZ)V", cancellable=true)

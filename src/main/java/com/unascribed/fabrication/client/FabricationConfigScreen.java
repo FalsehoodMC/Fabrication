@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -49,7 +50,13 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Matrix4f;
 
+import static com.unascribed.fabrication.client.FabricationConfigScreen.TrileanFlag.*;
+
 public class FabricationConfigScreen extends Screen {
+
+	public enum TrileanFlag {
+		CLIENT_ONLY, REQUIRES_FABRIC_API
+	}
 
 	private static final ImmutableMap<String, String> SECTION_DESCRIPTIONS = ImmutableMap.<String, String>builder()
 			.put("general", "Broad features\nand global settings.")
@@ -710,16 +717,16 @@ public class FabricationConfigScreen extends Screen {
 						"'unset' but not enabled by the profile will be initialized.\n" +
 						"You can still disable something completely if it's causing problems by setting it " +
 						"to false explicitly.\n" +
-						"§cIf this is disabled, you must restart the game for changes made here to apply.", y, mouseX, mouseY, false);
+						"§cIf this is disabled, you must restart the game for changes made here to apply.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "general.reduced_motion", "Reduced Motion",
-						"Disable high-motion GUI animations.", y, mouseX, mouseY, true);
+						"Disable high-motion GUI animations.", y, mouseX, mouseY, CLIENT_ONLY);
 			} else if ("fixes".equals(section)) {
 				y = drawTrilean(matrices, "fixes.sync_attacker_yaw", "Sync Attacker Yaw",
 						"Makes the last attacker yaw field sync properly when the player is damaged, instead "
 						+ "of always being zero. Causes the camera shake animation when being hurt to tilt "
 						+ "away from the source of damage.\n"
 						+ "Fixes MC-26678, which is closed as Won't Fix.\n"
-						+ "Needed on both client and server, but doesn't break vanilla clients.", y, mouseX, mouseY, false);
+						+ "Needed on both client and server, but doesn't break vanilla clients.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "fixes.furnace_minecart_pushing", "Furnace Minecart Pushing",
 						"Right-clicking a furnace minecart with a non-fuel while it's out of " +
 						"fuel gives it a little bit of fuel, allowing you to \"push\" it. " +
@@ -728,51 +735,49 @@ public class FabricationConfigScreen extends Screen {
 						"Note: All furnace minecart tweaks enable a mixin that overrides " +
 						"multiple methods in the furnace minecart entity. If you have another " +
 						"mod that changes furnace minecarts (wow!) then you'll need to disable\n" +
-						"this.", y, mouseX, mouseY, false);
+						"this.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "fixes.use_player_list_name_in_tag", "Use Player List Name In Tag",
 						"Changes player name tags to match names in the player list. "
-						+ "Good in combination with nickname mods like Drogtor.", y, mouseX, mouseY, true);
+						+ "Good in combination with nickname mods like Drogtor.", y, mouseX, mouseY, CLIENT_ONLY);
 				y = drawTrilean(matrices, "fixes.better_pause_freezing", "Better Pause Freezing",
 						"Makes textures not tick while the game is paused.\n" +
-						"May do more in the future.", y, mouseX, mouseY, true);
+						"May do more in the future.", y, mouseX, mouseY, CLIENT_ONLY);
 				y = drawTrilean(matrices, "fixes.inanimates_can_be_invisible", "Inanimates Can Be Invisible",
 						"Prevents inanimate entities from rendering at all if their \"invisible\" " +
-						"flag is set to true.", y, mouseX, mouseY, true);
+						"flag is set to true.", y, mouseX, mouseY, CLIENT_ONLY);
 				y = drawTrilean(matrices, "fixes.omniscent_player", "Omniscent Player",
 						"The player render in the inventory follows your cursor, even if it's not" +
-						"inside the game window.", y, mouseX, mouseY, true);
+						"inside the game window.", y, mouseX, mouseY, CLIENT_ONLY);
 				y = drawTrilean(matrices, "fixes.uncap_menu_fps", "Uncap Menu FPS",
 						"Allow the menu to render at your set frame limit instead of being " +
-						"locked to 60. (30 in older versions)", y, mouseX, mouseY, true);
+						"locked to 60. (30 in older versions)", y, mouseX, mouseY, CLIENT_ONLY);
 				y = drawTrilean(matrices, "fixes.adventure_tags_in_survival", "Adventure Tags In Survival",
 						"Makes the CanDestroy and CanPlaceOn tags be honored in survival mode " +
 						"instead of just adventure mode.\n" +
-						"Only needed on the server, but the experience is more seamless if it's also on the client.", y, mouseX, mouseY, false);
+						"Only needed on the server, but the experience is more seamless if it's also on the client.", y, mouseX, mouseY);
 			} else if ("utility".equals(section)) {
 				y = drawTrilean(matrices, "utility.mods_command", "/mods command",
 						"Adds a /mods command that anyone can run that lists installed mods. Lets " +
-						"players see what changes are present on a server at a glance.\n" +
-						"Requires Fabric API. Force disabled if Fabric API is not present.", y, mouseX, mouseY, false);
+						"players see what changes are present on a server at a glance.", y, mouseX, mouseY, REQUIRES_FABRIC_API);
 				y = drawTrilean(matrices, "utility.taggable_players", "Taggable Players",
 						"Allows players to be tagged by ops with /fabrication tag. Allows " +
 						"making them not need to eat food, not be targeted by mobs, have " +
 						"permanent dolphin's grace or conduit power, able to breathe water, " +
-						"fireproof, scare creepers, or not have phantoms spawn.", y, mouseX, mouseY, false);
+						"fireproof, scare creepers, or not have phantoms spawn.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "utility.legacy_command_syntax", "Legacy Command Syntax",
 						"Re-adds /toggledownfall and numeric arguments to /difficulty and /gamemode, as "
-						+ "well as capitalized arguments to /summon.\n" +
-						"Requires Fabric API. Force disabled if Fabric API is not present.", y, mouseX, mouseY, false);
+						+ "well as capitalized arguments to /summon.", y, mouseX, mouseY, REQUIRES_FABRIC_API);
 				y = drawTrilean(matrices, "utility.books_show_enchants", "Books Show Enchants",
 						"Makes enchanted books show the first letter of their enchants in the" +
-						"bottom left, cycling through enchants every second if they have multiple.", y, mouseX, mouseY, true);
+						"bottom left, cycling through enchants every second if they have multiple.", y, mouseX, mouseY, CLIENT_ONLY);
 				y = drawTrilean(matrices, "utility.tools_show_important_enchant", "Tools Show Important Enchant",
 						"Makes tools enchanted with Silk Touch, Fortune, or Riptide show " +
 						"the first letter of that enchant in the top left.\n" +
-						"Never break an Ender Chest with the wrong tool again.", y, mouseX, mouseY, true);
+						"Never break an Ender Chest with the wrong tool again.", y, mouseX, mouseY, CLIENT_ONLY);
 				y = drawTrilean(matrices, "utility.despawning_items_blink", "Despawning Items Blink",
 						"Items that are about to despawn blink.\n" +
 						"Needed on both sides. Server sends packets, client actually does the blinking.\n" +
-						"Will not break vanilla clients.", y, mouseX, mouseY, false);
+						"Will not break vanilla clients.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "utility.canhit", "CanHit",
 						"Adds a CanHit tag that only allows hitting entities matching given filters. Works for " +
 						"melee, bows, and tridents. Bows will also check the arrow they're firing " +
@@ -780,119 +785,119 @@ public class FabricationConfigScreen extends Screen {
 						"well as the arrow's.\n" +
 						"Honors Fixes > Adventure Tags In Survival.\n" +
 						"Only needed on server, but the experience is more seamless if it's " +
-						"also on the client.", y, mouseX, mouseY, false);
+						"also on the client.", y, mouseX, mouseY);
 			} else if ("tweaks".equals(section)) {
 				y = drawTrilean(matrices, "tweaks.creepers_explode_when_on_fire", "Creepers Explode When On Fire",
-						"Causes creepers to light their fuses when lit on fire. Just because.", y, mouseX, mouseY, false);
+						"Causes creepers to light their fuses when lit on fire. Just because.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "tweaks.tridents_in_void_return", "Tridents In Void Return",
 						"Makes Loyalty tridents immune to void damage, and causes them to start " +
-						"their return timer upon falling into the void.", y, mouseX, mouseY, false);
+						"their return timer upon falling into the void.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "tweaks.less_annoying_fire", "Less Annoying Fire",
 						"Makes the \"on fire\" overlay half as tall, and removes it completely if " +
-						"you have Fire Resistance.", y, mouseX, mouseY, true);
+						"you have Fire Resistance.", y, mouseX, mouseY, CLIENT_ONLY);
 				y = drawTrilean(matrices, "tweaks.less_restrictive_note_blocks", "Less Restrictive Note Blocks",
 						"Allows note blocks to play if any block next to them has a nonsolid " +
 						"face, instead of only if the block above is air.\n" +
-						"On the client, just adjusts the note particle to fly the right direction.", y, mouseX, mouseY, false);
+						"On the client, just adjusts the note particle to fly the right direction.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "tweaks.cactus_walk_doesnt_hurt_with_boots", "Cactus Walk Doesn't Hurt With Boots",
 						"Makes walking on top of a cactus (not touching the side of one) with " +
-						"boots equipped not deal damage.", y, mouseX, mouseY, false);
+						"boots equipped not deal damage.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "tweaks.cactus_brush_doesnt_hurt_with_chest", "Cactus Brush Doesn't Hurt With Chest",
 						"Makes touching the side of a cactus (not walking on top of one) with " +
-						"a chestplate equipped not deal damage.", y, mouseX, mouseY, false);
+						"a chestplate equipped not deal damage.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "tweaks.bush_walk_doesnt_hurt_with_armor", "Bush Walk Doesn't Hurt With Armor",
 						"Makes walking through berry bushes with both leggings and boots\n" +
-						"equipped not deal damage.", y, mouseX, mouseY, false);
+						"equipped not deal damage.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "tweaks.shulker_bullets_despawn_on_death", "Shulker Bullets Despawn On Death",
-						"Makes shulker bullets despawn when the shulker that shot them is killed.", y, mouseX, mouseY, false);
+						"Makes shulker bullets despawn when the shulker that shot them is killed.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "tweaks.arrows_work_in_water", "Arrows Work In Water",
 						"Makes arrows viable in water by reducing their drag. Nowhere near as\n" +
-						"good as a trident, but usable.", y, mouseX, mouseY, false);
+						"good as a trident, but usable.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "tweaks.reverse_note_block_tuning", "Reverse Note Block Tuning",
-						"Sneaking while tuning a note block reduces its pitch rather than increases.", y, mouseX, mouseY, false);
+						"Sneaking while tuning a note block reduces its pitch rather than increases.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "tweaks.campfires_place_unlit", "Campfires Place Unlit",
-						"Campfires are unlit when placed and must be lit.", y, mouseX, mouseY, false);
+						"Campfires are unlit when placed and must be lit.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "tweaks.rainbow_experience", "Rainbow Experience",
 						"Makes experience rainbow instead of just lime green. "+
-						"Every orb picks two random colors to pulse between when spawning.", y, mouseX, mouseY, true);
+						"Every orb picks two random colors to pulse between when spawning.", y, mouseX, mouseY, CLIENT_ONLY);
 				y = drawTrilean(matrices, "tweaks.long_levelup_sound_at_30", "Long Level Up Sound At 30",
-						"Plays the old longer level up sound when you hit level 30.", y, mouseX, mouseY, true);
+						"Plays the old longer level up sound when you hit level 30.", y, mouseX, mouseY, CLIENT_ONLY, REQUIRES_FABRIC_API);
 				y = drawTrilean(matrices, "tweaks.ghost_chest_woo_woo", "Ghost Chest Woo Woo",
-						"?", y, mouseX, mouseY, true);
+						"?", y, mouseX, mouseY, CLIENT_ONLY);
 			} else if ("minor_mechanics".equals(section)) {
 				y = drawTrilean(matrices, "minor_mechanics.feather_falling_five", "Feather Falling V",
-						"Makes Feather Falling V a valid enchant that completely negates fall damage.", y, mouseX, mouseY, false);
+						"Makes Feather Falling V a valid enchant that completely negates fall damage.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "minor_mechanics.feather_falling_five_damages_boots", "Feather Falling V Damages Boots",
-						"Absorbing fall damage with Feather Falling V causes damage to the boots.", y, mouseX, mouseY, false);
+						"Absorbing fall damage with Feather Falling V causes damage to the boots.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "minor_mechanics.furnace_minecart_any_fuel", "Furnace Minecart Any Fuel",
 						"Allows furnace minecarts to accept any furnace fuel, rather than just " +
 						"coal and charcoal.\n" +
 						"Note: All furnace minecart tweaks enable a mixin that overrides " +
 						"multiple methods in the furnace minecart entity. If you have another " +
 						"mod that changes furnace minecarts (wow!) then you'll need to disable " +
-						"this.", y, mouseX, mouseY, false);
+						"this.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "minor_mechanics.infibows", "InfiBows (aka Bow Infinity Fix)",
-						"Makes Infinity bows not require an arrow in your inventory to fire.", y, mouseX, mouseY, false);
+						"Makes Infinity bows not require an arrow in your inventory to fire.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "minor_mechanics.note_blocks_play_on_landing", "Note Blocks Play On Landing",
-						"Makes note blocks play their note when landed on. Also triggers observers.", y, mouseX, mouseY, false);
+						"Makes note blocks play their note when landed on. Also triggers observers.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "minor_mechanics.fire_protection_on_any_item", "Fire Protection On Any Item",
 						"Fire Protection can be applied to any enchantable item rather than just " +
-						"armor, and makes items enchanted with it immune to fire and lava damage.", y, mouseX, mouseY, false);
+						"armor, and makes items enchanted with it immune to fire and lava damage.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "minor_mechanics.observers_see_entities", "Observers See Entities",
 						"Observers detect when entities move in front of them if they have\n" +
-						"no block in front of them. Not as laggy as it sounds.", y, mouseX, mouseY, false);
+						"no block in front of them. Not as laggy as it sounds.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "minor_mechanics.observers_see_entities_living_only", "Observers See Entities - Living Only",
 						"Observers only detect living entities, and not e.g. item entities. " +
-						"Safety option to prevent breaking a variety of vanilla contraptions.", y, mouseX, mouseY, false);
+						"Safety option to prevent breaking a variety of vanilla contraptions.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "minor_mechanics.exact_note_block_tuning", "Exact Note Block Tuning",
 						"Right-clicking a note block with a stack of sticks sets its pitch to the " +
-						"size of the stack minus one.", y, mouseX, mouseY, false);
+						"size of the stack minus one.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "minor_mechanics.note_block_notes", "Note Block Notes",
 						"Tells you the note the note block has been tuned to when right-clicking " +
-						"it above your hotbar.", y, mouseX, mouseY, false);
+						"it above your hotbar.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "minor_mechanics.spiders_cant_climb_glazed_terracotta", "Spiders Can't Climb Glazed Terracotta",
 						"Spiders can't climb Glazed Terracotta. Slime (the stickiest substance " +
-						"known to Stevekind) can't stick to it, so why should spiders?", y, mouseX, mouseY, false);
+						"known to Stevekind) can't stick to it, so why should spiders?", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "minor_mechanics.water_fills_on_break", "Water Fills On Break",
 						"Water source blocks fill in broken blocks instead of air if there is " +
 						"more water on its north, east, south, west, and top faces than there is " +
 						"air on its north, east, south, and west faces. In case of a tie, air " +
 						"wins. Makes terraforming lakes and building canals, etc much less " +
-						"frustrating.", y, mouseX, mouseY, false);
+						"frustrating.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "minor_mechanics.invisibility_splash_on_inanimates", "Invisibility Splash On Inanimates",
 						"Invisibility splash potions affect inanimates (minecarts, arrows, etc) " +
 						"making them invisible. They will become visible again if they become wet.\n" +
 						"See Fixes > Inanimates Can Be Invisible.\n" +
-						"Interacts with Mechanics > Enhanced Moistness.", y, mouseX, mouseY, false);
+						"Interacts with Mechanics > Enhanced Moistness.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "minor_mechanics.fire_aspect_is_flint_and_steel", "Fire Aspect Is Flint And Steel",
 						"Right-clicking a block with no action with a Fire Aspect tool " +
 						"emulates a click with flint and steel, allowing you to light fires " +
 						"and such with a Fire Aspect tool instead of having to carry around " +
-						"flint and steel. ", y, mouseX, mouseY, false);
+						"flint and steel. ", y, mouseX, mouseY);
 			} else if ("mechanics".equals(section)) {
 				y = drawTrilean(matrices, "mechanics.enhanced_moistness", "Enhanced Moistness",
 						"Entities are considered \"wet\" for 5 seconds after leaving a source of " +
 						"wetness. Additionally, lingering or splash water bottles inflict " +
 						"wetness. Also makes wet entities drip to show they're wet. Affects " +
-						"various vanilla mechanics including fire and undead burning.", y, mouseX, mouseY, false);
+						"various vanilla mechanics including fire and undead burning.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "mechanics.slowfall_splash_on_inanimates", "Slow Fall Splash On Inanimates",
 						"Slow fall splash potions affect inanimates (minecarts, arrows, etc) " +
 						"making them unaffected by gravity. They will become normally affected " +
 						"again if they become wet. This is kind of overpowered.\n" +
-						"Interacts with Enhanced Moistness.", y, mouseX, mouseY, false);
+						"Interacts with Enhanced Moistness.", y, mouseX, mouseY);
 			} else if ("balance".equals(section)) {
 				y = drawTrilean(matrices, "balance.faster_obsidian", "Faster Obsidian",
 						"Makes obsidian break 3x faster. Needed on both sides to work properly."
 						+ "Does not break vanilla clients when on the server, but when on the client, "
-						+ "vanilla servers will think you're cheating. (And they won't be wrong.)", y, mouseX, mouseY, false);
+						+ "vanilla servers will think you're cheating. (And they won't be wrong.)", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "balance.disable_prior_work_penalty", "Disable Prior Work Penalty",
 						"Disables the anvil prior work penalty when an item has been worked " +
-						"multiple times. Makes non-Mending tools relevant.", y, mouseX, mouseY, false);
+						"multiple times. Makes non-Mending tools relevant.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "balance.soul_speed_doesnt_damage_boots", "Soul Speed Doesn't Damage Boots",
-						"Makes running on soul blocks with Soul Speed not deal damage to your boots.", y, mouseX, mouseY, false);
+						"Makes running on soul blocks with Soul Speed not deal damage to your boots.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "balance.infinity_mending", "Infinity & Mending",
 						"Makes Mending and Infinity compatible enchantments.\n"
-						+ "§4Not enabled in the \"vienna\" profile.", y, mouseX, mouseY, false);
+						+ "§4Not enabled in the \"vienna\" profile.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "balance.hyperspeed_furnace_minecart", "Hyperspeed Furnace Minecart",
 						"Make furnace minecarts very fast.\n" +
 						"An attempt to make rail transport relevant again, as well as furnace " +
@@ -902,57 +907,57 @@ public class FabricationConfigScreen extends Screen {
 						"Note: All furnace minecart tweaks enable a mixin that overrides " +
 						"multiple methods in the furnace minecart entity. If you have another " +
 						"mod that changes furnace minecarts (wow!) then you'll need to disable " +
-						"this.", y, mouseX, mouseY, false);
+						"this.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "balance.tridents_accept_power", "Tridents Accept Power",
 						"Allows tridents to accept the Power enchantment, increasing their ranged " +
 						"damage. It's pitiful that tridents only deal as much damage as an " +
 						"unenchanted bow and this cannot be improved at all other than via " +
 						"Impaling, which is exclusive to aquatic mobs (not including Drowned).\n" +
-						"Power is considered incompatible with Sharpness and Impaling.", y, mouseX, mouseY, false);
+						"Power is considered incompatible with Sharpness and Impaling.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "balance.tridents_accept_sharpness", "Tridents Accept Sharpness",
 						"Allows tridents to accept the Sharpness enchantment, increasing their " +
 						"melee damage. See Tridents Accept Power for justification.\n" +
-						"Sharpness is considered incompatible with Power and Impaling.", y, mouseX, mouseY, false);
+						"Sharpness is considered incompatible with Power and Impaling.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "balance.bedrock_impaling", "Bedrock-Like Impaling",
 						"Makes the Impaling enchantment act like it does in Bedrock Edition and " +
 						"Combat Test 4. Namely, it deals bonus damage to anything that is in " +
 						"water or rain (i.e. is wet), instead of only aquatic mobs.\n" +
-						"Interacts with Mechanics > Enhanced Moistness.", y, mouseX, mouseY, false);
+						"Interacts with Mechanics > Enhanced Moistness.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "balance.environmentally_friendly_creepers", "Environmentally Friendly Creepers",
 						"Creeper explosions deal entity damage, but not block damage, even " +
-						"if mobGriefing is true.", y, mouseX, mouseY, false);
+						"if mobGriefing is true.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "balance.anvil_damage_only_on_fall", "Anvil Damage Only On Fall",
 						"Anvils only take damage when falling from a height rather than randomly " +
 						"after being used.\n"
-						+ "§4Not enabled in the \"vienna\" profile.", y, mouseX, mouseY, false);
+						+ "§4Not enabled in the \"vienna\" profile.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "balance.broken_tools_drop_components", "Broken Gear Drops Components",
 						"Makes tools and armor drop 75% minus one of their original materials when " +
 						"broken. Assumes vanilla material costs. Doesn't use loot tables because I " +
 						"have never written a JSON file in my life. Broken Netherite gear " +
-						"drops all 4 of its constituent scrap.", y, mouseX, mouseY, false);
+						"drops all 4 of its constituent scrap.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "balance.drop_more_exp_on_death", "Drop More Experience On Death",
-						"Players drop 80% of their experience upon death instead of basically none.", y, mouseX, mouseY, false);
+						"Players drop 80% of their experience upon death instead of basically none.", y, mouseX, mouseY);
 			} else if ("weird_tweaks".equals(section)) {
 				y = drawTrilean(matrices, "weird_tweaks.endermen_dont_squeal", "Endermen Don't Squeal",
 						"Makes Endermen not make their growling or screeching sounds when angry.\n" +
 						"On client, mutes the sounds for just you. This means angry endermen don't " +
 						"make ambient sounds.\n" +
 						"On server, replaces the angry ambient sound with the normal ambient sound " +
-						"for everyone. The stare sound is client-sided, unfortunately.", y, mouseX, mouseY, false);
+						"for everyone. The stare sound is client-sided, unfortunately.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "weird_tweaks.disable_equip_sound", "Disable Equip Sound",
 						"Disables the unnecessary \"Gear equips\" sound that plays when your hands " +
 						"change, and is often glitchily played every tick. Armor equip sounds and " +
 						"other custom equip sounds remain unchanged. You won't even notice it's " +
 						"gone.\n" +
 						"On client, mutes it just for you.\n" +
-						"On server, prevents the sound from playing at all for everyone.", y, mouseX, mouseY, false);
+						"On server, prevents the sound from playing at all for everyone.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "weird_tweaks.repelling_void", "Déjà Void (aka Repelling Void)",
 						"Players falling into the void teleports them back to the last place they " +
-						"were on the ground and deals 6 hearts of damage.", y, mouseX, mouseY, false);
+						"were on the ground and deals 6 hearts of damage.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "weird_tweaks.drop_exp_with_keep_inventory", "Drop Experience With keepInventory",
 						"If keepInventory is enabled, players still drop their experience when " +
 						"dying, but do so losslessly. Incents returning to where you died even " +
-						"when keepInventory is enabled.", y, mouseX, mouseY, false);
+						"when keepInventory is enabled.", y, mouseX, mouseY);
 			} else if ("pedantry".equals(section)) {
 				y = drawTrilean(matrices, "pedantry.tnt_is_dynamite", "TNT Is Dynamite",
 						"TNT is renamed to Dynamite and doesn't say TNT on it. TNT is more stable " +
@@ -963,17 +968,17 @@ public class FabricationConfigScreen extends Screen {
 						"mechanics to make it \"correct\".)\n" +
 						"Gunpowder is renamed to Creeper Dust, because gunpowder is not that " +
 						"explosive.\n"+
-						"§6Reloads resource packs.", y, mouseX, mouseY, true);
+						"§6Reloads resource packs.", y, mouseX, mouseY, CLIENT_ONLY, REQUIRES_FABRIC_API);
 				y = drawTrilean(matrices, "pedantry.oak_is_apple", "Oak Is Apple",
 						"Oak trees become apple trees. Because oak trees do not grow apples.\n"+
-						"§6Reloads resource packs.", y, mouseX, mouseY, true);
+						"§6Reloads resource packs.", y, mouseX, mouseY, CLIENT_ONLY, REQUIRES_FABRIC_API);
 			} else if ("situational".equals(section)) {
 				y = drawTrilean(matrices, "situational.all_damage_is_fatal", "All Damage Is Fatal",
-						"Any amount of damage done to an entity is unconditionally fatal.", y, mouseX, mouseY, false);
+						"Any amount of damage done to an entity is unconditionally fatal.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "situational.weapons_accept_silk", "Weapons Accept Silk Touch",
 						"Weapons can accept Silk Touch. Does nothing on its own, but datapacks " +
 						"can use this for special drops. Also makes Silk Touch incompatible with " +
-						"Looting.", y, mouseX, mouseY, false);
+						"Looting.", y, mouseX, mouseY);
 			}
 		}
 		GlStateManager.popMatrix();
@@ -998,9 +1003,13 @@ public class FabricationConfigScreen extends Screen {
 		return click;
 	}
 
-	private int drawTrilean(MatrixStack matrices, String key, String title, String desc, int y, float mouseX, float mouseY, boolean clientOnly) {
-		boolean disabled = (configuringServer && (serverReadOnly || clientOnly)) || !isValid(key);
-		boolean noValue = configuringServer && clientOnly || !isValid(key);
+	private int drawTrilean(MatrixStack matrices, String key, String title, String desc, int y, float mouseX, float mouseY, TrileanFlag... flags) {
+		boolean clientOnly = ArrayUtils.contains(flags, CLIENT_ONLY);
+		boolean requiresFabricApi = ArrayUtils.contains(flags, REQUIRES_FABRIC_API);
+		// presence of Fabric API is implied by the fact you need ModMenu to access this menu
+		boolean noFabricApi = false; //!configuringServer && requiresFabricApi && !FabricLoader.getInstance().isModLoaded("fabric");
+		boolean disabled = noFabricApi || (configuringServer && (serverReadOnly || clientOnly)) || !isValid(key);
+		boolean noValue = noFabricApi || (configuringServer && clientOnly || !isValid(key));
 		float time = optionAnimationTime.getOrDefault(key, 0f);
 		float disabledTime = disabledAnimationTime.getOrDefault(key, 0f);
 		boolean animateDisabled = disabledTime > 0;
@@ -1092,10 +1101,22 @@ public class FabricationConfigScreen extends Screen {
 		int startX = 136+50;
 		int endX = textRenderer.draw(matrices, title, startX, y+2, 0xFFFFFF | textAlpha);
 		if (mouseX >= startX && mouseX <= endX && mouseY >= y && mouseY <= y+10) {
-			renderOrderedTooltip(matrices, textRenderer.wrapLines(new LiteralText((clientOnly ? "§6Client Only§r\n" : "")+desc), width/3), (int)(mouseX+10), (int)(20+mouseY));
+			String prefix = "";
+			if (clientOnly) {
+				prefix += "§6Client Only ";
+			}
+			if (requiresFabricApi) {
+				prefix += "§bRequires Fabric API ";
+			}
+			if (!prefix.isEmpty()) {
+				prefix += "§r\n";
+			}
+			renderOrderedTooltip(matrices, textRenderer.wrapLines(new LiteralText(prefix+desc), mouseX < width/2 ? (int)(width-mouseX-30) : (int)mouseX-20), (int)(mouseX), (int)(20+mouseY));
 		} else if (mouseX >= 134 && mouseX <= 134+45 && mouseY >= y && mouseY <= y+10) {
 			if (disabled) {
-				if (noValue) {
+				if (noFabricApi) {
+					renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"This option requires Fabric API"), (int)mouseX, (int)mouseY);
+				} else if (noValue) {
 					renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"The server does not recognize this option"), (int)mouseX, (int)mouseY);
 				} else {
 					renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"You cannot configure this server"), (int)mouseX, (int)mouseY);
