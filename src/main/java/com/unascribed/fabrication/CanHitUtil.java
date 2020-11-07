@@ -5,12 +5,14 @@ import java.util.function.Predicate;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.command.EntitySelector;
 import net.minecraft.command.EntitySelectorReader;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.ListTag;
 
@@ -58,6 +60,14 @@ public class CanHitUtil {
 			return canHit(canhit, entity);
 		}
 		return true;
+	}
+
+	public static boolean isExempt(Entity shooter) {
+		if (shooter instanceof PlayerEntity) {
+			PlayerEntity p = (PlayerEntity)shooter;
+			return p.abilities.creativeMode || (!MixinConfigPlugin.isEnabled("*.adventure_tags_in_survival") && p.canModifyBlocks());
+		}
+		return false;
 	}
 
 }

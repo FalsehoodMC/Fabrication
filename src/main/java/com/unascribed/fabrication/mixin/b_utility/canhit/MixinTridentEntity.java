@@ -2,6 +2,8 @@ package com.unascribed.fabrication.mixin.b_utility.canhit;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+
+import com.unascribed.fabrication.CanHitUtil;
 import com.unascribed.fabrication.interfaces.SetCanHitList;
 import com.unascribed.fabrication.support.EligibleIf;
 import net.fabricmc.fabric.api.util.NbtType;
@@ -18,7 +20,8 @@ public abstract class MixinTridentEntity implements SetCanHitList {
 	
 	@Override
 	public ListTag fabrication$getCanHitList() {
-		return tridentStack.hasTag() && tridentStack.getTag().contains("CanHit") ? tridentStack.getTag().getList("CanHit", NbtType.STRING) : null;
+		return tridentStack.hasTag() && tridentStack.getTag().contains("CanHit") && !CanHitUtil.isExempt(((TridentEntity)(Object)this).getOwner()) ?
+				tridentStack.getTag().getList("CanHit", NbtType.STRING) : null;
 	}
 	
 }

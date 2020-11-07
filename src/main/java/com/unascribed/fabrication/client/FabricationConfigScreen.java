@@ -786,6 +786,9 @@ public class FabricationConfigScreen extends Screen {
 						"Honors Fixes > Adventure Tags In Survival.\n" +
 						"Only needed on server, but the experience is more seamless if it's " +
 						"also on the client.", y, mouseX, mouseY);
+				y = drawTrilean(matrices, "utility.item_despawn", "Item Despawn Control",
+						"Allows fine-tuned adjustment of item despawn times.\n" +
+						"See fabrication_item_despawn.ini.", y, mouseX, mouseY);
 			} else if ("tweaks".equals(section)) {
 				y = drawTrilean(matrices, "tweaks.creepers_explode_when_on_fire", "Creepers Explode When On Fire",
 						"Causes creepers to light their fuses when lit on fire. Just because.", y, mouseX, mouseY);
@@ -931,10 +934,9 @@ public class FabricationConfigScreen extends Screen {
 						"after being used.\n"
 						+ "§4Not enabled in the \"vienna\" profile.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "balance.broken_tools_drop_components", "Broken Gear Drops Components",
-						"Makes tools and armor drop 75% minus one of their original materials when " +
-						"broken. Assumes vanilla material costs. Doesn't use loot tables because I " +
-						"have never written a JSON file in my life. Broken Netherite gear " +
-						"drops all 4 of its constituent scrap.", y, mouseX, mouseY);
+						"Makes items drop a configurable portion of configurable constituent "
+						+ "components.\n"
+						+ "See fabrication_gear_components.ini.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "balance.drop_more_exp_on_death", "Drop More Experience On Death",
 						"Players drop 80% of their experience upon death instead of basically none.", y, mouseX, mouseY);
 			} else if ("weird_tweaks".equals(section)) {

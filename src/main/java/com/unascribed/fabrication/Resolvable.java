@@ -7,6 +7,9 @@ import com.google.common.base.Objects;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
+/**
+ * Allows referencing registry items that may not have been registered yet in an efficient manner.
+ */
 public class Resolvable<T> {
 
 	private static final ThreadLocal<Resolvable> MAP_KEY = ThreadLocal.withInitial(() -> new Resolvable<>(null, null, null));
@@ -25,12 +28,20 @@ public class Resolvable<T> {
 		this.resolvedImmediately = resolved != null && resolved.isPresent();
 	}
 
+	public Identifier getId() {
+		return id;
+	}
+	
 	public Optional<T> get() {
 		if (resolved == null) throw new IllegalStateException("Cannot resolve a mapKey resolvable");
 		if (!resolved.isPresent()) {
 			resolved = registry.getOrEmpty(id);
 		}
 		return resolved;
+	}
+	
+	public T getOrNull() {
+		return get().orElse(null);
 	}
 	
 	public boolean isResolved() {
@@ -83,7 +94,5 @@ public class Resolvable<T> {
 		if (registry != other.registry) return false;
 		return true;
 	}
-	
-	
 	
 }

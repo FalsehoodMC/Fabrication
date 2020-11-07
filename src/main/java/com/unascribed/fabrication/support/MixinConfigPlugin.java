@@ -9,6 +9,7 @@ import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -107,7 +108,21 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	private static final ImmutableMap<String, String> starMap;
 	private static ImmutableMap<String, Boolean> defaults;
 	
-	private static final Set<SpecialEligibility> metSpecialEligibility = Sets.newHashSet();
+	private static final Set<SpecialEligibility> metSpecialEligibility = EnumSet.noneOf(SpecialEligibility.class);
+	
+	public static void setMet(SpecialEligibility se, boolean met) {
+		if (met) {
+			metSpecialEligibility.add(se);
+		} else {
+			metSpecialEligibility.remove(se);
+		}
+	}
+	
+	public static boolean isMet(SpecialEligibility se) {
+		return metSpecialEligibility.contains(se);
+	}
+	
+	private static final List<ConfigLoader> loaders = Lists.newArrayList();
 	
 	static {
 		try (InputStream is = MixinConfigPlugin.class.getClassLoader().getResourceAsStream("default_config.ini")) {
@@ -142,8 +157,6 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	private static Profile profile;
 	private static Map<String, String> rawConfig;
 	private static Map<String, Trilean> config;
-	
-	public static Map<String, String> rawItemDespawnConfig = null;
 	
 	public static String remap(String configKey) {
 		return starMap.getOrDefault(configKey, configKey);
@@ -256,6 +269,11 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		}
 	}
 	
+	public static void introduce(ConfigLoader ldr) {
+		load(ldr);
+		loaders.add(ldr);
+	}
+	
 	public static void reload() {
 		Path configFile = FabricLoader.getInstance().getConfigDir().resolve("fabrication.ini");
 		checkForAndSaveDefaultsOrUpgrade(configFile, "default_config.ini");
@@ -322,26 +340,22 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		} catch (IOException e) {
 			log.warn("Failed to transform configuration file", e);
 		}
-		Path despawnConfigFile = FabricLoader.getInstance().getConfigDir().resolve("fabrication_item_despawn.ini");
-		checkForAndSaveDefaultsOrUpgrade(despawnConfigFile, "default_item_despawn_config.ini");
-		try (InputStream is = Files.newInputStream(despawnConfigFile)) {
-			rawItemDespawnConfig = QDIni.load(is);
-			boolean unmet = true;
-			for (String s : rawItemDespawnConfig.values()) {
-				if (!("unset".equals(s) || "unset!".equals(s))) {
-					metSpecialEligibility.add(SpecialEligibility.ITEM_DESPAWN_NOT_ALL_UNSET);
-					unmet = false;
-					break;
-				}
-			}
-			if (unmet) {
-				metSpecialEligibility.remove(SpecialEligibility.ITEM_DESPAWN_NOT_ALL_UNSET);
-			}
-		} catch (IOException e) {
-			log.warn("Failed to load item despawn configuration file", e);
+		for (ConfigLoader ldr : loaders) {
+			load(ldr);
 		}
 	}
 	
+	private static void load(ConfigLoader ldr) {
+		String name = ldr.getConfigName();
+		Path file = FabricLoader.getInstance().getConfigDir().resolve("fabrication_"+name+".ini");
+		checkForAndSaveDefaultsOrUpgrade(file, "default_"+name+"_config.ini");
+		try (InputStream is = Files.newInputStream(file)) {
+			ldr.load(QDIni.load(is));
+		} catch (IOException e) {
+			log.warn("Failed to load "+name+" configuration file", e);
+		}
+	}
+
 	private static void checkForAndSaveDefaultsOrUpgrade(Path configFile, String defaultName) {
 		if (!Files.exists(configFile)) {
 			Path configFileOld = configFile.resolveSibling(configFile.getFileName()+".old");
@@ -553,7 +567,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 												} else {
 													try {
 														SpecialEligibility se = SpecialEligibility.valueOf(e[1]);
-														if (metSpecialEligibility.contains(se)) {
+														if (isMet(se)) {
 															eligibilitySuccesses.add("Special condition "+se+" is met");
 														} else {
 															eligibilityFailures.add("Special condition "+se+" is not met");

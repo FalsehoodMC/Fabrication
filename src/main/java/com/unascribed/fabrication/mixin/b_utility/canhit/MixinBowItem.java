@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+import com.unascribed.fabrication.CanHitUtil;
 import com.unascribed.fabrication.interfaces.SetCanHitList;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
@@ -30,7 +31,7 @@ public class MixinBowItem {
 			locals=LocalCapture.CAPTURE_FAILHARD)
 	public void onStoppedUsing(ItemStack bowStack, World world, LivingEntity user, int remaining, CallbackInfo ci,
 			PlayerEntity entity, boolean infinity, ItemStack arrowStack, int i, float f, boolean b2, ArrowItem ai, PersistentProjectileEntity arrow) {
-		if (!RuntimeChecks.check("*.canhit")) return;
+		if (!RuntimeChecks.check("*.canhit") || CanHitUtil.isExempt(entity)) return;
 		ListTag canHitList = bowStack.hasTag() && bowStack.getTag().contains("CanHit") ? bowStack.getTag().getList("CanHit", NbtType.STRING) : null;
 		ListTag canHitList2 = arrowStack.hasTag() && arrowStack.getTag().contains("CanHit") ? arrowStack.getTag().getList("CanHit", NbtType.STRING) : null;
 		if (arrow instanceof SetCanHitList) {

@@ -155,7 +155,6 @@ public class FeatureFabricationCommand implements Feature {
 			config.then(LiteralArgumentBuilder.<T>literal("reload")
 				.executes((c) -> {
 					MixinConfigPlugin.reload();
-					FeatureItemDespawn.parseConfig();
 					if (c.getSource() instanceof ServerCommandSource) {
 						FabricationMod.sendConfigUpdate(((ServerCommandSource)c.getSource()).getMinecraftServer(), null);
 					}

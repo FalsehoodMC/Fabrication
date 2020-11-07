@@ -23,11 +23,11 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 	protected MixinPlayerEntity(EntityType<? extends LivingEntity> entityType, World world) {
 		super(entityType, world);
 	}
-	
+
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/entity/Entity.isAttackable()Z"),
 			method="attack(Lnet/minecraft/entity/Entity;)V")
 	public boolean isAttackable(Entity entity) {
-		if (!RuntimeChecks.check("*.canhit")) return entity.isAttackable();
+		if (!RuntimeChecks.check("*.canhit") || CanHitUtil.isExempt(this)) return entity.isAttackable();
 		if (!entity.isAttackable()) return false;
 		ItemStack stack = getStackInHand(Hand.MAIN_HAND);
 		return CanHitUtil.canHit(stack, entity);

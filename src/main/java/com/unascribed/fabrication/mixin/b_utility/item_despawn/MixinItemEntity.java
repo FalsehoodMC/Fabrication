@@ -1,4 +1,4 @@
-package com.unascribed.fabrication.mixin._general.item_despawn;
+package com.unascribed.fabrication.mixin.b_utility.item_despawn;
 
 import java.util.Map;
 import java.util.UUID;
@@ -13,11 +13,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.ParsedTime;
 import com.unascribed.fabrication.Resolvable;
-import com.unascribed.fabrication.features.FeatureItemDespawn;
 import com.unascribed.fabrication.interfaces.SetFromPlayerDeath;
+import com.unascribed.fabrication.loaders.LoaderItemDespawn;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.SpecialEligibility;
-
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -39,7 +37,7 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 @Mixin(ItemEntity.class)
-@EligibleIf(specialConditions=SpecialEligibility.ITEM_DESPAWN_NOT_ALL_UNSET)
+@EligibleIf(configEnabled="*.item_despawn")
 public abstract class MixinItemEntity extends Entity implements SetFromPlayerDeath {
 
 	public MixinItemEntity(EntityType<?> type, World world) {
@@ -104,32 +102,32 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 		if (world.isClient) return;
 		ItemStack stack = getStack();
 		ParsedTime time = ParsedTime.UNSET;
-		ParsedTime itemTime = FeatureItemDespawn.itemDespawns.get(Resolvable.mapKey(stack.getItem(), Registry.ITEM));
+		ParsedTime itemTime = LoaderItemDespawn.itemDespawns.get(Resolvable.mapKey(stack.getItem(), Registry.ITEM));
 		if (itemTime != null) {
 			time = itemTime;
 		}
 		if (!time.priority) {
 			for (Enchantment e : EnchantmentHelper.get(stack).keySet()) {
 				if (e.isCursed()) {
-					if (FeatureItemDespawn.curseDespawn.overshadows(time)) {
-						time = FeatureItemDespawn.curseDespawn;
+					if (LoaderItemDespawn.curseDespawn.overshadows(time)) {
+						time = LoaderItemDespawn.curseDespawn;
 					}
 				} else {
-					if (FeatureItemDespawn.normalEnchDespawn.overshadows(time)) {
-						time = FeatureItemDespawn.normalEnchDespawn;
+					if (LoaderItemDespawn.normalEnchDespawn.overshadows(time)) {
+						time = LoaderItemDespawn.normalEnchDespawn;
 					}
 					if (e.isTreasure()) {
-						if (FeatureItemDespawn.treasureDespawn.overshadows(time)) {
-							time = FeatureItemDespawn.treasureDespawn;
+						if (LoaderItemDespawn.treasureDespawn.overshadows(time)) {
+							time = LoaderItemDespawn.treasureDespawn;
 						}
 					}
 				}
-				ParsedTime enchTime = FeatureItemDespawn.enchDespawns.get(Resolvable.mapKey(e, Registry.ENCHANTMENT));
+				ParsedTime enchTime = LoaderItemDespawn.enchDespawns.get(Resolvable.mapKey(e, Registry.ENCHANTMENT));
 				if (enchTime != null && enchTime.overshadows(time)) {
 					time = enchTime;
 				}
 			}
-			for (Map.Entry<Identifier, ParsedTime> en : FeatureItemDespawn.tagDespawns.entrySet()) {
+			for (Map.Entry<Identifier, ParsedTime> en : LoaderItemDespawn.tagDespawns.entrySet()) {
 				Tag<Item> itemTag = ItemTags.getTagGroup().getTag(en.getKey());
 				if (itemTag != null && itemTag.contains(stack.getItem())) {
 					if (en.getValue().overshadows(time)) {
@@ -147,7 +145,7 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 				}
 			}
 			if (stack.hasTag()) {
-				for (Map.Entry<String, ParsedTime> en : FeatureItemDespawn.nbtBools.entrySet()) {
+				for (Map.Entry<String, ParsedTime> en : LoaderItemDespawn.nbtBools.entrySet()) {
 					if (stack.getTag().getBoolean(en.getKey())) {
 						if (en.getValue().overshadows(time)) {
 							time = en.getValue();
@@ -156,11 +154,11 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 				}
 			}
 		}
-		if (fabrication$fromPlayerDeath && FeatureItemDespawn.playerDeathDespawn.overshadows(time)) {
-			time = FeatureItemDespawn.playerDeathDespawn;
+		if (fabrication$fromPlayerDeath && LoaderItemDespawn.playerDeathDespawn.overshadows(time)) {
+			time = LoaderItemDespawn.playerDeathDespawn;
 		}
 		if (time == ParsedTime.UNSET) {
-			time = thrower == null ? FeatureItemDespawn.dropsDespawn : FeatureItemDespawn.defaultDespawn;
+			time = thrower == null ? LoaderItemDespawn.dropsDespawn : LoaderItemDespawn.defaultDespawn;
 		}
 //		System.out.println(stack+": "+time);
 		int origAge = age;

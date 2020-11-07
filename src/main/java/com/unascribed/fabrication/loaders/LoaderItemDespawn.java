@@ -1,14 +1,10 @@
-package com.unascribed.fabrication.features;
+package com.unascribed.fabrication.loaders;
 
 import java.util.Map;
 
 import com.unascribed.fabrication.ParsedTime;
 import com.unascribed.fabrication.Resolvable;
-import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.Feature;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
-import com.unascribed.fabrication.support.SpecialEligibility;
-
+import com.unascribed.fabrication.support.ConfigLoader;
 import com.google.common.collect.Maps;
 
 import net.minecraft.enchantment.Enchantment;
@@ -16,8 +12,7 @@ import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
-@EligibleIf(specialConditions=SpecialEligibility.ITEM_DESPAWN_NOT_ALL_UNSET)
-public class FeatureItemDespawn implements Feature {
+public class LoaderItemDespawn implements ConfigLoader {
 
 	public static final Map<Resolvable<Item>, ParsedTime> itemDespawns = Maps.newHashMap();
 	public static final Map<Resolvable<Enchantment>, ParsedTime> enchDespawns = Maps.newHashMap();
@@ -33,22 +28,12 @@ public class FeatureItemDespawn implements Feature {
 	public static ParsedTime playerDeathDespawn = ParsedTime.UNSET;
 	
 	@Override
-	public void apply() {
-		parseConfig();
+	public String getConfigName() {
+		return "item_despawn";
 	}
-
+	
 	@Override
-	public boolean undo() {
-		clearConfig();
-		return true;
-	}
-
-	@Override
-	public String getConfigKey() {
-		return null;
-	}
-
-	public static void clearConfig() {
+	public void load(Map<String, String> config) {
 		itemDespawns.clear();
 		enchDespawns.clear();
 		tagDespawns.clear();
@@ -59,11 +44,7 @@ public class FeatureItemDespawn implements Feature {
 		defaultDespawn = ParsedTime.UNSET;
 		dropsDespawn = ParsedTime.UNSET;
 		playerDeathDespawn = ParsedTime.UNSET;
-	}
-	
-	public static void parseConfig() {
-		clearConfig();
-		for (Map.Entry<String, String> en : MixinConfigPlugin.rawItemDespawnConfig.entrySet()) {
+		for (Map.Entry<String, String> en : config.entrySet()) {
 			ParsedTime time = ParsedTime.parse(en.getValue());
 			if (time == ParsedTime.UNSET) continue;
 			if (en.getKey().startsWith("@enchantments.")) {
@@ -101,5 +82,5 @@ public class FeatureItemDespawn implements Feature {
 			}
 		}
 	}
-
+	
 }

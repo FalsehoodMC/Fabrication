@@ -9,6 +9,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 
 import com.unascribed.fabrication.interfaces.SetFabricationConfigAware;
+import com.unascribed.fabrication.support.ConfigLoader;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
@@ -47,6 +48,13 @@ public class FabricationMod implements ModInitializer {
 	
 	@Override
 	public void onInitialize() {
+		for (String str : MixinConfigPlugin.discoverClassesInPackage("com.unascribed.fabrication.loaders", false)) {
+			try {
+				MixinConfigPlugin.introduce((ConfigLoader)Class.forName(str).newInstance());
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
 		for (String s : MixinConfigPlugin.discoverClassesInPackage("com.unascribed.fabrication.features", false)) {
 			try {
 				Feature r = (Feature)Class.forName(s).newInstance();
