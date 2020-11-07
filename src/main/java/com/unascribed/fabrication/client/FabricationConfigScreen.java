@@ -935,7 +935,7 @@ public class FabricationConfigScreen extends Screen {
 						+ "§4Not enabled in the \"vienna\" profile.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "balance.broken_tools_drop_components", "Broken Gear Drops Components",
 						"Makes items drop a configurable portion of configurable constituent "
-						+ "components.\n"
+						+ "components. when broken\n"
 						+ "See fabrication_gear_components.ini.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "balance.drop_more_exp_on_death", "Drop More Experience On Death",
 						"Players drop 80% of their experience upon death instead of basically none.", y, mouseX, mouseY);
