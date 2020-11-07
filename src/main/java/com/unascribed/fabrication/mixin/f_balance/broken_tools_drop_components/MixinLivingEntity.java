@@ -57,7 +57,7 @@ public abstract class MixinLivingEntity extends Entity {
 			Item nugget = md.nuggetGetter.get();
 			int nuggetsPerIngot = md.nuggetsPerIngot;
 			double value = imv.valueInIngots;
-			int valueInNuggets = (int)Math.round(value*nuggetsPerIngot);
+			int valueInNuggets = (int)(value*nuggetsPerIngot);
 			double dropChance = 1;
 			Object self = this;
 			if (self instanceof MobEntity) {
@@ -66,7 +66,6 @@ public abstract class MixinLivingEntity extends Entity {
 				if (dropChance <= 0) continue;
 			}
 			double dropRate = imv.ignoreDropRate ? 1 : LoaderGearComponents.dropRate.getAsDouble();
-			System.out.println("dropRate="+(dropRate*100)+"%");
 			int nuggetsToReturn = (int)(valueInNuggets*(dropRate*dropChance));
 			if (!imv.ignoreDropRate) {
 				nuggetsToReturn -= LoaderGearComponents.cheat;
