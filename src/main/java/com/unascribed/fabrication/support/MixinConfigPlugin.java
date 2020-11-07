@@ -49,10 +49,9 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	
 	private static final ImmutableSet<String> VIENNA_EXCEPTIONS = ImmutableSet.of(
 			"balance.infinity_mending",
-			"tweaks.ghost_chest_woo_woo",
 			"balance.anvil_damage_only_on_fall"
 	);
-	private static final ImmutableSet<String> BURNT_EXCEPTIONS = ImmutableSet.of(
+	private static final ImmutableSet<String> NEVER_DEFAULT = ImmutableSet.of(
 			"tweaks.ghost_chest_woo_woo"
 	);
 	private static final ImmutableSet<String> NON_TRILEANS = ImmutableSet.of(
@@ -142,7 +141,10 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 					int dot = key.indexOf('.');
 					String section = dot != -1 ? key.substring(0, dot) : "";
 					boolean enabled = (p.sections.contains("*") && !p.sections.contains("!"+section)) || p.sections.contains(section)
-							&& (p == Profile.VIENNA ? !VIENNA_EXCEPTIONS.contains(key) : p == Profile.BURNT ? !BURNT_EXCEPTIONS.contains(key) : true);
+							&& (p != Profile.VIENNA || !VIENNA_EXCEPTIONS.contains(key));
+					if (NEVER_DEFAULT.contains(key)) {
+						enabled = false;
+					}
 					defaultsBuilder.put(key, enabled);
 				}
 				profilesBuilder.put(p, defaultsBuilder.build());
