@@ -4,7 +4,11 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.apache.logging.log4j.LogManager;
+
 import com.unascribed.fabrication.support.Feature;
+
+import com.google.common.collect.Sets;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -42,7 +46,14 @@ public abstract class ResourcePackFeature implements Feature, ResourcePackProvid
 	private void initClient() {
 		Set<ResourcePackProvider> providers = FabricationMod.snag(ResourcePackManager.class, MinecraftClient.getInstance().getResourcePackManager(),
 				"field_14227", "providers");
-		providers.add(this);
+		try {
+			providers.add(this);
+		} catch (UnsupportedOperationException e) {
+			LogManager.getLogger("Fabrication").info("Injecting mutable resource pack provider set, as no-one else has yet.");
+			providers = Sets.newHashSet(providers);
+			FabricationMod.shove(ResourcePackManager.class, MinecraftClient.getInstance().getResourcePackManager(),
+					"field_14227", "providers", providers);
+		}
 	}
 
 	@Override

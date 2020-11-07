@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 
+import org.apache.commons.lang3.reflect.FieldUtils;
+
 import com.unascribed.fabrication.interfaces.SetFabricationConfigAware;
 import com.unascribed.fabrication.support.ConfigLoader;
 import com.unascribed.fabrication.support.Feature;
@@ -118,6 +120,17 @@ public class FabricationMod implements ModInitializer {
 			}
 			f.setAccessible(true);
 			return f;
+		} catch (Throwable e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public static <T> void shove(Class<?> clazz, Object inst, String intermediateName, String yarnName, Object value) {
+		try {
+			Field f = snagField(clazz, intermediateName, yarnName);
+			f.setAccessible(true);
+			FieldUtils.removeFinalModifier(f);
+			f.set(inst, value);
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
 		}
