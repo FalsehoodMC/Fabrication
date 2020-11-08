@@ -1,5 +1,6 @@
 package com.unascribed.fabrication;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -9,7 +10,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
-
 import com.unascribed.fabrication.interfaces.SetFabricationConfigAware;
 import com.unascribed.fabrication.support.ConfigLoader;
 import com.unascribed.fabrication.support.Feature;
@@ -36,9 +36,28 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
 
 public class FabricationMod implements ModInitializer {
+	
+	public static final Direction.Type NULL_DIRECTION_TYPE;
+	static {
+		try {
+			Class<Direction.Type> clazz = Direction.Type.class;
+			Constructor<Direction.Type> cons = clazz.getDeclaredConstructor(String.class, int.class, Direction[].class, Direction.Axis[].class);
+			cons.setAccessible(true);
+			// have to do this to bypass the enum check
+			sun.reflect.ReflectionFactory rf = sun.reflect.ReflectionFactory.getReflectionFactory();
+			NULL_DIRECTION_TYPE = (Direction.Type)rf.newConstructorAccessor(cons)
+					.newInstance(new Object[] {"FABRICATION$NULL", -1, new Direction[0], new Direction.Axis[0]});
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 	
 	private static final Map<String, Feature> features = Maps.newHashMap();
 	private static final List<Feature> unconfigurableFeatures = Lists.newArrayList();
@@ -217,6 +236,49 @@ public class FabricationMod implements ModInitializer {
 		}
 		CustomPayloadS2CPacket pkt = new CustomPayloadS2CPacket(CONFIG, data);
 		spe.networkHandler.sendPacket(pkt);
+	}
+	
+	private static final BlockPos.Mutable scratchpos1 = new BlockPos.Mutable();
+	private static final BlockPos.Mutable scratchpos2 = new BlockPos.Mutable();
+	private static final BlockPos.Mutable scratchpos3 = new BlockPos.Mutable();
+	private static final BlockPos.Mutable scratchpos4 = new BlockPos.Mutable();
+
+	public interface BlockScanCallback {
+		boolean invoke(World w, BlockPos.Mutable bp, BlockPos.Mutable scratch, Direction dir);
+	}
+	
+	public static void forAllAdjacentBlocks(Entity entity, BlockScanCallback callback) {
+		World w = entity.world;
+		Box box = entity.getBoundingBox();
+		if (!scanBlocks(w, box.minX, box.minY, box.minZ, box.maxX, box.minY, box.maxZ, Direction.DOWN, callback)) return;
+		if (!scanBlocks(w, box.minX, box.maxY, box.minZ, box.maxX, box.maxY, box.maxZ, Direction.UP, callback)) return;
+		
+		if (!scanBlocks(w, box.minX, box.minY, box.minZ, box.minX, box.maxY, box.maxZ, Direction.WEST, callback)) return;
+		if (!scanBlocks(w, box.maxX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, Direction.EAST, callback)) return;
+		
+		if (!scanBlocks(w, box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.minZ, Direction.NORTH, callback)) return;
+		if (!scanBlocks(w, box.minX, box.minY, box.maxZ, box.maxX, box.maxY, box.maxZ, Direction.SOUTH, callback)) return;
+	}
+	
+	private static boolean scanBlocks(World w, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, Direction dir,
+			BlockScanCallback callback) {
+		BlockPos min = scratchpos1.set(minX+dir.getOffsetX(), minY+dir.getOffsetY(), minZ+dir.getOffsetZ());
+		BlockPos max = scratchpos2.set(maxX+dir.getOffsetX(), maxY+dir.getOffsetY(), maxZ+dir.getOffsetZ());
+		BlockPos.Mutable mut = scratchpos3;
+		if (w.isRegionLoaded(min, max)) {
+			for (int x = min.getX(); x <= max.getX(); x++) {
+				for (int y = min.getY(); y <= max.getY(); y++) {
+					for (int z = min.getZ(); z <= max.getZ(); z++) {
+						mut.set(x, y, z);
+						scratchpos4.set(mut);
+						if (!callback.invoke(w, mut, scratchpos4, dir)) {
+							return false;
+						}
+					}
+				}
+			}
+		}
+		return true;
 	}
 	
 }

@@ -51,6 +51,9 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			"balance.infinity_mending",
 			"balance.anvil_damage_only_on_fall"
 	);
+	private static final ImmutableSet<String> NEVER_DEFAULT_EXCEPT_BURNT = ImmutableSet.of(
+			"minor_mechanics.spiders_cant_climb_while_wet"
+	);
 	private static final ImmutableSet<String> NEVER_DEFAULT = ImmutableSet.of(
 			"tweaks.ghost_chest_woo_woo"
 	);
@@ -140,10 +143,12 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 				for (String key : keys) {
 					int dot = key.indexOf('.');
 					String section = dot != -1 ? key.substring(0, dot) : "";
-					boolean enabled = (p.sections.contains("*") && !p.sections.contains("!"+section)) || p.sections.contains(section)
-							&& (p != Profile.VIENNA || !VIENNA_EXCEPTIONS.contains(key));
-					if (NEVER_DEFAULT.contains(key)) {
+					boolean enabled;
+					if (NEVER_DEFAULT.contains(key) || (NEVER_DEFAULT_EXCEPT_BURNT.contains(key) && p != Profile.BURNT)) {
 						enabled = false;
+					} else {
+						enabled = (p.sections.contains("*") && !p.sections.contains("!"+section)) || p.sections.contains(section)
+								&& (p != Profile.VIENNA || !VIENNA_EXCEPTIONS.contains(key));
 					}
 					defaultsBuilder.put(key, enabled);
 				}

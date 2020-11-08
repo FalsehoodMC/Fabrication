@@ -755,6 +755,11 @@ public class FabricationConfigScreen extends Screen {
 						"Makes the CanDestroy and CanPlaceOn tags be honored in survival mode " +
 						"instead of just adventure mode.\n" +
 						"Only needed on the server, but the experience is more seamless if it's also on the client.", y, mouseX, mouseY);
+				y = drawTrilean(matrices, "fixes.stable_cacti", "Stable Cacti",
+						"Fixes cactuses being made of Explodium due to long-since-fixed engine " +
+						"limitations. In English: Makes cacti not break themselves if a block " +
+						"is placed next to them. They will still break if they *grow* into such " +
+						"a space, so cactus randomizers and cactus farms still work.", y, mouseX, mouseY);
 			} else if ("utility".equals(section)) {
 				y = drawTrilean(matrices, "utility.mods_command", "/mods command",
 						"Adds a /mods command that anyone can run that lists installed mods. Lets " +
@@ -861,6 +866,12 @@ public class FabricationConfigScreen extends Screen {
 				y = drawTrilean(matrices, "minor_mechanics.spiders_cant_climb_glazed_terracotta", "Spiders Can't Climb Glazed Terracotta",
 						"Spiders can't climb Glazed Terracotta. Slime (the stickiest substance " +
 						"known to Stevekind) can't stick to it, so why should spiders?", y, mouseX, mouseY);
+				y = drawTrilean(matrices, "minor_mechanics.spiders_cant_climb_while_wet", "Spiders Can't Climb While Wet",
+						"Spiders can't climb while wet. Basically a much easier version of the " +
+						"previous tweak, that is also a lot harder to control. May break vanilla " +
+						"spider farms.\n" +
+						"Not enabled by profiles other than Burnt.\n" +
+						"Interacts with Mechanics > Enhanced Moistness.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "minor_mechanics.water_fills_on_break", "Water Fills On Break",
 						"Water source blocks fill in broken blocks instead of air if there is " +
 						"more water on its north, east, south, west, and top faces than there is " +
