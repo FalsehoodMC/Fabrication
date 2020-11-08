@@ -34,7 +34,7 @@ public class CanHitUtil {
 				}
 				if (s.startsWith("@")) {
 					EntitySelector ep = new EntitySelectorReader(new StringReader(s), true).read();
-					Predicate<Entity> predicate = FabricationMod.snag(EntitySelector.class, ep, "field_10820", "basePredicate");
+					Predicate<Entity> predicate = ep.basePredicate;
 					if (predicate.test(entity)) {
 						return true;
 					}

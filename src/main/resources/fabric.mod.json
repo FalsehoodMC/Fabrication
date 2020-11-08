@@ -22,9 +22,8 @@
     "cotton-client-commands": ["com.unascribed.fabrication.FabricationClientCommands"],
     "modmenu": ["com.unascribed.fabrication.ModMenuInitializer"]
   },
-  "mixins": [
-    "fabrication.mixins.json"
-  ],
+  "mixins": ["fabrication.mixins.json"],
+  "accessWidener" : "fabrication.accesswidener",
 
   "depends": {
     "fabricloader": ">=0.7.4",

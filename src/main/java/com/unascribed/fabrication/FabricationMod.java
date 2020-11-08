@@ -1,15 +1,11 @@
 package com.unascribed.fabrication;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 
-import org.apache.commons.lang3.reflect.FieldUtils;
 import com.unascribed.fabrication.interfaces.SetFabricationConfigAware;
 import com.unascribed.fabrication.support.ConfigLoader;
 import com.unascribed.fabrication.support.Feature;
@@ -34,6 +30,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage;
+import net.minecraft.server.world.ThreadedAnvilChunkStorage.EntityTracker;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -43,21 +40,6 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 public class FabricationMod implements ModInitializer {
-	
-	public static final Direction.Type NULL_DIRECTION_TYPE;
-	static {
-		try {
-			Class<Direction.Type> clazz = Direction.Type.class;
-			Constructor<Direction.Type> cons = clazz.getDeclaredConstructor(String.class, int.class, Direction[].class, Direction.Axis[].class);
-			cons.setAccessible(true);
-			// have to do this to bypass the enum check
-			sun.reflect.ReflectionFactory rf = sun.reflect.ReflectionFactory.getReflectionFactory();
-			NULL_DIRECTION_TYPE = (Direction.Type)rf.newConstructorAccessor(cons)
-					.newInstance(new Object[] {"FABRICATION$NULL", -1, new Direction[0], new Direction.Axis[0]});
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
 	
 	private static final Map<String, Feature> features = Maps.newHashMap();
 	private static final List<Feature> unconfigurableFeatures = Lists.newArrayList();
@@ -121,63 +103,14 @@ public class FabricationMod implements ModInitializer {
 		}
 	}
 	
-	public static <T> T snag(Class<?> clazz, Object inst, String intermediateName, String yarnName) {
-		try {
-			return (T)snagField(clazz, intermediateName, yarnName).get(inst);
-		} catch (Throwable e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	public static Field snagField(Class<?> clazz, String intermediateName, String yarnName) {
-		try {
-			Field f;
-			try {
-				f = clazz.getDeclaredField(intermediateName);
-			} catch (NoSuchFieldException e) {
-				f = clazz.getDeclaredField(yarnName);
-			}
-			f.setAccessible(true);
-			return f;
-		} catch (Throwable e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	public static <T> void shove(Class<?> clazz, Object inst, String intermediateName, String yarnName, Object value) {
-		try {
-			Field f = snagField(clazz, intermediateName, yarnName);
-			f.setAccessible(true);
-			FieldUtils.removeFinalModifier(f);
-			f.set(inst, value);
-		} catch (Throwable e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	public static <T> T twiddle(Class<?> clazz, Object inst, String intermediateName, String yarnName, Class<?>[] argTypes, Object... args) {
-		try {
-			Method m;
-			try {
-				m = clazz.getDeclaredMethod(intermediateName, argTypes);
-			} catch (NoSuchMethodException e) {
-				m = clazz.getDeclaredMethod(yarnName, argTypes);
-			}
-			m.setAccessible(true);
-			return (T)m.invoke(inst, args);
-		} catch (Throwable e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 	public static void sendToTrackersMatching(Entity entity, CustomPayloadS2CPacket pkt, Predicate<ServerPlayerEntity> predicate) {
 		if (entity.world.isClient) return;
 		ServerChunkManager cm = ((ServerWorld)entity.world).getChunkManager();
 		ThreadedAnvilChunkStorage tacs = cm.threadedAnvilChunkStorage;
-		Int2ObjectMap<?> entityTrackers = FabricationMod.snag(ThreadedAnvilChunkStorage.class, tacs, "field_18242", "entityTrackers");
-		Object tracker = entityTrackers.get(entity.getEntityId());
+		Int2ObjectMap<EntityTracker> entityTrackers = tacs.entityTrackers;
+		EntityTracker tracker = entityTrackers.get(entity.getEntityId());
 		if (tracker == null) return;
-		Set<ServerPlayerEntity> playersTracking = FabricationMod.snag(tracker.getClass(), tracker, "field_18250", "playersTracking");
+		Set<ServerPlayerEntity> playersTracking = tracker.playersTracking;
 		if (entity instanceof ServerPlayerEntity) {
 			ServerPlayerEntity spe = (ServerPlayerEntity)entity;
 			if (predicate.test(spe)) {

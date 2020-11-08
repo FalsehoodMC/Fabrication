@@ -6,7 +6,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
@@ -32,7 +31,7 @@ public class MixinInventoryScreen {
 			fabrication$reentering = true;
 			MinecraftClient mc = MinecraftClient.getInstance();
 			Window window = mc.getWindow();
-			long handle = FabricationMod.snag(Window.class, window, "field_5187", "handle");
+			long handle = window.handle;
 			double[] xpos = new double[1];
 			double[] ypos = new double[1];
 			float scaleFactor = window.getWidth()/(float)window.getScaledWidth();

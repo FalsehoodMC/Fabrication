@@ -1,0 +1,21 @@
+accessWidener v1 named
+
+accessible field net/minecraft/command/EntitySelector basePredicate Ljava/util/function/Predicate;
+
+accessible field net/minecraft/resource/ResourcePackManager providers Ljava/util/Set;
+mutable field net/minecraft/resource/ResourcePackManager providers Ljava/util/Set;
+
+accessible field net/minecraft/server/world/ThreadedAnvilChunkStorage entityTrackers Lit/unimi/dsi/fastutil/ints/Int2ObjectMap;
+accessible class net/minecraft/server/world/ThreadedAnvilChunkStorage$EntityTracker
+accessible field net/minecraft/server/world/ThreadedAnvilChunkStorage$EntityTracker playersTracking Ljava/util/Set;
+
+mutable field net/minecraft/predicate/entity/EntityPredicates EXCEPT_CREATIVE_SPECTATOR_OR_PEACEFUL Ljava/util/function/Predicate;
+
+accessible field net/minecraft/network/packet/c2s/play/CustomPayloadC2SPacket channel Lnet/minecraft/util/Identifier;
+accessible field net/minecraft/network/packet/c2s/play/CustomPayloadC2SPacket data Lnet/minecraft/network/PacketByteBuf;
+
+accessible field net/minecraft/client/util/Window handle J
+
+accessible field net/minecraft/entity/ai/goal/FleeEntityGoal withinRangePredicate Lnet/minecraft/entity/ai/TargetPredicate;
+
+accessible method net/minecraft/entity/mob/MobEntity getDropChance (Lnet/minecraft/entity/EquipmentSlot;)F

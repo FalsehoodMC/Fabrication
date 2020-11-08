@@ -1,5 +1,7 @@
 package com.unascribed.fabrication.mixin.a_fixes.stable_cacti;
 
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.Random;
 
 import org.spongepowered.asm.mixin.Mixin;
@@ -11,8 +13,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
-import com.unascribed.fabrication.FabricationMod;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -33,11 +33,11 @@ public class MixinCactusBlock extends Block {
 	}
 	
 
-	@Redirect(at=@At(value="FIELD", target="net/minecraft/util/math/Direction$Type.HORIZONTAL:Lnet/minecraft/util/math/Direction$Type;"),
+	@Redirect(at=@At(value="INVOKE", target="net/minecraft/util/math/Direction$Type.iterator()Ljava/util/Iterator;"),
 			method="canPlaceAt(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/WorldView;Lnet/minecraft/util/math/BlockPos;)Z")
-	public Direction.Type getHorizontalDirections() {
-		if (RuntimeChecks.check("*.stable_cacti")) return FabricationMod.NULL_DIRECTION_TYPE;
-		return Direction.Type.HORIZONTAL;
+	public Iterator<Direction> getHorizontalDirectionIterator(Direction.Type subject) {
+		if (RuntimeChecks.check("*.stable_cacti")) return Collections.emptyIterator();
+		return subject.iterator();
 	}
 	
 	@Inject(at=@At("HEAD"), method="getStateForNeighborUpdate(Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/Direction;Lnet/minecraft/block/BlockState;Lnet/minecraft/world/WorldAccess;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;")

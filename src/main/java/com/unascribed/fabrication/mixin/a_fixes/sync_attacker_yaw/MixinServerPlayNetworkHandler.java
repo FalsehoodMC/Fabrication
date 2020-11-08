@@ -7,7 +7,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.interfaces.SetAttackerYawAware;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
@@ -26,7 +25,7 @@ public class MixinServerPlayNetworkHandler {
 	
 	@Inject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/c2s/play/CustomPayloadC2SPacket;)V", cancellable=true)
 	public void onCustomPayload(CustomPayloadC2SPacket packet, CallbackInfo ci) {
-		Identifier channel = FabricationMod.snag(CustomPayloadC2SPacket.class, packet, "field_12830", "channel");
+		Identifier channel = packet.channel;
 		if (channel.getNamespace().equals("fabrication") && channel.getPath().equals("attacker_yaw")) {
 			if (RuntimeChecks.check("*.sync_attacker_yaw") && player instanceof SetAttackerYawAware) {
 				LogManager.getLogger("Fabrication").debug("Enabling attacker yaw syncing for "+player.getEntityName());

@@ -30,9 +30,9 @@ public class MixinServerPlayNetworkHandler {
 	
 	@Inject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/c2s/play/CustomPayloadC2SPacket;)V", cancellable=true)
 	public void onCustomPayload(CustomPayloadC2SPacket packet, CallbackInfo ci) {
-		Identifier channel = FabricationMod.snag(CustomPayloadC2SPacket.class, packet, "field_12830", "channel");
+		Identifier channel = packet.channel;
 		if (channel.getNamespace().equals("fabrication") && channel.getPath().equals("config")) {
-			PacketByteBuf recvdData = FabricationMod.snag(CustomPayloadC2SPacket.class, packet, "field_12832", "data");
+			PacketByteBuf recvdData = packet.data;
 			int id = recvdData.readVarInt();
 			if (id == 0) {
 				// hello

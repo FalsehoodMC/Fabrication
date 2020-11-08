@@ -5,7 +5,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.PlayerTag;
 import com.unascribed.fabrication.interfaces.TaggablePlayer;
 import com.unascribed.fabrication.support.EligibleIf;
@@ -32,7 +31,7 @@ public abstract class MixinCreeperEntity extends HostileEntity {
 		FleeEntityGoal<ServerPlayerEntity> goal = new FleeEntityGoal<>(this, ServerPlayerEntity.class,
 				spe -> spe instanceof TaggablePlayer && ((TaggablePlayer)spe).fabrication$hasTag(PlayerTag.SCARES_CREEPERS), 8, 1, 2,
 				EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR::test);
-		TargetPredicate withinRangePredicate = FabricationMod.snag(FleeEntityGoal.class, goal, "field_18084", "withinRangePredicate");
+		TargetPredicate withinRangePredicate = goal.withinRangePredicate;
 		withinRangePredicate.ignoreEntityTargetRules();
 		goalSelector.add(3, goal);
 	}

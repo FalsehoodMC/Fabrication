@@ -15,7 +15,6 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.resource.ResourcePack;
-import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.resource.ResourcePackProvider;
 import net.minecraft.resource.ResourcePackSource;
@@ -44,15 +43,13 @@ public abstract class ResourcePackFeature implements Feature, ResourcePackProvid
 	
 	@Environment(EnvType.CLIENT)
 	private void initClient() {
-		Set<ResourcePackProvider> providers = FabricationMod.snag(ResourcePackManager.class, MinecraftClient.getInstance().getResourcePackManager(),
-				"field_14227", "providers");
+		Set<ResourcePackProvider> providers = MinecraftClient.getInstance().getResourcePackManager().providers;
 		try {
 			providers.add(this);
 		} catch (UnsupportedOperationException e) {
 			LogManager.getLogger("Fabrication").info("Injecting mutable resource pack provider set, as no-one else has yet.");
 			providers = Sets.newHashSet(providers);
-			FabricationMod.shove(ResourcePackManager.class, MinecraftClient.getInstance().getResourcePackManager(),
-					"field_14227", "providers", providers);
+			MinecraftClient.getInstance().getResourcePackManager().providers = providers;
 		}
 	}
 

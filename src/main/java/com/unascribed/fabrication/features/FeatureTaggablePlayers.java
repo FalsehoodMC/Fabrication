@@ -1,11 +1,7 @@
 package com.unascribed.fabrication.features;
 
-import java.lang.reflect.Field;
 import java.util.function.Predicate;
 
-import org.apache.commons.lang3.reflect.FieldUtils;
-
-import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.PlayerTag;
 import com.unascribed.fabrication.interfaces.TaggablePlayer;
 import com.unascribed.fabrication.support.EligibleIf;
@@ -29,14 +25,7 @@ public class FeatureTaggablePlayers implements Feature {
 	}
 
 	private void amendUntargetablePredicate(Predicate<Entity> p) {
-		Field field = FabricationMod.snagField(EntityPredicates.class, "field_22280", "EXCEPT_CREATIVE_SPECTATOR_OR_PEACEFUL");
-		field.setAccessible(true);
-		FieldUtils.removeFinalModifier(field);
-		try {
-			field.set(null, p);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		EntityPredicates.EXCEPT_CREATIVE_SPECTATOR_OR_PEACEFUL = p;
 	}
 
 	@Override
