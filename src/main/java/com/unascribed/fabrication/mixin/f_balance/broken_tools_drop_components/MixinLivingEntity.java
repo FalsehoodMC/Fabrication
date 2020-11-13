@@ -22,6 +22,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Hand;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
@@ -49,6 +50,9 @@ public abstract class MixinLivingEntity extends Entity {
 		if (!RuntimeChecks.check("*.broken_tools_drop_components")) return;
 		Item item = stack.getItem();
 		if (LoaderGearComponents.ignoreVanishing && EnchantmentHelper.hasVanishingCurse(stack)) return;
+		if (stack.hasTag() && stack.getTag().getBoolean("fabrication:ShatteredAlready")) return;
+		if (!stack.hasTag()) stack.setTag(new CompoundTag());
+		stack.getTag().putBoolean("fabrication:ShatteredAlready", true);
 		for (ItemMaterialValue imv : LoaderGearComponents.items.get(Resolvable.mapKey(Registry.ITEM.getId(item), Registry.ITEM))) {
 			MaterialData md = LoaderGearComponents.materials.get(imv.materialName);
 			if (md == null) continue;
