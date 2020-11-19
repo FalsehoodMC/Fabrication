@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.loaders;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -67,7 +68,7 @@ public class LoaderGearComponents implements ConfigLoader {
 	private static final Pattern MATERIAL_VALUE_PATTERN = Pattern.compile("^([0-9]+(?:\\.[0-9]+)?)(.*)$");
 	
 	@Override
-	public void load(Map<String, String> config) {
+	public void load(Path configDir, Map<String, String> config) {
 		dropRate = () -> 0.75;
 		guaranteedIngots = 1;
 		ignoreVanishing = true;

@@ -73,7 +73,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		LIGHT("general", "fixes", "utility", "tweaks"),
 		MEDIUM("general", "fixes", "utility", "tweaks", "minor_mechanics"),
 		DARK("general", "fixes", "utility", "tweaks", "minor_mechanics", "mechanics"),
-		VIENNA("general", "fixes", "utility", "tweaks", "minor_mechanics", "mechanics", "balance", "weird_tweaks"),
+		VIENNA("general", "fixes", "utility", "tweaks", "minor_mechanics", "mechanics", "balance", "weird_tweaks", "woina"),
 		BURNT("*", "!situational")
 		;
 		public final ImmutableSet<String> sections;
@@ -127,7 +127,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	private static final List<ConfigLoader> loaders = Lists.newArrayList();
 	
 	static {
-		try (InputStream is = MixinConfigPlugin.class.getClassLoader().getResourceAsStream("default_config.ini")) {
+		try (InputStream is = MixinConfigPlugin.class.getClassLoader().getResourceAsStream("default_features_config.ini")) {
 			Set<String> keys = QDIni.load(is).keySet();
 			ImmutableMap.Builder<String, String> starMapBldr = ImmutableMap.builder();
 			for (String key : keys) {
@@ -227,7 +227,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			profile = Profile.valueOf(rawConfig.getOrDefault("general.profile", "light").toUpperCase(Locale.ROOT));
 			defaults = defaultsByProfile.get(profile);
 		}
-		Path configFile = FabricLoader.getInstance().getConfigDir().resolve("fabrication.ini");
+		Path configFile = FabricLoader.getInstance().getConfigDir().resolve("fabrication").resolve("features.ini");
 		StringWriter sw = new StringWriter();
 		try (InputStream is = Files.newInputStream(configFile)) {
 			 QDIni.loadAndTransform(new InputStreamReader(is, Charsets.UTF_8), new IniTransformer() {
@@ -282,8 +282,14 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	}
 	
 	public static void reload() {
-		Path configFile = FabricLoader.getInstance().getConfigDir().resolve("fabrication.ini");
-		checkForAndSaveDefaultsOrUpgrade(configFile, "default_config.ini");
+		Path dir = FabricLoader.getInstance().getConfigDir().resolve("fabrication");
+		try {
+			Files.createDirectories(dir);
+		} catch (IOException e1) {
+			throw new RuntimeException("Failed to create fabrication config directory", e1);
+		}
+		Path configFile = dir.resolve("features.ini");
+		checkForAndSaveDefaultsOrUpgrade(configFile, "default_features_config.ini");
 		StringWriter sw = new StringWriter();
 		try (InputStream is = Files.newInputStream(configFile)) {
 			rawConfig = QDIni.loadAndTransform(new InputStreamReader(is, Charsets.UTF_8), new IniTransformer() {
@@ -354,10 +360,11 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	
 	private static void load(ConfigLoader ldr) {
 		String name = ldr.getConfigName();
-		Path file = FabricLoader.getInstance().getConfigDir().resolve("fabrication_"+name+".ini");
+		Path dir = FabricLoader.getInstance().getConfigDir().resolve("fabrication");
+		Path file = dir.resolve(name+".ini");
 		checkForAndSaveDefaultsOrUpgrade(file, "default_"+name+"_config.ini");
 		try (InputStream is = Files.newInputStream(file)) {
-			ldr.load(QDIni.load(is));
+			ldr.load(dir, QDIni.load(is));
 		} catch (IOException e) {
 			log.warn("Failed to load "+name+" configuration file", e);
 		}
@@ -365,7 +372,25 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 
 	private static void checkForAndSaveDefaultsOrUpgrade(Path configFile, String defaultName) {
 		if (!Files.exists(configFile)) {
+			Path configFileLegacy = configFile.getParent().getParent().resolve(defaultName.equals("default_features_config.ini") ? "fabrication.ini" : "fabrication_"+configFile.getFileName().toString());
+			boolean migrated = false;
+			if (Files.exists(configFileLegacy)) {
+				try {
+					Files.move(configFileLegacy, configFile);
+					migrated = true;
+				} catch (IOException e) {
+					throw new RuntimeException("Failed to move legacy config file into directory");
+				}
+			}
+			Path configFileLegacyOld = configFileLegacy.resolveSibling(configFileLegacy.getFileName()+".old");
 			Path configFileOld = configFile.resolveSibling(configFile.getFileName()+".old");
+			if (Files.exists(configFileLegacyOld)) {
+				try {
+					Files.move(configFileLegacyOld, configFileOld);
+				} catch (IOException e) {
+					throw new RuntimeException("Failed to move legacy old config file into directory");
+				}
+			}
 			if (Files.exists(configFileOld)) {
 				try {
 					Map<String, String> currentValues;
@@ -397,7 +422,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 				} catch (IOException e) {
 					throw new RuntimeException("Failed to upgrade config", e);
 				}
-			} else {
+			} else if (!migrated) {
 				try {
 					Resources.asByteSource(MixinConfigPlugin.class.getClassLoader().getResource(defaultName)).copyTo(MoreFiles.asByteSink(configFile));
 				} catch (IOException e) {

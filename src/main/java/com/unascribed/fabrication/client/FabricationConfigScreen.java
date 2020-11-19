@@ -69,6 +69,7 @@ public class FabricationConfigScreen extends Screen {
 			.put("weird_tweaks", "Opinionated\nchanges.")
 			.put("pedantry", "Fixes for\nnon-problems.")
 			.put("situational", "Rarely useful\nsmall features.")
+			.put("woina", "Forward ports of\nforgotten tidbits.")
 			.build();
 	
 	private static final ImmutableMap<Profile, String> PROFILE_DESCRIPTIONS = ImmutableMap.<Profile, String>builder()
@@ -77,7 +78,7 @@ public class FabricationConfigScreen extends Screen {
 			.put(Profile.LIGHT, "Blonde + Tweaks. Default.")
 			.put(Profile.MEDIUM, "Light + Minor Mechanics.")
 			.put(Profile.DARK, "Medium + Mechanics. Recommended.")
-			.put(Profile.VIENNA, "Dark + Balance + Weird Tweaks.\nYou agree with all of Una's opinions.")
+			.put(Profile.VIENNA, "Dark + Balance + Weird Tweaks + W.O.I.N.A.\nYou agree with all of Una's opinions.")
 			.put(Profile.BURNT, "Screw it, enable everything.\n(Except Situational.)")
 			.build();
 	
@@ -463,7 +464,7 @@ public class FabricationConfigScreen extends Screen {
 				GlStateManager.popMatrix();
 			}
 			if (y >= -12 && y < height) {
-				textRenderer.draw(matrices, "§l"+formatTitleCase(s), 4, y, -1);
+				textRenderer.draw(matrices, "§l"+("woina".equals(s) ? "W.O.I.N.A." : formatTitleCase(s)), 4, y, -1);
 			}
 			String desc = SECTION_DESCRIPTIONS.getOrDefault(s, "No description available");
 			y += 12;
@@ -656,7 +657,9 @@ public class FabricationConfigScreen extends Screen {
 			if (drawButton(matrices, 140, 20+height+8, 120, 20, "Take me to the wiki", mouseX, mouseY)) {
 				Util.getOperatingSystem().open("https://github.com/unascribed/Fabrication/wiki");
 			}
-			
+			if (drawButton(matrices, 140, 20+height+32, 120, 20, "Reload files", mouseX, mouseY)) {
+				MixinConfigPlugin.reload();
+			}
 		} else {
 			GlStateManager.enableBlend();
 			RenderSystem.defaultBlendFunc();
@@ -985,6 +988,24 @@ public class FabricationConfigScreen extends Screen {
 				y = drawTrilean(matrices, "pedantry.oak_is_apple", "Oak Is Apple",
 						"Oak trees become apple trees. Because oak trees do not grow apples.\n"+
 						"§6Reloads resource packs.", y, mouseX, mouseY, CLIENT_ONLY, REQUIRES_FABRIC_API);
+			} else if ("woina".equals(section)) {
+				y = drawTrilean(matrices, "woina.block_logo", "Block Logo",
+						"Brings back the old animated block logo, with a dash of customizability.\n" +
+						"See block_logo.png and block_logo.ini.", y, mouseX, mouseY, CLIENT_ONLY);
+				y = drawTrilean(matrices, "woina.old_lava", "Old Lava",
+						"Brings back the old (better) lava texture, as a dynamic texture just " +
+						"like before.", y, mouseX, mouseY, CLIENT_ONLY);
+				y = drawTrilean(matrices, "woina.classic_block_drops", "Classic Block Drops",
+						"Changes block drops to look like they did in Survival Test. Namely, it " +
+						"reduces their pixel density. By default, this is done by using a " +
+						"mipmapped (downscaled) texture, but blocks with tileable textures can " +
+						"instead just have a portion be rendered like the original implementation.\n" +
+						"See classic_block_drops.ini.", y, mouseX, mouseY, CLIENT_ONLY);
+				y = drawTrilean(matrices, "woina.blinking_drops", "Blinking Drops",
+						"Makes dropped items and blocks blink white periodically like they did in " +
+						"Survival Test. If Utility > Despawning Items Blink is also enabled, " +
+						"the blinking becomes faster and faster as the item gets closer to " +
+						"despawning.", y, mouseX, mouseY, CLIENT_ONLY);
 			} else if ("situational".equals(section)) {
 				y = drawTrilean(matrices, "situational.all_damage_is_fatal", "All Damage Is Fatal",
 						"Any amount of damage done to an entity is unconditionally fatal.", y, mouseX, mouseY);

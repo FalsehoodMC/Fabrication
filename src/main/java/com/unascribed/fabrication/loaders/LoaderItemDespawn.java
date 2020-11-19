@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.loaders;
 
+import java.nio.file.Path;
 import java.util.Map;
 
 import com.unascribed.fabrication.ParsedTime;
@@ -33,7 +34,7 @@ public class LoaderItemDespawn implements ConfigLoader {
 	}
 	
 	@Override
-	public void load(Map<String, String> config) {
+	public void load(Path configDir, Map<String, String> config) {
 		itemDespawns.clear();
 		enchDespawns.clear();
 		tagDespawns.clear();

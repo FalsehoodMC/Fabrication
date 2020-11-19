@@ -161,7 +161,7 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 			time = thrower == null ? LoaderItemDespawn.dropsDespawn : LoaderItemDespawn.defaultDespawn;
 		}
 //		System.out.println(stack+": "+time);
-		int origAge = age;
+		int origAge = 0;
 		fabrication$invincible = false;
 		if (time == ParsedTime.FOREVER) {
 			fabrication$extraTime = 0;

@@ -19,3 +19,19 @@ accessible field net/minecraft/client/util/Window handle J
 accessible field net/minecraft/entity/ai/goal/FleeEntityGoal withinRangePredicate Lnet/minecraft/entity/ai/TargetPredicate;
 
 accessible method net/minecraft/entity/mob/MobEntity getDropChance (Lnet/minecraft/entity/EquipmentSlot;)F
+
+accessible field net/minecraft/client/texture/SpriteAtlasTexture sprites Ljava/util/Map;
+accessible field net/minecraft/client/texture/SpriteAtlasTexture animatedSprites Ljava/util/List;
+
+accessible field net/minecraft/client/texture/Sprite x I
+accessible field net/minecraft/client/texture/Sprite y I
+
+accessible field net/minecraft/client/texture/SpriteAtlasTexture$Data width I
+accessible field net/minecraft/client/texture/SpriteAtlasTexture$Data height I
+accessible field net/minecraft/client/texture/SpriteAtlasTexture$Data maxLevel I
+
+accessible method net/minecraft/client/texture/MipmapHelper blend (IIIIZ)I
+
+accessible method net/minecraft/client/render/item/ItemRenderer renderBakedItemModel (Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/item/ItemStack;IILnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;)V
+
+accessible field net/minecraft/client/MinecraftClient itemColors Lnet/minecraft/client/color/item/ItemColors;

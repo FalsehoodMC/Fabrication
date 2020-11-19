@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.unascribed.fabrication.interfaces.RenderingAgeAccess;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
 
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -22,7 +23,7 @@ public class MixinItemEntityRenderer {
 	@Inject(at=@At("HEAD"), method="render(Lnet/minecraft/entity/ItemEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",
 			cancellable=true)
 	public void render(ItemEntity entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
-		if (RuntimeChecks.check("*.despawning_items_blink") && entity instanceof RenderingAgeAccess) {
+		if (RuntimeChecks.check("*.despawning_items_blink") && !MixinConfigPlugin.isEnabled("*.blinking_drops") && entity instanceof RenderingAgeAccess) {
 			RenderingAgeAccess aa = (RenderingAgeAccess)entity;
 			int age = aa.fabrication$getRenderingAge();
 			int timeUntilDespawn = 6000-age;
