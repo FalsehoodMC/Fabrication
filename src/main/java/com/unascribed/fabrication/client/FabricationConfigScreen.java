@@ -974,6 +974,17 @@ public class FabricationConfigScreen extends Screen {
 						"If keepInventory is enabled, players still drop their experience when " +
 						"dying, but do so losslessly. Incents returning to where you died even " +
 						"when keepInventory is enabled.", y, mouseX, mouseY);
+				y = drawTrilean(matrices, "weird_tweaks.gold_tools_useful_in_nether", "Gold Tools Useful In Nether",
+						"Makes breaking nether blocks deal 50x damage to non-golden and " +
+						"non-netherite tools, and makes golden tools take 1/50th the damage " +
+						"when breaking the same blocks, bringing their durability just above " +
+						"diamond. Relevant tags:\n" +
+						"- fabrication:nether_blocks\n" +
+						"- fabrication:nether_blocks_only_in_nether\n" +
+						"- fabrication:gold_tools\n" +
+						"- fabrication:nether_tools\n" +
+						"Unnecessary on client.\n" +
+						"Requires Fabric API.", y, mouseX, mouseY);
 			} else if ("pedantry".equals(section)) {
 				y = drawTrilean(matrices, "pedantry.tnt_is_dynamite", "TNT Is Dynamite",
 						"TNT is renamed to Dynamite and doesn't say TNT on it. TNT is more stable " +

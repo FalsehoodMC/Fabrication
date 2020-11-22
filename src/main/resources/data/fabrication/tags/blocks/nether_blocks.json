@@ -1,0 +1,16 @@
+{
+	"values": [
+		"#minecraft:base_stone_nether",
+		"#minecraft:nylium",
+		"#minecraft:crimson_stems",
+		"#minecraft:warped_stems",
+		"minecraft:soul_sand",
+		"minecraft:soul_soil",
+		"minecraft:glowstone",
+		"minecraft:shroomlight",
+		"minecraft:nether_gold_ore",
+		"minecraft:nether_quartz_ore",
+		"minecraft:magma_block",
+		"minecraft:ancient_debris"
+	]
+}

@@ -128,6 +128,12 @@ public class MixinTitleScreen extends Screen {
 				for (int x = 0; x < fabrication$blocks[y].length; x++) {
 					LogoBlock blk = fabrication$blocks[y][x];
 					if (blk != null) {
+						if (hasShiftDown() && Math.random() < 0.05) {
+							blk.velocity = ((float)Math.random())*3;
+						}
+						if (hasAltDown()) {
+							blk.velocity = 1+((float)Math.random())*2;
+						}
 						blk.tick();
 					}
 				}
@@ -212,16 +218,16 @@ public class MixinTitleScreen extends Screen {
 					if (blk == null) continue;
 					BlockState state = blk.state;
 					GlStateManager.pushMatrix();
-					float progress = blk.lastProgress + (blk.progress - blk.lastProgress) * partialTicks;
+					float position = blk.lastPosition + (blk.position - blk.lastPosition) * partialTicks;
 					float scale = 1;
 					float alpha = 1;
 					float rot = 0;
 					if (pass == 0) {
-						scale = progress * 0.04f + 1;
-						alpha = 1f / scale;
-						progress = 0.0F;
+						scale = position * 0.04f + 1;
+						alpha = 1 / scale;
+						position = 0;
 					}
-					GlStateManager.translatef(x, y, progress);
+					GlStateManager.translatef(x, y, position);
 					GlStateManager.scalef(scale, scale, scale);
 					GlStateManager.rotatef(rot, 0, 1, 0);
 					if (pass != 0) {
