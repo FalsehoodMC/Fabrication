@@ -983,8 +983,7 @@ public class FabricationConfigScreen extends Screen {
 						"- fabrication:nether_blocks_only_in_nether\n" +
 						"- fabrication:gold_tools\n" +
 						"- fabrication:nether_tools\n" +
-						"Unnecessary on client.\n" +
-						"Requires Fabric API.", y, mouseX, mouseY);
+						"On client, adjusts gold tool tooltips to show fractional damage.", y, mouseX, mouseY, REQUIRES_FABRIC_API);
 			} else if ("pedantry".equals(section)) {
 				y = drawTrilean(matrices, "pedantry.tnt_is_dynamite", "TNT Is Dynamite",
 						"TNT is renamed to Dynamite and doesn't say TNT on it. TNT is more stable " +
