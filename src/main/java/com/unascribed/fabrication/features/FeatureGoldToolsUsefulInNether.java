@@ -23,6 +23,7 @@ public class FeatureGoldToolsUsefulInNether implements Feature {
 	
 	public static final Tag<Item> NETHER_TOOLS = TagRegistry.item(new Identifier("fabrication", "nether_tools"));
 	public static final Tag<Item> GOLD_TOOLS = TagRegistry.item(new Identifier("fabrication", "gold_tools"));
+	public static final Tag<Item> POSSIBLY_FUNGAL_TOOLS = TagRegistry.item(new Identifier("fabrication", "possibly_fungal_tools"));
 	
 	private boolean applied = false;
 	private boolean active = false;
@@ -41,7 +42,7 @@ public class FeatureGoldToolsUsefulInNether implements Feature {
 	@Environment(EnvType.CLIENT)
 	private void applyClient() {
 		ItemTooltipCallback.EVENT.register((stack, ctx, lines) -> {
-			if (stack.getItem().isIn(GOLD_TOOLS) && active) {
+			if (active && (stack.getItem().isIn(GOLD_TOOLS) || (stack.hasTag() && stack.getTag().getBoolean("fabrication:ActLikeGold")))) {
 				for (int i = 0; i < lines.size(); i++) {
 					Text t = lines.get(i);
 					if (t instanceof TranslatableText) {

@@ -34,7 +34,7 @@ public class MixinMiningToolItem {
 					(world.getDimension().isUltrawarm() && world.getDimension().isPiglinSafe() && state.getBlock().isIn(FeatureGoldToolsUsefulInNether.NETHER_BLOCKS_ONLY_IN_NETHER)))
 				&& (!(miner instanceof PlayerEntity) || !((PlayerEntity)miner).abilities.creativeMode)) {
 			if (!stack.isDamageable()) return;
-			if (stack.getItem().isIn(FeatureGoldToolsUsefulInNether.GOLD_TOOLS)) {
+			if (stack.getItem().isIn(FeatureGoldToolsUsefulInNether.GOLD_TOOLS) || (stack.hasTag() && stack.getTag().getBoolean("fabrication:ActLikeGold"))) {
 				if (!stack.hasTag()) stack.setTag(new CompoundTag());
 				int partialDamage = stack.getTag().getInt("PartialDamage");
 				if (stack.getDamage() == 0) {
