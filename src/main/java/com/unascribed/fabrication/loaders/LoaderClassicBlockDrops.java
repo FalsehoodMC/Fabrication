@@ -9,6 +9,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.unascribed.fabrication.support.ConfigLoader;
+import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Trilean;
 
 import com.google.common.collect.Lists;
@@ -16,6 +18,7 @@ import net.minecraft.block.Block;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
+@EligibleIf(envMatches=Env.CLIENT)
 public class LoaderClassicBlockDrops implements ConfigLoader {
 
 	public static final List<Function<Identifier, Trilean>> rules = Lists.newArrayList();

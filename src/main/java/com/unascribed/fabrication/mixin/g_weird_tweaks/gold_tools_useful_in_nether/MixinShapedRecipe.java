@@ -10,13 +10,13 @@ import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.resource.language.I18n;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.text.LiteralText;
+import net.minecraft.util.Language;
 
 @Mixin(ShapedRecipe.class)
 @EligibleIf(configEnabled="*.gold_tools_useful_in_nether")
@@ -43,7 +43,7 @@ public class MixinShapedRecipe {
 				}
 			}
 			if (fungal) {
-				stack.setCustomName(new LiteralText("§f"+I18n.translate(stack.getTranslationKey()).replace("Wooden", "Fungal")));
+				stack.setCustomName(new LiteralText("§f"+Language.getInstance().get(stack.getTranslationKey()).replace("Wooden", "Fungal")));
 				stack.getTag().putBoolean("fabrication:ActLikeGold", true);
 			}
 		}

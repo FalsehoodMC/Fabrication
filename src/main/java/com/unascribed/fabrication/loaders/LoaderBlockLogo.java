@@ -17,6 +17,8 @@ import org.apache.logging.log4j.LogManager;
 import com.ibm.icu.impl.locale.XCldrStub.Splitter;
 import com.unascribed.fabrication.Resolvable;
 import com.unascribed.fabrication.support.ConfigLoader;
+import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import com.google.common.collect.Lists;
@@ -31,6 +33,7 @@ import net.minecraft.client.texture.NativeImage;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
+@EligibleIf(envMatches=Env.CLIENT)
 public class LoaderBlockLogo implements ConfigLoader {
 
 	public static boolean invalidated = true;
