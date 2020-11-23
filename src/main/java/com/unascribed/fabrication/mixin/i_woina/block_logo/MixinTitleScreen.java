@@ -129,10 +129,10 @@ public class MixinTitleScreen extends Screen {
 					LogoBlock blk = fabrication$blocks[y][x];
 					if (blk != null) {
 						if (hasShiftDown() && Math.random() < 0.05) {
-							blk.velocity = ((float)Math.random())*3;
+							blk.velocity += ((float)Math.random())*3;
 						}
 						if (hasAltDown()) {
-							blk.velocity = 1+((float)Math.random())*2;
+							blk.velocity += 0.9+((float)Math.random()*0.2);
 						}
 						blk.tick();
 					}

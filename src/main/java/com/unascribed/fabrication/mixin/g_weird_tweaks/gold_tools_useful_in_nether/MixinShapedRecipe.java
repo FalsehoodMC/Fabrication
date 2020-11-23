@@ -30,24 +30,19 @@ public class MixinShapedRecipe {
 			boolean fungal = false;
 			for (int i = 0; i < inv.size(); i++) {
 				ItemStack ing = inv.getStack(i);
-				System.out.println(ing);
 				if (ing.getItem() instanceof BlockItem) {
 					Block b = ((BlockItem)ing.getItem()).getBlock();
 					if (b.isIn(BlockTags.PLANKS)) {
-						System.out.println("plank");
 						if (!b.isIn(BlockTags.NON_FLAMMABLE_WOOD)) {
-							System.out.println("not fungal");
 							fungal = false;
 							break;
 						} else {
-							System.out.println("fungal");
 							fungal = true;
 						}
 					}
 				}
 			}
 			if (fungal) {
-				System.out.println("ultimately fungal");
 				stack.setCustomName(new LiteralText("§f"+I18n.translate(stack.getTranslationKey()).replace("Wooden", "Fungal")));
 				stack.getTag().putBoolean("fabrication:ActLikeGold", true);
 			}
