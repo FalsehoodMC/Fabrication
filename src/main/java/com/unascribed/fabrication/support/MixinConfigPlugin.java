@@ -23,6 +23,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
+import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.QDIni;
 import com.unascribed.fabrication.QDIni.IniTransformer;
 
@@ -38,9 +39,6 @@ import com.google.common.io.MoreFiles;
 import com.google.common.io.Resources;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
-
-import net.fabricmc.api.EnvType;
-import net.fabricmc.loader.api.FabricLoader;
 
 public class MixinConfigPlugin implements IMixinConfigPlugin {
 
@@ -127,6 +125,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	private static final List<ConfigLoader> loaders = Lists.newArrayList();
 	
 	static {
+		setMet(SpecialEligibility.EVENTS_AVAILABLE, Agnos.INST.eventsAvailable());
 		try (InputStream is = MixinConfigPlugin.class.getClassLoader().getResourceAsStream("default_features_config.ini")) {
 			Set<String> keys = QDIni.load(is).keySet();
 			ImmutableMap.Builder<String, String> starMapBldr = ImmutableMap.builder();
@@ -227,7 +226,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			profile = Profile.valueOf(rawConfig.getOrDefault("general.profile", "light").toUpperCase(Locale.ROOT));
 			defaults = defaultsByProfile.get(profile);
 		}
-		Path configFile = FabricLoader.getInstance().getConfigDir().resolve("fabrication").resolve("features.ini");
+		Path configFile = Agnos.INST.getConfigDir().resolve("fabrication").resolve("features.ini");
 		StringWriter sw = new StringWriter();
 		try (InputStream is = Files.newInputStream(configFile)) {
 			 QDIni.loadAndTransform(new InputStreamReader(is, Charsets.UTF_8), new IniTransformer() {
@@ -282,7 +281,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	}
 	
 	public static void reload() {
-		Path dir = FabricLoader.getInstance().getConfigDir().resolve("fabrication");
+		Path dir = Agnos.INST.getConfigDir().resolve("fabrication");
 		try {
 			Files.createDirectories(dir);
 		} catch (IOException e1) {
@@ -360,7 +359,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	
 	private static void load(ConfigLoader ldr) {
 		String name = ldr.getConfigName();
-		Path dir = FabricLoader.getInstance().getConfigDir().resolve("fabrication");
+		Path dir = Agnos.INST.getConfigDir().resolve("fabrication");
 		Path file = dir.resolve(name+".ini");
 		checkForAndSaveDefaultsOrUpgrade(file, "default_"+name+"_config.ini");
 		try (InputStream is = Files.newInputStream(file)) {
@@ -512,9 +511,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 									String[] arr = (String[])v;
 									if (arr[0].equals("Lcom/unascribed/fabrication/support/Env;")) {
 										Env e = Env.valueOf(arr[1]);
-										EnvType et = e.fabric;
-										EnvType curEnv = FabricLoader.getInstance().getEnvironmentType();
-										if (et != null && et != curEnv) {
+										Env curEnv = Agnos.INST.getCurrentEnv();
+										if (!curEnv.matches(e)) {
 											eligibilityFailures.add("Environment is incorrect (want "+e.name().toLowerCase(Locale.ROOT)+", got "+curEnv.name().toLowerCase(Locale.ROOT)+")");
 											eligible = false;
 										} else {
@@ -523,7 +521,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 									}
 								} else if (k.equals("modLoaded")) {
 									for (String s : (List<String>)v) {
-										if (!FabricLoader.getInstance().isModLoaded(s)) {
+										if (!Agnos.INST.isModLoaded(s)) {
 											eligibilityFailures.add("Required mod "+s+" is not loaded");
 											eligible = false;
 										} else {
@@ -532,7 +530,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 									}
 								} else if (k.equals("modNotLoaded")) {
 									for (String s : (List<String>)v) {
-										if (FabricLoader.getInstance().isModLoaded(s)) {
+										if (Agnos.INST.isModLoaded(s)) {
 											eligibilityFailures.add("Conflicting mod "+s+" is loaded");
 											eligible = false;
 										} else {

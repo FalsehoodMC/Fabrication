@@ -16,6 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.Cardinal;
 import com.unascribed.fabrication.FabricationClientCommands;
 import com.unascribed.fabrication.FabricationMod;
@@ -23,6 +24,7 @@ import com.unascribed.fabrication.PlayerTag;
 import com.unascribed.fabrication.interfaces.TaggablePlayer;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin.Profile;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
@@ -34,7 +36,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.command.CommandSource;
@@ -57,12 +58,12 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.ChunkStatus;
 
-@EligibleIf(modLoaded="fabric")
+@EligibleIf(specialConditions=SpecialEligibility.EVENTS_AVAILABLE)
 public class FeatureFabricationCommand implements Feature {
 	
 	@Override
 	public void apply() {
-		CommandRegistrationCallback.EVENT.register((dispatcher, dedi) -> {
+		Agnos.INST.runForCommandRegistration((dispatcher, dedi) -> {
 			LiteralArgumentBuilder<ServerCommandSource> root = LiteralArgumentBuilder.<ServerCommandSource>literal("fabrication");
 			addConfig(root);
 			
@@ -182,7 +183,7 @@ public class FeatureFabricationCommand implements Feature {
 
 			long scanned = 0;
 			long skipped = 0;
-			long goal = 1000*16*16*world.getHeight();
+			long goal = 8000*16*16*world.getHeight();
 			
 			class MutableLong { long value = 1; }
 			
@@ -252,6 +253,7 @@ public class FeatureFabricationCommand implements Feature {
 				i++;
 			}
 			LogManager.getLogger("Fabrication").info("Scanned "+scanned+"/"+goal+" blocks (skipped "+skipped+"), 100% done. Writing file");
+			LogManager.getLogger("Fabrication").info("NOTE: Fabrication block distribution analysis is NOT A BENCHMARK. Chunk generation speed is intentionally limited to keep servers responsive and not crashing.");
 			List<Map.Entry<BlockState, MutableLong>> sorted = Lists.newArrayList(counts.entrySet());
 			sorted.sort((a, b) -> Long.compare(b.getValue().value, a.getValue().value));
 			try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(new File(name)), Charsets.UTF_8)) {

@@ -41,9 +41,13 @@ public class FeatureFasterObsidian implements Feature {
 			f = AbstractBlockState.class.getDeclaredField("field_23172");
 		} catch (NoSuchFieldException e) {
 			try {
-				f = AbstractBlockState.class.getDeclaredField("hardness");
+				f = AbstractBlockState.class.getDeclaredField("field_235705_i_");
 			} catch (NoSuchFieldException e1) {
-				throw new RuntimeException("Can't find hardness field", e1);
+				try {
+					f = AbstractBlockState.class.getDeclaredField("hardness");
+				} catch (NoSuchFieldException e2) {
+					throw new RuntimeException("Can't find hardness field", e1);
+				}
 			}
 		}
 		FieldUtils.removeFinalModifier(f, true);

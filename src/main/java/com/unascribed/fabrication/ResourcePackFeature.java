@@ -6,13 +6,13 @@ import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
 
+import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Feature;
 
 import com.google.common.collect.Sets;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.resource.ResourcePack;
 import net.minecraft.resource.ResourcePackProfile;
@@ -36,7 +36,7 @@ public abstract class ResourcePackFeature implements Feature, ResourcePackProvid
 	public ResourcePackFeature(String path) {
 		this.configKey = "*."+path;
 		this.path = path;
-		if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+		if (Agnos.INST.getCurrentEnv() == Env.CLIENT) {
 			initClient();
 		}
 	}
@@ -66,7 +66,7 @@ public abstract class ResourcePackFeature implements Feature, ResourcePackProvid
 	@Override
 	public void apply() {
 		active = true;
-		if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+		if (Agnos.INST.getCurrentEnv() == Env.CLIENT) {
 			reloadClient();
 		}
 	}
@@ -81,7 +81,7 @@ public abstract class ResourcePackFeature implements Feature, ResourcePackProvid
 	@Override
 	public boolean undo() {
 		active = false;
-		if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+		if (Agnos.INST.getCurrentEnv() == Env.CLIENT) {
 			reloadClient();
 		}
 		return true;

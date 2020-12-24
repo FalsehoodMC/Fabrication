@@ -1,14 +1,12 @@
 package com.unascribed.fabrication.support;
 
-import net.fabricmc.api.EnvType;
-
 public enum Env {
-	ANY(null),
-	CLIENT(EnvType.CLIENT),
-	SERVER(EnvType.SERVER),
+	ANY,
+	CLIENT,
+	SERVER,
 	;
-	public final EnvType fabric;
-	private Env(EnvType fabric) {
-		this.fabric = fabric;
+
+	public boolean matches(Env e) {
+		return this == ANY || e == ANY || e == this;
 	}
 }

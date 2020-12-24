@@ -9,11 +9,12 @@ import java.util.Collections;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+import com.unascribed.fabrication.support.SpecialEligibility;
 
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.DifficultyCommand;
@@ -25,7 +26,7 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.level.ServerWorldProperties;
 
-@EligibleIf(configEnabled="*.legacy_command_syntax", modLoaded="fabric")
+@EligibleIf(configEnabled="*.legacy_command_syntax", specialConditions=SpecialEligibility.EVENTS_AVAILABLE)
 public class FeatureLegacyCommandSyntax implements Feature {
 
 	private boolean applied = false;
@@ -34,7 +35,7 @@ public class FeatureLegacyCommandSyntax implements Feature {
 	public void apply() {
 		if (applied) return;
 		applied = true;
-		CommandRegistrationCallback.EVENT.register((dispatcher, dedi) -> {
+		Agnos.INST.runForCommandRegistration((dispatcher, dedi) -> {
 			LiteralArgumentBuilder<ServerCommandSource> gmCmd = CommandManager.literal("gamemode")
 					.requires(scs -> MixinConfigPlugin.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2));
 			for (GameMode mode : GameMode.values()) {
@@ -72,8 +73,8 @@ public class FeatureLegacyCommandSyntax implements Feature {
 		});
 	}
 	
-	private final MethodHandle gmExecute = unreflect(GameModeCommand.class, "method_13387", "execute", CommandContext.class, Collection.class, GameMode.class);
-	private final MethodHandle worldProperties = unreflectField(ServerWorld.class, "field_24456", "worldProperties");
+	private final MethodHandle gmExecute = unreflect(GameModeCommand.class, "method_13387", "func_198484_a", "execute", CommandContext.class, Collection.class, GameMode.class);
+	private final MethodHandle worldProperties = unreflectField(ServerWorld.class, "field_24456", "field_241103_E_", "worldProperties");
 	
 	private static Object invoke(MethodHandle execute, Object... args) {
 		try {
@@ -83,13 +84,17 @@ public class FeatureLegacyCommandSyntax implements Feature {
 		}
 	}
 	
-	private static MethodHandle unreflect(Class<?> clazz, String intermediateName, String yarnName, Class<?>... args) {
+	private static MethodHandle unreflect(Class<?> clazz, String intermediateName, String srgName, String yarnName, Class<?>... args) {
 		try {
 			Method m;
 			try {
 				m = clazz.getDeclaredMethod(intermediateName, args);
 			} catch (NoSuchMethodException e) {
-				m = clazz.getDeclaredMethod(yarnName, args);
+				try {
+					m = clazz.getDeclaredMethod(srgName, args);
+				} catch (NoSuchMethodException e2) {
+					m = clazz.getDeclaredMethod(yarnName, args);
+				}
 			}
 			m.setAccessible(true);
 			return MethodHandles.lookup().unreflect(m);
@@ -98,13 +103,17 @@ public class FeatureLegacyCommandSyntax implements Feature {
 		}
 	}
 	
-	private static MethodHandle unreflectField(Class<?> clazz, String intermediateName, String yarnName) {
+	private static MethodHandle unreflectField(Class<?> clazz, String intermediateName, String srgName, String yarnName) {
 		try {
 			Field f;
 			try {
 				f = clazz.getDeclaredField(intermediateName);
 			} catch (NoSuchFieldException e) {
-				f = clazz.getDeclaredField(yarnName);
+				try {
+					f = clazz.getDeclaredField(srgName);
+				} catch (NoSuchFieldException e2) {
+					f = clazz.getDeclaredField(yarnName);
+				}
 			}
 			f.setAccessible(true);
 			return MethodHandles.lookup().unreflectGetter(f);
