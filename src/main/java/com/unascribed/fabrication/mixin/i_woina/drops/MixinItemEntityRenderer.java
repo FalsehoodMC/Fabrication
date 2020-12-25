@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.mixin.i_woina.drops;
 
 import java.io.IOException;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.Map;
@@ -208,7 +209,9 @@ public class MixinItemEntityRenderer {
 			float maxV = Float.NEGATIVE_INFINITY;
 			for (int pass = 0; pass < 2; pass++) {
 				for (int i = 0; i < j; ++i) {
-					iBuf.clear();
+					// IntBuffer-specific clear() override was added after Java 8
+					// This cast avoids a NSME
+					((Buffer)iBuf).clear();
 					iBuf.put(data, i * 8, 8);
 					float u = buf.getFloat(16);
 					float v = buf.getFloat(20);

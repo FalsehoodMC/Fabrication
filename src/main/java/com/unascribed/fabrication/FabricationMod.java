@@ -8,6 +8,7 @@ import java.util.function.Predicate;
 
 import com.unascribed.fabrication.interfaces.SetFabricationConfigAware;
 import com.unascribed.fabrication.support.ConfigLoader;
+import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
@@ -75,7 +76,7 @@ public class FabricationMod implements ModInitializer {
 				throw new RuntimeException("Failed to initialize feature "+s, e);
 			}
 		}
-		if (MixinConfigPlugin.getValue("*.long_levelup_sound_at_30") != Trilean.FALSE && Agnos.INST.eventsAvailable()) {
+		if (MixinConfigPlugin.getValue("*.long_levelup_sound_at_30") != Trilean.FALSE && Agnos.INST.eventsAvailable() && Agnos.INST.getCurrentEnv() == Env.CLIENT) {
 			LEVELUP_LONG = Agnos.INST.registerSoundEvent("fabrication:levelup_long", new SoundEvent(new Identifier("fabrication", "levelup_long")));
 		}
 	}
