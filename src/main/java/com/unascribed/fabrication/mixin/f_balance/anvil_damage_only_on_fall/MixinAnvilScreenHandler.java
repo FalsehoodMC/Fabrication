@@ -5,12 +5,13 @@ import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
 import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
 
 import net.minecraft.screen.AnvilScreenHandler;
 
 @Mixin(AnvilScreenHandler.class)
-@EligibleIf(configEnabled="*.anvil_damage_only_on_fall")
+@EligibleIf(configEnabled="*.anvil_damage_only_on_fall", specialConditions=SpecialEligibility.NOT_FORGE)
 public class MixinAnvilScreenHandler {
 
 	@ModifyConstant(constant=@Constant(floatValue=0.12f),

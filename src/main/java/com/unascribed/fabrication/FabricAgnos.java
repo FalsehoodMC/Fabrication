@@ -58,5 +58,10 @@ public class FabricAgnos implements Agnos {
 	public boolean isModLoaded(String modid) {
 		return FabricLoader.getInstance().isModLoaded(modid);
 	}
-
+	
+	@Override
+	public String getModVersion() {
+		return FabricLoader.getInstance().getModContainer("fabrication").get().getMetadata().getVersion().getFriendlyString();
+	}
+	
 }

@@ -35,3 +35,7 @@ accessible method net/minecraft/client/texture/MipmapHelper blend (IIIIZ)I
 accessible method net/minecraft/client/render/item/ItemRenderer renderBakedItemModel (Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/item/ItemStack;IILnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;)V
 
 accessible field net/minecraft/client/MinecraftClient itemColors Lnet/minecraft/client/color/item/ItemColors;
+
+accessible method net/minecraft/client/texture/NativeImage <init> (Lnet/minecraft/client/texture/NativeImage$Format;IIZJ)V
+
+accessible field net/minecraft/client/texture/AbstractTexture glId I

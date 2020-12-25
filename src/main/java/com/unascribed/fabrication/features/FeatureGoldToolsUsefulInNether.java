@@ -4,18 +4,16 @@ import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Feature;
+import com.unascribed.fabrication.support.SpecialEligibility;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.tag.Tag;
-import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Identifier;
 
-@EligibleIf(configEnabled="*.gold_tools_useful_in_nether", modLoaded="fabric")
+@EligibleIf(configEnabled="*.gold_tools_useful_in_nether", specialConditions=SpecialEligibility.EVENTS_AVAILABLE)
 public class FeatureGoldToolsUsefulInNether implements Feature {
 
 	public static final Tag<Block> NETHER_BLOCKS = Agnos.INST.registerBlockTag("fabrication:nether_blocks");
@@ -42,15 +40,21 @@ public class FeatureGoldToolsUsefulInNether implements Feature {
 	@Environment(EnvType.CLIENT)
 	private void applyClient() {
 		Agnos.INST.runForTooltipRender((stack, lines) -> {
-			if (active && (stack.getItem().isIn(GOLD_TOOLS) || (stack.hasTag() && stack.getTag().getBoolean("fabrication:ActLikeGold")))) {
-				for (int i = 0; i < lines.size(); i++) {
-					Object t = lines.get(i);
-					if (t instanceof TranslatableText) {
-						if (((TranslatableText) t).getKey().equals("item.durability")) {
-							lines.set(i, new TranslatableText("item.durability", (stack.getMaxDamage() - stack.getDamage())+(1-(stack.getTag().getInt("PartialDamage")/50D)), stack.getMaxDamage()));
+			try {
+				if (active && !stack.isEmpty() && (stack.getItem().isIn(GOLD_TOOLS) || (stack.hasTag() && stack.getTag().getBoolean("fabrication:ActLikeGold")))) {
+					for (int i = 0; i < lines.size(); i++) {
+						Object t = lines.get(i);
+						if (t instanceof TranslatableText) {
+							if (((TranslatableText) t).getKey().equals("item.durability")) {
+								lines.set(i, new TranslatableText("item.durability", (stack.getMaxDamage() - stack.getDamage())+(1-(stack.getTag().getInt("PartialDamage")/50D)), stack.getMaxDamage()));
+							}
 						}
 					}
 				}
+			} catch (IllegalStateException e) {
+				// ssh bby is ok
+				if (e.getMessage().contains("before it was bound")) return;
+				throw e;
 			}
 		});
 	}

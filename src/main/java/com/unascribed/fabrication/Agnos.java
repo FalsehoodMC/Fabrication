@@ -45,4 +45,6 @@ public interface Agnos {
 	<T> T registerBlockTag(String id);
 	<T> T registerItemTag(String id);
 	
+	String getModVersion();
+	
 }

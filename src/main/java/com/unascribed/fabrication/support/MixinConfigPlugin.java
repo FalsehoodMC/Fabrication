@@ -42,7 +42,7 @@ import com.google.common.reflect.ClassPath.ClassInfo;
 
 public class MixinConfigPlugin implements IMixinConfigPlugin {
 
-	private static final boolean DEBUG = Boolean.getBoolean("com.unascribed.fabrication.debug");
+	private static final boolean DEBUG = Boolean.getBoolean("com.unascribed.fabrication.debug") || Boolean.getBoolean("fabrication.debug");
 	private static final Logger log = LogManager.getLogger("Fabrication");
 	
 	private static final ImmutableSet<String> VIENNA_EXCEPTIONS = ImmutableSet.of(
@@ -126,6 +126,12 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	
 	static {
 		setMet(SpecialEligibility.EVENTS_AVAILABLE, Agnos.INST.eventsAvailable());
+		try {
+			Class.forName("net.fabricmc.loader.api.FabricLoader");
+			setMet(SpecialEligibility.NOT_FORGE, true);
+		} catch (Throwable t) {
+			setMet(SpecialEligibility.FORGE, true);
+		}
 		try (InputStream is = MixinConfigPlugin.class.getClassLoader().getResourceAsStream("default_features_config.ini")) {
 			Set<String> keys = QDIni.load(is).keySet();
 			ImmutableMap.Builder<String, String> starMapBldr = ImmutableMap.builder();
@@ -584,29 +590,27 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 										}
 									}
 								} else if (k.equals("specialConditions")) {
-									if (RuntimeChecks.ENABLED) {
-										eligibilityNotes.add("Runtime checks is enabled, ignoring special conditions");
+									List<String[]> li = (List<String[]>)v;
+									if (li.isEmpty()) {
+										eligibilityNotes.add("Special conditions is present but empty - ignoring");
 									} else {
-										List<String[]> li = (List<String[]>)v;
-										if (li.isEmpty()) {
-											eligibilityNotes.add("Special conditions is present but empty - ignoring");
-										} else {
-											for (String[] e : li) {
-												if (!"Lcom/unascribed/fabrication/support/SpecialEligibility;".equals(e[0])) {
-													eligibilityNotes.add("Unknown special condition type "+e[0]+" - ignoring");
-												} else {
-													try {
-														SpecialEligibility se = SpecialEligibility.valueOf(e[1]);
-														if (isMet(se)) {
-															eligibilitySuccesses.add("Special condition "+se+" is met");
-														} else {
-															eligibilityFailures.add("Special condition "+se+" is not met");
-															eligible = false;
-														}
-													} catch (IllegalArgumentException ex) {
-														eligibilityFailures.add("Unknown special condition "+e[1]);
+										for (String[] e : li) {
+											if (!"Lcom/unascribed/fabrication/support/SpecialEligibility;".equals(e[0])) {
+												eligibilityNotes.add("Unknown special condition type "+e[0]+" - ignoring");
+											} else {
+												try {
+													SpecialEligibility se = SpecialEligibility.valueOf(e[1]);
+													if (RuntimeChecks.ENABLED && se.ignorableWithRuntimeChecks) {
+														eligibilityNotes.add("Runtime checks is enabled, ignoring special condition "+se);
+													} else if (isMet(se)) {
+														eligibilitySuccesses.add("Special condition "+se+" is met");
+													} else {
+														eligibilityFailures.add("Special condition "+se+" is not met");
 														eligible = false;
 													}
+												} catch (IllegalArgumentException ex) {
+													eligibilityFailures.add("Unknown special condition "+e[1]);
+													eligible = false;
 												}
 											}
 										}

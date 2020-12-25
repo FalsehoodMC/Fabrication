@@ -11,6 +11,7 @@ import org.lwjgl.opengl.ARBCopyImage;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.system.MemoryStack;
+import org.lwjgl.system.MemoryUtil;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -44,6 +45,7 @@ import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.client.texture.AbstractTexture;
 import net.minecraft.client.texture.MipmapHelper;
 import net.minecraft.client.texture.NativeImage;
+import net.minecraft.client.texture.NativeImage.Format;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.texture.TextureUtil;
 import net.minecraft.client.util.math.MatrixStack;
@@ -118,17 +120,34 @@ public class MixinItemEntityRenderer {
 							public void load(ResourceManager manager) throws IOException {
 								clearGlId();
 								SpriteAtlasTexture atlas = MinecraftClient.getInstance().getBakedModelManager().method_24153(new Identifier("textures/atlas/blocks.png"));
+								if (atlas.glId == -1) {
+									throw new IOException("Cannot load: atlas is not uploaded?");
+								}
+								GlStateManager.bindTexture(atlas.getGlId());
 								int maxLevel = GL11.glGetTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LEVEL);
 								if (maxLevel == 0) {
 									int w = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_WIDTH);
 									int h = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_HEIGHT);
-									NativeImage img = new NativeImage(w, h, false);
-									GlStateManager.bindTexture(atlas.getGlId());
-									img.loadFromTextureImage(0, false);
-									NativeImage mipped = MipmapHelper.getMipmapLevelsImages(img, 1)[1];
-									TextureUtil.allocate(getGlId(), mipped.getWidth(), mipped.getHeight());
-									GlStateManager.bindTexture(getGlId());
-									mipped.upload(0, 0, 0, true);
+									ByteBuffer dest = MemoryUtil.memAlloc(w*h*4);
+									try {
+										GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, Format.ABGR.getPixelDataFormat(), GL11.GL_UNSIGNED_BYTE, MemoryUtil.memAddress(dest));
+									} catch (Error | RuntimeException e) {
+										MemoryUtil.memFree(dest);
+										throw e;
+									}
+									NativeImage img = new NativeImage(Format.ABGR, w, h, false, MemoryUtil.memAddress(dest));
+									try {
+										NativeImage mipped = MipmapHelper.getMipmapLevelsImages(img, 1)[1];
+										try {
+											TextureUtil.allocate(getGlId(), mipped.getWidth(), mipped.getHeight());
+											GlStateManager.bindTexture(getGlId());
+											mipped.upload(0, 0, 0, true);
+										} finally {
+											mipped.close();
+										}
+									} finally {
+										img.close();
+									}
 								} else {
 									int w = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 1, GL11.GL_TEXTURE_WIDTH);
 									int h = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 1, GL11.GL_TEXTURE_HEIGHT);

@@ -4,6 +4,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.EligibleIf;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
@@ -18,8 +19,8 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.util.Formatting;
 
-@EligibleIf(configEnabled="*.mods_command", modLoaded="fabric")
-public class FeatureModsCommand implements Feature {
+@EligibleIf(configEnabled="*.mods_command", modLoaded="fabric", specialConditions=SpecialEligibility.NOT_FORGE)
+public class FeatureModsCommandFabric implements Feature {
 	
 	private boolean applied = false;
 	
@@ -69,13 +70,19 @@ public class FeatureModsCommand implements Feature {
 			} else {
 				first = false;
 			}
-			StringBuilder desc = new StringBuilder(mm.getDescription());
+			StringBuilder desc = new StringBuilder(mm.getDescription().replace("\r", ""));
 			if (desc.length() > 0) {
 				desc.append("\n\n");
 			}
 			if (!mm.getAuthors().isEmpty()) {
 				desc.append("Authors: ");
+				boolean firstAuthor = true;
 				for (Person p : mm.getAuthors()) {
+					if (!firstAuthor) {
+						desc.append(", ");
+					} else {
+						firstAuthor = false;
+					}
 					desc.append(p.getName());
 				}
 				desc.append("\n");

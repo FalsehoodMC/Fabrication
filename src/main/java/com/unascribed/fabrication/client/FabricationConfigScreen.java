@@ -12,6 +12,7 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.brigadier.CommandDispatcher;
+import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.interfaces.GetServerConfig;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
@@ -28,7 +29,6 @@ import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 
 import io.netty.buffer.Unpooled;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
@@ -95,7 +95,7 @@ public class FabricationConfigScreen extends Screen {
 	private static final Identifier BG = new Identifier("fabrication", "bg.png");
 	private static final Identifier PRIDETEX = new Identifier("fabrication", "pride.png");
 	
-	private static final boolean PRIDE = Calendar.getInstance().get(Calendar.MONTH) == Calendar.JUNE || Boolean.getBoolean("com.unascribed.fabrication.everyMonthIsPrideMonth");
+	private static final boolean PRIDE = Calendar.getInstance().get(Calendar.MONTH) == Calendar.JUNE || Boolean.getBoolean("com.unascribed.fabrication.everyMonthIsPrideMonth") || Boolean.getBoolean("fabrication.everyMonthIsPrideMonth");
 	
 	private static long serverLaunchId = -1;
 	
@@ -649,7 +649,7 @@ public class FabricationConfigScreen extends Screen {
 		GlStateManager.translatef(-60, -(choiceY+16), 0);
 		int y = 16;
 		if (section == null) {
-			String v = FabricLoader.getInstance().getModContainer("fabrication").get().getMetadata().getVersion().getFriendlyString();
+			String v = Agnos.INST.getModVersion();
 			String blurb = "§lFabrication v"+v+" §rby unascribed\n"
 					+ "Click a category on the left to change settings.\n\n"
 					+ "Detail offered by tooltips here is somewhat sparse. For additional detail and demonstration videos, please check the wiki.";
