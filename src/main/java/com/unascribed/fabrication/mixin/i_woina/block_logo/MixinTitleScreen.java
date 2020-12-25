@@ -40,6 +40,7 @@ import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.Vector3f;
+import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
@@ -177,9 +178,9 @@ public class MixinTitleScreen extends Screen {
 		GlStateManager.depthMask(true);
 		GlStateManager.pushMatrix();
 		DiffuseLighting.enable();
-        RenderSystem.setupGui3DDiffuseLighting(
-        		Util.make(new Vector3f(0f, -1.0f, -0.7f), Vector3f::normalize),
-        		Util.make(new Vector3f(0f, -1.0f, -0.7f), Vector3f::normalize));
+		RenderSystem.setupGui3DDiffuseLighting(
+				Util.make(new Vector3f(0f, -1.0f, -0.7f), Vector3f::normalize),
+				Util.make(new Vector3f(0f, -1.0f, -0.7f), Vector3f::normalize));
 		GlStateManager.popMatrix();
 		BlockRenderManager brm = mc.getBlockRenderManager();
 		MatrixStack matrices = new MatrixStack();
@@ -207,6 +208,7 @@ public class MixinTitleScreen extends Screen {
 			GlStateManager.translatef(-img.getWidth() * 0.5f, -img.getHeight() * 0.5f, 0);
 			if (pass == 0) {
 				GlStateManager.disableTexture();
+				GlStateManager.color4f(1, 1, 1, 1);
 			} else {
 				GlStateManager.enableTexture();
 				GlStateManager.color4f(1, 1, 1, 1);
@@ -234,8 +236,9 @@ public class MixinTitleScreen extends Screen {
 						Immediate vertexConsumer = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
 						GlStateManager.rotatef(90, 1, 0, 0);
 						GlStateManager.translatef(0, 0, -1);
-						brm.renderBlockAsEntity(state, matrices, vertexConsumer, 0xFFFF, OverlayTexture.DEFAULT_UV);
-						vertexConsumer.draw();
+						brm.renderBlockAsEntity(state, matrices, vertexConsumer, 0, OverlayTexture.DEFAULT_UV);
+						mc.getTextureManager().bindTexture(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE);
+						Tessellator.getInstance().draw();
 					} else {
 						GlStateManager.color4f(0, 0, 0, 0.855f*alpha*fade);
 						BufferBuilder bb = Tessellator.getInstance().getBuffer();
