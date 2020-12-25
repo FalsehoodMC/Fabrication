@@ -984,6 +984,15 @@ public class FabricationConfigScreen extends Screen {
 						"- fabrication:gold_tools\n" +
 						"- fabrication:nether_tools\n" +
 						"On client, adjusts gold tool tooltips to show fractional damage.", y, mouseX, mouseY, REQUIRES_FABRIC_API);
+				y = drawTrilean(matrices, "weird_tweaks.photoallergic_creepers", "Photoallergic Creepers",
+						"Makes Creepers burn in sunlight. Very dangerous if combined with "
+						+ "Tweaks > Creepers Explode When On Fire.\n"
+						+ "§cConflicts with Photoresistant Mobs.\n"
+						+ "§4Not enabled in the \"vienna\" profile.", y, mouseX, mouseY);
+				y = drawTrilean(matrices, "weird_tweaks.photoresistant_mobs", "Photoresistant Mobs",
+						"Makes mobs not burn in sunlight.\n"
+						+ "§cConflicts with Photoallergic Creepers. This option takes precedence.\n"
+						+ "§4Not enabled in the \"vienna\" profile.", y, mouseX, mouseY);
 			} else if ("pedantry".equals(section)) {
 				y = drawTrilean(matrices, "pedantry.tnt_is_dynamite", "TNT Is Dynamite",
 						"TNT is renamed to Dynamite and doesn't say TNT on it. TNT is more stable " +
