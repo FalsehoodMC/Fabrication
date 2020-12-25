@@ -5,23 +5,20 @@ import java.nio.file.Path;
 import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.support.Env;
 
-import net.minecraft.tags.TagRegistry;
-import net.minecraft.tags.ITag.INamedTag;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.common.ForgeTagHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.GameData;
 
 public class ForgeAgnos implements Agnos {
 
@@ -35,8 +32,8 @@ public class ForgeAgnos implements Agnos {
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public void runForTooltipRender(TooltipRenderCallback r) {
-		MinecraftForge.EVENT_BUS.addListener((RenderTooltipEvent e) -> {
-			r.render(e.getStack(), e.getLines());
+		MinecraftForge.EVENT_BUS.addListener((ItemTooltipEvent e) -> {
+			r.render(e.getItemStack(), e.getToolTip());
 		});
 	}
 	
@@ -51,12 +48,12 @@ public class ForgeAgnos implements Agnos {
 	
 	@Override
 	public <T> T registerBlockTag(String id) {
-		return (T)ForgeTagHandler.makeWrapperTag(ForgeRegistries.BLOCKS, new ResourceLocation(id));
+		return (T)ForgeTagHandler.createOptionalTag(ForgeRegistries.BLOCKS, new ResourceLocation(id));
 	}
 
 	@Override
 	public <T> T registerItemTag(String id) {
-		return (T)ForgeTagHandler.makeWrapperTag(ForgeRegistries.ITEMS, new ResourceLocation(id));
+		return (T)ForgeTagHandler.createOptionalTag(ForgeRegistries.ITEMS, new ResourceLocation(id));
 	}
 
 	@Override
