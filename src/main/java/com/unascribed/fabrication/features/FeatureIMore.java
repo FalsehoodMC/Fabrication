@@ -7,12 +7,12 @@ import java.util.function.Predicate;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.SpecialEligibility;
 
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.argument.EntityArgumentType;
@@ -45,7 +45,7 @@ public class FeatureIMore implements Feature {
 		applied = true;
 		if (!registered) {
 			registered = true;
-			CommandRegistrationCallback.EVENT.register((dispatcher, dedi) -> {
+			Agnos.INST.runForCommandRegistration((dispatcher, dedi) -> {
 				Predicate<ServerCommandSource> requirement = s -> s.hasPermissionLevel(2) && MixinConfigPlugin.isEnabled("*.i_and_more") && applied;
 				// I tried redirect(). It doesn't work.
 				String[] itemCommandNames = { "item", "i" };
