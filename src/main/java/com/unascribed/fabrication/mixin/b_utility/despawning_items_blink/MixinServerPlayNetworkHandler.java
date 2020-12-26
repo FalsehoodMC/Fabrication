@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.FabLog;
+import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.interfaces.SetAttackerYawAware;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
@@ -25,7 +26,7 @@ public class MixinServerPlayNetworkHandler {
 	
 	@Inject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/c2s/play/CustomPayloadC2SPacket;)V", cancellable=true)
 	public void onCustomPayload(CustomPayloadC2SPacket packet, CallbackInfo ci) {
-		Identifier channel = packet.channel;
+		Identifier channel = FabRefl.getChannel(packet);
 		if (channel.getNamespace().equals("fabrication") && channel.getPath().equals("item_despawn")) {
 			if (RuntimeChecks.check("*.sync_attacker_yaw") && player instanceof SetAttackerYawAware) {
 				FabLog.debug("Enabling item despawn syncing for "+player.getEntityName());

@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.Resolvable;
 import com.unascribed.fabrication.loaders.LoaderGearComponents;
 import com.unascribed.fabrication.loaders.LoaderGearComponents.ItemMaterialValue;
@@ -64,7 +65,7 @@ public abstract class MixinLivingEntity extends Entity {
 			double dropChance = 1;
 			Object self = this;
 			if (self instanceof MobEntity) {
-				dropChance = ((MobEntity)self).getDropChance(slot);
+				dropChance = FabRefl.MobEntity_getDropChance((MobEntity)self, slot);
 				if (dropChance > 1) dropChance = 1;
 				if (dropChance <= 0) continue;
 			}

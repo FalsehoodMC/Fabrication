@@ -8,6 +8,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.unascribed.fabrication.Agnos;
+import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
@@ -27,7 +28,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.GiveCommand;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
@@ -155,7 +155,7 @@ public class FeatureIMore implements Feature {
 		} catch (IllegalArgumentException e) {
 			count = 1;
 		}
-		return GiveCommand.execute(ctx.getSource(), ctx.getArgument("item", ItemStackArgument.class), Collections.singleton(ctx.getSource().getPlayer()), count);
+		return FabRefl.GiveCommand_execute(ctx.getSource(), ctx.getArgument("item", ItemStackArgument.class), Collections.singleton(ctx.getSource().getPlayer()), count);
 	}
 
 	@Override

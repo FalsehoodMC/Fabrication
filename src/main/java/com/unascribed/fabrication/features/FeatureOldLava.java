@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.features;
 
+import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.client.SpriteLava;
 import com.unascribed.fabrication.client.SpriteLavaFlow;
 import com.unascribed.fabrication.support.EligibleIf;
@@ -29,23 +30,23 @@ public class FeatureOldLava implements Feature {
 			Identifier flow = new Identifier("block/lava_flow");
 			originalLava = atlas.getSprite(still);
 			originalLavaFlow = atlas.getSprite(flow);
-			SpriteLava newLava = new SpriteLava(atlas, new Info(still, 16, 16, AnimationResourceMetadata.EMPTY), data.maxLevel,
-					data.width, data.height, originalLava.x, originalLava.y);
-			SpriteLavaFlow newLavaFlow = new SpriteLavaFlow(atlas, new Info(flow, 32, 32, AnimationResourceMetadata.EMPTY), data.maxLevel,
-					data.width, data.height, originalLavaFlow.x, originalLavaFlow.y);
-			atlas.sprites.put(still, newLava);
-			atlas.sprites.put(flow, newLavaFlow);
-			int origIdx = atlas.animatedSprites.indexOf(originalLava);
-			int origFlowIdx = atlas.animatedSprites.indexOf(originalLavaFlow);
+			SpriteLava newLava = new SpriteLava(atlas, new Info(still, 16, 16, AnimationResourceMetadata.EMPTY), FabRefl.getMaxLevel(data),
+					FabRefl.getWidth(data), FabRefl.getHeight(data), FabRefl.getX(originalLava), FabRefl.getY(originalLava));
+			SpriteLavaFlow newLavaFlow = new SpriteLavaFlow(atlas, new Info(flow, 32, 32, AnimationResourceMetadata.EMPTY), FabRefl.getMaxLevel(data),
+					FabRefl.getWidth(data), FabRefl.getHeight(data), FabRefl.getX(originalLavaFlow), FabRefl.getX(originalLavaFlow));
+			FabRefl.getSprites(atlas).put(still, newLava);
+			FabRefl.getSprites(atlas).put(flow, newLavaFlow);
+			int origIdx = FabRefl.getAnimatedSprites(atlas).indexOf(originalLava);
+			int origFlowIdx = FabRefl.getAnimatedSprites(atlas).indexOf(originalLavaFlow);
 			if (origIdx != -1) {
-				atlas.animatedSprites.set(origIdx, newLava);
+				FabRefl.getAnimatedSprites(atlas).set(origIdx, newLava);
 			} else {
-				atlas.animatedSprites.add(newLava);
+				FabRefl.getAnimatedSprites(atlas).add(newLava);
 			}
 			if (origFlowIdx != -1) {
-				atlas.animatedSprites.set(origFlowIdx, newLavaFlow);
+				FabRefl.getAnimatedSprites(atlas).set(origFlowIdx, newLavaFlow);
 			} else {
-				atlas.animatedSprites.add(newLavaFlow);
+				FabRefl.getAnimatedSprites(atlas).add(newLavaFlow);
 			}
 			newLava.tickAnimation();
 			newLava.upload();
@@ -91,7 +92,7 @@ public class FeatureOldLava implements Feature {
 			int h = mip.getHeight();
 			for (int x = 0; x < w; ++x) {
 				for (int y = 0; y < h; ++y) {
-					mip.setPixelColor(x, y, MipmapHelper.blend(
+					mip.setPixelColor(x, y, FabRefl.MipmapHelper_blend(
 							src.getPixelColor(x * 2 + 0, y * 2 + 0),
 							src.getPixelColor(x * 2 + 1, y * 2 + 0),
 							src.getPixelColor(x * 2 + 0, y * 2 + 1),

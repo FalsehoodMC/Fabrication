@@ -31,7 +31,7 @@ public class MixinInventoryScreen {
 			fabrication$reentering = true;
 			MinecraftClient mc = MinecraftClient.getInstance();
 			Window window = mc.getWindow();
-			long handle = window.handle;
+			long handle = window.getHandle();
 			double[] xpos = new double[1];
 			double[] ypos = new double[1];
 			float scaleFactor = window.getWidth()/(float)window.getScaledWidth();

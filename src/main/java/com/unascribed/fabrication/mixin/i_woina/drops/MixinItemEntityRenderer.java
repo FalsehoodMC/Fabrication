@@ -21,6 +21,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.interfaces.RenderingAgeAccess;
 import com.unascribed.fabrication.loaders.LoaderClassicBlockDrops;
 import com.unascribed.fabrication.support.EligibleIf;
@@ -30,6 +31,7 @@ import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.block.Block;
 import net.minecraft.block.Material;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.color.item.ItemColors;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderLayers;
@@ -121,9 +123,6 @@ public class MixinItemEntityRenderer {
 							public void load(ResourceManager manager) throws IOException {
 								clearGlId();
 								SpriteAtlasTexture atlas = MinecraftClient.getInstance().getBakedModelManager().method_24153(new Identifier("textures/atlas/blocks.png"));
-								if (atlas.glId == -1) {
-									throw new IOException("Cannot load: atlas is not uploaded?");
-								}
 								GlStateManager.bindTexture(atlas.getGlId());
 								int maxLevel = GL11.glGetTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LEVEL);
 								if (maxLevel == 0) {
@@ -136,7 +135,7 @@ public class MixinItemEntityRenderer {
 										MemoryUtil.memFree(dest);
 										throw e;
 									}
-									NativeImage img = new NativeImage(Format.ABGR, w, h, false, MemoryUtil.memAddress(dest));
+									NativeImage img = FabRefl.NativeImage_new(Format.ABGR, w, h, false, MemoryUtil.memAddress(dest));
 									try {
 										NativeImage mipped = MipmapHelper.getMipmapLevelsImages(img, 1)[1];
 										try {
@@ -167,7 +166,7 @@ public class MixinItemEntityRenderer {
 							RenderLayer.getEntityCutout(new Identifier("fabrication", "textures/atlas/blocks-mip.png")) :
 							RenderLayer.getEntityTranslucent(new Identifier("fabrication", "textures/atlas/blocks-mip.png"));
 					VertexConsumer vertices = vertexConsumers.getBuffer(layer);
-					subject.renderBakedItemModel(model, stack, light, overlay, matrices, vertices);
+					FabRefl.ItemRenderer_renderBakedItemModel(subject, model, stack, light, overlay, matrices, vertices);
 				}
 				matrices.pop();
 				return;
@@ -182,7 +181,7 @@ public class MixinItemEntityRenderer {
 		
 		int packedColor = -1;
 		if (quad.hasColor()) {
-			packedColor = MinecraftClient.getInstance().itemColors.getColorMultiplier(is, quad.getColorIndex());
+			packedColor = FabRefl.getItemColors(MinecraftClient.getInstance()).getColorMultiplier(is, quad.getColorIndex());
 			Block b = ((BlockItem)is.getItem()).getBlock();
 			if (b.getDefaultState().getMaterial() == Material.SOIL || b.getDefaultState().getMaterial() == Material.SOLID_ORGANIC) {
 				isProbablyGrass = true;

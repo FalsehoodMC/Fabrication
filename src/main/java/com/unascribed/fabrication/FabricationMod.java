@@ -21,6 +21,7 @@ import com.google.common.collect.Sets;
 
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketByteBuf;
@@ -106,10 +107,10 @@ public class FabricationMod implements ModInitializer {
 		if (entity.world.isClient) return;
 		ServerChunkManager cm = ((ServerWorld)entity.world).getChunkManager();
 		ThreadedAnvilChunkStorage tacs = cm.threadedAnvilChunkStorage;
-		Int2ObjectMap<EntityTracker> entityTrackers = tacs.entityTrackers;
+		Int2ObjectMap<EntityTracker> entityTrackers = FabRefl.getEntityTrackers(tacs);
 		EntityTracker tracker = entityTrackers.get(entity.getEntityId());
 		if (tracker == null) return;
-		Set<ServerPlayerEntity> playersTracking = tracker.playersTracking;
+		Set<ServerPlayerEntity> playersTracking = FabRefl.getPlayersTracking(tracker);
 		if (entity instanceof ServerPlayerEntity) {
 			ServerPlayerEntity spe = (ServerPlayerEntity)entity;
 			if (predicate.test(spe)) {

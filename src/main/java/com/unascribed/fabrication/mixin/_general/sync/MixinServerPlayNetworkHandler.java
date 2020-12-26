@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.interfaces.SetFabricationConfigAware;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
@@ -30,9 +31,9 @@ public class MixinServerPlayNetworkHandler {
 	
 	@Inject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/c2s/play/CustomPayloadC2SPacket;)V", cancellable=true)
 	public void onCustomPayload(CustomPayloadC2SPacket packet, CallbackInfo ci) {
-		Identifier channel = packet.channel;
+		Identifier channel = FabRefl.getChannel(packet);
 		if (channel.getNamespace().equals("fabrication") && channel.getPath().equals("config")) {
-			PacketByteBuf recvdData = packet.data;
+			PacketByteBuf recvdData = FabRefl.getData(packet);
 			int id = recvdData.readVarInt();
 			if (id == 0) {
 				// hello

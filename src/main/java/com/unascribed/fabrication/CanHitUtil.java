@@ -34,7 +34,7 @@ public class CanHitUtil {
 				}
 				if (s.startsWith("@")) {
 					EntitySelector ep = new EntitySelectorReader(new StringReader(s), true).read();
-					Predicate<Entity> predicate = ep.basePredicate;
+					Predicate<Entity> predicate = FabRefl.getBasePredicate(ep);
 					if (predicate.test(entity)) {
 						return true;
 					}

@@ -4,8 +4,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.apache.logging.log4j.LogManager;
-
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Feature;
 
@@ -43,13 +41,13 @@ public abstract class ResourcePackFeature implements Feature, ResourcePackProvid
 	
 	@Environment(EnvType.CLIENT)
 	private void initClient() {
-		Set<ResourcePackProvider> providers = MinecraftClient.getInstance().getResourcePackManager().providers;
+		Set<ResourcePackProvider> providers = FabRefl.getProviders(MinecraftClient.getInstance().getResourcePackManager());
 		try {
 			providers.add(this);
 		} catch (UnsupportedOperationException e) {
 			FabLog.info("Injecting mutable resource pack provider set, as no-one else has yet.");
 			providers = Sets.newHashSet(providers);
-			MinecraftClient.getInstance().getResourcePackManager().providers = providers;
+			FabRefl.setProviders(MinecraftClient.getInstance().getResourcePackManager(), providers);
 		}
 	}
 
