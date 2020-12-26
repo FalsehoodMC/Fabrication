@@ -3,6 +3,7 @@ package com.unascribed.fabrication;
 
 import java.math.BigDecimal;
 
+import com.google.common.base.CharMatcher;
 import com.google.common.base.Preconditions;
 
 public class ParsedTime {
@@ -36,6 +37,16 @@ public class ParsedTime {
 		return "ParsedTime{"+timeInTicks+"t"+(priority?"!":"")+"}";
 	}
 	
+	public static ParsedTime getFrom(QDIni cfg, String k) {
+		String v = cfg.get(k).orElse("");
+		try {
+			return parse(v);
+		} catch (IllegalArgumentException e) {
+			FabLog.warn(k+" must be one of unset, forever, f, invincible, invulnerable, i, instantly, or a timespec like 30s (got "+v+") at "+cfg.getBlame(k));
+			return UNSET;
+		}
+	}
+	
 	public static ParsedTime parse(String time) {
 		Preconditions.checkNotNull(time);
 		boolean priority = false;
@@ -48,22 +59,25 @@ public class ParsedTime {
 				return UNSET;
 			case "forever": case "f":
 				return FOREVER;
-			case "invincible": case "i":
+			case "invincible": case "invulnerable": case "i":
 				return INVINCIBLE;
 			case "instantly": case "0":
 				return INSTANTLY;
 		}
 		int multiplier;
 		char qualifier = time.charAt(time.length()-1);
-		time = time.substring(0, time.length()-1);
+		String timeNumPart = time.substring(0, time.length()-1);
+		if (!CharMatcher.digit().matchesAllOf(timeNumPart)) {
+			throw new IllegalArgumentException("Bad timespec "+time);
+		}
 		switch (qualifier) {
 			case 't': multiplier = 1; break;
 			case 's': multiplier = 20; break;
 			case 'm': multiplier = 20*60; break;
 			case 'h': multiplier = 20*60*60; break;
-			default: throw new IllegalArgumentException("Unknown qualifier "+qualifier);
+			default: throw new IllegalArgumentException("Unknown qualifier "+qualifier+" for time value "+time);
 		}
-		return new ParsedTime(new BigDecimal(time).multiply(new BigDecimal(multiplier)).intValueExact(), priority);
+		return new ParsedTime(new BigDecimal(timeNumPart).multiply(new BigDecimal(multiplier)).intValueExact(), priority);
 	}
 	
 }

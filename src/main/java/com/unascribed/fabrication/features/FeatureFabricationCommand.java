@@ -11,13 +11,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.logging.log4j.LogManager;
-
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.Cardinal;
+import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.FabricationClientCommands;
 import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.PlayerTag;
@@ -124,7 +123,7 @@ public class FeatureFabricationCommand implements Feature {
 			root.then(tag);
 			
 			LiteralArgumentBuilder<ServerCommandSource> analyze = LiteralArgumentBuilder.<ServerCommandSource>literal("analyze");
-			tag.requires(scs -> scs.hasPermissionLevel(2));
+			tag.requires(scs -> scs.hasPermissionLevel(4));
 			{
 				LiteralArgumentBuilder<ServerCommandSource> biome = CommandManager.literal("biome");
 				
@@ -198,7 +197,7 @@ public class FeatureFabricationCommand implements Feature {
 						final int fz = z;
 						chunk = world.getServer().submit(() -> world.getChunk(fx, fz, ChunkStatus.FULL, true)).get();
 					} catch (Exception e) {
-						LogManager.getLogger("Fabrication").warn("Failed to generate chunk at "+x+", "+z+" for block distribution analysis");
+						FabLog.warn("Failed to generate chunk at "+x+", "+z+" for block distribution analysis");
 					}
 				}
 				if (chunk != null) {
@@ -211,7 +210,7 @@ public class FeatureFabricationCommand implements Feature {
 										if (!biomes.contains(b)) {
 											skipped++;
 											if (skipped > goal && scanned == 0) {
-												LogManager.getLogger("Fabrication").warn("We have skipped more blocks than our goal and found nothing matching the given biome. Giving up.");
+												FabLog.warn("We have skipped more blocks than our goal and found nothing matching the given biome. Giving up.");
 												return;
 											}
 											continue;
@@ -237,7 +236,7 @@ public class FeatureFabricationCommand implements Feature {
 					}
 					scannedChunks++;
 					if (scannedChunks%20 == 0) {
-						LogManager.getLogger("Fabrication").info("Scanned "+scanned+"/"+goal+" blocks... (skipped "+skipped+") "+((scanned*100)/goal)+"% done");
+						FabLog.info("Scanned "+scanned+"/"+goal+" blocks... (skipped "+skipped+") "+((scanned*100)/goal)+"% done");
 					}
 				}
 				if (i >= legLength) {
@@ -252,8 +251,8 @@ public class FeatureFabricationCommand implements Feature {
 				z += dir.yOfs();
 				i++;
 			}
-			LogManager.getLogger("Fabrication").info("Scanned "+scanned+"/"+goal+" blocks (skipped "+skipped+"), 100% done. Writing file");
-			LogManager.getLogger("Fabrication").info("NOTE: Fabrication block distribution analysis is NOT A BENCHMARK. Chunk generation speed is intentionally limited to keep servers responsive and not crashing.");
+			FabLog.info("Scanned "+scanned+"/"+goal+" blocks (skipped "+skipped+"), 100% done. Writing file");
+			FabLog.info("NOTE: Fabrication block distribution analysis is NOT A BENCHMARK. Chunk generation speed is intentionally limited to keep servers responsive and not crashing.");
 			List<Map.Entry<BlockState, MutableLong>> sorted = Lists.newArrayList(counts.entrySet());
 			sorted.sort((a, b) -> Long.compare(b.getValue().value, a.getValue().value));
 			try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(new File(name)), Charsets.UTF_8)) {
@@ -281,9 +280,9 @@ public class FeatureFabricationCommand implements Feature {
 					osw.write(new BigDecimal(en.getValue().value).divide(scannedBD, MathContext.DECIMAL64).multiply(hundred).toString());
 					osw.write("\r\n");
 				}
-				LogManager.getLogger("Fabrication").info(name+" written to disk.");
+				FabLog.info(name+" written to disk.");
 			} catch (IOException e) {
-				LogManager.getLogger("Fabrication").error("Failed to save block distribution data", e);
+				FabLog.error("Failed to save block distribution data", e);
 			}
 		}, "Fabrication block analysis").start();
 		return 1;

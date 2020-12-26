@@ -4,7 +4,6 @@ import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Set;
 
-import org.apache.logging.log4j.LogManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -12,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.mojang.authlib.GameProfile;
+import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.PlayerTag;
 import com.unascribed.fabrication.interfaces.SetSaturation;
 import com.unascribed.fabrication.interfaces.TaggablePlayer;
@@ -120,7 +120,7 @@ public abstract class MixinServerPlayerEntity extends PlayerEntity implements Ta
 		for (int i = 0; i < li.size(); i++) {
 			PlayerTag pt = Enums.getIfPresent(PlayerTag.class, li.getString(i).toUpperCase(Locale.ROOT)).orNull();
 			if (pt == null) {
-				LogManager.getLogger("Fabrication").warn("Unrecognized tag "+li.getString(i)+" while loading player");
+				FabLog.warn("Unrecognized tag "+li.getString(i)+" while loading player");
 			} else {
 				fabrication$tags.add(pt);
 			}

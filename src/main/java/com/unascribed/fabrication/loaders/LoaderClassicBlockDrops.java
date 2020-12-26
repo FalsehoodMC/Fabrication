@@ -3,11 +3,13 @@ package com.unascribed.fabrication.loaders;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.WeakHashMap;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.unascribed.fabrication.QDIni;
 import com.unascribed.fabrication.support.ConfigLoader;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
@@ -41,33 +43,38 @@ public class LoaderClassicBlockDrops implements ConfigLoader {
 	}
 	
 	@Override
-	public void load(Path configDir, Map<String, String> config) {
+	public void load(Path configDir, QDIni config, boolean loadError) {
 		rules.clear();
 		cache.clear();
-		for (Map.Entry<String, String> en : config.entrySet()) {
-			if (en.getKey().startsWith("@heuristics.")) {
-				if (en.getKey().contains("\\E") || en.getKey().contains("\\Q"))
+		for (String k : config.keySet()) {
+			if (k.startsWith("@heuristics.")) {
+				if (k.contains("\\E") || k.contains("\\Q"))
 					throw new IllegalArgumentException("No.");
 				StringBuffer buf = new StringBuffer("^\\Q");
-				Matcher m = Pattern.compile("*", Pattern.LITERAL).matcher(en.getKey().substring(12));
+				Matcher m = Pattern.compile("*", Pattern.LITERAL).matcher(k.substring(12));
 				while (m.find()) {
 					m.appendReplacement(buf, "\\\\E.*\\\\Q");
 				}
 				m.appendTail(buf);
 				buf.append("\\E$");
 				Pattern p = Pattern.compile(buf.toString());
-				boolean value = Boolean.parseBoolean(en.getValue());
-				rules.add(id -> {
-					if (p.matcher(id.getPath()).matches()) return value ? Trilean.TRUE : Trilean.FALSE;
-					return Trilean.UNSET;
-				});
+				Optional<Boolean> valueOpt = config.getBoolean(k);
+				if (valueOpt.isPresent()) {
+					boolean value = valueOpt.get();
+					rules.add(id -> {
+						if (p.matcher(id.getPath()).matches()) return value ? Trilean.TRUE : Trilean.FALSE;
+						return Trilean.UNSET;
+					});
+				}
 			} else {
-				String k = en.getKey();
-				boolean value = Boolean.parseBoolean(en.getValue());
-				rules.add(id -> {
-					if (id.toString().equals(k)) return value ? Trilean.TRUE : Trilean.FALSE;
-					return Trilean.UNSET;
-				});
+				Optional<Boolean> valueOpt = config.getBoolean(k);
+				if (valueOpt.isPresent()) {
+					boolean value = valueOpt.get();
+					rules.add(id -> {
+						if (id.toString().equals(k)) return value ? Trilean.TRUE : Trilean.FALSE;
+						return Trilean.UNSET;
+					});
+				}
 			}
 		}
 	}

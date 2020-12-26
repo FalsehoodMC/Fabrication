@@ -1,12 +1,12 @@
 package com.unascribed.fabrication.mixin.a_fixes.sync_attacker_yaw;
 
-import org.apache.logging.log4j.LogManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.interfaces.SetAttackerYawAware;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
@@ -28,7 +28,7 @@ public class MixinServerPlayNetworkHandler {
 		Identifier channel = packet.channel;
 		if (channel.getNamespace().equals("fabrication") && channel.getPath().equals("attacker_yaw")) {
 			if (RuntimeChecks.check("*.sync_attacker_yaw") && player instanceof SetAttackerYawAware) {
-				LogManager.getLogger("Fabrication").debug("Enabling attacker yaw syncing for "+player.getEntityName());
+				FabLog.debug("Enabling attacker yaw syncing for "+player.getEntityName());
 				((SetAttackerYawAware)player).fabrication$setAttackerYawAware(true);
 			}
 			ci.cancel();

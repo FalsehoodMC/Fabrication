@@ -10,13 +10,12 @@ import java.lang.reflect.Constructor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
@@ -24,12 +23,16 @@ import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
 import com.unascribed.fabrication.Agnos;
+import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.QDIni;
+import com.unascribed.fabrication.QDIni.BadValueException;
 import com.unascribed.fabrication.QDIni.IniTransformer;
+import com.unascribed.fabrication.QDIni.SyntaxErrorException;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Enums;
 import com.google.common.base.Joiner;
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -42,8 +45,7 @@ import com.google.common.reflect.ClassPath.ClassInfo;
 
 public class MixinConfigPlugin implements IMixinConfigPlugin {
 
-	private static final boolean DEBUG = Boolean.getBoolean("com.unascribed.fabrication.debug") || Boolean.getBoolean("fabrication.debug");
-	private static final Logger log = LogManager.getLogger("Fabrication");
+	public static final boolean DEBUG = Boolean.getBoolean("com.unascribed.fabrication.debug") || Boolean.getBoolean("fabrication.debug");
 	
 	private static final ImmutableSet<String> VIENNA_EXCEPTIONS = ImmutableSet.of(
 			"balance.infinity_mending",
@@ -135,7 +137,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			setMet(SpecialEligibility.FORGE, true);
 		}
 		try (InputStream is = MixinConfigPlugin.class.getClassLoader().getResourceAsStream("default_features_config.ini")) {
-			Set<String> keys = QDIni.load(is).keySet();
+			Set<String> keys = QDIni.load("default_features_config.ini", is).keySet();
 			ImmutableMap.Builder<String, String> starMapBldr = ImmutableMap.builder();
 			for (String key : keys) {
 				int dot = key.indexOf('.');
@@ -169,7 +171,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	}
 	
 	private static Profile profile;
-	private static Map<String, String> rawConfig;
+	private static QDIni rawConfig;
 	private static Map<String, Trilean> config;
 	
 	public static String remap(String configKey) {
@@ -202,7 +204,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	
 	public static String getRawValue(String configKey) {
 		configKey = remap(remap(configKey));
-		return rawConfig.getOrDefault(configKey, configKey.equals("general.profile") ? "light" : "");
+		return rawConfig.get(configKey).orElse(configKey.equals("general.profile") ? "light" : "");
 	}
 	
 	public static boolean isValid(String configKey) {
@@ -231,13 +233,16 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		}
 		rawConfig.put(configKey, newValue);
 		if ("general.profile".equals(configKey)) {
-			profile = Profile.valueOf(rawConfig.getOrDefault("general.profile", "light").toUpperCase(Locale.ROOT));
+			profile = rawConfig.getEnum("general.profile", Profile.class).orElse(Profile.LIGHT);
 			defaults = defaultsByProfile.get(profile);
+		} else {
+			config.put(configKey, Trilean.parseTrilean(newValue));
 		}
 		Path configFile = Agnos.INST.getConfigDir().resolve("fabrication").resolve("features.ini");
+		Stopwatch watch = Stopwatch.createStarted();
 		StringWriter sw = new StringWriter();
-		try (InputStream is = Files.newInputStream(configFile)) {
-			 QDIni.loadAndTransform(new InputStreamReader(is, Charsets.UTF_8), new IniTransformer() {
+		try {
+			 QDIni.loadAndTransform(configFile, new IniTransformer() {
 				 
 				boolean found = false;
 				boolean foundEmptySection = false;
@@ -273,13 +278,10 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 				}
 				
 			}, sw);
-		} catch (IOException e) {
-			log.warn("Failed to update configuration file", e);
-		}
-		try {
 			Files.write(configFile, sw.toString().getBytes(Charsets.UTF_8));
+			FabLog.info("Update of features.ini done in "+watch);
 		} catch (IOException e) {
-			log.warn("Failed to update configuration file", e);
+			FabLog.warn("Failed to update configuration file", e);
 		}
 	}
 	
@@ -289,6 +291,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	}
 	
 	public static void reload() {
+		FabLog.info("Reloading configs...");
 		Path dir = Agnos.INST.getConfigDir().resolve("fabrication");
 		try {
 			Files.createDirectories(dir);
@@ -297,69 +300,84 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		}
 		Path configFile = dir.resolve("features.ini");
 		checkForAndSaveDefaultsOrUpgrade(configFile, "default_features_config.ini");
-		StringWriter sw = new StringWriter();
-		try (InputStream is = Files.newInputStream(configFile)) {
-			rawConfig = QDIni.loadAndTransform(new InputStreamReader(is, Charsets.UTF_8), new IniTransformer() {
-
-				final String NOTICES_HEADER = "; Notices: (Do not edit anything past this line; it will be overwritten)";
-				
-				Set<String> encounteredKeys = Sets.newHashSet();
-				
-				List<String> notices = Lists.newArrayList();
-				boolean encounteredNotices = false;
-				
-				@Override
-				public String transformLine(String path, String line) {
-					if ((!encounteredNotices && line == null) || (line != null && line.trim().equals(NOTICES_HEADER))) {
-						encounteredNotices = true;
-						boolean badKeys = false;
-						for (String s : validKeys) {
-							if (!encounteredKeys.contains(s)) {
-								notices.add("- "+s+" was not found");
-								badKeys = true;
+		FabLog.timeAndCountWarnings("Loading of features.ini", () -> {
+			StringWriter sw = new StringWriter();
+			try {
+				rawConfig = QDIni.loadAndTransform(configFile, new IniTransformer() {
+	
+					final String NOTICES_HEADER = "; Notices: (Do not edit anything past this line; it will be overwritten)";
+					
+					Set<String> encounteredKeys = Sets.newHashSet();
+					
+					List<String> notices = Lists.newArrayList();
+					boolean encounteredNotices = false;
+					
+					@Override
+					public String transformLine(String path, String line) {
+						if ((!encounteredNotices && line == null) || (line != null && line.trim().equals(NOTICES_HEADER))) {
+							encounteredNotices = true;
+							boolean badKeys = false;
+							for (String s : validKeys) {
+								if (!encounteredKeys.contains(s)) {
+									notices.add("- "+s+" was not found");
+									badKeys = true;
+								}
 							}
-						}
-						for (String s : encounteredKeys) {
-							if (!validKeys.contains(s)) {
-								notices.add("- "+s+" is not recognized");
-								badKeys = true;
+							for (String s : encounteredKeys) {
+								if (!validKeys.contains(s)) {
+									notices.add("- "+s+" is not recognized");
+									badKeys = true;
+								}
 							}
+							if (badKeys) {
+								notices.add("Consider updating this config file by renaming it to fabrication.ini.old");
+							}
+							if (notices.isEmpty()) {
+								return NOTICES_HEADER+"\r\n; - No notices. You're in the clear!";
+							}
+							return NOTICES_HEADER+"\r\n; "+Joiner.on("\r\n; ").join(notices);
 						}
-						if (badKeys) {
-							notices.add("Consider updating this config file by renaming it to fabrication.ini.old");
-						}
-						if (notices.isEmpty()) {
-							return NOTICES_HEADER+"\r\n; - No notices. You're in the clear!";
-						}
-						return NOTICES_HEADER+"\r\n; "+Joiner.on("\r\n; ").join(notices);
+						return encounteredNotices ? null : line;
 					}
-					return encounteredNotices ? null : line;
+	
+					@Override
+					public String transformValueComment(String key, String value, String comment) {
+						return comment;
+					}
+					
+					@Override
+					public String transformValue(String key, String value) {
+						encounteredKeys.add(key);
+						return value;
+					}
+					
+				}, sw);
+				profile = rawConfig.getEnum("general.profile", Profile.class).orElse(Profile.LIGHT);
+				defaults = defaultsByProfile.get(profile);
+				config = new HashMap<>();
+				for (String k : rawConfig.keySet()) {
+					if (isTrilean(k)) {
+						try {
+							config.put(k, rawConfig.getEnum(k, Trilean.class).get());
+						} catch (BadValueException e) {
+							FabLog.warn(e.getMessage()+" - assuming unset");
+							config.put(k, Trilean.UNSET);
+						}
+					}
 				}
-
-				@Override
-				public String transformValueComment(String key, String value, String comment) {
-					return comment;
-				}
-				
-				@Override
-				public String transformValue(String key, String value) {
-					encounteredKeys.add(key);
-					return value;
-				}
-				
-			}, sw);
-			profile = Profile.valueOf(rawConfig.getOrDefault("general.profile", "light").toUpperCase(Locale.ROOT));
-			defaults = defaultsByProfile.get(profile);
-			config = Maps.transformValues(Maps.filterKeys(rawConfig, MixinConfigPlugin::isTrilean), Trilean::parseTrilean);
-		} catch (IOException e) {
-			log.warn("Failed to load configuration file; will assume defaults", e);
-			config = Maps.transformValues(defaults, v -> Trilean.UNSET);
-		}
-		try {
-			Files.write(configFile, sw.toString().getBytes(Charsets.UTF_8));
-		} catch (IOException e) {
-			log.warn("Failed to transform configuration file", e);
-		}
+			} catch (SyntaxErrorException e) {
+				FabLog.warn("Failed to load configuration file: "+e.getMessage()+"; will assume defaults");
+				config = Maps.transformValues(defaults, v -> Trilean.UNSET);
+			} catch (IOException e) {
+				FabLog.warn("Failed to load configuration file; will assume defaults", e);
+				config = Maps.transformValues(defaults, v -> Trilean.UNSET);
+			}
+			try {
+				Files.write(configFile, sw.toString().getBytes(Charsets.UTF_8));
+			} catch (IOException e) {
+				FabLog.warn("Failed to transform configuration file", e);
+			}
+		});
 		for (ConfigLoader ldr : loaders) {
 			load(ldr);
 		}
@@ -370,11 +388,18 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		Path dir = Agnos.INST.getConfigDir().resolve("fabrication");
 		Path file = dir.resolve(name+".ini");
 		checkForAndSaveDefaultsOrUpgrade(file, "default_"+name+"_config.ini");
-		try (InputStream is = Files.newInputStream(file)) {
-			ldr.load(dir, QDIni.load(is));
-		} catch (IOException e) {
-			log.warn("Failed to load "+name+" configuration file", e);
-		}
+		FabLog.timeAndCountWarnings("Loading of "+name+".ini", () -> {
+			try {
+				QDIni qd = QDIni.load(file);
+				qd.setYapLog(FabLog::warn);
+				ldr.load(dir, qd, false);
+			} catch (SyntaxErrorException e) {
+				FabLog.warn("Failed to load "+name+": "+e.getMessage());
+				ldr.load(dir, QDIni.load("<empty>", ""), true);
+			} catch (IOException e) {
+				FabLog.warn("Failed to load "+name+" configuration file", e);
+			}
+		});
 	}
 
 	private static void checkForAndSaveDefaultsOrUpgrade(Path configFile, String defaultName) {
@@ -400,13 +425,10 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			}
 			if (Files.exists(configFileOld)) {
 				try {
-					Map<String, String> currentValues;
-					try (InputStream is = Files.newInputStream(configFileOld)) {
-						currentValues = QDIni.load(is);
-					}
+					QDIni currentValues = QDIni.load(configFileOld);
 					try (InputStream is = MixinConfigPlugin.class.getClassLoader().getResourceAsStream(defaultName);
 							OutputStreamWriter osw = new OutputStreamWriter(Files.newOutputStream(configFile), Charsets.UTF_8)) {
-						QDIni.loadAndTransform(new InputStreamReader(is, Charsets.UTF_8), new IniTransformer() {
+						QDIni.loadAndTransform(defaultName, new InputStreamReader(is, Charsets.UTF_8), new IniTransformer() {
 	
 							@Override
 							public String transformLine(String path, String line) {
@@ -420,7 +442,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 							
 							@Override
 							public String transformValue(String key, String value) {
-								return currentValues.getOrDefault(key, value);
+								return currentValues.get(key).orElse(value);
 							}
 							
 						}, osw);
@@ -461,12 +483,12 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 
 	@Override
 	public List<String> getMixins() {
-		if (DEBUG) log.info("☕ Profile: "+profile.name().toLowerCase(Locale.ROOT));
+		if (DEBUG) FabLog.info("☕ Profile: "+profile.name().toLowerCase(Locale.ROOT));
 		return discoverClassesInPackage("com.unascribed.fabrication.mixin", true);
 	}
 
 	public static List<String> discoverClassesInPackage(String pkg, boolean truncate) {
-		if (DEBUG) log.info("Starting discovery pass...");
+		if (DEBUG) FabLog.info("Starting discovery pass...");
 		try {
 			int count = 0;
 			int enabled = 0;
@@ -478,8 +500,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 				count++;
 				String truncName = ci.getName().substring(pkg.length()+1);
 				if (DEBUG) {
-					log.info("--");
-					log.info((Math.random() < 0.01 ? "👅" : "👀")+" Considering "+truncName);
+					FabLog.info("--");
+					FabLog.info((Math.random() < 0.01 ? "👅" : "👀")+" Considering "+truncName);
 				}
 				ClassReader cr = new ClassReader(ci.asByteSource().read());
 				ClassNode cn = new ClassNode();
@@ -618,7 +640,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 										}
 									}
 								} else {
-									log.warn("Unknown annotation setting "+k);
+									FabLog.warn("Unknown annotation setting "+k);
 								}
 							}
 						}
@@ -629,25 +651,25 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 				}
 				if (DEBUG) {
 					for (String s : eligibilityNotes) {
-						log.info("  ℹ️ "+s);
+						FabLog.info("  ℹ️ "+s);
 					}
 					for (String s : eligibilitySuccesses) {
-						log.info("  ✅ "+s);
+						FabLog.info("  ✅ "+s);
 					}
 					for (String s : eligibilityFailures) {
-						log.info("  ❌ "+s);
+						FabLog.info("  ❌ "+s);
 					}
 				}
 				if (eligible) {
 					enabled++;
-					if (DEBUG) log.info("👍 Eligibility requirements met. Applying "+truncName);
+					if (DEBUG) FabLog.info("👍 Eligibility requirements met. Applying "+truncName);
 					rtrn.add(truncate ? truncName : ci.getName());
 				} else {
 					skipped++;
-					if (DEBUG) log.info("✋ Eligibility requirements not met. Skipping "+truncName);
+					if (DEBUG) FabLog.info("✋ Eligibility requirements not met. Skipping "+truncName);
 				}
 			}
-			if (DEBUG) log.info("Discovery pass complete. Found "+count+" candidates, enabled "+enabled+", skipped "+skipped+".");
+			if (DEBUG) FabLog.info("Discovery pass complete. Found "+count+" candidates, enabled "+enabled+", skipped "+skipped+".");
 			return rtrn;
 		} catch (IOException e) {
 			throw new RuntimeException(e);

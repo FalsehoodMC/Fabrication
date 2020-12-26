@@ -20,6 +20,7 @@ import com.unascribed.fabrication.LogoBlock;
 import com.unascribed.fabrication.loaders.LoaderBlockLogo;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
 
 import net.minecraft.block.BlockRenderType;
@@ -37,6 +38,7 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.VertexConsumerProvider.Immediate;
 import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.texture.NativeImage;
+import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.Vector3f;
@@ -111,7 +113,7 @@ public class MixinTitleScreen extends Screen {
 			float fade = doBackgroundFade ? MathHelper.clamp(((Util.getMeasuringTimeMs() - backgroundFadeStart) / 1000f)-1, 0, 1) : 1;
 			int l = MathHelper.ceil(fade * 255.0f) << 24;
 			RenderSystem.pushMatrix();
-			RenderSystem.translatef(this.width / 2 + (LoaderBlockLogo.image.getWidth()*2.307692307692308f), 70, 0);
+			RenderSystem.translatef(this.width / 2 + ((LoaderBlockLogo.unrecoverableLoadError ? 48 : LoaderBlockLogo.image.getWidth())*2.307692307692308f), 70, 0);
 			RenderSystem.rotatef(-20, 0, 0, 1);
 			float s = 1.8f - MathHelper.abs(MathHelper.sin(Util.getMeasuringTimeMs() % 1000 / 1000f * 6.28f) * 0.1f);
 			s = s * 100f / (textRenderer.getWidth(splashText) + 32);
@@ -129,11 +131,13 @@ public class MixinTitleScreen extends Screen {
 				for (int x = 0; x < fabrication$blocks[y].length; x++) {
 					LogoBlock blk = fabrication$blocks[y][x];
 					if (blk != null) {
-						if (hasShiftDown() && Math.random() < 0.05) {
-							blk.velocity += ((float)Math.random())*3;
-						}
-						if (hasAltDown()) {
-							blk.velocity += 0.9+((float)Math.random()*0.2);
+						if (MixinConfigPlugin.DEBUG) {
+							if (hasShiftDown() && Math.random() < 0.05) {
+								blk.velocity += ((float)Math.random())*3;
+							}
+							if (hasAltDown()) {
+								blk.velocity += 0.9+((float)Math.random()*0.2);
+							}
 						}
 						blk.tick();
 					}
@@ -144,19 +148,40 @@ public class MixinTitleScreen extends Screen {
 	
 	@Unique
 	private void drawLogo(float partialTicks) {
+		MinecraftClient mc = MinecraftClient.getInstance();
 		float fade = doBackgroundFade ? MathHelper.clamp(((Util.getMeasuringTimeMs() - backgroundFadeStart) / 1000f)-1, 0, 1) : 1;
-		NativeImage img = LoaderBlockLogo.image;
-		if (fabrication$blocks == null || LoaderBlockLogo.invalidated || Screen.hasControlDown()) {
+		int logoDataWidth = LoaderBlockLogo.unrecoverableLoadError ? 48 : LoaderBlockLogo.image.getWidth();
+		int logoDataHeight = LoaderBlockLogo.unrecoverableLoadError ? 5 : LoaderBlockLogo.image.getHeight();
+		if (fabrication$blocks == null || LoaderBlockLogo.invalidated || (MixinConfigPlugin.DEBUG && Screen.hasControlDown())) {
 			LoaderBlockLogo.invalidated = false;
 			boolean reverse = LoaderBlockLogo.getReverse.getAsBoolean();
-			fabrication$blocks = new LogoBlock[img.getWidth()][img.getHeight()];
-			for (int x = 0; x < img.getWidth(); x++) {
-				for (int y = 0; y < img.getHeight(); y++) {
-					int color = img.getPixelColor(x, y);
-					if ((color&0xFF000000) == 0) continue;
-					BlockState state = LoaderBlockLogo.colorToState.getOrDefault(color&0x00FFFFFF, () -> Blocks.AIR.getDefaultState()).get();
-					if (state.isAir() || state.getRenderType() == BlockRenderType.INVISIBLE) continue;
-					fabrication$blocks[x][y] = new LogoBlock(reverse ? img.getWidth()-x : x, y, state);
+			fabrication$blocks = new LogoBlock[logoDataWidth][logoDataHeight];
+			if (LoaderBlockLogo.unrecoverableLoadError) {
+				String[] error = {
+						"### ### ### ### ###    ### ### ###   #   ### ###",
+						"#   # # # # # # # #    #   #   #     #   # # #  ",
+						"##  ##  ##  # # ##     ### ##  ##    #   # # # #",
+						"#   # # # # # # # #      # #   #     #   # # # #",
+						"### # # # # ### # # #  ### ### ###   ### ### ###"
+				};
+				for (int x = 0; x < error[0].length(); x++) {
+					for (int y = 0; y < error.length; y++) {
+						char c = error[y].charAt(x);
+						if (c == ' ') continue;
+						BlockState state = null;
+						fabrication$blocks[x][y] = new LogoBlock(reverse ? logoDataWidth-x : x, y, state);
+					}
+				}
+			} else {
+				NativeImage img = LoaderBlockLogo.image;
+				for (int x = 0; x < logoDataWidth; x++) {
+					for (int y = 0; y < logoDataHeight; y++) {
+						int color = img.getPixelColor(x, y);
+						if ((color&0xFF000000) == 0) continue;
+						BlockState state = LoaderBlockLogo.colorToState.getOrDefault(color&0x00FFFFFF, () -> Blocks.AIR.getDefaultState()).get();
+						if (state.isAir() || state.getRenderType() == BlockRenderType.INVISIBLE) continue;
+						fabrication$blocks[x][y] = new LogoBlock(reverse ? logoDataWidth-x : x, y, state);
+					}
 				}
 			}
 		}
@@ -164,7 +189,6 @@ public class MixinTitleScreen extends Screen {
 		// ported from beta 1.2_01. hell yeah
 		// getting MCP for that version to work was actually pretty easy
 		
-		MinecraftClient mc = MinecraftClient.getInstance();
 		GlStateManager.matrixMode(GL_PROJECTION);
 		GlStateManager.pushMatrix();
 		GlStateManager.loadIdentity();
@@ -205,7 +229,7 @@ public class MixinTitleScreen extends Screen {
 			GlStateManager.scalef(1, -1, 1);
 			GlStateManager.rotatef(15, 1, 0, 0);
 			GlStateManager.scalef(0.89f, 1, 0.4f);
-			GlStateManager.translatef(-img.getWidth() * 0.5f, -img.getHeight() * 0.5f, 0);
+			GlStateManager.translatef(-logoDataWidth * 0.5f, -logoDataHeight * 0.5f, 0);
 			if (pass == 0) {
 				GlStateManager.disableTexture();
 				GlStateManager.color4f(1, 1, 1, 1);
@@ -214,8 +238,8 @@ public class MixinTitleScreen extends Screen {
 				GlStateManager.color4f(1, 1, 1, 1);
 			}
 			
-			for (int y = 0; y < img.getHeight(); y++) {
-				for (int x = 0; x < img.getWidth(); x++) {
+			for (int y = 0; y < logoDataHeight; y++) {
+				for (int x = 0; x < logoDataWidth; x++) {
 					LogoBlock blk = fabrication$blocks[x][y];
 					if (blk == null) continue;
 					BlockState state = blk.state;
@@ -233,10 +257,51 @@ public class MixinTitleScreen extends Screen {
 					GlStateManager.scalef(scale, scale, scale);
 					GlStateManager.rotatef(rot, 0, 1, 0);
 					if (pass != 0) {
-						Immediate vertexConsumer = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
-						GlStateManager.rotatef(90, 1, 0, 0);
-						GlStateManager.translatef(0, 0, -1);
-						brm.renderBlockAsEntity(state, matrices, vertexConsumer, 0, OverlayTexture.DEFAULT_UV);
+						if (state == null) {
+							BufferBuilder bb = Tessellator.getInstance().getBuffer();
+							bb.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE_COLOR_NORMAL);
+							Sprite missing = mc.getSpriteAtlas(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE).apply(new Identifier("missingno", "missingno"));
+							
+							float minU = missing.getMinU();
+							float minV = missing.getMinV();
+							float maxU = missing.getMaxU();
+							float maxV = missing.getMaxV();
+							
+							bb.vertex(0, 0, 0).texture(minU, minV).color(255, 255, 255, 255).normal(0, -1, 0).next();
+							bb.vertex(1, 0, 0).texture(maxU, minV).color(255, 255, 255, 255).normal(0, -1, 0).next();
+							bb.vertex(1, 0, 1).texture(maxU, maxV).color(255, 255, 255, 255).normal(0, -1, 0).next();
+							bb.vertex(0, 0, 1).texture(minU, maxV).color(255, 255, 255, 255).normal(0, -1, 0).next();
+							
+							bb.vertex(0, 1, 0).texture(minU, minV).color(255, 255, 255, 255).normal(0,  1, 0).next();
+							bb.vertex(1, 1, 0).texture(maxU, minV).color(255, 255, 255, 255).normal(0,  1, 0).next();
+							bb.vertex(1, 1, 1).texture(maxU, maxV).color(255, 255, 255, 255).normal(0,  1, 0).next();
+							bb.vertex(0, 1, 1).texture(minU, maxV).color(255, 255, 255, 255).normal(0,  1, 0).next();
+							
+							bb.vertex(0, 0, 0).texture(minU, minV).color(255, 255, 255, 255).normal(0, 0, -1).next();
+							bb.vertex(1, 0, 0).texture(maxU, minV).color(255, 255, 255, 255).normal(0, 0, -1).next();
+							bb.vertex(1, 1, 0).texture(maxU, maxV).color(255, 255, 255, 255).normal(0, 0, -1).next();
+							bb.vertex(0, 1, 0).texture(minU, maxV).color(255, 255, 255, 255).normal(0, 0, -1).next();
+							
+							bb.vertex(0, 0, 1).texture(minU, minV).color(255, 255, 255, 255).normal(0, 0,  1).next();
+							bb.vertex(1, 0, 1).texture(maxU, minV).color(255, 255, 255, 255).normal(0, 0,  1).next();
+							bb.vertex(1, 1, 1).texture(maxU, maxV).color(255, 255, 255, 255).normal(0, 0,  1).next();
+							bb.vertex(0, 1, 1).texture(minU, maxV).color(255, 255, 255, 255).normal(0, 0,  1).next();
+							
+							bb.vertex(0, 0, 0).texture(minU, minV).color(255, 255, 255, 255).normal(-1, 0, 0).next();
+							bb.vertex(0, 1, 0).texture(maxU, minV).color(255, 255, 255, 255).normal(-1, 0, 0).next();
+							bb.vertex(0, 1, 1).texture(maxU, maxV).color(255, 255, 255, 255).normal(-1, 0, 0).next();
+							bb.vertex(0, 0, 1).texture(minU, maxV).color(255, 255, 255, 255).normal(-1, 0, 0).next();
+							
+							bb.vertex(1, 0, 0).texture(minU, minV).color(255, 255, 255, 255).normal( 1, 0, 0).next();
+							bb.vertex(1, 1, 0).texture(maxU, minV).color(255, 255, 255, 255).normal( 1, 0, 0).next();
+							bb.vertex(1, 1, 1).texture(maxU, maxV).color(255, 255, 255, 255).normal( 1, 0, 0).next();
+							bb.vertex(1, 0, 1).texture(minU, maxV).color(255, 255, 255, 255).normal( 1, 0, 0).next();
+						} else {
+							Immediate vertexConsumer = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
+							GlStateManager.rotatef(90, 1, 0, 0);
+							GlStateManager.translatef(0, 0, -1);
+							brm.renderBlockAsEntity(state, matrices, vertexConsumer, 0, OverlayTexture.DEFAULT_UV);
+						}
 						mc.getTextureManager().bindTexture(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE);
 						Tessellator.getInstance().draw();
 					} else {

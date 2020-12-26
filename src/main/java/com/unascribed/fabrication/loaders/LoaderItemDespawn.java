@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.Map;
 
 import com.unascribed.fabrication.ParsedTime;
+import com.unascribed.fabrication.QDIni;
 import com.unascribed.fabrication.Resolvable;
 import com.unascribed.fabrication.support.ConfigLoader;
 import com.google.common.collect.Maps;
@@ -34,52 +35,33 @@ public class LoaderItemDespawn implements ConfigLoader {
 	}
 	
 	@Override
-	public void load(Path configDir, Map<String, String> config) {
+	public void load(Path configDir, QDIni config, boolean loadError) {
 		itemDespawns.clear();
 		enchDespawns.clear();
 		tagDespawns.clear();
 		nbtBools.clear();
-		curseDespawn = ParsedTime.UNSET;
-		normalEnchDespawn = ParsedTime.UNSET;
-		treasureDespawn = ParsedTime.UNSET;
-		defaultDespawn = ParsedTime.UNSET;
-		dropsDespawn = ParsedTime.UNSET;
-		playerDeathDespawn = ParsedTime.UNSET;
-		for (Map.Entry<String, String> en : config.entrySet()) {
-			ParsedTime time = ParsedTime.parse(en.getValue());
+		curseDespawn = ParsedTime.getFrom(config, "@enchantments.@curses");
+		normalEnchDespawn = ParsedTime.getFrom(config, "@enchantments.@normal");
+		treasureDespawn = ParsedTime.getFrom(config, "@enchantments.@treasure");
+		defaultDespawn = ParsedTime.getFrom(config, "@special.default");
+		dropsDespawn = ParsedTime.getFrom(config, "@special.drops");
+		playerDeathDespawn = ParsedTime.getFrom(config, "@special.player_death");
+		for (String k : config.keySet()) {
+			ParsedTime time = ParsedTime.getFrom(config, k);
 			if (time == ParsedTime.UNSET) continue;
-			if (en.getKey().startsWith("@enchantments.")) {
-				String id = en.getKey().substring(14);
-				if ("@curses".equals(id)) {
-					curseDespawn = time;
-				} else if ("@normal".equals(id)) {
-					normalEnchDespawn = time;
-				} else if ("@treasure".equals(id)) {
-					treasureDespawn = time;
-				} else if (id.startsWith("@")) {
-					throw new IllegalArgumentException("Unknown special key "+en.getKey());
-				} else {
+			if (k.startsWith("@enchantments.")) {
+				String id = k.substring(14);
+				if (!id.startsWith("@")) {
 					enchDespawns.put(Resolvable.of(new Identifier(id), Registry.ENCHANTMENT), time);
 				}
-			} else if (en.getKey().startsWith("@tags.")) {
-				String id = en.getKey().substring(6);
+			} else if (k.startsWith("@tags.")) {
+				String id = k.substring(6);
 				tagDespawns.put(new Identifier(id), time);
-			} else if (en.getKey().startsWith("@special.")) {
-				String id = en.getKey().substring(9);
-				if ("default".equals(id)) {
-					defaultDespawn = time;
-				} else if ("drops".equals(id)) {
-					dropsDespawn = time;
-				} else if ("player_death".equals(id)) {
-					playerDeathDespawn = time;
-				} else {
-					throw new IllegalArgumentException("Unknown special key "+en.getKey());
-				}
-			} else if (en.getKey().startsWith("@nbtbools.")) {
-				String key = en.getKey().substring(10);
+			} else if (k.startsWith("@nbtbools.")) {
+				String key = k.substring(10);
 				nbtBools.put(key, time);
-			} else {
-				itemDespawns.put(Resolvable.of(new Identifier(en.getKey()), Registry.ITEM), time);
+			} else if (!k.startsWith("@")) {
+				itemDespawns.put(Resolvable.of(new Identifier(k), Registry.ITEM), time);
 			}
 		}
 	}

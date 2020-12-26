@@ -6,6 +6,7 @@ import com.unascribed.fabrication.loaders.LoaderBlockLogo;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.sound.SoundEvents;
 
 public class LogoBlock {
 
@@ -31,7 +32,7 @@ public class LogoBlock {
 			velocity = 0;
 			if (lastPosition > 0) {
 				if (LoaderBlockLogo.sound) {
-					MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(state.getSoundGroup().getPlaceSound(), 1f, 0.2f));
+					MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(state == null ? SoundEvents.BLOCK_BAMBOO_BREAK : state.getSoundGroup().getPlaceSound(), 1f, 0.2f));
 				}
 			}
 		}

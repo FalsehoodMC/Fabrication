@@ -32,7 +32,7 @@ public class LegacyIDs {
 				data.put(key, Registry.ITEM.get(new Identifier(en.getValue().getAsString())));
 			}
 		} catch (Throwable t) {
-			LogManager.getLogger("Fabrication").warn("Failed to load legacy IDs", t);
+			FabLog.warn("Failed to load legacy IDs", t);
 		}
 	}
 	

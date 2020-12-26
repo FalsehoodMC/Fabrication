@@ -3,14 +3,15 @@ package com.unascribed.fabrication.loaders;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.logging.log4j.LogManager;
-
+import com.unascribed.fabrication.FabLog;
+import com.unascribed.fabrication.QDIni;
 import com.unascribed.fabrication.Resolvable;
 import com.unascribed.fabrication.support.ConfigLoader;
 
@@ -18,6 +19,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.primitives.Ints;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -68,82 +70,15 @@ public class LoaderGearComponents implements ConfigLoader {
 	private static final Pattern MATERIAL_VALUE_PATTERN = Pattern.compile("^([0-9]+(?:\\.[0-9]+)?)(.*)$");
 	
 	@Override
-	public void load(Path configDir, Map<String, String> config) {
+	public void load(Path configDir, QDIni config, boolean loadError) {
 		dropRate = () -> 0.75;
-		guaranteedIngots = 1;
-		ignoreVanishing = true;
-		cheat = 1;
 		materials.clear();
 		items.clear();
-		double dropRateMin = 0.75;
-		double dropRateMid = 0.75;
-		double dropRateMax = 0.75;
-		boolean dropRateUniform = false;
-		for (Map.Entry<String, String> en : config.entrySet()) {
-			String v = en.getValue();
-			if (en.getKey().startsWith("@options.")) {
-				String id = en.getKey().substring(9);
-				if ("drop_rate_min".equals(id)) {
-					dropRateMin = Double.parseDouble(v)/100;
-				} else if ("drop_rate_mid".equals(id)) {
-					dropRateMid = Double.parseDouble(v)/100;
-				} else if ("drop_rate_max".equals(id)) {
-					dropRateMax = Double.parseDouble(v)/100;
-				} else if ("drop_rate_uniform".equals(id)) {
-					dropRateUniform = Boolean.parseBoolean(v);
-				} else if ("guaranteed_ingots".equals(id)) {
-					if ("*".equals(v)) {
-						guaranteedIngots = Integer.MAX_VALUE;
-					} else {
-						guaranteedIngots = Integer.parseInt(v);
-					}
-				} else if ("ignore_vanishing".equals(id)) {
-					ignoreVanishing = Boolean.parseBoolean(v);
-				} else if ("cheat".equals(id)) {
-					cheat = Integer.parseInt(v);
-				} else {
-					throw new IllegalArgumentException("Unknown option key "+en.getKey());
-				}
-			} else if (en.getKey().startsWith("@materials.")) {
-				String id = en.getKey().substring(11);
-				String namespace = id.contains(":") ? id.substring(0, id.indexOf(':')) : "minecraft";
-				String name = id.substring(id.indexOf(':')+1);
-				List<String> split = SPACE_SPLITTER.splitToList(v);
-				if (split.size() < 2) {
-					throw new IllegalArgumentException("Bad value for "+en.getKey()+" - not enough values: "+en.getValue());
-				}
-				if (split.size() > 3) {
-					throw new IllegalArgumentException("Bad value for "+en.getKey()+" - too many values: "+en.getValue());
-				}
-				int npi = Integer.parseInt(split.get(0));
-				String nuggetId = split.get(1);
-				String ingotId = split.size() >= 3 ? split.get(2) : null;
-				Supplier<Item> nuggetGetter = resolver(namespace, nuggetId);
-				Supplier<Item> ingotGetter = resolver(namespace, ingotId);
-				materials.put(name, new MaterialData(npi, nuggetGetter, ingotGetter));
-			} else {
-				Resolvable<Item> r = Resolvable.of(new Identifier(en.getKey()), Registry.ITEM);
-				for (String s : SPACE_SPLITTER.split(v)) {
-					Matcher m = MATERIAL_VALUE_PATTERN.matcher(s);
-					if (m.matches()) {
-						double amt = Double.parseDouble(m.group(1));
-						String mat = m.group(2);
-						boolean idr = mat.endsWith("!");
-						if (idr) {
-							mat = mat.substring(0, mat.length()-1);
-						}
-						items.put(r, new ItemMaterialValue(amt, mat, idr));
-					} else {
-						throw new IllegalArgumentException("Syntax error for "+en.getKey()+" around "+s);
-					}
-				}
-			}
-		}
-		for (Map.Entry<Resolvable<Item>, ItemMaterialValue> en : items.entries()) {
-			if (!materials.containsKey(en.getValue().materialName)) {
-				LogManager.getLogger("Fabrication").warn("Unknown material name "+en.getValue().materialName+" in drops for item "+en.getKey().getId());
-			}
-		}
+		double dropRateMin = config.getDouble("@options.drop_rate_min").orElse(75D)/100;
+		double dropRateMid = config.getDouble("@options.drop_rate_mid").orElse(75D)/100;
+		double dropRateMax = config.getDouble("@options.drop_rate_max").orElse(75D)/100;
+		boolean dropRateUniform = config.getBoolean("@options.drop_rate_uniform").orElse(false);
+		
 		if (dropRateMin == dropRateMid && dropRateMid == dropRateMax) {
 			final double rate = dropRateMid;
 			dropRate = () -> rate;
@@ -164,6 +99,69 @@ public class LoaderGearComponents implements ConfigLoader {
 				}
 				return 0;
 			};
+		}
+		
+		Optional<String> guaranteedIngotsStr = config.get("@options.guaranteed_ingots");
+		if (guaranteedIngotsStr.isPresent()) {
+			if ("*".equals(guaranteedIngotsStr.get())) {
+				guaranteedIngots = Integer.MAX_VALUE;
+			} else {
+				Integer i = Ints.tryParse(guaranteedIngotsStr.get());
+				if (i == null) {
+					FabLog.warn("@options.guaranteed_ingots must be * or a whole number (got "+guaranteedIngotsStr.get()+") at "+config.getBlame("@options.guaranteed_ingots"));
+					guaranteedIngots = 1;
+				} else {
+					guaranteedIngots = i;
+				}
+			}
+		} else {
+			guaranteedIngots = 1;
+		}
+		ignoreVanishing = config.getBoolean("@options.ignore_vanishing").orElse(false);
+		cheat = config.getInt("@options.cheat").orElse(1);
+		for (String k : config.keySet()) {
+			String v = config.get(k).get();
+			if (k.startsWith("@materials.")) {
+				String id = k.substring(11);
+				String namespace = id.contains(":") ? id.substring(0, id.indexOf(':')) : "minecraft";
+				String name = id.substring(id.indexOf(':')+1);
+				List<String> split = SPACE_SPLITTER.splitToList(v);
+				if (split.size() < 2) {
+					FabLog.warn(k+" is not a valid material definition (got "+v+" which only has "+split.size()+" elements, need 2 or 3) at "+config.getBlame(k));
+					continue;
+				}
+				if (split.size() > 3) {
+					FabLog.warn(k+" is not a valid material definition (got "+v+" which has "+split.size()+" elements, need 2 or 3) at "+config.getBlame(k));
+					continue;
+				}
+				int npi = Integer.parseInt(split.get(0));
+				String nuggetId = split.get(1);
+				String ingotId = split.size() >= 3 ? split.get(2) : null;
+				Supplier<Item> nuggetGetter = resolver(namespace, nuggetId);
+				Supplier<Item> ingotGetter = resolver(namespace, ingotId);
+				materials.put(name, new MaterialData(npi, nuggetGetter, ingotGetter));
+			} else if (!k.startsWith("@")) {
+				Resolvable<Item> r = Resolvable.of(new Identifier(k), Registry.ITEM);
+				for (String s : SPACE_SPLITTER.split(v)) {
+					Matcher m = MATERIAL_VALUE_PATTERN.matcher(s);
+					if (m.matches()) {
+						double amt = Double.parseDouble(m.group(1));
+						String mat = m.group(2);
+						boolean idr = mat.endsWith("!");
+						if (idr) {
+							mat = mat.substring(0, mat.length()-1);
+						}
+						items.put(r, new ItemMaterialValue(amt, mat, idr));
+					} else {
+						FabLog.warn(k+" is not a valid material value definition (got "+v+") at "+config.getBlame(k));
+					}
+				}
+			}
+		}
+		for (Map.Entry<Resolvable<Item>, ItemMaterialValue> en : items.entries()) {
+			if (!materials.containsKey(en.getValue().materialName)) {
+				FabLog.warn("Unknown material name "+en.getValue().materialName+" in drops for item "+en.getKey().getId());
+			}
 		}
 	}
 

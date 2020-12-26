@@ -47,7 +47,7 @@ public abstract class ResourcePackFeature implements Feature, ResourcePackProvid
 		try {
 			providers.add(this);
 		} catch (UnsupportedOperationException e) {
-			LogManager.getLogger("Fabrication").info("Injecting mutable resource pack provider set, as no-one else has yet.");
+			FabLog.info("Injecting mutable resource pack provider set, as no-one else has yet.");
 			providers = Sets.newHashSet(providers);
 			MinecraftClient.getInstance().getResourcePackManager().providers = providers;
 		}
