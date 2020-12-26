@@ -1,3 +1,3 @@
-# A Total Fabrication
+# A Total Fabrication / A Complete Forgery
 
-A bunch of mixins in a trenchcoat.
+A huge collection of vanilla tweaks for both Fabric and Forge.
