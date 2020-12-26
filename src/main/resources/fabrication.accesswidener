@@ -39,3 +39,5 @@ accessible field net/minecraft/client/MinecraftClient itemColors Lnet/minecraft/
 accessible method net/minecraft/client/texture/NativeImage <init> (Lnet/minecraft/client/texture/NativeImage$Format;IIZJ)V
 
 accessible field net/minecraft/client/texture/AbstractTexture glId I
+
+accessible method net/minecraft/server/command/GiveCommand execute (Lnet/minecraft/server/command/ServerCommandSource;Lnet/minecraft/command/argument/ItemStackArgument;Ljava/util/Collection;I)I

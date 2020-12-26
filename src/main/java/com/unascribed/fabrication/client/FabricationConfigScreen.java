@@ -763,6 +763,9 @@ public class FabricationConfigScreen extends Screen {
 						"limitations. In English: Makes cacti not break themselves if a block " +
 						"is placed next to them. They will still break if they *grow* into such " +
 						"a space, so cactus randomizers and cactus farms still work.", y, mouseX, mouseY);
+				y = drawTrilean(matrices, "fixes.boundless_levels", "Boundless Levels",
+						"Replaces translation strings for potion and enchantment levels with a "
+						+ "dynamic algorithm that supports arbitrarily large numbers.", y, mouseX, mouseY, CLIENT_ONLY);
 			} else if ("utility".equals(section)) {
 				y = drawTrilean(matrices, "utility.mods_command", "/mods command",
 						"Adds a /mods command that anyone can run that lists installed mods. Lets " +
@@ -773,8 +776,9 @@ public class FabricationConfigScreen extends Screen {
 						"permanent dolphin's grace or conduit power, able to breathe water, " +
 						"fireproof, scare creepers, or not have phantoms spawn.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "utility.legacy_command_syntax", "Legacy Command Syntax",
-						"Re-adds /toggledownfall and numeric arguments to /difficulty and /gamemode, as "
-						+ "well as capitalized arguments to /summon.", y, mouseX, mouseY, REQUIRES_FABRIC_API);
+						"Re-adds /toggledownfall and numeric arguments to /difficulty and "
+						+ "/gamemode, capitalized arguments to /summon, and numeric arguments "
+						+ "to /give and other commands that accept items.", y, mouseX, mouseY, REQUIRES_FABRIC_API);
 				y = drawTrilean(matrices, "utility.books_show_enchants", "Books Show Enchants",
 						"Makes enchanted books show the first letter of their enchants in the" +
 						"bottom left, cycling through enchants every second if they have multiple.", y, mouseX, mouseY, CLIENT_ONLY);
@@ -797,6 +801,11 @@ public class FabricationConfigScreen extends Screen {
 				y = drawTrilean(matrices, "utility.item_despawn", "Item Despawn Control",
 						"Allows fine-tuned adjustment of item despawn times.\n" +
 						"See fabrication_item_despawn.ini.", y, mouseX, mouseY);
+				y = drawTrilean(matrices, "utility.i_and_more", "/i And More",
+						"Adds /i, /item, /more, and /fenchant commands.\n"
+						+ "/i and /item are shorthand for /give to yourself, and /more increases "
+						+ "the size of your held item's stack. /fenchant is like /enchant but it "
+						+ "ignores all restrictions.", y, mouseX, mouseY, REQUIRES_FABRIC_API);
 			} else if ("tweaks".equals(section)) {
 				y = drawTrilean(matrices, "tweaks.creepers_explode_when_on_fire", "Creepers Explode When On Fire",
 						"Causes creepers to light their fuses when lit on fire. Just because.", y, mouseX, mouseY);
