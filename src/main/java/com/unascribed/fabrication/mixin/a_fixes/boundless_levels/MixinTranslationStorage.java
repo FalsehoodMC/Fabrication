@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.RomanNumeral;
 import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
 
 import com.google.common.primitives.Ints;
@@ -14,7 +15,7 @@ import com.google.common.primitives.Ints;
 import net.minecraft.client.resource.language.TranslationStorage;
 
 @Mixin(TranslationStorage.class)
-@EligibleIf(configEnabled="*.boundless_levels")
+@EligibleIf(configEnabled="*.boundless_levels", envMatches=Env.CLIENT)
 public class MixinTranslationStorage {
 
 	@Inject(at=@At("HEAD"), method="get(Ljava/lang/String;)Ljava/lang/String;", cancellable=true)

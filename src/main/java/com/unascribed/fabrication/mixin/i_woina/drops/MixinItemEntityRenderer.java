@@ -31,7 +31,6 @@ import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.block.Block;
 import net.minecraft.block.Material;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.color.item.ItemColors;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderLayers;
@@ -135,7 +134,7 @@ public class MixinItemEntityRenderer {
 										MemoryUtil.memFree(dest);
 										throw e;
 									}
-									NativeImage img = FabRefl.NativeImage_new(Format.ABGR, w, h, false, MemoryUtil.memAddress(dest));
+									NativeImage img = FabRefl.Client.NativeImage_new(Format.ABGR, w, h, false, MemoryUtil.memAddress(dest));
 									try {
 										NativeImage mipped = MipmapHelper.getMipmapLevelsImages(img, 1)[1];
 										try {
@@ -166,7 +165,7 @@ public class MixinItemEntityRenderer {
 							RenderLayer.getEntityCutout(new Identifier("fabrication", "textures/atlas/blocks-mip.png")) :
 							RenderLayer.getEntityTranslucent(new Identifier("fabrication", "textures/atlas/blocks-mip.png"));
 					VertexConsumer vertices = vertexConsumers.getBuffer(layer);
-					FabRefl.ItemRenderer_renderBakedItemModel(subject, model, stack, light, overlay, matrices, vertices);
+					FabRefl.Client.ItemRenderer_renderBakedItemModel(subject, model, stack, light, overlay, matrices, vertices);
 				}
 				matrices.pop();
 				return;
@@ -181,7 +180,7 @@ public class MixinItemEntityRenderer {
 		
 		int packedColor = -1;
 		if (quad.hasColor()) {
-			packedColor = FabRefl.getItemColors(MinecraftClient.getInstance()).getColorMultiplier(is, quad.getColorIndex());
+			packedColor = FabRefl.Client.getItemColors(MinecraftClient.getInstance()).getColorMultiplier(is, quad.getColorIndex());
 			Block b = ((BlockItem)is.getItem()).getBlock();
 			if (b.getDefaultState().getMaterial() == Material.SOIL || b.getDefaultState().getMaterial() == Material.SOLID_ORGANIC) {
 				isProbablyGrass = true;

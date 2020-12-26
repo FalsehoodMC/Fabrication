@@ -98,69 +98,6 @@ public class FabRefl {
 		}
 	}
 	
-	private static MethodHandle satd_width = unreflectGetter(SpriteAtlasTexture.Data.class, "width", "field_17901", "field_217806_b");
-	public static int getWidth(SpriteAtlasTexture.Data subject) {
-		try {
-			return (int)satd_width.invokeExact(subject);
-		} catch (Throwable t) {
-			throw rethrow(t);
-		}
-	}
-
-	private static MethodHandle satd_height = unreflectGetter(SpriteAtlasTexture.Data.class, "height", "field_17902", "field_217807_c");
-	public static int getHeight(SpriteAtlasTexture.Data subject) {
-		try {
-			return (int)satd_height.invokeExact(subject);
-		} catch (Throwable t) {
-			throw rethrow(t);
-		}
-	}
-	
-	private static MethodHandle satd_maxLevel = unreflectGetter(SpriteAtlasTexture.Data.class, "maxLevel", "field_21795", "field_229224_d_");
-	public static int getMaxLevel(SpriteAtlasTexture.Data subject) {
-		try {
-			return (int)satd_maxLevel.invokeExact(subject);
-		} catch (Throwable t) {
-			throw rethrow(t);
-		}
-	}
-
-	private static MethodHandle sprite_x = unreflectGetter(Sprite.class, "x", "field_5258", "field_110975_c");
-	public static int getX(Sprite subject) {
-		try {
-			return (int)sprite_x.invokeExact(subject);
-		} catch (Throwable t) {
-			throw rethrow(t);
-		}
-	}
-	
-	private static MethodHandle sprite_y = unreflectGetter(Sprite.class, "y", "field_5256", "field_110974_d");
-	public static int getY(Sprite subject) {
-		try {
-			return (int)sprite_y.invokeExact(subject);
-		} catch (Throwable t) {
-			throw rethrow(t);
-		}
-	}
-
-	private static MethodHandle sat_sprites = unreflectGetter(SpriteAtlasTexture.class, "sprites", "field_5280", "field_94252_e");
-	public static Map<Identifier, Sprite> getSprites(SpriteAtlasTexture subject) {
-		try {
-			return (Map<Identifier, Sprite>)sat_sprites.invokeExact(subject);
-		} catch (Throwable t) {
-			throw rethrow(t);
-		}
-	}
-
-	private static MethodHandle sat_animatedSprites = unreflectGetter(SpriteAtlasTexture.class, "animatedSprites", "field_5276", "field_94258_i");
-	public static List<Sprite> getAnimatedSprites(SpriteAtlasTexture subject) {
-		try {
-			return (List<Sprite>)sat_animatedSprites.invokeExact(subject);
-		} catch (Throwable t) {
-			throw rethrow(t);
-		}
-	}
-	
 	private static MethodHandle feg_withinRangePredicate = unreflectGetter(FleeEntityGoal.class, "withinRangePredicate", "field_18084", "field_220872_k");
 	public static TargetPredicate getWithinRangePredicate(FleeEntityGoal<?> subject) {
 		try {
@@ -170,17 +107,6 @@ public class FabRefl {
 		}
 	}
 	
-	@Environment(EnvType.CLIENT)
-	private static MethodHandle mc_itemColors = unreflectGetter(MinecraftClient.class, "itemColors", "field_1760", "field_184128_aI");
-	@Environment(EnvType.CLIENT)
-	public static ItemColors getItemColors(MinecraftClient subject) {
-		try {
-			return (ItemColors)mc_itemColors.invokeExact(subject);
-		} catch (Throwable t) {
-			throw rethrow(t);
-		}
-	}
-
 	private static MethodHandle es_basePredicate = unreflectGetter(EntitySelector.class, "basePredicate", "field_10820", "field_197357_d");
 	public static Predicate<Entity> getBasePredicate(EntitySelector subject) {
 		try {
@@ -228,17 +154,6 @@ public class FabRefl {
 	
 	
 	
-	private static MethodHandle mh_blend = unreflectMethod(MipmapHelper.class, "blend", "method_24101", "func_229172_a_",
-			int.class,
-			int.class, int.class, int.class, int.class, boolean.class);
-	public static int MipmapHelper_blend(int one, int two, int three, int four, boolean checkAlpha) {
-		try {
-			return (int)mh_blend.invokeExact(one, two, three, four, checkAlpha);
-		} catch (Throwable t) {
-			throw rethrow(t);
-		}
-	}
-	
 	private static MethodHandle gc_execute = unreflectMethod(GiveCommand.class, "execute", "method_13401", "func_198497_a",
 			int.class,
 			ServerCommandSource.class, ItemStackArgument.class, Collection.class, int.class);
@@ -262,28 +177,114 @@ public class FabRefl {
 	}
 
 	@Environment(EnvType.CLIENT)
-	private static MethodHandle ni_new = unreflectConstructor(NativeImage.class,
-			Format.class, int.class, int.class, boolean.class, long.class);
-	@Environment(EnvType.CLIENT)
-	public static NativeImage NativeImage_new(Format format, int width, int height, boolean useStb, long pointer) {
-		try {
-			return (NativeImage)ni_new.invokeExact(format, width, height, useStb, pointer);
-		} catch (Throwable t) {
-			throw rethrow(t);
+	public static final class Client {
+	
+		private static MethodHandle satd_width = unreflectGetter(SpriteAtlasTexture.Data.class, "width", "field_17901", "field_217806_b");
+		public static int getWidth(SpriteAtlasTexture.Data subject) {
+			try {
+				return (int)satd_width.invokeExact(subject);
+			} catch (Throwable t) {
+				throw rethrow(t);
+			}
 		}
-	}
 
-	@Environment(EnvType.CLIENT)
-	private static MethodHandle ir_renderBakedItemModel = unreflectMethod(ItemRenderer.class, "renderBakedItemModel", "method_23182", "func_229114_a_",
-			void.class,
-			BakedModel.class, ItemStack.class, int.class, int.class, MatrixStack.class, VertexConsumer.class);
-	@Environment(EnvType.CLIENT)
-	public static void ItemRenderer_renderBakedItemModel(ItemRenderer subject, BakedModel model, ItemStack stack, int light, int overlay, MatrixStack matrices, VertexConsumer vertices) {
-		try {
-			ir_renderBakedItemModel.invokeExact(subject, model, stack, light, overlay, matrices, vertices);
-		} catch (Throwable t) {
-			throw rethrow(t);
+		private static MethodHandle satd_height = unreflectGetter(SpriteAtlasTexture.Data.class, "height", "field_17902", "field_217807_c");
+		public static int getHeight(SpriteAtlasTexture.Data subject) {
+			try {
+				return (int)satd_height.invokeExact(subject);
+			} catch (Throwable t) {
+				throw rethrow(t);
+			}
 		}
+		
+		private static MethodHandle satd_maxLevel = unreflectGetter(SpriteAtlasTexture.Data.class, "maxLevel", "field_21795", "field_229224_d_");
+		public static int getMaxLevel(SpriteAtlasTexture.Data subject) {
+			try {
+				return (int)satd_maxLevel.invokeExact(subject);
+			} catch (Throwable t) {
+				throw rethrow(t);
+			}
+		}
+
+		private static MethodHandle sprite_x = unreflectGetter(Sprite.class, "x", "field_5258", "field_110975_c");
+		public static int getX(Sprite subject) {
+			try {
+				return (int)sprite_x.invokeExact(subject);
+			} catch (Throwable t) {
+				throw rethrow(t);
+			}
+		}
+		
+		private static MethodHandle sprite_y = unreflectGetter(Sprite.class, "y", "field_5256", "field_110974_d");
+		public static int getY(Sprite subject) {
+			try {
+				return (int)sprite_y.invokeExact(subject);
+			} catch (Throwable t) {
+				throw rethrow(t);
+			}
+		}
+
+		private static MethodHandle sat_sprites = unreflectGetter(SpriteAtlasTexture.class, "sprites", "field_5280", "field_94252_e");
+		public static Map<Identifier, Sprite> getSprites(SpriteAtlasTexture subject) {
+			try {
+				return (Map<Identifier, Sprite>)sat_sprites.invokeExact(subject);
+			} catch (Throwable t) {
+				throw rethrow(t);
+			}
+		}
+
+		private static MethodHandle sat_animatedSprites = unreflectGetter(SpriteAtlasTexture.class, "animatedSprites", "field_5276", "field_94258_i");
+		public static List<Sprite> getAnimatedSprites(SpriteAtlasTexture subject) {
+			try {
+				return (List<Sprite>)sat_animatedSprites.invokeExact(subject);
+			} catch (Throwable t) {
+				throw rethrow(t);
+			}
+		}
+		
+		private static MethodHandle mc_itemColors = unreflectGetter(MinecraftClient.class, "itemColors", "field_1760", "field_184128_aI");
+		public static ItemColors getItemColors(MinecraftClient subject) {
+			try {
+				return (ItemColors)mc_itemColors.invokeExact(subject);
+			} catch (Throwable t) {
+				throw rethrow(t);
+			}
+		}
+		
+		
+		
+		private static MethodHandle mh_blend = unreflectMethod(MipmapHelper.class, "blend", "method_24101", "func_229172_a_",
+				int.class,
+				int.class, int.class, int.class, int.class, boolean.class);
+		public static int MipmapHelper_blend(int one, int two, int three, int four, boolean checkAlpha) {
+			try {
+				return (int)mh_blend.invokeExact(one, two, three, four, checkAlpha);
+			} catch (Throwable t) {
+				throw rethrow(t);
+			}
+		}
+		
+		private static MethodHandle ni_new = unreflectConstructor(NativeImage.class,
+				Format.class, int.class, int.class, boolean.class, long.class);
+		public static NativeImage NativeImage_new(Format format, int width, int height, boolean useStb, long pointer) {
+			try {
+				return (NativeImage)ni_new.invokeExact(format, width, height, useStb, pointer);
+			} catch (Throwable t) {
+				throw rethrow(t);
+			}
+		}
+		
+		private static MethodHandle ir_renderBakedItemModel = unreflectMethod(ItemRenderer.class, "renderBakedItemModel", "method_23182", "func_229114_a_",
+				void.class,
+				BakedModel.class, ItemStack.class, int.class, int.class, MatrixStack.class, VertexConsumer.class);
+		public static void ItemRenderer_renderBakedItemModel(ItemRenderer subject, BakedModel model, ItemStack stack, int light, int overlay, MatrixStack matrices, VertexConsumer vertices) {
+			try {
+				ir_renderBakedItemModel.invokeExact(subject, model, stack, light, overlay, matrices, vertices);
+			} catch (Throwable t) {
+				throw rethrow(t);
+			}
+		}
+		
 	}
 
 	private static MethodHandle unreflectGetter(Class<?> clazz, String yarnName, String interName, String srgName) {
