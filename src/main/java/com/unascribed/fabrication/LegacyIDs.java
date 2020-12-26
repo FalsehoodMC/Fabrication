@@ -2,8 +2,6 @@ package com.unascribed.fabrication;
 
 import java.util.Map;
 
-import org.apache.logging.log4j.LogManager;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -22,7 +20,7 @@ public class LegacyIDs {
 	
 	static {
 		try {
-			JsonObject obj = new Gson().fromJson(Resources.toString(LegacyIDs.data.getClass().getClassLoader().getResource("legacy_ids.json"), Charsets.UTF_8), JsonObject.class);
+			JsonObject obj = new Gson().fromJson(Resources.toString(LegacyIDs.class.getClassLoader().getResource("legacy_ids.json"), Charsets.UTF_8), JsonObject.class);
 			for (Map.Entry<String, JsonElement> en : obj.entrySet()) {
 				if (en.getKey().equals("_comment")) continue;
 				int colon = en.getKey().indexOf(':');
