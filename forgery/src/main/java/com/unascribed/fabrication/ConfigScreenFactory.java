@@ -1,4 +1,4 @@
-package com.unascribed.forgery;
+package com.unascribed.fabrication;
 
 import net.minecraft.client.gui.screen.Screen;
 

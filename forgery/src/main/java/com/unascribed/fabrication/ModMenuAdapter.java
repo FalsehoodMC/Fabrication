@@ -1,4 +1,4 @@
-package com.unascribed.forgery;
+package com.unascribed.fabrication;
 
 public interface ModMenuAdapter {
 

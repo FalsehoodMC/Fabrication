@@ -123,7 +123,7 @@ public class FeatureFabricationCommand implements Feature {
 			root.then(tag);
 			
 			LiteralArgumentBuilder<ServerCommandSource> analyze = LiteralArgumentBuilder.<ServerCommandSource>literal("analyze");
-			tag.requires(scs -> scs.hasPermissionLevel(4));
+			analyze.requires(scs -> scs.hasPermissionLevel(4));
 			{
 				LiteralArgumentBuilder<ServerCommandSource> biome = CommandManager.literal("biome");
 				
@@ -295,7 +295,7 @@ public class FeatureFabricationCommand implements Feature {
 			if (!(s instanceof ServerCommandSource)) return true;
 			
 			ServerCommandSource scs = (ServerCommandSource)s;
-			if (scs.hasPermissionLevel(4)) return true;
+			if (scs.hasPermissionLevel(2)) return true;
 			if (scs.getMinecraftServer().isSinglePlayer() && scs.getEntity() != null) {
 				Entity e = scs.getEntity();
 				if (e instanceof PlayerEntity) {

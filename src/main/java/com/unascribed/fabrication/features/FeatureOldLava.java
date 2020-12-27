@@ -9,7 +9,6 @@ import com.unascribed.fabrication.support.Feature;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
-import net.minecraft.client.texture.MipmapHelper;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.Sprite.Info;

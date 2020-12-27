@@ -1,11 +1,10 @@
-package com.unascribed.forgery;
+package com.unascribed.fabrication;
 
 import java.util.List;
 import java.util.Optional;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.support.Feature;
 
 import net.minecraft.command.CommandSource;

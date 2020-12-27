@@ -1,8 +1,7 @@
-package com.unascribed.forgery;
+package com.unascribed.fabrication;
 
 import java.nio.file.Path;
 
-import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.support.Env;
 
 import net.minecraft.util.ResourceLocation;
