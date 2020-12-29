@@ -106,7 +106,7 @@ fixes.inanimates_can_be_invisible
 		Fabrication's own Invisibility Splash On Inanimates.
 
 fixes.omniscent_player
-	name: Inanimates Can Be Invisible
+	name: Omniscent Player
 	since: 1.1.1
 	sides: client
 	media: https://unascribed.com/fabrication/omniscent_player.mp4
