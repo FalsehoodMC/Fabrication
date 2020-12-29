@@ -223,6 +223,24 @@ public class FabRefl {
 				throw rethrow(t);
 			}
 		}
+		
+		private static MethodHandle sprite_frameIndex = unreflectGetter(Sprite.class, "frameIndex", "field_5273", "field_110973_g");
+		public static int getFrameIndex(Sprite subject) {
+			try {
+				return (int)sprite_frameIndex.invokeExact(subject);
+			} catch (Throwable t) {
+				throw rethrow(t);
+			}
+		}
+		
+		private static MethodHandle sprite_frameTicks = unreflectGetter(Sprite.class, "frameTicks", "field_5272", "field_110983_h");
+		public static int getFrameTicks(Sprite subject) {
+			try {
+				return (int)sprite_frameTicks.invokeExact(subject);
+			} catch (Throwable t) {
+				throw rethrow(t);
+			}
+		}
 
 		private static MethodHandle sat_sprites = unreflectGetter(SpriteAtlasTexture.class, "sprites", "field_5280", "field_94252_e");
 		public static Map<Identifier, Sprite> getSprites(SpriteAtlasTexture subject) {

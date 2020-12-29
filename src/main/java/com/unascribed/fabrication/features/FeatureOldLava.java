@@ -32,7 +32,7 @@ public class FeatureOldLava implements Feature {
 			SpriteLava newLava = new SpriteLava(atlas, new Info(still, 16, 16, AnimationResourceMetadata.EMPTY), FabRefl.Client.getMaxLevel(data),
 					FabRefl.Client.getWidth(data), FabRefl.Client.getHeight(data), FabRefl.Client.getX(originalLava), FabRefl.Client.getY(originalLava));
 			SpriteLavaFlow newLavaFlow = new SpriteLavaFlow(atlas, new Info(flow, 32, 32, AnimationResourceMetadata.EMPTY), FabRefl.Client.getMaxLevel(data),
-					FabRefl.Client.getWidth(data), FabRefl.Client.getHeight(data), FabRefl.Client.getX(originalLavaFlow), FabRefl.Client.getX(originalLavaFlow));
+					FabRefl.Client.getWidth(data), FabRefl.Client.getHeight(data), FabRefl.Client.getX(originalLavaFlow), FabRefl.Client.getY(originalLavaFlow));
 			FabRefl.Client.getSprites(atlas).put(still, newLava);
 			FabRefl.Client.getSprites(atlas).put(flow, newLavaFlow);
 			int origIdx = FabRefl.Client.getAnimatedSprites(atlas).indexOf(originalLava);
