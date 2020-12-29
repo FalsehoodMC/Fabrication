@@ -8,7 +8,7 @@ import com.unascribed.fabrication.support.SpecialEligibility;
 public class FeatureModsCommandForge extends DelegateFeature {
 
 	public FeatureModsCommandForge() {
-		super("com.unascribed.forgery.FeatureModsCommandForgeImpl");
+		super("com.unascribed.fabrication.FeatureModsCommandForgeImpl");
 	}
 
 }

@@ -8,7 +8,7 @@ import com.unascribed.fabrication.support.SpecialEligibility;
 public class FeatureAnvilDamageOnlyOnFallForge extends DelegateFeature {
 
 	public FeatureAnvilDamageOnlyOnFallForge() {
-		super("com.unascribed.forgery.FeatureAnvilDamageOnlyOnFallForgeImpl");
+		super("com.unascribed.fabrication.FeatureAnvilDamageOnlyOnFallForgeImpl");
 	}
 
 }

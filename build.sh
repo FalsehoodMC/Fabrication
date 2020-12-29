@@ -9,12 +9,12 @@ else
 fi
 rm -rf build/libs
 echo Building Fabrication...
-gw build
+gw clean build
 rm build/libs/*-dev.jar
 if [ "$canforgery" == "1" ]; then
 	cd forgery
 	echo Building Forgery runtime...
-	gw build
+	gw clean build
 	cd ..
 	fabrication=$(echo build/libs/fabrication*.jar)
 	forgery=$(echo "$fabrication" | sed "s/fabrication/forgery/")
