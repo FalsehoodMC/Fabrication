@@ -801,7 +801,7 @@ public class FabricationConfigScreen extends Screen {
 						"also on the client.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "utility.item_despawn", "Item Despawn Control",
 						"Allows fine-tuned adjustment of item despawn times.\n" +
-						"See fabrication_item_despawn.ini.", y, mouseX, mouseY);
+						"See fabrication/item_despawn.ini.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "utility.i_and_more", "/i And More",
 						"Adds /i, /item, /more, and /fenchant commands.\n"
 						+ "/i and /item are shorthand for /give to yourself, and /more increases "
@@ -914,7 +914,7 @@ public class FabricationConfigScreen extends Screen {
 						"Interacts with Enhanced Moistness.", y, mouseX, mouseY);
 			} else if ("balance".equals(section)) {
 				y = drawTrilean(matrices, "balance.faster_obsidian", "Faster Obsidian",
-						"Makes obsidian break 3x faster. Needed on both sides to work properly."
+						"Makes obsidian break 3x faster. Needed on both sides to work properly. "
 						+ "Does not break vanilla clients when on the server, but when on the client, "
 						+ "vanilla servers will think you're cheating. (And they won't be wrong.)", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "balance.disable_prior_work_penalty", "Disable Prior Work Penalty",
@@ -960,7 +960,7 @@ public class FabricationConfigScreen extends Screen {
 				y = drawTrilean(matrices, "balance.broken_tools_drop_components", "Broken Gear Drops Components",
 						"Makes items drop a configurable portion of configurable constituent "
 						+ "components when broken.\n"
-						+ "See fabrication_gear_components.ini.", y, mouseX, mouseY);
+						+ "See fabrication/gear_components.ini.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "balance.drop_more_exp_on_death", "Drop More Experience On Death",
 						"Players drop 80% of their experience upon death instead of basically none.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "balance.infinity_crossbows", "Infinity Crossbows",
