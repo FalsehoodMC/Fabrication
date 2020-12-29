@@ -963,6 +963,8 @@ public class FabricationConfigScreen extends Screen {
 						+ "See fabrication_gear_components.ini.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "balance.drop_more_exp_on_death", "Drop More Experience On Death",
 						"Players drop 80% of their experience upon death instead of basically none.", y, mouseX, mouseY);
+				y = drawTrilean(matrices, "balance.infinity_crossbows", "Infinity Crossbows",
+						"Allow putting Infinity on crossbows. Only works for plain arrows.", y, mouseX, mouseY);
 			} else if ("weird_tweaks".equals(section)) {
 				y = drawTrilean(matrices, "weird_tweaks.endermen_dont_squeal", "Endermen Don't Squeal",
 						"Makes Endermen not make their growling or screeching sounds when angry.\n" +
