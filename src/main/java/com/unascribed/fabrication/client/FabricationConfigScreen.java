@@ -70,6 +70,7 @@ public class FabricationConfigScreen extends Screen {
 			.put("pedantry", "Fixes for\nnon-problems.")
 			.put("situational", "Rarely useful\nsmall features.")
 			.put("woina", "Forward ports of\nforgotten tidbits.")
+			.put("experiments", "Bad ideas given\nform.")
 			.build();
 	
 	private static final ImmutableMap<Profile, String> PROFILE_DESCRIPTIONS = ImmutableMap.<Profile, String>builder()
@@ -79,7 +80,7 @@ public class FabricationConfigScreen extends Screen {
 			.put(Profile.MEDIUM, "Light + Minor Mechanics.")
 			.put(Profile.DARK, "Medium + Mechanics. Recommended.")
 			.put(Profile.VIENNA, "Dark + Balance + Weird Tweaks + W.O.I.N.A.\nYou agree with all of Una's opinions.")
-			.put(Profile.BURNT, "Screw it, enable everything.\n(Except Situational.)")
+			.put(Profile.BURNT, "Screw it, enable everything.\n(Except Situational and Experiments.)")
 			.build();
 	
 	private static final ImmutableMap<Profile, Integer> PROFILE_COLORS = ImmutableMap.<Profile, Integer>builder()
@@ -1041,6 +1042,12 @@ public class FabricationConfigScreen extends Screen {
 						"Weapons can accept Silk Touch. Does nothing on its own, but datapacks " +
 						"can use this for special drops. Also makes Silk Touch incompatible with " +
 						"Looting.", y, mouseX, mouseY);
+			} else if ("experiments".equals(section)) {
+				y = drawTrilean(matrices, "experiments.packed_atlases", "Packed Atlases",
+						"Disables rounding of atlases to the next power-of-two. "
+						+ "GPU drivers have supported \"NPOT\" textures since forever.\n"
+						+ "§aPossibly reduces VRAM usage.\n§4May reduce performance.\n"
+						+ "§eResources must be reloaded for this to take effect.", y, mouseX, mouseY, CLIENT_ONLY);
 			}
 		}
 		GlStateManager.popMatrix();

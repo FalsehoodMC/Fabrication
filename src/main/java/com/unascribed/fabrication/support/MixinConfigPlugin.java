@@ -76,7 +76,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		MEDIUM("general", "fixes", "utility", "tweaks", "minor_mechanics"),
 		DARK("general", "fixes", "utility", "tweaks", "minor_mechanics", "mechanics"),
 		VIENNA("general", "fixes", "utility", "tweaks", "minor_mechanics", "mechanics", "balance", "weird_tweaks", "woina"),
-		BURNT("*", "!situational")
+		BURNT("*", "!situational", "!experiments")
 		;
 		public final ImmutableSet<String> sections;
 		Profile(String... sections) {
