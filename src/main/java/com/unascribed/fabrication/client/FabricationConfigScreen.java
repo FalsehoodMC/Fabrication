@@ -912,6 +912,13 @@ public class FabricationConfigScreen extends Screen {
 						"making them unaffected by gravity. They will become normally affected " +
 						"again if they become wet. This is kind of overpowered.\n" +
 						"Interacts with Enhanced Moistness.", y, mouseX, mouseY);
+				y = drawTrilean(matrices, "mechanics.obsidian_tears", "Obsidian Tears",
+						"Empty bottles can be used to collect \"Obsidian Tears\" from Crying "
+						+ "Obsidian. When quaffed, or dispensed onto a player, it updates the "
+						+ "player's spawn to the location of the block the tears are from. "
+						+ "Dispensers can also be used to fill empty bottles with tears.\n"
+						+ "On client, just gives the bottle a custom appearance instead of "
+						+ "a potion item.", y, mouseX, mouseY);
 			} else if ("balance".equals(section)) {
 				y = drawTrilean(matrices, "balance.faster_obsidian", "Faster Obsidian",
 						"Makes obsidian break 3x faster. Needed on both sides to work properly. "
