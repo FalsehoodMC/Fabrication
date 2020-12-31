@@ -16,6 +16,10 @@ import com.unascribed.fabrication.Resolvable;
 import com.unascribed.fabrication.interfaces.SetFromPlayerDeath;
 import com.unascribed.fabrication.loaders.LoaderItemDespawn;
 import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
+
+import com.google.common.primitives.Ints;
+
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -26,6 +30,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.packet.s2c.play.EntityPositionS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.server.world.ServerWorld;
@@ -44,6 +49,7 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 		super(type, world);
 	}
 
+	private long fabrication$trueAge;
 	private int fabrication$extraTime;
 	private boolean fabrication$invincible;
 	private boolean fabrication$fromPlayerDeath;
@@ -62,6 +68,7 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 			fabrication$extraTime--;
 			age--;
 		}
+		fabrication$trueAge++;
 		if (getPos().y < -32) {
 			if (fabrication$invincible) {
 				teleport(getPos().x, 1, getPos().z);
@@ -76,7 +83,7 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 	
 	@Inject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", cancellable=true)
 	public void damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> ci) {
-		if (fabrication$invincible) {
+		if (fabrication$invincible || (RuntimeChecks.check("*.item_despawn") && world.isClient)) {
 			ci.setReturnValue(false);
 		}
 	}
@@ -160,8 +167,6 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 		if (time == ParsedTime.UNSET) {
 			time = thrower == null ? LoaderItemDespawn.dropsDespawn : LoaderItemDespawn.defaultDespawn;
 		}
-//		System.out.println(stack+": "+time);
-		int origAge = 0;
 		fabrication$invincible = false;
 		if (time == ParsedTime.FOREVER) {
 			fabrication$extraTime = 0;
@@ -176,7 +181,7 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 			fabrication$extraTime = 0;
 		} else {
 			int extra = time.timeInTicks-6000;
-			extra -= origAge;
+			extra -= Ints.saturatedCast(fabrication$trueAge);
 			if (extra < 0) {
 				age = -extra;
 				fabrication$extraTime = 0;
@@ -185,10 +190,22 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 				fabrication$extraTime = extra;
 			}
 		}
-//		System.out.println("age: "+age);
-//		System.out.println("extraTime: "+fabrication$extraTime);
-//		System.out.println("fromPlayerDeath: "+fabrication$fromPlayerDeath);
-//		System.out.println("invincible: "+fabrication$invincible);
+	}
+	
+	@Inject(at=@At("TAIL"), method="writeCustomDataToTag(Lnet/minecraft/nbt/CompoundTag;)V")
+	public void writeCustomDataToTag(CompoundTag tag, CallbackInfo ci) {
+		if (fabrication$extraTime > 0) tag.putInt("fabrication:ExtraTime", fabrication$extraTime);
+		tag.putLong("fabrication:TrueAge", fabrication$trueAge);
+		if (fabrication$fromPlayerDeath) tag.putBoolean("fabrication:FromPlayerDeath", true);
+		if (fabrication$invincible) tag.putBoolean("fabrication:Invincible", true);
+	}
+	
+	@Inject(at=@At("TAIL"), method="readCustomDataFromTag(Lnet/minecraft/nbt/CompoundTag;)V")
+	public void readCustomDataFromTag(CompoundTag tag, CallbackInfo ci) {
+		fabrication$extraTime = tag.getInt("fabrication:ExtraTime");
+		fabrication$trueAge = tag.getLong("fabrication:TrueAge");
+		fabrication$fromPlayerDeath = tag.getBoolean("fabrication:FromPlayerDeath");
+		fabrication$invincible = tag.getBoolean("fabrication:Invincible");
 	}
 	
 }
