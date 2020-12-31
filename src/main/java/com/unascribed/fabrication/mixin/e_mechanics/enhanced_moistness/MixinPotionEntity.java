@@ -12,6 +12,7 @@ import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.projectile.thrown.PotionEntity;
 import net.minecraft.entity.projectile.thrown.ThrownItemEntity;
 import net.minecraft.util.math.Box;
@@ -32,6 +33,9 @@ public abstract class MixinPotionEntity extends ThrownItemEntity {
 		for (Entity e : world.getEntitiesByClass(Entity.class, box, e -> true)) {
 			if (e instanceof MarkWet) {
 				((MarkWet)e).fabrication$markWet();
+			}
+			if (e instanceof EndermanEntity) {
+				((EndermanEntity) e).setTarget(null);
 			}
 		}
 	}
