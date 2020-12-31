@@ -843,6 +843,8 @@ public class FabricationConfigScreen extends Screen {
 						"Every orb picks two random colors to pulse between when spawning.", y, mouseX, mouseY, CLIENT_ONLY);
 				y = drawTrilean(matrices, "tweaks.long_levelup_sound_at_30", "Long Level Up Sound At 30",
 						"Plays the old longer level up sound when you hit level 30.", y, mouseX, mouseY, CLIENT_ONLY, REQUIRES_FABRIC_API);
+				y = drawTrilean(matrices, "tweaks.flammable_cobwebs", "Flammable Cobwebs",
+						"Cobwebs can burn.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "tweaks.ghost_chest_woo_woo", "Ghost Chest Woo Woo",
 						"?", y, mouseX, mouseY, CLIENT_ONLY);
 			} else if ("minor_mechanics".equals(section)) {
