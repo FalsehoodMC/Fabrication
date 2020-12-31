@@ -917,6 +917,9 @@ public class FabricationConfigScreen extends Screen {
 						+ "Obsidian. When quaffed, or dispensed onto a player, it updates the "
 						+ "player's spawn to the location of the block the tears are from. "
 						+ "Dispensers can also be used to fill empty bottles with tears.\n"
+						+ "Crying Obsidian respawn works in any dimension and doesn't need "
+						+ "to be recharged, but you spawn with less than full health, no "
+						+ "saturation, less than full food, and Weakness.\n"
 						+ "On client, just gives the bottle a custom appearance instead of "
 						+ "a potion item.", y, mouseX, mouseY);
 			} else if ("balance".equals(section)) {
