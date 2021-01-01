@@ -1,6 +1,10 @@
 package com.unascribed.fabrication.mixin.f_balance.broken_tools_drop_components;
 
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,6 +19,8 @@ import com.unascribed.fabrication.loaders.LoaderGearComponents.MaterialData;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
 
+import com.google.common.collect.Lists;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -54,6 +60,7 @@ public abstract class MixinLivingEntity extends Entity {
 		if (stack.hasTag() && stack.getTag().getBoolean("fabrication:ShatteredAlready")) return;
 		if (!stack.hasTag()) stack.setTag(new CompoundTag());
 		stack.getTag().putBoolean("fabrication:ShatteredAlready", true);
+		List<ItemStack> enchantables = Lists.newArrayList();
 		for (ItemMaterialValue imv : LoaderGearComponents.items.get(Resolvable.mapKey(Registry.ITEM.getId(item), Registry.ITEM))) {
 			MaterialData md = LoaderGearComponents.materials.get(imv.materialName);
 			if (md == null) continue;
@@ -87,15 +94,57 @@ public abstract class MixinLivingEntity extends Entity {
 					ingotsToReturn = world.random.nextInt(maxIngotsToReturn+1-guaranteed)+guaranteed;
 				}
 				nuggetsToReturn -= ingotsToReturn * nuggetsPerIngot;
-				for (int i = 0; i < ingotsToReturn; i++) {
-					dropItem(ingot);
+				if (imv.enchant && stack.hasEnchantments()) {
+					for (int i = 0; i < ingotsToReturn; i++) {
+						enchantables.add(new ItemStack(ingot));
+					}
+				} else {
+					for (int i = 0; i < ingotsToReturn; i++) {
+						dropItem(ingot);
+					}
 				}
 			}
 			if (nugget != null) {
-				for (int i = 0; i < nuggetsToReturn; i++) {
-					dropItem(nugget);
+				if (imv.enchant && stack.hasEnchantments()) {
+					for (int i = 0; i < nuggetsToReturn; i++) {
+						enchantables.add(new ItemStack(nugget));
+					}
+				} else {
+					for (int i = 0; i < nuggetsToReturn; i++) {
+						dropItem(nugget);
+					}
 				}
 			}
+		}
+		if (enchantables.size() == 1) {
+			EnchantmentHelper.set(EnchantmentHelper.get(stack), enchantables.get(0));
+		} else if (!enchantables.isEmpty()) {
+			for (Map.Entry<Enchantment, Integer> en : EnchantmentHelper.get(stack).entrySet()) {
+				int lvl = en.getValue();
+				int[] values;
+				if (lvl == 1 || world.random.nextInt(3) == 0) {
+					values = new int[] {lvl};
+				} else if (lvl == 2) {
+					values = new int[] {1, 1};
+				} else if (lvl >= 4 && enchantables.size() >= 4 && world.random.nextBoolean()) {
+					values = new int[] {lvl-1, lvl-2, lvl-3, lvl-3};
+				} else if (enchantables.size() >= 3 && world.random.nextBoolean()) {
+					values = new int[] {lvl-1, lvl-2, lvl-2};
+				} else  {
+					values = new int[] {lvl-1, lvl-1};
+				}
+				if (values.length == 1) {
+					enchantables.get(world.random.nextInt(enchantables.size())).addEnchantment(en.getKey(), values[0]);
+				} else {
+					Collections.shuffle(enchantables, world.random);
+					for (int i = 0; i < values.length; i++) {
+						enchantables.get(i).addEnchantment(en.getKey(), values[i]);
+					}
+				}
+			}
+		}
+		for (ItemStack is : enchantables) {
+			dropStack(is);
 		}
 	}
 	

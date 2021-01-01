@@ -47,11 +47,13 @@ public class LoaderGearComponents implements ConfigLoader {
 		public final double valueInIngots;
 		public final String materialName;
 		public final boolean ignoreDropRate;
+		public final boolean enchant;
 
-		public ItemMaterialValue(double valueInIngots, String materialName, boolean ignoreDropRate) {
+		public ItemMaterialValue(double valueInIngots, String materialName, boolean ignoreDropRate, boolean enchant) {
 			this.valueInIngots = valueInIngots;
 			this.materialName = materialName;
 			this.ignoreDropRate = ignoreDropRate;
+			this.enchant = enchant;
 		}
 	}
 	
@@ -147,11 +149,19 @@ public class LoaderGearComponents implements ConfigLoader {
 					if (m.matches()) {
 						double amt = Double.parseDouble(m.group(1));
 						String mat = m.group(2);
-						boolean idr = mat.endsWith("!");
-						if (idr) {
-							mat = mat.substring(0, mat.length()-1);
+						boolean ench = false;
+						boolean idr = false;
+						for (int i = 0; i < 2; i++) {
+							if (mat.endsWith("!")) {
+								idr = true;
+								mat = mat.substring(0, mat.length()-1);
+							}
+							if (mat.endsWith("*")) {
+								ench = true;
+								mat = mat.substring(0, mat.length()-1);
+							}
 						}
-						items.put(r, new ItemMaterialValue(amt, mat, idr));
+						items.put(r, new ItemMaterialValue(amt, mat, idr, ench));
 					} else {
 						FabLog.warn(k+" is not a valid material value definition (got "+v+") at "+config.getBlame(k));
 					}

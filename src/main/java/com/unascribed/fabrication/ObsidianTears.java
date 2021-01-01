@@ -16,9 +16,12 @@ import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.LiteralText;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPointer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 
 public class ObsidianTears {
@@ -41,21 +44,23 @@ public class ObsidianTears {
 	
 	public static void setSpawnPoint(ServerPlayerEntity p, ItemStack stack) {
 		World world = p.world;
+		RegistryKey<World> key = RegistryKey.of(Registry.DIMENSION, new Identifier(stack.getTag().getString("fabrication:ObsidianTearsOriginDim")));
 		BlockPos pos = BlockPos.fromLong(stack.getTag().getLong("fabrication:ObsidianTearsOrigin"));
 		if (world instanceof ServerWorld) {
 			((ServerWorld)world).spawnParticles(ParticleTypes.FALLING_OBSIDIAN_TEAR, p.getPos().x, p.getPos().y+p.getBoundingBox().getYLength()/2, p.getPos().z, 16,
 					p.getBoundingBox().getXLength()/2, p.getBoundingBox().getYLength()/2, p.getBoundingBox().getZLength()/2,
 					0.5);
 		}
-		p.setSpawnPoint(world.getRegistryKey(), pos, p.yaw, false, true);
+		p.setSpawnPoint(key, pos, p.yaw, false, true);
 	}
 	
-	public static ItemStack createStack(BlockPos blockPos) {
+	public static ItemStack createStack(World world, BlockPos blockPos) {
 		ItemStack stack = PotionUtil.setPotion(new ItemStack(Items.POTION), Potions.THICK);
 		stack.setCustomName(new LiteralText("§fObsidian Tears"));
 		CompoundTag tag = stack.getOrCreateTag();
 		tag.putBoolean("fabrication:ObsidianTears", true);
 		tag.putLong("fabrication:ObsidianTearsOrigin", blockPos.asLong());
+		tag.putString("fabrication:ObsidianTearsOriginDim", world.getRegistryKey().getValue().toString());
 		tag.putInt("CustomPotionColor", 0x540CB7);
 		tag.putInt("HideFlags", TooltipSection.ADDITIONAL.getFlag());
 		return stack;

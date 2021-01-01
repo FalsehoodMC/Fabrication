@@ -33,7 +33,7 @@ public class MixinGlassBottleDispenserBehavior extends FallibleItemDispenserBeha
 		BlockState state = w.getBlockState(pos);
 		if (state.getBlock() == Blocks.CRYING_OBSIDIAN) {
 			setSuccess(true);
-			ci.setReturnValue(method_22141(pointer, stack, ObsidianTears.createStack(pos)));
+			ci.setReturnValue(method_22141(pointer, stack, ObsidianTears.createStack(pointer.getWorld(), pos)));
 		}
 	}
 

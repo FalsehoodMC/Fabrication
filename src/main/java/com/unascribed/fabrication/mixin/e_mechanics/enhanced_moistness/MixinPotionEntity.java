@@ -25,7 +25,7 @@ public abstract class MixinPotionEntity extends ThrownItemEntity {
 	public MixinPotionEntity(EntityType<? extends ThrownItemEntity> entityType, double d, double e, double f, World world) {
 		super(entityType, d, e, f, world);
 	}
-
+	
 	
 	@Inject(at=@At("TAIL"), method="damageEntitiesHurtByWater()V", locals=LocalCapture.CAPTURE_FAILHARD)
 	public void damageEntitiesHurtByWater(CallbackInfo ci, Box box) {

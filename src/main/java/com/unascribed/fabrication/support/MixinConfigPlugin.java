@@ -57,7 +57,10 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			"minor_mechanics.spiders_cant_climb_while_wet"
 	);
 	private static final ImmutableSet<String> NEVER_DEFAULT = ImmutableSet.of(
-			"tweaks.ghost_chest_woo_woo"
+			"tweaks.ghost_chest_woo_woo",
+			"woina.janky_arm",
+			"woina.flat_items",
+			"woina.billboard_drops"
 	);
 	private static final ImmutableSet<String> NON_TRILEANS = ImmutableSet.of(
 			"general.profile"

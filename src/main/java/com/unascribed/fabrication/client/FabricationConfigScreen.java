@@ -924,6 +924,11 @@ public class FabricationConfigScreen extends Screen {
 						+ "saturation, less than full food, and Weakness.\n"
 						+ "On client, just gives the bottle a custom appearance instead of "
 						+ "a potion item.", y, mouseX, mouseY);
+				y = drawTrilean(matrices, "mechanics.grindstone_disenchanting", "Grindstone Disenchanting",
+						"Placing a book in the bottom slot of a Grindstone when disenchanting "
+						+ "an item will transfer the enchantments onto the book.\n"
+						+ "Doesn't work properly if the client doesn't also have it, but it will "
+						+ "not break vanilla clients.", y, mouseX, mouseY);
 			} else if ("balance".equals(section)) {
 				y = drawTrilean(matrices, "balance.faster_obsidian", "Faster Obsidian",
 						"Makes obsidian break 3x faster. Needed on both sides to work properly. "
@@ -1049,6 +1054,13 @@ public class FabricationConfigScreen extends Screen {
 						"Survival Test. If Utility > Despawning Items Blink is also enabled, " +
 						"the blinking becomes faster and faster as the item gets closer to " +
 						"despawning.", y, mouseX, mouseY, CLIENT_ONLY);
+				y = drawTrilean(matrices, "woina.janky_arm", "Janky Arm",
+						"Brings back Survival Test first-person arm rotation.", y, mouseX, mouseY, CLIENT_ONLY);
+				y = drawTrilean(matrices, "woina.flat_items", "Flat Items",
+						"Brings back Indev flat first-person item models.", y, mouseX, mouseY, CLIENT_ONLY);
+				y = drawTrilean(matrices, "woina.billboard_drops", "Billboard Drops",
+						"Brings back billboarded flat item drops like on Fast graphics prior to "
+						+ "1.8 or like always prior to 1.4.", y, mouseX, mouseY, CLIENT_ONLY);
 			} else if ("situational".equals(section)) {
 				y = drawTrilean(matrices, "situational.all_damage_is_fatal", "All Damage Is Fatal",
 						"Any amount of damage done to an entity is unconditionally fatal.", y, mouseX, mouseY);
