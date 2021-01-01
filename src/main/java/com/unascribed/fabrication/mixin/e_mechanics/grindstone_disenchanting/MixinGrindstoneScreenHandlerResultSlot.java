@@ -36,9 +36,12 @@ public class MixinGrindstoneScreenHandlerResultSlot {
 	public void onTakeItemPre(PlayerEntity player, ItemStack stack, CallbackInfoReturnable<ItemStack> ci) {
 		fabrication$storedResultBook = null;
 		if (RuntimeChecks.check("*.grindstone_disenchanting") && field_16780.getSlot(1).getStack().getItem() == Items.BOOK) {
-			fabrication$storedResultBook = new ItemStack(Items.ENCHANTED_BOOK);
+			fabrication$storedResultBook = field_16780.getSlot(1).getStack();
 			for (Map.Entry<Enchantment, Integer> en : EnchantmentHelper.get(field_16780.getSlot(0).getStack()).entrySet()) {
 				if (en.getKey().isCursed()) continue;
+				if (fabrication$storedResultBook.getItem() != Items.ENCHANTED_BOOK) {
+					fabrication$storedResultBook = new ItemStack(Items.ENCHANTED_BOOK);
+				}
 				EnchantedBookItem.addEnchantment(fabrication$storedResultBook, new EnchantmentLevelEntry(en.getKey(), en.getValue()));
 			}
 		}
