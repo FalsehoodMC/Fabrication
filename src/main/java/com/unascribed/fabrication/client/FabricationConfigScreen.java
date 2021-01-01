@@ -1271,9 +1271,11 @@ public class FabricationConfigScreen extends Screen {
 	@Override
 	public void onClose() {
 		if (!MixinConfigPlugin.isEnabled("*.reduced_motion")) {
-			leaving = true;
-			client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_BARREL_CLOSE, 0.7f));
-			client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_SHROOMLIGHT_PLACE, 2f, 1f));
+			if (!leaving) {
+				leaving = true;
+				client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_BARREL_CLOSE, 0.7f));
+				client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_SHROOMLIGHT_PLACE, 2f, 1f));
+			}
 		} else {
 			client.openScreen(parent);
 		}
