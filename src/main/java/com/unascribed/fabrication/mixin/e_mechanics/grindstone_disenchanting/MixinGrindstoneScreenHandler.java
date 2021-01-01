@@ -5,8 +5,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
 import com.unascribed.fabrication.support.EligibleIf;
 
 import net.minecraft.item.ItemStack;
@@ -33,11 +31,6 @@ public abstract class MixinGrindstoneScreenHandler extends ScreenHandler {
 			sendContentUpdates();
 			ci.cancel();
 		}
-	}
-	
-	@Inject(at=@At("HEAD"), method="grind(Lnet/minecraft/item/ItemStack;II)Lnet/minecraft/item/ItemStack;", cancellable=true)
-	private void grind(ItemStack item, int damage, int amount, CallbackInfoReturnable<ItemStack> ci) {
-		
 	}
 	
 }
