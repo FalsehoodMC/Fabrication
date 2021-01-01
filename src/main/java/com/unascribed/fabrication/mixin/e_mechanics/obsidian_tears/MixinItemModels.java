@@ -34,7 +34,7 @@ public abstract class MixinItemModels {
 			cancellable=true)
 	public void getModel(ItemStack stack, CallbackInfoReturnable<BakedModel> ci) {
 		if (!RuntimeChecks.check("*.obsidian_tears")) return;
-		if (stack.getItem() == Items.POTION && stack.hasTag() && stack.getTag().getBoolean("fabrication:ObsidianTears")) {
+		if (stack.getItem() == Items.POTION && stack.hasTag() && stack.getTag().getBoolean("fabrication:ObsidianTears") && fabrication$obsidianTearsModel != null) {
 			ci.setReturnValue(fabrication$obsidianTearsModel);
 		}
 	}

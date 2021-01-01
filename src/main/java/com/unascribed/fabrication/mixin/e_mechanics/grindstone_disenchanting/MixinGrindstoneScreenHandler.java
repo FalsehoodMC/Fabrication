@@ -5,6 +5,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import com.unascribed.fabrication.interfaces.SetOwner;
 import com.unascribed.fabrication.support.EligibleIf;
 
 import net.minecraft.item.ItemStack;
@@ -12,6 +14,7 @@ import net.minecraft.item.Items;
 import net.minecraft.screen.GrindstoneScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.screen.slot.Slot;
 
 @Mixin(GrindstoneScreenHandler.class)
 @EligibleIf(configEnabled="*.grindstone_disenchanting")
@@ -23,6 +26,15 @@ public abstract class MixinGrindstoneScreenHandler extends ScreenHandler {
 	
 	@Shadow
 	private ItemStack grind(ItemStack item, int damage, int amount) { return null; }
+	
+	@Inject(at=@At("TAIL"), method="<init>(ILnet/minecraft/entity/player/PlayerInventory;Lnet/minecraft/screen/ScreenHandlerContext;)V")
+	private void construct(CallbackInfo ci) {
+		for (Slot s : slots) {
+			if (s instanceof SetOwner) {
+				((SetOwner)s).fabrication$setOwner(this);
+			}
+		}
+	}
 
 	@Inject(at=@At("HEAD"), method="updateResult()V", cancellable=true)
 	private void updateResult(CallbackInfo ci) {

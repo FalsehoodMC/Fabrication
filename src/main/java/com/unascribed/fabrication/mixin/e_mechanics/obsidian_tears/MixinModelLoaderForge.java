@@ -15,13 +15,13 @@ import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.util.Identifier;
 
 @Mixin(ModelLoader.class)
-@EligibleIf(configEnabled="*.obsidian_tears", envMatches=Env.CLIENT, specialConditions=SpecialEligibility.NOT_FORGE)
-public class MixinModelLoader {
+@EligibleIf(configEnabled="*.obsidian_tears", envMatches=Env.CLIENT, specialConditions=SpecialEligibility.FORGE)
+public class MixinModelLoaderForge {
 
 	@Shadow
 	private void addModel(ModelIdentifier modelId) {}
 	
-	@Inject(at=@At(value="CONSTANT", args="stringValue=special"), method="<init>")
+	@Inject(at=@At(value="CONSTANT", args="stringValue=special"), method="processLoading", remap=false)
 	public void construct(CallbackInfo ci) {
 		addModel(new ModelIdentifier(new Identifier("fabrication", "obsidian_tears"), "inventory"));
 	}
