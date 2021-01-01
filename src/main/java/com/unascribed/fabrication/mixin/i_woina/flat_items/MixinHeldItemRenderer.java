@@ -14,6 +14,7 @@ import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.Matrix4f;
 
 @Mixin(HeldItemRenderer.class)
 @EligibleIf(configEnabled="*.flat_items", envMatches=Env.CLIENT)
@@ -26,7 +27,8 @@ public class MixinHeldItemRenderer {
 			if (!(stack.getItem() instanceof BlockItem)) {
 				if (orig == Mode.FIRST_PERSON_LEFT_HAND || orig == Mode.FIRST_PERSON_RIGHT_HAND) {
 					matrices.translate(leftHanded ? -0.1 : 0.1, -0.16, -0.15);
-					matrices.scale(1, 1, 0.01f);
+					// multiply the model matrix directly to avoid corrupting normals
+					matrices.peek().getModel().multiply(Matrix4f.scale(1, 1, 0));
 					if (leftHanded) {
 						matrices.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(180));
 					}
