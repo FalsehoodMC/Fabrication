@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
+import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
 
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.entity.ExperienceOrbEntityRenderer;
@@ -29,20 +30,22 @@ public class MixinExperienceOrbEntityRenderer {
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/client/render/entity/ExperienceOrbEntityRenderer.method_23171(Lnet/minecraft/client/render/VertexConsumer;Lnet/minecraft/util/math/Matrix4f;Lnet/minecraft/util/math/Matrix3f;FFIIIFFI)V"),
 			method="render(Lnet/minecraft/entity/ExperienceOrbEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")
 	public void addVertex(VertexConsumer arg1, Matrix4f arg2, Matrix3f arg3, float arg4, float arg5, int r, int g, int b, float arg9, float arg10, int arg11, ExperienceOrbEntity entity) {
-		fabrication$colorDecider.setSeed(entity.getUuid().hashCode());
-		float hue = fabrication$colorDecider.nextFloat();
-		int color1 = MathHelper.hsvToRgb(hue, 0.8f, 1);
-		int color2 = MathHelper.hsvToRgb(hue+(fabrication$colorDecider.nextBoolean() ? -0.08f : 0.08f), 0.8f, 1);
-		float r1 = ((color1>>16)&0xFF)/255f;
-		float g1 = ((color1>>8)&0xFF)/255f;
-		float b1 = ((color1>>0)&0xFF)/255f;
-		float r2 = ((color2>>16)&0xFF)/255f;
-		float g2 = ((color2>>8)&0xFF)/255f;
-		float b2 = ((color2>>0)&0xFF)/255f;
-		float a = r/255f;
-		r = (int)((r1+((r2-r1)*a))*255);
-		g = (int)((g1+((g2-g1)*a))*255);
-		b = (int)((b1+((b2-b1)*a))*255);
+		if (RuntimeChecks.check("*.rainbow_experience")) {
+			fabrication$colorDecider.setSeed(entity.getUuid().hashCode());
+			float hue = fabrication$colorDecider.nextFloat();
+			int color1 = MathHelper.hsvToRgb(hue, 0.8f, 1);
+			int color2 = MathHelper.hsvToRgb(hue+(fabrication$colorDecider.nextBoolean() ? -0.08f : 0.08f), 0.8f, 1);
+			float r1 = ((color1>>16)&0xFF)/255f;
+			float g1 = ((color1>>8)&0xFF)/255f;
+			float b1 = ((color1>>0)&0xFF)/255f;
+			float r2 = ((color2>>16)&0xFF)/255f;
+			float g2 = ((color2>>8)&0xFF)/255f;
+			float b2 = ((color2>>0)&0xFF)/255f;
+			float a = r/255f;
+			r = (int)((r1+((r2-r1)*a))*255);
+			g = (int)((g1+((g2-g1)*a))*255);
+			b = (int)((b1+((b2-b1)*a))*255);
+		}
 		method_23171(arg1, arg2, arg3, arg4, arg5, r, g, b, arg9, arg10, arg11);
 	}
 	
