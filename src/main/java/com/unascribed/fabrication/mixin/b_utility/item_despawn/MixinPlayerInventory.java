@@ -18,7 +18,6 @@ public abstract class MixinPlayerInventory {
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/entity/player/PlayerEntity.dropItem(Lnet/minecraft/item/ItemStack;ZZ)Lnet/minecraft/entity/ItemEntity;"),
 			method="dropAll()V")
 	public ItemEntity dropItem(PlayerEntity subject, ItemStack stack, boolean throwRandomly, boolean retainOwnership) {
-		System.out.println(subject+" dropping item "+stack+"!");
 		ItemEntity e = subject.dropItem(stack, throwRandomly, retainOwnership);
 		if (e instanceof SetFromPlayerDeath) {
 			((SetFromPlayerDeath)e).fabrication$setFromPlayerDeath(true);
