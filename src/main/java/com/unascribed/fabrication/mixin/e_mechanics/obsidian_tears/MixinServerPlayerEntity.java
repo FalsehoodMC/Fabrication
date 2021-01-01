@@ -31,7 +31,7 @@ public abstract class MixinServerPlayerEntity extends PlayerEntity {
 		if (!RuntimeChecks.check("*.obsidian_tears")) return;
 		if (!alive) {
 			ServerPlayerEntity self = (ServerPlayerEntity)(Object)this;
-			if (world.getRegistryKey().equals(oldPlayer.getSpawnPointDimension())
+			if (oldPlayer.getSpawnPointPosition() != null && world.getRegistryKey().equals(oldPlayer.getSpawnPointDimension())
 					&& world.getBlockState(oldPlayer.getSpawnPointPosition()).getBlock() == Blocks.CRYING_OBSIDIAN) {
 				CompoundTag hunger = new CompoundTag();
 				self.getHungerManager().toTag(hunger);
