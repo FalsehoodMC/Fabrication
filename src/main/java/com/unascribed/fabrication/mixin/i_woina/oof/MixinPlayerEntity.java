@@ -32,7 +32,7 @@ public abstract class MixinPlayerEntity {
 	@Inject(at=@At("HEAD"), method="getHurtSound(Lnet/minecraft/entity/damage/DamageSource;)Lnet/minecraft/sound/SoundEvent;",
 			cancellable=true)
 	public void getHurtSound(DamageSource src, CallbackInfoReturnable<SoundEvent> ci) {
-		if (!RuntimeChecks.check("*.oof")) return;
+		if (!RuntimeChecks.check("*.oof") || !((PlayerEntity)(Object)this).world.isClient) return;
 		if (src == DamageSource.DROWN) {
 			ci.setReturnValue(SoundEvents.ENTITY_PLAYER_HURT_DROWN);
 		} else {
