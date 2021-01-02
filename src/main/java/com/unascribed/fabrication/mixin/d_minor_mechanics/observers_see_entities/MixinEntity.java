@@ -51,7 +51,7 @@ public abstract class MixinEntity {
 						bs.scheduledTick((ServerWorld)world, bp.toImmutable(), world.random);
 					}
 				}
-				return false;
+				return true;
 			});
 			world.getProfiler().pop();
 			world.getProfiler().pop();

@@ -4,10 +4,7 @@ import java.io.IOException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.util.Map;
 import java.util.Random;
-import java.util.WeakHashMap;
-
 import org.lwjgl.opengl.ARBCopyImage;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
@@ -53,6 +50,7 @@ import net.minecraft.client.texture.TextureUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.client.util.math.Vector4f;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
@@ -67,8 +65,6 @@ import net.minecraft.util.math.Vec3i;
 @EligibleIf(anyConfigEnabled= {"*.blinking_drops", "*.classic_block_drops"}, envMatches=Env.CLIENT)
 public class MixinItemEntityRenderer {
 
-	private final Map<ItemEntity, Float> fabrication$timers = new WeakHashMap<>();
-	
 	private float fabrication$curTimer;
 	
 	private AbstractTexture fabrication$mippedBlocks;
@@ -77,16 +73,17 @@ public class MixinItemEntityRenderer {
 			cancellable=true)
 	public void render(ItemEntity entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
 		if (MixinConfigPlugin.isEnabled("*.blinking_drops")) {
-			float t = 1;
 			if (MixinConfigPlugin.isEnabled("*.despawning_items_blink") && entity instanceof RenderingAgeAccess) {
 				RenderingAgeAccess aa = (RenderingAgeAccess)entity;
+				float m = 1;
 				int age = aa.fabrication$getRenderingAge();
 				int timeUntilDespawn = 6000-age;
-				if (timeUntilDespawn < 200) {
-					t += (1-(timeUntilDespawn/200f))*9;
+				if (timeUntilDespawn < 100) {
+					m += 0.5f+(1-(timeUntilDespawn/100f))*4;
+				} else if (timeUntilDespawn < 200) {
+					m += (1-(timeUntilDespawn/200f));
 				}
-				float tf = t*tickDelta;
-				fabrication$curTimer = fabrication$timers.compute(entity, (e, f) -> (f == null ? 0 : f) + tf);
+				fabrication$curTimer = (((Entity)entity).age+tickDelta)*m;
 			}
 		}
 	}
