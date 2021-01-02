@@ -43,8 +43,9 @@ public class MixinCactusBlock extends Block {
 	@Inject(at=@At("HEAD"), method="getStateForNeighborUpdate(Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/Direction;Lnet/minecraft/block/BlockState;Lnet/minecraft/world/WorldAccess;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;")
 	public void getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom, CallbackInfoReturnable<BlockState> ci) {
 		if (!RuntimeChecks.check("*.stable_cacti")) return;
-		if (state.getBlock() == this && direction == Direction.UP
-				&& state.get(CactusBlock.AGE) > 0 && newState.get(CactusBlock.AGE) == 0) {
+		if (direction == Direction.UP &&
+				state.getBlock() == this && state.get(CactusBlock.AGE) > 0 &&
+				newState.getBlock() == this && newState.get(CactusBlock.AGE) == 0) {
 			// we just grew
 			boolean shouldBreak = false;
 			for (Direction d : Direction.Type.HORIZONTAL) {
