@@ -1065,6 +1065,11 @@ public class FabricationConfigScreen extends Screen {
 				y = drawTrilean(matrices, "woina.billboard_drops", "Billboard Drops",
 						"Brings back billboarded flat item drops like on Fast graphics prior to "
 						+ "1.8 or like always prior to 1.4.", y, mouseX, mouseY, CLIENT_ONLY);
+				y = drawTrilean(matrices, "woina.oof", "Oof",
+						"Brings back the old \"Oof\" hurt sound. Increases its pitch for the \"Alex\" "
+						+ "player model. Unlike the resource pack approach, this is player-specific "
+						+ "rather than replacing the generic fleshy damage sound, so it won't result "
+						+ "in random things Oof-ing.", y, mouseX, mouseY, CLIENT_ONLY);
 			} else if ("situational".equals(section)) {
 				y = drawTrilean(matrices, "situational.all_damage_is_fatal", "All Damage Is Fatal",
 						"Any amount of damage done to an entity is unconditionally fatal.", y, mouseX, mouseY);

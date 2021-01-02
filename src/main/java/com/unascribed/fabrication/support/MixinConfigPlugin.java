@@ -60,7 +60,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			"tweaks.ghost_chest_woo_woo",
 			"woina.janky_arm",
 			"woina.flat_items",
-			"woina.billboard_drops"
+			"woina.billboard_drops",
+			"woina.oof"
 	);
 	private static final ImmutableSet<String> NON_TRILEANS = ImmutableSet.of(
 			"general.profile"
