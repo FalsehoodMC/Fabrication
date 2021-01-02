@@ -15,6 +15,7 @@ import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.math.IntMath;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.NoteBlock;
@@ -35,34 +36,11 @@ import net.minecraft.world.World;
 @EligibleIf(anyConfigEnabled={"*.exact_note_block_tuning", "*.note_block_notes", "*.reverse_note_block_tuning"})
 public class MixinNoteBlock {
 	
+	private static final String FABRICATION$NOTE_COLORS = "aa66cccccdd559999bbbaaaaa";
 	private static final ImmutableList<String> FABRICATION$NOTES = ImmutableList.of(
-			"§aF#",
-			"§aG",
-			"§6G#",
-			"§6A",
-			"§cA#",
-			"§cB",
-			"§cC",
-			"§cC#",
-			"§cD",
-			"§dD#",
-			"§dE",
-			"§5F",
-			"§5F#",
-			"§9G",
-			"§9G#",
-			"§9A",
-			"§9A#",
-			"§bB",
-			"§bC",
-			"§bC#",
-			"§aD",
-			"§aD#",
-			"§aE",
-			"§aF",
-			"§aF#"
+			"F#", "G", "G#", "A", "A#", "B", "C", "C#", "D", "D#", "E", "F"
 	);
-	private static final ImmutableMap<Instrument, String> FABRICATION$INSTRUMENTS = ImmutableMap.<Instrument, String>builder()
+	private static final ImmutableMap<Instrument, String> FABRICATION$INSTRUMENT_NAMES = ImmutableMap.<Instrument, String>builder()
 			.put(Instrument.BASS, "String Bass")
 			.put(Instrument.SNARE, "Snare Drum")
 			.put(Instrument.HAT, "Clicks & Sticks")
@@ -79,6 +57,33 @@ public class MixinNoteBlock {
 			.put(Instrument.BANJO, "Banjo")
 			.put(Instrument.PLING, "Electric Piano")
 			.put(Instrument.HARP, "Piano")
+			.build();
+	private static final ImmutableMap<Instrument, Integer> FABRICATION$INSTRUMENT_OCTAVES = ImmutableMap.<Instrument, Integer>builder()
+			// source: own research via ffmpeg showcqt
+			.put(Instrument.SNARE, 3)
+			.put(Instrument.HAT, 5)
+			// bass drum's frequency range is utter nonsense and slides over time :(
+			.put(Instrument.BASEDRUM, -1)
+			
+			// source: Minecraft Wiki; a few verified via showcqt as a sanity check
+			.put(Instrument.BASS, 1)
+			.put(Instrument.BELL, 5)
+			.put(Instrument.FLUTE, 4)
+			.put(Instrument.CHIME, 5)
+			.put(Instrument.GUITAR, 2)
+			.put(Instrument.XYLOPHONE, 5)
+			.put(Instrument.IRON_XYLOPHONE, 3)
+			.put(Instrument.COW_BELL, 4)
+			.put(Instrument.DIDGERIDOO, 1)
+			.put(Instrument.BIT, 3)
+			.put(Instrument.BANJO, 3)
+			.put(Instrument.PLING, 3)
+			.put(Instrument.HARP, 3)
+			.build();
+	private static final ImmutableMap<Instrument, Integer> FABRICATION$INSTRUMENT_OFFSETS = ImmutableMap.<Instrument, Integer>builder()
+			// source: own research via ffmpeg showcqt
+			.put(Instrument.SNARE, -2) // starts at E rather than F#
+			.put(Instrument.HAT, -9) // starts at A rather than F#
 			.build();
 	
 	@Shadow
@@ -135,8 +140,24 @@ public class MixinNoteBlock {
 
 	private void fabrication$informNote(PlayerEntity player, BlockState state) {
 		if (!player.world.isClient && MixinConfigPlugin.isEnabled("*.note_block_notes")) {
-			player.sendMessage(new LiteralText(FABRICATION$NOTES.get(state.get(NoteBlock.NOTE))
-					+" "+FABRICATION$INSTRUMENTS.get(state.get(NoteBlock.INSTRUMENT))
+			int note = state.get(NoteBlock.NOTE);
+			Instrument instrument = state.get(NoteBlock.INSTRUMENT);
+			char color = FABRICATION$NOTE_COLORS.charAt(note);
+			if (FABRICATION$INSTRUMENT_OFFSETS.containsKey(instrument)) {
+				note += FABRICATION$INSTRUMENT_OFFSETS.get(instrument);
+			}
+			int baseOctave = FABRICATION$INSTRUMENT_OCTAVES.get(instrument);
+			String noteStr = FABRICATION$NOTES.get(IntMath.mod(note, FABRICATION$NOTES.size()));
+			String octaveStr;
+			if (baseOctave == -1) {
+				// this instrument has nonsensical frequency mapping, so don't try to print a note
+				noteStr = "";
+				octaveStr = "";
+			} else {
+				octaveStr = ((note/12)+baseOctave)+" ";
+			}
+			player.sendMessage(new LiteralText("§"+color+noteStr+octaveStr
+					+FABRICATION$INSTRUMENT_NAMES.get(instrument)
 					+" ("+state.get(NoteBlock.NOTE)+")"), true);
 		}
 	}
