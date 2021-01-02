@@ -848,6 +848,7 @@ public class FabricationConfigScreen extends Screen {
 				y = drawTrilean(matrices, "tweaks.ghost_chest_woo_woo", "Ghost Chest Woo Woo",
 						"?", y, mouseX, mouseY, CLIENT_ONLY);
 			} else if ("minor_mechanics".equals(section)) {
+				y -= 14;
 				y = drawTrilean(matrices, "minor_mechanics.feather_falling_five", "Feather Falling V",
 						"Makes Feather Falling V a valid enchant that completely negates fall damage.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "minor_mechanics.feather_falling_five_damages_boots", "Feather Falling V Damages Boots",
@@ -903,6 +904,9 @@ public class FabricationConfigScreen extends Screen {
 						"emulates a click with flint and steel, allowing you to light fires " +
 						"and such with a Fire Aspect tool instead of having to carry around " +
 						"flint and steel. ", y, mouseX, mouseY);
+				y = drawTrilean(matrices, "minor_mechanics.mechanism_muffling", "Mechanism Muffling",
+						"Placing a block of wool adjacent to a dispenser, dropper, or piston "
+						+ "makes it silent.", y, mouseX, mouseY);
 			} else if ("mechanics".equals(section)) {
 				y = drawTrilean(matrices, "mechanics.enhanced_moistness", "Enhanced Moistness",
 						"Entities are considered \"wet\" for 5 seconds after leaving a source of " +
