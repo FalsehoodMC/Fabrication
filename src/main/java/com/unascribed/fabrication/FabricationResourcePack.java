@@ -1,8 +1,8 @@
 package com.unascribed.fabrication;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UncheckedIOException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,11 +33,14 @@ public class FabricationResourcePack implements ResourcePack {
 	
 	public FabricationResourcePack(String path) {
 		this.path = path;
+		JsonObject meta;
 		try {
 			meta = new Gson().fromJson(Resources.toString(url("pack.mcmeta"), Charsets.UTF_8), JsonObject.class);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
+		} catch (Throwable t) {
+			FabLog.warn("Failed to load meta for internal resource pack "+path);
+			meta = new JsonObject();
 		}
+		this.meta = meta;
 	}
 	
 	@Override
@@ -46,7 +49,12 @@ public class FabricationResourcePack implements ResourcePack {
 		if (fileName.contains("/") || fileName.contains("\\")) {
 			throw new IllegalArgumentException("Root resources can only be filenames, not paths (no / allowed!)");
 		}
-		return getClass().getClassLoader().getResourceAsStream(path+"/"+fileName);
+		if ("pack.png".equals(fileName)) {
+			return getClass().getClassLoader().getResourceAsStream("assets/fabrication/icon.png");
+		}
+		InputStream is = getClass().getClassLoader().getResourceAsStream(path+"/"+fileName);
+		if (is == null) throw new FileNotFoundException(fileName);
+		return is;
 	}
 
 	private URL url(ResourceType type, Identifier id) {
@@ -59,7 +67,9 @@ public class FabricationResourcePack implements ResourcePack {
 	
 	@Override
 	public InputStream open(ResourceType type, Identifier id) throws IOException {
-		return url(type, id).openStream();
+		URL u = url(type, id);
+		if (u == null) throw new FileNotFoundException(id.toString());
+		return u.openStream();
 	}
 
 	@Override
@@ -86,7 +96,7 @@ public class FabricationResourcePack implements ResourcePack {
 
 	@Override
 	public String getName() {
-		return "Fabrication Internal Resource Pack: "+path;
+		return "Fabrication";
 	}
 
 	@Override
