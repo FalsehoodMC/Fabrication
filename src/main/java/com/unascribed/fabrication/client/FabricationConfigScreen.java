@@ -767,6 +767,10 @@ public class FabricationConfigScreen extends Screen {
 				y = drawTrilean(matrices, "fixes.boundless_levels", "Boundless Levels",
 						"Replaces translation strings for potion and enchantment levels with a "
 						+ "dynamic algorithm that supports arbitrarily large numbers.", y, mouseX, mouseY, CLIENT_ONLY);
+				y = drawTrilean(matrices, "fixes.ghast_charging", "Ghast Charging",
+						"Brings back the ghast \"charging\" animation when they're about to "
+						+ "fire a fireball that got broken in 1.3 and removed in 1.8, and "
+						+ "never worked in multiplayer.", y, mouseX, mouseY, CLIENT_ONLY);
 			} else if ("utility".equals(section)) {
 				y = drawTrilean(matrices, "utility.mods_command", "/mods command",
 						"Adds a /mods command that anyone can run that lists installed mods. Lets " +

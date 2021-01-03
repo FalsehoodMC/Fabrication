@@ -17,6 +17,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.util.Identifier;
@@ -51,7 +52,8 @@ public abstract class MixinLivingEntity extends Entity implements SetAttackerYaw
 		if (source == DamageSource.OUT_OF_WORLD && MixinConfigPlugin.isEnabled("*.repelling_void")) {
 			knockbackVelocity = yaw;
 		}
-		if (knockbackVelocity != fabrication$lastAttackerYaw && world != null && !world.isClient) {
+		Object self = this;
+		if (self instanceof PlayerEntity && knockbackVelocity != fabrication$lastAttackerYaw && world != null && !world.isClient) {
 			PacketByteBuf data = new PacketByteBuf(Unpooled.buffer(8));
 			data.writeInt(getEntityId());
 			data.writeFloat(knockbackVelocity);
