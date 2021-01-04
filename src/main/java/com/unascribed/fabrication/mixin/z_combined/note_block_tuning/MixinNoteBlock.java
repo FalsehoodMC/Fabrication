@@ -147,6 +147,10 @@ public class MixinNoteBlock {
 				note += FABRICATION$INSTRUMENT_OFFSETS.get(instrument);
 			}
 			int baseOctave = FABRICATION$INSTRUMENT_OCTAVES.get(instrument);
+			if (note < 0) {
+				baseOctave--;
+				note = 12+note;
+			}
 			String noteStr = FABRICATION$NOTES.get(IntMath.mod(note, FABRICATION$NOTES.size()));
 			String octaveStr;
 			if (baseOctave == -1) {
