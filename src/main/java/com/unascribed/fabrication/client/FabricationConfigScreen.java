@@ -691,10 +691,13 @@ public class FabricationConfigScreen extends Screen {
 					}
 					if (didClick && mouseX >= 134+x && mouseX <= 134+x+16 && mouseY >= 18 && mouseY <= 18+16) {
 						if (p == Profile.BURNT) {
+							client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_CHIME, 1.8f, 1f));
 							client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.ITEM_FLINTANDSTEEL_USE, 1f));
 							client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_FIRE_AMBIENT, 1f, 1f));
+						} else if (p == Profile.GREEN) {
+							client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_BASS, 0.5f, 1f));
 						} else {
-							client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_BASS, 0.7f+(p.ordinal()*0.22f), 1f));
+							client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_COW_BELL, 0.707107f+(p.ordinal()*0.22f), 1f));
 						}
 						setValue("general.profile", p.name().toLowerCase(Locale.ROOT));
 					}
@@ -1196,8 +1199,12 @@ public class FabricationConfigScreen extends Screen {
 				} else {
 					int clickedIndex = (int)((mouseX-134)/(noUnset ? 22 : 15));
 					Trilean newValue = clickedIndex == 0 ? Trilean.FALSE : clickedIndex == 1 && !noUnset ? Trilean.UNSET : Trilean.TRUE;
+					client.getSoundManager().play(PositionedSoundInstance.master(
+							newValue == Trilean.FALSE ? SoundEvents.BLOCK_NOTE_BLOCK_BASS :
+								newValue == Trilean.UNSET ? SoundEvents.BLOCK_NOTE_BLOCK_COW_BELL :
+									SoundEvents.BLOCK_NOTE_BLOCK_CHIME,
+							0.6f+pitch, 1f));
 					if (newValue != currentValue) {
-						client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_FLUTE, 0.6f+pitch+((clickedIndex*(noUnset?2:1))*0.18f), 1f));
 						optionPreviousValues.put(key, currentValue);
 						optionAnimationTime.compute(key, (k, f) -> 5 - (f == null ? 0 : f));
 						setValue(key, newValue.toString().toLowerCase(Locale.ROOT));
