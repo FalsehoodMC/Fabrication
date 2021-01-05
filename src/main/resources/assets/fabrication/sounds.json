@@ -10,11 +10,5 @@
 			"fabrication:oof"
 		],
 		"subtitle": "subtitles.entity.player.hurt"
-	},
-	"oof_alex": {
-		"sounds": [
-			{"name": "fabrication:oof", "pitch": 1.95}
-		],
-		"subtitle": "subtitles.entity.player.hurt"
 	}
 }

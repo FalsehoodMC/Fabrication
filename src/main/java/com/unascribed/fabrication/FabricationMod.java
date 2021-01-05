@@ -48,7 +48,6 @@ public class FabricationMod implements ModInitializer {
 	
 	public static SoundEvent LEVELUP_LONG;
 	public static SoundEvent OOF;
-	public static SoundEvent OOF_ALEX;
 	
 	@Override
 	public void onInitialize() {
@@ -81,7 +80,6 @@ public class FabricationMod implements ModInitializer {
 		if (MixinConfigPlugin.getValue("*.long_levelup_sound_at_30") != Trilean.FALSE && Agnos.INST.eventsAvailable() && Agnos.INST.getCurrentEnv() == Env.CLIENT) {
 			LEVELUP_LONG = Agnos.INST.registerSoundEvent("fabrication:levelup_long", new SoundEvent(new Identifier("fabrication", "levelup_long")));
 			OOF = Agnos.INST.registerSoundEvent("fabrication:oof", new SoundEvent(new Identifier("fabrication", "oof")));
-			OOF_ALEX = Agnos.INST.registerSoundEvent("fabrication:oof_alex", new SoundEvent(new Identifier("fabrication", "oof_alex")));
 		}
 	}
 	
