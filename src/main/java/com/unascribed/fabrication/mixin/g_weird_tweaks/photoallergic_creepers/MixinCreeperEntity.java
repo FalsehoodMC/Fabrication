@@ -16,7 +16,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
 @Mixin(CreeperEntity.class)
-@EligibleIf(configEnabled="*.photoallergic_creepers", configDisabled="*.photoresistant_mobs")
+@EligibleIf(configEnabled="*.photoallergic_creepers")
 public abstract class MixinCreeperEntity extends HostileEntity {
 	
 	protected MixinCreeperEntity(EntityType<? extends HostileEntity> entityType, World world) {

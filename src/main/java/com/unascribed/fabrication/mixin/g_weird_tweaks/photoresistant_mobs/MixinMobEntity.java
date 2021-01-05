@@ -6,8 +6,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
 
+import net.minecraft.entity.mob.CreeperEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.PhantomEntity;
@@ -20,6 +22,7 @@ public abstract class MixinMobEntity {
 	public void isAffectedByDaylight(CallbackInfoReturnable<Boolean> ci) {
 		if (RuntimeChecks.check("*.photoresistant_mobs")) {
 			Object self = this;
+			if (self instanceof CreeperEntity && MixinConfigPlugin.isEnabled("*.photoallergic_creepers")) return;
 			if (self instanceof HostileEntity || self instanceof PhantomEntity) {
 				ci.setReturnValue(false);
 			}
