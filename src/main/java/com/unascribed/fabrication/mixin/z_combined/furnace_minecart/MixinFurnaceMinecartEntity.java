@@ -63,6 +63,9 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 		boolean anyFuel = MixinConfigPlugin.isEnabled("*.furnace_minecart_any_fuel");
 		if (anyFuel ? FurnaceBlockEntity.canUseAsFuel(itemStack) : ACCEPTABLE_FUEL.test(itemStack)) {
 			int value = anyFuel ? FurnaceBlockEntity.createFuelTimeMap().get(itemStack.getItem())*2 : 3600;
+			if (MixinConfigPlugin.isEnabled("*.hyperspeed_furnace_minecart")) {
+				value /= 4;
+			}
 			if (this.fuel + value <= 32000) {
 				if (!player.abilities.creativeMode) {
 					itemStack.decrement(1);
