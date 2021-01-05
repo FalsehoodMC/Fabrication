@@ -131,6 +131,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	}
 	
 	private static final List<ConfigLoader> loaders = Lists.newArrayList();
+	private static final String defaultFeaturesConfigFile;
 	
 	static {
 		setMet(SpecialEligibility.EVENTS_AVAILABLE, Agnos.INST.eventsAvailable());
@@ -140,7 +141,13 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		} catch (Throwable t) {
 			setMet(SpecialEligibility.FORGE, true);
 		}
-		try (InputStream is = MixinConfigPlugin.class.getClassLoader().getResourceAsStream("default_features_config.ini")) {
+		if (MixinConfigPlugin.class.getClassLoader().getResource("default_features_config.ini") == null) {
+			// dev mode, no ini generated yet
+			defaultFeaturesConfigFile = "default_features_config.ini.inc";
+		} else {
+			defaultFeaturesConfigFile = "default_features_config.ini";
+		}
+		try (InputStream is = MixinConfigPlugin.class.getClassLoader().getResourceAsStream(defaultFeaturesConfigFile)) {
 			Set<String> keys = QDIni.load("default_features_config.ini", is).keySet();
 			ImmutableMap.Builder<String, String> starMapBldr = ImmutableMap.builder();
 			for (String key : keys) {
@@ -303,7 +310,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			throw new RuntimeException("Failed to create fabrication config directory", e1);
 		}
 		Path configFile = dir.resolve("features.ini");
-		checkForAndSaveDefaultsOrUpgrade(configFile, "default_features_config.ini");
+		checkForAndSaveDefaultsOrUpgrade(configFile, defaultFeaturesConfigFile);
 		FabLog.timeAndCountWarnings("Loading of features.ini", () -> {
 			StringWriter sw = new StringWriter();
 			try {
@@ -408,7 +415,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 
 	private static void checkForAndSaveDefaultsOrUpgrade(Path configFile, String defaultName) {
 		if (!Files.exists(configFile)) {
-			Path configFileLegacy = configFile.getParent().getParent().resolve(defaultName.equals("default_features_config.ini") ? "fabrication.ini" : "fabrication_"+configFile.getFileName().toString());
+			Path configFileLegacy = configFile.getParent().getParent().resolve(defaultName.equals(defaultFeaturesConfigFile) ? "fabrication.ini" : "fabrication_"+configFile.getFileName().toString());
 			boolean migrated = false;
 			if (Files.exists(configFileLegacy)) {
 				try {

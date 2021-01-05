@@ -27,3 +27,7 @@ bin/
 # fabric
 
 run/
+
+# project-specific
+src/main/resources/default_features_config.ini
+features.json

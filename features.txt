@@ -1,0 +1,1099 @@
+# This file is used to generate the default config comments, config GUI, wiki, CurseForge pages,
+# et al.
+
+config_screen
+	name: Config Screen
+	meta: true
+	media: https://unascribed.com/fabrication/config_screen.mp4
+	desc:
+		Fabrication has a nice ingame configuration GUI accessed via Mod Menu on Fabric or the
+		built-in Mods screen on Forge. It can be used to change profiles and toggle all features.
+		
+		The GUI is client/server aware (note Fabrication does not currently have config syncing
+		outside of the GUI) and can be used to view the server's config, or even change it if you're
+		an op.
+
+config_command
+	name: Config Command
+	meta: true
+	desc:
+		The /fabrication command has a "config" subcommand that can be used to reload config files,
+		set config keys, and get config keys. This is useful from command blocks (used extensively
+		in the demo videos), from non-Fabrication clients, or from Forge clients (no ingame Mods
+		button in 1.16)
+
+block_distribution_analysis
+	name: Block Distribution Analysis
+	meta: true
+	media: https://unascribed.com/fabrication/block_distribution_analysis.png
+	desc:
+		The /fabrication command has an "analyze" subcommand that can be used to perform block
+		distribution analysis on the world. (Don't try and use the biome subcommand, it doesn't
+		work right now.) By default it will scan the dimension you're in, but you can specify an
+		alternate dimension if you want.
+		
+		This will generate and/or load a ton of chunks. Use with caution. Progress reports go to
+		the console; once complete, a TSV (tab-separated value) file will be written to the game
+		directory.
+
+atlas_viewer
+	name: Atlas Viewer
+	meta: true
+	media: https://unascribed.com/fabrication/atlas_viewer.png
+	desc:
+		The /fabrication:client command (available under Fabric if you have Cotton Client Commands
+		installed - Forge does not support client commands) has an "atlas" subcommand that can be
+		used to view any of the loaded texture atlases. Information on sprites will be shown when
+		hovered.
+		
+		This is an invaluable debugging tool for various kinds of atlas disasters, and was added to
+		debug a sprite overwrite issue with Old Lava.
+
+general
+	name: General
+	since: 1.0
+	desc:
+		Broad features and global settings.
+
+general.profile
+	name: Profile
+	since: 1.0
+	desc:
+		To help with Fabrication's overwhelming number of options, Profiles let you pick what kinds
+		of features you want to be enabled by default. When a config value is set to 'unset', it is
+		up to the profile whether it's enabled or disabled.
+		
+		The available profiles are:
+		- Green: Enables nothing by default. Build your own.
+		- Blonde: Fixes and utilities only. Keeps things vanilla-y.
+		- Light: Blonde + tweaks. No major gameplay changes. Default.
+		- Medium: Light + gameplay and mechanic additions. Recommended; gives you most of Fabrication's features.
+		- Dark: Medium + major mechanic additions.
+		- Vienna: Dark + balance tweaks, weird mechanic additions, and revivals of old features. Author's choice.
+		- Burnt: Just enable everything, except the "Situational" and "Experiments" sections.
+
+general.runtime_checks
+	name: Runtime Checks
+	since: 1.0
+	desc:
+		Allows changing settings arbitrarily on-the-fly, but is very slightly slower and a fair bit
+		less compatible, as all options that are set to 'unset' but not enabled by the profile will
+		be initialized.
+		
+		You can still disable something completely if it's causing problems by setting it to false
+		explicitly.
+		
+		With this disabled, most changes to config options will not take effect until the game is
+		restarted.
+
+general.reduced_motion
+	name: Reduced Motion
+	since: 1.2
+	sides: client
+	desc:
+		Disables high-motion animations in the Fabrication config screen.
+
+fixes
+	name: Fixes
+	since: 1.0
+	desc:
+		Fixes for bugs and weird behavior.
+
+fixes.sync_attacker_yaw
+	name: Sync Attacker Yaw
+	since: 1.0
+	sides: server client?
+	media: https://unascribed.com/fabrication/sync_attacker_yaw.mp4
+	desc:
+		Makes the last attacker yaw field sync properly when the player is damaged, instead of
+		always being zero. Causes the camera shake animation when being hurt to tilt away from the
+		source of damage instead of always tilting right.
+		
+		Fixes MC-26678, which is closed as Won't Fix.
+		
+		Needed on both client and server, but doesn't break vanilla clients.
+
+fixes.furnace_minecart_pushing
+	name: Furnace Minecart Pushing
+	since: 1.0
+	sides: server
+	media: https://unascribed.com/fabrication/furnace_minecart_pushing.mp4
+	desc:
+		Right-clicking a furnace minecart with a non-fuel while it's out of fuel gives it a little
+		bit of fuel, allowing you to "push" it.
+		
+		Removed some time after 17w46a (1.13 pre releases); nobody seems to have noticed, and it
+		wasn't announced.
+
+fixes.use_player_list_name_in_tag
+	name: Use Player List Name In Tag
+	since: 1.0
+	sides: client
+	media: https://unascribed.com/fabrication/use_player_list_name_in_tag.png
+	desc:
+		Changes player name tags to match names in the player list. Good in combination with
+		nickname mods like Drogtor.
+
+fixes.better_pause_freezing
+	name: Better Pause Freezing
+	since: 1.0.1
+	sides: client
+	media: https://unascribed.com/fabrication/better_pause_freezing.mp4
+	desc:
+		Makes textures not tick while the game is paused.
+
+fixes.inanimates_can_be_invisible
+	name: Inanimates Can Be Invisible
+	since: 1.1.1
+	sides: client
+	desc:
+		Makes inanimate entities honor the "invisible" tag sent by the server. Does nothing on its
+		own; the server must have something that marks inanimate entities as invisible, such as
+		Fabrication's own Invisibility Splash On Inanimates.
+
+fixes.omniscent_player
+	name: Omniscent Player
+	since: 1.1.1
+	sides: client
+	media: https://unascribed.com/fabrication/omniscent_player.mp4
+	desc:
+		The player render in the inventory follows your cursor, even if it's not inside the game
+		window.
+
+fixes.uncap_menu_fps
+	name: Uncap Menu FPS
+	since: 1.2
+	sides: client
+	desc:
+		Removes the hardcoded 60 FPS cap in menu screens, instead using whatever you have the
+		framerate cap set to.
+		
+		Primarily added because in prior versions the cap was 30 FPS and I thought it still was.
+		Maybe this is nice if you have a 144Hz display?
+
+fixes.adventure_tags_in_survival
+	name: Adventure Tags In Survival
+	since: 1.2.1
+	sides: server client?
+	media: https://unascribed.com/fabrication/adventure_tags_in_survival.mp4
+	desc:
+		Makes the CanDestroy and CanPlaceOn tags be honored in survival mode instead of just adventure mode.
+		
+		Only needed on server, but the experience is more seamless if it's also on the client.
+
+fixes.stable_cacti
+	name: Stable Cacti
+	since: 1.2.3
+	sides: server
+	media: https://unascribed.com/fabrication/stable_cacti.mp4
+	desc:
+		Fixes cactuses being made of Explodium due to long-since-fixed engine limitations. In
+		English: Makes cacti not break themselves if a block is placed next to them. They will still
+		break if they *grow* into such a space, so cactus randomizers and cactus farms still work.
+
+fixes.boundless_levels
+	name: Boundless Levels
+	since: 1.2.5
+	sides: client
+	media: https://unascribed.com/fabrication/boundless_levels.mp4
+	desc:
+		Replaces translation strings for potion and enchantment levels with a dynamic algorithm that
+		supports arbitrarily large numbers.
+
+fixes.ghast_charging
+	name: Ghast Charging
+	since: 1.2.8
+	sides: client
+	media: https://unascribed.com/fabrication/ghast_charging.mp4
+	desc:
+		Brings back the ghast "charging" animation when they're about to fire a fireball that got
+		broken in 1.3 and removed in 1.8, and never worked in multiplayer.
+
+utility
+	name: Utility
+	since: 1.0
+	desc:
+		Useful tidbits that don't modify gameplay.
+
+utility.mods_command
+	name: /mods Command
+	since: 1.0
+	sides: server
+	needs: events
+	media: https://unascribed.com/fabrication/mods_command.mp4
+	desc:
+		Adds a /mods command listing all mods on the server. Hovering over the mods shows their
+		descriptions, clicking on them takes you to their homepage if they have one.
+		
+		If Bukkit is not present, also adds a /plugins command suggesting people use /mods instead.
+
+utility.taggable_players
+	name: Taggable Players
+	since: 1.0
+	sides: server
+	needs: events
+	desc:
+		Allows you to assign or unassign various "tags" from players via /fabrication tag.
+		
+		Valid tags:  
+		* invisible_to_mobs - The player cannot be targeted by mobs at all. Sorta like Apathetic Mobs.  
+		* no_hunger - The player never loses food, and when they eat food it instead heals them directly. Sorta like Hunger Strike.  
+		* fireproof - The player cannot take fire damage.  
+		* can_breathe_water - The player does not lose air while underwater.  
+		* permanent_dolphins_grace - The player always has Dolphin's Grace.  
+		* permanent_conduit_power - The player always has Conduit Power.  
+		* scares_creepers - (Since 1.1) The player scares creepers.  
+		* no_phantoms - (Since 1.1) The player cannot have phantoms spawn on them.
+
+		
+utility.legacy_command_syntax
+	name: Legacy Command Syntax
+	since: 1.0
+	sides: server
+	needs: events
+	media: https://unascribed.com/fabrication/legacy_command_syntax.mp4
+	desc:
+		Allows numeric arguments to /gamemode and /difficulty, re-adds /toggledownfall, allows
+		TitleCase arguments to /summon, and allows numeric arguments to commands that accept items
+		like /give.
+		
+		Old habits die hard.
+
+utility.books_show_enchants
+	name: Books Show Enchants
+	since: 1.0
+	sides: client
+	media: https://unascribed.com/fabrication/books_show_enchants.mp4
+	desc:
+		Makes enchanted books show the first letter of their enchants in the bottom left, cycling
+		through enchants every second if they have multiple.
+
+utility.tools_show_important_enchant
+	name: Tools Show Important Enchant
+	since: 1.0
+	sides: client
+	media: https://unascribed.com/fabrication/tools_show_important_enchant.mp4
+	desc:
+		Makes tools enchanted with Silk Touch, Fortune, or Riptide show the first letter of that
+		enchant in the top left.
+		
+		Never break an Ender Chest with the wrong tool again.
+
+utility.despawning_items_blink
+	name: Despawning Items Blink
+	since: 1.1
+	sides: server client?
+	media: https://unascribed.com/fabrication/despawning_items_blink.mp4
+	desc:
+		Makes items that are about to despawn blink. The despawn timer is synced from the server, so
+		this only works if the server also has it installed, but it means that the blinking only
+		happens when it should.
+
+utility.canhit
+	name: CanHit
+	since: 1.2.1
+	sides: server client?
+	media: https://unascribed.com/fabrication/canhit.mp4
+	desc:
+		Adds a new CanHit tag that affects melee attacks, bows, crossbows, and tridents. Also works
+		on arrows and fireworks, in which case the restrictions will be AND'd with the restrictions
+		of the bow or crossbow doing the firing.
+		
+		The tag must be a list of strings, which may contain UUIDs that match a specific entity or
+		an entity type ID optionally prefixed with a ! to invert the match.
+		
+		If installed on the client, adds hit information to the tooltip. You can hide this
+		information by creating an NBT byte set to 1 called "HideCanHit".
+		
+		For example, a sword that can only hit spiders: /give @p diamond_sword{CanHit:["spider"]}
+		
+		A sword that can hit anything but creepers: /give @p diamond_sword{CanHit:["!creeper"]}
+
+utility.item_despawn
+	name: Item Despawn Control
+	since: 1.1
+	sides: server
+	desc:
+		Allows fine-grained control over item despawn times and making items invulnerable to
+		all forms of damage including the void. You can filter by the item ID, whether the item was
+		dropped by a player, if the item was dropped by a player dying, what enchantments are on the
+		item, if the item is cursed, arbitrary NBT booleans, and block or item tags.
+		
+		Configured in config/fabrication/item_despawn.ini.
+
+utility.i_and_more
+	name: /i And More
+	since: 1.2.5
+	sides: server
+	needs: events
+	media: https://unascribed.com/fabrication/i_and_more.mp4
+	desc:
+		Adds /i, /item, /more, and /fenchant commands.
+		
+		/i and /item are shorthand for /give to yourself, and /more increases the size of your held
+		item's stack. /fenchant is like /enchant but it ignores all restrictions.
+
+tweaks
+	name: Tweaks
+	since: 1.0
+	desc:
+		Minor changes that fit with vanilla.
+
+tweaks.creepers_explode_when_on_fire
+	name: Creepers Explode When On Fire
+	since: 1.0
+	sides: server
+	media: https://unascribed.com/fabrication/creepers_explode_when_on_fire.mp4
+	desc:
+		Causes creepers to light their fuses when lit on fire. Just because.
+
+tweaks.tridents_in_void_return
+	name: Tridents In Void Return
+	since: 1.0
+	sides: server
+	media: https://unascribed.com/fabrication/tridents_in_void_return.mp4
+	desc:
+		Makes Loyalty tridents immune to void damage, and causes them to start their return timer
+		upon falling into the void.
+
+tweaks.less_annoying_fire
+	name: Less Annoying Fire
+	since: 1.0
+	sides: client
+	media: https://unascribed.com/fabrication/less_annoying_fire.mp4
+	desc:
+		Makes the "on fire" overlay half as tall, and removes it completely if you have Fire
+		Resistance.
+		
+		Especially nice with resource packs like Faithful that have tall fire textures.
+
+tweaks.less_restrictive_note_blocks
+	name: Less Restrictive Note Blocks
+	since: 1.0
+	sides: server client?
+	media: https://unascribed.com/fabrication/less_restrictive_note_blocks.mp4
+	desc:
+		Allows note blocks to play if any block next to them has a nonsolid face, instead of only if
+		the block above is air.
+		
+		On the client, just adjusts the note particle to fly the right direction.
+
+tweaks.cactus_walk_doesnt_hurt_with_boots
+	name: Cactus Walk Doesn't Hurt With Boots
+	since: 1.0
+	sides: server
+	media: https://unascribed.com/fabrication/cactus_walk_doesnt_hurt_with_boots.mp4
+	desc:
+		Makes walking on top of a cactus (not touching the side of one) with boots equipped not deal
+		damage.
+
+tweaks.cactus_brush_doesnt_hurt_with_chest
+	name: Cactus Brush Doesn't Hurt With Chest
+	since: 1.1
+	sides: server
+	media: https://unascribed.com/fabrication/cactus_brush_doesnt_hurt_with_chest.mp4
+	desc:
+		Makes touching the side of a cactus (not walking on top of one) with a chestplate equipped
+		not deal damage.
+
+tweaks.bush_walk_doesnt_hurt_with_armor
+	name: Bush Walk Doesn't Hurt With Armor
+	since: 1.1
+	sides: server
+	media: https://unascribed.com/fabrication/bush_walk_doesnt_hurt_with_armor.mp4
+	desc:
+		Makes walking through berry bushes with both leggings and boots equipped not deal damage.
+
+tweaks.shulker_bullets_despawn_on_death
+	name: Shulker Bullets Despawn On Death
+	since: 1.0
+	sides: server
+	media: https://unascribed.com/fabrication/shulker_bullets_despawn_on_death.mp4
+	desc:
+		Makes shulker bullets despawn when the shulker that shot them is killed.
+
+tweaks.arrows_work_in_water
+	name: Arrows Work In Water
+	since: 1.0
+	sides: server
+	media: https://unascribed.com/fabrication/arrows_work_in_water.mp4
+	desc:
+		Reduces arrow drag in water by a fair bit to make bows useful underwater. Not nearly as
+		good as a trident, but usable.
+
+tweaks.reverse_note_block_tuning
+	name: Reverse Note Block Tuning
+	since: 1.0
+	sides: server
+	media: https://unascribed.com/fabrication/reverse_note_block_tuning.mp4
+	desc:
+		Sneaking while tuning a note block reduces its pitch rather than increases.
+
+tweaks.campfires_place_unlit
+	name: Campfires Place Unlit
+	since: 1.1.1
+	sides: server
+	media: https://unascribed.com/fabrication/campfires_place_unlit.mp4
+	desc:
+		Campfires are unlit when placed and must be lit with a Flint and Steel.
+
+tweaks.rainbow_experience
+	name: Rainbow Experience
+	since: 1.2.1
+	sides: client
+	media: https://unascribed.com/fabrication/rainbow_experience.mp4
+	desc:
+		Makes experience random colors instead of just lime green.
+
+tweaks.long_levelup_sound_at_30
+	name: Long Level Up Sound At 30
+	since: 1.2.1
+	sides: client
+	needs: events
+	media: https://unascribed.com/fabrication/long_levelup_sound_at_30.mp4
+	desc:
+		Plays the old longer level up sound when you reach level 30.
+
+tweaks.flammable_cobwebs
+	name: Flammable Cobwebs
+	since: 1.2.8
+	sides: server
+	media: https://unascribed.com/fabrication/flammable_cobwebs.mp4
+	desc:
+		Cobwebs can burn.
+
+minor_mechanics
+	name: Minor Mechanics
+	since: 1.0
+	desc:
+		Small additions to vanilla mechanics.
+
+minor_mechanics.feather_falling_five
+	name: Feather Falling V
+	since: 1.0
+	sides: server client?
+	media: https://unascribed.com/fabrication/feather_falling_five.mp4
+	desc:
+		Makes Feather Falling V a valid enchant that completely negates fall damage. Optionally does
+		damage to the boots.
+		
+		If present on the client, makes the enchantment available in the Creative menu.
+
+minor_mechanics.feather_falling_five_damages_boots
+	name: Feather Falling V Damages Boots
+	since: 1.0
+	sides: server
+	parent: minor_mechanics.feather_falling_five
+	desc:
+		Makes absorbing fall damage with Feather Falling V cause damage to the boots.
+
+minor_mechanics.furnace_minecart_any_fuel
+	name: Furnace Minecart Accepts Any Fuel
+	since: 1.0
+	sides: server
+	media: https://unascribed.com/fabrication/furnace_minecart_any_fuel.mp4
+	desc:
+		Allows furnace minecarts to accept any furnace fuel, rather than just coal and charcoal.
+
+minor_mechanics.infibows
+	name: InfiBows
+	since: 1.0
+	sides: server
+	media: https://unascribed.com/fabrication/infibows.mp4
+	desc:
+		Makes Infinity bows not require an arrow in your inventory to fire.
+		
+		If not present on client, firing bows with no arrows is a bit janky.
+
+minor_mechanics.note_blocks_play_on_landing
+	name: Note Blocks Play On Landing
+	since: 1.0
+	sides: server
+	media: https://unascribed.com/fabrication/note_blocks_play_on_landing.mp4
+	desc:
+		Makes note blocks play when landed on. The higher the entity fell, the louder the note will
+		be. Also triggers Observers.
+
+minor_mechanics.fire_protection_on_any_item
+	name: Fire Protection On Any Item
+	since: 1.0
+	sides: server
+	media: https://unascribed.com/fabrication/fire_protection_on_any_item.mp4
+	desc:
+		Fire Protection can be applied to any enchantable item, and makes the item immune to fire
+		and lava damage.
+
+minor_mechanics.observers_see_entities
+	name: Observers See Entities
+	since: 1.0
+	sides: server
+	media: https://unascribed.com/fabrication/observers_see_entities.mp4
+	desc:
+		Observers detect when entities move in front of them if they have no block in front of them.
+		Not as laggy as it sounds.
+
+minor_mechanics.observers_see_entities_living_only
+	name: Observers See Entities - Living Only
+	since: 1.0
+	sides: server
+	parent: minor_mechanics.observers_see_entities
+	desc:
+		Observers only detect living entities, and not e.g. item entities.
+		
+		Safety option to prevent breaking a variety of vanilla contraptions.
+
+minor_mechanics.exact_note_block_tuning
+	name: Exact Note Block Tuning
+	since: 1.0
+	sides: server
+	media: https://unascribed.com/fabrication/exact_note_block_tuning.mp4
+	desc:
+		Right-clicking a note block with a stack of sticks sets its pitch to the
+		size of the stack minus one.
+
+minor_mechanics.note_block_notes
+	name: Note Block Notes
+	since: 1.0
+	sides: server
+	media: https://unascribed.com/fabrication/note_block_notes.mp4
+	desc:
+		Tells you the note the note block has been tuned to when tuning it or playing it manually
+		above your hotbar. Also shows the octave, and shows the correct note for the snare and click
+		instruments. (The bass drum is hard to nail down and so does not show note or octave info;
+		if you know the best way to describe the bass drum, please let me know in an issue.)
+
+minor_mechanics.spiders_cant_climb_glazed_terracotta
+	name: Spiders Can't Climb Glazed Terracotta
+	since: 1.0.2
+	sides: server
+	media: https://unascribed.com/fabrication/spiders_cant_climb_glazed_terracotta.mp4
+	desc:
+		Makes spiders unable to climb glazed terracotta, to make farming them less of a chore if you
+		go to the trouble to make glazed terracotta.
+		
+		Logic: Slime blocks can't stick to glazed terracotta. Are spiders really stickier than solid
+		slime?
+
+minor_mechanics.spiders_cant_climb_while_wet
+	name: Spiders Can't Climb While Wet
+	since: 1.2.3
+	sides: server
+	endorsed: false
+	media: https://unascribed.com/fabrication/spiders_cant_climb_while_wet.mp4
+	desc:
+		Makes spiders unable to climb while wet. Basically a more overpowered version of Spiders
+		Can't Climb Glazed Terracotta. May break vanilla spider farms.
+		
+		Interacts with Enhanced Moistness, and the demo video uses it for the water splash to work
+		like it does.
+
+minor_mechanics.water_fills_on_break
+	name: Water Fills On Break
+	since: 1.1.1
+	sides: server
+	media: https://unascribed.com/fabrication/water_fills_on_break.mp4
+	desc:
+		Water source blocks fill in broken blocks instead of air if there is more water on its
+		north, east, south, west, and top faces than there is air on its north, east, south, and
+		west faces. In case of a tie, air wins. Makes terraforming lakes and building canals, etc
+		much less frustrating.
+
+minor_mechanics.invisibility_splash_on_inanimates
+	name: Invisibility Splash On Inanimates
+	since: 1.1.1
+	sides: server
+	media: https://unascribed.com/fabrication/invisibility_splash_on_inanimates.mp4
+	desc:
+		Invisibility splash potions affect inanimates (minecarts, arrows, etc) making them
+		invisible. They will become visible again if they become wet. This enables the vanilla
+		"invisible" flag, which doesn't work on inanimates unless Fixes > Inanimates Can Be
+		Invisible is also enabled.
+		
+		Logic: Invisibility potions coat the outer surface of the object. Living entities absorb and
+		eventually eliminate the compound, and when drank it exudes from the pores, but inanimate
+		objects do not have metabolisms, so the invisibility hangs around indefinitely unless washed
+		off. Don't @ me about skeletons.
+
+minor_mechanics.fire_aspect_is_flint_and_steel
+	name: Fire Aspect Is Flint And Steel
+	since: 1.1.1
+	sides: server
+	media: https://unascribed.com/fabrication/fire_aspect_is_flint_and_steel.mp4
+	desc:
+		Right-clicking a block with no action with a Fire Aspect tool emulates a click with flint
+		and steel, allowing you to light fires and such with a Fire Aspect tool instead of having to
+		carry around flint and steel.
+		
+		Since it emulates clicking with a Flint and Steel, it's highly compatible.
+
+minor_mechanics.mechanism_muffling
+	name: Mechanism Muffling
+	since: 1.2.8
+	sides: server
+	media: https://unascribed.com/fabrication/mechanism_muffling.mp4
+	desc:
+		Placing a block of wool adjacent to a dispenser, dropper, or piston makes it silent.
+
+mechanics
+	name: Mechanics
+	since: 1.0
+	desc:
+		New mechanics and powerful additions.
+
+mechanics.enhanced_moistness
+	name: Enhanced Moistness
+	since: 1.0
+	sides: server
+	media: https://unascribed.com/fabrication/enhanced_moistness.mp4
+	desc:
+		Entities are considered "wet" for 5 seconds after leaving a source of wetness. Additionally,
+		lingering or splash water bottles inflict wetness. Also makes wet entities drip to show
+		they're wet. Affects various vanilla mechanics including fire and undead burning.
+		
+		Touching lava instantly removes wetness, meaning lava blades still work.
+
+mechanics.slowfall_splash_on_inanimates
+	name: Slow Fall Splash On Inanimates
+	since: 1.1.1
+	sides: server
+	media: https://unascribed.com/fabrication/slowfall_splash_on_inanimates.mp4
+	desc:
+		Slow fall splash potions affect inanimates (minecarts, arrows, etc) making them unaffected
+		by gravity. They will become normally affected again if they become wet.
+		
+		This is kind of overpowered.
+
+mechanics.broken_tools_drop_components
+	name: Broken Gear Drops Components
+	since: 1.1.2
+	sides: server
+	media: https://unascribed.com/fabrication/broken_tools_drop_components.mp4
+	link_url: https://github.com/unascribed/Fabrication/blob/trunk/src/main/resources/default_gear_components_config.ini
+	link_text: See the default config for more info
+	desc:
+		Makes gear drop its consituent items when broken. This is completely configurable in
+		config/fabrication/gear_components.ini.
+		
+		Also works with nonplayer entities, where it is affected by their drop chance table.
+		
+mechanics.obsidian_tears
+	name: Obsidian Tears
+	since: 1.2.8
+	sides: server client?
+	media: https://unascribed.com/fabrication/obsidian_tears.mp4
+	desc:
+		Empty bottles can be used to collect "Obsidian Tears" from Crying Obsidian. When quaffed by
+		or dispensed onto a player, it updates their spawn to the location of the block the
+		tears are from. Dispensers can also be used to fill empty bottles with tears.
+		
+		Crying Obsidian respawn works in any dimension and doesn't need to be recharged, but you
+		spawn with half health, no saturation, less than full food, and Weakness.
+		
+		On client, just gives the bottle a custom appearance instead of a potion item.
+
+mechanics.grindstone_disenchanting
+	name: Grindstone Disenchanting
+	since: 1.2.8
+	sides: server client
+	media: https://unascribed.com/fabrication/grindstone_disenchanting.mp4
+	desc:
+		Placing a book in the bottom slot of a Grindstone when disenchanting an item will transfer
+		the enchantments onto the book.
+		
+		Doesn't work properly if the client doesn't also have it, but it will not break vanilla
+		clients.
+
+balance
+	name: Balance
+	since: 1.0
+	desc:
+		Changes to vanilla balance.
+
+balance.faster_obsidian
+	name: Faster Obsidian
+	since: 1.0
+	sides: server client
+	media: https://unascribed.com/fabrication/faster_obsidian.mp4
+	desc:
+		Makes obsidian and obsidian-related blocks break 3× faster. Needed on both sides to work
+		properly.
+		
+		Does not break vanilla clients when on the server, but when on the client, vanilla servers
+		will think you're cheating. (And they won't be wrong.)
+
+balance.disable_prior_work_penalty
+	name: Disable Prior Work Penalty
+	since: 1.0
+	sides: server client
+	media: https://unascribed.com/fabrication/disable_prior_work_penalty.mp4
+	desc:
+		Disables the anvil prior work penalty when an item has been worked multiple times. Makes
+		non-Mending tools relevant by allowing you to repair them indefinitely, and makes putting
+		books on tools easier.
+		
+		If only on the server and not the client, the wrong level cost will briefly be displayed
+		before being corrected.
+
+balance.soul_speed_doesnt_damage_boots
+	name: Soul Speed Doesn't Damage Boots
+	since: 1.0
+	sides: server
+	desc:
+		Makes running on soul blocks with Soul Speed not deal damage to your boots.
+
+balance.infinity_mending
+	name: Infinity & Mending
+	since: 1.0
+	sides: server
+	endorsed: false
+	media: https://unascribed.com/fabrication/infinity_mending.mp4
+	desc:
+		Makes Mending and Infinity compatible enchantments.
+
+balance.hyperspeed_furnace_minecart
+	name: Hyperspeed Furnace Minecart
+	since: 1.0
+	sides: server
+	media: https://unascribed.com/fabrication/hyperspeed_furnace_minecart.mp4
+	desc:
+		Makes furnace minecarts very fast and burn fuel more quickly.
+		
+		An attempt to make rail transport relevant again, as well as furnace carts, in a world with
+		ice roads, swimming, elytra, etc.
+		
+		Warning: These carts are so fast that they sometimes fall off of track corners. Make sure to
+		surround track corners with blocks.
+
+balance.tridents_accept_power
+	name: Tridents Accept Power
+	since: 1.0
+	sides: server
+	media: https://unascribed.com/fabrication/tridents_accept_power.mp4
+	desc:
+		Allows tridents to accept the Power enchantment, increasing their ranged damage. It's
+		pitiful that tridents only deal as much damage as an unenchanted bow and this cannot be
+		improved at all other than via Impaling, which is exclusive to aquatic mobs; notably,
+		Drowned do not count as aquatic mobs. Only the harmless squids, salmon, cod, tropical fish,
+		and the less harmless pufferfish and guardians count as "aquatic".
+		
+		Power is considered incompatible with Sharpness and Impaling.
+
+balance.tridents_accept_sharpness
+	name: Tridents Accept Sharpness
+	since: 1.0
+	sides: server
+	media: https://unascribed.com/fabrication/tridents_accept_sharpness.mp4
+	desc:
+		Allows tridents to accept the Sharpness enchantment, increasing their melee damage. See
+		above for justification. Tridents deal 1 more damage than a Netherite Sword, but this tweak
+		*only* allows them to accept Sharpness; no Smite, no Looting, etc.
+		
+		Sharpness is considered incompatible with Power and Impaling.
+
+balance.bedrock_impaling
+	name: Bedrock-Like Impaling
+	since: 1.0
+	sides: server
+	media: https://unascribed.com/fabrication/bedrock_impaling.mp4
+	desc:
+		Makes the Impaling enchantment act like it does in Bedrock Edition and Combat Test 4.
+		Namely, it deals bonus damage to anything that is in water or rain (i.e. is wet), instead
+		of only aquatic mobs.
+		
+		Interacts with Enhanced Moistness.
+
+balance.environmentally_friendly_creepers
+	name: Environmentally Friendly Creepers
+	since: 1.0
+	sides: server
+	media: https://unascribed.com/fabrication/environmentally_friendly_creepers.mp4
+	desc:
+		Creeper explosions deal entity damage, but not block damage, even if mobGriefing is true.
+
+balance.anvil_damage_only_on_fall
+	name: Anvils Take Damage Only When Falling
+	since: 1.1
+	sides: server
+	endorsed: false
+	media: https://unascribed.com/fabrication/anvil_damage_only_on_fall.mp4
+	desc:
+		Anvils only take damage when falling from a height rather than randomly after being used.
+
+balance.drop_more_exp_on_death
+	name: Drop More Experience On Death
+	since: 1.2.1
+	sides: server
+	media: https://unascribed.com/fabrication/drop_more_exp_on_death.mp4
+	desc:
+		Players drop 80% of their experience when dying instead of basically nothing.
+
+balance.infinity_crossbows
+	name: Infinity Crossbows
+	since: 1.2.8
+	sides: server client?
+	desc:
+		Allow putting Infinity on crossbows. Only works for plain arrows.
+		
+		Honors InfiBows.
+
+weird_tweaks
+	name: Weird Tweaks
+	since: 1.0
+	desc:
+		Opinionated changes.
+
+weird_tweaks.endermen_dont_squeal
+	name: Endermen Don't Squeal
+	since: 1.0
+	sides: server? client?
+	desc:
+		Makes Endermen not make their growling or screeching sounds when angry.
+		
+		On client, mutes the sounds for just you. This means angry endermen don't make ambient
+		sounds.
+		
+		On server, replaces the angry ambient sound with the normal ambient sound for everyone. The
+		stare sound is client-sided, unfortunately.
+
+weird_tweaks.disable_equip_sound
+	name: Disable Equip Sound
+	since: 1.0
+	sides: server? client?
+	desc:
+		Disables the unnecessary "Gear equips" sound that plays when your hands change, and is often
+		glitchily played every tick. Armor equip sounds and other custom equip sounds remain
+		unchanged. You won't even notice it's gone.
+		
+		On client, mutes it just for you.
+		
+		On server, prevents the sound from playing at all for everyone.
+
+weird_tweaks.repelling_void
+	name: Déjà Void
+	since: 1.0
+	sides: server
+	media: https://unascribed.com/fabrication/repelling_void.mp4
+	desc:
+		Players falling into the void teleports them back to the last place they were on the ground
+		and deals 6 hearts of unblockable void damage.
+
+weird_tweaks.drop_exp_with_keep_inventory
+	name: Drop Experience With keepInventory
+	since: 1.2.1
+	sides: server
+	media: https://unascribed.com/fabrication/drop_exp_with_keepinventory.mp4
+	desc:
+		If keepInventory is enabled, players still drop their experience when dying, but do so
+		losslessly. Incents returning to where you died even when keepInventory is enabled.
+
+weird_tweaks.gold_tools_useful_in_nether
+	name: Gold Tools Useful In Nether
+	since: 1.2.4
+	sides: server client?
+	media: https://unascribed.com/fabrication/gold_tools_useful_in_nether.mp4
+	desc:
+		Makes breaking nether blocks deal 50x damage to non-golden and non-netherite tools, and
+		makes golden tools take 1/50th the damage when breaking the same blocks, bringing their
+		durability just above diamond. Also makes wooden tools crafted with nether planks into
+		"Fungal" tools, which also get the 1/50th damage bonus. Relevant tags:  
+		* fabrication:nether_blocks  
+		* fabrication:nether_blocks_only_in_nether  
+		* fabrication:gold_tools  
+		* fabrication:nether_tools
+		
+		On client, adjusts gold tool tooltips to show fractional damage.
+		
+		Inspired by a joke video.
+
+weird_tweaks.photoallergic_creepers
+	name: Photoallergic Creepers
+	since: 1.2.4
+	sides: server
+	endorsed: false
+	media: https://unascribed.com/fabrication/photoallergic_creepers.mp4
+	desc:
+		Creepers burn in sunlight. Very dangerous in combination with Creepers Explode When On Fire.
+		
+		Takes precedence over Photoresistant Mobs if that is also enabled, allowing you to make only
+		creepers burn in sunlight.
+
+weird_tweaks.photoresistant_mobs
+	name: Photoresistant Mobs
+	since: 1.2.4
+	sides: server
+	endorsed: false
+	media: https://unascribed.com/fabrication/photoresistant_mobs.mp4
+	desc:
+		Mobs don't burn in sunlight.
+
+woina
+	name: What's Old Is New Again
+	short_name: W.O.I.N.A.
+	since: 1.2.4
+	desc:
+		Forward ports of forgotten tidbits.
+
+woina.block_logo
+	name: Block Logo
+	since: 1.2.4
+	sides: client
+	media: https://unascribed.com/fabrication/block_logo.mp4
+	desc:
+		Resurrects the Beta 1.2-era animated falling block logo. Because it looked sweet and it is
+		shameful they removed it.
+		
+		The block logo is completely customizable in config/fabrication/block_logo.png and
+		config/fabrication/block_logo.ini. The default is identical to how it was in Beta 1.2.
+
+woina.old_lava
+	name: Old Lava
+	since: 1.2.4
+	sides: client
+	media: https://unascribed.com/fabrication/old_lava.mp4
+	desc:
+		Resurrects the old procedural lava texture from 1.4. Replace your molten cheese with pasta
+		sauce today! HAYO!
+
+woina.classic_block_drops
+	name: Classic Block Drops
+	since: 1.2.4
+	sides: client
+	media: https://unascribed.com/fabrication/classic_block_drops.mp4
+	extra_media: https://unascribed.com/fabrication/survival_test.mp4
+	extra_media_text: Survival Test video, for reference
+	desc:
+		Back in Survival Test, likely in the interest of keeping a consistent pixel density in the
+		world, block drops were drawn with an 8x8 portion of the block texture. This didn't always
+		work well back then, and rather than fix things up and design textures with it in mind, it
+		was simply removed.
+
+		This option uses a whitelist in config/fabrication/classic_block_drops.ini to emulate the
+		old behavior, and for anything not whitelisted, uses mipmapped textures.
+		
+		This looks pretty neat.
+
+woina.blinking_drops
+	name: Blinking Drops
+	since: 1.2.4
+	sides: client
+	media: https://unascribed.com/fabrication/blinking_drops.mp4
+	extra_media: https://unascribed.com/fabrication/survival_test.mp4
+	extra_media_text: Survival Test video, for reference
+	desc:
+		Back in Survival Test, drops blinked white to make them stand out more. This is an
+		implementation of that.
+		
+		If utility.despawning_items_blink is enabled, that tweak's disappear-flashing will be
+		disabled, and instead this tweak's white flashing will get faster and faster as despawn
+		approaches.
+
+woina.janky_arm
+	name: Janky Arm
+	since: 1.2.8
+	sides: client
+	endorsed: false
+	media: https://unascribed.com/fabrication/janky_arm.png
+	extra_media: https://unascribed.com/fabrication/survival_test.mp4
+	extra_media_text: Survival Test video, for reference
+	desc:
+		Brings back Survival Test arm rotation.
+		
+		"Why?" Why not.
+
+woina.flat_items
+	name: Flat Items
+	since: 1.2.8
+	sides: client
+	endorsed: false
+	media: https://unascribed.com/fabrication/flat_items.png
+	desc:
+		Brings back Indev flat first-person item models.
+		
+		"Why?" Why not.
+
+woina.billboard_drops
+	name: Billboard Drops
+	since: 1.2.8
+	sides: client
+	endorsed: false
+	media: https://unascribed.com/fabrication/billboard_drops.mp4
+	desc:
+		Brings back billboarded flat item drops like on Fast graphics prior to 1.8 or like always
+		prior to 1.4.
+
+woina.oof
+	name: Oof
+	since: 1.2.8
+	sides: client
+	endorsed: false
+	media: https://unascribed.com/fabrication/oof.mp4
+	desc:
+		Brings back the old "Oof" hurt sound. Unlike the resource pack approach, this is
+		player-specific rather than replacing the generic fleshy damage sound, so it won't result
+		in random things Oof-ing.
+
+pedantry
+	name: Pedantry
+	since: 1.0.1
+	desc:
+		Fixes for non-problems.
+
+pedantry.tnt_is_dynamite
+	name: TNT Is Dynamite
+	since: 1.0.1
+	sides: client
+	media: https://unascribed.com/fabrication/tnt_is_dynamite.png
+	desc:
+		TNT is renamed to Dynamite and doesn't say TNT on it. TNT is more stable than Minecraft's
+		representation of it, and the texture is clearly dynamite.
+		
+		(Technically dynamite is made from nitroglycerin, but nitro is so incredibly unstable that
+		you would need to change a dozen different mechanics to make it "correct".)
+		
+		Gunpowder is also renamed to Creeper Dust, because gunpowder is not that explosive.
+
+pedantry.oak_is_apple
+	name: Oak Is Apple
+	since: 1.0.1
+	sides: client
+	media: https://unascribed.com/fabrication/oak_is_apple.png
+	desc:
+		Oak trees become apple trees. Because oak trees do not grow apples.
+
+situational
+	name: Situational
+	since: 1.0.1
+	desc:
+		Rarely useful small features.
+
+situational.all_damage_is_fatal
+	name: All Damage Is Fatal
+	since: 1.0.1
+	sides: server
+	media: https://unascribed.com/fabrication/all_damage_is_fatal.mp4
+	desc:
+		Any amount of damage done to an entity is unconditionally fatal.
+
+situational.weapons_accept_silk
+	name: Weapons Accept Silk
+	since: 1.1.2
+	sides: server
+	desc:
+		Weapons can be enchanted with Silk Touch, and Silk Touch becomes incompatible with Looting.
+		
+		Can be used with datapacks and loot tables (or so I'm told).
+
+experiments
+	name: Experiments
+	since: 1.2.8
+	desc:
+		Bad ideas given form.
+
+experiments.packed_atlases
+	name: Packed Atlases
+	since: 1.2.8
+	sides: client
+	desc:
+		Disables rounding of atlases to the next power-of-two. GPU drivers have supported "NPOT" textures since forever.
+		
+		Possibly reduces VRAM usage. May reduce performance. Might cause incompatibilites.
