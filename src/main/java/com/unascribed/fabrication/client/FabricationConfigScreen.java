@@ -925,6 +925,10 @@ public class FabricationConfigScreen extends Screen {
 						"making them unaffected by gravity. They will become normally affected " +
 						"again if they become wet. This is kind of overpowered.\n" +
 						"Interacts with Enhanced Moistness.", y, mouseX, mouseY);
+				y = drawTrilean(matrices, "mechanics.broken_tools_drop_components", "Broken Gear Drops Components",
+						"Makes items drop a configurable portion of configurable constituent "
+						+ "components when broken.\n"
+						+ "See fabrication/gear_components.ini.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "mechanics.obsidian_tears", "Obsidian Tears",
 						"Empty bottles can be used to collect \"Obsidian Tears\" from Crying "
 						+ "Obsidian. When quaffed, or dispensed onto a player, it updates the "
@@ -985,10 +989,6 @@ public class FabricationConfigScreen extends Screen {
 						"Anvils only take damage when falling from a height rather than randomly " +
 						"after being used.\n"
 						+ "§4Not enabled in the \"vienna\" profile.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "balance.broken_tools_drop_components", "Broken Gear Drops Components",
-						"Makes items drop a configurable portion of configurable constituent "
-						+ "components when broken.\n"
-						+ "See fabrication/gear_components.ini.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "balance.drop_more_exp_on_death", "Drop More Experience On Death",
 						"Players drop 80% of their experience upon death instead of basically none.", y, mouseX, mouseY);
 				y = drawTrilean(matrices, "balance.infinity_crossbows", "Infinity Crossbows",
