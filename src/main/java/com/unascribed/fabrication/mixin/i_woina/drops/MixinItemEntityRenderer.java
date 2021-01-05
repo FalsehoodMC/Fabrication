@@ -92,7 +92,7 @@ public class MixinItemEntityRenderer {
 			method="render(Lnet/minecraft/entity/ItemEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")
 	public void interceptRender(ItemRenderer subject, ItemStack stack, ModelTransformation.Mode renderMode, boolean leftHanded, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, BakedModel model) {
 		if (MixinConfigPlugin.isEnabled("*.blinking_drops")) {
-			overlay = OverlayTexture.getUv(Math.max(0, MathHelper.sin(fabrication$curTimer/5.3f))*0.7f, false);
+			overlay = OverlayTexture.getUv(Math.max(0, MathHelper.sin((fabrication$curTimer+(stack.hashCode()%2000))/5.3f))*0.7f, false);
 		}
 		if (MixinConfigPlugin.isEnabled("*.classic_block_drops")) {
 			if (stack.getItem() instanceof BlockItem && model instanceof BasicBakedModel && model.hasDepth()) {
