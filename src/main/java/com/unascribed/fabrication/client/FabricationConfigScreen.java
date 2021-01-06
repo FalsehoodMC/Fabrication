@@ -9,18 +9,24 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.lwjgl.opengl.GL11;
+
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.brigadier.CommandDispatcher;
 import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.FabricationMod;
+import com.unascribed.fabrication.FeaturesFile;
+import com.unascribed.fabrication.FeaturesFile.FeatureEntry;
+import com.unascribed.fabrication.FeaturesFile.Sides;
 import com.unascribed.fabrication.interfaces.GetServerConfig;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.MixinConfigPlugin.Profile;
 import com.unascribed.fabrication.support.ResolvedTrilean;
 import com.unascribed.fabrication.support.Trilean;
 
+import com.google.common.base.CharMatcher;
 import com.google.common.base.Objects;
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -58,30 +64,8 @@ public class FabricationConfigScreen extends Screen {
 		CLIENT_ONLY, REQUIRES_FABRIC_API
 	}
 
-	private static final ImmutableMap<String, String> SECTION_DESCRIPTIONS = ImmutableMap.<String, String>builder()
-			.put("general", "Broad features\nand global settings.")
-			.put("fixes", "Fixes for bugs\nand weird behavior.")
-			.put("utility", "Useful tidbits that\ndon't modify gameplay.")
-			.put("tweaks", "Minor changes that\nfit with vanilla.")
-			.put("minor_mechanics", "Small additions to\nvanilla mechanics.")
-			.put("mechanics", "New mechanics and\npowerful additions.")
-			.put("balance", "Changes to vanilla\nbalance.")
-			.put("weird_tweaks", "Opinionated\nchanges.")
-			.put("pedantry", "Fixes for\nnon-problems.")
-			.put("situational", "Rarely useful\nsmall features.")
-			.put("woina", "Forward ports of\nforgotten tidbits.")
-			.put("experiments", "Bad ideas given\nform.")
-			.build();
-	
-	private static final ImmutableMap<Profile, String> PROFILE_DESCRIPTIONS = ImmutableMap.<Profile, String>builder()
-			.put(Profile.GREEN, "Enables nothing. Build your own config.")
-			.put(Profile.BLONDE, "Enables Fixes and Utility. The bare minimum.\nYou like vanilla.")
-			.put(Profile.LIGHT, "Blonde + Tweaks. Default.")
-			.put(Profile.MEDIUM, "Light + Minor Mechanics.")
-			.put(Profile.DARK, "Medium + Mechanics. Recommended.")
-			.put(Profile.VIENNA, "Dark + Balance + Weird Tweaks + W.O.I.N.A.\nYou agree with all of Una's opinions.")
-			.put(Profile.BURNT, "Screw it, enable everything.\n(Except Situational and Experiments.)")
-			.build();
+	private final Map<String, String> SECTION_DESCRIPTIONS = Maps.newHashMap();
+	private final Map<Profile, String> PROFILE_DESCRIPTIONS = Maps.newHashMap();
 	
 	private static final ImmutableMap<Profile, Integer> PROFILE_COLORS = ImmutableMap.<Profile, Integer>builder()
 			.put(Profile.GREEN, 0xFF8BC34A)
@@ -156,6 +140,12 @@ public class FabricationConfigScreen extends Screen {
 	public FabricationConfigScreen(Screen parent) {
 		super(new LiteralText("Fabrication configuration"));
 		this.parent = parent;
+		for (String sec : MixinConfigPlugin.getAllSections()) {
+			SECTION_DESCRIPTIONS.put(sec, FeaturesFile.get(sec).desc);
+		}
+		for (Profile prof : Profile.values()) {
+			PROFILE_DESCRIPTIONS.put(prof, FeaturesFile.get("general.profile."+prof.name().toLowerCase(Locale.ROOT)).desc);
+		}
 	}
 	
 	@Override
@@ -465,14 +455,25 @@ public class FabricationConfigScreen extends Screen {
 				GlStateManager.popMatrix();
 			}
 			if (y >= -12 && y < height) {
-				textRenderer.draw(matrices, "§l"+("woina".equals(s) ? "W.O.I.N.A." : formatTitleCase(s)), 4, y, -1);
+				textRenderer.draw(matrices, "§l"+FeaturesFile.get(s).shortName, 4, y, -1);
 			}
 			String desc = SECTION_DESCRIPTIONS.getOrDefault(s, "No description available");
 			y += 12;
 			newHeight += 12;
-			int textHeight = drawWrappedText(matrices, 8, y, desc, 116, -1, false);
-			y += textHeight;
-			newHeight += textHeight;
+			int x = 8;
+			int line = 0;
+			for (String word : Splitter.on(CharMatcher.whitespace()).split(desc)) {
+				int w = textRenderer.getWidth(word);
+				if (x+w > 100 && line == 0) {
+					x = 8;
+					y += 12;
+					newHeight += 12;
+					line = 1;
+				}
+				x = textRenderer.draw(matrices, word+" ", x, y, -1);
+			}
+			y += 12;
+			newHeight += 12;
 			if (didClick) {
 				if (mouseX >= 0 && mouseX <= 130 && mouseY > startY-4 && mouseY < y) {
 					boolean deselect = s.equals(selectedSection);
@@ -705,391 +706,30 @@ public class FabricationConfigScreen extends Screen {
 					drawTexture(matrices, 134+x, 18, 0, 0, 0, 16, 16, 16, 16);
 					x += 18;
 				}
-				int textRight = textRenderer.draw(matrices, "Profile", 136, 6, -1);
+				FeatureEntry profile = FeaturesFile.get("general.profile");
+				int textRight = textRenderer.draw(matrices, profile.name, 136, 6, -1);
 				if (mouseX >= 136 && mouseX <= textRight && mouseY >= 6 && mouseY <= 18) {
-					renderTooltip(matrices, new LiteralText("Choose your defaults."), (int)mouseX, (int)mouseY);
+					renderWrappedTooltip(matrices, profile.desc, mouseX, mouseY);
 				}
 				if (hovered != null) {
-					List<String> li = Lists.newArrayList();
-					li.add("§l"+formatTitleCase(hovered.name()));
-					for (String s : PROFILE_DESCRIPTIONS.get(hovered).split("\n")) {
-						li.add(s);
-					}
-					renderTooltip(matrices, Lists.transform(li, s -> new LiteralText(s)), (int)mouseX, (int)mouseY);
+					FeatureEntry hoveredEntry = FeaturesFile.get("general.profile."+hovered.name().toLowerCase(Locale.ROOT));
+					renderWrappedTooltip(matrices, "§l"+hoveredEntry.name+"\n§f"+hoveredEntry.desc, mouseX, mouseY);
 				}
 				y = 40;
-				y = drawTrilean(matrices, "general.runtime_checks", "Runtime Checks",
-						"Allows changing settings arbitrarily on-the-fly, but is very slightly " +
-						"slower and a fair bit less compatible, as all options that are set to " +
-						"'unset' but not enabled by the profile will be initialized.\n" +
-						"You can still disable something completely if it's causing problems by setting it " +
-						"to false explicitly.\n" +
-						"§cIf this is disabled, you must restart the game for changes made here to apply.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "general.reduced_motion", "Reduced Motion",
-						"Disable high-motion GUI animations.", y, mouseX, mouseY, CLIENT_ONLY);
-			} else if ("fixes".equals(section)) {
-				y = drawTrilean(matrices, "fixes.sync_attacker_yaw", "Sync Attacker Yaw",
-						"Makes the last attacker yaw field sync properly when the player is damaged, instead "
-						+ "of always being zero. Causes the camera shake animation when being hurt to tilt "
-						+ "away from the source of damage.\n"
-						+ "Fixes MC-26678, which is closed as Won't Fix.\n"
-						+ "Needed on both client and server, but doesn't break vanilla clients.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "fixes.furnace_minecart_pushing", "Furnace Minecart Pushing",
-						"Right-clicking a furnace minecart with a non-fuel while it's out of " +
-						"fuel gives it a little bit of fuel, allowing you to \"push\" it. " +
-						"Removed some time after 17w46a (1.13 pre releases)\n" +
-						"Unnecessary on client.\n" +
-						"Note: All furnace minecart tweaks enable a mixin that overrides " +
-						"multiple methods in the furnace minecart entity. If you have another " +
-						"mod that changes furnace minecarts (wow!) then you'll need to disable\n" +
-						"this.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "fixes.use_player_list_name_in_tag", "Use Player List Name In Tag",
-						"Changes player name tags to match names in the player list. "
-						+ "Good in combination with nickname mods like Drogtor.", y, mouseX, mouseY, CLIENT_ONLY);
-				y = drawTrilean(matrices, "fixes.better_pause_freezing", "Better Pause Freezing",
-						"Makes textures not tick while the game is paused.\n" +
-						"May do more in the future.", y, mouseX, mouseY, CLIENT_ONLY);
-				y = drawTrilean(matrices, "fixes.inanimates_can_be_invisible", "Inanimates Can Be Invisible",
-						"Prevents inanimate entities from rendering at all if their \"invisible\" " +
-						"flag is set to true.", y, mouseX, mouseY, CLIENT_ONLY);
-				y = drawTrilean(matrices, "fixes.omniscent_player", "Omniscent Player",
-						"The player render in the inventory follows your cursor, even if it's not" +
-						"inside the game window.", y, mouseX, mouseY, CLIENT_ONLY);
-				y = drawTrilean(matrices, "fixes.uncap_menu_fps", "Uncap Menu FPS",
-						"Allow the menu to render at your set frame limit instead of being " +
-						"locked to 60. (30 in older versions)", y, mouseX, mouseY, CLIENT_ONLY);
-				y = drawTrilean(matrices, "fixes.adventure_tags_in_survival", "Adventure Tags In Survival",
-						"Makes the CanDestroy and CanPlaceOn tags be honored in survival mode " +
-						"instead of just adventure mode.\n" +
-						"Only needed on the server, but the experience is more seamless if it's also on the client.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "fixes.stable_cacti", "Stable Cacti",
-						"Fixes cactuses being made of Explodium due to long-since-fixed engine " +
-						"limitations. In English: Makes cacti not break themselves if a block " +
-						"is placed next to them. They will still break if they *grow* into such " +
-						"a space, so cactus randomizers and cactus farms still work.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "fixes.boundless_levels", "Boundless Levels",
-						"Replaces translation strings for potion and enchantment levels with a "
-						+ "dynamic algorithm that supports arbitrarily large numbers.", y, mouseX, mouseY, CLIENT_ONLY);
-				y = drawTrilean(matrices, "fixes.ghast_charging", "Ghast Charging",
-						"Brings back the ghast \"charging\" animation when they're about to "
-						+ "fire a fireball that got broken in 1.3 and removed in 1.8, and "
-						+ "never worked in multiplayer.", y, mouseX, mouseY, CLIENT_ONLY);
-			} else if ("utility".equals(section)) {
-				y = drawTrilean(matrices, "utility.mods_command", "/mods command",
-						"Adds a /mods command that anyone can run that lists installed mods. Lets " +
-						"players see what changes are present on a server at a glance.", y, mouseX, mouseY, REQUIRES_FABRIC_API);
-				y = drawTrilean(matrices, "utility.taggable_players", "Taggable Players",
-						"Allows players to be tagged by ops with /fabrication tag. Allows " +
-						"making them not need to eat food, not be targeted by mobs, have " +
-						"permanent dolphin's grace or conduit power, able to breathe water, " +
-						"fireproof, scare creepers, or not have phantoms spawn.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "utility.legacy_command_syntax", "Legacy Command Syntax",
-						"Re-adds /toggledownfall and numeric arguments to /difficulty and "
-						+ "/gamemode, capitalized arguments to /summon, and numeric arguments "
-						+ "to /give and other commands that accept items.", y, mouseX, mouseY, REQUIRES_FABRIC_API);
-				y = drawTrilean(matrices, "utility.books_show_enchants", "Books Show Enchants",
-						"Makes enchanted books show the first letter of their enchants in the" +
-						"bottom left, cycling through enchants every second if they have multiple.", y, mouseX, mouseY, CLIENT_ONLY);
-				y = drawTrilean(matrices, "utility.tools_show_important_enchant", "Tools Show Important Enchant",
-						"Makes tools enchanted with Silk Touch, Fortune, or Riptide show " +
-						"the first letter of that enchant in the top left.\n" +
-						"Never break an Ender Chest with the wrong tool again.", y, mouseX, mouseY, CLIENT_ONLY);
-				y = drawTrilean(matrices, "utility.despawning_items_blink", "Despawning Items Blink",
-						"Items that are about to despawn blink.\n" +
-						"Needed on both sides. Server sends packets, client actually does the blinking.\n" +
-						"Will not break vanilla clients.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "utility.canhit", "CanHit",
-						"Adds a CanHit tag that only allows hitting entities matching given filters. Works for " +
-						"melee, bows, and tridents. Bows will also check the arrow they're firing " +
-						"and will only allow hitting entities that are in the bow's CanHit list as " +
-						"well as the arrow's.\n" +
-						"Honors Fixes > Adventure Tags In Survival.\n" +
-						"Only needed on server, but the experience is more seamless if it's " +
-						"also on the client.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "utility.item_despawn", "Item Despawn Control",
-						"Allows fine-tuned adjustment of item despawn times.\n" +
-						"See fabrication/item_despawn.ini.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "utility.i_and_more", "/i And More",
-						"Adds /i, /item, /more, and /fenchant commands.\n"
-						+ "/i and /item are shorthand for /give to yourself, and /more increases "
-						+ "the size of your held item's stack. /fenchant is like /enchant but it "
-						+ "ignores all restrictions.", y, mouseX, mouseY, REQUIRES_FABRIC_API);
-			} else if ("tweaks".equals(section)) {
-				y = drawTrilean(matrices, "tweaks.creepers_explode_when_on_fire", "Creepers Explode When On Fire",
-						"Causes creepers to light their fuses when lit on fire. Just because.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "tweaks.tridents_in_void_return", "Tridents In Void Return",
-						"Makes Loyalty tridents immune to void damage, and causes them to start " +
-						"their return timer upon falling into the void.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "tweaks.less_annoying_fire", "Less Annoying Fire",
-						"Makes the \"on fire\" overlay half as tall, and removes it completely if " +
-						"you have Fire Resistance.", y, mouseX, mouseY, CLIENT_ONLY);
-				y = drawTrilean(matrices, "tweaks.less_restrictive_note_blocks", "Less Restrictive Note Blocks",
-						"Allows note blocks to play if any block next to them has a nonsolid " +
-						"face, instead of only if the block above is air.\n" +
-						"On the client, just adjusts the note particle to fly the right direction.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "tweaks.cactus_walk_doesnt_hurt_with_boots", "Cactus Walk Doesn't Hurt With Boots",
-						"Makes walking on top of a cactus (not touching the side of one) with " +
-						"boots equipped not deal damage.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "tweaks.cactus_brush_doesnt_hurt_with_chest", "Cactus Brush Doesn't Hurt With Chest",
-						"Makes touching the side of a cactus (not walking on top of one) with " +
-						"a chestplate equipped not deal damage.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "tweaks.bush_walk_doesnt_hurt_with_armor", "Bush Walk Doesn't Hurt With Armor",
-						"Makes walking through berry bushes with both leggings and boots\n" +
-						"equipped not deal damage.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "tweaks.shulker_bullets_despawn_on_death", "Shulker Bullets Despawn On Death",
-						"Makes shulker bullets despawn when the shulker that shot them is killed.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "tweaks.arrows_work_in_water", "Arrows Work In Water",
-						"Makes arrows viable in water by reducing their drag. Nowhere near as\n" +
-						"good as a trident, but usable.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "tweaks.reverse_note_block_tuning", "Reverse Note Block Tuning",
-						"Sneaking while tuning a note block reduces its pitch rather than increases.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "tweaks.campfires_place_unlit", "Campfires Place Unlit",
-						"Campfires are unlit when placed and must be lit.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "tweaks.rainbow_experience", "Rainbow Experience",
-						"Makes experience rainbow instead of just lime green. "+
-						"Every orb picks two random colors to pulse between when spawning.", y, mouseX, mouseY, CLIENT_ONLY);
-				y = drawTrilean(matrices, "tweaks.long_levelup_sound_at_30", "Long Level Up Sound At 30",
-						"Plays the old longer level up sound when you hit level 30.", y, mouseX, mouseY, CLIENT_ONLY, REQUIRES_FABRIC_API);
-				y = drawTrilean(matrices, "tweaks.flammable_cobwebs", "Flammable Cobwebs",
-						"Cobwebs can burn.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "tweaks.ghost_chest_woo_woo", "Ghost Chest Woo Woo",
-						"?", y, mouseX, mouseY, CLIENT_ONLY);
-			} else if ("minor_mechanics".equals(section)) {
-				y -= 14;
-				y = drawTrilean(matrices, "minor_mechanics.feather_falling_five", "Feather Falling V",
-						"Makes Feather Falling V a valid enchant that completely negates fall damage.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "minor_mechanics.feather_falling_five_damages_boots", "Feather Falling V Damages Boots",
-						"Absorbing fall damage with Feather Falling V causes damage to the boots.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "minor_mechanics.furnace_minecart_any_fuel", "Furnace Minecart Any Fuel",
-						"Allows furnace minecarts to accept any furnace fuel, rather than just " +
-						"coal and charcoal.\n" +
-						"Note: All furnace minecart tweaks enable a mixin that overrides " +
-						"multiple methods in the furnace minecart entity. If you have another " +
-						"mod that changes furnace minecarts (wow!) then you'll need to disable " +
-						"this.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "minor_mechanics.infibows", "InfiBows (aka Bow Infinity Fix)",
-						"Makes Infinity bows not require an arrow in your inventory to fire.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "minor_mechanics.note_blocks_play_on_landing", "Note Blocks Play On Landing",
-						"Makes note blocks play their note when landed on. Also triggers observers.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "minor_mechanics.fire_protection_on_any_item", "Fire Protection On Any Item",
-						"Fire Protection can be applied to any enchantable item rather than just " +
-						"armor, and makes items enchanted with it immune to fire and lava damage.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "minor_mechanics.observers_see_entities", "Observers See Entities",
-						"Observers detect when entities move in front of them if they have\n" +
-						"no block in front of them. Not as laggy as it sounds.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "minor_mechanics.observers_see_entities_living_only", "Observers See Entities - Living Only",
-						"Observers only detect living entities, and not e.g. item entities. " +
-						"Safety option to prevent breaking a variety of vanilla contraptions.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "minor_mechanics.exact_note_block_tuning", "Exact Note Block Tuning",
-						"Right-clicking a note block with a stack of sticks sets its pitch to the " +
-						"size of the stack minus one.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "minor_mechanics.note_block_notes", "Note Block Notes",
-						"Tells you the note the note block has been tuned to when right-clicking " +
-						"it above your hotbar.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "minor_mechanics.spiders_cant_climb_glazed_terracotta", "Spiders Can't Climb Glazed Terracotta",
-						"Spiders can't climb Glazed Terracotta. Slime (the stickiest substance " +
-						"known to Stevekind) can't stick to it, so why should spiders?", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "minor_mechanics.spiders_cant_climb_while_wet", "Spiders Can't Climb While Wet",
-						"Spiders can't climb while wet. Basically a much easier version of the " +
-						"previous tweak, that is also a lot harder to control. May break vanilla " +
-						"spider farms.\n" +
-						"Not enabled by profiles other than Burnt.\n" +
-						"Interacts with Mechanics > Enhanced Moistness.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "minor_mechanics.water_fills_on_break", "Water Fills On Break",
-						"Water source blocks fill in broken blocks instead of air if there is " +
-						"more water on its north, east, south, west, and top faces than there is " +
-						"air on its north, east, south, and west faces. In case of a tie, air " +
-						"wins. Makes terraforming lakes and building canals, etc much less " +
-						"frustrating.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "minor_mechanics.invisibility_splash_on_inanimates", "Invisibility Splash On Inanimates",
-						"Invisibility splash potions affect inanimates (minecarts, arrows, etc) " +
-						"making them invisible. They will become visible again if they become wet.\n" +
-						"See Fixes > Inanimates Can Be Invisible.\n" +
-						"Interacts with Mechanics > Enhanced Moistness.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "minor_mechanics.fire_aspect_is_flint_and_steel", "Fire Aspect Is Flint And Steel",
-						"Right-clicking a block with no action with a Fire Aspect tool " +
-						"emulates a click with flint and steel, allowing you to light fires " +
-						"and such with a Fire Aspect tool instead of having to carry around " +
-						"flint and steel. ", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "minor_mechanics.mechanism_muffling", "Mechanism Muffling",
-						"Placing a block of wool adjacent to a dispenser, dropper, or piston "
-						+ "makes it silent.", y, mouseX, mouseY);
-			} else if ("mechanics".equals(section)) {
-				y = drawTrilean(matrices, "mechanics.enhanced_moistness", "Enhanced Moistness",
-						"Entities are considered \"wet\" for 5 seconds after leaving a source of " +
-						"wetness. Additionally, lingering or splash water bottles inflict " +
-						"wetness. Also makes wet entities drip to show they're wet. Affects " +
-						"various vanilla mechanics including fire and undead burning.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "mechanics.slowfall_splash_on_inanimates", "Slow Fall Splash On Inanimates",
-						"Slow fall splash potions affect inanimates (minecarts, arrows, etc) " +
-						"making them unaffected by gravity. They will become normally affected " +
-						"again if they become wet. This is kind of overpowered.\n" +
-						"Interacts with Enhanced Moistness.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "mechanics.broken_tools_drop_components", "Broken Gear Drops Components",
-						"Makes items drop a configurable portion of configurable constituent "
-						+ "components when broken.\n"
-						+ "See fabrication/gear_components.ini.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "mechanics.obsidian_tears", "Obsidian Tears",
-						"Empty bottles can be used to collect \"Obsidian Tears\" from Crying "
-						+ "Obsidian. When quaffed, or dispensed onto a player, it updates the "
-						+ "player's spawn to the location of the block the tears are from. "
-						+ "Dispensers can also be used to fill empty bottles with tears.\n"
-						+ "Crying Obsidian respawn works in any dimension and doesn't need "
-						+ "to be recharged, but you spawn with half health, no "
-						+ "saturation, less than full food, and Weakness.\n"
-						+ "On client, just gives the bottle a custom appearance instead of "
-						+ "a potion item.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "mechanics.grindstone_disenchanting", "Grindstone Disenchanting",
-						"Placing a book in the bottom slot of a Grindstone when disenchanting "
-						+ "an item will transfer the enchantments onto the book.\n"
-						+ "Doesn't work properly if the client doesn't also have it, but it will "
-						+ "not break vanilla clients.", y, mouseX, mouseY);
-			} else if ("balance".equals(section)) {
-				y = drawTrilean(matrices, "balance.faster_obsidian", "Faster Obsidian",
-						"Makes obsidian break 3x faster. Needed on both sides to work properly. "
-						+ "Does not break vanilla clients when on the server, but when on the client, "
-						+ "vanilla servers will think you're cheating. (And they won't be wrong.)", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "balance.disable_prior_work_penalty", "Disable Prior Work Penalty",
-						"Disables the anvil prior work penalty when an item has been worked " +
-						"multiple times. Makes non-Mending tools relevant.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "balance.soul_speed_doesnt_damage_boots", "Soul Speed Doesn't Damage Boots",
-						"Makes running on soul blocks with Soul Speed not deal damage to your boots.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "balance.infinity_mending", "Infinity & Mending",
-						"Makes Mending and Infinity compatible enchantments.\n"
-						+ "§4Not enabled in the \"vienna\" profile.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "balance.hyperspeed_furnace_minecart", "Hyperspeed Furnace Minecart",
-						"Make furnace minecarts very fast.\n" +
-						"An attempt to make rail transport relevant again, as well as furnace " +
-						"carts, in a world with ice roads, swimming, elytra, etc.\n" +
-						"Warning: These carts are so fast that they sometimes fall off of track " +
-						"corners. Make sure to surround track corners with blocks.\n" +
-						"Note: All furnace minecart tweaks enable a mixin that overrides " +
-						"multiple methods in the furnace minecart entity. If you have another " +
-						"mod that changes furnace minecarts (wow!) then you'll need to disable " +
-						"this.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "balance.tridents_accept_power", "Tridents Accept Power",
-						"Allows tridents to accept the Power enchantment, increasing their ranged " +
-						"damage. It's pitiful that tridents only deal as much damage as an " +
-						"unenchanted bow and this cannot be improved at all other than via " +
-						"Impaling, which is exclusive to aquatic mobs (not including Drowned).\n" +
-						"Power is considered incompatible with Sharpness and Impaling.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "balance.tridents_accept_sharpness", "Tridents Accept Sharpness",
-						"Allows tridents to accept the Sharpness enchantment, increasing their " +
-						"melee damage. See Tridents Accept Power for justification.\n" +
-						"Sharpness is considered incompatible with Power and Impaling.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "balance.bedrock_impaling", "Bedrock-Like Impaling",
-						"Makes the Impaling enchantment act like it does in Bedrock Edition and " +
-						"Combat Test 4. Namely, it deals bonus damage to anything that is in " +
-						"water or rain (i.e. is wet), instead of only aquatic mobs.\n" +
-						"Interacts with Mechanics > Enhanced Moistness.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "balance.environmentally_friendly_creepers", "Environmentally Friendly Creepers",
-						"Creeper explosions deal entity damage, but not block damage, even " +
-						"if mobGriefing is true.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "balance.anvil_damage_only_on_fall", "Anvil Damage Only On Fall",
-						"Anvils only take damage when falling from a height rather than randomly " +
-						"after being used.\n"
-						+ "§4Not enabled in the \"vienna\" profile.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "balance.drop_more_exp_on_death", "Drop More Experience On Death",
-						"Players drop 80% of their experience upon death instead of basically none.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "balance.infinity_crossbows", "Infinity Crossbows",
-						"Allow putting Infinity on crossbows. Only works for plain arrows.", y, mouseX, mouseY);
-			} else if ("weird_tweaks".equals(section)) {
-				y = drawTrilean(matrices, "weird_tweaks.endermen_dont_squeal", "Endermen Don't Squeal",
-						"Makes Endermen not make their growling or screeching sounds when angry.\n" +
-						"On client, mutes the sounds for just you. This means angry endermen don't " +
-						"make ambient sounds.\n" +
-						"On server, replaces the angry ambient sound with the normal ambient sound " +
-						"for everyone. The stare sound is client-sided, unfortunately.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "weird_tweaks.disable_equip_sound", "Disable Equip Sound",
-						"Disables the unnecessary \"Gear equips\" sound that plays when your hands " +
-						"change, and is often glitchily played every tick. Armor equip sounds and " +
-						"other custom equip sounds remain unchanged. You won't even notice it's " +
-						"gone.\n" +
-						"On client, mutes it just for you.\n" +
-						"On server, prevents the sound from playing at all for everyone.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "weird_tweaks.repelling_void", "Déjà Void (aka Repelling Void)",
-						"Players falling into the void teleports them back to the last place they " +
-						"were on the ground and deals 6 hearts of damage.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "weird_tweaks.drop_exp_with_keep_inventory", "Drop Experience With keepInventory",
-						"If keepInventory is enabled, players still drop their experience when " +
-						"dying, but do so losslessly. Incents returning to where you died even " +
-						"when keepInventory is enabled.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "weird_tweaks.gold_tools_useful_in_nether", "Gold Tools Useful In Nether",
-						"Makes breaking nether blocks deal 50x damage to non-golden and " +
-						"non-netherite tools, and makes golden tools take 1/50th the damage " +
-						"when breaking the same blocks, bringing their durability just above " +
-						"diamond. Relevant tags:\n" +
-						"- fabrication:nether_blocks\n" +
-						"- fabrication:nether_blocks_only_in_nether\n" +
-						"- fabrication:gold_tools\n" +
-						"- fabrication:nether_tools\n" +
-						"On client, adjusts gold tool tooltips to show fractional damage.", y, mouseX, mouseY, REQUIRES_FABRIC_API);
-				y = drawTrilean(matrices, "weird_tweaks.photoallergic_creepers", "Photoallergic Creepers",
-						"Makes Creepers burn in sunlight. Very dangerous if combined with "
-						+ "Tweaks > Creepers Explode When On Fire.\n"
-						+ "§cConflicts with Photoresistant Mobs.\n"
-						+ "§4Not enabled in the \"vienna\" profile.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "weird_tweaks.photoresistant_mobs", "Photoresistant Mobs",
-						"Makes mobs not burn in sunlight.\n"
-						+ "§cConflicts with Photoallergic Creepers. This option takes precedence.\n"
-						+ "§4Not enabled in the \"vienna\" profile.", y, mouseX, mouseY);
-			} else if ("pedantry".equals(section)) {
-				y = drawTrilean(matrices, "pedantry.tnt_is_dynamite", "TNT Is Dynamite",
-						"TNT is renamed to Dynamite and doesn't say TNT on it. TNT is more stable " +
-						"than Minecraft's representation of it, and the texture is clearly " +
-						"dynamite.\n" +
-						"(Technically dynamite is made from nitroglycerin, but nitro is so " +
-						"incredibly unstable that you would need to change a dozen different " +
-						"mechanics to make it \"correct\".)\n" +
-						"Gunpowder is renamed to Creeper Dust, because gunpowder is not that " +
-						"explosive.\n"+
-						"§6Reloads resource packs.", y, mouseX, mouseY, CLIENT_ONLY, REQUIRES_FABRIC_API);
-				y = drawTrilean(matrices, "pedantry.oak_is_apple", "Oak Is Apple",
-						"Oak trees become apple trees. Because oak trees do not grow apples.\n"+
-						"§6Reloads resource packs.", y, mouseX, mouseY, CLIENT_ONLY, REQUIRES_FABRIC_API);
-			} else if ("woina".equals(section)) {
-				y = drawTrilean(matrices, "woina.block_logo", "Block Logo",
-						"Brings back the old animated block logo, with a dash of customizability.\n" +
-						"See block_logo.png and block_logo.ini.", y, mouseX, mouseY, CLIENT_ONLY);
-				y = drawTrilean(matrices, "woina.old_lava", "Old Lava",
-						"Brings back the old (better) lava texture, as a dynamic texture just " +
-						"like before.", y, mouseX, mouseY, CLIENT_ONLY);
-				y = drawTrilean(matrices, "woina.classic_block_drops", "Classic Block Drops",
-						"Changes block drops to look like they did in Survival Test. Namely, it " +
-						"reduces their pixel density. By default, this is done by using a " +
-						"mipmapped (downscaled) texture, but blocks with tileable textures can " +
-						"instead just have a portion be rendered like the original implementation.\n" +
-						"See classic_block_drops.ini.", y, mouseX, mouseY, CLIENT_ONLY);
-				y = drawTrilean(matrices, "woina.blinking_drops", "Blinking Drops",
-						"Makes dropped items and blocks blink white periodically like they did in " +
-						"Survival Test. If Utility > Despawning Items Blink is also enabled, " +
-						"the blinking becomes faster and faster as the item gets closer to " +
-						"despawning.", y, mouseX, mouseY, CLIENT_ONLY);
-				y = drawTrilean(matrices, "woina.janky_arm", "Janky Arm",
-						"Brings back Survival Test first-person arm rotation.", y, mouseX, mouseY, CLIENT_ONLY);
-				y = drawTrilean(matrices, "woina.flat_items", "Flat Items",
-						"Brings back Indev flat first-person item models.", y, mouseX, mouseY, CLIENT_ONLY);
-				y = drawTrilean(matrices, "woina.billboard_drops", "Billboard Drops",
-						"Brings back billboarded flat item drops like on Fast graphics prior to "
-						+ "1.8 or like always prior to 1.4.", y, mouseX, mouseY, CLIENT_ONLY);
-				y = drawTrilean(matrices, "woina.oof", "Oof",
-						"Brings back the old \"Oof\" hurt sound. Increases its pitch for the \"Alex\" "
-						+ "player model. Unlike the resource pack approach, this is player-specific "
-						+ "rather than replacing the generic fleshy damage sound, so it won't result "
-						+ "in random things Oof-ing.", y, mouseX, mouseY, CLIENT_ONLY);
-			} else if ("situational".equals(section)) {
-				y = drawTrilean(matrices, "situational.all_damage_is_fatal", "All Damage Is Fatal",
-						"Any amount of damage done to an entity is unconditionally fatal.", y, mouseX, mouseY);
-				y = drawTrilean(matrices, "situational.weapons_accept_silk", "Weapons Accept Silk Touch",
-						"Weapons can accept Silk Touch. Does nothing on its own, but datapacks " +
-						"can use this for special drops. Also makes Silk Touch incompatible with " +
-						"Looting.", y, mouseX, mouseY);
-			} else if ("experiments".equals(section)) {
-				y = drawTrilean(matrices, "experiments.packed_atlases", "Packed Atlases",
-						"Disables rounding of atlases to the next power-of-two. "
-						+ "GPU drivers have supported \"NPOT\" textures since forever.\n"
-						+ "§aPossibly reduces VRAM usage.\n§4May reduce performance.\n"
-						+ "§eResources must be reloaded for this to take effect.", y, mouseX, mouseY, CLIENT_ONLY);
+				FeatureEntry rchecks = FeaturesFile.get("general.runtime_checks");
+				y = drawTrilean(matrices, "general.runtime_checks", rchecks.name, rchecks.desc, y, mouseX, mouseY);
+				FeatureEntry rmot = FeaturesFile.get("general.reduced_motion");
+				y = drawTrilean(matrices, "general.reduced_motion", rmot.name, rmot.desc, y, mouseX, mouseY, CLIENT_ONLY);
+			} else {
+				for (Map.Entry<String, FeatureEntry> en : FeaturesFile.getAll().entrySet()) {
+					if (en.getKey().startsWith(section+".")) {
+						FeatureEntry fe = en.getValue();
+						if (fe.meta) continue;
+						TrileanFlag[] flags = {};
+						if (fe.sides == Sides.CLIENT_ONLY) flags = ArrayUtils.add(flags, CLIENT_ONLY);
+						y = drawTrilean(matrices, en.getKey(), fe.name, fe.desc, y, mouseX, mouseY, flags);
+					}
+				}
 			}
 		}
 		GlStateManager.popMatrix();
@@ -1226,7 +866,7 @@ public class FabricationConfigScreen extends Screen {
 			if (!prefix.isEmpty()) {
 				prefix += "§r\n";
 			}
-			renderOrderedTooltip(matrices, textRenderer.wrapLines(new LiteralText(prefix+desc), mouseX < width/2 ? (int)(width-mouseX-30) : (int)mouseX-20), (int)(mouseX), (int)(20+mouseY));
+			renderWrappedTooltip(matrices, prefix+desc, mouseX, mouseY);
 		} else if (mouseX >= 134 && mouseX <= 134+45 && mouseY >= y && mouseY <= y+10) {
 			if (disabled) {
 				if (noFabricApi) {
@@ -1255,6 +895,10 @@ public class FabricationConfigScreen extends Screen {
 			}
 		}
 		return y+14;
+	}
+
+	private void renderWrappedTooltip(MatrixStack matrices, String str, float mouseX, float mouseY) {
+		renderOrderedTooltip(matrices, textRenderer.wrapLines(new LiteralText(str), mouseX < width/2 ? (int)(width-mouseX-30) : (int)mouseX-20), (int)(mouseX), (int)(20+mouseY));
 	}
 
 	public static String formatTitleCase(String in) {

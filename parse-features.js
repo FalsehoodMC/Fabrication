@@ -34,9 +34,10 @@ let defaults = (curKey, cur) => ({
 	name: curKey,
 	short_name: cur && cur.name || null,
 	meta: false,
+	hidden: false,
 	since: null,
 	since_code: cur && cur.since ? versionNamesToCodes[cur.since] : null,
-	sides: [],
+	sides: "irrelevant",
 	needs: [],
 	endorsed: true,
 	parent: null,
@@ -114,7 +115,7 @@ lines.forEach((line) => {
 				multilineKey = k;
 			} else {
 				switch (k) {
-					case 'sides': case 'needs':
+					case 'needs':
 						v = v.split(' ');
 						break;
 					case 'endorsed':
@@ -139,7 +140,7 @@ lines.forEach((line) => {
 if (curKey !== null) commit();
 
 if (process.argv[3]) {
-	fs.writeFileSync(process.argv[3], JSON.stringify(data));
+	fs.writeFileSync(process.argv[3], JSON.stringify(data, (k, v) => { if (v !== null) return v; }));
 } else {
-	console.log(JSON.stringify(data));
+	console.log(JSON.stringify(data), (k, v) => { if (v !== null) return v; });
 }

@@ -129,9 +129,7 @@
 	; << FEATURE: tweaks.flammable_cobwebs >>
 	flammable_cobwebs=unset
 	
-	; ?
-	; Client-only.
-	; Not enabled by any profiles.
+	; << FEATURE: tweaks.ghost_chest_woo_woo >>
 	ghost_chest_woo_woo=unset
 
 ; << FEATURE: minor_mechanics >>

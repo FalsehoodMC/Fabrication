@@ -7,6 +7,7 @@ else
 	echo
 	canforgery=0
 fi
+./build-features.sh
 rm -rf build/libs
 echo Building Fabrication...
 gw clean build

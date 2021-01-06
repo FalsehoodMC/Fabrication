@@ -112,6 +112,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	}
 	
 	private static final ImmutableMap<Profile, ImmutableMap<String, Boolean>> defaultsByProfile;
+	private static final ImmutableSet<String> validSections;
 	private static final ImmutableSet<String> validKeys;
 	private static final ImmutableMap<String, String> starMap;
 	private static ImmutableMap<String, Boolean> defaults;
@@ -149,6 +150,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		}
 		try (InputStream is = MixinConfigPlugin.class.getClassLoader().getResourceAsStream(defaultFeaturesConfigFile)) {
 			Set<String> keys = QDIni.load("default_features_config.ini", is).keySet();
+			Set<String> sections = Sets.newHashSet();
 			ImmutableMap.Builder<String, String> starMapBldr = ImmutableMap.builder();
 			for (String key : keys) {
 				int dot = key.indexOf('.');
@@ -163,6 +165,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 				for (String key : keys) {
 					int dot = key.indexOf('.');
 					String section = dot != -1 ? key.substring(0, dot) : "";
+					if (!section.isEmpty()) sections.add(section);
 					boolean enabled;
 					if (NEVER_DEFAULT.contains(key) || (NEVER_DEFAULT_EXCEPT_BURNT.contains(key) && p != Profile.BURNT)) {
 						enabled = false;
@@ -175,6 +178,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 				profilesBuilder.put(p, defaultsBuilder.build());
 			}
 			validKeys = ImmutableSet.copyOf(keys);
+			validSections = ImmutableSet.copyOf(sections);
 			defaultsByProfile = profilesBuilder.build();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
@@ -228,6 +232,10 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	
 	public static ImmutableSet<String> getAllKeys() {
 		return validKeys;
+	}
+	
+	public static ImmutableSet<String> getAllSections() {
+		return validSections;
 	}
 	
 	public static void set(String configKey, String newValue) {

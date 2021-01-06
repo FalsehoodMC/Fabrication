@@ -3,11 +3,18 @@ package com.unascribed.fabrication;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.unascribed.fabrication.support.MixinConfigPlugin;
+import com.unascribed.fabrication.support.SpecialEligibility;
+
 import com.google.common.base.Stopwatch;
 
 public class FabLog {
 
 	private static final Logger log = LogManager.getLogger("Fabrication");
+	
+	// Fabric uses vanilla's log config, which doesn't print log tags, so we need to add our own prefix
+	// Forge modifies the log config to include log tags among other things, so the prefix is redundant there
+	private static final boolean needPrefixes = MixinConfigPlugin.isMet(SpecialEligibility.NOT_FORGE);
 	
 	// for (limited, one-level) reentrancy
 	private static int warningsOld = -1;
@@ -31,54 +38,58 @@ public class FabLog {
 		return w;
 	}
 
+	private static String prefix(String message) {
+		return needPrefixes ? "[Fabrication] "+message : message;
+	}
+	
 	public static void debug(String message) {
-		log.debug("[Fabrication] "+message);
+		log.debug(prefix(message));
 	}
 
 	public static void debug(String message, Throwable t) {
-		log.debug("[Fabrication] "+message, t);
+		log.debug(prefix(message), t);
 	}
 
 	public static void error(String message) {
-		log.error("[Fabrication] "+message);
+		log.error(prefix(message));
 	}
 
 	public static void error(String message, Throwable t) {
-		log.error("[Fabrication] "+message, t);
+		log.error(prefix(message), t);
 	}
 
 	public static void fatal(String message) {
-		log.fatal("[Fabrication] "+message);
+		log.fatal(prefix(message));
 	}
 
 	public static void fatal(String message, Throwable t) {
-		log.fatal("[Fabrication] "+message, t);
+		log.fatal(prefix(message), t);
 	}
 
 	public static void info(String message) {
-		log.info("[Fabrication] "+message);
+		log.info(prefix(message));
 	}
 
 	public static void info(String message, Throwable t) {
-		log.info("[Fabrication] "+message, t);
+		log.info(prefix(message), t);
 	}
 
 	public static void trace(String message) {
-		log.trace("[Fabrication] "+message);
+		log.trace(prefix(message));
 	}
 
 	public static void trace(String message, Throwable t) {
-		log.trace("[Fabrication] "+message, t);
+		log.trace(prefix(message), t);
 	}
 
 	public static void warn(String message) {
 		if (warnings != -1) warnings++;
-		log.warn("[Fabrication] "+message);
+		log.warn(prefix(message));
 	}
 
 	public static void warn(String message, Throwable t) {
 		if (warnings != -1) warnings++;
-		log.warn("[Fabrication] "+message, t);
+		log.warn(prefix(message), t);
 	}
 
 	public static void timeAndCountWarnings(String prefix, Runnable r) {

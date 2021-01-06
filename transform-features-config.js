@@ -28,7 +28,7 @@ lines.forEach((line) => {
 			desc = "ERROR: Unknown key "+res[1];
 		}
 		desc = child.spawnSync('fold', ['-s', '-w', 78-(leadingTabs*8)], {input: desc}).stdout.toString('utf8');
-		desc = desc.replace(/\*(.*?)\r?\n([^*].*?)/g, "*$1\n  $2");
+		desc = desc.replace(/\r?\n\*(.*?)\r?\n([^*].*?)/g, "\n*$1\n  $2");
 		if (datum && (datum.media || datum.extra_media || datum.link_url)) desc += '\n';
 		if (datum && datum.media) {
 			desc += '\n'+datum.media_text+': '+datum.media;
