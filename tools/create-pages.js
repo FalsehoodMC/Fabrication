@@ -4,7 +4,7 @@ const hbs = require('handlebars');
 const md = require('markdown-it')();
 
 let data = JSON.parse(fs.readFileSync(process.argv[2] || 'features.json').toString('utf8'));
-let metaSection = {name: 'Meta', features: [], features_incl_meta: []};
+let metaSection = {name: 'Meta', key: 'meta', features: [], features_incl_meta: []};
 let ctx = {feature_count:0,sections:[],sections_incl_meta:[metaSection]};
 let buildingSection = null;
 let featureCount = 0;

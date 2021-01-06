@@ -13,6 +13,7 @@
 			color: #ECEFF1;
 			line-height: 1.4;
 			font-size: 16px;
+			padding-bottom: 80vh;
 		}
 		code {
 			font-family: 'Fira Mono', monospace;
@@ -38,6 +39,13 @@
 		}
 		h1 {
 			border-bottom: 2px currentColor solid;
+			margin-top: 0;
+		}
+		h2 {
+			margin-top: 0;
+		}
+		.pad {
+			padding-top: 24px;
 		}
 		a:any-link {
 			color: #64FFDA;
@@ -45,11 +53,12 @@
 		.media {
 			width: 854px;
 			height: 480px;
-			max-width: 100%;
-			object-fit: contain;
+			max-width: calc(100vw - 64px);
+			max-height: calc((100vw - 64px) * (9 / 16));
 		}
 		.indent {
 			padding-left: 24px;
+			padding-right: 24px;
 		}
 		.sides-either {
 			color: #5FF;
@@ -66,14 +75,108 @@
 		.sides-server_only_with_client_helper {
 			color: #5F5;
 		}
+		#sidebar-toc {
+			display: none;
+		}
+		.tocent {
+			background-image: linear-gradient(to right, #FFF3, #FFF0);
+			background-repeat: no-repeat;
+			background-attachment: fixed;
+			background-size: 0px 100%;
+			padding: 2px;
+			transition: background-size 0.6s;
+		}
+		.active {
+			background-size: 300px 100%;
+		}
+		@media(max-width: 960px) {
+			.indent {
+				padding-left: 12px;
+				padding-right: 12px;
+			}
+			.media {
+				max-width: calc(100vw - 40px);
+				max-height: calc((100vw - 40px) * (9 / 16));
+			}
+		}
+		@media(min-width: 1280px) {
+			.yescript #toc {
+				display: none;
+			}
+			.yescript #sidebar-toc {
+				display: block;
+				position: absolute;
+				top: calc(25vw + 8px);
+				left: 8px;
+				max-height: calc(100vh - (25vw + 8px));
+				overflow-y: auto;
+			}
+			#sidebar-toc.fixed {
+				position: fixed;
+				top: 8px;
+				max-height: 100vh;
+			}
+			.yescript .inner {
+				margin-left: auto;
+				margin-right: 64px;
+			}
+		}
 	</style>
 </head>
 <body>
 	<img class="banner" src="https://unascribed.com/fabrication/banner.svg?v=2"/>
+	<div id="sidebar-toc">
+	{{#sections_incl_meta}}
+	<details>
+		<summary id="{{key}}-tocent" class="tocent"><a href="#{{key}}">{{name}}</a></summary>
+		<ul style="margin: 0">
+			{{#features_incl_meta}}
+			<li id="{{key}}-tocent" class="tocent"><a href="#{{key}}">{{name}}</a></li>
+			{{/features_incl_meta}}
+		</ul>
+	</details>
+	{{/sections_incl_meta}}
+	</div>
+	<script>
+		document.body.classList.add('yescript');
+		let banner = document.querySelector('.banner');
+		let toc = document.querySelector('#sidebar-toc');
+		let keys = [
+			{{#sections_incl_meta}}"{{{key}}}", {{#features_incl_meta}}"{{{key}}}", {{/features_incl_meta}}{{/sections_incl_meta}}
+		];
+		document.addEventListener('scroll', () => {
+			if (banner.getBoundingClientRect().bottom+8 < 0) {
+				toc.classList.add("fixed");
+			} else {
+				toc.classList.remove("fixed");
+			}
+			keys.forEach((k) => {
+				let ele = document.getElementById(k+"-outer");
+				let tocent = document.getElementById(k+"-tocent");
+				let rect = ele.getBoundingClientRect();
+				if (rect.top <= 0 && rect.bottom > 0) {
+					tocent.classList.add("active");
+					if (tocent.nodeName === "SUMMARY" && !tocent.parentElement.open) {
+						tocent.parentElement.dataset.openDueToScroll = true;
+						tocent.parentElement.open = true;
+					}
+				} else {
+					tocent.classList.remove("active");
+					if (tocent.nodeName === "SUMMARY") {
+						if (tocent.parentElement.dataset.openDueToScroll) {
+							tocent.parentElement.open = false;
+						}
+						delete tocent.parentElement.dataset.openDueToScroll;
+					}
+				}
+			});
+		});
+	</script>
 	<div class="inner">
 		<p>
 			<b><a href="https://www.curseforge.com/minecraft/mc-mods/fabrication">Fabrication</a></b> is a huge collection of vanilla tweaks and small features for Minecraft 1.16. <b><a href="https://www.curseforge.com/minecraft/mc-mods/forgery">Forgery</a></b> is a version of Fabrication specially distorted to work under Forge rather than Fabric.
 		</p>
+		<span id="toc">
 		<h1>Table of Contents</h1>
 		<p>
 		Click arrows to expand.
@@ -90,11 +193,16 @@
 		</details>
 		{{/sections_incl_meta}}
 		</div>
+		</span>
 		{{#sections_incl_meta}}
-		<a id="{{key}}"><h1>{{name}}</h1></a>
+		<div id="{{key}}-outer" class="pad">
+		<a id="{{key}}"></a>
+		<h1>{{name}}</h1>
 		<div>
 		{{#features_incl_meta}}
-		<a id="{{key}}"><h2>{{name}}</h2></a>
+		<div id="{{key}}-outer" class="pad">
+		<a id="{{key}}"></a>
+		<h2>{{name}}</h2>
 		<div class="indent">
 		{{^meta}}<b>Key</b>: <code>{{key}}</code><br/>{{/meta}}
 		{{#sides_friendly}}<b class="sides-{{../sides}}">{{this}}</b><br/>{{/sides_friendly}}
@@ -124,7 +232,9 @@
 		{{/../extra_media_video}}
 		{{/extra_media}}
 		</div>
+		</div>
 		{{/features_incl_meta}}
+		</div>
 		</div>
 		{{/sections_incl_meta}}
 	</div>
