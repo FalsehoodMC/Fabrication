@@ -76,7 +76,7 @@
 		</p>
 		<h1>Table of Contents</h1>
 		<div style="padding: 8px">
-		{{#sections}}
+		{{#sections_incl_meta}}
 		<details>
 			<summary><a href="#{{key}}">{{name}}</a></summary>
 			<ul style="margin: 0">
@@ -85,9 +85,9 @@
 				{{/features_incl_meta}}
 			</ul>
 		</details>
-		{{/sections}}
+		{{/sections_incl_meta}}
 		</div>
-		{{#sections}}
+		{{#sections_incl_meta}}
 		<a id="{{key}}"><h1>{{name}}</h1></a>
 		<div>
 		{{#features_incl_meta}}
@@ -123,7 +123,7 @@
 		</div>
 		{{/features_incl_meta}}
 		</div>
-		{{/sections}}
+		{{/sections_incl_meta}}
 	</div>
 </body>
 </html>

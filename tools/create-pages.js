@@ -5,7 +5,7 @@ const md = require('markdown-it')();
 
 let data = JSON.parse(fs.readFileSync(process.argv[2] || 'features.json').toString('utf8'));
 let metaSection = {name: 'Meta', features: [], features_incl_meta: []};
-let ctx = {feature_count:0,sections:[metaSection]};
+let ctx = {feature_count:0,sections:[],sections_incl_meta:[metaSection]};
 let buildingSection = null;
 let featureCount = 0;
 Object.entries(data).forEach(([k, v]) => {
@@ -47,11 +47,17 @@ Object.entries(data).forEach(([k, v]) => {
 		}
 	} else {
 		if (v.meta) return;
-		if (buildingSection !== null) ctx.sections.push(buildingSection);
+		if (buildingSection !== null) {
+			ctx.sections.push(buildingSection);
+			ctx.sections_incl_meta.push(buildingSection);
+		}
 		buildingSection = {...v, key: k, desc_html: md.render(v.desc), features:[], features_incl_meta:[]};
 	}
 });
-if (buildingSection !== null) ctx.sections.push(buildingSection);
+if (buildingSection !== null) {
+	ctx.sections.push(buildingSection);
+	ctx.sections_incl_meta.push(buildingSection);
+}
 ctx.feature_count = featureCount;
 let me = path.resolve(process.argv[1], '..');
 let render = hbs.compile(fs.readFileSync(path.resolve(me, 'curse.html.hbs')).toString('utf8'));
