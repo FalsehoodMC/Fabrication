@@ -27,6 +27,13 @@ lines.forEach((line) => {
 			console.error("At line "+lineNum+": Unknown key "+res[1]);
 			desc = "ERROR: Unknown key "+res[1];
 		}
+		if (res[1] === 'general.profile') {
+			desc += '\n\nThe available profiles are:\n';
+			['green', 'blonde', 'light', 'medium', 'dark', 'vienna', 'burnt'].forEach((p) => {
+				en = data['general.profile.'+p];
+				desc += '* '+en.name+': '+en.desc+'\n';
+			});
+		}
 		desc = child.spawnSync('fold', ['-s', '-w', 78-(leadingTabs*8)], {input: desc}).stdout.toString('utf8');
 		desc = desc.replace(/\r?\n\*(.*?)\r?\n([^*].*?)/g, "\n*$1\n  $2");
 		if (datum && (datum.media || datum.extra_media || datum.link_url)) desc += '\n';
