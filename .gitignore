@@ -31,3 +31,6 @@ run/
 # project-specific
 src/main/resources/default_features_config.ini
 features.json
+curse-*.html
+wiki.html
+node_modules

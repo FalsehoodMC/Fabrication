@@ -52,7 +52,6 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Matrix4f;
 
@@ -653,12 +652,8 @@ public class FabricationConfigScreen extends Screen {
 		if (section == null) {
 			String v = Agnos.INST.getModVersion();
 			String blurb = "§lFabrication v"+v+" §rby unascribed\n"
-					+ "Click a category on the left to change settings.\n\n"
-					+ "Detail offered by tooltips here is somewhat sparse. For additional detail and demonstration videos, please check the wiki.";
+					+ "Click a category on the left to change settings.";
 			int height = drawWrappedText(matrices, 140, 20, blurb, width-130, -1, false);
-			if (drawButton(matrices, 140, 20+height+8, 120, 20, "Take me to the wiki", mouseX, mouseY)) {
-				Util.getOperatingSystem().open("https://github.com/unascribed/Fabrication/wiki");
-			}
 			if (drawButton(matrices, 140, 20+height+32, 120, 20, "Reload files", mouseX, mouseY)) {
 				MixinConfigPlugin.reload();
 			}
@@ -721,6 +716,7 @@ public class FabricationConfigScreen extends Screen {
 				FeatureEntry rmot = FeaturesFile.get("general.reduced_motion");
 				y = drawTrilean(matrices, "general.reduced_motion", rmot.name, rmot.desc, y, mouseX, mouseY, CLIENT_ONLY);
 			} else {
+				if ("minor_mechanics".equals(section)) y -= 14;
 				for (Map.Entry<String, FeatureEntry> en : FeaturesFile.getAll().entrySet()) {
 					if (en.getKey().startsWith(section+".")) {
 						FeatureEntry fe = en.getValue();

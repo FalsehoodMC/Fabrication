@@ -355,6 +355,8 @@ utility.item_despawn
 	name: Item Despawn Control
 	since: 1.1
 	sides: server_only
+	link_url: https://github.com/unascribed/Fabrication/blob/trunk/src/main/resources/default_item_despawn_config.ini
+	link_text: See the default config for more info
 	desc:
 		Allows fine-grained control over item despawn times and making items invulnerable to
 		all forms of damage including the void. You can filter by the item ID, whether the item was
@@ -1033,7 +1035,7 @@ woina.blinking_drops
 		Back in Survival Test, drops blinked white to make them stand out more. This is an
 		implementation of that.
 		
-		If utility.despawning_items_blink is enabled, that tweak's disappear-flashing will be
+		If Utility > Despawning Items Blink is enabled, that tweak's disappear-flashing will be
 		disabled, and instead this tweak's white flashing will get faster and faster as despawn
 		approaches.
 

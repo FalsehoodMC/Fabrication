@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="https://fonts.googleapis.com/css2?family=Fira+Mono&family=Fira+Sans:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+	<title>Fabrication &amp; Forgery</title>
+	<style>
+		body {
+			margin: 0;
+			font-family: 'Fira Sans', sans-serif;
+			background: #263238;
+			color: #ECEFF1;
+			line-height: 1.4;
+			font-size: 16px;
+		}
+		code {
+			font-family: 'Fira Mono', monospace;
+			background: rgba(0, 0, 0, 0.2);
+			padding: 2px;
+			font-size: 12px;
+			border-radius: 2px;
+		}
+		p, ul {
+			max-width: 640px;
+		}
+		.banner {
+			width: 100vw;
+			height: 25vw;
+		}
+		.inner {
+			max-width: 960px;
+			padding: 20px 8px;
+			margin: auto;
+		}
+		h1, h2 {
+			margin-bottom: 0;
+		}
+		h1 {
+			border-bottom: 2px currentColor solid;
+		}
+		a:link {
+			color: #00DBAD;
+		}
+		.media {
+			width: 854px;
+			height: 480px;
+			max-width: 100%;
+			object-fit: contain;
+		}
+		.indent {
+			padding-left: 24px;
+		}
+		.sides-either {
+			color: #5FF;
+		}
+		.sides-client_only {
+			color: #FA0;
+		}
+		.sides-server_only {
+			color: #F5F;
+		}
+		.sides-server_and_client {
+			color: #F55;
+		}
+		.sides-server_only_with_client_helper {
+			color: #5F5;
+		}
+	</style>
+</head>
+<body>
+	<img class="banner" src="https://unascribed.com/fabrication/banner.svg?v=2"/>
+	<div class="inner">
+		<p>
+			<b><a href="https://www.curseforge.com/minecraft/mc-mods/fabrication">Fabrication</a></b> is a huge collection of vanilla tweaks and small features for Minecraft 1.16. <b><a href="https://www.curseforge.com/minecraft/mc-mods/forgery">Forgery</a></b> is a version of Fabrication specially distorted to work under Forge rather than Fabric.
+		</p>
+		<h1>Table of Contents</h1>
+		<div style="padding: 8px">
+		{{#sections}}
+		<details>
+			<summary><a href="#{{key}}">{{name}}</a></summary>
+			<ul style="margin: 0">
+				{{#features}}
+				<li><a href="#{{key}}">{{name}}</a></li>
+				{{/features}}
+			</ul>
+		</details>
+		{{/sections}}
+		</div>
+		{{#sections}}
+		<a id="{{key}}"><h1>{{name}}</h1></a>
+		<div>
+		{{#features}}
+		<a id="{{key}}"><h2>{{name}}</h2></a>
+		<div class="indent">
+		<b>Key</b>: <code>{{key}}</code><br/>
+		{{#sides_friendly}}<b class="sides-{{../sides}}">{{this}}</b><br/>{{/sides_friendly}}
+		{{{desc_html}}}
+		{{#link_url}}
+		<p>
+			<a href="{{../link_url}}">{{../link_text}}</a>
+		</p>
+		{{/link_url}}
+		{{#media}}
+		<h3>{{../media_text}}</h3>
+		{{#../media_video}}
+			<video class="media" src="{{../../media}}" poster="{{../../media_poster}}" controls preload="none"></video>
+		{{/../media_video}}
+		{{^../media_video}}
+			<img class="media" src="{{../media}}"/>
+		{{/../media_video}}
+		{{/media}}
+		{{#extra_media}}
+		<h3>{{../extra_media_text}}</h3>
+		{{#../extra_media_video}}
+			<video class="media" src="{{../../extra_media}}" poster="{{../../extra_media_poster}}" controls preload="none"></video>
+		{{/../extra_media_video}}
+		{{^../extra_media_video}}
+			<img class="media" src="{{../extra_media}}"/>
+		{{/../extra_media_video}}
+		{{/extra_media}}
+		</div>
+		{{/features}}
+		</div>
+		{{/sections}}
+	</div>
+</body>
+</html>
