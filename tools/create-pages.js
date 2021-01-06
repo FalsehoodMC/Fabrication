@@ -48,14 +48,14 @@ Object.entries(data).forEach(([k, v]) => {
 	} else {
 		if (v.meta) return;
 		if (buildingSection !== null) {
-			ctx.sections.push(buildingSection);
+			if (buildingSection.features.length > 0) ctx.sections.push(buildingSection);
 			ctx.sections_incl_meta.push(buildingSection);
 		}
 		buildingSection = {...v, key: k, desc_html: md.render(v.desc), features:[], features_incl_meta:[]};
 	}
 });
 if (buildingSection !== null) {
-	ctx.sections.push(buildingSection);
+	if (buildingSection.features.length > 0) ctx.sections.push(buildingSection);
 	ctx.sections_incl_meta.push(buildingSection);
 }
 ctx.feature_count = featureCount;

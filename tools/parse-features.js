@@ -47,6 +47,7 @@ let defaults = (curKey, cur) => ({
 	extra_media_text: cur && cur.extra_media ? (/\.mp4$/.exec(cur.extra_media) ? 'Extra demonstration video' : 'Extra demonstration image') : null,
 	link_url: null,
 	link_text: cur && cur.link_url ? 'See also' : null,
+	short_desc: cur && cur.desc ? cur.desc.search(/\.( |\n|$)/) !== -1 ? cur.desc.substring(0, cur.desc.search(/\.( |\n|$)/)) : cur.desc : null,
 	desc: null
 });
 let lineNum = 0;

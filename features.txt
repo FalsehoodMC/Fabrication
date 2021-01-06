@@ -58,6 +58,7 @@ general
 general.profile
 	name: Profile
 	since: 1.0
+	meta: true
 	desc:
 		To help with Fabrication's overwhelming number of options, Profiles let you pick what kinds
 		of features you want to be enabled by default. When a config value is set to 'unset', it is
@@ -117,6 +118,7 @@ general.profile.burnt
 general.runtime_checks
 	name: Runtime Checks
 	since: 1.0
+	meta: true
 	desc:
 		Allows changing settings arbitrarily on-the-fly, but is very slightly slower and a fair bit
 		less compatible, as all options that are set to 'unset' but not enabled by the profile will
@@ -131,6 +133,7 @@ general.runtime_checks
 general.reduced_motion
 	name: Reduced Motion
 	since: 1.2
+	meta: true
 	sides: client_only
 	desc:
 		Disables high-motion animations in the Fabrication config screen.
@@ -146,6 +149,7 @@ fixes.sync_attacker_yaw
 	since: 1.0
 	sides: server_and_client
 	media: https://unascribed.com/fabrication/sync_attacker_yaw.mp4
+	short_desc: Correctly sync the last attacker yaw for damage tilt; fixes MC-26678
 	desc:
 		Makes the last attacker yaw field sync properly when the player is damaged, instead of
 		always being zero. Causes the camera shake animation when being hurt to tilt away from the
@@ -160,6 +164,7 @@ fixes.furnace_minecart_pushing
 	since: 1.0
 	sides: server_only
 	media: https://unascribed.com/fabrication/furnace_minecart_pushing.mp4
+	short_desc: Right-clicking a furnace minecart pushes it; silently removed around 17w46a
 	desc:
 		Right-clicking a furnace minecart with a non-fuel while it's out of fuel gives it a little
 		bit of fuel, allowing you to "push" it.
@@ -181,8 +186,10 @@ fixes.better_pause_freezing
 	since: 1.0.1
 	sides: client_only
 	media: https://unascribed.com/fabrication/better_pause_freezing.mp4
+	short_desc: Makes textures not tick while the game is paused
 	desc:
-		Makes textures not tick while the game is paused.
+		Makes textures not tick while the game is paused, meaning animated blocks and such properly
+		freeze instead of continuing to animate.
 
 fixes.inanimates_can_be_invisible
 	name: Inanimates Can Be Invisible
@@ -198,6 +205,7 @@ fixes.omniscent_player
 	since: 1.1.1
 	sides: client_only
 	media: https://unascribed.com/fabrication/omniscent_player.mp4
+	short_desc: The player render in the inventory always follows your cursor
 	desc:
 		The player render in the inventory follows your cursor, even if it's not inside the game
 		window.
@@ -206,6 +214,7 @@ fixes.uncap_menu_fps
 	name: Uncap Menu FPS
 	since: 1.2
 	sides: client_only
+	short_desc: Removes the hardcoded 60 FPS cap in menu screens
 	desc:
 		Removes the hardcoded 60 FPS cap in menu screens, instead using whatever you have the
 		framerate cap set to.
@@ -218,6 +227,7 @@ fixes.adventure_tags_in_survival
 	since: 1.2.1
 	sides: server_only_with_client_helper
 	media: https://unascribed.com/fabrication/adventure_tags_in_survival.mp4
+	short_desc: Makes CanDestroy/CanPlaceOn work in Survival
 	desc:
 		Makes the CanDestroy and CanPlaceOn tags be honored in survival mode instead of just adventure mode.
 		
@@ -228,6 +238,7 @@ fixes.stable_cacti
 	since: 1.2.3
 	sides: server_only
 	media: https://unascribed.com/fabrication/stable_cacti.mp4
+	short_desc: Makes cacti less afraid
 	desc:
 		Fixes cactuses being made of Explodium due to long-since-fixed engine limitations. In
 		English: Makes cacti not break themselves if a block is placed next to them. They will still
@@ -238,6 +249,7 @@ fixes.boundless_levels
 	since: 1.2.5
 	sides: client_only
 	media: https://unascribed.com/fabrication/boundless_levels.mp4
+	short_desc: Fixes enchantment.level.27
 	desc:
 		Replaces translation strings for potion and enchantment levels with a dynamic algorithm that
 		supports arbitrarily large numbers.
@@ -247,6 +259,7 @@ fixes.ghast_charging
 	since: 1.2.8
 	sides: client_only
 	media: https://unascribed.com/fabrication/ghast_charging.mp4
+	short_desc: Brings back the ghast "charging" animation that broke in 1.3
 	desc:
 		Brings back the ghast "charging" animation when they're about to fire a fireball that got
 		broken in 1.3 and removed in 1.8, and never worked in multiplayer.
@@ -263,6 +276,7 @@ utility.mods_command
 	sides: server_only
 	needs: events
 	media: https://unascribed.com/fabrication/mods_command.mp4
+	short_desc: Adds a /mods command in the same vein as Bukkit's /plugins
 	desc:
 		Adds a /mods command listing all mods on the server. Hovering over the mods shows their
 		descriptions, clicking on them takes you to their homepage if they have one.
@@ -274,6 +288,7 @@ utility.taggable_players
 	since: 1.0
 	sides: server_only
 	needs: events
+	short_desc: Allows assigning various "tags" to players, such as no_hunger or invisible_to_mobs
 	desc:
 		Allows you to assign or unassign various "tags" from players via /fabrication tag.
 		
@@ -294,6 +309,7 @@ utility.legacy_command_syntax
 	sides: server_only
 	needs: events
 	media: https://unascribed.com/fabrication/legacy_command_syntax.mp4
+	short_desc: Brings back various kinds of old command syntax; old habits die hard
 	desc:
 		Allows numeric arguments to /gamemode and /difficulty, re-adds /toggledownfall, allows
 		TitleCase arguments to /summon, and allows numeric arguments to commands that accept items
@@ -306,6 +322,7 @@ utility.books_show_enchants
 	since: 1.0
 	sides: client_only
 	media: https://unascribed.com/fabrication/books_show_enchants.mp4
+	short_desc: Enchanted books show the first letter of their enchant
 	desc:
 		Makes enchanted books show the first letter of their enchants in the bottom left, cycling
 		through enchants every second if they have multiple.
@@ -315,6 +332,7 @@ utility.tools_show_important_enchant
 	since: 1.0
 	sides: client_only
 	media: https://unascribed.com/fabrication/tools_show_important_enchant.mp4
+	short_desc: Tools show the first letter of their "important" enchant
 	desc:
 		Makes tools enchanted with Silk Touch, Fortune, or Riptide show the first letter of that
 		enchant in the top left.
@@ -336,6 +354,7 @@ utility.canhit
 	since: 1.2.1
 	sides: server_only_with_client_helper
 	media: https://unascribed.com/fabrication/canhit.mp4
+	short_desc: A CanHit tag for weapons in the same vein as CanDestroy/CanPlaceOn
 	desc:
 		Adds a new CanHit tag that affects melee attacks, bows, crossbows, and tridents. Also works
 		on arrows and fireworks, in which case the restrictions will be AND'd with the restrictions
@@ -357,6 +376,7 @@ utility.item_despawn
 	sides: server_only
 	link_url: https://github.com/unascribed/Fabrication/blob/trunk/src/main/resources/default_item_despawn_config.ini
 	link_text: See the default config for more info
+	short_desc: Allows fine-grained control over item despawn times
 	desc:
 		Allows fine-grained control over item despawn times and making items invulnerable to
 		all forms of damage including the void. You can filter by the item ID, whether the item was
@@ -396,6 +416,7 @@ tweaks.tridents_in_void_return
 	since: 1.0
 	sides: server_only
 	media: https://unascribed.com/fabrication/tridents_in_void_return.mp4
+	short_desc: Loyalty tridents return when falling into the Void
 	desc:
 		Makes Loyalty tridents immune to void damage, and causes them to start their return timer
 		upon falling into the void.
@@ -405,6 +426,7 @@ tweaks.less_annoying_fire
 	since: 1.0
 	sides: client_only
 	media: https://unascribed.com/fabrication/less_annoying_fire.mp4
+	short_desc: Shortens the fire overlay and hides it when you have Fire Resistance
 	desc:
 		Makes the "on fire" overlay half as tall, and removes it completely if you have Fire
 		Resistance.
@@ -416,6 +438,7 @@ tweaks.less_restrictive_note_blocks
 	since: 1.0
 	sides: server_only_with_client_helper
 	media: https://unascribed.com/fabrication/less_restrictive_note_blocks.mp4
+	short_desc: Makes note blocks work with blocks above them
 	desc:
 		Allows note blocks to play if any block next to them has a nonsolid face, instead of only if
 		the block above is air.
@@ -427,6 +450,7 @@ tweaks.cactus_walk_doesnt_hurt_with_boots
 	since: 1.0
 	sides: server_only
 	media: https://unascribed.com/fabrication/cactus_walk_doesnt_hurt_with_boots.mp4
+	short_desc: Walking on top of a cactus with boots on doesn't hurt
 	desc:
 		Makes walking on top of a cactus (not touching the side of one) with boots equipped not deal
 		damage.
@@ -436,6 +460,7 @@ tweaks.cactus_brush_doesnt_hurt_with_chest
 	since: 1.1
 	sides: server_only
 	media: https://unascribed.com/fabrication/cactus_brush_doesnt_hurt_with_chest.mp4
+	short_desc: Touching the side of a cactus with a chestplate on doesn't hurt
 	desc:
 		Makes touching the side of a cactus (not walking on top of one) with a chestplate equipped
 		not deal damage.
@@ -445,6 +470,7 @@ tweaks.bush_walk_doesnt_hurt_with_armor
 	since: 1.1
 	sides: server_only
 	media: https://unascribed.com/fabrication/bush_walk_doesnt_hurt_with_armor.mp4
+	short_desc: Walking through berry bushes with both legging and boots equipped doesn't hurt
 	desc:
 		Makes walking through berry bushes with both leggings and boots equipped not deal damage.
 
@@ -589,6 +615,7 @@ minor_mechanics.observers_see_entities_living_only
 	since: 1.0
 	sides: server_only
 	parent: minor_mechanics.observers_see_entities
+	short_desc: Observers only detect living entities, and not e.g. item entities
 	desc:
 		Observers only detect living entities, and not e.g. item entities.
 		
@@ -619,6 +646,7 @@ minor_mechanics.spiders_cant_climb_glazed_terracotta
 	since: 1.0.2
 	sides: server_only
 	media: https://unascribed.com/fabrication/spiders_cant_climb_glazed_terracotta.mp4
+	short_desc: Makes spiders unable to climb glazed terracotta
 	desc:
 		Makes spiders unable to climb glazed terracotta, to make farming them less of a chore if you
 		go to the trouble to make glazed terracotta.
@@ -644,6 +672,7 @@ minor_mechanics.water_fills_on_break
 	since: 1.1.1
 	sides: server_only
 	media: https://unascribed.com/fabrication/water_fills_on_break.mp4
+	short_desc: Water source blocks fill in broken blocks instead of air under some conditions
 	desc:
 		Water source blocks fill in broken blocks instead of air if there is more water on its
 		north, east, south, west, and top faces than there is air on its north, east, south, and
@@ -671,6 +700,7 @@ minor_mechanics.fire_aspect_is_flint_and_steel
 	since: 1.1.1
 	sides: server_only
 	media: https://unascribed.com/fabrication/fire_aspect_is_flint_and_steel.mp4
+	short_desc: Makes Fire Aspect tools act like Flint and Steel
 	desc:
 		Right-clicking a block with no action with a Fire Aspect tool emulates a click with flint
 		and steel, allowing you to light fires and such with a Fire Aspect tool instead of having to
@@ -733,6 +763,7 @@ mechanics.obsidian_tears
 	since: 1.2.8
 	sides: server_only_with_client_helper
 	media: https://unascribed.com/fabrication/obsidian_tears.mp4
+	short_desc: Lets you set your spawn at a Crying Obsidian block; automatable
 	desc:
 		Empty bottles can be used to collect "Obsidian Tears" from Crying Obsidian. When quaffed by
 		or dispensed onto a player, it updates their spawn to the location of the block the
@@ -1013,6 +1044,7 @@ woina.classic_block_drops
 	media: https://unascribed.com/fabrication/classic_block_drops.mp4
 	extra_media: https://unascribed.com/fabrication/survival_test.mp4
 	extra_media_text: Survival Test video, for reference
+	short_desc: Draws block drops with a mipmapped or small portion of the texture
 	desc:
 		Back in Survival Test, likely in the interest of keeping a consistent pixel density in the
 		world, block drops were drawn with an 8x8 portion of the block texture. This didn't always
