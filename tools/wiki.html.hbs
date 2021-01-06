@@ -18,8 +18,8 @@
 		code {
 			font-family: 'Fira Mono', monospace;
 			background: rgba(0, 0, 0, 0.2);
-			padding: 2px;
-			font-size: 12px;
+			padding: .125em;
+			font-size: .75em;
 			border-radius: 2px;
 		}
 		p, ul {
@@ -55,6 +55,7 @@
 			height: 480px;
 			max-width: calc(100vw - 64px);
 			max-height: calc((100vw - 64px) * (9 / 16));
+			box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.5);
 		}
 		.indent {
 			padding-left: 24px;
@@ -86,8 +87,15 @@
 			padding: 2px;
 			transition: background-size 0.6s;
 		}
+		li.tocent {
+			padding-left: 4px;
+			list-style-position: inside;
+		}
 		.active {
 			background-size: 300px 100%;
+		}
+		ul {
+			padding-left: 20px;
 		}
 		@media(max-width: 960px) {
 			.indent {
@@ -124,8 +132,13 @@
 	</style>
 </head>
 <body>
+	<a name="intro"></a>
 	<img class="banner" src="https://unascribed.com/fabrication/banner.svg?v=2"/>
 	<div id="sidebar-toc">
+	<ul style="margin: 0; padding-left: 0">
+		<li id="intro-tocent" class="tocent"><a href="#intro">Introduction</a></li>
+		<li id="faq-tocent" class="tocent"><a href="#faq">FAQ</a></li>
+	</ul>
 	{{#sections_incl_meta}}
 	<details>
 		<summary id="{{key}}-tocent" class="tocent"><a href="#{{key}}">{{name}}</a></summary>
@@ -142,7 +155,7 @@
 		let banner = document.querySelector('.banner');
 		let toc = document.querySelector('#sidebar-toc');
 		let keys = [
-			{{#sections_incl_meta}}"{{{key}}}", {{#features_incl_meta}}"{{{key}}}", {{/features_incl_meta}}{{/sections_incl_meta}}
+			"intro", "faq", {{#sections_incl_meta}}"{{{key}}}", {{#features_incl_meta}}"{{{key}}}", {{/features_incl_meta}}{{/sections_incl_meta}}
 		];
 		document.addEventListener('scroll', () => {
 			if (banner.getBoundingClientRect().bottom+8 < 0) {
@@ -154,7 +167,7 @@
 				let ele = document.getElementById(k+"-outer");
 				let tocent = document.getElementById(k+"-tocent");
 				let rect = ele.getBoundingClientRect();
-				if (rect.top <= 0 && rect.bottom > 0) {
+				if ((k === 'intro' || rect.top <= 0) && rect.bottom > 0) {
 					tocent.classList.add("active");
 					if (tocent.nodeName === "SUMMARY" && !tocent.parentElement.open) {
 						tocent.parentElement.dataset.openDueToScroll = true;
@@ -173,15 +186,20 @@
 		});
 	</script>
 	<div class="inner">
-		<p>
-			<b><a href="https://www.curseforge.com/minecraft/mc-mods/fabrication">Fabrication</a></b> is a huge collection of vanilla tweaks and small features for Minecraft 1.16. <b><a href="https://www.curseforge.com/minecraft/mc-mods/forgery">Forgery</a></b> is a version of Fabrication specially distorted to work under Forge rather than Fabric.
-		</p>
+		<div id="intro-outer">
+			<p>
+				<b><a href="https://www.curseforge.com/minecraft/mc-mods/fabrication">Fabrication</a></b> is a huge collection of vanilla tweaks and small features for Minecraft 1.16. <b><a href="https://www.curseforge.com/minecraft/mc-mods/forgery">Forgery</a></b> is a version of Fabrication specially distorted to work under Forge rather than Fabric.
+			</p>
+		</div>
 		<span id="toc">
 		<h1>Table of Contents</h1>
 		<p>
 		Click arrows to expand.
 		</p>
 		<div style="padding: 8px">
+		<ul style="margin: 0; padding-left: 0">
+			<li><a href="#faq">FAQ</a></li>
+		</ul>
 		{{#sections_incl_meta}}
 		<details>
 			<summary><a href="#{{key}}">{{name}}</a></summary>
@@ -194,6 +212,24 @@
 		{{/sections_incl_meta}}
 		</div>
 		</span>
+		<div id="faq-outer" class="pad">
+		<a id="faq"></a>
+		<h1>FAQ</h1>
+		<div class="pad">
+		<h2>Will you add <code>$THING</code>?</h2>
+		<p>
+			Maybe; I will add basically anything under a certain level of complexity or that I think is a good idea. Things I don't care for can be added, but won't be enabled by any profiles. <a href="https://github.com/unascribed/Fabrication/issues/new">Open an issue</a> and receive your judgement.
+		</p>
+		<h2>Why the name Fabrication?</h2>
+		<p>
+			Naming mods is hard, and naming things with no real topic or theme is even harder. So I just named it after the first word to come to mind while setting up the Fabric workspace. The "full" name is "A Total Fabrication", and the logo alludes to "Fabric Vacation".
+		</p>
+		<h2>Why the name Forgery?</h2>
+		<p>
+			For the parallel with Fabrication. The "full" name is "A Complete Forgery".
+		</p>
+		</div>
+		</div>
 		{{#sections_incl_meta}}
 		<div id="{{key}}-outer" class="pad">
 		<a id="{{key}}"></a>
@@ -204,9 +240,10 @@
 		<a id="{{key}}"></a>
 		<h2>{{name}}</h2>
 		<div class="indent">
-		{{^meta}}<b>Key</b>: <code>{{key}}</code><br/>{{/meta}}
+		{{^keyless}}<b>Key</b>: <code>{{key}}</code><br/>{{/keyless}}
 		{{#sides_friendly}}<b class="sides-{{../sides}}">{{this}}</b><br/>{{/sides_friendly}}
 		{{#since}}<b class="since">Added in v{{this}}</b><br/>{{/since}}
+		{{^endorsed}}<b>Not enabled by any profiles (not endorsed)</b><br/>{{/endorsed}}
 		{{{desc_html}}}
 		{{#link_url}}
 		<p>

@@ -34,6 +34,7 @@ Object.entries(data).forEach(([k, v]) => {
 		let obj = {
 			...v,
 			key: k,
+			keyless: v.meta && k.indexOf('.') === -1,
 			desc_html: md.render(desc),
 			media_video: v.media && /\.mp4$/.exec(v.media),
 			media_poster: v.media && v.media.replace('.mp4', '-poster.jpg'),
