@@ -974,6 +974,7 @@ weird_tweaks.gold_tools_useful_in_nether
 	since: 1.2.4
 	sides: server_only_with_client_helper
 	media: https://unascribed.com/fabrication/gold_tools_useful_in_nether.mp4
+	short_desc: Non-netherite tools take 50× damage from nether blocks; gold tools take 1/50th
 	desc:
 		Makes breaking nether blocks deal 50x damage to non-golden and non-netherite tools, and
 		makes golden tools take 1/50th the damage when breaking the same blocks, bringing their
