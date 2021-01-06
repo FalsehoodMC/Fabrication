@@ -39,8 +39,8 @@
 		h1 {
 			border-bottom: 2px currentColor solid;
 		}
-		a:link {
-			color: #00DBAD;
+		a:any-link {
+			color: #64FFDA;
 		}
 		.media {
 			width: 854px;
@@ -80,9 +80,9 @@
 		<details>
 			<summary><a href="#{{key}}">{{name}}</a></summary>
 			<ul style="margin: 0">
-				{{#features}}
+				{{#features_incl_meta}}
 				<li><a href="#{{key}}">{{name}}</a></li>
-				{{/features}}
+				{{/features_incl_meta}}
 			</ul>
 		</details>
 		{{/sections}}
@@ -90,10 +90,10 @@
 		{{#sections}}
 		<a id="{{key}}"><h1>{{name}}</h1></a>
 		<div>
-		{{#features}}
+		{{#features_incl_meta}}
 		<a id="{{key}}"><h2>{{name}}</h2></a>
 		<div class="indent">
-		<b>Key</b>: <code>{{key}}</code><br/>
+		{{^meta}}<b>Key</b>: <code>{{key}}</code><br/>{{/meta}}
 		{{#sides_friendly}}<b class="sides-{{../sides}}">{{this}}</b><br/>{{/sides_friendly}}
 		{{#since}}<b class="since">Added in v{{this}}</b><br/>{{/since}}
 		{{{desc_html}}}
@@ -121,7 +121,7 @@
 		{{/../extra_media_video}}
 		{{/extra_media}}
 		</div>
-		{{/features}}
+		{{/features_incl_meta}}
 		</div>
 		{{/sections}}
 	</div>

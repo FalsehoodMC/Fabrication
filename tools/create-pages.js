@@ -4,12 +4,15 @@ const hbs = require('handlebars');
 const md = require('markdown-it')();
 
 let data = JSON.parse(fs.readFileSync(process.argv[2] || 'features.json').toString('utf8'));
-let ctx = {feature_count:0,sections:[]};
-let section = null;
+let metaSection = {name: 'Meta', features: [], features_incl_meta: []};
+let ctx = {feature_count:0,sections:[metaSection]};
+let buildingSection = null;
 let featureCount = 0;
 Object.entries(data).forEach(([k, v]) => {
-	if (v.meta) return;
-	if (k.indexOf('.') !== -1) {
+	if (v.hidden) return;
+	if (k.indexOf('general.profile.') === 0) return;
+	if (k.indexOf('.') !== -1 || v.meta) {
+		let section = k.indexOf('.') === -1 ? metaSection : buildingSection;
 		featureCount++;
 		let sides_friendly = null;
 		switch (v.sides) {
@@ -28,7 +31,7 @@ Object.entries(data).forEach(([k, v]) => {
 				desc += ' * **'+en.name+'**: '+en.desc+'\n';
 			});
 		}
-		section.features.push({
+		let obj = {
 			...v,
 			key: k,
 			desc_html: md.render(desc),
@@ -37,13 +40,18 @@ Object.entries(data).forEach(([k, v]) => {
 			extra_media_video: v.extra_media && /\.mp4$/.exec(v.extra_media),
 			extra_media_poster: v.extra_media && v.extra_media.replace('.mp4', '-poster.jpg'),
 			sides_friendly
-		});
+		};
+		section.features_incl_meta.push(obj);
+		if (!v.meta) {
+			section.features.push(obj);
+		}
 	} else {
-		if (section !== null) ctx.sections.push(section);
-		section = {...v, key: k, desc_html: md.render(v.desc), features:[]};
+		if (v.meta) return;
+		if (buildingSection !== null) ctx.sections.push(buildingSection);
+		buildingSection = {...v, key: k, desc_html: md.render(v.desc), features:[], features_incl_meta:[]};
 	}
 });
-if (section !== null) ctx.sections.push(section);
+if (buildingSection !== null) ctx.sections.push(buildingSection);
 ctx.feature_count = featureCount;
 let me = path.resolve(process.argv[1], '..');
 let render = hbs.compile(fs.readFileSync(path.resolve(me, 'curse.html.hbs')).toString('utf8'));
