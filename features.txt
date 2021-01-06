@@ -1064,6 +1064,7 @@ woina.blinking_drops
 	media: https://unascribed.com/fabrication/blinking_drops.mp4
 	extra_media: https://unascribed.com/fabrication/survival_test.mp4
 	extra_media_text: Survival Test video, for reference
+	short_desc: Drops blink white like they did in Survival Test
 	desc:
 		Back in Survival Test, drops blinked white to make them stand out more. This is an
 		implementation of that.
