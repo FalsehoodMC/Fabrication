@@ -28,6 +28,7 @@ let versionNamesToCodes = {
 };
 
 let currentVersion = /version\s+=\s+(.*?)\s+/.exec(fs.readFileSync('gradle.properties').toString('utf8'))[1];
+let currentVersionCode = versionNamesToCodes[currentVersion];
 
 let data = {};
 let lines = fs.readFileSync(process.argv[2] || 'features.txt').toString('utf8').split(/\r?\n/g);
@@ -52,7 +53,8 @@ let defaults = (curKey, cur) => ({
 	link_text: cur && cur.link_url ? 'See also' : null,
 	short_desc: cur && cur.desc ? cur.desc.search(/\.( |\n|$)/) !== -1 ? cur.desc.substring(0, cur.desc.search(/\.( |\n|$)/)) : cur.desc : null,
 	desc: null,
-	new: cur && cur.since && cur.since === currentVersion
+	brand_new: cur && cur.since && cur.since === currentVersion,
+	new: (cur ? cur.since_code ? cur.since_code : versionNamesToCodes[cur.since] : 9999) >= currentVersionCode-1
 });
 let lineNum = 0;
 let multilineKey = null
