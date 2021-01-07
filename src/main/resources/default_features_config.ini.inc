@@ -55,6 +55,9 @@
 	
 	; << FEATURE: fixes.ghast_charging >>
 	ghast_charging=unset
+	
+	; << FEATURE: fixes.no_night_vision_flash >>
+	no_night_vision_flash=unset
 
 ; << FEATURE: utility >>
 [utility]
@@ -128,6 +131,12 @@
 	
 	; << FEATURE: tweaks.flammable_cobwebs >>
 	flammable_cobwebs=unset
+	
+	; << FEATURE: tweaks.normal_fog_with_night_vision >>
+	normal_fog_with_night_vision=unset
+	
+	; << FEATURE: tweaks.play_note_blocks_in_creative >>
+	play_note_blocks_in_creative=unset
 	
 	; << FEATURE: tweaks.ghost_chest_woo_woo >>
 	ghost_chest_woo_woo=unset

@@ -264,6 +264,14 @@ fixes.ghast_charging
 		Brings back the ghast "charging" animation when they're about to fire a fireball that got
 		broken in 1.3 and removed in 1.8, and never worked in multiplayer.
 
+fixes.no_night_vision_flash
+	name: No Night Vision Flashing
+	since: 1.2.9
+	sides: client_only
+	desc:
+		Disables the flashing effect when Night Vision is about to run out. This effect ranges from
+		"annoying" to "actively dangerous". With this enabled, it just slowly fades out instead.
+
 utility
 	name: Utility
 	since: 1.0
@@ -531,6 +539,23 @@ tweaks.flammable_cobwebs
 	media: https://unascribed.com/fabrication/flammable_cobwebs.mp4
 	desc:
 		Cobwebs can burn.
+
+tweaks.normal_fog_with_night_vision
+	name: Normal Fog With Night Vision
+	since: 1.2.9
+	sides: client_only
+	desc:
+		Disables the fog brightening effect with Night Vision.
+
+tweaks.play_note_blocks_in_creative
+	name: Play Note Blocks In Creative
+	since: 1.2.9
+	sides: server_only_with_client_helper
+	desc:
+		Allows sneaking when punching note blocks to play them in Creative mode.
+		
+		On the client, prevents the break effect from occurring as usually happens with server-side
+		break prevention.
 
 tweaks.ghost_chest_woo_woo
 	name: Ghost Chest Woo Woo
