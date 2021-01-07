@@ -145,7 +145,7 @@
 		<summary id="{{key}}-tocent" class="tocent"><a href="#{{key}}">{{name}}</a></summary>
 		<ul style="margin: 0">
 			{{#features_incl_meta}}
-			<li id="{{key}}-tocent" class="tocent"><a href="#{{key}}">{{name}}</a></li>
+			<li id="{{key}}-tocent" class="tocent"><a href="#{{key}}">{{name}}</a>{{#new}} <b>New in v{{since}}</b>{{/new}}</li>
 			{{/features_incl_meta}}
 		</ul>
 	</details>
@@ -206,7 +206,7 @@
 			<summary><a href="#{{key}}">{{name}}</a></summary>
 			<ul style="margin: 0">
 				{{#features_incl_meta}}
-				<li><a href="#{{key}}">{{name}}</a></li>
+				<li><a href="#{{key}}">{{name}}</a>{{#new}} <b>New in v{{since}}</b>{{/new}}</li>
 				{{/features_incl_meta}}
 			</ul>
 		</details>
@@ -243,7 +243,7 @@
 		<div class="indent">
 		{{^keyless}}<b>Key</b>: <code>{{key}}</code><br/>{{/keyless}}
 		{{#sides_friendly}}<b class="sides-{{../sides}}">{{this}}</b><br/>{{/sides_friendly}}
-		{{#since}}<b class="since">Added in v{{this}}</b><br/>{{/since}}
+		{{#since}}<b class="since">Added in v{{this}}{{#../new}} (New!){{/../new}}</b><br/>{{/since}}
 		{{^endorsed}}<b>Not enabled by any profiles (not endorsed)</b><br/>{{/endorsed}}
 		{{{desc_html}}}
 		{{#link_url}}

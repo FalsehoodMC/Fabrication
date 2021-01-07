@@ -23,8 +23,11 @@ let versionNamesToCodes = {
 	'1.2.5': 19,
 	'1.2.6': 20,
 	'1.2.7': 21,
-	'1.2.8': 28
+	'1.2.8': 28,
+	'1.2.9': 29
 };
+
+let currentVersion = /version\s+=\s+(.*?)\s+/.exec(fs.readFileSync('gradle.properties').toString('utf8'))[1];
 
 let data = {};
 let lines = fs.readFileSync(process.argv[2] || 'features.txt').toString('utf8').split(/\r?\n/g);
@@ -48,7 +51,8 @@ let defaults = (curKey, cur) => ({
 	link_url: null,
 	link_text: cur && cur.link_url ? 'See also' : null,
 	short_desc: cur && cur.desc ? cur.desc.search(/\.( |\n|$)/) !== -1 ? cur.desc.substring(0, cur.desc.search(/\.( |\n|$)/)) : cur.desc : null,
-	desc: null
+	desc: null,
+	new: cur && cur.since && cur.since === currentVersion
 });
 let lineNum = 0;
 let multilineKey = null

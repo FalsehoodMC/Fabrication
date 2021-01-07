@@ -16,7 +16,7 @@
 	<strong>{{name}}</strong> - {{short_desc}}
 	<ul>
 	{{#features}}
-		<li><a style="color: #ff6600;" href="https://unascribed.com/fabrication/#{{key}}">{{name}}</a> - {{short_desc}}</li>
+		<li><a style="color: #ff6600;" href="https://unascribed.com/fabrication/#{{key}}">{{name}}</a> - {{#new}}<strong><em>New in v{{since}}</em></strong> {{/new}}{{short_desc}}</li>
 	{{/features}}
 	</ul>
 {{/sections}}

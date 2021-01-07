@@ -553,6 +553,7 @@ tweaks.play_note_blocks_in_creative
 	name: Play Note Blocks In Creative
 	since: 1.2.9
 	sides: server_only_with_client_helper
+	media: https://unascribed.com/fabrication/play_note_blocks_in_creative.mp4
 	desc:
 		Allows sneaking when punching note blocks to play them in Creative mode.
 		
