@@ -944,6 +944,13 @@ balance.infinity_crossbows
 		
 		Honors InfiBows.
 
+balance.anvil_rename_always_costs_one
+	name: Anvil Rename Always Costs One
+	since: 1.2.9
+	sides: server_only
+	desc:
+		Makes renaming an item on an anvil always cost one level.
+
 weird_tweaks
 	name: Weird Tweaks
 	since: 1.0

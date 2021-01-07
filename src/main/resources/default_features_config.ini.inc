@@ -244,6 +244,9 @@
 	; << FEATURE: balance.infinity_crossbows >>
 	infinity_crossbows=unset
 	
+	; << FEATURE: balance.anvil_rename_always_costs_one >>
+	anvil_rename_always_costs_one=unset
+	
 ; << FEATURE: weird_tweaks >>
 [weird_tweaks]
 	; << FEATURE: weird_tweaks.endermen_dont_squeal >>
