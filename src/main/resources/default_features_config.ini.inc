@@ -188,7 +188,7 @@
 	
 	; << FEATURE: minor_mechanics.mechanism_muffling >>
 	mechanism_muffling=unset
-
+	
 ; << FEATURE: mechanics >>
 [mechanics]
 	; << FEATURE: mechanics.enhanced_moistness >>
@@ -205,6 +205,9 @@
 	
 	; << FEATURE: mechanics.grindstone_disenchanting >>
 	grindstone_disenchanting=unset
+	
+	; << FEATURE: mechanics.anvil_repair >>
+	anvil_repair=unset
 	
 ; << FEATURE: balance >>
 [balance]

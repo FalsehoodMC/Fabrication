@@ -811,6 +811,13 @@ mechanics.grindstone_disenchanting
 		Doesn't work properly if the client doesn't also have it, but it will not break vanilla
 		clients.
 
+mechanics.anvil_repair
+	name: Anvil Repair
+	since: 1.2.9
+	sides: server_only
+	desc:
+		Allows right-clicking on an anvil with a Block of Iron to repair it one stage. 
+
 balance
 	name: Balance
 	since: 1.0
