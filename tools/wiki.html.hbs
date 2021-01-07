@@ -97,6 +97,9 @@
 		ul {
 			padding-left: 20px;
 		}
+		del {
+			color: #607D8B;
+		}
 		@media(max-width: 960px) {
 			.indent {
 				padding-left: 12px;
@@ -145,7 +148,7 @@
 		<summary id="{{key}}-tocent" class="tocent"><a href="#{{key}}">{{name}}</a></summary>
 		<ul style="margin: 0">
 			{{#features_incl_meta}}
-			<li id="{{key}}-tocent" class="tocent"><a href="#{{key}}">{{name}}</a>{{#new}} <b>New in v{{since}}</b>{{/new}}</li>
+			<li id="{{key}}-tocent" class="tocent"><a href="#{{key}}">{{name}}</a>{{#new}} {{#brand_new}}<b>{{/brand_new}}New in v{{since}}{{#brand_new}}</b>{{/brand_new}}{{/new}}</li>
 			{{/features_incl_meta}}
 		</ul>
 	</details>
@@ -191,7 +194,7 @@
 			<p>
 				<b><a href="https://www.curseforge.com/minecraft/mc-mods/fabrication">Fabrication</a></b> is a huge collection of vanilla tweaks and small features for Minecraft 1.16. <b><a href="https://www.curseforge.com/minecraft/mc-mods/forgery">Forgery</a></b> is a version of Fabrication specially distorted to work under Forge rather than Fabric.
 			</p>
-			<p><em>{{#past_feature_counts}}<del style="color: #AAA">{{this}}</del> {{/past_feature_counts}}</em><strong>{{feature_count}}</strong> features and counting.</p>
+			<p><em>{{#past_feature_counts}}<del>{{this}}</del> {{/past_feature_counts}}</em><strong>{{feature_count}}</strong> features and counting.</p>
 		</div>
 		<span id="toc">
 		<h1>Table of Contents</h1>
@@ -207,7 +210,7 @@
 			<summary><a href="#{{key}}">{{name}}</a></summary>
 			<ul style="margin: 0">
 				{{#features_incl_meta}}
-				<li><a href="#{{key}}">{{name}}</a>{{#new}} <b>New in v{{since}}</b>{{/new}}</li>
+				<li><a href="#{{key}}">{{name}}</a>{{#new}} {{#brand_new}}<b>{{/brand_new}}New in v{{since}}{{#brand_new}}</b>{{/brand_new}}{{/new}}</li>
 				{{/features_incl_meta}}
 			</ul>
 		</details>
@@ -244,7 +247,7 @@
 		<div class="indent">
 		{{^keyless}}<b>Key</b>: <code>{{key}}</code><br/>{{/keyless}}
 		{{#sides_friendly}}<b class="sides-{{../sides}}">{{this}}</b><br/>{{/sides_friendly}}
-		{{#since}}<b class="since">Added in v{{this}}{{#../new}} (New!){{/../new}}</b><br/>{{/since}}
+		{{#since}}<b class="since">Added in v{{this}}{{#../new}} (New{{#../brand_new}}!{{/../brand_new}}){{/../new}}</b><br/>{{/since}}
 		{{^endorsed}}<b>Not enabled by any profiles (not endorsed)</b><br/>{{/endorsed}}
 		{{{desc_html}}}
 		{{#link_url}}
