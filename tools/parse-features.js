@@ -119,7 +119,7 @@ lines.forEach((line) => {
 					case 'needs':
 						v = v.split(' ');
 						break;
-					case 'endorsed':
+					case 'endorsed': case 'hidden':
 						v = (v === 'false' ? false : v === 'true' ? true : v);
 						break;
 				}

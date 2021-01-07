@@ -106,7 +106,7 @@ public class FabricationConfigScreen extends Screen {
 	private float timeExisted;
 	private boolean leaving = false;
 	private float timeLeaving;
-	private float sidebarScrollVelocity;
+	private float sidebarScrollTarget;
 	private float sidebarScroll;
 	private float lastSidebarScroll;
 	private float sidebarHeight;
@@ -115,6 +115,14 @@ public class FabricationConfigScreen extends Screen {
 	private float selectTime;
 	private String selectedSection;
 	private String prevSelectedSection;
+	private float selectedSectionHeight;
+	private float prevSelectedSectionHeight;
+	private float selectedSectionScroll;
+	private float prevSelectedSectionScroll;
+	private float lastSelectedSectionScroll;
+	private float lastPrevSelectedSectionScroll;
+	private float selectedSectionScrollTarget;
+	private float prevSelectedSectionScrollTarget;
 	
 	private int tooltipBlinkTicks = 0;
 	
@@ -229,7 +237,7 @@ public class FabricationConfigScreen extends Screen {
 					fill(matrices, -realWidth, -realHeight, realWidth*2, 0, 0xFF2196F3);
 					GlStateManager.pushMatrix();
 						GlStateManager.scaled(scaleCompensation, scaleCompensation, 1);
-						drawBackground(matrices, -200, -200, delta);
+						drawBackground(matrices, -200, -200, delta, 0, 0);
 						drawForeground(matrices, -200, -200, delta);
 					GlStateManager.popMatrix();
 				GlStateManager.popMatrix();
@@ -247,7 +255,7 @@ public class FabricationConfigScreen extends Screen {
 		} else {
 			GlStateManager.pushMatrix();
 			GlStateManager.scaled(scaleCompensation, scaleCompensation, 1);
-			drawBackground(matrices, (int)(mouseX/scaleCompensation), (int)(mouseY/scaleCompensation), delta);
+			drawBackground(matrices, (int)(mouseX/scaleCompensation), (int)(mouseY/scaleCompensation), delta, 0, 0);
 			drawForeground(matrices, (int)(mouseX/scaleCompensation), (int)(mouseY/scaleCompensation), delta);
 			GlStateManager.popMatrix();
 		}
@@ -256,14 +264,17 @@ public class FabricationConfigScreen extends Screen {
 		}
 	}
 	
-	private void drawBackground(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		fillGradient(matrices, -width, 0, width*2, height, 0xFF2196F3, 0xFF009688);
+	private void drawBackground(MatrixStack matrices, int mouseX, int mouseY, float delta, int cutoffX, int cutoffY) {
+		float cutoffV = cutoffY/(float)height;
+		
+		fillGradient(matrices, cutoffX == 0 ? -width : cutoffX, cutoffY, width*2, height, lerpColor(0xFF2196F3, 0xFF009688, cutoffV), 0xFF009688);
 		float ratio = 502/1080f;
 		
 		float w = height*ratio;
 		float brk = Math.min(width-w, (width*2/3f)-(w/3));
 		float brk2 = brk+w;
 		float border = (float)(20/(client.getWindow().getScaleFactor()*scaleCompensation));
+		if (brk < cutoffX) brk = cutoffX;
 		
 		Matrix4f mat = matrices.peek().getModel();
 		
@@ -277,49 +288,64 @@ public class FabricationConfigScreen extends Screen {
 
 		float top = (570/1080f)*height;
 		float bottom = (901/1080f)*height;
-		if (PRIDE) {
-			client.getTextureManager().bindTexture(PRIDETEX);
-			int flags = 21;
-			int flag = Math.abs(random)%flags;
-			float minU = (flag/(float)flags)+(0.5f/flags);
-			float maxU = (flag/(float)flags)+(0.75f/flags);
-			bb.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE);
-			bb.vertex(mat, brk, top, 0).texture(minU, 0).next();
-			bb.vertex(mat, brk2, top, 0).texture(maxU, 0).next();
-			bb.vertex(mat, brk2, bottom, 0).texture(maxU, 1).next();
-			bb.vertex(mat, brk, bottom, 0).texture(minU, 1).next();
-			bb.end();
-			BufferRenderer.draw(bb);
-		} else {
-			GlStateManager.shadeModel(GL11.GL_SMOOTH);
-			GlStateManager.disableTexture();
-			bb.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
-			bb.vertex(mat, brk, top, 0).color(0.298f, 0.686f, 0.314f, 1).next();
-			bb.vertex(mat, brk2, top, 0).color(0.298f, 0.686f, 0.314f, 1).next();
-			bb.vertex(mat, brk2, bottom, 0).color(0.475f, 0.333f, 0.282f, 1).next();
-			bb.vertex(mat, brk, bottom, 0).color(0.475f, 0.333f, 0.282f, 1).next();
-			bb.end();
-			BufferRenderer.draw(bb);
-			GlStateManager.enableTexture();
-			GlStateManager.shadeModel(GL11.GL_FLAT);
+		if (cutoffY < bottom) {
+			float h = bottom-top;
+			float flagCutoffV = 0;
+			if (top < cutoffY) {
+				top = cutoffY;
+				flagCutoffV = 1-((bottom-top)/h);
+			}
+			if (PRIDE) {
+				client.getTextureManager().bindTexture(PRIDETEX);
+				int flags = 21;
+				int flag = Math.abs(random)%flags;
+				float minU = (flag/(float)flags)+(0.5f/flags);
+				float maxU = (flag/(float)flags)+(0.75f/flags);
+				
+				float minV = flagCutoffV;
+				float maxV = 1;
+				
+				bb.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE);
+				bb.vertex(mat, brk, top, 0).texture(minU, minV).next();
+				bb.vertex(mat, brk2, top, 0).texture(maxU, minV).next();
+				bb.vertex(mat, brk2, bottom, 0).texture(maxU, maxV).next();
+				bb.vertex(mat, brk, bottom, 0).texture(minU, maxV).next();
+				bb.end();
+				BufferRenderer.draw(bb);
+			} else {
+				GlStateManager.shadeModel(GL11.GL_SMOOTH);
+				GlStateManager.disableTexture();
+				bb.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
+				float r = MathHelper.lerp(flagCutoffV, 0.298f, 0.475f);
+				float g = MathHelper.lerp(flagCutoffV, 0.686f, 0.333f);
+				float b = MathHelper.lerp(flagCutoffV, 0.314f, 0.282f);
+				bb.vertex(mat, brk, top, 0).color(r, g, b, 1).next();
+				bb.vertex(mat, brk2, top, 0).color(r, g, b, 1).next();
+				bb.vertex(mat, brk2, bottom, 0).color(0.475f, 0.333f, 0.282f, 1).next();
+				bb.vertex(mat, brk, bottom, 0).color(0.475f, 0.333f, 0.282f, 1).next();
+				bb.end();
+				BufferRenderer.draw(bb);
+				GlStateManager.enableTexture();
+				GlStateManager.shadeModel(GL11.GL_FLAT);
+			}
 		}
 		
 		client.getTextureManager().bindTexture(BG);
 		GlStateManager.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 		GlStateManager.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 		bb.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE);
-		bb.vertex(mat, border, 0, 0).texture(0, 0).next();
-		bb.vertex(mat, brk, 0, 0).texture(0, 0).next();
+		bb.vertex(mat, Math.max(cutoffX, border), cutoffY, 0).texture(0, cutoffV).next();
+		bb.vertex(mat, brk, cutoffY, 0).texture(0, cutoffV).next();
 		bb.vertex(mat, brk, height, 0).texture(0, 1).next();
-		bb.vertex(mat, border, height, 0).texture(0, 1).next();
+		bb.vertex(mat, Math.max(cutoffX, border), height, 0).texture(0, 1).next();
 		
-		bb.vertex(mat, brk, 0, 0).texture(0, 0).next();
-		bb.vertex(mat, brk2, 0, 0).texture(1, 0).next();
+		bb.vertex(mat, brk, cutoffY, 0).texture(0, cutoffV).next();
+		bb.vertex(mat, brk2, cutoffY, 0).texture(1, cutoffV).next();
 		bb.vertex(mat, brk2, height, 0).texture(1, 1).next();
 		bb.vertex(mat, brk, height, 0).texture(0, 1).next();
 		
-		bb.vertex(mat, brk2, 0, 0).texture(1, 0).next();
-		bb.vertex(mat, width-border, 0, 0).texture(1, 0).next();
+		bb.vertex(mat, brk2, cutoffY, 0).texture(1, cutoffV).next();
+		bb.vertex(mat, width-border, cutoffY, 0).texture(1, cutoffV).next();
 		bb.vertex(mat, width-border, height, 0).texture(1, 1).next();
 		bb.vertex(mat, brk2, height, 0).texture(1, 1).next();
 		
@@ -329,8 +355,21 @@ public class FabricationConfigScreen extends Screen {
 		float a = 1-(0.3f+(sCurve5(time/10f)*0.7f));
 		if (a > 0) {
 			int ai = ((int)(a*255))<<24;
-			fillGradient(matrices, -width, 0, width*2, height, 0x2196F3|ai, 0x009688|ai);
+			fillGradient(matrices, cutoffX == 0 ? -width : cutoffX, cutoffY, width*2, height, lerpColor(0x2196F3, 0x009688, cutoffV)|ai, 0x009688|ai);
 		}
+	}
+
+	private int lerpColor(int from, int to, float delta) {
+		float a = MathHelper.lerp(delta, ((from>>24)&0xFF)/255f, ((to>>24)&0xFF)/255f);
+		float r = MathHelper.lerp(delta, ((from>>16)&0xFF)/255f, ((to>>16)&0xFF)/255f);
+		float g = MathHelper.lerp(delta, ((from>>8 )&0xFF)/255f, ((to>>8 )&0xFF)/255f);
+		float b = MathHelper.lerp(delta, ((from>>0 )&0xFF)/255f, ((to>>0 )&0xFF)/255f);
+		int c = 0;
+		c |= ((int)(a*255)&0xFF)<<24;
+		c |= ((int)(r*255)&0xFF)<<16;
+		c |= ((int)(g*255)&0xFF)<<8;
+		c |= ((int)(b*255)&0xFF)<<0;
+		return c;
 	}
 
 	private void drawForeground(MatrixStack matrices, int mouseX, int mouseY, float delta) {
@@ -353,45 +392,6 @@ public class FabricationConfigScreen extends Screen {
 		}
 		if (configuringServer) {
 			a = 1-a;
-		}
-		GlStateManager.pushMatrix();
-		GlStateManager.disableDepthTest();
-		fill(matrices, width-120, 0, width*2, 16, 0x33000000);
-		GlStateManager.pushMatrix();
-			GlStateManager.translatef(width-60, 8, 0);
-			GlStateManager.pushMatrix();
-				GlStateManager.rotatef(a*-180, 0, 0, 1);
-				float h = (40+(a*-100))/360f;
-				if (h < 0) {
-					h = 1+h;
-				}
-				GlStateManager.pushMatrix();
-					GlStateManager.scalef((float)(1-(Math.abs(Math.sin(a*Math.PI))/2)), 1, 1);
-					fill(matrices, -60, -8, 0, 8, MathHelper.hsvToRgb(h, 0.9f, 0.9f)|0xFF000000);
-					if (isSingleplayer) {
-						fill(matrices, 0, -8, 60, 8, MathHelper.hsvToRgb(0.833333f, 0.9f, 0.9f)|0xFF000000);
-					}
-				GlStateManager.popMatrix();
-				GlStateManager.pushMatrix();
-					GlStateManager.rotatef(45, 0, 0, 1);
-					// 8 / sqrt(2)
-					float f = 5.6568542f;
-					GlStateManager.scalef(f, f, 1);
-					fill(matrices, -1, -1, 1, 1, 0xFFFFFFFF);
-				GlStateManager.popMatrix();
-				if (!isSingleplayer) {
-					fill(matrices, -6, -1, -2, 1, 0xFF000000);
-				}
-			GlStateManager.popMatrix();
-			fill(matrices, -2, -2, 2, 2, 0xFF000000);
-		GlStateManager.popMatrix();
-		
-		textRenderer.draw(matrices, "CLIENT", width-115, 4, 0xFF000000);
-		textRenderer.draw(matrices, "SERVER", width-40, 4, whyCantConfigureServer == null || isSingleplayer ? 0xFF000000 : 0x44000000);
-		if (serverReadOnly && whyCantConfigureServer == null) {
-			client.getTextureManager().bindTexture(new Identifier("fabrication", "lock.png"));
-			GlStateManager.color4f(0, 0, 0, 1);
-			drawTexture(matrices, width-49, 3, 0, 0, 0, 8, 8, 8, 8);
 		}
 		
 		fill(matrices, -width, -height, 130, height, 0x44000000);
@@ -479,6 +479,17 @@ public class FabricationConfigScreen extends Screen {
 					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_BELL, deselect ? 0.5f : 0.6f+(i*0.1f), 1f));
 					prevSelectedSection = selectedSection;
 					selectedSection = deselect ? null : s;
+					
+					prevSelectedSectionScroll = selectedSectionScroll;
+					lastPrevSelectedSectionScroll = lastSelectedSectionScroll;
+					prevSelectedSectionHeight = selectedSectionHeight;
+					prevSelectedSectionScrollTarget = selectedSectionScrollTarget;
+					
+					selectedSectionScroll = 0;
+					lastSelectedSectionScroll = 0;
+					selectedSectionHeight = 0;
+					selectedSectionScrollTarget = 0;
+					
 					selectTime = 10-selectTime;
 				}
 			}
@@ -494,11 +505,52 @@ public class FabricationConfigScreen extends Screen {
 		}
 		
 		bufferTooltips = true;
-		drawSection(matrices, selectedSection, mouseX, mouseY, selectedChoiceY, sCurve5((10-selectTime)/10f));
+		drawSection(matrices, selectedSection, mouseX, mouseY, selectedChoiceY, sCurve5((10-selectTime)/10f), true);
 		if (!MixinConfigPlugin.isEnabled("general.reduced_motion") && !Objects.equal(selectedSection, prevSelectedSection)) {
-			drawSection(matrices, prevSelectedSection, -200, -200, prevSelectedChoiceY, sCurve5(selectTime/10f));
+			drawSection(matrices, prevSelectedSection, -200, -200, prevSelectedChoiceY, sCurve5(selectTime/10f), false);
 		}
 		
+		GlStateManager.pushMatrix();
+		GlStateManager.disableDepthTest();
+		fill(matrices, width-120, 0, width*2, 16, 0x33000000);
+		GlStateManager.pushMatrix();
+			GlStateManager.translatef(width-60, 8, 0);
+			GlStateManager.pushMatrix();
+				GlStateManager.rotatef(a*-180, 0, 0, 1);
+				float h = (40+(a*-100))/360f;
+				if (h < 0) {
+					h = 1+h;
+				}
+				GlStateManager.pushMatrix();
+					GlStateManager.scalef((float)(1-(Math.abs(Math.sin(a*Math.PI))/2)), 1, 1);
+					fill(matrices, -60, -8, 0, 8, MathHelper.hsvToRgb(h, 0.9f, 0.9f)|0xFF000000);
+					if (isSingleplayer) {
+						fill(matrices, 0, -8, 60, 8, MathHelper.hsvToRgb(0.833333f, 0.9f, 0.9f)|0xFF000000);
+					}
+				GlStateManager.popMatrix();
+				GlStateManager.pushMatrix();
+					GlStateManager.rotatef(45, 0, 0, 1);
+					// 8 / sqrt(2)
+					float f = 5.6568542f;
+					GlStateManager.scalef(f, f, 1);
+					fill(matrices, -1, -1, 1, 1, 0xFFFFFFFF);
+				GlStateManager.popMatrix();
+				if (!isSingleplayer) {
+					fill(matrices, -6, -1, -2, 1, 0xFF000000);
+				}
+			GlStateManager.popMatrix();
+			fill(matrices, -2, -2, 2, 2, 0xFF000000);
+		GlStateManager.popMatrix();
+		
+		textRenderer.draw(matrices, "CLIENT", width-115, 4, 0xFF000000);
+		textRenderer.draw(matrices, "SERVER", width-40, 4, whyCantConfigureServer == null || isSingleplayer ? 0xFF000000 : 0x44000000);
+		if (serverReadOnly && whyCantConfigureServer == null) {
+			client.getTextureManager().bindTexture(new Identifier("fabrication", "lock.png"));
+			GlStateManager.color4f(0, 0, 0, 1);
+			drawTexture(matrices, width-49, 3, 0, 0, 0, 8, 8, 8, 8);
+		}
+		
+		drawBackground(matrices, mouseX, mouseY, delta, 130, height-20);
 		
 		List<String> notes = Lists.newArrayList();
 		
@@ -638,17 +690,20 @@ public class FabricationConfigScreen extends Screen {
 		return height;
 	}
 
-	private void drawSection(MatrixStack matrices, String section, float mouseX, float mouseY, float choiceY, float a) {
+	private void drawSection(MatrixStack matrices, String section, float mouseX, float mouseY, float choiceY, float a, boolean selected) {
 		if (a <= 0) return;
 		if (MixinConfigPlugin.isEnabled("general.reduced_motion")) {
 			a = 1;
 		}
-		// jesus fucking christ
 		GlStateManager.pushMatrix();
 		GlStateManager.translatef(60, choiceY+16, 0);
 		GlStateManager.scalef(a, a, 1);
 		GlStateManager.translatef(-60, -(choiceY+16), 0);
-		int y = 16;
+		float lastScrollOfs = (selected ? lastSelectedSectionScroll : lastPrevSelectedSectionScroll);
+		float scrollOfs = (selected ? selectedSectionScroll : prevSelectedSectionScroll);
+		float scroll = (selected ? selectedSectionHeight : prevSelectedSectionHeight) < height-36 ? 0 : lastScrollOfs+((scrollOfs-lastScrollOfs)*client.getTickDelta());
+		int startY = 16-(int)(scroll);
+		int y = startY;
 		if (section == null) {
 			String v = Agnos.INST.getModVersion();
 			String blurb = "§lFabrication v"+v+" §rby unascribed\n"
@@ -657,6 +712,8 @@ public class FabricationConfigScreen extends Screen {
 			if (drawButton(matrices, 140, 20+height+32, 120, 20, "Reload files", mouseX, mouseY)) {
 				MixinConfigPlugin.reload();
 			}
+			y += height;
+			y += 22;
 		} else {
 			GlStateManager.enableBlend();
 			RenderSystem.defaultBlendFunc();
@@ -681,7 +738,7 @@ public class FabricationConfigScreen extends Screen {
 				int x = 0;
 				Profile hovered = null;
 				for (Profile p : Profile.values()) {
-					boolean selected = getRawValue("general.profile").toUpperCase(Locale.ROOT).equals(p.name());
+					boolean profSel = getRawValue("general.profile").toUpperCase(Locale.ROOT).equals(p.name());
 					if (mouseX >= 134+x && mouseX <= 134+x+16 && mouseY >= 18 && mouseY <= 18+16) {
 						hovered = p;
 					}
@@ -697,7 +754,7 @@ public class FabricationConfigScreen extends Screen {
 						}
 						setValue("general.profile", p.name().toLowerCase(Locale.ROOT));
 					}
-					color(PROFILE_COLORS.get(p), selected ? 1f : hovered == p ? 0.6f : 0.3f);
+					color(PROFILE_COLORS.get(p), profSel ? 1f : hovered == p ? 0.6f : 0.3f);
 					drawTexture(matrices, 134+x, 18, 0, 0, 0, 16, 16, 16, 16);
 					x += 18;
 				}
@@ -716,7 +773,6 @@ public class FabricationConfigScreen extends Screen {
 				FeatureEntry rmot = FeaturesFile.get("general.reduced_motion");
 				y = drawTrilean(matrices, "general.reduced_motion", rmot.name, rmot.desc, y, mouseX, mouseY, CLIENT_ONLY);
 			} else {
-				if ("minor_mechanics".equals(section)) y -= 14;
 				for (Map.Entry<String, FeatureEntry> en : FeaturesFile.getAll().entrySet()) {
 					if (en.getKey().startsWith(section+".")) {
 						FeatureEntry fe = en.getValue();
@@ -727,6 +783,18 @@ public class FabricationConfigScreen extends Screen {
 					}
 				}
 			}
+		}
+		float h = y-startY;
+		if (selected) {
+			selectedSectionHeight = h;
+		} else {
+			prevSelectedSectionHeight = h;
+		}
+		int sh = height-36;
+		if (h > sh) {
+			float knobHeight = (sh/h)*sh;
+			float knobY = ((selected ? selectedSectionScroll : prevSelectedSectionScroll)/(h-sh))*(sh-knobHeight)+16;
+			fill(matrices, width-2, Math.max(16, (int)knobY), width, Math.min(height-20, (int)(knobY+knobHeight)), 0xAAFFFFFF);
 		}
 		GlStateManager.popMatrix();
 	}
@@ -751,6 +819,7 @@ public class FabricationConfigScreen extends Screen {
 	}
 
 	private int drawTrilean(MatrixStack matrices, String key, String title, String desc, int y, float mouseX, float mouseY, TrileanFlag... flags) {
+		if (y < -12 || y > height-16) return y+14;
 		boolean clientOnly = ArrayUtils.contains(flags, CLIENT_ONLY);
 		boolean requiresFabricApi = ArrayUtils.contains(flags, REQUIRES_FABRIC_API);
 		// presence of Fabric API is implied by the fact you need ModMenu to access this menu
@@ -942,20 +1011,26 @@ public class FabricationConfigScreen extends Screen {
 	@Override
 	public void tick() {
 		super.tick();
-		if (sidebarHeight < height) return;
-		lastSidebarScroll = sidebarScroll;
-		sidebarScroll += sidebarScrollVelocity;
-		sidebarScrollVelocity *= MixinConfigPlugin.isEnabled("*.reduced_motion") ? 0.45f : 0.75f;
-		if (sidebarScroll > (sidebarHeight-height)) {
-			if (sidebarScrollVelocity > 0) {
-				sidebarScrollVelocity *= 0.6f;
-			}
-			sidebarScrollVelocity -= (sidebarScroll-(sidebarHeight-height))/8;
-		} else if (sidebarScroll < 0) {
-			if (sidebarScrollVelocity < 0) {
-				sidebarScrollVelocity *= 0.6f;
-			}
-			sidebarScrollVelocity += (-sidebarScroll)/8;
+		if (sidebarHeight > height) {
+			lastSidebarScroll = sidebarScroll;
+			sidebarScroll += (sidebarScrollTarget-sidebarScroll)/2;
+			if (sidebarScrollTarget < 0) sidebarScrollTarget /= 2;
+			float h = sidebarHeight-height;
+			if (sidebarScrollTarget > h) sidebarScrollTarget = h+((sidebarScrollTarget-h)/2);
+		}
+		if (selectedSectionHeight > height-36) {
+			lastSelectedSectionScroll = selectedSectionScroll;
+			selectedSectionScroll += (selectedSectionScrollTarget-selectedSectionScroll)/2;
+			if (selectedSectionScrollTarget < 0) selectedSectionScrollTarget /= 2;
+			float h = selectedSectionHeight-(height-36);
+			if (selectedSectionScrollTarget > h) selectedSectionScrollTarget = h+((selectedSectionScrollTarget-h)/2);
+		}
+		if (prevSelectedSectionHeight > height-36) {
+			lastPrevSelectedSectionScroll = prevSelectedSectionScroll;
+			prevSelectedSectionScroll += (prevSelectedSectionScrollTarget-prevSelectedSectionScroll)/2;
+			if (prevSelectedSectionScrollTarget < 0) prevSelectedSectionScrollTarget /= 2;
+			float h = prevSelectedSectionHeight-(height-36);
+			if (prevSelectedSectionScrollTarget > h) prevSelectedSectionScrollTarget = h+((prevSelectedSectionScrollTarget-h)/2);
 		}
 		if (tooltipBlinkTicks > 0) {
 			tooltipBlinkTicks--;
@@ -965,13 +1040,9 @@ public class FabricationConfigScreen extends Screen {
 	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
 		if (mouseX <= 120*scaleCompensation) {
-			boolean dampen;
-			if (amount < 0) {
-				dampen = sidebarScroll < 0;
-			} else {
-				dampen = sidebarScroll > sidebarHeight;
-			}
-			sidebarScrollVelocity -= amount*(dampen ? 2 : 5);
+			sidebarScrollTarget -= amount*20;
+		} else {
+			selectedSectionScrollTarget -= amount*20;
 		}
 		return super.mouseScrolled(mouseX, mouseY, amount);
 	}
