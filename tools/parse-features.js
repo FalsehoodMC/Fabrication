@@ -2,6 +2,7 @@ const fs = require('fs');
 
 let versionNamesToCodes = {
 	'1.0.0': 0,
+	'1.0': 0,
 	'1.0.1': 1,
 	'1.0.1_01': 2,
 	'1.0.2': 3,
@@ -23,8 +24,8 @@ let versionNamesToCodes = {
 	'1.2.5': 19,
 	'1.2.6': 20,
 	'1.2.7': 21,
-	'1.2.8': 28,
-	'1.2.9': 29
+	'1.2.8': 22,
+	'1.2.9': 23
 };
 
 let currentVersion = /version\s+=\s+(.*?)\s+/.exec(fs.readFileSync('gradle.properties').toString('utf8'))[1];

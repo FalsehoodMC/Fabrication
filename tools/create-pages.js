@@ -7,12 +7,16 @@ let data = JSON.parse(fs.readFileSync(process.argv[2] || 'features.json').toStri
 let metaSection = {name: 'Meta', key: 'meta', features: [], features_incl_meta: []};
 let ctx = {feature_count:0,sections:[],sections_incl_meta:[metaSection]};
 let buildingSection = null;
+let pastFeatureCounts = {};
 let featureCount = 0;
 Object.entries(data).forEach(([k, v]) => {
 	if (v.hidden) return;
 	if (k.indexOf('general.profile.') === 0) return;
 	if (k.indexOf('.') !== -1 || v.meta) {
 		let section = k.indexOf('.') === -1 ? metaSection : buildingSection;
+		for (let i = v.since_code; i < 100; i++) {
+			pastFeatureCounts[i] = (pastFeatureCounts[i] || 0) + 1;
+		}
 		featureCount++;
 		let sides_friendly = null;
 		switch (v.sides) {
@@ -60,6 +64,8 @@ if (buildingSection !== null) {
 	ctx.sections_incl_meta.push(buildingSection);
 }
 ctx.feature_count = featureCount;
+let pfc = Object.values(pastFeatureCounts).sort((a, b) => a-b);
+ctx.past_feature_counts = pfc.filter((e, i) => pfc.indexOf(e) === i);
 let me = path.resolve(process.argv[1], '..');
 let render = hbs.compile(fs.readFileSync(path.resolve(me, 'curse.html.hbs')).toString('utf8'));
 fs.writeFileSync('curse-fabrication.html', render({...ctx, fabrication: true}));
