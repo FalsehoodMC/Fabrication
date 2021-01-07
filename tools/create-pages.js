@@ -65,3 +65,4 @@ let render = hbs.compile(fs.readFileSync(path.resolve(me, 'curse.html.hbs')).toS
 fs.writeFileSync('curse-fabrication.html', render({...ctx, fabrication: true}));
 fs.writeFileSync('curse-forgery.html', render({...ctx, fabrication: false}));
 fs.writeFileSync('wiki.html', hbs.compile(fs.readFileSync(path.resolve(me, 'wiki.html.hbs')).toString('utf8'))(ctx));
+fs.writeFileSync('changelog.md', hbs.compile(fs.readFileSync(path.resolve(me, 'changelog.md.hbs')).toString('utf8'))(ctx));
