@@ -273,6 +273,14 @@ fixes.no_night_vision_flash
 		Disables the flashing effect when Night Vision is about to run out. This effect ranges from
 		"annoying" to "actively dangerous". With this enabled, it just slowly fades out instead.
 
+fixes.multiline_sign_paste
+	name: Multiline Sign Paste
+	since: 1.2.10
+	sides: client_only
+	desc:
+		Allows pasting multiple lines of text into a sign. You can also copy all the lines of a sign
+		by holding Shift while copying.
+
 utility
 	name: Utility
 	since: 1.0
@@ -559,6 +567,13 @@ tweaks.play_note_blocks_in_creative
 		
 		On the client, prevents the break effect from occurring as usually happens with server-side
 		break prevention.
+
+tweaks.legible_signs
+	name: Legible Signs
+	since: 1.2.10
+	sides: client_only
+	desc:
+		Adjusts sign text colors to be less garbage.
 
 tweaks.ghost_chest_woo_woo
 	name: Ghost Chest Woo Woo

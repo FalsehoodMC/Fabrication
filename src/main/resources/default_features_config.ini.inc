@@ -58,6 +58,9 @@
 	
 	; << FEATURE: fixes.no_night_vision_flash >>
 	no_night_vision_flash=unset
+	
+	; << FEATURE: fixes.multiline_sign_paste >>
+	multiline_sign_paste=unset
 
 ; << FEATURE: utility >>
 [utility]
@@ -137,6 +140,9 @@
 	
 	; << FEATURE: tweaks.play_note_blocks_in_creative >>
 	play_note_blocks_in_creative=unset
+	
+	; << FEATURE: tweaks.legible_signs >>
+	legible_signs=unset
 	
 	; << FEATURE: tweaks.ghost_chest_woo_woo >>
 	ghost_chest_woo_woo=unset

@@ -195,7 +195,10 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	
 	public static boolean isEnabled(String configKey) {
 		configKey = remap(configKey);
-		if (!validKeys.contains(configKey)) throw new IllegalArgumentException("Cannot look up status of config key "+configKey+" with no default");
+		if (!validKeys.contains(configKey)) {
+			FabLog.error("Cannot look up value for config key "+configKey+" with no default");
+			return false;
+		}
 		if (!config.containsKey(configKey))
 			return defaults == null ? false : defaults.get(configKey);
 		return config.get(configKey).resolve(defaults == null ? false : defaults.get(configKey));

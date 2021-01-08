@@ -50,6 +50,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage.EntityTracker;
+import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
 
 public class FabRefl {
@@ -192,6 +193,14 @@ public class FabRefl {
 		}
 	}
 	
+	private static final MethodHandle dc_color = unreflectGetter(DyeColor.class, "color", "field_7949", "field_193351_w");
+	public static int getColor(DyeColor subject) {
+		try {
+			return (int)dc_color.invokeExact(subject);
+		} catch (Throwable t) {
+			throw rethrow(t);
+		}
+	}
 	
 	
 	private static final MethodHandle gc_execute = unreflectMethod(GiveCommand.class, "execute", "method_13401", "func_198497_a",
