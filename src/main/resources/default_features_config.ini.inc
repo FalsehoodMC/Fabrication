@@ -144,9 +144,15 @@
 	; << FEATURE: tweaks.legible_signs >>
 	legible_signs=unset
 	
+	; << FEATURE: tweaks.fullres_banner_shields >>
+	fullres_banner_shields=unset
+	
+	; << FEATURE: tweaks.ghast_panic >>
+	ghast_panic=unset
+	
 	; << FEATURE: tweaks.ghost_chest_woo_woo >>
 	ghost_chest_woo_woo=unset
-
+	
 ; << FEATURE: minor_mechanics >>
 [minor_mechanics]
 	; << FEATURE: minor_mechanics.feather_falling_five >>

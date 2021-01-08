@@ -575,6 +575,21 @@ tweaks.legible_signs
 	desc:
 		Adjusts sign text colors to be less garbage.
 
+tweaks.fullres_banner_shields
+	name: Fullres Banner Shields
+	since: 1.2.10
+	sides: client_only
+	desc:
+		Makes shields use the full-res banner patterns instead of weird smaller versions. Compatible
+		with custom patterns and resource packs.
+
+tweaks.ghast_panic
+	name: Ghast Panic
+	since: 1.2.10
+	sides: server_only
+	desc:
+		Makes ghasts randomly play the unused "scream" sound when outside of the Nether.
+
 tweaks.ghost_chest_woo_woo
 	name: Ghost Chest Woo Woo
 	hidden: true
