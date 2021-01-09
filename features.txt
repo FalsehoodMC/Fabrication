@@ -288,6 +288,13 @@ fixes.colored_crack_particles
 	desc:
 		Makes "crack" particles honor item coloration, such as leather armor dye.
 
+fixes.silverfish_step
+	name: Silverfish Step
+	since: 1.2.10
+	sides: server_only
+	desc:
+		Fixes an oversight that prevents silverfish from playing their step sound.
+
 utility
 	name: Utility
 	since: 1.0

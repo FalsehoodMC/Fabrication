@@ -64,6 +64,9 @@
 	
 	; << FEATURE: fixes.colored_crack_particles >>
 	colored_crack_particles=unset
+	
+	; << FEATURE: fixes.silverfish_step >>
+	silverfish_step=unset
 
 ; << FEATURE: utility >>
 [utility]
