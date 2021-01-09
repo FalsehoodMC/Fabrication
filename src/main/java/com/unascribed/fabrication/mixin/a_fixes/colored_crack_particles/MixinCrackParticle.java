@@ -13,7 +13,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.particle.CrackParticle;
 import net.minecraft.client.particle.SpriteBillboardParticle;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.item.DyeableArmorItem;
 import net.minecraft.item.ItemStack;
 
 @Mixin(CrackParticle.class)
@@ -26,11 +25,7 @@ public abstract class MixinCrackParticle extends SpriteBillboardParticle {
 
 	@Inject(at=@At("TAIL"), method="<init>(Lnet/minecraft/client/world/ClientWorld;DDDLnet/minecraft/item/ItemStack;)V")
 	public void construct(ClientWorld world, double x, double y, double z, ItemStack stack, CallbackInfo ci) {
-		int index = 0;
-		if (stack.getItem() instanceof DyeableArmorItem) {
-			index = 1;
-		}
-		int c = FabRefl.Client.getItemColors(MinecraftClient.getInstance()).getColorMultiplier(stack, index);
+		int c = FabRefl.Client.getItemColors(MinecraftClient.getInstance()).getColorMultiplier(stack, 0);
 		setColor(((c>>16)&0xFF)/255f, ((c>>8)&0xFF)/255f, (c&0xFF)/255f);
 	}
 	
