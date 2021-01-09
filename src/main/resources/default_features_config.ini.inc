@@ -61,6 +61,9 @@
 	
 	; << FEATURE: fixes.multiline_sign_paste >>
 	multiline_sign_paste=unset
+	
+	; << FEATURE: fixes.colored_crack_particles >>
+	colored_crack_particles=unset
 
 ; << FEATURE: utility >>
 [utility]
@@ -149,6 +152,9 @@
 	
 	; << FEATURE: tweaks.ghast_panic >>
 	ghast_panic=unset
+	
+	; << FEATURE: tweaks.cracking_spawn_eggs >>
+	cracking_spawn_eggs=unset
 	
 	; << FEATURE: tweaks.ghost_chest_woo_woo >>
 	ghost_chest_woo_woo=unset

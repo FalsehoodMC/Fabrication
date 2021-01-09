@@ -281,6 +281,13 @@ fixes.multiline_sign_paste
 		Allows pasting multiple lines of text into a sign. You can also copy all the lines of a sign
 		by holding Shift while copying.
 
+fixes.colored_crack_particles
+	name: Colored Crack Particles
+	since: 1.2.10
+	sides: client_only
+	desc:
+		Makes "crack" particles honor item coloration, such as leather armor dye.
+
 utility
 	name: Utility
 	since: 1.0
@@ -589,6 +596,13 @@ tweaks.ghast_panic
 	sides: server_only
 	desc:
 		Makes ghasts randomly play the unused "scream" sound when outside of the Nether.
+
+tweaks.cracking_spawn_eggs
+	name: Cracking Spawn Eggs
+	since: 1.2.10
+	sides: server_only
+	desc:
+		Spawn eggs spawn cracking particles and play a sound when used.
 
 tweaks.ghost_chest_woo_woo
 	name: Ghost Chest Woo Woo
