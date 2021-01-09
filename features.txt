@@ -293,7 +293,9 @@ fixes.silverfish_step
 	since: 1.2.10
 	sides: server_only
 	desc:
-		Fixes an oversight that prevents silverfish from playing their step sound.
+		Fixes an oversight that prevents silverfish from playing their step sound. It's also
+		possible it's not an oversight and that Mojang simply deemed the silverfish step sound too
+		horrible and dummied it out.
 
 utility
 	name: Utility
