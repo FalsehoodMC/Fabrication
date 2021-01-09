@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.Env;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.particle.CrackParticle;
@@ -16,7 +17,7 @@ import net.minecraft.item.DyeableArmorItem;
 import net.minecraft.item.ItemStack;
 
 @Mixin(CrackParticle.class)
-@EligibleIf(configEnabled="*.colored_crack_particles")
+@EligibleIf(configEnabled="*.colored_crack_particles", envMatches=Env.CLIENT)
 public abstract class MixinCrackParticle extends SpriteBillboardParticle {
 
 	protected MixinCrackParticle(ClientWorld arg, double d, double e, double f) {
@@ -25,7 +26,11 @@ public abstract class MixinCrackParticle extends SpriteBillboardParticle {
 
 	@Inject(at=@At("TAIL"), method="<init>(Lnet/minecraft/client/world/ClientWorld;DDDLnet/minecraft/item/ItemStack;)V")
 	public void construct(ClientWorld world, double x, double y, double z, ItemStack stack, CallbackInfo ci) {
-		int c = FabRefl.Client.getItemColors(MinecraftClient.getInstance()).getColorMultiplier(stack, 0);
+		int index = 0;
+		if (stack.getItem() instanceof DyeableArmorItem) {
+			index = 1;
+		}
+		int c = FabRefl.Client.getItemColors(MinecraftClient.getInstance()).getColorMultiplier(stack, index);
 		setColor(((c>>16)&0xFF)/255f, ((c>>8)&0xFF)/255f, (c&0xFF)/255f);
 	}
 	
