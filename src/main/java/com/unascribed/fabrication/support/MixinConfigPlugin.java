@@ -142,6 +142,15 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		} catch (Throwable t) {
 			setMet(SpecialEligibility.FORGE, true);
 		}
+		try {
+			if (isMet(SpecialEligibility.FORGE)) {
+				Class.forName("io.github.zekerzhayard.optiforge.OptiForge", false, MixinConfigPlugin.class.getClassLoader());
+			} else {
+				Class.forName("me.modmuss50.optifabric.mod.OptifabricSetup", false, MixinConfigPlugin.class.getClassLoader());
+			}
+			setMet(SpecialEligibility.NO_OPTIFINE, true);
+		} catch (Throwable t) {
+		}
 		if (MixinConfigPlugin.class.getClassLoader().getResource("default_features_config.ini") == null) {
 			// dev mode, no ini generated yet
 			defaultFeaturesConfigFile = "default_features_config.ini.inc";

@@ -4,6 +4,7 @@ public enum SpecialEligibility {
 	EVENTS_AVAILABLE("Running under Fabric with Fabric API, or running under Forge", false),
 	NOT_FORGE("Running under Fabric", false),
 	FORGE("Running under Forge", false),
+	NO_OPTIFINE("OptiFine is not present", false)
 	;
 	public final String displayName;
 	public final boolean ignorableWithRuntimeChecks;
