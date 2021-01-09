@@ -5,6 +5,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
 
 import net.minecraft.client.render.BackgroundRenderer;
@@ -13,7 +14,7 @@ import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
 
 @Mixin(BackgroundRenderer.class)
-@EligibleIf(configEnabled="*.normal_fog_with_night_vision")
+@EligibleIf(configEnabled="*.normal_fog_with_night_vision", envMatches=Env.CLIENT)
 public class MixinBackgroundRenderer {
 
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/entity/LivingEntity.hasStatusEffect(Lnet/minecraft/entity/effect/StatusEffect;)Z"),

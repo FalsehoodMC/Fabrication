@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
 
 import net.minecraft.client.render.GameRenderer;
@@ -13,7 +14,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffects;
 
 @Mixin(GameRenderer.class)
-@EligibleIf(configEnabled="*.no_night_vision_flash")
+@EligibleIf(configEnabled="*.no_night_vision_flash", envMatches=Env.CLIENT)
 public class MixinGameRenderer {
 
 	@Inject(at=@At("HEAD"), method="getNightVisionStrength(Lnet/minecraft/entity/LivingEntity;F)F", cancellable=true)
