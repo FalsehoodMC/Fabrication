@@ -21,7 +21,7 @@ public class FeatureOldLava implements Feature {
 	private static Sprite originalLava;
 	private static Sprite originalLavaFlow;
 	
-	private static boolean applied = true;
+	private static boolean applied = false;
 	
 	public static void onLoaded(SpriteAtlasTexture atlas, SpriteAtlasTexture.Data data) {
 		if (applied && atlas.getId().toString().equals("minecraft:textures/atlas/blocks.png")) {
