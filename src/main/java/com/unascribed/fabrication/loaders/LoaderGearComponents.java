@@ -11,6 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.unascribed.fabrication.FabLog;
+import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.QDIni;
 import com.unascribed.fabrication.Resolvable;
 import com.unascribed.fabrication.support.ConfigLoader;
@@ -178,17 +179,10 @@ public class LoaderGearComponents implements ConfigLoader {
 	private static Supplier<Item> resolver(String namespace, String id) {
 		if (id == null) return () -> null;
 		if (id.startsWith("#")) {
-			return tagResolver(createIdWithCustomDefault(namespace, id.substring(1)));
+			return tagResolver(FabricationMod.createIdWithCustomDefault(namespace, id.substring(1)));
 		} else {
-			return Resolvable.of(createIdWithCustomDefault(namespace, id), Registry.ITEM)::getOrNull;
+			return Resolvable.of(FabricationMod.createIdWithCustomDefault(namespace, id), Registry.ITEM)::getOrNull;
 		}
-	}
-
-	private static Identifier createIdWithCustomDefault(String namespace, String pathOrId) {
-		if (pathOrId.contains(":")) {
-			return new Identifier(pathOrId);
-		}
-		return new Identifier(namespace, pathOrId);
 	}
 
 	private static Supplier<Item> tagResolver(Identifier id) {

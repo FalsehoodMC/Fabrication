@@ -31,6 +31,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.registry.Registry;
 
 @EligibleIf(envMatches=Env.CLIENT)
@@ -114,7 +115,11 @@ public class LoaderBlockLogo implements ConfigLoader {
 				swapped |= (colorInt&0x000000FF) << 16;
 				List<Resolvable<Block>> blocks = Lists.newArrayList();
 				for (String s : Splitter.on(' ').split(config.get(key).orElse(""))) {
-					blocks.add(Resolvable.of(new Identifier(s), Registry.BLOCK));
+					try {
+						blocks.add(Resolvable.of(new Identifier(s), Registry.BLOCK));
+					} catch (InvalidIdentifierException e) {
+						FabLog.warn(s+" is not a valid identifier at "+config.getBlame(key));
+					}
 				}
 				colorToState.put(swapped, () -> {
 					Resolvable<Block> res = blocks.get(ThreadLocalRandom.current().nextInt(blocks.size()));

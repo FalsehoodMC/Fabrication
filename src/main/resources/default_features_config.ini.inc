@@ -285,8 +285,8 @@
 	; << FEATURE: weird_tweaks.drop_exp_with_keep_inventory >>
 	drop_exp_with_keep_inventory=unset
 	
-	; << FEATURE: weird_tweaks.gold_tools_useful_in_nether >>
-	gold_tools_useful_in_nether=unset
+	; << FEATURE: weird_tweaks.dimensional_tools >>
+	dimensional_tools=unset
 	
 	; << FEATURE: weird_tweaks.photoallergic_creepers >>
 	photoallergic_creepers=unset

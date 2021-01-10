@@ -83,6 +83,13 @@ public class FabricationMod implements ModInitializer {
 		}
 	}
 	
+	public static Identifier createIdWithCustomDefault(String namespace, String pathOrId) {
+		if (pathOrId.contains(":")) {
+			return new Identifier(pathOrId);
+		}
+		return new Identifier(namespace, pathOrId);
+	}
+
 	public static boolean isAvailableFeature(String configKey) {
 		return features.containsKey(MixinConfigPlugin.remap(configKey));
 	}
