@@ -277,6 +277,7 @@ fixes.multiline_sign_paste
 	name: Multiline Sign Paste
 	since: 1.2.10
 	sides: client_only
+	media: https://unascribed.com/fabrication/multiline_sign_paste.mp4
 	desc:
 		Allows pasting multiple lines of text into a sign. You can also copy all the lines of a sign
 		by holding Shift while copying.
@@ -285,6 +286,7 @@ fixes.colored_crack_particles
 	name: Colored Crack Particles
 	since: 1.2.10
 	sides: client_only
+	media: https://unascribed.com/fabrication/colored_crack_particles.mp4
 	desc:
 		Makes "crack" particles honor item coloration, such as leather armor dye.
 
@@ -292,6 +294,7 @@ fixes.silverfish_step
 	name: Silverfish Step
 	since: 1.2.10
 	sides: server_only
+	media: https://unascribed.com/fabrication/silverfish_step.mp4
 	desc:
 		Fixes an oversight that prevents silverfish from playing their step sound. It's also
 		possible it's not an oversight and that Mojang simply deemed the silverfish step sound too
@@ -588,6 +591,7 @@ tweaks.legible_signs
 	name: Legible Signs
 	since: 1.2.10
 	sides: client_only
+	media: https://unascribed.com/fabrication/legible_signs.mp4
 	desc:
 		Adjusts sign text colors to be less garbage.
 
@@ -595,6 +599,7 @@ tweaks.fullres_banner_shields
 	name: Fullres Banner Shields
 	since: 1.2.10
 	sides: client_only
+	media: https://unascribed.com/fabrication/fullres_banner_shields.mp4
 	desc:
 		Makes shields use the full-res banner patterns instead of weird smaller versions. Compatible
 		with custom patterns and resource packs.
@@ -610,6 +615,7 @@ tweaks.cracking_spawn_eggs
 	name: Cracking Spawn Eggs
 	since: 1.2.10
 	sides: server_only
+	media: https://unascribed.com/fabrication/cracking_spawn_eggs.mp4
 	desc:
 		Spawn eggs spawn cracking particles and play a sound when used.
 
