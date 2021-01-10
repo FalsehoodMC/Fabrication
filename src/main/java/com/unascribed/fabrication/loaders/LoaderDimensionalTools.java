@@ -322,7 +322,7 @@ public class LoaderDimensionalTools implements ConfigLoader {
 				}
 				int value;
 				Optional<Integer> valueOpt = config.getInt(realKey);
-				if (valueOpt.isEmpty()) {
+				if (!valueOpt.isPresent()) {
 					if ("Infinity".equals(config.get(realKey))) {
 						value = Integer.MAX_VALUE;
 					} else {
