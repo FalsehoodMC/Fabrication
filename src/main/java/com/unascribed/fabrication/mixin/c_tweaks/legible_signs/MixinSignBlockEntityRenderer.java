@@ -4,7 +4,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.FabRefl;
@@ -15,6 +15,7 @@ import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.SignBlockEntityRenderer;
+import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.DyeColor;
 
@@ -38,10 +39,10 @@ public class MixinSignBlockEntityRenderer {
 		fabrication$currentEntity = null;
 	}
 	
-	@ModifyArg(at=@At(value="INVOKE", target="net/minecraft/client/font/TextRenderer.draw(Lnet/minecraft/text/OrderedText;FFIZLnet/minecraft/util/math/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;ZII)I"),
-			method=RENDER, index=3)
-	public int modifySignTextColor(int orig) {
-		if (!RuntimeChecks.check("*.legible_signs")) return orig;
+	@Redirect(at=@At(value="INVOKE", target="net/minecraft/client/texture/NativeImage.getAbgrColor(IIII)I"),
+			method=RENDER)
+	public int modifySignTextColor(int a, int r, int g, int b) {
+		if (!RuntimeChecks.check("*.legible_signs")) return NativeImage.getAbgrColor(a, r, g, b);
 		DyeColor dc = fabrication$currentEntity.getTextColor();
 		switch (dc) {
 			case BLACK: return 0x000000;

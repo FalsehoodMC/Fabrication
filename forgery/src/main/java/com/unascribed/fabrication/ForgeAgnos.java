@@ -72,6 +72,7 @@ public class ForgeAgnos implements Agnos {
 
 	@Override
 	public boolean isModLoaded(String modid) {
+		// ModList is not available during Mixin application
 		return false;
 	}
 	

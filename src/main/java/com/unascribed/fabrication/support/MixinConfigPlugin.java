@@ -601,7 +601,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 								} else if (k.equals("classPresent")) {
 									for (String s : (List<String>)v) {
 										try {
-											Class.forName(s);
+											Class.forName(s, false, MixinConfigPlugin.class.getClassLoader());
 											eligibilitySuccesses.add("Required class "+s+" is present");
 										} catch (ClassNotFoundException e) {
 											eligibilityFailures.add("Required class "+s+" is not present");
@@ -611,7 +611,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 								} else if (k.equals("classNotPresent")) {
 									for (String s : (List<String>)v) {
 										try {
-											Class.forName(s);
+											Class.forName(s, false, MixinConfigPlugin.class.getClassLoader());
 											eligibilityFailures.add("Conflicting class "+s+" is present");
 											eligible = false;
 										} catch (ClassNotFoundException e) {
