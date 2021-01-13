@@ -46,5 +46,6 @@ public interface Agnos {
 	<T> T registerItemTag(String id);
 	
 	String getModVersion();
+	byte[] getClassBytes(Class<?> clazz);
 	
 }

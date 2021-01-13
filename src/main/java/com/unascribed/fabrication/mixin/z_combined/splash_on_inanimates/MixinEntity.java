@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.unascribed.fabrication.interfaces.SetInvisNoGravReversible;
 import com.unascribed.fabrication.support.EligibleIf;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.World;
 
@@ -36,6 +37,10 @@ public abstract class MixinEntity implements SetInvisNoGravReversible {
 		if (!world.isClient && isWet()) {
 			if (fabrication$invisibilityReversible) {
 				setInvisible(false);
+				Object self = this;
+				if (self instanceof ArmorStandEntity) {
+					((ArmorStandEntity)self).setInvisible(false);
+				}
 				fabrication$invisibilityReversible = false;
 			}
 			if (fabrication$noGravityReversible) {
@@ -67,8 +72,12 @@ public abstract class MixinEntity implements SetInvisNoGravReversible {
 	
 	@Inject(at=@At("TAIL"), method="toTag(Lnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/nbt/CompoundTag;")
 	public void toTag(CompoundTag tag, CallbackInfoReturnable<CompoundTag> ci) {
-		tag.putBoolean("fabrication:InvisibilityReversible", fabrication$invisibilityReversible);
-		tag.putBoolean("fabrication:NoGravityReversible", fabrication$noGravityReversible);
+		if (fabrication$invisibilityReversible) {
+			tag.putBoolean("fabrication:InvisibilityReversible", fabrication$invisibilityReversible);
+		}
+		if (fabrication$noGravityReversible) {
+			tag.putBoolean("fabrication:NoGravityReversible", fabrication$noGravityReversible);
+		}
 	}
 	
 	@Inject(at=@At("TAIL"), method="fromTag(Lnet/minecraft/nbt/CompoundTag;)V")

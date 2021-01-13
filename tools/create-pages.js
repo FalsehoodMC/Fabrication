@@ -69,7 +69,7 @@ let pfc = Object.values(pastFeatureCounts).sort((a, b) => a-b);
 pfc = pfc.filter((e, i) => pfc.indexOf(e) === i);
 if (pfc.length > 15) pfc = pfc.slice(-15);
 ctx.past_feature_counts = pfc.map((e, i) => { let s = Math.max(0.45, Math.min(1, (i+1)/12)); return {
-	count: e, size: s, sizePx: s*12};});
+	count: e, size: s, sizePx: Math.max(6, s*12)};});
 let me = path.resolve(process.argv[1], '..');
 let render = hbs.compile(fs.readFileSync(path.resolve(me, 'curse.html.hbs')).toString('utf8'));
 fs.writeFileSync('curse-fabrication.html', render({...ctx, fabrication: true}));

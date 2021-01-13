@@ -16,6 +16,7 @@ import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.projectile.thrown.PotionEntity;
@@ -45,7 +46,7 @@ public abstract class MixinPotionEntity extends ThrownItemEntity {
 			}
 		}
 		if (invis || slowfall) {
-			for (Entity e : world.getEntitiesByClass(Entity.class, box, e -> !(e instanceof LivingEntity) && e instanceof SetInvisNoGravReversible)) {
+			for (Entity e : world.getEntitiesByClass(Entity.class, box, e -> (!(e instanceof LivingEntity) || e instanceof ArmorStandEntity) && e instanceof SetInvisNoGravReversible)) {
 				if (invis) {
 					e.setInvisible(true);
 					((SetInvisNoGravReversible)e).fabrication$setInvisibilityReversible(true);

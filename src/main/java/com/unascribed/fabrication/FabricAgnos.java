@@ -2,12 +2,16 @@ package com.unascribed.fabrication;
 
 import java.nio.file.Path;
 
+import org.spongepowered.asm.mixin.MixinEnvironment;
+import org.spongepowered.asm.mixin.transformer.IMixinTransformer;
+
 import com.unascribed.fabrication.support.Env;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.tag.TagRegistry;
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.launch.common.FabricLauncherBase;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -62,6 +66,18 @@ public class FabricAgnos implements Agnos {
 	@Override
 	public String getModVersion() {
 		return FabricLoader.getInstance().getModContainer("fabrication").get().getMetadata().getVersion().getFriendlyString();
+	}
+	
+	@Override
+	public byte[] getClassBytes(Class<?> clazz) {
+		try {
+			byte[] bys = FabricLauncherBase.getLauncher().getClassByteArray(clazz.getName(), true);
+			((IMixinTransformer)MixinEnvironment.getCurrentEnvironment().getActiveTransformer()).transformClassBytes(clazz.getName(), clazz.getName(), bys);
+			return bys;
+		} catch (Throwable e) {
+			FabLog.warn("Failed to look up "+clazz, e);
+			return null;
+		}
 	}
 	
 }

@@ -55,5 +55,10 @@ public class FabricAgnos implements Agnos {
 	public String getModVersion() {
 		throw new IllegalArgumentException("Stub!");
 	}
+	
+	@Override
+	public byte[] getClassBytes(Class<?> clazz) {
+		throw new IllegalArgumentException("Stub!");
+	}
 
 }
