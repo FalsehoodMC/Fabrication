@@ -4,7 +4,7 @@
   "version": "${version}",
 
   "name": "Fabrication",
-  "description": "A bunch of mixins in a trenchcoat.",
+  "description": "A huge collection of vanilla tweaks and small features.",
   "authors": [
     "unascribed"
   ],
@@ -23,7 +23,7 @@
     "modmenu": ["com.unascribed.fabrication.ModMenuInitializer"]
   },
   "mixins": ["fabrication.mixins.json"],
-  "accessWidener" : "fabrication.accesswidener",
+  "accessWidener": "fabrication.accesswidener",
 
   "depends": {
     "fabricloader": ">=0.7.4",
