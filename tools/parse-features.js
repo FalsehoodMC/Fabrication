@@ -153,7 +153,6 @@ let sections = ["general", "fixes", "utility", "tweaks", "minor_mechanics", "mec
 data.sort((a, b) => {
 	let sectionA = a.key.indexOf('.') === -1 ? a.key : a.key.substring(0, a.key.indexOf('.'));
 	let sectionB = b.key.indexOf('.') === -1 ? b.key : b.key.substring(0, b.key.indexOf('.'));
-	console.log("a="+sectionA+" b="+sectionB);
 	if (sectionA === sectionB && sectionA === a.key) return -1;
 	if (sectionA === sectionB && sectionB === b.key) return 1;
 	if (sectionA !== sectionB) return sections.indexOf(sectionA) - sections.indexOf(sectionB);
