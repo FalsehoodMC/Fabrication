@@ -1020,7 +1020,7 @@ public class FabricationConfigScreen extends Screen {
 				} else if (noValue) {
 					renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"The server does not recognize this option"), (int)mouseX, (int)mouseY);
 				} else if (failed) {
-					renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"A mixin required for this feature failed to apply"), (int)mouseX, (int)mouseY);
+					renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"This feature failed to initialize"), (int)mouseX, (int)mouseY);
 				} else {
 					renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"You cannot configure this server"), (int)mouseX, (int)mouseY);
 				}

@@ -261,7 +261,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		return failuresReadOnly;
 	}
 	
-	protected static void addFailure(String configKey) {
+	public static void addFailure(String configKey) {
 		failures.add(remap(configKey));
 	}
 	

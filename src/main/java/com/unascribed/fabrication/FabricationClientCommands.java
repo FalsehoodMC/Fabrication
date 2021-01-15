@@ -16,6 +16,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.unascribed.fabrication.client.AtlasTracking;
 import com.unascribed.fabrication.client.AtlasViewerScreen;
 import com.unascribed.fabrication.features.FeatureFabricationCommand;
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import io.github.cottonmc.clientcommands.ClientCommandPlugin;
 import io.github.cottonmc.clientcommands.CottonClientCommandSource;
@@ -58,15 +59,17 @@ public class FabricationClientCommands implements ClientCommandPlugin {
 	public void registerCommands(CommandDispatcher<CottonClientCommandSource> dispatcher) {
 		LiteralArgumentBuilder<CottonClientCommandSource> root = LiteralArgumentBuilder.<CottonClientCommandSource>literal("fabrication:client");
 		FeatureFabricationCommand.addConfig(root, false);
-		root.then(LiteralArgumentBuilder.<CottonClientCommandSource>literal("atlas")
-				.then(LiteralArgumentBuilder.<CottonClientCommandSource>literal("view")
-						.then(RequiredArgumentBuilder.<CottonClientCommandSource, Identifier>argument("atlas", new AtlasArgumentType())
-								.executes((c) -> {
-									MinecraftClient.getInstance().send(() -> {
-										MinecraftClient.getInstance().openScreen(new AtlasViewerScreen(c.getArgument("atlas", Identifier.class)));
-									});
-									return 1;
-								}))));
+		if (!MixinConfigPlugin.isFailed("atlas_viewer")) {
+			root.then(LiteralArgumentBuilder.<CottonClientCommandSource>literal("atlas")
+					.then(LiteralArgumentBuilder.<CottonClientCommandSource>literal("view")
+							.then(RequiredArgumentBuilder.<CottonClientCommandSource, Identifier>argument("atlas", new AtlasArgumentType())
+									.executes((c) -> {
+										MinecraftClient.getInstance().send(() -> {
+											MinecraftClient.getInstance().openScreen(new AtlasViewerScreen(c.getArgument("atlas", Identifier.class)));
+										});
+										return 1;
+									}))));
+		}
 		dispatcher.register(root);
 	}
 
