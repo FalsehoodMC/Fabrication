@@ -33,7 +33,7 @@ let versionNamesToCodes = {
 let currentVersion = /version\s+=\s+(.*?)\s+/.exec(fs.readFileSync('gradle.properties').toString('utf8'))[1];
 let currentVersionCode = versionNamesToCodes[currentVersion];
 
-let data = {};
+let data = [];
 let lines = fs.readFileSync(process.argv[2] || 'features.txt').toString('utf8').split(/\r?\n/g);
 let curKey = null;
 let cur = {};
@@ -74,7 +74,8 @@ function commitMultiline() {
 function commit() {
 	commitMultiline();
 	cur = Object.assign(defaults(curKey, cur), cur);
-	data[curKey] = cur;
+	cur.key = curKey;
+	data.push(cur);
 	curKey = null;
 	cur = {};
 }
@@ -148,9 +149,27 @@ lines.forEach((line) => {
 	}
 });
 if (curKey !== null) commit();
+let sections = ["general", "fixes", "utility", "tweaks", "minor_mechanics", "mechanics", "balance", "weird_tweaks", "woina", "pedantry", "situational", "experiments"];
+data.sort((a, b) => {
+	let sectionA = a.key.indexOf('.') === -1 ? a.key : a.key.substring(0, a.key.indexOf('.'));
+	let sectionB = b.key.indexOf('.') === -1 ? b.key : b.key.substring(0, b.key.indexOf('.'));
+	console.log("a="+sectionA+" b="+sectionB);
+	if (sectionA === sectionB && sectionA === a.key) return -1;
+	if (sectionA === sectionB && sectionB === b.key) return 1;
+	if (sectionA !== sectionB) return sections.indexOf(sectionA) - sections.indexOf(sectionB);
+	if (a.meta !== b.meta) return a.meta ? -1 : 1;
+	return a.key.localeCompare(b.key);
+});
+
+let dataObj = {};
+data.forEach((d) => {
+	let key = d.key;
+	delete d.key;
+	dataObj[key] = d;
+});
 
 if (process.argv[3]) {
-	fs.writeFileSync(process.argv[3], JSON.stringify(data, (k, v) => { if (v !== null) return v; }));
+	fs.writeFileSync(process.argv[3], JSON.stringify(dataObj, (k, v) => { if (v !== null) return v; }));
 } else {
-	console.log(JSON.stringify(data), (k, v) => { if (v !== null) return v; });
+	console.log(JSON.stringify(dataObj), (k, v) => { if (v !== null) return v; });
 }
