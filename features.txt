@@ -437,11 +437,12 @@ utility.killmessage
 	name: KillMessage
 	since: 1.2.11
 	sides: server_only
-	short_desc: Allows customizing kill messages for summoned entities
+	short_desc: Allows customizing kill messages for summoned entities and spawned items
 	desc:
-		Adds a KillMessage NBT tag to entities, allowing them to show a custom death message when
-		they kill a player. You can use placeholders to show the name of the killed entity, the name
-		of the killing entity, or the name of the killing entity's held item, in that order.
+		Adds a KillMessage NBT tag to entities and items, allowing them to show a custom death
+		message when they kill a player. You can use placeholders to show the name of the killed
+		entity, the name of the killing entity, or the name of the killing entity's held item, in
+		that order.
 		
 		For example, "%s found a %s" would show e.g. "unascribed found a Skeleton". You could also
 		write this as "%1$s found a %2$s" for the same result, or, say "A %2$s found %1$s" to show

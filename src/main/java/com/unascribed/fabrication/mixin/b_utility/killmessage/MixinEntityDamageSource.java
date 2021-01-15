@@ -14,6 +14,7 @@ import com.unascribed.fabrication.interfaces.GetKillMessage;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
 
+import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.EntityDamageSource;
@@ -34,8 +35,20 @@ public abstract class MixinEntityDamageSource {
 		if (!RuntimeChecks.check("*.killmessage")) return;
 		Entity attacker = ((EntityDamageSource)(Object)this).getAttacker();
 		if (attacker instanceof GetKillMessage) {
-			String msg = ((GetKillMessage)attacker).fabrication$getKillMessage();
-			System.out.println(msg);
+			Iterator<ItemStack> iter = attacker.getItemsHand().iterator();
+			ItemStack held;
+			if (iter.hasNext()) {
+				held = iter.next();
+			} else {
+				held = ItemStack.EMPTY;
+			}
+			String msg = null;
+			if (held.hasTag() && held.getTag().contains("KillMessage", NbtType.STRING)) {
+				msg = held.getTag().getString("KillMessage");
+			}
+			if (msg == null) {
+				msg = ((GetKillMessage)attacker).fabrication$getKillMessage();
+			}
 			if (msg != null) {
 				Matcher m = fabrication$placeholderPattern.matcher(msg);
 				if (m.find()) {
@@ -58,13 +71,7 @@ public abstract class MixinEntityDamageSource {
 						} else if (idx == 1) {
 							base.append(attacker.getDisplayName());
 						} else if (idx == 2) {
-							Iterator<ItemStack> iter = attacker.getItemsHand().iterator();
-							if (iter.hasNext()) {
-								ItemStack held = iter.next();
-								base.append(held.toHoverableText());
-							} else {
-								base.append(m.group());
-							}
+							base.append(held.toHoverableText());
 						} else {
 							base.append(m.group());
 						}
