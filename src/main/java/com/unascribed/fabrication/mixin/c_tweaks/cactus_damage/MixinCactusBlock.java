@@ -6,8 +6,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CactusBlock;
 import net.minecraft.entity.Entity;
@@ -26,13 +25,13 @@ public class MixinCactusBlock {
 		LivingEntity le = (LivingEntity)entity;
 		boolean touchedTop = (int)(entity.getPos().y+0.075) > pos.getY();
 		if (touchedTop) {
-			if (RuntimeChecks.check("*.cactus_walk_doesnt_hurt_with_boots")) {
+			if (MixinConfigPlugin.isEnabled("*.cactus_walk_doesnt_hurt_with_boots")) {
 				if (!le.getEquippedStack(EquipmentSlot.FEET).isEmpty()) {
 					ci.cancel();
 				}
 			}
 		} else {
-			if (RuntimeChecks.check("*.cactus_brush_doesnt_hurt_with_chest")) {
+			if (MixinConfigPlugin.isEnabled("*.cactus_brush_doesnt_hurt_with_chest")) {
 				if (!le.getEquippedStack(EquipmentSlot.CHEST).isEmpty()) {
 					ci.cancel();
 				}

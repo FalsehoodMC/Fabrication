@@ -9,8 +9,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.entity.ExperienceOrbEntityRenderer;
 import net.minecraft.entity.ExperienceOrbEntity;
@@ -30,7 +29,7 @@ public class MixinExperienceOrbEntityRenderer {
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/client/render/entity/ExperienceOrbEntityRenderer.method_23171(Lnet/minecraft/client/render/VertexConsumer;Lnet/minecraft/util/math/Matrix4f;Lnet/minecraft/util/math/Matrix3f;FFIIIFFI)V"),
 			method="render(Lnet/minecraft/entity/ExperienceOrbEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")
 	public void addVertex(VertexConsumer arg1, Matrix4f arg2, Matrix3f arg3, float arg4, float arg5, int r, int g, int b, float arg9, float arg10, int arg11, ExperienceOrbEntity entity) {
-		if (RuntimeChecks.check("*.rainbow_experience")) {
+		if (MixinConfigPlugin.isEnabled("*.rainbow_experience")) {
 			fabrication$colorDecider.setSeed(entity.getUuid().hashCode());
 			float hue = fabrication$colorDecider.nextFloat();
 			int color1 = MathHelper.hsvToRgb(hue, 0.8f, 1);

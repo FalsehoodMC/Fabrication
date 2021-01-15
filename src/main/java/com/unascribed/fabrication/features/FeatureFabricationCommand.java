@@ -19,6 +19,8 @@ import com.unascribed.fabrication.Cardinal;
 import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.FabricationClientCommands;
 import com.unascribed.fabrication.FabricationMod;
+import com.unascribed.fabrication.FeaturesFile;
+import com.unascribed.fabrication.FeaturesFile.Sides;
 import com.unascribed.fabrication.PlayerTag;
 import com.unascribed.fabrication.interfaces.TaggablePlayer;
 import com.unascribed.fabrication.support.Feature;
@@ -26,7 +28,6 @@ import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin.Profile;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
@@ -37,6 +38,7 @@ import com.google.common.collect.Sets;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.DimensionArgumentType;
 import net.minecraft.command.argument.EntityArgumentType;
@@ -47,6 +49,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.property.Property;
 import net.minecraft.text.LiteralText;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.BuiltinRegistries;
 import net.minecraft.util.registry.Registry;
@@ -64,7 +67,7 @@ public class FeatureFabricationCommand implements Feature {
 	public void apply() {
 		Agnos.INST.runForCommandRegistration((dispatcher, dedi) -> {
 			LiteralArgumentBuilder<ServerCommandSource> root = LiteralArgumentBuilder.<ServerCommandSource>literal("fabrication");
-			addConfig(root);
+			addConfig(root, dedi);
 			
 			LiteralArgumentBuilder<ServerCommandSource> tag = LiteralArgumentBuilder.<ServerCommandSource>literal("tag");
 			tag.requires(scs -> MixinConfigPlugin.isEnabled("*.taggable_players") && scs.hasPermissionLevel(2));
@@ -288,7 +291,7 @@ public class FeatureFabricationCommand implements Feature {
 		return 1;
 	}
 
-	public static <T extends CommandSource> void addConfig(LiteralArgumentBuilder<T> root) {
+	public static <T extends CommandSource> void addConfig(LiteralArgumentBuilder<T> root, boolean dediServer) {
 		LiteralArgumentBuilder<T> config = LiteralArgumentBuilder.<T>literal("config");
 		config.requires(s -> {
 			// always allow a client to reconfigure itself
@@ -316,7 +319,13 @@ public class FeatureFabricationCommand implements Feature {
 					boolean tri = MixinConfigPlugin.isTrilean(s);
 					if (value.isEmpty() && tri) value = "unset";
 					boolean def = MixinConfigPlugin.getDefault(s);
-					sendFeedback(c, new LiteralText(s+" = "+value+(tri ? " (default "+def+")" : "")), false);
+					LiteralText txt = new LiteralText(s+" = "+value+(tri ? " (default "+def+")" : ""));
+					if (tri && !MixinConfigPlugin.isEnabled(s)) {
+						// so that command blocks report failure
+						throw new CommandException(txt.formatted(Formatting.WHITE));
+					} else {
+						sendFeedback(c, txt, false);
+					}
 					return 1;
 				});
 				get.then(key);
@@ -324,6 +333,7 @@ public class FeatureFabricationCommand implements Feature {
 			config.then(get);
 			LiteralArgumentBuilder<T> set = LiteralArgumentBuilder.<T>literal("set");
 			for (String s : MixinConfigPlugin.getAllKeys()) {
+				if (dediServer && FeaturesFile.get(s).sides == Sides.CLIENT_ONLY) continue;
 				LiteralArgumentBuilder<T> key = LiteralArgumentBuilder.<T>literal(s);
 				String[] values;
 				if (s.equals("general.runtime_checks")) {
@@ -425,7 +435,7 @@ public class FeatureFabricationCommand implements Feature {
 			}
 			if ("general.runtime_checks".equals(key)) {
 				sendFeedback(c, new LiteralText("§cYou will need to restart the game for this change to take effect."), false);
-			} else if (!RuntimeChecks.ENABLED && !MixinConfigPlugin.isRuntimeConfigurable(key)) {
+			} else if (!MixinConfigPlugin.RUNTIME_CHECKS_WAS_ENABLED && !MixinConfigPlugin.isRuntimeConfigurable(key)) {
 				sendFeedback(c, new LiteralText("§cgeneral.runtime_checks is disabled, you may need to restart the game for this change to take effect."), false);
 			}
 		}

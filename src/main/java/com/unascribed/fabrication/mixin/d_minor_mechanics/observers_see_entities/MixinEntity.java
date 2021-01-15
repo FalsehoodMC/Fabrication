@@ -9,8 +9,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.ObserverBlock;
@@ -39,7 +37,7 @@ public abstract class MixinEntity {
 	
 	@Inject(at=@At("TAIL"), method="move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V")
 	public void move(MovementType type, Vec3d movement, CallbackInfo ci) {
-		if (!RuntimeChecks.check("*.observers_see_entities")) return;
+		if (!MixinConfigPlugin.isEnabled("*.observers_see_entities")) return;
 		Object self = this;
 		if ((self instanceof LivingEntity || !MixinConfigPlugin.isEnabled("*.observers_see_entities_living_only")) && !world.isClient && movement.lengthSquared() > 0.00615) {
 			world.getProfiler().push("move");

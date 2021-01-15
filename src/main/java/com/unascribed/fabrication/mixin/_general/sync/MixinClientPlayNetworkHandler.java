@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.mixin._general.sync;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,6 +16,7 @@ import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.ResolvedTrilean;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
@@ -36,6 +38,8 @@ public class MixinClientPlayNetworkHandler implements GetServerConfig {
 	private final Map<String, ResolvedTrilean> fabrication$serverTrileanConfig = Maps.newHashMap();
 	private final Map<String, String> fabrication$serverStringConfig = Maps.newHashMap();
 	private long fabrication$launchId;
+	private final Set<String> fabrication$serverFailedConfig = Sets.newHashSet();
+	private String fabrication$serverVersion;
 	
 	@Inject(at=@At("TAIL"), method="onGameJoin(Lnet/minecraft/network/packet/s2c/play/GameJoinS2CPacket;)V")
 	public void onGameJoin(GameJoinS2CPacket packet, CallbackInfo ci) {
@@ -66,6 +70,15 @@ public class MixinClientPlayNetworkHandler implements GetServerConfig {
 				}
 				if (buf.isReadable(8)) {
 					fabrication$launchId = buf.readLong();
+					if (buf.isReadable()) {
+						fabrication$serverVersion = buf.readString(32767);
+						int failedKeys = buf.readVarInt();
+						for (int i = 0; i < failedKeys; i++) {
+							fabrication$serverFailedConfig.add(buf.readString(32767));
+						}
+					} else {
+						fabrication$serverVersion = "1.2.11 or earlier";
+					}
 				} else if (fabrication$launchId == 0) {
 					fabrication$launchId = hashCode()*31L;
 				}
@@ -95,6 +108,16 @@ public class MixinClientPlayNetworkHandler implements GetServerConfig {
 	@Override
 	public long fabrication$getLaunchId() {
 		return fabrication$launchId;
+	}
+	
+	@Override
+	public Set<String> fabrication$getServerFailedConfig() {
+		return fabrication$serverFailedConfig;
+	}
+	
+	@Override
+	public String fabrication$getServerVersion() {
+		return fabrication$serverVersion;
 	}
 	
 }

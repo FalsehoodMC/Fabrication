@@ -16,8 +16,7 @@ import com.unascribed.fabrication.Resolvable;
 import com.unascribed.fabrication.interfaces.SetFromPlayerDeath;
 import com.unascribed.fabrication.loaders.LoaderItemDespawn;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.google.common.primitives.Ints;
 
 import net.minecraft.block.Block;
@@ -83,7 +82,7 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 	
 	@Inject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", cancellable=true)
 	public void damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> ci) {
-		if (fabrication$invincible || (RuntimeChecks.check("*.item_despawn") && world.isClient)) {
+		if (fabrication$invincible || (MixinConfigPlugin.isEnabled("*.item_despawn") && world.isClient)) {
 			ci.setReturnValue(false);
 		}
 	}

@@ -11,8 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.LegacyIDs;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.google.common.base.CharMatcher;
 
 import net.minecraft.command.argument.ItemStringReader;
@@ -34,7 +33,7 @@ public class MixinItemStringReader {
 			method="readItem()V")
 	public Optional<Item> getOrEmpty(DefaultedRegistry<Item> subject, Identifier id) {
 		fabrication$legacyDamageNbt = null;
-		if (RuntimeChecks.check("*.legacy_command_syntax")) {
+		if (MixinConfigPlugin.isEnabled("*.legacy_command_syntax")) {
 			String numId;
 			String meta;
 			if (id.getNamespace().equals("minecraft")) {

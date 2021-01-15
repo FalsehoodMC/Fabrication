@@ -10,9 +10,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.SpecialEligibility;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
 import net.minecraft.client.render.item.ItemModels;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedModelManager;
@@ -34,7 +33,7 @@ public abstract class MixinItemModels {
 	@Inject(at=@At("HEAD"), method="getModel(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/client/render/model/BakedModel;",
 			cancellable=true)
 	public void getModel(ItemStack stack, CallbackInfoReturnable<BakedModel> ci) {
-		if (!RuntimeChecks.check("*.obsidian_tears")) return;
+		if (!MixinConfigPlugin.isEnabled("*.obsidian_tears")) return;
 		if (stack.getItem() == Items.POTION && stack.hasTag() && stack.getTag().getBoolean("fabrication:ObsidianTears") && fabrication$obsidianTearsModel != null) {
 			ci.setReturnValue(fabrication$obsidianTearsModel);
 		}

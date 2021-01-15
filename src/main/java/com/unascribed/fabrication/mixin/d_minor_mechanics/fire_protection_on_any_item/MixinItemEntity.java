@@ -7,8 +7,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.ItemEntity;
@@ -26,7 +25,7 @@ public abstract class MixinItemEntity {
 	
 	@Inject(at=@At("HEAD"), method="isFireImmune()Z", cancellable=true)
 	public void isFireImmune(CallbackInfoReturnable<Boolean> cir) {
-		if (RuntimeChecks.check("*.fire_protection_on_any_item") && EnchantmentHelper.getLevel(Enchantments.FIRE_PROTECTION, getStack()) > 0) {
+		if (MixinConfigPlugin.isEnabled("*.fire_protection_on_any_item") && EnchantmentHelper.getLevel(Enchantments.FIRE_PROTECTION, getStack()) > 0) {
 			cir.setReturnValue(true);
 		}
 	}

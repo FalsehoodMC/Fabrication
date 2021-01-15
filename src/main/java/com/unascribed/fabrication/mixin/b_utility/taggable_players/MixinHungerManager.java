@@ -9,8 +9,7 @@ import com.unascribed.fabrication.PlayerTag;
 import com.unascribed.fabrication.interfaces.SetSaturation;
 import com.unascribed.fabrication.interfaces.TaggablePlayer;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.entity.player.HungerManager;
 import net.minecraft.entity.player.PlayerEntity;
 
@@ -23,7 +22,7 @@ public abstract class MixinHungerManager implements SetSaturation {
 	
 	@Inject(at=@At("HEAD"), method="update(Lnet/minecraft/entity/player/PlayerEntity;)V", cancellable=true)
 	public void update(PlayerEntity pe, CallbackInfo ci) {
-		if (RuntimeChecks.check("*.taggable_players") && pe instanceof TaggablePlayer) {
+		if (MixinConfigPlugin.isEnabled("*.taggable_players") && pe instanceof TaggablePlayer) {
 			if (((TaggablePlayer)pe).fabrication$hasTag(PlayerTag.NO_HUNGER)) {
 				ci.cancel();
 			}

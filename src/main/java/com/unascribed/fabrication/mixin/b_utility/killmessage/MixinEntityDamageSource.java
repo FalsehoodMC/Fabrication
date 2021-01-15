@@ -12,8 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.interfaces.GetKillMessage;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -32,7 +31,7 @@ public abstract class MixinEntityDamageSource {
 	
 	@Inject(at=@At("HEAD"), method="getDeathMessage(Lnet/minecraft/entity/LivingEntity;)Lnet/minecraft/text/Text;", cancellable=true)
 	public void getDeathMessage(LivingEntity victim, CallbackInfoReturnable<Text> rtrn) {
-		if (!RuntimeChecks.check("*.killmessage")) return;
+		if (!MixinConfigPlugin.isEnabled("*.killmessage")) return;
 		Entity attacker = ((EntityDamageSource)(Object)this).getAttacker();
 		if (attacker instanceof GetKillMessage) {
 			Iterator<ItemStack> iter = attacker.getItemsHand().iterator();

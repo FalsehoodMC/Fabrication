@@ -10,8 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.EntityType;
@@ -30,7 +29,7 @@ public class MixinItemStackClient {
 			method="getTooltip(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/client/item/TooltipContext;)Ljava/util/List;",
 			locals=LocalCapture.CAPTURE_FAILHARD)
 	public void getTooltip(PlayerEntity player, TooltipContext ctx, CallbackInfoReturnable<List<Text>> ci, List<Text> list) {
-		if (!RuntimeChecks.check("*.canhit")) return;
+		if (!MixinConfigPlugin.isEnabled("*.canhit")) return;
 		ItemStack self = (ItemStack)(Object)this;
 		if (self.hasTag() && self.getTag().contains("CanHit", NbtType.LIST) && !self.getTag().getBoolean("HideCanHit")) {
 			list.add(LiteralText.EMPTY);

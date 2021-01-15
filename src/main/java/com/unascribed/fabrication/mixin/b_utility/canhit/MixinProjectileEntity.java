@@ -8,8 +8,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.unascribed.fabrication.CanHitUtil;
 import com.unascribed.fabrication.interfaces.SetCanHitList;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.ProjectileEntity;
@@ -28,7 +27,7 @@ public class MixinProjectileEntity implements SetCanHitList {
 	
 	@Inject(at=@At("HEAD"), method="onCollision(Lnet/minecraft/util/hit/HitResult;)V", cancellable=true)
 	public void onCollision(HitResult result, CallbackInfo ci) {
-		if (!RuntimeChecks.check("*.canhit")) return;
+		if (!MixinConfigPlugin.isEnabled("*.canhit")) return;
 		if (result.getType() == Type.ENTITY) {
 			Entity e = ((EntityHitResult)result).getEntity();
 			if (!CanHitUtil.canHit(fabrication$getCanHitList(), e) || !CanHitUtil.canHit(fabrication$getCanHitList2(), e)) {

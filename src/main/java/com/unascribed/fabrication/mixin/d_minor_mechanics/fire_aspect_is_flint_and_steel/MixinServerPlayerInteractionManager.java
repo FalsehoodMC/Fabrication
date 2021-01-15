@@ -6,8 +6,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;
@@ -28,7 +27,7 @@ public class MixinServerPlayerInteractionManager {
 	@Inject(at=@At("RETURN"), method="interactBlock(Lnet/minecraft/server/network/ServerPlayerEntity;Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;",
 		cancellable=true)
 	public void interactBlock(ServerPlayerEntity player, World world, ItemStack stack, Hand hand, BlockHitResult hitResult, CallbackInfoReturnable<ActionResult> ci) {
-		if (RuntimeChecks.check("*.fire_aspect_is_flint_and_steel") && ci.getReturnValue() == ActionResult.PASS) {
+		if (MixinConfigPlugin.isEnabled("*.fire_aspect_is_flint_and_steel") && ci.getReturnValue() == ActionResult.PASS) {
 			if (EnchantmentHelper.getLevel(Enchantments.FIRE_ASPECT, stack) > 0) {
 				ServerPlayerInteractionManager self = (ServerPlayerInteractionManager)(Object)this;
 				ItemStack flintAndSteel = new ItemStack(Items.FLINT_AND_STEEL);

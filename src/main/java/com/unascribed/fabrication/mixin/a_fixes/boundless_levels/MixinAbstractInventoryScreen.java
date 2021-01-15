@@ -6,8 +6,7 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 
 @Mixin(AbstractInventoryScreen.class)
@@ -16,7 +15,7 @@ public class MixinAbstractInventoryScreen {
 
 	@ModifyConstant(constant=@Constant(intValue=9), method="drawStatusEffectDescriptions(Lnet/minecraft/client/util/math/MatrixStack;IILjava/lang/Iterable;)V")
 	public int modifyMaxRenderedLevel(int orig) {
-		if (RuntimeChecks.check("*.boundless_levels")) return 32767;
+		if (MixinConfigPlugin.isEnabled("*.boundless_levels")) return 32767;
 		return orig;
 	}
 	

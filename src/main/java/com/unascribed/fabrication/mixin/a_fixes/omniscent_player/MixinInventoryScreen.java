@@ -8,8 +8,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.util.Window;
@@ -24,7 +23,7 @@ public class MixinInventoryScreen {
 	
 	@Inject(at=@At("HEAD"), method="drawEntity(IIIFFLnet/minecraft/entity/LivingEntity;)V", cancellable=true)
 	private static void drawEntity(int x, int y, int size, float mouseX, float mouseY, LivingEntity entity, CallbackInfo ci) {
-		if (!RuntimeChecks.check("*.omniscent_player")) return;
+		if (!MixinConfigPlugin.isEnabled("*.omniscent_player")) return;
 		if (fabrication$reentering) return;
 		if (!(entity instanceof PlayerEntity)) return;
 		try {

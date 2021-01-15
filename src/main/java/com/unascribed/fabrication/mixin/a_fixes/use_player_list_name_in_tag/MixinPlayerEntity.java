@@ -7,8 +7,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.PlayerListEntry;
@@ -28,7 +27,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 
 	@Inject(at=@At("RETURN"), method="getDisplayName()Lnet/minecraft/text/Text;", cancellable=true)
 	public void getDisplayName(CallbackInfoReturnable<Text> ci) {
-		if (!RuntimeChecks.check("*.use_player_list_name_in_tag")) return;
+		if (!MixinConfigPlugin.isEnabled("*.use_player_list_name_in_tag")) return;
 		Object self = this;
 		if (self instanceof AbstractClientPlayerEntity) {
 			PlayerListEntry ple = MinecraftClient.getInstance().getNetworkHandler().getPlayerListEntry(getUuid());

@@ -8,8 +8,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.google.common.collect.Lists;
 
 import net.minecraft.block.SideShapeType;
@@ -43,7 +42,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 	
 	@Inject(at=@At("TAIL"), method="tick()V")
 	public void tick(CallbackInfo ci) {
-		if (!RuntimeChecks.check("*.repelling_void")) return;
+		if (!MixinConfigPlugin.isEnabled("*.repelling_void")) return;
 		if (onGround) {
 			fabrication$lastGroundPos = getPos();
 			fabrication$voidFallTrail.clear();
@@ -60,7 +59,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 	@Override
 	protected void destroy() {
 		Vec3d pos = fabrication$lastGroundPos;
-		if (RuntimeChecks.check("*.repelling_void") && pos != null) {
+		if (MixinConfigPlugin.isEnabled("*.repelling_void") && pos != null) {
 			BlockPos bp = new BlockPos(pos).down();
 			if (!world.getBlockState(bp).isSideSolid(world, bp, Direction.UP, SideShapeType.CENTER)) {
 				boolean foundOne = false;

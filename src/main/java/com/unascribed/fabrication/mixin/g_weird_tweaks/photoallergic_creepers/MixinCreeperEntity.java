@@ -6,8 +6,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.mob.CreeperEntity;
@@ -25,7 +24,7 @@ public abstract class MixinCreeperEntity extends HostileEntity {
 
 	@Inject(at=@At("HEAD"), method="tick()V")
 	public void onTick(CallbackInfo ci) {
-		if (RuntimeChecks.check("*.photoallergic_creepers")) {
+		if (MixinConfigPlugin.isEnabled("*.photoallergic_creepers")) {
 			if (isAffectedByDaylight()) {
 				ItemStack helmet = this.getEquippedStack(EquipmentSlot.HEAD);
 				if (!helmet.isEmpty()) {

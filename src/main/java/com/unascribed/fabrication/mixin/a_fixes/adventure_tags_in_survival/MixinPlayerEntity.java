@@ -8,8 +8,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.block.pattern.CachedBlockPosition;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -35,7 +34,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 	@Inject(at=@At("HEAD"), method="isBlockBreakingRestricted(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/world/GameMode;)Z",
 			cancellable=true)
 	public void isBlockBreakingRestricted(World world, BlockPos pos, GameMode mode, CallbackInfoReturnable<Boolean> ci) {
-		if (!RuntimeChecks.check("*.adventure_tags_in_survival") || mode.isCreative() || mode.isBlockBreakingRestricted()) return;
+		if (!MixinConfigPlugin.isEnabled("*.adventure_tags_in_survival") || mode.isCreative() || mode.isBlockBreakingRestricted()) return;
 		ItemStack stack = getMainHandStack();
 		if (!stack.isEmpty()) {
 			if (stack.hasTag() && stack.getTag().contains("CanDestroy")) {
@@ -49,7 +48,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 	public void canPlaceOn(BlockPos pos, Direction dir, ItemStack stack, CallbackInfoReturnable<Boolean> ci) {
 		// note: this isn't called for block placement for some reason; that's hardcoded into ItemStack
 		// however, this *is* used for buckets, spawn eggs, etc, and may be used by other mods
-		if (!RuntimeChecks.check("*.adventure_tags_in_survival") || abilities.creativeMode || !abilities.allowModifyWorld) return;
+		if (!MixinConfigPlugin.isEnabled("*.adventure_tags_in_survival") || abilities.creativeMode || !abilities.allowModifyWorld) return;
 		if (!stack.isEmpty()) {
 			if (stack.hasTag() && stack.getTag().contains("CanPlaceOn")) {
 				ci.setReturnValue(stack.canPlaceOn(world.getTagManager(), new CachedBlockPosition(world, pos.offset(dir.getOpposite()), false)));

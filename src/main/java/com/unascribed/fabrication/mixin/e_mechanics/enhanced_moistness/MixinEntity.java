@@ -9,8 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.interfaces.MarkWet;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.particle.ParticleTypes;
@@ -48,7 +47,7 @@ public abstract class MixinEntity implements MarkWet {
 	
 	@Inject(at=@At("TAIL"), method="baseTick()V")
 	public void baseTick(CallbackInfo ci) {
-		if (!RuntimeChecks.check("*.enhanced_moistness") || world.isClient) return;
+		if (!MixinConfigPlugin.isEnabled("*.enhanced_moistness") || world.isClient) return;
 		if (isInLava()) {
 			fabrication$wetTimer = 0;
 		} else {
@@ -77,7 +76,7 @@ public abstract class MixinEntity implements MarkWet {
 	
 	@Inject(at=@At("HEAD"), method="isWet()Z", cancellable=true)
 	public void isWet(CallbackInfoReturnable<Boolean> ci) {
-		if (RuntimeChecks.check("*.enhanced_moistness")) {
+		if (MixinConfigPlugin.isEnabled("*.enhanced_moistness")) {
 			if (fabrication$wetTimer > 0 && !fabrication$checkingOriginalWetness) {
 				ci.setReturnValue(true);
 			}

@@ -6,8 +6,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.block.pattern.CachedBlockPosition;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -21,7 +20,7 @@ public class MixinItemStack {
 	@Inject(at=@At("HEAD"), method="useOnBlock(Lnet/minecraft/item/ItemUsageContext;)Lnet/minecraft/util/ActionResult;",
 			cancellable=true)
 	public void useOnBlock(ItemUsageContext iuc, CallbackInfoReturnable<ActionResult> ci) {
-		if (!RuntimeChecks.check("*.adventure_tags_in_survival")) return;
+		if (!MixinConfigPlugin.isEnabled("*.adventure_tags_in_survival")) return;
 		PlayerEntity player = iuc.getPlayer();
 		if (player != null && (player.abilities.creativeMode || !player.abilities.allowModifyWorld)) return;
 		ItemStack self = (ItemStack)(Object)this;

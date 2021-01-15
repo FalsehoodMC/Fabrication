@@ -10,8 +10,7 @@ import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.interfaces.SetAttackerYawAware;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -28,7 +27,7 @@ public class MixinServerPlayNetworkHandler {
 	public void onCustomPayload(CustomPayloadC2SPacket packet, CallbackInfo ci) {
 		Identifier channel = FabRefl.getChannel(packet);
 		if (channel.getNamespace().equals("fabrication") && channel.getPath().equals("item_despawn")) {
-			if (RuntimeChecks.check("*.sync_attacker_yaw") && player instanceof SetAttackerYawAware) {
+			if (MixinConfigPlugin.isEnabled("*.sync_attacker_yaw") && player instanceof SetAttackerYawAware) {
 				FabLog.debug("Enabling item despawn syncing for "+player.getEntityName());
 				((SetAttackerYawAware)player).fabrication$setAttackerYawAware(true);
 			}

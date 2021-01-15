@@ -11,8 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.unascribed.fabrication.loaders.LoaderDimensionalTools;
 import com.unascribed.fabrication.loaders.LoaderDimensionalTools.MohsIdentifier;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.google.common.collect.Sets;
 
 import net.minecraft.block.BlockState;
@@ -34,7 +33,7 @@ public class MixinMiningToolItem {
 	@Inject(at=@At("HEAD"), method="postMine(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/LivingEntity;)Z",
 			cancellable=true)
 	public void postMine(ItemStack stack, World world, BlockState state, BlockPos pos, LivingEntity miner, CallbackInfoReturnable<Boolean> ci) {
-		if (!RuntimeChecks.check("*.dimensional_tools")) return;
+		if (!MixinConfigPlugin.isEnabled("*.dimensional_tools")) return;
 		if (world.isClient) return;
 		if ((!(miner instanceof PlayerEntity) || !((PlayerEntity)miner).abilities.creativeMode)) {
 			if (!stack.isDamageable()) return;

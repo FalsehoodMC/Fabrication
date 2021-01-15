@@ -21,8 +21,6 @@ import com.unascribed.fabrication.loaders.LoaderBlockLogo;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -76,7 +74,7 @@ public class MixinTitleScreen extends Screen {
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/client/gui/screen/TitleScreen.method_29343(IILjava/util/function/BiConsumer;)V"),
 			method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V", require=2)
 	public void drawLogo(TitleScreen subject, int x, int y, BiConsumer<Integer, Integer> callback) {
-		if (!RuntimeChecks.check("*.block_logo")) {
+		if (!MixinConfigPlugin.isEnabled("*.block_logo")) {
 			subject.method_29343(x, y, callback);
 			return;
 		}
@@ -86,7 +84,7 @@ public class MixinTitleScreen extends Screen {
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/client/texture/TextureManager.bindTexture(Lnet/minecraft/util/Identifier;)V"),
 			method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
 	public void bindTexture(TextureManager subject, Identifier id) {
-		if (RuntimeChecks.check("*.block_logo") && id == EDITION_TITLE_TEXTURE) {
+		if (MixinConfigPlugin.isEnabled("*.block_logo") && id == EDITION_TITLE_TEXTURE) {
 			id = FABRICATION$EMPTY;
 		}
 		subject.bindTexture(id);
@@ -94,21 +92,21 @@ public class MixinTitleScreen extends Screen {
 	
 	@Inject(at=@At("HEAD"), method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
 	public void renderHead(MatrixStack matrices, int mouseX, int mouseY, float tickDelta, CallbackInfo ci) {
-		if (!RuntimeChecks.check("*.block_logo")) return;
+		if (!MixinConfigPlugin.isEnabled("*.block_logo")) return;
 		fabrication$splashText = splashText;
 		splashText = null;
 	}
 	
 	@Inject(at=@At("RETURN"), method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
 	public void renderReturn(MatrixStack matrices, int mouseX, int mouseY, float tickDelta, CallbackInfo ci) {
-		if (!RuntimeChecks.check("*.block_logo")) return;
+		if (!MixinConfigPlugin.isEnabled("*.block_logo")) return;
 		splashText = fabrication$splashText;
 		fabrication$splashText = null;
 	}
 	
 	@Inject(at=@At("TAIL"), method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
 	public void renderTail(MatrixStack matrices, int mouseX, int mouseY, float tickDelta, CallbackInfo ci) {
-		if (!RuntimeChecks.check("*.block_logo")) return;
+		if (!MixinConfigPlugin.isEnabled("*.block_logo")) return;
 		if (splashText != null) {
 			float fade = doBackgroundFade ? MathHelper.clamp(((Util.getMeasuringTimeMs() - backgroundFadeStart) / 1000f)-1, 0, 1) : 1;
 			int l = MathHelper.ceil(fade * 255.0f) << 24;

@@ -9,8 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import com.unascribed.fabrication.CanHitUtil;
 import com.unascribed.fabrication.interfaces.SetCanHitList;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
@@ -31,7 +30,7 @@ public class MixinCrossbowItem {
 			locals=LocalCapture.CAPTURE_FAILHARD)
 	private static void shoot(World world, LivingEntity shooter, Hand hand, ItemStack crossbow, ItemStack projectile, float soundPitch, boolean creative, float speed, float divergence, float simulated,
 			CallbackInfo ci, boolean firework, ProjectileEntity proj) {
-		if (!RuntimeChecks.check("*.canhit") || CanHitUtil.isExempt(shooter)) return;
+		if (!MixinConfigPlugin.isEnabled("*.canhit") || CanHitUtil.isExempt(shooter)) return;
 		ListTag canHitList = crossbow.hasTag() && crossbow.getTag().contains("CanHit") ? crossbow.getTag().getList("CanHit", NbtType.STRING) : null;
 		ListTag canHitList2 = projectile.hasTag() && projectile.getTag().contains("CanHit") ? projectile.getTag().getList("CanHit", NbtType.STRING) : null;
 		if (proj instanceof SetCanHitList) {

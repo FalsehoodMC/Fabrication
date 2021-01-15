@@ -6,8 +6,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.projectile.ShulkerBulletEntity;
@@ -19,7 +18,7 @@ public abstract class MixinShulkerBulletEntity {
 	@Inject(at=@At("HEAD"), method="tick()V", cancellable=true)
 	public void tick(CallbackInfo ci) {
 		Object self = this;
-		if (RuntimeChecks.check("*.shulker_bullets_despawn_on_death") && !((Entity)self).world.isClient) {
+		if (MixinConfigPlugin.isEnabled("*.shulker_bullets_despawn_on_death") && !((Entity)self).world.isClient) {
 			Entity owner = ((ProjectileEntity)self).getOwner();
 			if (owner == null || !owner.isAlive()) {
 				((Entity)self).remove();

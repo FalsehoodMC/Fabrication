@@ -6,8 +6,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;
@@ -19,7 +18,7 @@ public abstract class MixinEnchantment {
 	
 	@Inject(at=@At("HEAD"), method="isAcceptableItem(Lnet/minecraft/item/ItemStack;)Z", cancellable=true)
 	public void isAcceptableItem(ItemStack stack, CallbackInfoReturnable<Boolean> ci) {
-		if (RuntimeChecks.check("*.infinity_crossbows") && (Object)this == Enchantments.INFINITY && stack.getItem() == Items.CROSSBOW) {
+		if (MixinConfigPlugin.isEnabled("*.infinity_crossbows") && (Object)this == Enchantments.INFINITY && stack.getItem() == Items.CROSSBOW) {
 			ci.setReturnValue(true);
 		}
 	}

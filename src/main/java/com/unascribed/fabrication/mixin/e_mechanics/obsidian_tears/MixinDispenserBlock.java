@@ -7,8 +7,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.ObsidianTears;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.block.dispenser.DispenserBehavior;
 import net.minecraft.item.ItemStack;
@@ -21,7 +20,7 @@ public class MixinDispenserBlock {
 	@Inject(at=@At("HEAD"), method="getBehaviorForItem(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/block/dispenser/DispenserBehavior;",
 			cancellable=true)
 	public void getBehaviorForItem(ItemStack stack, CallbackInfoReturnable<DispenserBehavior> ci) {
-		if (!RuntimeChecks.check("*.obsidian_tears")) return;
+		if (!MixinConfigPlugin.isEnabled("*.obsidian_tears")) return;
 		if (stack.getItem() == Items.POTION && stack.hasTag() && stack.getTag().getBoolean("fabrication:ObsidianTears")) {
 			ci.setReturnValue(ObsidianTears.DISPENSER_BEHAVIOR);
 		}

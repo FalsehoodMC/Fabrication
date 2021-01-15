@@ -10,6 +10,7 @@ import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +25,7 @@ import javax.swing.plaf.metal.MetalLookAndFeel;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
+import org.spongepowered.asm.mixin.Mixins;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
@@ -98,21 +100,6 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 				out[i] = values[i].name().toLowerCase(Locale.ROOT);
 			}
 			return out;
-		}
-	}
-	
-	public static final class RuntimeChecks {
-		public static final boolean ENABLED = MixinConfigPlugin.isEnabled("general.runtime_checks");
-		/**
-		 * <b>Warning:</b> If runtime_checks is disabled, this method <i>always returns true</i> to
-		 * allow JIT simplification and removal of branches. If you have a mixin that uses
-		 * anyConfigEnabled, you need to use {@link MixinConfigPlugin#isEnabled isEnabled} directly.
-		 * <p>
-		 * In other words, only use this method in code that <i>will not be present at all</i> if
-		 * the option in question is disabled and runtime_checks is off.
-		 */
-		public static boolean check(String cfg) {
-			return !ENABLED || MixinConfigPlugin.isEnabled(cfg);
 		}
 	}
 	
@@ -194,6 +181,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	private static Profile profile;
 	private static QDIni rawConfig;
 	private static Map<String, Trilean> config;
+	private static final Set<String> failures = Sets.newHashSet();
+	private static final Set<String> failuresReadOnly = Collections.unmodifiableSet(failures);
 	
 	public static String remap(String configKey) {
 		return starMap.getOrDefault(configKey, configKey);
@@ -216,6 +205,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	}
 
 	public static boolean isEnabled(String configKey) {
+		if (isFailed(configKey)) return false;
 		configKey = remap(configKey);
 		if (!validKeys.contains(configKey)) {
 			FabLog.error("Cannot look up value for config key "+configKey+" with no default");
@@ -226,11 +216,17 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		return config.get(configKey).resolve(defaults == null ? false : defaults.get(configKey));
 	}
 	
+	public static boolean isFailed(String configKey) {
+		return failures.contains(remap(configKey));
+	}
+	
 	public static Trilean getValue(String configKey) {
+		if (isFailed(configKey)) return Trilean.FALSE;
 		return config.getOrDefault(remap(configKey), Trilean.UNSET);
 	}
 	
 	public static ResolvedTrilean getResolvedValue(String configKey) {
+		if (isFailed(configKey)) return ResolvedTrilean.FALSE;
 		return config.getOrDefault(remap(configKey), Trilean.UNSET).resolveSemantically(defaults == null ? false : defaults.get(configKey));
 	}
 	
@@ -261,6 +257,14 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	
 	public static ImmutableSet<String> getAllSections() {
 		return validSections;
+	}
+	
+	public static Set<String> getAllFailures() {
+		return failuresReadOnly;
+	}
+	
+	protected static void addFailure(String configKey) {
+		failures.add(remap(configKey));
 	}
 	
 	public static void set(String configKey, String newValue) {
@@ -508,6 +512,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	@Override
 	public void onLoad(String mixinPackage) {
 		reload();
+		RUNTIME_CHECKS_WAS_ENABLED = isEnabled("general.runtime_checks");
+		Mixins.registerErrorHandlerClass("com.unascribed.fabrication.support.MixinErrorHandler");
 	}
 
 	@Override
@@ -568,7 +574,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 										if (DEBUG) FabLog.info("🙈 Dev error! Exploding.");
 										throw devError(cn.name.substring(pkg.length()+1).replace('/', '.')+" references an unknown config key "+v+"\n\nDid you forget to add it to features.txt and run build-features.sh?");
 									}
-									if (getValue((String)v) == Trilean.UNSET && RuntimeChecks.ENABLED) {
+									if (getValue((String)v) == Trilean.UNSET && MixinConfigPlugin.RUNTIME_CHECKS_WAS_ENABLED) {
 										eligibilitySuccesses.add("Runtime checks is enabled and required config key "+remap((String)v)+" is unset");
 									} else if (!isEnabled((String)v)) {
 										eligibilityFailures.add("Required config setting "+remap((String)v)+" is disabled "+(config.get(v) == Trilean.FALSE ? "explicitly" : "by profile"));
@@ -577,7 +583,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 										eligibilitySuccesses.add("Required config setting "+remap((String)v)+" is enabled "+(config.get(v) == Trilean.TRUE ? "explicitly" : "by profile"));
 									}
 								} else if (k.equals("configDisabled")) {
-									if (getValue((String)v) == Trilean.UNSET && RuntimeChecks.ENABLED) {
+									if (getValue((String)v) == Trilean.UNSET && MixinConfigPlugin.RUNTIME_CHECKS_WAS_ENABLED) {
 										eligibilitySuccesses.add("Runtime checks is enabled and conflicting config key "+remap((String)v)+" is unset");
 									} else if (!isEnabled((String)v)) {
 										eligibilitySuccesses.add("Conflicting config setting "+remap((String)v)+" is disabled "+(config.get(v) == Trilean.FALSE ? "explicitly" : "by profile"));
@@ -654,7 +660,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 										eligibilityFailures.add("All of the relevant config settings are explicitly disabled");
 										eligible = false;
 									} else if (!foundAny) {
-										if (RuntimeChecks.ENABLED) {
+										if (MixinConfigPlugin.RUNTIME_CHECKS_WAS_ENABLED) {
 											eligibilityNotes.add("None of the relevant config settings are enabled, but runtime checks is enabled");
 										} else {
 											eligibilityFailures.add("None of the relevant config settings are enabled");
@@ -672,7 +678,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 											} else {
 												try {
 													SpecialEligibility se = SpecialEligibility.valueOf(e[1]);
-													if (RuntimeChecks.ENABLED && se.ignorableWithRuntimeChecks) {
+													if (MixinConfigPlugin.RUNTIME_CHECKS_WAS_ENABLED && se.ignorableWithRuntimeChecks) {
 														eligibilityNotes.add("Runtime checks is enabled, ignoring special condition "+se);
 													} else if (isMet(se)) {
 														eligibilitySuccesses.add("Special condition "+se+" is met");
@@ -759,4 +765,6 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
 	}
 
+	public static boolean RUNTIME_CHECKS_WAS_ENABLED;
+	
 }

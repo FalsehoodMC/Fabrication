@@ -7,8 +7,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.item.HeldItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -23,7 +22,7 @@ public class MixinHeldItemRenderer {
 			method="renderArmHoldingItem(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IFFLnet/minecraft/util/Arm;)V")
 	private void renderArmHoldingItem(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, float equipProgress, float swingProgress, Arm arm, CallbackInfo ci) {
 		float f = arm == Arm.LEFT ? -1 : 1;
-		if (RuntimeChecks.check("*.janky_arm")) {
+		if (MixinConfigPlugin.isEnabled("*.janky_arm")) {
 			matrices.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(-33.0F));
 			matrices.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(f*-35.0F));
 			matrices.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(f*-8f));

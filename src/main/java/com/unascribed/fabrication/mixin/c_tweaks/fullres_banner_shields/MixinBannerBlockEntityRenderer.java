@@ -13,8 +13,7 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.datafixers.util.Pair;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.block.entity.BannerPattern;
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.render.RenderLayer;
@@ -40,7 +39,7 @@ public class MixinBannerBlockEntityRenderer {
 	@Inject(at=@At(value="INVOKE", target="net/minecraft/client/model/ModelPart.render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;II)V",
 			shift=Shift.AFTER, ordinal=0), method=RENDER_CANVAS, cancellable=true)
 	private static void renderCanvasHead(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, ModelPart canvas, SpriteIdentifier baseSprite, boolean isBanner, List<Pair<BannerPattern, DyeColor>> patterns, boolean bl2, CallbackInfo ci) {
-		if (!RuntimeChecks.check("*.fullres_banner_shields")) return;
+		if (!MixinConfigPlugin.isEnabled("*.fullres_banner_shields")) return;
 		if (!isBanner) {
 			((Immediate)vertexConsumers).draw();
 			GlStateManager.enablePolygonOffset();

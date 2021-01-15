@@ -11,7 +11,6 @@ import com.unascribed.fabrication.support.ConfigLoader;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
 import com.unascribed.fabrication.support.ResolvedTrilean;
 import com.unascribed.fabrication.support.Trilean;
 
@@ -62,7 +61,7 @@ public class FabricationMod implements ModInitializer {
 			try {
 				Feature r = (Feature)Class.forName(s).newInstance();
 				String key = MixinConfigPlugin.remap(r.getConfigKey());
-				if (key == null || RuntimeChecks.check(key)) {
+				if (key == null || MixinConfigPlugin.isEnabled(key)) {
 					r.apply();
 					if (key != null) {
 						enabledFeatures.add(key);
@@ -174,6 +173,11 @@ public class FabricationMod implements ModInitializer {
 				data.writeString(MixinConfigPlugin.getRawValue(key));
 				data.writeLong(LAUNCH_ID);
 			}
+		}
+		data.writeString(Agnos.INST.getModVersion());
+		data.writeVarInt(MixinConfigPlugin.getAllFailures().size());
+		for (String k : MixinConfigPlugin.getAllFailures()) {
+			data.writeString(k);
 		}
 		CustomPayloadS2CPacket pkt = new CustomPayloadS2CPacket(CONFIG, data);
 		spe.networkHandler.sendPacket(pkt);

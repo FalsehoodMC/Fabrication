@@ -6,8 +6,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.entity.mob.SilverfishEntity;
 
 @Mixin(SilverfishEntity.class)
@@ -17,7 +16,7 @@ public class MixinSilverfishEntity {
 	// this method is poorly mapped. a better name is "hasStepSound"
 	@Inject(at=@At("HEAD"), method="canClimb()Z", cancellable=true)
 	public void canClimb(CallbackInfoReturnable<Boolean> ci) {
-		if (RuntimeChecks.check("*.silverfish_step")) ci.setReturnValue(true);
+		if (MixinConfigPlugin.isEnabled("*.silverfish_step")) ci.setReturnValue(true);
 	}
 	
 }

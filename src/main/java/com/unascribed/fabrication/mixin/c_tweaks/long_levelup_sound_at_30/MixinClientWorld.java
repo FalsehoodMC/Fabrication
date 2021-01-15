@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.SpecialEligibility;
 
 import net.minecraft.client.MinecraftClient;
@@ -23,7 +23,7 @@ public class MixinClientWorld {
 
 	@Inject(at=@At("HEAD"), method="playSound(DDDLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FFZ)V", cancellable=true)
 	public void playSound(double x, double y, double z, SoundEvent event, SoundCategory category, float pitch, float volume, boolean useDistance, CallbackInfo ci) {
-		if (!RuntimeChecks.check("*.long_levelup_sound_at_30")) return;
+		if (!MixinConfigPlugin.isEnabled("*.long_levelup_sound_at_30")) return;
 		if (event == SoundEvents.ENTITY_PLAYER_LEVELUP && category == SoundCategory.PLAYERS) {
 			int lvl = MinecraftClient.getInstance().player.experienceLevel;
 			if (lvl >= 25 && lvl < 30 && MinecraftClient.getInstance().player.squaredDistanceTo(x, y, z) < 0.05) {

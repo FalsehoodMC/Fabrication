@@ -8,8 +8,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -27,7 +26,7 @@ public class MixinPlayerEntity {
 	@Inject(at=@At("HEAD"), method="findRespawnPosition(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;FZZ)Ljava/util/Optional;",
 			cancellable=true)
 	private static void findRespawnPosition(ServerWorld world, BlockPos pos, float f, boolean b, boolean b2, CallbackInfoReturnable<Optional<Vec3d>> ci) {
-		if (!RuntimeChecks.check("*.obsidian_tears")) return;
+		if (!MixinConfigPlugin.isEnabled("*.obsidian_tears")) return;
 		BlockState state = world.getBlockState(pos);
 		Block bl = state.getBlock();
 		if (bl == Blocks.CRYING_OBSIDIAN) {

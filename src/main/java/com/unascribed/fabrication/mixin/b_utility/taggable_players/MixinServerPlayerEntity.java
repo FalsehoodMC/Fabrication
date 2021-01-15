@@ -16,8 +16,7 @@ import com.unascribed.fabrication.PlayerTag;
 import com.unascribed.fabrication.interfaces.SetSaturation;
 import com.unascribed.fabrication.interfaces.TaggablePlayer;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.google.common.base.Enums;
 import com.google.common.collect.ImmutableSet;
 
@@ -75,7 +74,7 @@ public abstract class MixinServerPlayerEntity extends PlayerEntity implements Ta
 	
 	@Inject(at=@At("TAIL"), method="tick()V")
 	public void tick(CallbackInfo ci) {
-		if (RuntimeChecks.check("*.taggable_players")) {
+		if (MixinConfigPlugin.isEnabled("*.taggable_players")) {
 			if (fabrication$tags.contains(PlayerTag.NO_HUNGER)) {
 				getHungerManager().setFoodLevel(getHealth() >= getMaxHealth() ? 20 : 17);
 				// prevent the hunger bar from jiggling

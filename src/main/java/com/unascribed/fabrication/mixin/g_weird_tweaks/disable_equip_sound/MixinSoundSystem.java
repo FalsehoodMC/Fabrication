@@ -6,9 +6,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.support.Env;
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
 import net.minecraft.client.sound.SoundInstance;
 import net.minecraft.client.sound.SoundSystem;
 
@@ -18,7 +17,7 @@ public class MixinSoundSystem {
 
 	@Inject(at=@At("HEAD"), method="play(Lnet/minecraft/client/sound/SoundInstance;)V", cancellable=true)
 	public void play(SoundInstance si, CallbackInfo ci) {
-		if (!RuntimeChecks.check("*.disable_equip_sound")) return;
+		if (!MixinConfigPlugin.isEnabled("*.disable_equip_sound")) return;
 		if (si != null && si.getId().getNamespace().equals("minecraft")) {
 			if (si.getId().getPath().equals("item.armor.equip_generic")) {
 				ci.cancel();

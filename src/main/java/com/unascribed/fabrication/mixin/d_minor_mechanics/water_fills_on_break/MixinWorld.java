@@ -5,8 +5,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.google.common.collect.ImmutableSet;
 
 import org.spongepowered.asm.mixin.injection.At;
@@ -29,7 +28,7 @@ public class MixinWorld {
 	
 	@Inject(at=@At("HEAD"), method="removeBlock(Lnet/minecraft/util/math/BlockPos;Z)Z", cancellable=true)
 	public void removeBlock(BlockPos pos, boolean move, CallbackInfoReturnable<Boolean> ci) {
-		if (RuntimeChecks.check("*.water_fills_on_break")) {
+		if (MixinConfigPlugin.isEnabled("*.water_fills_on_break")) {
 			World self = (World)(Object)this;
 			int countWater = 0;
 			int countAir = 0;

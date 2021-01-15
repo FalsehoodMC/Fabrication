@@ -17,8 +17,7 @@ import com.unascribed.fabrication.loaders.LoaderGearComponents;
 import com.unascribed.fabrication.loaders.LoaderGearComponents.ItemMaterialValue;
 import com.unascribed.fabrication.loaders.LoaderGearComponents.MaterialData;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.google.common.collect.Lists;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -54,7 +53,7 @@ public abstract class MixinLivingEntity extends Entity {
 
 	@Unique
 	private void shatter(EquipmentSlot slot, ItemStack stack) {
-		if (!RuntimeChecks.check("*.broken_tools_drop_components")) return;
+		if (!MixinConfigPlugin.isEnabled("*.broken_tools_drop_components")) return;
 		Item item = stack.getItem();
 		if (LoaderGearComponents.ignoreVanishing && EnchantmentHelper.hasVanishingCurse(stack)) return;
 		if (stack.hasTag() && stack.getTag().getBoolean("fabrication:ShatteredAlready")) return;

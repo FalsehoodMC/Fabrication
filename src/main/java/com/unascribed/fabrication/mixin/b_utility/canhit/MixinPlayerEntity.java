@@ -6,8 +6,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 import com.unascribed.fabrication.CanHitUtil;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -27,7 +26,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/entity/Entity.isAttackable()Z"),
 			method="attack(Lnet/minecraft/entity/Entity;)V")
 	public boolean isAttackable(Entity entity) {
-		if (!RuntimeChecks.check("*.canhit") || CanHitUtil.isExempt(this)) return entity.isAttackable();
+		if (!MixinConfigPlugin.isEnabled("*.canhit") || CanHitUtil.isExempt(this)) return entity.isAttackable();
 		if (!entity.isAttackable()) return false;
 		ItemStack stack = getStackInHand(Hand.MAIN_HAND);
 		return CanHitUtil.canHit(stack, entity);

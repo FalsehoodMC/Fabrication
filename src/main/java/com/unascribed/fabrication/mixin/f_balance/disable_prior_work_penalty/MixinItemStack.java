@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 @Mixin(ItemStack.class)
 @EligibleIf(configEnabled="*.disable_prior_work_penalty")
@@ -16,7 +16,7 @@ public class MixinItemStack {
 
 	@Inject(at=@At("HEAD"), method="getRepairCost()I", cancellable=true)
 	public void getRepairCost(CallbackInfoReturnable<Integer> cir) {
-		if (!RuntimeChecks.check("*.disable_prior_work_penalty")) return;
+		if (!MixinConfigPlugin.isEnabled("*.disable_prior_work_penalty")) return;
 		cir.setReturnValue(0);
 	}
 	

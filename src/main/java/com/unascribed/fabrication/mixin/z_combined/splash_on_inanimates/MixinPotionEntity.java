@@ -11,8 +11,6 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import com.unascribed.fabrication.interfaces.SetInvisNoGravReversible;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -34,7 +32,7 @@ public abstract class MixinPotionEntity extends ThrownItemEntity {
 
 	@Inject(at=@At("TAIL"), method= "applySplashPotion(Ljava/util/List;Lnet/minecraft/entity/Entity;)V", locals=LocalCapture.CAPTURE_FAILHARD)
 	public void applySplashPotion(List<StatusEffectInstance> effects, Entity hit, CallbackInfo ci, Box box) {
-		if (!RuntimeChecks.check("*.invisibility_splash_on_inanimates") || world.isClient) return;
+		if (!MixinConfigPlugin.isEnabled("*.invisibility_splash_on_inanimates") || world.isClient) return;
 		boolean invis = false;
 		boolean slowfall = false;
 		for (StatusEffectInstance sei : effects) {

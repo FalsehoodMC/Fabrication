@@ -57,7 +57,7 @@ public class FabricationClientCommands implements ClientCommandPlugin {
 	@Override
 	public void registerCommands(CommandDispatcher<CottonClientCommandSource> dispatcher) {
 		LiteralArgumentBuilder<CottonClientCommandSource> root = LiteralArgumentBuilder.<CottonClientCommandSource>literal("fabrication:client");
-		FeatureFabricationCommand.addConfig(root);
+		FeatureFabricationCommand.addConfig(root, false);
 		root.then(LiteralArgumentBuilder.<CottonClientCommandSource>literal("atlas")
 				.then(LiteralArgumentBuilder.<CottonClientCommandSource>literal("view")
 						.then(RequiredArgumentBuilder.<CottonClientCommandSource, Identifier>argument("atlas", new AtlasArgumentType())

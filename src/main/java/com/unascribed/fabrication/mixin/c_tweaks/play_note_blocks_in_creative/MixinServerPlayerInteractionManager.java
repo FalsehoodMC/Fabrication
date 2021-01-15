@@ -7,8 +7,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -27,7 +26,7 @@ public class MixinServerPlayerInteractionManager {
 	
 	@Inject(at=@At("HEAD"), method="tryBreakBlock(Lnet/minecraft/util/math/BlockPos;)Z", cancellable=true)
 	public void tryBreakBlock(BlockPos pos, CallbackInfoReturnable<Boolean> ci) {
-		if (!RuntimeChecks.check("*.play_note_blocks_in_creative")) return;
+		if (!MixinConfigPlugin.isEnabled("*.play_note_blocks_in_creative")) return;
 		BlockState bs = world.getBlockState(pos);
 		if (bs.getBlock() == Blocks.NOTE_BLOCK) {
 			if (player.isSneaky()) {

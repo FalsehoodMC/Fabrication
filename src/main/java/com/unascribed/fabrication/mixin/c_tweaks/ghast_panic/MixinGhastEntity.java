@@ -6,8 +6,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.FlyingEntity;
 import net.minecraft.entity.mob.GhastEntity;
@@ -25,7 +24,7 @@ public abstract class MixinGhastEntity extends FlyingEntity {
 
 	@Inject(at=@At("HEAD"), method="getAmbientSound()Lnet/minecraft/sound/SoundEvent;", cancellable=true)
 	public void getAmbientSound(CallbackInfoReturnable<SoundEvent> ci) {
-		if (!RuntimeChecks.check("*.ghast_panic")) return;
+		if (!MixinConfigPlugin.isEnabled("*.ghast_panic")) return;
 		if (!world.getDimension().isUltrawarm() && world.random.nextInt(8) == 0) {
 			ci.setReturnValue(SoundEvents.ENTITY_GHAST_SCREAM);
 		}

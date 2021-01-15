@@ -7,8 +7,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EquipmentSlot;
@@ -22,7 +20,7 @@ public class MixinLivingEntity {
 
 	@Inject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", cancellable=true)
 	public void damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-		if (!RuntimeChecks.check("*.feather_falling_five")) return;
+		if (!MixinConfigPlugin.isEnabled("*.feather_falling_five")) return;
 		LivingEntity self = ((LivingEntity)(Object)this);
 		ItemStack boots = self.getEquippedStack(EquipmentSlot.FEET);
 		if (source == DamageSource.FALL && EnchantmentHelper.getLevel(Enchantments.FEATHER_FALLING, boots) >= 5) {

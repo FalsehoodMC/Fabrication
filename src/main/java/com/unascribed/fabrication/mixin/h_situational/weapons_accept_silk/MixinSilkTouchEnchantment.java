@@ -6,8 +6,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentTarget;
 import net.minecraft.enchantment.Enchantments;
@@ -24,7 +23,7 @@ public class MixinSilkTouchEnchantment extends Enchantment {
 
 	@Inject(at=@At("HEAD"), method="canAccept(Lnet/minecraft/enchantment/Enchantment;)Z", cancellable=true)
 	public void canAccept(Enchantment other, CallbackInfoReturnable<Boolean> ci) {
-		if (!RuntimeChecks.check("*.weapons_accept_silk")) return;
+		if (!MixinConfigPlugin.isEnabled("*.weapons_accept_silk")) return;
 		if (other == Enchantments.LOOTING) {
 			ci.setReturnValue(false);
 		}

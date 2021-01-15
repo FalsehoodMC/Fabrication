@@ -10,8 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.unascribed.fabrication.interfaces.RenderingAgeAccess;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
@@ -39,7 +38,7 @@ public class MixinClientPlayNetworkHandler {
 	@Inject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/s2c/play/CustomPayloadS2CPacket;)V", cancellable=true)
 	public void onCustomPayload(CustomPayloadS2CPacket packet, CallbackInfo ci) {
 		if (packet.getChannel().getNamespace().equals("fabrication") && packet.getChannel().getPath().equals("item_despawn")) {
-			if (RuntimeChecks.check("*.despawning_items_blink")) {
+			if (MixinConfigPlugin.isEnabled("*.despawning_items_blink")) {
 				if (MinecraftClient.getInstance().world != null) {
 					PacketByteBuf buf = packet.getData();
 					Entity e = MinecraftClient.getInstance().world.getEntityById(buf.readInt());

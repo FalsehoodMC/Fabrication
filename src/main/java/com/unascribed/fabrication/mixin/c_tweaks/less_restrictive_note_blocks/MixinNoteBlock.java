@@ -3,8 +3,7 @@ package com.unascribed.fabrication.mixin.c_tweaks.less_restrictive_note_blocks;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.NoteBlock;
@@ -28,7 +27,7 @@ public abstract class MixinNoteBlock extends Block {
 		boolean topCovered = world.getBlockState(pos.up()).isAir();
 		boolean canPlay;
 		Direction particleDir = Direction.UP;
-		if (RuntimeChecks.check("*.less_restrictive_note_blocks")) {
+		if (MixinConfigPlugin.isEnabled("*.less_restrictive_note_blocks")) {
 			canPlay = false;
 			Direction[] directions = {
 				Direction.UP,
@@ -51,7 +50,7 @@ public abstract class MixinNoteBlock extends Block {
 			canPlay = topCovered;
 		}
 		if (canPlay) {
-			if (RuntimeChecks.check("*.less_restrictive_note_blocks")) {
+			if (MixinConfigPlugin.isEnabled("*.less_restrictive_note_blocks")) {
 				BlockState state = world.getBlockState(pos);
 				int note = state.get(NoteBlock.NOTE);
 				float pitch = (float) Math.pow(2, (note - 12) / 12D);

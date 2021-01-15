@@ -7,8 +7,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.features.FeatureDimensionalTools;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.ShapelessRecipe;
@@ -21,7 +20,7 @@ public class MixinShapelessRecipe {
 	// can't be used because the two methods obfuscate differently
 	@Inject(at=@At("RETURN"), method="craft(Lnet/minecraft/inventory/CraftingInventory;)Lnet/minecraft/item/ItemStack;")
 	public void craft(CraftingInventory inv, CallbackInfoReturnable<ItemStack> ci) {
-		if (!RuntimeChecks.check("*.dimensional_tools")) return;
+		if (!MixinConfigPlugin.isEnabled("*.dimensional_tools")) return;
 		FeatureDimensionalTools.handleCraft(inv, ci.getReturnValue());
 	}
 	

@@ -7,8 +7,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffects;
@@ -19,7 +18,7 @@ public class MixinGameRenderer {
 
 	@Inject(at=@At("HEAD"), method="getNightVisionStrength(Lnet/minecraft/entity/LivingEntity;F)F", cancellable=true)
 	private static void getNightVisionStrength(LivingEntity entity, float tickDelta, CallbackInfoReturnable<Float> ci) {
-		if (RuntimeChecks.check("*.no_night_vision_flash")) {
+		if (MixinConfigPlugin.isEnabled("*.no_night_vision_flash")) {
 			int duration = entity.getStatusEffect(StatusEffects.NIGHT_VISION).getDuration();
 			if (duration < 200) {
 				ci.setReturnValue(duration/200f);

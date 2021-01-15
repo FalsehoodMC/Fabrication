@@ -11,8 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import com.unascribed.fabrication.client.FlatItems;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.ItemEntityRenderer;
 import net.minecraft.client.render.item.ItemRenderer;
@@ -30,7 +29,7 @@ public class MixinItemEntityRenderer {
 	@Inject(at=@At(value="INVOKE", target="net/minecraft/client/util/math/MatrixStack.push()V", shift=Shift.AFTER, ordinal=1),
 			method="render(Lnet/minecraft/entity/ItemEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")
 	public void render(ItemEntity entity, float f, float g, MatrixStack matrices, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci) {
-		if (RuntimeChecks.check("*.billboard_drops") && FlatItems.hasGeneratedModel(entity.getStack())) {
+		if (MixinConfigPlugin.isEnabled("*.billboard_drops") && FlatItems.hasGeneratedModel(entity.getStack())) {
 			// multiply the model matrix directly to avoid corrupting normals
 			matrices.peek().getModel().multiply(Matrix4f.scale(1, 1, 0));
 		}

@@ -4,8 +4,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.data.TrackedData;
@@ -30,7 +29,7 @@ public abstract class MixinTridentEntity extends Entity {
 	@Override
 	protected void destroy() {
 		TridentEntity self = (TridentEntity)(Object)this;
-		if (RuntimeChecks.check("*.tridents_in_void_return") && self.getOwner() != null) {
+		if (MixinConfigPlugin.isEnabled("*.tridents_in_void_return") && self.getOwner() != null) {
 			int i = this.dataTracker.get(LOYALTY);
 			if (i > 0) {
 				this.dealtDamage = true;

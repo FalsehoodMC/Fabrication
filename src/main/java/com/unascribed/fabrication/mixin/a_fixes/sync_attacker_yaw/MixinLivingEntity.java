@@ -10,8 +10,6 @@ import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.interfaces.SetAttackerYawAware;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -42,13 +40,13 @@ public abstract class MixinLivingEntity extends Entity implements SetAttackerYaw
 	
 	@Inject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z")
 	public void damageHead(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-		if (!RuntimeChecks.check("*.sync_attacker_yaw")) return;
+		if (!MixinConfigPlugin.isEnabled("*.sync_attacker_yaw")) return;
 		fabrication$lastAttackerYaw = knockbackVelocity;
 	}
 	
 	@Inject(at=@At("RETURN"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z")
 	public void damageReturn(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-		if (!RuntimeChecks.check("*.sync_attacker_yaw")) return;
+		if (!MixinConfigPlugin.isEnabled("*.sync_attacker_yaw")) return;
 		if (source == DamageSource.OUT_OF_WORLD && MixinConfigPlugin.isEnabled("*.repelling_void")) {
 			knockbackVelocity = yaw;
 		}

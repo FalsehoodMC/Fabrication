@@ -6,8 +6,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerAbilities;
@@ -21,7 +19,7 @@ public class MixinPlayerEntity {
 	@Redirect(at=@At(value="FIELD", target="net/minecraft/entity/player/PlayerAbilities.creativeMode:Z"),
 			method="getArrowType(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;")
 	public boolean redirectIsCreativeMode(PlayerAbilities subject, ItemStack crossbow) {
-		if (RuntimeChecks.check("*.infinity_crossbows") && MixinConfigPlugin.isEnabled("*.infibows")
+		if (MixinConfigPlugin.isEnabled("*.infinity_crossbows") && MixinConfigPlugin.isEnabled("*.infibows")
 				&& EnchantmentHelper.getLevel(Enchantments.INFINITY, crossbow) > 0) {
 			return true;
 		}

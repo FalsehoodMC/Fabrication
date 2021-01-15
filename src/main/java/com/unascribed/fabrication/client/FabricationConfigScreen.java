@@ -137,7 +137,9 @@ public class FabricationConfigScreen extends Screen {
 	private final Map<String, Trilean> optionPreviousValues = Maps.newHashMap();
 	private final Map<String, Float> optionAnimationTime = Maps.newHashMap();
 	private final Map<String, Float> disabledAnimationTime = Maps.newHashMap();
+	private final Map<String, Float> disappearAnimationTime = Maps.newHashMap();
 	private final Set<String> knownDisabled = Sets.newHashSet();
+	private final Set<String> disappeared = Sets.newHashSet();
 	
 	private boolean bufferTooltips = false;
 	private final List<Runnable> bufferedTooltips = Lists.newArrayList();
@@ -705,9 +707,9 @@ public class FabricationConfigScreen extends Screen {
 		int startY = 16-(int)(scroll);
 		int y = startY;
 		if (section == null) {
-			String v = Agnos.INST.getModVersion();
-			String blurb = "§lFabrication v"+v+" §rby unascribed\n"
-					+ "Click a category on the left to change settings.";
+			String v = getVersion();
+			String blurb = "§lFabrication v"+v+" §rby unascribed\n"+(configuringServer ? "(Local version: v"+Agnos.INST.getModVersion()+")" : "")
+					+ "\nClick a category on the left to change settings.";
 			int height = drawWrappedText(matrices, 140, 20, blurb, width-130, -1, false);
 			if (drawButton(matrices, 140, 20+height+32, 120, 20, "Reload files", mouseX, mouseY)) {
 				MixinConfigPlugin.reload();
@@ -784,6 +786,9 @@ public class FabricationConfigScreen extends Screen {
 				}
 			}
 		}
+		if (y == startY) {
+			textRenderer.draw(matrices, "There are no available features in this category", 136, startY+14, -1);
+		}
 		float h = y-startY;
 		if (selected) {
 			selectedSectionHeight = h;
@@ -821,13 +826,24 @@ public class FabricationConfigScreen extends Screen {
 	private int drawTrilean(MatrixStack matrices, String key, String title, String desc, int y, float mouseX, float mouseY, TrileanFlag... flags) {
 		if (y < -12 || y > height-16) return y+14;
 		boolean clientOnly = ArrayUtils.contains(flags, CLIENT_ONLY);
+		boolean disappear = clientOnly && configuringServer;
 		boolean requiresFabricApi = ArrayUtils.contains(flags, REQUIRES_FABRIC_API);
 		// presence of Fabric API is implied by the fact you need ModMenu to access this menu
 		boolean noFabricApi = false; //!configuringServer && requiresFabricApi && !FabricLoader.getInstance().isModLoaded("fabric");
-		boolean disabled = noFabricApi || (configuringServer && (serverReadOnly || clientOnly)) || !isValid(key);
+		boolean failed = isFailed(key);
+		boolean disabled = failed || noFabricApi || (configuringServer && (serverReadOnly || clientOnly)) || !isValid(key);
 		boolean noValue = noFabricApi || (configuringServer && clientOnly || !isValid(key));
 		float time = optionAnimationTime.getOrDefault(key, 0f);
 		float disabledTime = disabledAnimationTime.getOrDefault(key, 0f);
+		float disappearTime = disappearAnimationTime.getOrDefault(key, 0f);
+		if (disappear && !disappeared.contains(key)) {
+			disappearTime = disappearAnimationTime.compute(key, (k, f) -> 5 - (f == null ? 0 : f));
+			disappeared.add(key);
+		} else if (!disappear && disappeared.contains(key)) {
+			disappearTime = disappearAnimationTime.compute(key, (k, f) -> 5 - (f == null ? 0 : f));
+			disappeared.remove(key);
+		}
+		if (disappear && disappearTime <= 0) return y;
 		boolean animateDisabled = disabledTime > 0;
 		if (disabled && !knownDisabled.contains(key)) {
 			disabledTime = disabledAnimationTime.compute(key, (k, f) -> 5 - (f == null ? 0 : f));
@@ -854,6 +870,24 @@ public class FabricationConfigScreen extends Screen {
 				disabledAnimationTime.put(key, disabledTime);
 			}
 		}
+		if (disappearTime > 0) {
+			disappearTime -= client.getLastFrameDuration();
+			if (disappearTime <= 0) {
+				disappearAnimationTime.remove(key);
+				disappearTime = 0;
+			} else {
+				disappearAnimationTime.put(key, disappearTime);
+			}
+		}
+		GlStateManager.pushMatrix();
+		GlStateManager.translatef(0, y, 0);
+		float dia = sCurve5((5-disappearTime)/5f);
+		float scale;
+		if (disappear) {
+			GlStateManager.scalef(1, scale = 1-dia, 1);
+		} else {
+			GlStateManager.scalef(1, scale = dia, 1);
+		}
 		boolean noUnset = key.startsWith("general.");
 		Trilean currentValue = noUnset ? (isEnabled(key) ? Trilean.TRUE : Trilean.FALSE) : getValue(key);
 		boolean keyEnabled = isEnabled(key);
@@ -868,18 +902,18 @@ public class FabricationConfigScreen extends Screen {
 			da = 1-da;
 		}
 		if (clientOnly) {
-			fill(matrices, 133, y, 134+46, y+11, 0xFFFFAA00);
+			fill(matrices, 133, 0, 134+46, 11, 0xFFFFAA00);
 		} else {
-			fill(matrices, 133, y, 134+46, y+11, 0xFFFFFFFF);
+			fill(matrices, 133, 0, 134+46, 11, 0xFFFFFFFF);
 		}
-		fill(matrices, 134, y+1, 134+45, y+10, 0x66000000);
-		if (!noUnset) fill(matrices, 134+15, y+1, 134+15+15, y+10, 0x33000000);
+		fill(matrices, 134, 1, 134+45, 10, 0x66000000);
+		if (!noUnset) fill(matrices, 134+15, 1, 134+15+15, 10, 0x33000000);
 		GlStateManager.pushMatrix();
 		GlStateManager.translatef(134+(prevX+((curX-prevX)*a)), 0, 0);
 		int knobAlpha = ((int)((noValue ? 1-da : 1) * 255))<<24;
-		fill(matrices, 0, y+1, noUnset ? 22 : 15, y+10, MathHelper.hsvToRgb((prevHue+((curHue-prevHue)*a))/360f, 0.9f, 0.8f)|knobAlpha);
+		fill(matrices, 0, 1, noUnset ? 22 : 15, 10, MathHelper.hsvToRgb((prevHue+((curHue-prevHue)*a))/360f, 0.9f, 0.8f)|knobAlpha);
 		if (!noUnset && a >= 1 && currentValue == Trilean.UNSET) {
-			fill(matrices, keyEnabled ? 15 : -1, y+1, keyEnabled ? 16 : 0, y+10, MathHelper.hsvToRgb((keyEnabled ? 120 : 0)/360f, 0.9f, 0.8f)|knobAlpha);
+			fill(matrices, keyEnabled ? 15 : -1, 1, keyEnabled ? 16 : 0, 10, MathHelper.hsvToRgb((keyEnabled ? 120 : 0)/360f, 0.9f, 0.8f)|knobAlpha);
 		}
 		GlStateManager.popMatrix();
 		GlStateManager.enableBlend();
@@ -888,10 +922,10 @@ public class FabricationConfigScreen extends Screen {
 		GlStateManager.color4f(1, 1, 1, 0.5f+((1-da)*0.5f));
 		GlStateManager.enableTexture();
 		if (noUnset) {
-			drawTexture(matrices, 134+3, y+1, 0, 0, 15, 9, 45, 9);
-			drawTexture(matrices, 134+4+22, y+1, 30, 0, 15, 9, 45, 9);
+			drawTexture(matrices, 134+3, 1, 0, 0, 15, 9, 45, 9);
+			drawTexture(matrices, 134+4+22, 1, 30, 0, 15, 9, 45, 9);
 		} else {
-			drawTexture(matrices, 134, y+1, 0, 0, 45, 9, 45, 9);
+			drawTexture(matrices, 134, 1, 0, 0, 45, 9, 45, 9);
 		}
 		GlStateManager.disableTexture();
 		if (didClick) {
@@ -919,7 +953,8 @@ public class FabricationConfigScreen extends Screen {
 		}
 		int textAlpha = ((int)((0.7f+((1-da)*0.3f)) * 255))<<24;
 		int startX = 136+50;
-		int endX = textRenderer.draw(matrices, title, startX, y+2, 0xFFFFFF | textAlpha);
+		int endX = textRenderer.draw(matrices, title, startX, 2, 0xFFFFFF | textAlpha);
+		GlStateManager.popMatrix();
 		if (mouseX >= startX && mouseX <= endX && mouseY >= y && mouseY <= y+10) {
 			String prefix = "";
 			if (clientOnly) {
@@ -938,6 +973,8 @@ public class FabricationConfigScreen extends Screen {
 					renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"This option requires Fabric API"), (int)mouseX, (int)mouseY);
 				} else if (noValue) {
 					renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"The server does not recognize this option"), (int)mouseX, (int)mouseY);
+				} else if (failed) {
+					renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"A mixin required for this feature failed to apply"), (int)mouseX, (int)mouseY);
 				} else {
 					renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"You cannot configure this server"), (int)mouseX, (int)mouseY);
 				}
@@ -959,7 +996,7 @@ public class FabricationConfigScreen extends Screen {
 				}
 			}
 		}
-		return y+14;
+		return (int)(y+(14*scale));
 	}
 
 	private void renderWrappedTooltip(MatrixStack matrices, String str, float mouseX, float mouseY) {
@@ -1074,6 +1111,22 @@ public class FabricationConfigScreen extends Screen {
 			didClick = true;
 		}
 		return super.mouseClicked(mouseX, mouseY, button);
+	}
+	
+	private String getVersion() {
+		if (configuringServer) {
+			return ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerVersion();
+		} else {
+			return Agnos.INST.getModVersion();
+		}
+	}
+	
+	private boolean isFailed(String key) {
+		if (configuringServer) {
+			return ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerFailedConfig().contains(key);
+		} else {
+			return MixinConfigPlugin.isFailed(key);
+		}
 	}
 	
 	private boolean isValid(String key) {

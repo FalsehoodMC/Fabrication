@@ -10,8 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
-
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.SignBlockEntityRenderer;
@@ -42,7 +41,7 @@ public class MixinSignBlockEntityRenderer {
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/client/texture/NativeImage.getAbgrColor(IIII)I"),
 			method=RENDER)
 	public int modifySignTextColor(int a, int r, int g, int b) {
-		if (!RuntimeChecks.check("*.legible_signs")) return NativeImage.getAbgrColor(a, r, g, b);
+		if (!MixinConfigPlugin.isEnabled("*.legible_signs")) return NativeImage.getAbgrColor(a, r, g, b);
 		DyeColor dc = fabrication$currentEntity.getTextColor();
 		switch (dc) {
 			case BLACK: return 0x000000;
