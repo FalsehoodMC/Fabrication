@@ -55,6 +55,29 @@ general
 	desc:
 		Broad features and global settings.
 
+general.runtime_checks
+	name: Runtime Checks
+	since: 1.0
+	meta: true
+	desc:
+		Allows changing settings arbitrarily on-the-fly, but is very slightly slower and a fair bit
+		less compatible, as all options that are set to 'unset' but not enabled by the profile will
+		be initialized.
+		
+		You can still disable something completely if it's causing problems by setting it to false
+		explicitly.
+		
+		With this disabled, most changes to config options will not take effect until the game is
+		restarted.
+
+general.reduced_motion
+	name: Reduced Motion
+	since: 1.2
+	meta: true
+	sides: client_only
+	desc:
+		Disables high-motion animations in the Fabrication config screen.
+
 general.profile
 	name: Profile
 	since: 1.0
@@ -114,29 +137,6 @@ general.profile.burnt
 	parent: general.profile
 	desc:
 		Just enable everything, except the "Situational" and "Experiments" sections.
-
-general.runtime_checks
-	name: Runtime Checks
-	since: 1.0
-	meta: true
-	desc:
-		Allows changing settings arbitrarily on-the-fly, but is very slightly slower and a fair bit
-		less compatible, as all options that are set to 'unset' but not enabled by the profile will
-		be initialized.
-		
-		You can still disable something completely if it's causing problems by setting it to false
-		explicitly.
-		
-		With this disabled, most changes to config options will not take effect until the game is
-		restarted.
-
-general.reduced_motion
-	name: Reduced Motion
-	since: 1.2
-	meta: true
-	sides: client_only
-	desc:
-		Disables high-motion animations in the Fabrication config screen.
 
 fixes
 	name: Fixes

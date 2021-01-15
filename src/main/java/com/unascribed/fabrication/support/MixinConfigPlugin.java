@@ -16,6 +16,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.JOptionPane;
+
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
@@ -132,7 +134,6 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	}
 	
 	private static final List<ConfigLoader> loaders = Lists.newArrayList();
-	private static final String defaultFeaturesConfigFile;
 	
 	static {
 		setMet(SpecialEligibility.EVENTS_AVAILABLE, Agnos.INST.eventsAvailable());
@@ -143,21 +144,18 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			setMet(SpecialEligibility.FORGE, true);
 		}
 		try {
-			if (isMet(SpecialEligibility.FORGE)) {
-				Class.forName("io.github.zekerzhayard.optiforge.OptiForge", false, MixinConfigPlugin.class.getClassLoader());
-			} else {
-				Class.forName("me.modmuss50.optifabric.mod.OptifabricSetup", false, MixinConfigPlugin.class.getClassLoader());
-			}
+			Class.forName("optifine.Installer", false, MixinConfigPlugin.class.getClassLoader());
 			setMet(SpecialEligibility.NO_OPTIFINE, true);
 		} catch (Throwable t) {
 		}
 		if (MixinConfigPlugin.class.getClassLoader().getResource("default_features_config.ini") == null) {
-			// dev mode, no ini generated yet
-			defaultFeaturesConfigFile = "default_features_config.ini.inc";
-		} else {
-			defaultFeaturesConfigFile = "default_features_config.ini";
+			try {
+				JOptionPane.showMessageDialog(null, "You must run build-features.sh before running the game.", "Fabrication", JOptionPane.ERROR_MESSAGE);
+			} catch (Throwable t) {}
+			System.exit(1);
+			throw new RuntimeException("You must run build-features.sh before running the game.");
 		}
-		try (InputStream is = MixinConfigPlugin.class.getClassLoader().getResourceAsStream(defaultFeaturesConfigFile)) {
+		try (InputStream is = MixinConfigPlugin.class.getClassLoader().getResourceAsStream("default_features_config.ini")) {
 			Set<String> keys = QDIni.load("default_features_config.ini", is).keySet();
 			Set<String> sections = Sets.newHashSet();
 			ImmutableMap.Builder<String, String> starMapBldr = ImmutableMap.builder();
@@ -330,7 +328,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			throw new RuntimeException("Failed to create fabrication config directory", e1);
 		}
 		Path configFile = dir.resolve("features.ini");
-		checkForAndSaveDefaultsOrUpgrade(configFile, defaultFeaturesConfigFile);
+		checkForAndSaveDefaultsOrUpgrade(configFile, "default_features_config.ini");
 		FabLog.timeAndCountWarnings("Loading of features.ini", () -> {
 			StringWriter sw = new StringWriter();
 			try {
@@ -435,7 +433,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 
 	private static void checkForAndSaveDefaultsOrUpgrade(Path configFile, String defaultName) {
 		if (!Files.exists(configFile)) {
-			Path configFileLegacy = configFile.getParent().getParent().resolve(defaultName.equals(defaultFeaturesConfigFile) ? "fabrication.ini" : "fabrication_"+configFile.getFileName().toString());
+			Path configFileLegacy = configFile.getParent().getParent().resolve(defaultName.equals("default_features_config.ini") ? "fabrication.ini" : "fabrication_"+configFile.getFileName().toString());
 			boolean migrated = false;
 			if (Files.exists(configFileLegacy)) {
 				try {
@@ -543,7 +541,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 				List<String> eligibilitySuccesses = DEBUG ? Lists.newArrayList() : BlackHoleList.getInstance();
 				boolean anyRestrictions = false;
 				if (cn.visibleAnnotations != null) {
-					out: for (AnnotationNode an : cn.visibleAnnotations) {
+					for (AnnotationNode an : cn.visibleAnnotations) {
 						if (an.desc.equals("Lcom/unascribed/fabrication/support/EligibleIf;")) {
 							if (an.values == null) continue;
 							for (int i = 0; i < an.values.size(); i += 2) {
