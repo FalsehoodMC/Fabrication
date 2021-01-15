@@ -12,8 +12,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
-
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.fabricmc.api.EnvType;
@@ -75,9 +73,7 @@ public class FabRefl {
 		}
 		DEV = devTmp;
 		FORGE = forgeTmp;
-		if (MixinConfigPlugin.DEBUG) {
-			FabLog.info("Detected runtime: "+(DEV ? "Fabric Dev" : FORGE ? "Forge" : "Fabric"));
-		}
+		FabLog.debug("Detected runtime: "+(DEV ? "Fabric Dev" : FORGE ? "Forge" : "Fabric"));
 	}
 	
 	// "muh performance"

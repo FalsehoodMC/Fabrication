@@ -129,14 +129,6 @@ public class MixinTitleScreen extends Screen {
 				for (int x = 0; x < fabrication$blocks[y].length; x++) {
 					LogoBlock blk = fabrication$blocks[y][x];
 					if (blk != null) {
-						if (MixinConfigPlugin.DEBUG) {
-							if (hasShiftDown() && Math.random() < 0.05) {
-								blk.velocity += ((float)Math.random())*3;
-							}
-							if (hasAltDown()) {
-								blk.velocity += 0.9+((float)Math.random()*0.2);
-							}
-						}
 						blk.tick();
 					}
 				}
@@ -150,7 +142,7 @@ public class MixinTitleScreen extends Screen {
 		float fade = doBackgroundFade ? MathHelper.clamp(((Util.getMeasuringTimeMs() - backgroundFadeStart) / 1000f)-1, 0, 1) : 1;
 		int logoDataWidth = LoaderBlockLogo.unrecoverableLoadError ? 48 : LoaderBlockLogo.image.getWidth();
 		int logoDataHeight = LoaderBlockLogo.unrecoverableLoadError ? 5 : LoaderBlockLogo.image.getHeight();
-		if (fabrication$blocks == null || LoaderBlockLogo.invalidated || (MixinConfigPlugin.DEBUG && Screen.hasControlDown())) {
+		if (fabrication$blocks == null || LoaderBlockLogo.invalidated) {
 			LoaderBlockLogo.invalidated = false;
 			boolean reverse = LoaderBlockLogo.getReverse.getAsBoolean();
 			fabrication$blocks = new LogoBlock[logoDataWidth][logoDataHeight];

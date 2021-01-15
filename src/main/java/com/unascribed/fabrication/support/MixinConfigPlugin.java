@@ -52,8 +52,6 @@ import com.google.common.reflect.ClassPath.ClassInfo;
 
 public class MixinConfigPlugin implements IMixinConfigPlugin {
 
-	public static final boolean DEBUG = Boolean.getBoolean("com.unascribed.fabrication.debug") || Boolean.getBoolean("fabrication.debug");
-	
 	private static final ImmutableSet<String> VIENNA_EXCEPTIONS = ImmutableSet.of(
 			"balance.infinity_mending",
 			"balance.anvil_damage_only_on_fall",
@@ -533,12 +531,12 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 
 	@Override
 	public List<String> getMixins() {
-		if (DEBUG) FabLog.info("☕ Profile: "+profile.name().toLowerCase(Locale.ROOT));
+		FabLog.debug("☕ Profile: "+profile.name().toLowerCase(Locale.ROOT));
 		return discoverClassesInPackage("com.unascribed.fabrication.mixin", true);
 	}
 
 	public static List<String> discoverClassesInPackage(String pkg, boolean truncate) {
-		if (DEBUG) FabLog.info("Starting discovery pass...");
+		FabLog.debug("Starting discovery pass...");
 		try {
 			int count = 0;
 			int enabled = 0;
@@ -549,17 +547,15 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 				if (ci.getName().contains("$")) continue;
 				count++;
 				String truncName = ci.getName().substring(pkg.length()+1);
-				if (DEBUG) {
-					FabLog.info("--");
-					FabLog.info((Math.random() < 0.01 ? "👅" : "👀")+" Considering "+truncName);
-				}
+				FabLog.debug("--");
+				FabLog.debug((Math.random() < 0.01 ? "👅" : "👀")+" Considering "+truncName);
 				ClassReader cr = new ClassReader(ci.asByteSource().read());
 				ClassNode cn = new ClassNode();
 				cr.accept(cn, ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
 				boolean eligible = true;
-				List<String> eligibilityFailures = DEBUG ? Lists.newArrayList() : BlackHoleList.getInstance();
-				List<String> eligibilityNotes = DEBUG ? Lists.newArrayList() : BlackHoleList.getInstance();
-				List<String> eligibilitySuccesses = DEBUG ? Lists.newArrayList() : BlackHoleList.getInstance();
+				List<String> eligibilityFailures = Lists.newArrayList();
+				List<String> eligibilityNotes = Lists.newArrayList();
+				List<String> eligibilitySuccesses = Lists.newArrayList();
 				boolean anyRestrictions = false;
 				if (cn.visibleAnnotations != null) {
 					for (AnnotationNode an : cn.visibleAnnotations) {
@@ -571,7 +567,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 								Object v = an.values.get(i+1);
 								if (k.equals("configEnabled")) {
 									if (!defaults.containsKey(remap((String)v))) {
-										if (DEBUG) FabLog.info("🙈 Dev error! Exploding.");
+										FabLog.debug("🙈 Dev error! Exploding.");
 										throw devError(cn.name.substring(pkg.length()+1).replace('/', '.')+" references an unknown config key "+v+"\n\nDid you forget to add it to features.txt and run build-features.sh?");
 									}
 									if (getValue((String)v) == Trilean.UNSET && MixinConfigPlugin.RUNTIME_CHECKS_WAS_ENABLED) {
@@ -703,27 +699,25 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 				if (!anyRestrictions) {
 					eligibilityNotes.add("No restrictions on eligibility");
 				}
-				if (DEBUG) {
-					for (String s : eligibilityNotes) {
-						FabLog.info("  ℹ️ "+s);
-					}
-					for (String s : eligibilitySuccesses) {
-						FabLog.info("  ✅ "+s);
-					}
-					for (String s : eligibilityFailures) {
-						FabLog.info("  ❌ "+s);
-					}
+				for (String s : eligibilityNotes) {
+					FabLog.debug("  ℹ️ "+s);
+				}
+				for (String s : eligibilitySuccesses) {
+					FabLog.debug("  ✅ "+s);
+				}
+				for (String s : eligibilityFailures) {
+					FabLog.debug("  ❌ "+s);
 				}
 				if (eligible) {
 					enabled++;
-					if (DEBUG) FabLog.info("👍 Eligibility requirements met. Applying "+truncName);
+					FabLog.debug("👍 Eligibility requirements met. Applying "+truncName);
 					rtrn.add(truncate ? truncName : ci.getName());
 				} else {
 					skipped++;
-					if (DEBUG) FabLog.info("✋ Eligibility requirements not met. Skipping "+truncName);
+					FabLog.debug("✋ Eligibility requirements not met. Skipping "+truncName);
 				}
 			}
-			if (DEBUG) FabLog.info("Discovery pass complete. Found "+count+" candidates, enabled "+enabled+", skipped "+skipped+".");
+			FabLog.debug("Discovery pass complete. Found "+count+" candidates, enabled "+enabled+", skipped "+skipped+".");
 			return rtrn;
 		} catch (IOException e) {
 			throw new RuntimeException(e);

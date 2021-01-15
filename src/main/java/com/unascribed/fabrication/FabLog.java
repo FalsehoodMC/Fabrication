@@ -14,7 +14,10 @@ public class FabLog {
 	
 	// Fabric uses vanilla's log config, which doesn't print log tags, so we need to add our own prefix
 	// Forge modifies the log config to include log tags among other things, so the prefix is redundant there
-	private static final boolean needPrefixes = MixinConfigPlugin.isMet(SpecialEligibility.NOT_FORGE);
+	private static final boolean PREFIX = MixinConfigPlugin.isMet(SpecialEligibility.NOT_FORGE);
+	// Forge has a debug log that includes, well, debug-level messages
+	// Fabric uses vanilla's log config which simply ignores debug messages
+	private static final boolean FAKE_DEBUG = Boolean.getBoolean("fabrication.debug") && MixinConfigPlugin.isMet(SpecialEligibility.NOT_FORGE);
 	
 	// for (limited, one-level) reentrancy
 	private static int warningsOld = -1;
@@ -39,14 +42,16 @@ public class FabLog {
 	}
 
 	private static String prefix(String message) {
-		return needPrefixes ? "[Fabrication] "+message : message;
+		return PREFIX ? "[Fabrication] "+message : message;
 	}
 	
 	public static void debug(String message) {
+		if (FAKE_DEBUG) { info(message); return; }
 		log.debug(prefix(message));
 	}
 
 	public static void debug(String message, Throwable t) {
+		if (FAKE_DEBUG) { info(message, t); return; }
 		log.debug(prefix(message), t);
 	}
 
