@@ -81,6 +81,7 @@ public class MixinClientPlayNetworkHandler implements GetServerConfig {
 					}
 				} else if (fabrication$launchId == 0) {
 					fabrication$launchId = hashCode()*31L;
+					fabrication$serverVersion = "1.2 or earlier";
 				}
 				ci.cancel();
 			} catch (RuntimeException e) {
