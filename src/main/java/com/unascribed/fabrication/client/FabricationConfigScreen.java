@@ -109,10 +109,6 @@ public class FabricationConfigScreen extends Screen {
 	
 	private final Screen parent;
 	
-	private int realWidth;
-	private int realHeight;
-	private double scaleCompensation = 1;
-	
 	private float timeExisted;
 	private boolean leaving = false;
 	private float timeLeaving;
@@ -206,23 +202,6 @@ public class FabricationConfigScreen extends Screen {
 				fixedPrideFlag = idx;
 			}
 		}
-		realWidth = width;
-		realHeight = height;
-		float ratio = width/(float)height;
-		if (ratio < 13.5/9f) {
-			double scaleFactor = client.getWindow().getScaleFactor();
-			if (scaleFactor <= 1) {
-				// nothing we can do...
-				scaleCompensation = 1;
-				return;
-			}
-			double newScaleFactor = client.getWindow().getScaleFactor()-1;
-			this.width = (int)(client.getWindow().getFramebufferWidth()/newScaleFactor);
-			this.height = (int)(client.getWindow().getFramebufferHeight()/newScaleFactor);
-			scaleCompensation = newScaleFactor/scaleFactor;
-		} else {
-			scaleCompensation = 1;
-		}
 	}
 	
 	@Override
@@ -274,17 +253,16 @@ public class FabricationConfigScreen extends Screen {
 //				GlStateManager.translatef(realWidth/2f, realHeight/2f, 0);
 //				GlStateManager.scalef(0.5f, 0.5f, 0.5f);
 //				GlStateManager.translatef(-realWidth/2f, -realHeight/2f, 0);
-				GlStateManager.translatef(realWidth/2f, realHeight, 0);
+				GlStateManager.translatef(width/2f, height, 0);
 				GlStateManager.rotatef(a*(leaving ? -180 : 180), 0, 0, 1);
-				GlStateManager.translatef(-realWidth/2, -realHeight, 0);
+				GlStateManager.translatef(-width/2, -height, 0);
 				GlStateManager.pushMatrix();
-					GlStateManager.translatef(0, realHeight, 0);
-					GlStateManager.translatef(realWidth/2f, realHeight/2f, 0);
+					GlStateManager.translatef(0, height, 0);
+					GlStateManager.translatef(width/2f, height/2f, 0);
 					GlStateManager.rotatef(180, 0, 0, 1);
-					GlStateManager.translatef(-realWidth/2f, -realHeight/2f, 0);
-					fill(matrices, -realWidth, -realHeight, realWidth*2, 0, 0xFF2196F3);
+					GlStateManager.translatef(-width/2f, -height/2f, 0);
+					fill(matrices, -width, -height, width*2, 0, 0xFF2196F3);
 					GlStateManager.pushMatrix();
-						GlStateManager.scaled(scaleCompensation, scaleCompensation, 1);
 						drawBackground(matrices, -200, -200, delta, 0, 0);
 						drawForeground(matrices, -200, -200, delta);
 					GlStateManager.popMatrix();
@@ -293,7 +271,7 @@ public class FabricationConfigScreen extends Screen {
 					for (int y = -1; y <= 0; y++) {
 						if (x == 0 && y == 0) continue;
 						GlStateManager.pushMatrix();
-						GlStateManager.translatef(realWidth*x, realHeight*y, 0);
+						GlStateManager.translatef(width*x, height*y, 0);
 						parent.renderBackgroundTexture(0);
 						GlStateManager.popMatrix();
 					}
@@ -302,9 +280,8 @@ public class FabricationConfigScreen extends Screen {
 			GlStateManager.popMatrix();
 		} else {
 			GlStateManager.pushMatrix();
-			GlStateManager.scaled(scaleCompensation, scaleCompensation, 1);
-			drawBackground(matrices, (int)(mouseX/scaleCompensation), (int)(mouseY/scaleCompensation), delta, 0, 0);
-			drawForeground(matrices, (int)(mouseX/scaleCompensation), (int)(mouseY/scaleCompensation), delta);
+			drawBackground(matrices, mouseX, mouseY, delta, 0, 0);
+			drawForeground(matrices, mouseX, mouseY, delta);
 			GlStateManager.popMatrix();
 		}
 		if (leaving && timeLeaving > 10) {
@@ -321,7 +298,7 @@ public class FabricationConfigScreen extends Screen {
 		float w = height*ratio;
 		float brk = Math.min(width-w, (width*2/3f)-(w/3));
 		float brk2 = brk+w;
-		float border = (float)(20/(client.getWindow().getScaleFactor()*scaleCompensation));
+		float border = (float)(20/(client.getWindow().getScaleFactor()));
 		if (brk < cutoffX) brk = cutoffX;
 		
 		Matrix4f mat = matrices.peek().getModel();
@@ -998,10 +975,13 @@ public class FabricationConfigScreen extends Screen {
 			}
 		}
 		int textAlpha = ((int)((0.7f+((1-da)*0.3f)) * 255))<<24;
+		int startY = y;
 		int startX = 136+50;
-		int endX = textRenderer.draw(matrices, title, startX, 2, 0xFFFFFF | textAlpha);
+		y += drawWrappedText(matrices, startX, 2, title, width-startX-6, 0xFFFFFF | textAlpha, false)*scale;
+		int endX = width-6;
+//		int endX = textRenderer.draw(matrices, title, startX, 2, 0xFFFFFF | textAlpha);
 		GlStateManager.popMatrix();
-		if (mouseX >= startX && mouseX <= endX && mouseY >= y && mouseY <= y+10) {
+		if (mouseX >= startX && mouseX <= endX && mouseY >= startY && mouseY <= y) {
 			String prefix = "";
 			if (clientOnly) {
 				prefix += "§6Client Only ";
@@ -1042,7 +1022,7 @@ public class FabricationConfigScreen extends Screen {
 				}
 			}
 		}
-		return (int)(y+(14*scale));
+		return (y+2);
 	}
 
 	private void renderWrappedTooltip(MatrixStack matrices, String str, float mouseX, float mouseY) {
@@ -1122,7 +1102,7 @@ public class FabricationConfigScreen extends Screen {
 	
 	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		if (mouseX <= 120*scaleCompensation) {
+		if (mouseX <= 120) {
 			sidebarScrollTarget -= amount*20;
 		} else {
 			selectedSectionScrollTarget -= amount*20;
@@ -1134,14 +1114,14 @@ public class FabricationConfigScreen extends Screen {
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		if (button == 0) {
 			if (configuringServer) {
-				if (mouseX > (width-120)*scaleCompensation && mouseY < 16*scaleCompensation) {
+				if (mouseX > (width-120) && mouseY < 16) {
 					hasClonked = false;
 					serverAnimateTime = 10-serverAnimateTime;
 					configuringServer = false;
 					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_XYLOPHONE, 0.8f, 1));
 				}
 			} else {
-				if (mouseX > (width-120)*scaleCompensation && mouseY < 16*scaleCompensation) {
+				if (mouseX > (width-120) && mouseY < 16) {
 					if (whyCantConfigureServer == null) {
 						hasClonked = false;
 						serverAnimateTime = 10-serverAnimateTime;
