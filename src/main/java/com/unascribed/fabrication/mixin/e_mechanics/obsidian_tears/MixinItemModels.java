@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.MixinConfigPlugin.RuntimeChecks;
 
 import net.minecraft.client.render.item.ItemModels;
@@ -21,7 +22,7 @@ import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 
 @Mixin(ItemModels.class)
-@EligibleIf(configEnabled="*.obsidian_tears", envMatches=Env.CLIENT)
+@EligibleIf(configEnabled="*.obsidian_tears", envMatches=Env.CLIENT, specialConditions=SpecialEligibility.NO_OPTIFINE)
 public abstract class MixinItemModels {
 	
 	@Unique

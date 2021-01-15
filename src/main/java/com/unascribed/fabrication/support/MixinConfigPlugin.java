@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.support;
 
+import java.awt.Toolkit;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,8 +17,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-
+import javax.swing.UIManager;
+import javax.swing.plaf.metal.MetalLookAndFeel;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
@@ -145,15 +148,11 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		}
 		try {
 			Class.forName("optifine.Installer", false, MixinConfigPlugin.class.getClassLoader());
-			setMet(SpecialEligibility.NO_OPTIFINE, true);
 		} catch (Throwable t) {
+			setMet(SpecialEligibility.NO_OPTIFINE, true);
 		}
 		if (MixinConfigPlugin.class.getClassLoader().getResource("default_features_config.ini") == null) {
-			try {
-				JOptionPane.showMessageDialog(null, "You must run build-features.sh before running the game.", "Fabrication", JOptionPane.ERROR_MESSAGE);
-			} catch (Throwable t) {}
-			System.exit(1);
-			throw new RuntimeException("You must run build-features.sh before running the game.");
+			throw devError("You must run build-features.sh before running the game.");
 		}
 		try (InputStream is = MixinConfigPlugin.class.getClassLoader().getResourceAsStream("default_features_config.ini")) {
 			Set<String> keys = QDIni.load("default_features_config.ini", is).keySet();
@@ -200,6 +199,22 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		return starMap.getOrDefault(configKey, configKey);
 	}
 	
+	private static RuntimeException devError(String msg) {
+		try {
+			UIManager.setLookAndFeel(new MetalLookAndFeel());
+			JFrame dummyFrame = new JFrame();
+			dummyFrame.setIconImage(Toolkit.getDefaultToolkit().createImage(MixinConfigPlugin.class.getClassLoader().getResource("assets/fabrication/icon.png")));
+			dummyFrame.setSize(1, 1);
+			dummyFrame.setLocationRelativeTo(null);
+			JOptionPane.showOptionDialog(dummyFrame, msg, "Fabrication Dev Error",
+					JOptionPane.OK_OPTION, JOptionPane.ERROR_MESSAGE,
+					null,
+					new String[] {"Exit"}, "Exit");
+			System.exit(1);
+		} catch (Throwable t) {}
+		return new RuntimeException(msg);
+	}
+
 	public static boolean isEnabled(String configKey) {
 		configKey = remap(configKey);
 		if (!validKeys.contains(configKey)) {
@@ -549,6 +564,10 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 								String k = (String)an.values.get(i);
 								Object v = an.values.get(i+1);
 								if (k.equals("configEnabled")) {
+									if (!defaults.containsKey(remap((String)v))) {
+										if (DEBUG) FabLog.info("🙈 Dev error! Exploding.");
+										throw devError(cn.name.substring(pkg.length()+1).replace('/', '.')+" references an unknown config key "+v+"\n\nDid you forget to add it to features.txt and run build-features.sh?");
+									}
 									if (getValue((String)v) == Trilean.UNSET && RuntimeChecks.ENABLED) {
 										eligibilitySuccesses.add("Runtime checks is enabled and required config key "+remap((String)v)+" is unset");
 									} else if (!isEnabled((String)v)) {
