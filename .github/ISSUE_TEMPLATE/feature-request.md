@@ -8,3 +8,5 @@ assignees: ''
 ---
 
 Please give a clear description of what you want the feature to do. If you want a WOINA forward-port of an old feature, please mention the version of the game that the feature was removed in, or the last version that you know had it. Delete this guidance text when you're ready to start writing.
+
+One feature per issue. Making bulk feature requests is asking for me to do an unreasonable amount of work for you and makes tracking issues very difficult.
