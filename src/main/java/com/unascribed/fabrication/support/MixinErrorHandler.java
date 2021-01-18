@@ -3,7 +3,6 @@ package com.unascribed.fabrication.support;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfig;
 import org.spongepowered.asm.mixin.extensibility.IMixinErrorHandler;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
-
 import com.unascribed.fabrication.FabLog;
 
 import com.google.common.base.Joiner;
