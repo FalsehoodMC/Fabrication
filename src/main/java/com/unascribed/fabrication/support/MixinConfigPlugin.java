@@ -42,10 +42,12 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Enums;
 import com.google.common.base.Joiner;
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import com.google.common.io.MoreFiles;
 import com.google.common.io.Resources;
@@ -183,9 +185,14 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	private static Map<String, Trilean> config;
 	private static final Set<String> failures = Sets.newHashSet();
 	private static final Set<String> failuresReadOnly = Collections.unmodifiableSet(failures);
+	private static final SetMultimap<String, String> configKeysForDiscoveredClasses = HashMultimap.create();
 	
 	public static String remap(String configKey) {
 		return starMap.getOrDefault(configKey, configKey);
+	}
+	
+	public static Set<String> getConfigKeysForDiscoveredClass(String clazz) {
+		return Collections.unmodifiableSet(configKeysForDiscoveredClasses.get(clazz.replace('/', '.')));
 	}
 	
 	private static RuntimeException devError(String msg) {
@@ -509,10 +516,12 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		}
 	}
 
+	public static boolean ORIGINAL_DEBUG_INJECTORS;
+	
 	@Override
 	public void onLoad(String mixinPackage) {
 		reload();
-		// HACK
+		ORIGINAL_DEBUG_INJECTORS = MixinEnvironment.getCurrentEnvironment().getOption(Option.DEBUG_INJECTORS);
 		MixinEnvironment.getCurrentEnvironment().setOption(Option.DEBUG_INJECTORS, true);
 		RUNTIME_CHECKS_WAS_ENABLED = isEnabled("general.runtime_checks");
 		Mixins.registerErrorHandlerClass("com.unascribed.fabrication.support.MixinErrorHandler");
@@ -582,6 +591,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 									} else {
 										eligibilitySuccesses.add("Required config setting "+remap((String)v)+" is enabled "+(config.get(v) == Trilean.TRUE ? "explicitly" : "by profile"));
 									}
+									configKeysForDiscoveredClasses.put(ci.getName(), (String)v);
 								} else if (k.equals("configDisabled")) {
 									if (getValue((String)v) == Trilean.UNSET && MixinConfigPlugin.RUNTIME_CHECKS_WAS_ENABLED) {
 										eligibilitySuccesses.add("Runtime checks is enabled and conflicting config key "+remap((String)v)+" is unset");
@@ -655,6 +665,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 											}
 											eligibilityNotes.add("Relevant config setting "+remap(s)+" is disabled "+(config.get(s) == Trilean.FALSE ? "explicitly" : "by profile"));
 										}
+										configKeysForDiscoveredClasses.put(ci.getName(), s);
 									}
 									if (allDisabled) {
 										eligibilityFailures.add("All of the relevant config settings are explicitly disabled");
