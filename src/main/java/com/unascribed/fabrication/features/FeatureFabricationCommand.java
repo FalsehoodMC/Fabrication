@@ -194,7 +194,7 @@ public class FeatureFabricationCommand implements Feature {
 
 			long scanned = 0;
 			long skipped = 0;
-			long goal = 8000*16*16*world.getHeight();
+			long goal = (biomes.isEmpty() ? 8000 : 1000)*16*16*world.getHeight();
 			
 			class MutableLong { long value = 1; }
 			
