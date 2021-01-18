@@ -16,7 +16,7 @@ import net.minecraft.util.Identifier;
 @EligibleIf(envMatches=Env.CLIENT)
 public class MixinSpriteAtlasTexture {
 
-	@Inject(at=@At("TAIL"), method="<init>(Lnet/minecraft/util/Identifier;)V")
+	@Inject(at=@At("TAIL"), method="<init>(Lnet/minecraft/util/Identifier;)V", expect=1)
 	public void construct(Identifier id, CallbackInfo ci) {
 		AtlasTracking.allAtlases.add((SpriteAtlasTexture)(Object)this);
 	}

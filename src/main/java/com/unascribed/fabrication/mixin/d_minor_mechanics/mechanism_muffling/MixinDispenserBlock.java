@@ -17,7 +17,7 @@ import net.minecraft.util.math.BlockPos;
 public class MixinDispenserBlock {
 
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/server/world/ServerWorld.syncWorldEvent(ILnet/minecraft/util/math/BlockPos;I)V"),
-			method="dispense(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;)V")
+			method="dispense(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;)V", expect=1)
 	public void syncWorldEvent(ServerWorld subject, int event, BlockPos pos, int data) {
 		if (event == 1001 && MixinConfigPlugin.isEnabled("*.mechanism_muffling") && MechanismMuffling.isMuffled(subject, pos)) return;
 		subject.syncWorldEvent(event, pos, data);

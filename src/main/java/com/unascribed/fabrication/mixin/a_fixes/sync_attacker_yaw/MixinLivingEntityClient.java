@@ -27,25 +27,25 @@ public abstract class MixinLivingEntityClient extends Entity {
 	@Shadow
 	private float knockbackVelocity;
 	
-	@Inject(at=@At("HEAD"), method="animateDamage()V")
+	@Inject(at=@At("HEAD"), method="animateDamage()V", expect=1)
 	public void animateDamageHead(CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.sync_attacker_yaw")) return;
 		fabrication$lastAttackerYaw = knockbackVelocity;
 	}
 	
-	@Inject(at=@At("TAIL"), method="animateDamage()V")
+	@Inject(at=@At("TAIL"), method="animateDamage()V", expect=1)
 	public void animateDamageTail(CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.sync_attacker_yaw")) return;
 		knockbackVelocity = fabrication$lastAttackerYaw;
 	}
 	
-	@Inject(at=@At("HEAD"), method="handleStatus(B)V")
+	@Inject(at=@At("HEAD"), method="handleStatus(B)V", expect=1)
 	public void handleStatusHead(CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.sync_attacker_yaw")) return;
 		fabrication$lastAttackerYaw = knockbackVelocity;
 	}
 	
-	@Inject(at=@At("TAIL"), method="handleStatus(B)V")
+	@Inject(at=@At("TAIL"), method="handleStatus(B)V", expect=1)
 	public void handleStatusTail(CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.sync_attacker_yaw")) return;
 		knockbackVelocity = fabrication$lastAttackerYaw;

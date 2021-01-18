@@ -61,7 +61,7 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 	@Shadow
 	public abstract ItemStack getStack();
 	
-	@Inject(at=@At("HEAD"), method="tick()V")
+	@Inject(at=@At("HEAD"), method="tick()V", expect=1)
 	public void tickHead(CallbackInfo ci) {
 		if (fabrication$extraTime > 0) {
 			fabrication$extraTime--;
@@ -80,19 +80,19 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 		}
 	}
 	
-	@Inject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", cancellable=true)
+	@Inject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", cancellable=true, expect=1)
 	public void damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> ci) {
 		if (fabrication$invincible || (MixinConfigPlugin.isEnabled("*.item_despawn") && world.isClient)) {
 			ci.setReturnValue(false);
 		}
 	}
 	
-	@Inject(at=@At("TAIL"), method="setStack(Lnet/minecraft/item/ItemStack;)V")
+	@Inject(at=@At("TAIL"), method="setStack(Lnet/minecraft/item/ItemStack;)V", expect=1)
 	public void setStack(ItemStack stack, CallbackInfo ci) {
 		calculateDespawn();
 	}
 	
-	@Inject(at=@At("TAIL"), method="setThrower(Ljava/util/UUID;)V")
+	@Inject(at=@At("TAIL"), method="setThrower(Ljava/util/UUID;)V", expect=1)
 	public void setThrower(UUID id, CallbackInfo ci) {
 		calculateDespawn();
 	}
@@ -191,7 +191,7 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 		}
 	}
 	
-	@Inject(at=@At("TAIL"), method="writeCustomDataToTag(Lnet/minecraft/nbt/CompoundTag;)V")
+	@Inject(at=@At("TAIL"), method="writeCustomDataToTag(Lnet/minecraft/nbt/CompoundTag;)V", expect=1)
 	public void writeCustomDataToTag(CompoundTag tag, CallbackInfo ci) {
 		if (fabrication$extraTime > 0) tag.putInt("fabrication:ExtraTime", fabrication$extraTime);
 		tag.putLong("fabrication:TrueAge", fabrication$trueAge);
@@ -199,7 +199,7 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 		if (fabrication$invincible) tag.putBoolean("fabrication:Invincible", true);
 	}
 	
-	@Inject(at=@At("TAIL"), method="readCustomDataFromTag(Lnet/minecraft/nbt/CompoundTag;)V")
+	@Inject(at=@At("TAIL"), method="readCustomDataFromTag(Lnet/minecraft/nbt/CompoundTag;)V", expect=1)
 	public void readCustomDataFromTag(CompoundTag tag, CallbackInfo ci) {
 		fabrication$extraTime = tag.getInt("fabrication:ExtraTime");
 		fabrication$trueAge = tag.getLong("fabrication:TrueAge");

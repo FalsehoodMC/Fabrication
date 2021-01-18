@@ -70,7 +70,7 @@ public class MixinItemEntityRenderer {
 	private AbstractTexture fabrication$mippedBlocks;
 	
 	@Inject(at=@At("HEAD"), method="render(Lnet/minecraft/entity/ItemEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",
-			cancellable=true)
+			cancellable=true, expect=1)
 	public void render(ItemEntity entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
 		if (MixinConfigPlugin.isEnabled("*.blinking_drops")) {
 			if (MixinConfigPlugin.isEnabled("*.despawning_items_blink") && entity instanceof RenderingAgeAccess) {
@@ -89,7 +89,7 @@ public class MixinItemEntityRenderer {
 	}
 	
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/client/render/item/ItemRenderer.renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformation$Mode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/render/model/BakedModel;)V"),
-			method="render(Lnet/minecraft/entity/ItemEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")
+			method="render(Lnet/minecraft/entity/ItemEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", expect=1)
 	public void interceptRender(ItemRenderer subject, ItemStack stack, ModelTransformation.Mode renderMode, boolean leftHanded, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, BakedModel model) {
 		if (MixinConfigPlugin.isEnabled("*.blinking_drops")) {
 			overlay = OverlayTexture.getUv(Math.max(0, MathHelper.sin((fabrication$curTimer+(stack.hashCode()%2000))/5.3f))*0.7f, false);

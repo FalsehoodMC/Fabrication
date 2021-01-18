@@ -21,7 +21,7 @@ public class MixinInventoryScreen {
 	
 	private static boolean fabrication$reentering = false;
 	
-	@Inject(at=@At("HEAD"), method="drawEntity(IIIFFLnet/minecraft/entity/LivingEntity;)V", cancellable=true)
+	@Inject(at=@At("HEAD"), method="drawEntity(IIIFFLnet/minecraft/entity/LivingEntity;)V", cancellable=true, expect=1)
 	private static void drawEntity(int x, int y, int size, float mouseX, float mouseY, LivingEntity entity, CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.omniscent_player")) return;
 		if (fabrication$reentering) return;

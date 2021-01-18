@@ -18,7 +18,7 @@ import net.minecraft.util.Identifier;
 public class MixinEntitySummonArgumentType {
 	
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/util/Identifier.fromCommandInput(Lcom/mojang/brigadier/StringReader;)Lnet/minecraft/util/Identifier;"),
-			method="parse(Lcom/mojang/brigadier/StringReader;)Lnet/minecraft/util/Identifier;")
+			method="parse(Lcom/mojang/brigadier/StringReader;)Lnet/minecraft/util/Identifier;", expect=1)
 	public Identifier fromCommandInput(StringReader sr) throws CommandSyntaxException {
 		if (!MixinConfigPlugin.isEnabled("*.legacy_command_syntax")) return Identifier.fromCommandInput(sr);
 		char peek = sr.peek();

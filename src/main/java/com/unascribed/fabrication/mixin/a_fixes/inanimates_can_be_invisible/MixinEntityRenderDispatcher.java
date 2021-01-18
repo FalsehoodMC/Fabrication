@@ -34,7 +34,7 @@ public abstract class MixinEntityRenderDispatcher {
 	@Shadow
 	public abstract <T extends Entity> EntityRenderer<? super T> getRenderer(T entity);
 	
-	@Inject(at=@At("HEAD"), method="shouldRender(Lnet/minecraft/entity/Entity;Lnet/minecraft/client/render/Frustum;DDD)Z", cancellable=true)
+	@Inject(at=@At("HEAD"), method="shouldRender(Lnet/minecraft/entity/Entity;Lnet/minecraft/client/render/Frustum;DDD)Z", cancellable=true, expect=1)
 	public void shouldRender(Entity e, Frustum f, double x, double y, double z, CallbackInfoReturnable<Boolean> ci) {
 		if (!(e instanceof LivingEntity) && e.isInvisible()) {
 			EntityRenderer<?> rend = getRenderer(e);

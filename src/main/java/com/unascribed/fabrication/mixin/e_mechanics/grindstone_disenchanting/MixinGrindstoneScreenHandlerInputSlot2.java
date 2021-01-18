@@ -20,7 +20,7 @@ public class MixinGrindstoneScreenHandlerInputSlot2 extends Slot {
 		super(inventory, index, x, y);
 	}
 
-	@Inject(at=@At("HEAD"), method="canInsert(Lnet/minecraft/item/ItemStack;)Z", cancellable=true)
+	@Inject(at=@At("HEAD"), method="canInsert(Lnet/minecraft/item/ItemStack;)Z", cancellable=true, expect=1)
 	public void canInsert(ItemStack stack, CallbackInfoReturnable<Boolean> ci) {
 		if (MixinConfigPlugin.isEnabled("*.grindstone_disenchanting") && stack.getItem() == Items.BOOK) {
 			ci.setReturnValue(true);

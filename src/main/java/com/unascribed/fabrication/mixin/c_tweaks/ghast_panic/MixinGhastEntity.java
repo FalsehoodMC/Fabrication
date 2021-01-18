@@ -22,7 +22,7 @@ public abstract class MixinGhastEntity extends FlyingEntity {
 		super(arg, arg2);
 	}
 
-	@Inject(at=@At("HEAD"), method="getAmbientSound()Lnet/minecraft/sound/SoundEvent;", cancellable=true)
+	@Inject(at=@At("HEAD"), method="getAmbientSound()Lnet/minecraft/sound/SoundEvent;", cancellable=true, expect=1)
 	public void getAmbientSound(CallbackInfoReturnable<SoundEvent> ci) {
 		if (!MixinConfigPlugin.isEnabled("*.ghast_panic")) return;
 		if (!world.getDimension().isUltrawarm() && world.random.nextInt(8) == 0) {

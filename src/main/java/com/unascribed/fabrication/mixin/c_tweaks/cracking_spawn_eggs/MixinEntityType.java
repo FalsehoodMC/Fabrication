@@ -24,13 +24,12 @@ import net.minecraft.util.math.Vec3d;
 @EligibleIf(configEnabled="*.cracking_spawn_eggs")
 public class MixinEntityType {
 
-	@Inject(at=@At("RETURN"), method="spawnFromItemStack(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/SpawnReason;ZZ)Lnet/minecraft/entity/Entity;")
+	@Inject(at=@At("RETURN"), method="spawnFromItemStack(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/SpawnReason;ZZ)Lnet/minecraft/entity/Entity;", expect=1)
 	public void spawnFromItemStack(ServerWorld world, ItemStack stack, PlayerEntity player, BlockPos pos, SpawnReason reason, boolean alignPosition, boolean invertY, CallbackInfoReturnable<Entity> ci) {
 		if (!MixinConfigPlugin.isEnabled("*.cracking_spawn_eggs")) return;
 		Entity e = ci.getReturnValue();
 		Box box = e.getBoundingBox();
 		Vec3d center = box.getCenter();
-		System.out.println(stack);
 		world.spawnParticles(new ItemStackParticleEffect(ParticleTypes.ITEM, stack), center.x, center.y, center.z, 20, box.getXLength()/2, box.getYLength()/2, box.getZLength()/2, 0.05);
 		e.playSound(SoundEvents.ENTITY_TURTLE_EGG_CRACK, 1.0f, 1.0f);
 	}

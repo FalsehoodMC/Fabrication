@@ -21,7 +21,7 @@ public class MixinSilkTouchEnchantment extends Enchantment {
 		super(weight, type, slotTypes);
 	}
 
-	@Inject(at=@At("HEAD"), method="canAccept(Lnet/minecraft/enchantment/Enchantment;)Z", cancellable=true)
+	@Inject(at=@At("HEAD"), method="canAccept(Lnet/minecraft/enchantment/Enchantment;)Z", cancellable=true, expect=1)
 	public void canAccept(Enchantment other, CallbackInfoReturnable<Boolean> ci) {
 		if (!MixinConfigPlugin.isEnabled("*.weapons_accept_silk")) return;
 		if (other == Enchantments.LOOTING) {

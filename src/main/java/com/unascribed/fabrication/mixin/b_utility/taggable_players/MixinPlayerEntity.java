@@ -31,7 +31,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 		super(entityType, world);
 	}
 
-	@Inject(at=@At("HEAD"), method="eatFood(Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;", cancellable=true)
+	@Inject(at=@At("HEAD"), method="eatFood(Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;", cancellable=true, expect=1)
 	public void eatFood(World world, ItemStack stack, CallbackInfoReturnable<ItemStack> ci) {
 		if (MixinConfigPlugin.isEnabled("*.taggable_players") && this instanceof TaggablePlayer) {
 			if (((TaggablePlayer)this).fabrication$hasTag(PlayerTag.NO_HUNGER)) {
@@ -51,7 +51,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 		}
 	}
 	
-	@Inject(at=@At("HEAD"), method="isInvulnerableTo(Lnet/minecraft/entity/damage/DamageSource;)Z", cancellable=true)
+	@Inject(at=@At("HEAD"), method="isInvulnerableTo(Lnet/minecraft/entity/damage/DamageSource;)Z", cancellable=true, expect=1)
 	public void isInvulnerableTo(DamageSource ds, CallbackInfoReturnable<Boolean> ci) {
 		if (MixinConfigPlugin.isEnabled("*.taggable_players") && this instanceof TaggablePlayer) {
 			if (((TaggablePlayer)this).fabrication$hasTag(PlayerTag.FIREPROOF) && ds.isFire()) {

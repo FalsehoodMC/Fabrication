@@ -38,13 +38,13 @@ public abstract class MixinLivingEntity extends Entity implements SetAttackerYaw
 	@Shadow
 	private float knockbackVelocity;
 	
-	@Inject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z")
+	@Inject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", expect=1)
 	public void damageHead(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
 		if (!MixinConfigPlugin.isEnabled("*.sync_attacker_yaw")) return;
 		fabrication$lastAttackerYaw = knockbackVelocity;
 	}
 	
-	@Inject(at=@At("RETURN"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z")
+	@Inject(at=@At("RETURN"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", expect=1)
 	public void damageReturn(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
 		if (!MixinConfigPlugin.isEnabled("*.sync_attacker_yaw")) return;
 		if (source == DamageSource.OUT_OF_WORLD && MixinConfigPlugin.isEnabled("*.repelling_void")) {

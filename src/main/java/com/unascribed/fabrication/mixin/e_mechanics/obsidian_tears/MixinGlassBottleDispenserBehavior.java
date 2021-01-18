@@ -26,7 +26,7 @@ public class MixinGlassBottleDispenserBehavior extends FallibleItemDispenserBeha
 	private ItemStack method_22141(BlockPointer blockPointer, ItemStack emptyBottleStack, ItemStack filledBottleStack) { return null; }
 	
 	@Inject(at=@At("HEAD"), method="dispenseSilently(Lnet/minecraft/util/math/BlockPointer;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;",
-			cancellable=true)
+			cancellable=true, expect=1)
 	public void dispenseSilently(BlockPointer pointer, ItemStack stack, CallbackInfoReturnable<ItemStack> ci) {
 		ServerWorld w = pointer.getWorld();
 		BlockPos pos = pointer.getBlockPos().offset(pointer.getBlockState().get(DispenserBlock.FACING));

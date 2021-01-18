@@ -18,7 +18,7 @@ import net.minecraft.item.Items;
 public class MixinDispenserBlock {
 
 	@Inject(at=@At("HEAD"), method="getBehaviorForItem(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/block/dispenser/DispenserBehavior;",
-			cancellable=true)
+			cancellable=true, expect=1)
 	public void getBehaviorForItem(ItemStack stack, CallbackInfoReturnable<DispenserBehavior> ci) {
 		if (!MixinConfigPlugin.isEnabled("*.obsidian_tears")) return;
 		if (stack.getItem() == Items.POTION && stack.hasTag() && stack.getTag().getBoolean("fabrication:ObsidianTears")) {

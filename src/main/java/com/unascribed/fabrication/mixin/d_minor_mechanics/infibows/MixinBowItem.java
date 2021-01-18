@@ -20,7 +20,7 @@ import com.unascribed.fabrication.support.MixinConfigPlugin;
 @EligibleIf(configEnabled="*.infibows", classNotPresent="net.parker8283.bif.BowInfinityFix")
 public class MixinBowItem {
 	
-	@Inject(at = @At("HEAD"), cancellable = true, method = "use(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/TypedActionResult;")
+	@Inject(at = @At("HEAD"), cancellable = true, method = "use(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/TypedActionResult;", expect=1)
 	private void use(World world, PlayerEntity player, Hand hand, CallbackInfoReturnable<TypedActionResult<ItemStack>> cir) {
 		if (!MixinConfigPlugin.isEnabled("*.infibows")) return;
 		ItemStack stack = player.getStackInHand(hand);

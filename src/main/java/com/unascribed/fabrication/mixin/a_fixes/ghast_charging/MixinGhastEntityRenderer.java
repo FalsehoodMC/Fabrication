@@ -17,7 +17,7 @@ import net.minecraft.entity.mob.GhastEntity;
 @EligibleIf(configEnabled="*.ghast_charging", envMatches=Env.CLIENT)
 public class MixinGhastEntityRenderer {
 
-	@Inject(at=@At("HEAD"), method="scale(Lnet/minecraft/entity/mob/GhastEntity;Lnet/minecraft/client/util/math/MatrixStack;F)V", cancellable=true)
+	@Inject(at=@At("HEAD"), method="scale(Lnet/minecraft/entity/mob/GhastEntity;Lnet/minecraft/client/util/math/MatrixStack;F)V", cancellable=true, expect=1)
 	public void scale(GhastEntity ghast, MatrixStack matrices, float tickDelta, CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.ghast_charging")) return;
 

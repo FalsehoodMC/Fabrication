@@ -41,12 +41,12 @@ public abstract class MixinLivingEntity extends Entity {
 		super(type, world);
 	}
 
-	@Inject(at=@At("HEAD"), method="sendEquipmentBreakStatus(Lnet/minecraft/entity/EquipmentSlot;)V")
+	@Inject(at=@At("HEAD"), method="sendEquipmentBreakStatus(Lnet/minecraft/entity/EquipmentSlot;)V", expect=1)
 	public void sendEquipmentBreakStatus(EquipmentSlot slot, CallbackInfo ci) {
 		shatter(slot, ((LivingEntity)(Object)this).getEquippedStack(slot));
 	}
 	
-	@Inject(at=@At("HEAD"), method="sendToolBreakStatus(Lnet/minecraft/util/Hand;)V")
+	@Inject(at=@At("HEAD"), method="sendToolBreakStatus(Lnet/minecraft/util/Hand;)V", expect=1)
 	public void sendToolBreakStatus(Hand hand, CallbackInfo ci) {
 		shatter(hand == Hand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND, ((LivingEntity)(Object)this).getStackInHand(hand));
 	}

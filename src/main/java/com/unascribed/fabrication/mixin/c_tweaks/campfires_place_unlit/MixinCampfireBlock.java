@@ -16,7 +16,7 @@ import net.minecraft.item.ItemPlacementContext;
 @EligibleIf(configEnabled="*.campfires_place_unlit")
 public class MixinCampfireBlock {
 
-	@Inject(at=@At("RETURN"), method="getPlacementState(Lnet/minecraft/item/ItemPlacementContext;)Lnet/minecraft/block/BlockState;", cancellable=true)
+	@Inject(at=@At("RETURN"), method="getPlacementState(Lnet/minecraft/item/ItemPlacementContext;)Lnet/minecraft/block/BlockState;", cancellable=true, expect=1)
 	public void getPlacementState(ItemPlacementContext ctx, CallbackInfoReturnable<BlockState> ci) {
 		if (MixinConfigPlugin.isEnabled("*.campfires_place_unlit")) {
 			ci.setReturnValue(ci.getReturnValue().with(CampfireBlock.LIT, false));

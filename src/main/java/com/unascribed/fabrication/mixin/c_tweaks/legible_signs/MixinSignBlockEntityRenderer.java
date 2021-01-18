@@ -28,18 +28,18 @@ public class MixinSignBlockEntityRenderer {
 	@Unique
 	private SignBlockEntity fabrication$currentEntity;
 	
-	@Inject(at=@At("HEAD"), method=RENDER)
+	@Inject(at=@At("HEAD"), method=RENDER, expect=1)
 	public void renderHead(SignBlockEntity sbe, float f, MatrixStack matrices, VertexConsumerProvider vcp, int i, int j, CallbackInfo ci) {
 		fabrication$currentEntity = sbe;
 	}
 	
-	@Inject(at=@At("TAIL"), method=RENDER)
+	@Inject(at=@At("TAIL"), method=RENDER, expect=1)
 	public void renderTail(SignBlockEntity sbe, float f, MatrixStack matrices, VertexConsumerProvider vcp, int i, int j, CallbackInfo ci) {
 		fabrication$currentEntity = null;
 	}
 	
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/client/texture/NativeImage.getAbgrColor(IIII)I"),
-			method=RENDER)
+			method=RENDER, expect=1)
 	public int modifySignTextColor(int a, int r, int g, int b) {
 		if (!MixinConfigPlugin.isEnabled("*.legible_signs")) return NativeImage.getAbgrColor(a, r, g, b);
 		DyeColor dc = fabrication$currentEntity.getTextColor();

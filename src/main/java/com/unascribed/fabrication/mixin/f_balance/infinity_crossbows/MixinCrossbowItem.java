@@ -26,7 +26,7 @@ import net.minecraft.world.World;
 public class MixinCrossbowItem {
 
 	@ModifyVariable(at=@At("HEAD"), method="loadProjectile(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemStack;ZZ)Z",
-			argsOnly=true, index=4)
+			argsOnly=true, index=4, expect=1)
 	private static boolean modifyCreativeModeLoadProjectile(boolean creative, LivingEntity shooter, ItemStack crossbow) {
 		if (MixinConfigPlugin.isEnabled("*.infinity_crossbows") && EnchantmentHelper.getLevel(Enchantments.INFINITY, crossbow) > 0) {
 			return true;
@@ -36,7 +36,7 @@ public class MixinCrossbowItem {
 	
 	@Inject(at=@At(value="INVOKE", target="net/minecraft/item/ItemStack.damage(ILnet/minecraft/entity/LivingEntity;Ljava/util/function/Consumer;)V"),
 			method="shoot(Lnet/minecraft/world/World;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemStack;FZFFF)V",
-			locals=LocalCapture.CAPTURE_FAILHARD)
+			locals=LocalCapture.CAPTURE_FAILHARD, expect=1)
 	private static void shoot(World world, LivingEntity shooter, Hand hand, ItemStack crossbow, ItemStack projectile, float soundPitch, boolean creative, float speed, float divergence, float simulated,
 			CallbackInfo ci, boolean firework, ProjectileEntity proj) {
 		if (!MixinConfigPlugin.isEnabled("*.infinity_crossbows")) return;

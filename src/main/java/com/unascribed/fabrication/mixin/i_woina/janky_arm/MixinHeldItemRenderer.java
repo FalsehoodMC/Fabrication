@@ -19,7 +19,7 @@ import net.minecraft.util.Arm;
 public class MixinHeldItemRenderer {
 
 	@Inject(at=@At(value="CONSTANT", args="floatValue=-20"),
-			method="renderArmHoldingItem(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IFFLnet/minecraft/util/Arm;)V")
+			method="renderArmHoldingItem(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IFFLnet/minecraft/util/Arm;)V", expect=1)
 	private void renderArmHoldingItem(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, float equipProgress, float swingProgress, Arm arm, CallbackInfo ci) {
 		float f = arm == Arm.LEFT ? -1 : 1;
 		if (MixinConfigPlugin.isEnabled("*.janky_arm")) {

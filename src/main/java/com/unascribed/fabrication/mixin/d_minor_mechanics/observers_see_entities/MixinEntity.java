@@ -35,7 +35,7 @@ public abstract class MixinEntity {
 	@Shadow
 	public abstract Box getBoundingBox();
 	
-	@Inject(at=@At("TAIL"), method="move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V")
+	@Inject(at=@At("TAIL"), method="move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V", expect=1)
 	public void move(MovementType type, Vec3d movement, CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.observers_see_entities")) return;
 		Object self = this;

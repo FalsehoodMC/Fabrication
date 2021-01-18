@@ -24,14 +24,14 @@ public abstract class MixinEntity implements GetKillMessage {
 		return fabrication$killmessage;
 	}
 	
-	@Inject(at=@At("TAIL"), method="toTag(Lnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/nbt/CompoundTag;")
+	@Inject(at=@At("TAIL"), method="toTag(Lnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/nbt/CompoundTag;", expect=1)
 	public void toTag(CompoundTag tag, CallbackInfoReturnable<CompoundTag> ci) {
 		if (fabrication$killmessage != null) {
 			tag.putString("KillMessage", fabrication$killmessage);
 		}
 	}
 	
-	@Inject(at=@At("TAIL"), method="fromTag(Lnet/minecraft/nbt/CompoundTag;)V")
+	@Inject(at=@At("TAIL"), method="fromTag(Lnet/minecraft/nbt/CompoundTag;)V", expect=1)
 	public void fromTag(CompoundTag tag, CallbackInfo ci) {
 		if (tag.contains("KillMessage", NbtType.STRING) ) {
 			fabrication$killmessage = tag.getString("KillMessage");

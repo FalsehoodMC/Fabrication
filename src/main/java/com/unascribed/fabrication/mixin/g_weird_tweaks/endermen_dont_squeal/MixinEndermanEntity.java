@@ -16,7 +16,7 @@ import net.minecraft.sound.SoundEvents;
 @EligibleIf(configEnabled="*.endermen_dont_squeal")
 public class MixinEndermanEntity {
 
-	@Inject(at=@At("HEAD"), method="playAngrySound()V", cancellable=true)
+	@Inject(at=@At("HEAD"), method="playAngrySound()V", cancellable=true, expect=1)
 	public void playAngrySound(CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.endermen_dont_squeal")) return;
 		ci.cancel();

@@ -16,7 +16,7 @@ public class MixinBackgroundRenderer {
 
 	@ModifyVariable(at=@At(value="INVOKE_ASSIGN", target="net/minecraft/client/render/GameRenderer.getNightVisionStrength(Lnet/minecraft/entity/LivingEntity;F)F",
 				shift=Shift.AFTER),
-			method="render(Lnet/minecraft/client/render/Camera;FLnet/minecraft/client/world/ClientWorld;IF)V", ordinal=2)
+			method="render(Lnet/minecraft/client/render/Camera;FLnet/minecraft/client/world/ClientWorld;IF)V", ordinal=2, expect=1)
 	private static float getNightVisionStrength(float orig) {
 		if (MixinConfigPlugin.isEnabled("*.normal_fog_with_night_vision")) {
 			return 0;

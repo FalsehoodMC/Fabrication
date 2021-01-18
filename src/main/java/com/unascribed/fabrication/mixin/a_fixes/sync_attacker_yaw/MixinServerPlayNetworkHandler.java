@@ -23,7 +23,7 @@ public class MixinServerPlayNetworkHandler {
 	@Shadow
 	public ServerPlayerEntity player;
 	
-	@Inject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/c2s/play/CustomPayloadC2SPacket;)V", cancellable=true)
+	@Inject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/c2s/play/CustomPayloadC2SPacket;)V", cancellable=true, expect=1)
 	public void onCustomPayload(CustomPayloadC2SPacket packet, CallbackInfo ci) {
 		Identifier channel = FabRefl.getChannel(packet);
 		if (channel.getNamespace().equals("fabrication") && channel.getPath().equals("attacker_yaw")) {

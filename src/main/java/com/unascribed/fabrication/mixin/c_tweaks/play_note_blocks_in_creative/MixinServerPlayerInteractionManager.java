@@ -24,7 +24,7 @@ public class MixinServerPlayerInteractionManager {
 	@Shadow
 	public ServerPlayerEntity player;
 	
-	@Inject(at=@At("HEAD"), method="tryBreakBlock(Lnet/minecraft/util/math/BlockPos;)Z", cancellable=true)
+	@Inject(at=@At("HEAD"), method="tryBreakBlock(Lnet/minecraft/util/math/BlockPos;)Z", cancellable=true, expect=1)
 	public void tryBreakBlock(BlockPos pos, CallbackInfoReturnable<Boolean> ci) {
 		if (!MixinConfigPlugin.isEnabled("*.play_note_blocks_in_creative")) return;
 		BlockState bs = world.getBlockState(pos);

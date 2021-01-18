@@ -24,7 +24,7 @@ import net.minecraft.util.math.Vec3d;
 public class MixinPlayerEntity {
 
 	@Inject(at=@At("HEAD"), method="findRespawnPosition(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;FZZ)Ljava/util/Optional;",
-			cancellable=true)
+			cancellable=true, expect=1)
 	private static void findRespawnPosition(ServerWorld world, BlockPos pos, float f, boolean b, boolean b2, CallbackInfoReturnable<Optional<Vec3d>> ci) {
 		if (!MixinConfigPlugin.isEnabled("*.obsidian_tears")) return;
 		BlockState state = world.getBlockState(pos);

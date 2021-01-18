@@ -40,7 +40,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 	private final List<Vec3d> fabrication$voidFallTrail = Lists.newArrayList();
 	private boolean fabrication$debted;
 	
-	@Inject(at=@At("TAIL"), method="tick()V")
+	@Inject(at=@At("TAIL"), method="tick()V", expect=1)
 	public void tick(CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.repelling_void")) return;
 		if (onGround) {
@@ -101,7 +101,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 		}
 	}
 	
-	@Inject(at = @At("TAIL"), method = "writeCustomDataToTag(Lnet/minecraft/nbt/CompoundTag;)V")
+	@Inject(at = @At("TAIL"), method = "writeCustomDataToTag(Lnet/minecraft/nbt/CompoundTag;)V", expect=1)
 	public void writeCustomDataToTag(CompoundTag tag, CallbackInfo ci) {
 		if (fabrication$lastGroundPos != null) {
 			Vec3d pos = fabrication$lastGroundPos;
@@ -109,10 +109,12 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 			tag.putDouble("fabrication:LastGroundPosY", pos.y);
 			tag.putDouble("fabrication:LastGroundPosZ", pos.z);
 		}
-		tag.putBoolean("fabrication:Debted", fabrication$debted);
+		if (fabrication$debted) {
+			tag.putBoolean("fabrication:Debted", fabrication$debted);
+		}
 	}
 	
-	@Inject(at = @At("TAIL"), method = "readCustomDataFromTag(Lnet/minecraft/nbt/CompoundTag;)V")
+	@Inject(at = @At("TAIL"), method = "readCustomDataFromTag(Lnet/minecraft/nbt/CompoundTag;)V", expect=1)
 	public void readCustomDataFromTag(CompoundTag tag, CallbackInfo ci) {
 		if (tag.contains("fabrication:LastGroundPosX")) {
 			fabrication$lastGroundPos = new Vec3d(

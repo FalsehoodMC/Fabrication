@@ -18,7 +18,7 @@ public class MixinShapelessRecipe {
 
 	// even though this signature is identical to the one in ShapedRecipe, a multi-target mixin
 	// can't be used because the two methods obfuscate differently
-	@Inject(at=@At("RETURN"), method="craft(Lnet/minecraft/inventory/CraftingInventory;)Lnet/minecraft/item/ItemStack;")
+	@Inject(at=@At("RETURN"), method="craft(Lnet/minecraft/inventory/CraftingInventory;)Lnet/minecraft/item/ItemStack;", expect=1)
 	public void craft(CraftingInventory inv, CallbackInfoReturnable<ItemStack> ci) {
 		if (!MixinConfigPlugin.isEnabled("*.dimensional_tools")) return;
 		FeatureDimensionalTools.handleCraft(inv, ci.getReturnValue());

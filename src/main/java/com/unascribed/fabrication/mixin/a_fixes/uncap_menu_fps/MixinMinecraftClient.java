@@ -14,7 +14,7 @@ import net.minecraft.client.MinecraftClient;
 @EligibleIf(configEnabled="*.uncap_menu_fps", envMatches=Env.CLIENT)
 public class MixinMinecraftClient {
 
-	@Inject(at=@At("HEAD"), method="getFramerateLimit()I", cancellable=true)
+	@Inject(at=@At("HEAD"), method="getFramerateLimit()I", cancellable=true, expect=1)
 	private void getFramerateLimit(CallbackInfoReturnable<Integer> ci) {
 		if (MixinConfigPlugin.isEnabled("*.uncap_menu_fps")) {
 			ci.setReturnValue(((MinecraftClient)(Object)this).getWindow().getFramerateLimit());

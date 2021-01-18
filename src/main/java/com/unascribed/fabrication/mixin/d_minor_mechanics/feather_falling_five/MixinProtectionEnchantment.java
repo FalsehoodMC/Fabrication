@@ -14,7 +14,7 @@ import net.minecraft.enchantment.ProtectionEnchantment;
 @EligibleIf(configEnabled="*.feather_falling_five")
 public class MixinProtectionEnchantment {
 
-	@Inject(at=@At("RETURN"), method="getMaxLevel()I", cancellable=true)
+	@Inject(at=@At("RETURN"), method="getMaxLevel()I", cancellable=true, expect=1)
 	public void getMaxLevel(CallbackInfoReturnable<Integer> cir) {
 		if (!MixinConfigPlugin.isEnabled("*.feather_falling_five")) return;
 		if (((Object)this) == Enchantments.FEATHER_FALLING && cir.getReturnValueI() < 5) {

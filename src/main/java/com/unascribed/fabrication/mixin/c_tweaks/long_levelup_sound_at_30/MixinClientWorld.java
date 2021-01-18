@@ -21,7 +21,7 @@ import net.minecraft.sound.SoundEvents;
 @EligibleIf(configEnabled="*.long_levelup_sound_at_30", envMatches=Env.CLIENT, specialConditions=SpecialEligibility.EVENTS_AVAILABLE)
 public class MixinClientWorld {
 
-	@Inject(at=@At("HEAD"), method="playSound(DDDLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FFZ)V", cancellable=true)
+	@Inject(at=@At("HEAD"), method="playSound(DDDLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FFZ)V", cancellable=true, expect=1)
 	public void playSound(double x, double y, double z, SoundEvent event, SoundCategory category, float pitch, float volume, boolean useDistance, CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.long_levelup_sound_at_30")) return;
 		if (event == SoundEvents.ENTITY_PLAYER_LEVELUP && category == SoundCategory.PLAYERS) {

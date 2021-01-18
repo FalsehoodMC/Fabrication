@@ -45,7 +45,7 @@ public abstract class MixinEntity implements MarkWet {
 	@Shadow
 	public abstract void playSound(SoundEvent se, float volume, float pitch);
 	
-	@Inject(at=@At("TAIL"), method="baseTick()V")
+	@Inject(at=@At("TAIL"), method="baseTick()V", expect=1)
 	public void baseTick(CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.enhanced_moistness") || world.isClient) return;
 		if (isInLava()) {
@@ -74,7 +74,7 @@ public abstract class MixinEntity implements MarkWet {
 		}
 	}
 	
-	@Inject(at=@At("HEAD"), method="isWet()Z", cancellable=true)
+	@Inject(at=@At("HEAD"), method="isWet()Z", cancellable=true, expect=1)
 	public void isWet(CallbackInfoReturnable<Boolean> ci) {
 		if (MixinConfigPlugin.isEnabled("*.enhanced_moistness")) {
 			if (fabrication$wetTimer > 0 && !fabrication$checkingOriginalWetness) {

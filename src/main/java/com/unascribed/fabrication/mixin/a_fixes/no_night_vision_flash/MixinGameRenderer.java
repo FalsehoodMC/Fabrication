@@ -16,7 +16,7 @@ import net.minecraft.entity.effect.StatusEffects;
 @EligibleIf(configEnabled="*.no_night_vision_flash", envMatches=Env.CLIENT)
 public class MixinGameRenderer {
 
-	@Inject(at=@At("HEAD"), method="getNightVisionStrength(Lnet/minecraft/entity/LivingEntity;F)F", cancellable=true)
+	@Inject(at=@At("HEAD"), method="getNightVisionStrength(Lnet/minecraft/entity/LivingEntity;F)F", cancellable=true, expect=1)
 	private static void getNightVisionStrength(LivingEntity entity, float tickDelta, CallbackInfoReturnable<Float> ci) {
 		if (MixinConfigPlugin.isEnabled("*.no_night_vision_flash")) {
 			int duration = entity.getStatusEffect(StatusEffects.NIGHT_VISION).getDuration();

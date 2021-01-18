@@ -14,7 +14,7 @@ import net.minecraft.server.world.ServerWorld;
 @EligibleIf(configEnabled="*.item_despawn")
 public abstract class MixinServerWorld {
 
-	@Inject(at=@At("HEAD"), method="addEntity(Lnet/minecraft/entity/Entity;)Z", cancellable=true)
+	@Inject(at=@At("HEAD"), method="addEntity(Lnet/minecraft/entity/Entity;)Z", cancellable=true, expect=1)
 	public void addEntity(Entity e, CallbackInfoReturnable<Boolean> ci) {
 		if (e instanceof ItemEntity && e.removed) {
 			// don't squawk about items set to despawn instantly

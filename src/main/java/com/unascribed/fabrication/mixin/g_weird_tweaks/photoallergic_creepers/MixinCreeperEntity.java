@@ -22,7 +22,7 @@ public abstract class MixinCreeperEntity extends HostileEntity {
 		super(entityType, world);
 	}
 
-	@Inject(at=@At("HEAD"), method="tick()V")
+	@Inject(at=@At("HEAD"), method="tick()V", expect=1)
 	public void onTick(CallbackInfo ci) {
 		if (MixinConfigPlugin.isEnabled("*.photoallergic_creepers")) {
 			if (isAffectedByDaylight()) {

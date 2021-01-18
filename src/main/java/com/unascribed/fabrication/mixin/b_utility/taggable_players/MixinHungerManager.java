@@ -20,7 +20,7 @@ public abstract class MixinHungerManager implements SetSaturation {
 	@Shadow
 	private float foodSaturationLevel;
 	
-	@Inject(at=@At("HEAD"), method="update(Lnet/minecraft/entity/player/PlayerEntity;)V", cancellable=true)
+	@Inject(at=@At("HEAD"), method="update(Lnet/minecraft/entity/player/PlayerEntity;)V", cancellable=true, expect=1)
 	public void update(PlayerEntity pe, CallbackInfo ci) {
 		if (MixinConfigPlugin.isEnabled("*.taggable_players") && pe instanceof TaggablePlayer) {
 			if (((TaggablePlayer)pe).fabrication$hasTag(PlayerTag.NO_HUNGER)) {

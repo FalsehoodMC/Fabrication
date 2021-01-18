@@ -18,7 +18,7 @@ import net.minecraft.util.math.BlockPos;
 @EligibleIf(configEnabled="*.play_note_blocks_in_creative", envMatches=Env.CLIENT)
 public class MixinClientPlayerInteractionManager {
 
-	@Inject(at=@At("HEAD"), method="breakBlock(Lnet/minecraft/util/math/BlockPos;)Z", cancellable=true)
+	@Inject(at=@At("HEAD"), method="breakBlock(Lnet/minecraft/util/math/BlockPos;)Z", cancellable=true, expect=1)
 	public void breakBlock(BlockPos pos, CallbackInfoReturnable<Boolean> ci) {
 		if (!MixinConfigPlugin.isEnabled("*.play_note_blocks_in_creative")) return;
 		BlockState bs = MinecraftClient.getInstance().world.getBlockState(pos);

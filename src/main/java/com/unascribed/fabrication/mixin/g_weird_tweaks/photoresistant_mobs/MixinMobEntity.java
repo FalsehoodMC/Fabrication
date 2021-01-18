@@ -16,7 +16,7 @@ import net.minecraft.entity.mob.PhantomEntity;
 @EligibleIf(configEnabled="*.photoresistant_mobs")
 public abstract class MixinMobEntity {
 	
-	@Inject(at=@At("HEAD"), method="isAffectedByDaylight()Z", cancellable=true)
+	@Inject(at=@At("HEAD"), method="isAffectedByDaylight()Z", cancellable=true, expect=1)
 	public void isAffectedByDaylight(CallbackInfoReturnable<Boolean> ci) {
 		if (MixinConfigPlugin.isEnabled("*.photoresistant_mobs")) {
 			Object self = this;

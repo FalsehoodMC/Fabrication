@@ -16,7 +16,7 @@ import net.minecraft.item.ItemStack;
 public abstract class MixinPlayerInventory {
 
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/entity/player/PlayerEntity.dropItem(Lnet/minecraft/item/ItemStack;ZZ)Lnet/minecraft/entity/ItemEntity;"),
-			method="dropAll()V")
+			method="dropAll()V", expect=1)
 	public ItemEntity dropItem(PlayerEntity subject, ItemStack stack, boolean throwRandomly, boolean retainOwnership) {
 		ItemEntity e = subject.dropItem(stack, throwRandomly, retainOwnership);
 		if (e instanceof SetFromPlayerDeath) {

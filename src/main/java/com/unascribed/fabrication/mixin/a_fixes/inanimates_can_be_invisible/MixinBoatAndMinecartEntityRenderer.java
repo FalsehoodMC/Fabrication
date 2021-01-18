@@ -19,7 +19,7 @@ public class MixinBoatAndMinecartEntityRenderer {
 
 	// for rendering a player's own mounted vehicle
 	
-	@Inject(at=@At("HEAD"), method="render(Lnet/minecraft/entity/Entity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", cancellable=true)
+	@Inject(at=@At("HEAD"), method="render(Lnet/minecraft/entity/Entity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", cancellable=true, expect=1)
 	public void render(Entity e, float f, float f2, MatrixStack matricies, VertexConsumerProvider vcp, int i, CallbackInfo ci) {
 		if (e.isInvisible()) {
 			ci.cancel();

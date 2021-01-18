@@ -25,6 +25,8 @@ import javax.swing.plaf.metal.MetalLookAndFeel;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
+import org.spongepowered.asm.mixin.MixinEnvironment;
+import org.spongepowered.asm.mixin.MixinEnvironment.Option;
 import org.spongepowered.asm.mixin.Mixins;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -510,6 +512,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	@Override
 	public void onLoad(String mixinPackage) {
 		reload();
+		// HACK
+		MixinEnvironment.getCurrentEnvironment().setOption(Option.DEBUG_INJECTORS, true);
 		RUNTIME_CHECKS_WAS_ENABLED = isEnabled("general.runtime_checks");
 		Mixins.registerErrorHandlerClass("com.unascribed.fabrication.support.MixinErrorHandler");
 	}

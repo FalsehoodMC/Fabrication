@@ -41,14 +41,14 @@ public class MixinClientPlayNetworkHandler implements GetServerConfig {
 	private final Set<String> fabrication$serverFailedConfig = Sets.newHashSet();
 	private String fabrication$serverVersion;
 	
-	@Inject(at=@At("TAIL"), method="onGameJoin(Lnet/minecraft/network/packet/s2c/play/GameJoinS2CPacket;)V")
+	@Inject(at=@At("TAIL"), method="onGameJoin(Lnet/minecraft/network/packet/s2c/play/GameJoinS2CPacket;)V", expect=1)
 	public void onGameJoin(GameJoinS2CPacket packet, CallbackInfo ci) {
 		PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
 		data.writeVarInt(0);
 		connection.send(new CustomPayloadC2SPacket(new Identifier("fabrication", "config"), data));
 	}
 	
-	@Inject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/s2c/play/CustomPayloadS2CPacket;)V", cancellable=true)
+	@Inject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/s2c/play/CustomPayloadS2CPacket;)V", cancellable=true, expect=1)
 	public void onCustomPayload(CustomPayloadS2CPacket packet, CallbackInfo ci) {
 		if (packet.getChannel().getNamespace().equals("fabrication") && packet.getChannel().getPath().equals("config")) {
 			try {

@@ -20,7 +20,7 @@ import net.minecraft.util.hit.EntityHitResult;
 public class MixinTridentEntity {
 
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/enchantment/EnchantmentHelper.getAttackDamage(Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/EntityGroup;)F"),
-			method="onEntityHit(Lnet/minecraft/util/hit/EntityHitResult;)V")
+			method="onEntityHit(Lnet/minecraft/util/hit/EntityHitResult;)V", expect=1)
 	public float getAttackDamage(ItemStack stack, EntityGroup grp, EntityHitResult ehr) {
 		ItemStack real = stack;
 		if (MixinConfigPlugin.isEnabled("*.tridents_accept_sharpness") && EnchantmentHelper.getLevel(Enchantments.SHARPNESS, stack) > 0) {

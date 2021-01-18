@@ -72,7 +72,7 @@ public abstract class MixinServerPlayerEntity extends PlayerEntity implements Ta
 		return fabrication$tags.contains(tag);
 	}
 	
-	@Inject(at=@At("TAIL"), method="tick()V")
+	@Inject(at=@At("TAIL"), method="tick()V", expect=1)
 	public void tick(CallbackInfo ci) {
 		if (MixinConfigPlugin.isEnabled("*.taggable_players")) {
 			if (fabrication$tags.contains(PlayerTag.NO_HUNGER)) {
@@ -97,22 +97,24 @@ public abstract class MixinServerPlayerEntity extends PlayerEntity implements Ta
 		return !hasStatusEffect(se) || !getStatusEffect(se).isAmbient() || getStatusEffect(se).shouldShowIcon() || getStatusEffect(se).shouldShowParticles();
 	}
 
-	@Inject(at=@At("HEAD"), method="copyFrom(Lnet/minecraft/server/network/ServerPlayerEntity;Z)V", cancellable=true)
+	@Inject(at=@At("HEAD"), method="copyFrom(Lnet/minecraft/server/network/ServerPlayerEntity;Z)V", cancellable=true, expect=1)
 	public void copyFrom(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
 		fabrication$tags.clear();
 		fabrication$tags.addAll(((TaggablePlayer)oldPlayer).fabrication$getTags());
 	}
 	
-	@Inject(at=@At("TAIL"), method="writeCustomDataToTag(Lnet/minecraft/nbt/CompoundTag;)V")
+	@Inject(at=@At("TAIL"), method="writeCustomDataToTag(Lnet/minecraft/nbt/CompoundTag;)V", expect=1)
 	public void writeCustomDataToTag(CompoundTag tag, CallbackInfo ci) {
 		ListTag li = new ListTag();
 		for (PlayerTag pt : fabrication$tags) {
 			li.add(StringTag.of(pt.lowerName()));
 		}
-		tag.put("fabrication:Tags", li);
+		if (!li.isEmpty()) {
+			tag.put("fabrication:Tags", li);
+		}
 	}
 	
-	@Inject(at=@At("TAIL"), method="readCustomDataFromTag(Lnet/minecraft/nbt/CompoundTag;)V")
+	@Inject(at=@At("TAIL"), method="readCustomDataFromTag(Lnet/minecraft/nbt/CompoundTag;)V", expect=1)
 	public void readCustomDataFromTag(CompoundTag tag, CallbackInfo ci) {
 		fabrication$tags.clear();
 		ListTag li = tag.getList("fabrication:Tags", NbtType.STRING);

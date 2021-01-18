@@ -13,7 +13,7 @@ import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 @EligibleIf(configEnabled="*.boundless_levels", envMatches=Env.CLIENT)
 public class MixinAbstractInventoryScreen {
 
-	@ModifyConstant(constant=@Constant(intValue=9), method="drawStatusEffectDescriptions(Lnet/minecraft/client/util/math/MatrixStack;IILjava/lang/Iterable;)V")
+	@ModifyConstant(constant=@Constant(intValue=9), method="drawStatusEffectDescriptions(Lnet/minecraft/client/util/math/MatrixStack;IILjava/lang/Iterable;)V", expect=1)
 	public int modifyMaxRenderedLevel(int orig) {
 		if (MixinConfigPlugin.isEnabled("*.boundless_levels")) return 32767;
 		return orig;

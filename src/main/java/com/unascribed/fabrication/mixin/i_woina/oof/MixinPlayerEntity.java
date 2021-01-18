@@ -24,7 +24,7 @@ public abstract class MixinPlayerEntity {
 	public abstract GameProfile getGameProfile();
 	
 	@Inject(at=@At("HEAD"), method="getHurtSound(Lnet/minecraft/entity/damage/DamageSource;)Lnet/minecraft/sound/SoundEvent;",
-			cancellable=true)
+			cancellable=true, expect=1)
 	public void getHurtSound(DamageSource src, CallbackInfoReturnable<SoundEvent> ci) {
 		if (!MixinConfigPlugin.isEnabled("*.oof") || !((PlayerEntity)(Object)this).world.isClient) return;
 		if (src == DamageSource.DROWN) {

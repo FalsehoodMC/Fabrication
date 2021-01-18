@@ -25,7 +25,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 		super(entityType, world);
 	}
 
-	@Inject(at=@At("RETURN"), method="getDisplayName()Lnet/minecraft/text/Text;", cancellable=true)
+	@Inject(at=@At("RETURN"), method="getDisplayName()Lnet/minecraft/text/Text;", cancellable=true, expect=1)
 	public void getDisplayName(CallbackInfoReturnable<Text> ci) {
 		if (!MixinConfigPlugin.isEnabled("*.use_player_list_name_in_tag")) return;
 		Object self = this;

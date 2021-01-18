@@ -14,7 +14,7 @@ import net.minecraft.entity.mob.SilverfishEntity;
 public class MixinSilverfishEntity {
 
 	// this method is poorly mapped. a better name is "hasStepSound"
-	@Inject(at=@At("HEAD"), method="canClimb()Z", cancellable=true)
+	@Inject(at=@At("HEAD"), method="canClimb()Z", cancellable=true, expect=1)
 	public void canClimb(CallbackInfoReturnable<Boolean> ci) {
 		if (MixinConfigPlugin.isEnabled("*.silverfish_step")) ci.setReturnValue(true);
 	}

@@ -37,7 +37,7 @@ public class MixinBannerBlockEntityRenderer {
 	private static final String RENDER_CANVAS = "renderCanvas(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/model/ModelPart;Lnet/minecraft/client/util/SpriteIdentifier;ZLjava/util/List;Z)V";
 
 	@Inject(at=@At(value="INVOKE", target="net/minecraft/client/model/ModelPart.render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;II)V",
-			shift=Shift.AFTER, ordinal=0), method=RENDER_CANVAS, cancellable=true)
+			shift=Shift.AFTER, ordinal=0), method=RENDER_CANVAS, cancellable=true, expect=1)
 	private static void renderCanvasHead(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, ModelPart canvas, SpriteIdentifier baseSprite, boolean isBanner, List<Pair<BannerPattern, DyeColor>> patterns, boolean bl2, CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.fullres_banner_shields")) return;
 		if (!isBanner) {

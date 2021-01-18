@@ -17,7 +17,7 @@ import net.minecraft.world.gen.PhantomSpawner;
 public class MixinPhantomSpawner {
 
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/entity/player/PlayerEntity.isSpectator()Z"),
-			method="spawn(Lnet/minecraft/server/world/ServerWorld;ZZ)I")
+			method="spawn(Lnet/minecraft/server/world/ServerWorld;ZZ)I", expect=1)
 	public boolean spawnIsSpectator(PlayerEntity subject) {
 		if (subject instanceof TaggablePlayer && (((TaggablePlayer)subject).fabrication$hasTag(PlayerTag.NO_PHANTOMS) || ((TaggablePlayer)subject).fabrication$hasTag(PlayerTag.INVISIBLE_TO_MOBS))) {
 			return true;

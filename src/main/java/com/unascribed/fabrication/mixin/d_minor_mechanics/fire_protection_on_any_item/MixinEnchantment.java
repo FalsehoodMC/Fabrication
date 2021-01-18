@@ -15,7 +15,7 @@ import net.minecraft.item.ItemStack;
 @EligibleIf(configEnabled="*.fire_protection_on_any_item")
 public abstract class MixinEnchantment {
 
-	@Inject(at=@At("HEAD"), method="isAcceptableItem(Lnet/minecraft/item/ItemStack;)Z", cancellable=true)
+	@Inject(at=@At("HEAD"), method="isAcceptableItem(Lnet/minecraft/item/ItemStack;)Z", cancellable=true, expect=1)
 	public void isAcceptableItem(ItemStack stack, CallbackInfoReturnable<Boolean> ci) {
 		if (MixinConfigPlugin.isEnabled("*.fire_protection_on_any_item") && (Object)this == Enchantments.FIRE_PROTECTION && stack.getItem().isEnchantable(stack)) {
 			ci.setReturnValue(true);

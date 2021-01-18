@@ -16,7 +16,7 @@ import net.minecraft.item.Items;
 @EligibleIf(configEnabled="*.infinity_crossbows")
 public abstract class MixinEnchantment {
 	
-	@Inject(at=@At("HEAD"), method="isAcceptableItem(Lnet/minecraft/item/ItemStack;)Z", cancellable=true)
+	@Inject(at=@At("HEAD"), method="isAcceptableItem(Lnet/minecraft/item/ItemStack;)Z", cancellable=true, expect=1)
 	public void isAcceptableItem(ItemStack stack, CallbackInfoReturnable<Boolean> ci) {
 		if (MixinConfigPlugin.isEnabled("*.infinity_crossbows") && (Object)this == Enchantments.INFINITY && stack.getItem() == Items.CROSSBOW) {
 			ci.setReturnValue(true);

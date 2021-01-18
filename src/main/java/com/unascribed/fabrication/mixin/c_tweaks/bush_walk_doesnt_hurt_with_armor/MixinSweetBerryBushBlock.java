@@ -20,7 +20,7 @@ import net.minecraft.world.World;
 public class MixinSweetBerryBushBlock {
 	
 	@Inject(at=@At(value="INVOKE", target="net/minecraft/entity/Entity.damage(Lnet/minecraft/entity/damage/DamageSource;F)Z"),
-			method="onEntityCollision(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/Entity;)V", cancellable=true)
+			method="onEntityCollision(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/Entity;)V", cancellable=true, expect=1)
 	public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity, CallbackInfo ci) {
 		if (MixinConfigPlugin.isEnabled("*.bush_walk_doesnt_hurt_with_armor") && entity instanceof LivingEntity
 				&& !((LivingEntity)entity).getEquippedStack(EquipmentSlot.LEGS).isEmpty()
