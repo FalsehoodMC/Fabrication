@@ -28,9 +28,8 @@ block_distribution_analysis
 	media: https://unascribed.com/fabrication/block_distribution_analysis.png
 	desc:
 		The /fabrication command has an "analyze" subcommand that can be used to perform block
-		distribution analysis on the world. (Don't try and use the biome subcommand, it doesn't
-		work right now.) By default it will scan the dimension you're in, but you can specify an
-		alternate dimension if you want.
+		distribution analysis on the world. By default it will scan the dimension you're in, but
+		you can specify an alternate dimension if you want. A biome filter can also be specified.
 		
 		This will generate and/or load a ton of chunks. Use with caution. Progress reports go to
 		the console; once complete, a TSV (tab-separated value) file will be written to the game

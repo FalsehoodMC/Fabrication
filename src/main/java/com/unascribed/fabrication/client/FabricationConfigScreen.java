@@ -44,11 +44,8 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.PacketByteBuf;
@@ -309,7 +306,6 @@ public class FabricationConfigScreen extends Screen {
 		GlStateManager.color4f(1, 1, 1, 1);
 		
 		GlStateManager.disableCull();
-		BufferBuilder bb = Tessellator.getInstance().getBuffer();
 
 		float top = (570/1080f)*height;
 		float bottom = (901/1080f)*height;
@@ -330,26 +326,40 @@ public class FabricationConfigScreen extends Screen {
 				float minV = flagCutoffV;
 				float maxV = 1;
 				
-				bb.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE);
-				bb.vertex(mat, brk, top, 0).texture(minU, minV).next();
-				bb.vertex(mat, brk2, top, 0).texture(maxU, minV).next();
-				bb.vertex(mat, brk2, bottom, 0).texture(maxU, maxV).next();
-				bb.vertex(mat, brk, bottom, 0).texture(minU, maxV).next();
-				bb.end();
-				BufferRenderer.draw(bb);
+				GL11.glBegin(GL11.GL_QUADS);
+					GL11.glTexCoord2f(minU, minV);
+					GL11.glVertex2f(brk, top);
+					
+					GL11.glTexCoord2f(maxU, minV);
+					GL11.glVertex2f(brk2, top);
+					
+					GL11.glTexCoord2f(maxU, maxV);
+					GL11.glVertex2f(brk2, bottom);
+					
+					GL11.glTexCoord2f(minU, maxV);
+					GL11.glVertex2f(brk, bottom);
+				GL11.glEnd();
 			} else {
 				GlStateManager.shadeModel(GL11.GL_SMOOTH);
 				GlStateManager.disableTexture();
-				bb.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
 				float r = MathHelper.lerp(flagCutoffV, 0.298f, 0.475f);
 				float g = MathHelper.lerp(flagCutoffV, 0.686f, 0.333f);
 				float b = MathHelper.lerp(flagCutoffV, 0.314f, 0.282f);
-				bb.vertex(mat, brk, top, 0).color(r, g, b, 1).next();
-				bb.vertex(mat, brk2, top, 0).color(r, g, b, 1).next();
-				bb.vertex(mat, brk2, bottom, 0).color(0.475f, 0.333f, 0.282f, 1).next();
-				bb.vertex(mat, brk, bottom, 0).color(0.475f, 0.333f, 0.282f, 1).next();
-				bb.end();
-				BufferRenderer.draw(bb);
+				
+				GL11.glBegin(GL11.GL_QUADS);
+					GL11.glColor4f(r, g, b, 1);
+					GL11.glVertex2f(brk, top);
+					
+					GL11.glColor4f(r, g, b, 1);
+					GL11.glVertex2f(brk2, top);
+					
+					GL11.glColor4f(0.475f, 0.333f, 0.282f, 1);
+					GL11.glVertex2f(brk2, bottom);
+					
+					GL11.glColor4f(0.475f, 0.333f, 0.282f, 1);
+					GL11.glVertex2f(brk, bottom);
+				GL11.glEnd();
+				
 				GlStateManager.enableTexture();
 				GlStateManager.shadeModel(GL11.GL_FLAT);
 			}
@@ -358,24 +368,45 @@ public class FabricationConfigScreen extends Screen {
 		client.getTextureManager().bindTexture(BG);
 		GlStateManager.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 		GlStateManager.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-		bb.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE);
-		bb.vertex(mat, Math.max(cutoffX, border), cutoffY, 0).texture(0, cutoffV).next();
-		bb.vertex(mat, brk, cutoffY, 0).texture(0, cutoffV).next();
-		bb.vertex(mat, brk, height, 0).texture(0, 1).next();
-		bb.vertex(mat, Math.max(cutoffX, border), height, 0).texture(0, 1).next();
-		
-		bb.vertex(mat, brk, cutoffY, 0).texture(0, cutoffV).next();
-		bb.vertex(mat, brk2, cutoffY, 0).texture(1, cutoffV).next();
-		bb.vertex(mat, brk2, height, 0).texture(1, 1).next();
-		bb.vertex(mat, brk, height, 0).texture(0, 1).next();
-		
-		bb.vertex(mat, brk2, cutoffY, 0).texture(1, cutoffV).next();
-		bb.vertex(mat, width-border, cutoffY, 0).texture(1, cutoffV).next();
-		bb.vertex(mat, width-border, height, 0).texture(1, 1).next();
-		bb.vertex(mat, brk2, height, 0).texture(1, 1).next();
-		
-		bb.end();
-		BufferRenderer.draw(bb);
+		GL11.glBegin(GL11.GL_QUADS);
+			GL11.glTexCoord2f(0, cutoffV);
+			GL11.glVertex2f(Math.max(cutoffX, border), cutoffY);
+			
+			GL11.glTexCoord2f(0, cutoffV);
+			GL11.glVertex2f(brk, cutoffY);
+			
+			GL11.glTexCoord2f(0, 1);
+			GL11.glVertex2f(brk, height);
+			
+			GL11.glTexCoord2f(0, 1);
+			GL11.glVertex2f(Math.max(cutoffX, border), height);
+	
+			
+			GL11.glTexCoord2f(0, cutoffV);
+			GL11.glVertex2f(brk, cutoffY);
+			
+			GL11.glTexCoord2f(1, cutoffV);
+			GL11.glVertex2f(brk2, cutoffY);
+			
+			GL11.glTexCoord2f(1, 1);
+			GL11.glVertex2f(brk2, height);
+			
+			GL11.glTexCoord2f(0, 1);
+			GL11.glVertex2f(brk, height);
+			
+			
+			GL11.glTexCoord2f(1, cutoffV);
+			GL11.glVertex2f(brk2, cutoffY);
+			
+			GL11.glTexCoord2f(1, cutoffV);
+			GL11.glVertex2f(width-border, cutoffY);
+			
+			GL11.glTexCoord2f(1, 1);
+			GL11.glVertex2f(width-border, height);
+			
+			GL11.glTexCoord2f(1, 1);
+			GL11.glVertex2f(brk2, height);
+		GL11.glEnd();
 		
 		float a = 1-(0.3f+(sCurve5(time/10f)*0.7f));
 		if (a > 0) {
@@ -452,16 +483,17 @@ public class FabricationConfigScreen extends Screen {
 				RenderSystem.defaultBlendFunc();
 				GlStateManager.disableTexture();
 				GlStateManager.disableAlphaTest();
-				Matrix4f mat = matrices.peek().getModel();
 				GlStateManager.shadeModel(GL11.GL_SMOOTH);
-				BufferBuilder bb = Tessellator.getInstance().getBuffer();
-				bb.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
-				bb.vertex(mat, 0, y-4, 0).color(1f, 1f, 1f, 0.2f).next();
-				bb.vertex(mat, 130*selectA, y-4, 0).color(1f, 1f, 1f, 0.2f+((1-selectA)*0.8f)).next();
-				bb.vertex(mat, 130*selectA, y+36, 0).color(1f, 1f, 1f, 0.2f+((1-selectA)*0.8f)).next();
-				bb.vertex(mat, 0, y+36, 0).color(1f, 1f, 1f, 0.2f).next();
-				bb.end();
-				BufferRenderer.draw(bb);
+				GL11.glBegin(GL11.GL_QUADS);
+				GL11.glColor4f(1, 1, 1, 0.2f);
+				GL11.glVertex2f(0, y-4);
+				GL11.glColor4f(1, 1, 1, 0.2f+((1-selectA)*0.8f));
+				GL11.glVertex2f(130*selectA, y-4);
+				GL11.glColor4f(1, 1, 1, 0.2f+((1-selectA)*0.8f));
+				GL11.glVertex2f(130*selectA, y+36);
+				GL11.glColor4f(1, 1, 1, 0.2f);
+				GL11.glVertex2f(0, y+36);
+				GL11.glEnd();
 				GlStateManager.shadeModel(GL11.GL_FLAT);
 				GlStateManager.enableTexture();
 			}

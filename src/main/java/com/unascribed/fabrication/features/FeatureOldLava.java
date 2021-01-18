@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.features;
 
 import com.unascribed.fabrication.FabRefl;
+import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.client.SpriteLava;
 import com.unascribed.fabrication.client.SpriteLavaFlow;
 import com.unascribed.fabrication.support.EligibleIf;
@@ -24,33 +25,38 @@ public class FeatureOldLava implements Feature {
 	private static boolean applied = false;
 	
 	public static void onLoaded(SpriteAtlasTexture atlas, SpriteAtlasTexture.Data data) {
-		if (applied && atlas.getId().toString().equals("minecraft:textures/atlas/blocks.png")) {
-			Identifier still = new Identifier("block/lava_still");
-			Identifier flow = new Identifier("block/lava_flow");
-			originalLava = atlas.getSprite(still);
-			originalLavaFlow = atlas.getSprite(flow);
-			SpriteLava newLava = new SpriteLava(atlas, new Info(still, 16, 16, AnimationResourceMetadata.EMPTY), FabRefl.Client.getMaxLevel(data),
-					FabRefl.Client.getWidth(data), FabRefl.Client.getHeight(data), FabRefl.Client.getX(originalLava), FabRefl.Client.getY(originalLava));
-			SpriteLavaFlow newLavaFlow = new SpriteLavaFlow(atlas, new Info(flow, 32, 32, AnimationResourceMetadata.EMPTY), FabRefl.Client.getMaxLevel(data),
-					FabRefl.Client.getWidth(data), FabRefl.Client.getHeight(data), FabRefl.Client.getX(originalLavaFlow), FabRefl.Client.getY(originalLavaFlow));
-			FabRefl.Client.getSprites(atlas).put(still, newLava);
-			FabRefl.Client.getSprites(atlas).put(flow, newLavaFlow);
-			int origIdx = FabRefl.Client.getAnimatedSprites(atlas).indexOf(originalLava);
-			int origFlowIdx = FabRefl.Client.getAnimatedSprites(atlas).indexOf(originalLavaFlow);
-			if (origIdx != -1) {
-				FabRefl.Client.getAnimatedSprites(atlas).set(origIdx, newLava);
-			} else {
-				FabRefl.Client.getAnimatedSprites(atlas).add(newLava);
+		try {
+			if (applied && atlas.getId().toString().equals("minecraft:textures/atlas/blocks.png")) {
+				Identifier still = new Identifier("block/lava_still");
+				Identifier flow = new Identifier("block/lava_flow");
+				originalLava = atlas.getSprite(still);
+				originalLavaFlow = atlas.getSprite(flow);
+				SpriteLava newLava = new SpriteLava(atlas, new Info(still, 16, 16, AnimationResourceMetadata.EMPTY), FabRefl.Client.getMaxLevel(data),
+						FabRefl.Client.getWidth(data), FabRefl.Client.getHeight(data), FabRefl.Client.getX(originalLava), FabRefl.Client.getY(originalLava));
+				SpriteLavaFlow newLavaFlow = new SpriteLavaFlow(atlas, new Info(flow, 32, 32, AnimationResourceMetadata.EMPTY), FabRefl.Client.getMaxLevel(data),
+						FabRefl.Client.getWidth(data), FabRefl.Client.getHeight(data), FabRefl.Client.getX(originalLavaFlow), FabRefl.Client.getY(originalLavaFlow));
+				FabRefl.Client.getSprites(atlas).put(still, newLava);
+				FabRefl.Client.getSprites(atlas).put(flow, newLavaFlow);
+				int origIdx = FabRefl.Client.getAnimatedSprites(atlas).indexOf(originalLava);
+				int origFlowIdx = FabRefl.Client.getAnimatedSprites(atlas).indexOf(originalLavaFlow);
+				if (origIdx != -1) {
+					FabRefl.Client.getAnimatedSprites(atlas).set(origIdx, newLava);
+				} else {
+					FabRefl.Client.getAnimatedSprites(atlas).add(newLava);
+				}
+				if (origFlowIdx != -1) {
+					FabRefl.Client.getAnimatedSprites(atlas).set(origFlowIdx, newLavaFlow);
+				} else {
+					FabRefl.Client.getAnimatedSprites(atlas).add(newLavaFlow);
+				}
+				newLava.tickAnimation();
+				newLava.upload();
+				newLavaFlow.tickAnimation();
+				newLavaFlow.upload();
 			}
-			if (origFlowIdx != -1) {
-				FabRefl.Client.getAnimatedSprites(atlas).set(origFlowIdx, newLavaFlow);
-			} else {
-				FabRefl.Client.getAnimatedSprites(atlas).add(newLavaFlow);
-			}
-			newLava.tickAnimation();
-			newLava.upload();
-			newLavaFlow.tickAnimation();
-			newLavaFlow.upload();
+		} catch (Throwable t) {
+			applied = false;
+			FabricationMod.featureError(FeatureOldLava.class, "*.old_lava", t);
 		}
 	}
 	

@@ -10,6 +10,7 @@ import java.util.Collections;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.unascribed.fabrication.Agnos;
+import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
@@ -36,40 +37,44 @@ public class FeatureLegacyCommandSyntax implements Feature {
 		if (applied) return;
 		applied = true;
 		Agnos.INST.runForCommandRegistration((dispatcher, dedi) -> {
-			LiteralArgumentBuilder<ServerCommandSource> gmCmd = CommandManager.literal("gamemode")
-					.requires(scs -> MixinConfigPlugin.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2));
-			for (GameMode mode : GameMode.values()) {
-				if (mode != GameMode.NOT_SET) {
-					gmCmd.then(CommandManager.literal(Integer.toString(mode.getId()))
-						.executes(c -> (int)invoke(gmExecute, c, Collections.singleton(c.getSource().getPlayer()), mode))
-						.then(CommandManager.argument("target", EntityArgumentType.players())
-							.executes(c -> (int)invoke(gmExecute, c, EntityArgumentType.getPlayers(c, "target"), mode)))
-						);
+			try {
+				LiteralArgumentBuilder<ServerCommandSource> gmCmd = CommandManager.literal("gamemode")
+						.requires(scs -> MixinConfigPlugin.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2));
+				for (GameMode mode : GameMode.values()) {
+					if (mode != GameMode.NOT_SET) {
+						gmCmd.then(CommandManager.literal(Integer.toString(mode.getId()))
+							.executes(c -> (int)invoke(gmExecute, c, Collections.singleton(c.getSource().getPlayer()), mode))
+							.then(CommandManager.argument("target", EntityArgumentType.players())
+								.executes(c -> (int)invoke(gmExecute, c, EntityArgumentType.getPlayers(c, "target"), mode)))
+							);
+					}
 				}
+				dispatcher.register(gmCmd);
+				
+				LiteralArgumentBuilder<ServerCommandSource> diffCmd = CommandManager.literal("difficulty")
+						.requires(scs -> MixinConfigPlugin.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2));
+				for (Difficulty difficulty : Difficulty.values()) {
+					diffCmd.then(CommandManager.literal(Integer.toString(difficulty.getId()))
+							.executes(c -> DifficultyCommand.execute(c.getSource(), difficulty)));
+				}
+				dispatcher.register(diffCmd);
+				
+				dispatcher.register(CommandManager.literal("toggledownfall")
+						.requires(scs -> MixinConfigPlugin.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2))
+						.executes(c -> {
+							ServerWorld world = c.getSource().getWorld();
+							ServerWorldProperties props = (ServerWorldProperties) invoke(worldProperties, world);
+							if (props.isRaining()) {
+								world.setWeather(12000, 0, false, props.isThundering());
+							} else {
+								world.setWeather(0, 12000, true, props.isThundering());
+							}
+							c.getSource().sendFeedback(new LiteralText("Toggled downfall"), true);
+							return 1;
+						}));
+			} catch (Throwable t) {
+				FabricationMod.featureError(this, t);
 			}
-			dispatcher.register(gmCmd);
-			
-			LiteralArgumentBuilder<ServerCommandSource> diffCmd = CommandManager.literal("difficulty")
-					.requires(scs -> MixinConfigPlugin.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2));
-			for (Difficulty difficulty : Difficulty.values()) {
-				diffCmd.then(CommandManager.literal(Integer.toString(difficulty.getId()))
-						.executes(c -> DifficultyCommand.execute(c.getSource(), difficulty)));
-			}
-			dispatcher.register(diffCmd);
-			
-			dispatcher.register(CommandManager.literal("toggledownfall")
-					.requires(scs -> MixinConfigPlugin.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2))
-					.executes(c -> {
-						ServerWorld world = c.getSource().getWorld();
-						ServerWorldProperties props = (ServerWorldProperties) invoke(worldProperties, world);
-						if (props.isRaining()) {
-							world.setWeather(12000, 0, false, props.isThundering());
-						} else {
-							world.setWeather(0, 12000, true, props.isThundering());
-						}
-						c.getSource().sendFeedback(new LiteralText("Toggled downfall"), true);
-						return 1;
-					}));
 		});
 	}
 	

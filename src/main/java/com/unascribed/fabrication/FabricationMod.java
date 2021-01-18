@@ -62,9 +62,14 @@ public class FabricationMod implements ModInitializer {
 				Feature r = (Feature)Class.forName(s).newInstance();
 				String key = MixinConfigPlugin.remap(r.getConfigKey());
 				if (key == null || MixinConfigPlugin.isEnabled(key)) {
-					r.apply();
-					if (key != null) {
-						enabledFeatures.add(key);
+					try {
+						r.apply();
+						if (key != null) {
+							enabledFeatures.add(key);
+						}
+					} catch (Throwable t) {
+						featureError(r, t);
+						continue;
 					}
 				}
 				if (key != null) {
@@ -82,6 +87,19 @@ public class FabricationMod implements ModInitializer {
 		}
 	}
 	
+	public static void featureError(Feature f, Throwable t) {
+		featureError(f.getClass(), f.getConfigKey(), t);
+	}
+	
+	public static void featureError(Class<?> clazz, String configKey, Throwable t) {
+		if (configKey == null) {
+			FabLog.warn("Feature "+clazz.getName()+" failed to apply!");
+		} else {
+			FabLog.warn("Feature "+clazz.getName()+" failed to apply! Force-disabling "+configKey);
+		}
+		MixinConfigPlugin.addFailure(configKey);
+	}
+
 	public static Identifier createIdWithCustomDefault(String namespace, String pathOrId) {
 		if (pathOrId.contains(":")) {
 			return new Identifier(pathOrId);

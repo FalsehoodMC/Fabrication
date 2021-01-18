@@ -5,6 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.SpecialEligibility;
+import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.support.EligibleIf;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
@@ -29,26 +30,30 @@ public class FeatureModsCommandFabric implements Feature {
 		if (applied) return;
 		applied = true;
 		CommandRegistrationCallback.EVENT.register((dispatcher, dedi) -> {
-			dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("mods")
-					.requires(s -> MixinConfigPlugin.isEnabled("*.mods_command"))
-					.then(LiteralArgumentBuilder.<ServerCommandSource>literal("all")
-							.executes((c) -> {
-								sendMods(c, true);
-								return 1;
-							}))
-					.executes((c) -> {
-						sendMods(c, false);
-						return 1;
-					}));
 			try {
-				// I mean, you never know...
-				Class.forName("org.bukkit.Bukkit");
-			} catch (Throwable t) {
-				dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("plugins")
+				dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("mods")
+						.requires(s -> MixinConfigPlugin.isEnabled("*.mods_command"))
+						.then(LiteralArgumentBuilder.<ServerCommandSource>literal("all")
+								.executes((c) -> {
+									sendMods(c, true);
+									return 1;
+								}))
 						.executes((c) -> {
-							c.getSource().sendFeedback(new LiteralText("§cThis ain't no Bukkit!\nTry /mods"), false);
+							sendMods(c, false);
 							return 1;
 						}));
+				try {
+					// I mean, you never know...
+					Class.forName("org.bukkit.Bukkit");
+				} catch (Throwable t) {
+					dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("plugins")
+							.executes((c) -> {
+								c.getSource().sendFeedback(new LiteralText("§cThis ain't no Bukkit!\nTry /mods"), false);
+								return 1;
+							}));
+				}
+			} catch (Throwable t) {
+				FabricationMod.featureError(this, t);
 			}
 		});
 	}

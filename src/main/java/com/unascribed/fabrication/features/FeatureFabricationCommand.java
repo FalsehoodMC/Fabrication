@@ -47,6 +47,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.Property;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
@@ -66,108 +67,116 @@ public class FeatureFabricationCommand implements Feature {
 	@Override
 	public void apply() {
 		Agnos.INST.runForCommandRegistration((dispatcher, dedi) -> {
-			LiteralArgumentBuilder<ServerCommandSource> root = LiteralArgumentBuilder.<ServerCommandSource>literal("fabrication");
-			addConfig(root, dedi);
-			
-			LiteralArgumentBuilder<ServerCommandSource> tag = LiteralArgumentBuilder.<ServerCommandSource>literal("tag");
-			tag.requires(scs -> MixinConfigPlugin.isEnabled("*.taggable_players") && scs.hasPermissionLevel(2));
-			{
-				LiteralArgumentBuilder<ServerCommandSource> add = LiteralArgumentBuilder.<ServerCommandSource>literal("add");
-				LiteralArgumentBuilder<ServerCommandSource> remove = LiteralArgumentBuilder.<ServerCommandSource>literal("remove");
-				LiteralArgumentBuilder<ServerCommandSource> get = LiteralArgumentBuilder.<ServerCommandSource>literal("get");
-				LiteralArgumentBuilder<ServerCommandSource> clear = LiteralArgumentBuilder.<ServerCommandSource>literal("clear");
+			try {
+				LiteralArgumentBuilder<ServerCommandSource> root = LiteralArgumentBuilder.<ServerCommandSource>literal("fabrication");
+				addConfig(root, dedi);
 				
-				for (PlayerTag pt : PlayerTag.values()) {
-					add.then(CommandManager.literal(pt.lowerName())
-						.executes(c -> {
-							return addTag(c, Collections.singleton(c.getSource().getPlayer()), pt);
-						})
-						.then(CommandManager.argument("players", EntityArgumentType.players())
+				LiteralArgumentBuilder<ServerCommandSource> tag = LiteralArgumentBuilder.<ServerCommandSource>literal("tag");
+				tag.requires(scs -> MixinConfigPlugin.isEnabled("*.taggable_players") && scs.hasPermissionLevel(2));
+				{
+					LiteralArgumentBuilder<ServerCommandSource> add = LiteralArgumentBuilder.<ServerCommandSource>literal("add");
+					LiteralArgumentBuilder<ServerCommandSource> remove = LiteralArgumentBuilder.<ServerCommandSource>literal("remove");
+					LiteralArgumentBuilder<ServerCommandSource> get = LiteralArgumentBuilder.<ServerCommandSource>literal("get");
+					LiteralArgumentBuilder<ServerCommandSource> clear = LiteralArgumentBuilder.<ServerCommandSource>literal("clear");
+					
+					for (PlayerTag pt : PlayerTag.values()) {
+						add.then(CommandManager.literal(pt.lowerName())
 							.executes(c -> {
-								return addTag(c, EntityArgumentType.getPlayers(c, "players"), pt);
+								return addTag(c, Collections.singleton(c.getSource().getPlayer()), pt);
 							})
-						)
+							.then(CommandManager.argument("players", EntityArgumentType.players())
+								.executes(c -> {
+									return addTag(c, EntityArgumentType.getPlayers(c, "players"), pt);
+								})
+							)
+						);
+						
+						remove.then(CommandManager.literal(pt.lowerName())
+							.executes(c -> {
+								return removeTag(c, Collections.singleton(c.getSource().getPlayer()), pt);
+							})
+							.then(CommandManager.argument("players", EntityArgumentType.players())
+								.executes(c -> {
+									return removeTag(c, EntityArgumentType.getPlayers(c, "players"), pt);
+								})
+							)
+						);
+					}
+					
+					get.executes(c -> {
+						return getTags(c, c.getSource().getPlayer());
+					}).then(CommandManager.argument("player", EntityArgumentType.player())
+						.executes(c -> {
+							return getTags(c, EntityArgumentType.getPlayer(c, "player"));
+						})
 					);
 					
-					remove.then(CommandManager.literal(pt.lowerName())
+					clear.executes(c -> {
+						return clearTags(c, Collections.singleton(c.getSource().getPlayer()));
+					}).then(CommandManager.argument("players", EntityArgumentType.players())
 						.executes(c -> {
-							return removeTag(c, Collections.singleton(c.getSource().getPlayer()), pt);
+							return clearTags(c, EntityArgumentType.getPlayers(c, "players"));
 						})
-						.then(CommandManager.argument("players", EntityArgumentType.players())
-							.executes(c -> {
-								return removeTag(c, EntityArgumentType.getPlayers(c, "players"), pt);
-							})
-						)
 					);
+				
+					tag.then(add);
+					tag.then(remove);
+					tag.then(get);
+					tag.then(clear);
+					
 				}
+				root.then(tag);
 				
-				get.executes(c -> {
-					return getTags(c, c.getSource().getPlayer());
-				}).then(CommandManager.argument("player", EntityArgumentType.player())
-					.executes(c -> {
-						return getTags(c, EntityArgumentType.getPlayer(c, "player"));
-					})
-				);
-				
-				clear.executes(c -> {
-					return clearTags(c, Collections.singleton(c.getSource().getPlayer()));
-				}).then(CommandManager.argument("players", EntityArgumentType.players())
-					.executes(c -> {
-						return clearTags(c, EntityArgumentType.getPlayers(c, "players"));
-					})
-				);
-			
-				tag.then(add);
-				tag.then(remove);
-				tag.then(get);
-				tag.then(clear);
-				
-			}
-			root.then(tag);
-			
-			LiteralArgumentBuilder<ServerCommandSource> analyze = LiteralArgumentBuilder.<ServerCommandSource>literal("analyze");
-			analyze.requires(scs -> scs.hasPermissionLevel(4));
-			{
-				LiteralArgumentBuilder<ServerCommandSource> biome = CommandManager.literal("biome");
-				
-				
-				for (Map.Entry<RegistryKey<Biome>, Biome> en : BuiltinRegistries.BIOME.getEntries()) {
-					Identifier id = en.getKey().getValue();
-					Biome b = en.getValue();
-					Command<ServerCommandSource> exec = c -> {
-						Set<Biome> set = Sets.newHashSet(b);
-						World w;
-						try {
-							c.getArgument("dimension", Identifier.class);
-							w = DimensionArgumentType.getDimensionArgument(c, "dimension");
-						} catch (IllegalArgumentException e) {
-							w = c.getSource().getEntityOrThrow().world;
+				LiteralArgumentBuilder<ServerCommandSource> analyze = LiteralArgumentBuilder.<ServerCommandSource>literal("analyze");
+				analyze.requires(scs -> scs.hasPermissionLevel(4));
+				{
+					LiteralArgumentBuilder<ServerCommandSource> biome = CommandManager.literal("biome");
+					
+					
+					for (Map.Entry<RegistryKey<Biome>, Biome> en : BuiltinRegistries.BIOME.getEntries()) {
+						Identifier id = en.getKey().getValue();
+						Identifier b = en.getKey().getValue();
+						Command<ServerCommandSource> exec = c -> {
+							Set<Identifier> set = Sets.newHashSet(b);
+							World w;
+							try {
+								c.getArgument("dimension", Identifier.class);
+								w = DimensionArgumentType.getDimensionArgument(c, "dimension");
+							} catch (IllegalArgumentException e) {
+								w = c.getSource().getEntityOrThrow().world;
+							}
+							return analyzeBlockDistribution(c, w, set);
+						};
+						if (id.getNamespace().equals("minecraft")) {
+							biome.then(CommandManager.literal(id.getPath())
+									.executes(exec));
 						}
-						return analyzeBlockDistribution(c, w, set);
-					};
-					if (id.getNamespace().equals("minecraft")) {
-						biome.then(CommandManager.literal(id.getPath())
+						biome.then(CommandManager.literal(id.toString())
 								.executes(exec));
 					}
-					biome.then(CommandManager.literal(id.toString())
-							.executes(exec));
+					
+					analyze.then(CommandManager.literal("block_distribution")
+									.executes(c -> analyzeBlockDistribution(c, c.getSource().getEntityOrThrow().world, null))
+									.then(biome)
+									.then(CommandManager.literal("in")
+										.then(CommandManager.argument("dimension", DimensionArgumentType.dimension())
+												.then(biome)
+												.executes(c -> analyzeBlockDistribution(c, DimensionArgumentType.getDimensionArgument(c, "dimension"), null)))));
 				}
+				root.then(analyze);
 				
-				analyze.then(CommandManager.literal("block_distribution")
-								.executes(c -> analyzeBlockDistribution(c, c.getSource().getEntityOrThrow().world, null))
-								.then(biome)
-								.then(CommandManager.literal("in")
-									.then(CommandManager.argument("dimension", DimensionArgumentType.dimension())
-											.then(biome)
-											.executes(c -> analyzeBlockDistribution(c, DimensionArgumentType.getDimensionArgument(c, "dimension"), null)))));
+				dispatcher.register(root);
+			} catch (Throwable t) {
+				FabricationMod.featureError(this, t);
 			}
-			root.then(analyze);
-			
-			dispatcher.register(root);
 		});
 	}
 
-	private int analyzeBlockDistribution(CommandContext<ServerCommandSource> c, World world, Set<Biome> biomes) {
+	private int analyzeBlockDistribution(CommandContext<ServerCommandSource> c, World world, Set<Identifier> biomesIn) {
+		Set<Biome> biomes = Sets.newHashSet();
+		for (Identifier b : biomesIn) {
+			biomes.add(c.getSource().getMinecraftServer().getRegistryManager().get(Registry.BIOME_KEY).get(b));
+		}
 		String name = "fabrication_block_distribution_"+System.currentTimeMillis()+".tsv";
 		c.getSource().sendFeedback(new LiteralText("Starting background block distribution analysis"), false);
 		c.getSource().sendFeedback(new LiteralText("This could take a while, but the server should remain usable"), false);
@@ -209,7 +218,7 @@ public class FeatureFabricationCommand implements Feature {
 							for (int cX = 0; cX < 16; cX++) {
 								for (int cZ = 0; cZ < 16; cZ++) {
 									if (biomes != null) {
-										Biome b = chunk.getBiomeArray().getBiomeForNoiseGen(cX, cY, cZ);
+										Biome b = ((ServerWorld)world).getChunkManager().getChunkGenerator().getBiomeSource().getBiomeForNoiseGen(cX+chunk.getPos().getStartX(), cY, cZ+chunk.getPos().getStartZ());
 										if (!biomes.contains(b)) {
 											skipped++;
 											if (skipped > goal && scanned == 0) {
