@@ -3,7 +3,7 @@ name: Incompatibility (Fabric)
 about: "[For Fabric Users Only] The game is crashing or something doesn't work right,
   and it doesn't happen in a fresh install"
 title: ''
-labels: 'k: Incompatibility, n: Fabric'
+labels: 'k: Incompatibility, n: Fabric, s: New'
 assignees: ''
 
 ---

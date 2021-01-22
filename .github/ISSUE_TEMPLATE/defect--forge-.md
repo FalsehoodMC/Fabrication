@@ -4,7 +4,7 @@ about: "[For Forge Users Only] The game is crashing or something doesn't work ri
   AND THE ISSUE IS REPRODUCIBLE IN A FRESH INSTALL OF FORGE WITH ONLY FORGERY, NO
   OTHER MODS"
 title: ''
-labels: 'k: Defect, n: Forge'
+labels: 'k: Defect, n: Forge, s: New'
 assignees: ''
 
 ---

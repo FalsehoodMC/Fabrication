@@ -4,7 +4,7 @@ about: "[For Fabric Users Only] The game is crashing or something doesn't work r
   AND THE ISSUE IS REPRODUCIBLE IN A FRESH INSTALL OF FABRIC WITH ONLY FABRICATION,
   NO OTHER MODS"
 title: ''
-labels: 'k: Defect, n: Fabric'
+labels: 'k: Defect, n: Fabric, s: New'
 assignees: ''
 
 ---

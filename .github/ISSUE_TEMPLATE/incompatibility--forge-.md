@@ -3,7 +3,7 @@ name: Incompatibility (Forge)
 about: "[For Forge Users Only] The game is crashing or something doesn't work right,
   and it doesn't happen in a fresh install"
 title: ''
-labels: 'k: Incompatibility, n: Forge'
+labels: 'k: Incompatibility, n: Forge, s: New'
 assignees: ''
 
 ---
