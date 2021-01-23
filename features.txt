@@ -642,6 +642,13 @@ tweaks.ghost_chest_woo_woo
 	desc:
 		?
 
+tweaks.feather_falling_no_trample
+	name: Feather Falling No Trample
+	since: 1.2.12
+	sides: server_only
+	desc:
+		Farmland will not get trampled when wearing feather falling.
+
 minor_mechanics
 	name: Minor Mechanics
 	since: 1.0
