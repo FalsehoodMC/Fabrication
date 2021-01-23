@@ -647,7 +647,7 @@ tweaks.feather_falling_no_trample
 	since: 1.2.12
 	sides: server_only
 	desc:
-		Farmland will not get trampled when wearing feather falling
+		Farmland will not get trampled when wearing feather falling.
 
 minor_mechanics
 	name: Minor Mechanics
