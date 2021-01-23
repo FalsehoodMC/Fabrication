@@ -7,11 +7,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(value = PlayerEntity.class)
-@EligibleIf(configEnabled="*.food_always_edible", modNotLoaded = "eternaleats")
+@Mixin(PlayerEntity.class)
+@EligibleIf(configEnabled="*.food_always_edible", modNotLoaded="eternaleats")
 public class MixinPlayerEntity {
-	@Inject(method = "canConsume", at = @At("HEAD"), cancellable = true)
-	public void canConsume(boolean ignoreHunger, CallbackInfoReturnable cir) {
+	
+	@Inject(method="canConsume", at=@At("HEAD"), cancellable=true)
+	public void canConsume(boolean ignoreHunger, CallbackInfoReturnable<Boolean> cir) {
 		cir.setReturnValue(true);
 	}
 	
