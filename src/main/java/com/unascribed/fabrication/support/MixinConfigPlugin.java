@@ -59,6 +59,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	private static final ImmutableSet<String> VIENNA_EXCEPTIONS = ImmutableSet.of(
 			"balance.infinity_mending",
 			"balance.anvil_damage_only_on_fall",
+			"balance.food_always_edible",
 			"weird_tweaks.photoallergic_creepers",
 			"weird_tweaks.photoresistant_mobs"
 	);
