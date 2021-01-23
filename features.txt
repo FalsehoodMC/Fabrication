@@ -1036,6 +1036,13 @@ balance.anvil_rename_always_costs_one
 	desc:
 		Makes renaming an item on an anvil always cost one level.
 
+balance.food_always_edible
+	name: Food Always Edible
+	since: 1.2.12
+	sides: server_only
+	desc:
+		Allows players to eat unconditionally.
+
 weird_tweaks
 	name: Weird Tweaks
 	since: 1.0
