@@ -129,7 +129,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	private static final List<ConfigLoader> loaders = Lists.newArrayList();
 	
 	static {
-		setMet(SpecialEligibility.EVENTS_AVAILABLE, Agnos.INST.eventsAvailable());
+		setMet(SpecialEligibility.EVENTS_AVAILABLE, Agnos.eventsAvailable());
 		try {
 			Class.forName("net.fabricmc.loader.api.FabricLoader");
 			setMet(SpecialEligibility.NOT_FORGE, true);
@@ -294,7 +294,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		} else {
 			config.put(configKey, Trilean.parseTrilean(newValue));
 		}
-		Path configFile = Agnos.INST.getConfigDir().resolve("fabrication").resolve("features.ini");
+		Path configFile = Agnos.getConfigDir().resolve("fabrication").resolve("features.ini");
 		Stopwatch watch = Stopwatch.createStarted();
 		StringWriter sw = new StringWriter();
 		try {
@@ -348,7 +348,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	
 	public static void reload() {
 		FabLog.info("Reloading configs...");
-		Path dir = Agnos.INST.getConfigDir().resolve("fabrication");
+		Path dir = Agnos.getConfigDir().resolve("fabrication");
 		try {
 			Files.createDirectories(dir);
 		} catch (IOException e1) {
@@ -441,7 +441,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	
 	private static void load(ConfigLoader ldr) {
 		String name = ldr.getConfigName();
-		Path dir = Agnos.INST.getConfigDir().resolve("fabrication");
+		Path dir = Agnos.getConfigDir().resolve("fabrication");
 		Path file = dir.resolve(name+".ini");
 		checkForAndSaveDefaultsOrUpgrade(file, "default_"+name+"_config.ini");
 		FabLog.timeAndCountWarnings("Loading of "+name+".ini", () -> {
@@ -587,26 +587,26 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 									if (getValue((String)v) == Trilean.UNSET && MixinConfigPlugin.RUNTIME_CHECKS_WAS_ENABLED) {
 										eligibilitySuccesses.add("Runtime checks is enabled and required config key "+remap((String)v)+" is unset");
 									} else if (!isEnabled((String)v)) {
-										eligibilityFailures.add("Required config setting "+remap((String)v)+" is disabled "+(config.get(v) == Trilean.FALSE ? "explicitly" : "by profile"));
+										eligibilityFailures.add("Required config setting "+remap((String)v)+" is disabled "+(config.get(remap((String)v)) == Trilean.FALSE ? "explicitly" : "by profile"));
 										eligible = false;
 									} else {
-										eligibilitySuccesses.add("Required config setting "+remap((String)v)+" is enabled "+(config.get(v) == Trilean.TRUE ? "explicitly" : "by profile"));
+										eligibilitySuccesses.add("Required config setting "+remap((String)v)+" is enabled "+(config.get(remap((String)v)) == Trilean.TRUE ? "explicitly" : "by profile"));
 									}
 									configKeysForDiscoveredClasses.put(ci.getName(), (String)v);
 								} else if (k.equals("configDisabled")) {
 									if (getValue((String)v) == Trilean.UNSET && MixinConfigPlugin.RUNTIME_CHECKS_WAS_ENABLED) {
 										eligibilitySuccesses.add("Runtime checks is enabled and conflicting config key "+remap((String)v)+" is unset");
 									} else if (!isEnabled((String)v)) {
-										eligibilitySuccesses.add("Conflicting config setting "+remap((String)v)+" is disabled "+(config.get(v) == Trilean.FALSE ? "explicitly" : "by profile"));
+										eligibilitySuccesses.add("Conflicting config setting "+remap((String)v)+" is disabled "+(config.get(remap((String)v)) == Trilean.FALSE ? "explicitly" : "by profile"));
 									} else {
-										eligibilityFailures.add("Conflicting config setting "+remap((String)v)+" is enabled "+(config.get(v) == Trilean.TRUE ? "explicitly" : "by profile"));
+										eligibilityFailures.add("Conflicting config setting "+remap((String)v)+" is enabled "+(config.get(remap((String)v)) == Trilean.TRUE ? "explicitly" : "by profile"));
 										eligible = false;
 									}
 								} else if (k.equals("envMatches")) {
 									String[] arr = (String[])v;
 									if (arr[0].equals("Lcom/unascribed/fabrication/support/Env;")) {
 										Env e = Env.valueOf(arr[1]);
-										Env curEnv = Agnos.INST.getCurrentEnv();
+										Env curEnv = Agnos.getCurrentEnv();
 										if (!curEnv.matches(e)) {
 											eligibilityFailures.add("Environment is incorrect (want "+e.name().toLowerCase(Locale.ROOT)+", got "+curEnv.name().toLowerCase(Locale.ROOT)+")");
 											eligible = false;
@@ -616,7 +616,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 									}
 								} else if (k.equals("modLoaded")) {
 									for (String s : (List<String>)v) {
-										if (!Agnos.INST.isModLoaded(s)) {
+										if (!Agnos.isModLoaded(s)) {
 											eligibilityFailures.add("Required mod "+s+" is not loaded");
 											eligible = false;
 										} else {
@@ -625,7 +625,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 									}
 								} else if (k.equals("modNotLoaded")) {
 									for (String s : (List<String>)v) {
-										if (Agnos.INST.isModLoaded(s)) {
+										if (Agnos.isModLoaded(s)) {
 											eligibilityFailures.add("Conflicting mod "+s+" is loaded");
 											eligible = false;
 										} else {
@@ -656,15 +656,16 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 									boolean allDisabled = true;
 									boolean foundAny = false;
 									for (String s : (List<String>)v) {
+										s = remap(s);
 										if (isEnabled(s)) {
 											foundAny = true;
 											allDisabled = false;
-											eligibilitySuccesses.add("Relevant config setting "+remap(s)+" is enabled "+(config.get(s) == Trilean.TRUE ? "explicitly" : "by profile"));
+											eligibilitySuccesses.add("Relevant config setting "+s+" is enabled "+(config.get(s) == Trilean.TRUE ? "explicitly" : "by profile"));
 										} else {
 											if (getValue(s) != Trilean.FALSE) {
 												allDisabled = false;
 											}
-											eligibilityNotes.add("Relevant config setting "+remap(s)+" is disabled "+(config.get(s) == Trilean.FALSE ? "explicitly" : "by profile"));
+											eligibilityNotes.add("Relevant config setting "+s+" is disabled "+(config.get(s) == Trilean.FALSE ? "explicitly" : "by profile"));
 										}
 										configKeysForDiscoveredClasses.put(ci.getName(), s);
 									}

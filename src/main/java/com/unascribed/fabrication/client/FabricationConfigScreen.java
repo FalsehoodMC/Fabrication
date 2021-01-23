@@ -763,7 +763,7 @@ public class FabricationConfigScreen extends Screen {
 		int y = startY;
 		if (section == null) {
 			String v = getVersion();
-			String blurb = "§lFabrication v"+v+" §rby unascribed\n"+(configuringServer ? "(Local version: v"+Agnos.INST.getModVersion()+")" : "")
+			String blurb = "§lFabrication v"+v+" §rby unascribed\n"+(configuringServer ? "(Local version: v"+Agnos.getModVersion()+")" : "")
 					+ "\nClick a category on the left to change settings.";
 			int height = drawWrappedText(matrices, 140, 20, blurb, width-130, -1, false);
 			if (drawButton(matrices, 140, 20+height+32, 120, 20, "Reload files", mouseX, mouseY)) {
@@ -1175,7 +1175,7 @@ public class FabricationConfigScreen extends Screen {
 		if (configuringServer) {
 			return ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerVersion();
 		} else {
-			return Agnos.INST.getModVersion();
+			return Agnos.getModVersion();
 		}
 	}
 	

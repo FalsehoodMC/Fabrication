@@ -34,7 +34,7 @@ public abstract class ResourcePackFeature implements Feature, ResourcePackProvid
 	public ResourcePackFeature(String path) {
 		this.configKey = "*."+path;
 		this.path = path;
-		if (Agnos.INST.getCurrentEnv() == Env.CLIENT) {
+		if (Agnos.getCurrentEnv() == Env.CLIENT) {
 			initClient();
 		}
 	}
@@ -64,7 +64,7 @@ public abstract class ResourcePackFeature implements Feature, ResourcePackProvid
 	@Override
 	public void apply() {
 		active = true;
-		if (Agnos.INST.getCurrentEnv() == Env.CLIENT) {
+		if (Agnos.getCurrentEnv() == Env.CLIENT) {
 			reloadClient();
 		}
 	}
@@ -79,7 +79,7 @@ public abstract class ResourcePackFeature implements Feature, ResourcePackProvid
 	@Override
 	public boolean undo() {
 		active = false;
-		if (Agnos.INST.getCurrentEnv() == Env.CLIENT) {
+		if (Agnos.getCurrentEnv() == Env.CLIENT) {
 			reloadClient();
 		}
 		return true;

@@ -81,9 +81,9 @@ public class FabricationMod implements ModInitializer {
 				throw new RuntimeException("Failed to initialize feature "+s, e);
 			}
 		}
-		if (MixinConfigPlugin.getValue("*.long_levelup_sound_at_30") != Trilean.FALSE && Agnos.INST.eventsAvailable() && Agnos.INST.getCurrentEnv() == Env.CLIENT) {
-			LEVELUP_LONG = Agnos.INST.registerSoundEvent("fabrication:levelup_long", new SoundEvent(new Identifier("fabrication", "levelup_long")));
-			OOF = Agnos.INST.registerSoundEvent("fabrication:oof", new SoundEvent(new Identifier("fabrication", "oof")));
+		if (MixinConfigPlugin.getValue("*.long_levelup_sound_at_30") != Trilean.FALSE && Agnos.eventsAvailable() && Agnos.getCurrentEnv() == Env.CLIENT) {
+			LEVELUP_LONG = Agnos.registerSoundEvent("fabrication:levelup_long", new SoundEvent(new Identifier("fabrication", "levelup_long")));
+			OOF = Agnos.registerSoundEvent("fabrication:oof", new SoundEvent(new Identifier("fabrication", "oof")));
 		}
 	}
 	
@@ -192,7 +192,7 @@ public class FabricationMod implements ModInitializer {
 				data.writeLong(LAUNCH_ID);
 			}
 		}
-		data.writeString(Agnos.INST.getModVersion());
+		data.writeString(Agnos.getModVersion());
 		data.writeVarInt(MixinConfigPlugin.getAllFailures().size());
 		for (String k : MixinConfigPlugin.getAllFailures()) {
 			data.writeString(k);

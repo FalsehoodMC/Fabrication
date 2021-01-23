@@ -27,7 +27,7 @@ public class FeatureModsCommandForgeImpl implements Feature {
 		applied = true;
 		if (!registered) {
 			registered = true;
-			Agnos.INST.runForCommandRegistration((dispatcher, dedi) -> {
+			Agnos.runForCommandRegistration((dispatcher, dedi) -> {
 				dispatcher.register(LiteralArgumentBuilder.<CommandSource>literal("mods")
 						.requires(s -> applied)
 						.then(LiteralArgumentBuilder.<CommandSource>literal("all")

@@ -66,7 +66,7 @@ public class FeatureFabricationCommand implements Feature {
 	
 	@Override
 	public void apply() {
-		Agnos.INST.runForCommandRegistration((dispatcher, dedi) -> {
+		Agnos.runForCommandRegistration((dispatcher, dedi) -> {
 			try {
 				LiteralArgumentBuilder<ServerCommandSource> root = LiteralArgumentBuilder.<ServerCommandSource>literal("fabrication");
 				addConfig(root, dedi);

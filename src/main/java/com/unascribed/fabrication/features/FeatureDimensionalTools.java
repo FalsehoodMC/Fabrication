@@ -43,7 +43,7 @@ public class FeatureDimensionalTools implements Feature {
 		active = true;
 		if (!applied) {
 			applied = true;
-			if (Agnos.INST.getCurrentEnv() == Env.CLIENT) {
+			if (Agnos.getCurrentEnv() == Env.CLIENT) {
 				applyClient();
 			}
 		}
@@ -51,7 +51,7 @@ public class FeatureDimensionalTools implements Feature {
 
 	@Environment(EnvType.CLIENT)
 	private void applyClient() {
-		Agnos.INST.runForTooltipRender((stack, lines) -> {
+		Agnos.runForTooltipRender((stack, lines) -> {
 			if (active && !stack.isEmpty() && (stack.hasTag() && stack.getTag().contains("fabrication:PartialDamage"))) {
 				for (int i = 0; i < lines.size(); i++) {
 					Object t = lines.get(i);

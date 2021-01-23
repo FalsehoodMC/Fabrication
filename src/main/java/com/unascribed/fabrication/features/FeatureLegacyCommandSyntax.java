@@ -36,7 +36,7 @@ public class FeatureLegacyCommandSyntax implements Feature {
 	public void apply() {
 		if (applied) return;
 		applied = true;
-		Agnos.INST.runForCommandRegistration((dispatcher, dedi) -> {
+		Agnos.runForCommandRegistration((dispatcher, dedi) -> {
 			try {
 				LiteralArgumentBuilder<ServerCommandSource> gmCmd = CommandManager.literal("gamemode")
 						.requires(scs -> MixinConfigPlugin.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2));

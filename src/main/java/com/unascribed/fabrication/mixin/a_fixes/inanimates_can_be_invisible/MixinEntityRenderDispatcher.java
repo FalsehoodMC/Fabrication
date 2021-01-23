@@ -42,7 +42,7 @@ public abstract class MixinEntityRenderDispatcher {
 			if (!fabrication$renderersUseInvisibility.containsKey(clazz)) {
 				// ...is this evil?
 				// eh. who cares
-				byte[] classBytes = Agnos.INST.getClassBytes(clazz);
+				byte[] classBytes = Agnos.getClassBytes(clazz);
 				if (classBytes != null) {
 					try {
 						ClassReader cr = new ClassReader(classBytes);

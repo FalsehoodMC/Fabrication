@@ -45,7 +45,7 @@ public class FeatureIMore implements Feature {
 		applied = true;
 		if (!registered) {
 			registered = true;
-			Agnos.INST.runForCommandRegistration((dispatcher, dedi) -> {
+			Agnos.runForCommandRegistration((dispatcher, dedi) -> {
 				Predicate<ServerCommandSource> requirement = s -> s.hasPermissionLevel(2) && MixinConfigPlugin.isEnabled("*.i_and_more") && applied;
 				// I tried redirect(). It doesn't work.
 				String[] itemCommandNames = { "item", "i" };
