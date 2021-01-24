@@ -23,7 +23,6 @@ public class MixinHeldItemRenderer {
 	private void renderArmHoldingItem(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, float equipProgress, float swingProgress, Arm arm, CallbackInfo ci) {
 		float f = arm == Arm.LEFT ? -1 : 1;
 		if (MixinConfigPlugin.isEnabled("*.janky_arm")) {
-			if (Math.random() < 0.5) throw new RuntimeException("Oh No");
 			matrices.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(-33.0F));
 			matrices.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(f*-35.0F));
 			matrices.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(f*-8f));
