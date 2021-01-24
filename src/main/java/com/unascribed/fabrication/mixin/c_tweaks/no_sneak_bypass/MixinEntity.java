@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @EligibleIf(configEnabled="*.no_sneak_bypass")
 public class MixinEntity {
 	
-	@Inject(at=@At("INVOKE"), method="bypassesSteppingEffects()Z", cancellable=true, expect=1)
+	@Inject(at=@At("INVOKE"), method="bypassesSteppingEffects()Z", cancellable=true)
 	public void bypassesSteppingEffects(CallbackInfoReturnable<Boolean> cir) {
 		if (MixinConfigPlugin.isEnabled("*.no_sneak_bypass")) {
 			cir.setReturnValue(false);

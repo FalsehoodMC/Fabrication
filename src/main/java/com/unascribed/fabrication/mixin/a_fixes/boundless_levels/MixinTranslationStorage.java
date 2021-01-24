@@ -17,7 +17,7 @@ import net.minecraft.client.resource.language.TranslationStorage;
 @EligibleIf(configEnabled="*.boundless_levels", envMatches=Env.CLIENT)
 public class MixinTranslationStorage {
 
-	@Inject(at=@At("HEAD"), method="get(Ljava/lang/String;)Ljava/lang/String;", cancellable=true, expect=1)
+	@Inject(at=@At("HEAD"), method="get(Ljava/lang/String;)Ljava/lang/String;", cancellable=true)
 	public void get(String key, CallbackInfoReturnable<String> ci) {
 		if (!MixinConfigPlugin.isEnabled("*.boundless_levels")) return;
 		if (key.startsWith("enchantment.level.")) {

@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @EligibleIf(configEnabled="*.food_always_edible", modNotLoaded="eternaleats")
 public class MixinPlayerEntity {
 	
-	@Inject(method="canConsume(Z)Z", at=@At("HEAD"), cancellable=true, expect=1)
+	@Inject(method="canConsume(Z)Z", at=@At("HEAD"), cancellable=true)
 	public void canConsume(boolean ignoreHunger, CallbackInfoReturnable<Boolean> cir) {
 		if (!MixinConfigPlugin.isEnabled("*.food_always_edible")) return;
 		cir.setReturnValue(true);

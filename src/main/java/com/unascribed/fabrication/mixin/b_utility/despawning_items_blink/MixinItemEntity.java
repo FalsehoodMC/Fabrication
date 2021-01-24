@@ -35,7 +35,7 @@ public abstract class MixinItemEntity extends Entity implements RenderingAgeAcce
 	
 	private int fabrication$renderingAge = -1000000;
 
-	@Inject(at=@At("TAIL"), method="tick()V", expect=1)
+	@Inject(at=@At("TAIL"), method="tick()V")
 	public void tick(CallbackInfo ci) {
 		Object self = this;
 		if (!world.isClient) {

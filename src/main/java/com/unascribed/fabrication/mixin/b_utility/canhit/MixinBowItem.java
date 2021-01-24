@@ -27,7 +27,7 @@ public class MixinBowItem {
 
 	@Inject(at=@At(value="INVOKE", target="net/minecraft/item/ItemStack.damage(ILnet/minecraft/entity/LivingEntity;Ljava/util/function/Consumer;)V"),
 			method="onStoppedUsing(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/LivingEntity;I)V",
-			locals=LocalCapture.CAPTURE_FAILHARD, expect=1)
+			locals=LocalCapture.CAPTURE_FAILHARD)
 	public void onStoppedUsing(ItemStack bowStack, World world, LivingEntity user, int remaining, CallbackInfo ci,
 			PlayerEntity entity, boolean infinity, ItemStack arrowStack, int i, float f, boolean b2, ArrowItem ai, PersistentProjectileEntity arrow) {
 		if (!MixinConfigPlugin.isEnabled("*.canhit") || CanHitUtil.isExempt(entity)) return;

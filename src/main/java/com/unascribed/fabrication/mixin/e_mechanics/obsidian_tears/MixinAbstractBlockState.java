@@ -27,7 +27,7 @@ import net.minecraft.world.World;
 public class MixinAbstractBlockState {
 
 	@Inject(at=@At("HEAD"), method="onUse(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;",
-			cancellable=true, expect=1)
+			cancellable=true)
 	public void onUse(World world, PlayerEntity user, Hand hand, BlockHitResult hit, CallbackInfoReturnable<ActionResult> ci) {
 		if (MixinConfigPlugin.isEnabled("*.obsidian_tears") && world.getBlockState(hit.getBlockPos()).getBlock() == Blocks.CRYING_OBSIDIAN) {
 			ItemStack held = user.getStackInHand(hand);

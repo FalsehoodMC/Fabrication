@@ -16,7 +16,7 @@ import net.minecraft.item.ItemStack;
 @EligibleIf(configEnabled="*.weapons_accept_silk")
 public class MixinEnchantment {
 
-	@Inject(at=@At("HEAD"), method="isAcceptableItem(Lnet/minecraft/item/ItemStack;)Z", cancellable=true, expect=1)
+	@Inject(at=@At("HEAD"), method="isAcceptableItem(Lnet/minecraft/item/ItemStack;)Z", cancellable=true)
 	public void isAcceptableItem(ItemStack stack, CallbackInfoReturnable<Boolean> ci) {
 		if (MixinConfigPlugin.isEnabled("*.weapons_accept_silk") && (Object)this == Enchantments.SILK_TOUCH && EnchantmentTarget.WEAPON.isAcceptableItem(stack.getItem())) {
 			ci.setReturnValue(true);

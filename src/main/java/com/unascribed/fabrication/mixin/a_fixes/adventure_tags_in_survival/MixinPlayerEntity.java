@@ -32,7 +32,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 	public PlayerAbilities abilities;
 
 	@Inject(at=@At("HEAD"), method="isBlockBreakingRestricted(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/world/GameMode;)Z",
-			cancellable=true, expect=1)
+			cancellable=true)
 	public void isBlockBreakingRestricted(World world, BlockPos pos, GameMode mode, CallbackInfoReturnable<Boolean> ci) {
 		if (!MixinConfigPlugin.isEnabled("*.adventure_tags_in_survival") || mode.isCreative() || mode.isBlockBreakingRestricted()) return;
 		ItemStack stack = getMainHandStack();
@@ -44,7 +44,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 	}
 	
 	@Inject(at=@At("HEAD"), method="canPlaceOn(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;Lnet/minecraft/item/ItemStack;)Z",
-			cancellable=true, expect=1)
+			cancellable=true)
 	public void canPlaceOn(BlockPos pos, Direction dir, ItemStack stack, CallbackInfoReturnable<Boolean> ci) {
 		// note: this isn't called for block placement for some reason; that's hardcoded into ItemStack
 		// however, this *is* used for buckets, spawn eggs, etc, and may be used by other mods

@@ -14,7 +14,7 @@ import net.minecraft.sound.SoundEvents;
 @EligibleIf(configEnabled="*.disable_equip_sound")
 public class MixinEntity {
 
-	@Inject(at=@At("HEAD"), method="playSound(Lnet/minecraft/sound/SoundEvent;FF)V", cancellable=true, expect=1)
+	@Inject(at=@At("HEAD"), method="playSound(Lnet/minecraft/sound/SoundEvent;FF)V", cancellable=true)
 	public void playSound(SoundEvent event, float f, float f2, CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.disable_equip_sound")) return;
 		if (event == SoundEvents.ITEM_ARMOR_EQUIP_GENERIC) {

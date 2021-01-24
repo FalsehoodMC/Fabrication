@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.support;
 
 public enum SpecialEligibility {
+	NEVER("Never", false),
 	EVENTS_AVAILABLE("Running under Fabric with Fabric API, or running under Forge", false),
 	NOT_FORGE("Running under Fabric", false),
 	FORGE("Running under Forge", false),

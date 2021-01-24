@@ -32,7 +32,7 @@ public abstract class MixinEntity implements SetInvisNoGravReversible {
 	@Shadow
 	public abstract void setNoGravity(boolean noGravity);
 	
-	@Inject(at=@At("TAIL"), method="baseTick()V", expect=1)
+	@Inject(at=@At("TAIL"), method="baseTick()V")
 	public void baseTick(CallbackInfo ci) {
 		if (!world.isClient && isWet()) {
 			if (fabrication$invisibilityReversible) {
@@ -70,7 +70,7 @@ public abstract class MixinEntity implements SetInvisNoGravReversible {
 		fabrication$noGravityReversible = reversible;
 	}
 	
-	@Inject(at=@At("TAIL"), method="toTag(Lnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/nbt/CompoundTag;", expect=1)
+	@Inject(at=@At("TAIL"), method="toTag(Lnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/nbt/CompoundTag;")
 	public void toTag(CompoundTag tag, CallbackInfoReturnable<CompoundTag> ci) {
 		if (fabrication$invisibilityReversible) {
 			tag.putBoolean("fabrication:InvisibilityReversible", fabrication$invisibilityReversible);
@@ -80,7 +80,7 @@ public abstract class MixinEntity implements SetInvisNoGravReversible {
 		}
 	}
 	
-	@Inject(at=@At("TAIL"), method="fromTag(Lnet/minecraft/nbt/CompoundTag;)V", expect=1)
+	@Inject(at=@At("TAIL"), method="fromTag(Lnet/minecraft/nbt/CompoundTag;)V")
 	public void fromTag(CompoundTag tag, CallbackInfo ci) {
 		fabrication$invisibilityReversible = tag.getBoolean("fabrication:InvisibilityReversible");
 		fabrication$noGravityReversible = tag.getBoolean("fabrication:NoGravityReversible");

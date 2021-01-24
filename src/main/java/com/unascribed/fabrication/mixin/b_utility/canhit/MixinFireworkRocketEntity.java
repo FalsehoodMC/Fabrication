@@ -17,7 +17,7 @@ import net.minecraft.entity.projectile.FireworkRocketEntity;
 public class MixinFireworkRocketEntity {
 
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/entity/LivingEntity.damage(Lnet/minecraft/entity/damage/DamageSource;F)Z"),
-			method="explode()V", expect=1)
+			method="explode()V")
 	public boolean damage(LivingEntity subject, DamageSource source, float amt) {
 		if (MixinConfigPlugin.isEnabled("*.canhit") && this instanceof SetCanHitList) {
 			SetCanHitList schl = (SetCanHitList)this;

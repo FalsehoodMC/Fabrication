@@ -17,7 +17,7 @@ import net.minecraft.item.ItemStack;
 public class MixinPlayerEntity {
 
 	@Redirect(at=@At(value="FIELD", target="net/minecraft/entity/player/PlayerAbilities.creativeMode:Z"),
-			method="getArrowType(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;", expect=1)
+			method="getArrowType(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;")
 	public boolean redirectIsCreativeMode(PlayerAbilities subject, ItemStack crossbow) {
 		if (MixinConfigPlugin.isEnabled("*.infinity_crossbows") && MixinConfigPlugin.isEnabled("*.infibows")
 				&& EnchantmentHelper.getLevel(Enchantments.INFINITY, crossbow) > 0) {

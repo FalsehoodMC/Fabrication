@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @EligibleIf(configEnabled="*.old_lava", envMatches=Env.CLIENT)
 public class MixinSpriteAtlasTexture {
 
-	@Inject(at=@At("TAIL"), method="upload(Lnet/minecraft/client/texture/SpriteAtlasTexture$Data;)V", expect=1)
+	@Inject(at=@At("TAIL"), method="upload(Lnet/minecraft/client/texture/SpriteAtlasTexture$Data;)V")
 	public void upload(Data data, CallbackInfo ci) {
 		FeatureOldLava.onLoaded((SpriteAtlasTexture)(Object)this, data);
 	}

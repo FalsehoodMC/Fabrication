@@ -31,7 +31,7 @@ public abstract class MixinPlayerEntity implements GetSuppressedSlots {
 		return fabrication$suppressedSlots;
 	}
 	
-	@Inject(at=@At("TAIL"), method="writeCustomDataToTag(Lnet/minecraft/nbt/CompoundTag;)V", expect=1)
+	@Inject(at=@At("TAIL"), method="writeCustomDataToTag(Lnet/minecraft/nbt/CompoundTag;)V")
 	public void writeCustomDataToTag(CompoundTag tag, CallbackInfo ci) {
 		ListTag li = new ListTag();
 		for (EquipmentSlot pt : fabrication$suppressedSlots) {
@@ -42,7 +42,7 @@ public abstract class MixinPlayerEntity implements GetSuppressedSlots {
 		}
 	}
 	
-	@Inject(at=@At("TAIL"), method="readCustomDataFromTag(Lnet/minecraft/nbt/CompoundTag;)V", expect=1)
+	@Inject(at=@At("TAIL"), method="readCustomDataFromTag(Lnet/minecraft/nbt/CompoundTag;)V")
 	public void readCustomDataFromTag(CompoundTag tag, CallbackInfo ci) {
 		fabrication$suppressedSlots.clear();
 		ListTag li = tag.getList("fabrication:SuppressedSlots", NbtType.STRING);

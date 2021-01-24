@@ -16,7 +16,7 @@ import net.minecraft.recipe.ShapedRecipe;
 @EligibleIf(configEnabled="*.dimensional_tools")
 public class MixinShapedRecipe {
 
-	@Inject(at=@At("RETURN"), method="craft(Lnet/minecraft/inventory/CraftingInventory;)Lnet/minecraft/item/ItemStack;", expect=1)
+	@Inject(at=@At("RETURN"), method="craft(Lnet/minecraft/inventory/CraftingInventory;)Lnet/minecraft/item/ItemStack;")
 	public void craft(CraftingInventory inv, CallbackInfoReturnable<ItemStack> ci) {
 		if (!MixinConfigPlugin.isEnabled("*.dimensional_tools")) return;
 		FeatureDimensionalTools.handleCraft(inv, ci.getReturnValue());

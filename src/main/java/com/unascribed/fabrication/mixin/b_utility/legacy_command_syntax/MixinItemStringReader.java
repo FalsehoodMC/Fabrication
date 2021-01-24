@@ -30,7 +30,7 @@ public class MixinItemStringReader {
 	private CompoundTag fabrication$legacyDamageNbt = null;
 	
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/util/registry/DefaultedRegistry.getOrEmpty(Lnet/minecraft/util/Identifier;)Ljava/util/Optional;"),
-			method="readItem()V", expect=1)
+			method="readItem()V")
 	public Optional<Item> getOrEmpty(DefaultedRegistry<Item> subject, Identifier id) {
 		fabrication$legacyDamageNbt = null;
 		if (MixinConfigPlugin.isEnabled("*.legacy_command_syntax")) {

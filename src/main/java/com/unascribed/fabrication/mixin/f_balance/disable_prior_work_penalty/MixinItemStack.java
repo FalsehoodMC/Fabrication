@@ -14,7 +14,7 @@ import com.unascribed.fabrication.support.MixinConfigPlugin;
 @EligibleIf(configEnabled="*.disable_prior_work_penalty")
 public class MixinItemStack {
 
-	@Inject(at=@At("HEAD"), method="getRepairCost()I", cancellable=true, expect=1)
+	@Inject(at=@At("HEAD"), method="getRepairCost()I", cancellable=true)
 	public void getRepairCost(CallbackInfoReturnable<Integer> cir) {
 		if (!MixinConfigPlugin.isEnabled("*.disable_prior_work_penalty")) return;
 		cir.setReturnValue(0);

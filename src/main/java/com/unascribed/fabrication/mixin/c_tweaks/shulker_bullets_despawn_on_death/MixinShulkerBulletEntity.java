@@ -15,7 +15,7 @@ import net.minecraft.entity.projectile.ShulkerBulletEntity;
 @EligibleIf(configEnabled="*.shulker_bullets_despawn_on_death")
 public abstract class MixinShulkerBulletEntity {
 
-	@Inject(at=@At("HEAD"), method="tick()V", cancellable=true, expect=1)
+	@Inject(at=@At("HEAD"), method="tick()V", cancellable=true)
 	public void tick(CallbackInfo ci) {
 		Object self = this;
 		if (MixinConfigPlugin.isEnabled("*.shulker_bullets_despawn_on_death") && !((Entity)self).world.isClient) {

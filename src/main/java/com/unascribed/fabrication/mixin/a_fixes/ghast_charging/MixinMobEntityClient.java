@@ -21,7 +21,7 @@ public class MixinMobEntityClient implements GhastAttackTime {
 	@Unique
 	private int fabrication$ghastAttackTime;
 	
-	@Inject(at=@At("TAIL"), method="tick()V", expect=1)
+	@Inject(at=@At("TAIL"), method="tick()V")
 	public void tick(CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.ghast_charging")) return;
 		Object self = this;

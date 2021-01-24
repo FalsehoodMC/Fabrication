@@ -26,7 +26,7 @@ public class MixinWorld {
 			Direction.UP, Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST
 		);
 	
-	@Inject(at=@At("HEAD"), method="removeBlock(Lnet/minecraft/util/math/BlockPos;Z)Z", cancellable=true, expect=1)
+	@Inject(at=@At("HEAD"), method="removeBlock(Lnet/minecraft/util/math/BlockPos;Z)Z", cancellable=true)
 	public void removeBlock(BlockPos pos, boolean move, CallbackInfoReturnable<Boolean> ci) {
 		if (MixinConfigPlugin.isEnabled("*.water_fills_on_break")) {
 			World self = (World)(Object)this;

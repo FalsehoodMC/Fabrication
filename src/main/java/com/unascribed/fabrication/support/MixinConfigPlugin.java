@@ -25,18 +25,22 @@ import javax.swing.plaf.metal.MetalLookAndFeel;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
-import org.spongepowered.asm.mixin.MixinEnvironment;
-import org.spongepowered.asm.mixin.MixinEnvironment.Option;
 import org.spongepowered.asm.mixin.Mixins;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
-
+import org.spongepowered.asm.mixin.injection.struct.InjectionInfo;
 import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.QDIni;
 import com.unascribed.fabrication.QDIni.BadValueException;
 import com.unascribed.fabrication.QDIni.IniTransformer;
 import com.unascribed.fabrication.QDIni.SyntaxErrorException;
+import com.unascribed.fabrication.support.injection.FailsoftCallbackInjectionInfo;
+import com.unascribed.fabrication.support.injection.FailsoftModifyArgInjectionInfo;
+import com.unascribed.fabrication.support.injection.FailsoftModifyArgsInjectionInfo;
+import com.unascribed.fabrication.support.injection.FailsoftModifyConstantInjectionInfo;
+import com.unascribed.fabrication.support.injection.FailsoftModifyVariableInjectionInfo;
+import com.unascribed.fabrication.support.injection.FailsoftRedirectInjectionInfo;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Enums;
@@ -517,15 +521,17 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		}
 	}
 
-	public static boolean ORIGINAL_DEBUG_INJECTORS;
-	
 	@Override
 	public void onLoad(String mixinPackage) {
 		reload();
-		ORIGINAL_DEBUG_INJECTORS = MixinEnvironment.getCurrentEnvironment().getOption(Option.DEBUG_INJECTORS);
-		MixinEnvironment.getCurrentEnvironment().setOption(Option.DEBUG_INJECTORS, true);
 		RUNTIME_CHECKS_WAS_ENABLED = isEnabled("general.runtime_checks");
 		Mixins.registerErrorHandlerClass("com.unascribed.fabrication.support.MixinErrorHandler");
+		InjectionInfo.register(FailsoftCallbackInjectionInfo.class);
+		InjectionInfo.register(FailsoftModifyArgInjectionInfo.class);
+		InjectionInfo.register(FailsoftModifyArgsInjectionInfo.class);
+		InjectionInfo.register(FailsoftRedirectInjectionInfo.class);
+		InjectionInfo.register(FailsoftModifyVariableInjectionInfo.class);
+		InjectionInfo.register(FailsoftModifyConstantInjectionInfo.class);
 	}
 
 	@Override

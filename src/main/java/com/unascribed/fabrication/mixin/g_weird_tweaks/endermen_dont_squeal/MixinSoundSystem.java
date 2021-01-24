@@ -15,7 +15,7 @@ import net.minecraft.client.sound.SoundSystem;
 @EligibleIf(configEnabled="*.endermen_dont_squeal", envMatches=Env.CLIENT)
 public class MixinSoundSystem {
 
-	@Inject(at=@At("HEAD"), method="play(Lnet/minecraft/client/sound/SoundInstance;)V", cancellable=true, expect=1)
+	@Inject(at=@At("HEAD"), method="play(Lnet/minecraft/client/sound/SoundInstance;)V", cancellable=true)
 	public void play(SoundInstance si, CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.endermen_dont_squeal")) return;
 		if (si != null && si.getId().getNamespace().equals("minecraft")) {

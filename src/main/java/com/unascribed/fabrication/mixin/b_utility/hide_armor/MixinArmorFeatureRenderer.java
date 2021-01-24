@@ -22,7 +22,7 @@ import com.unascribed.fabrication.support.MixinConfigPlugin;
 public class MixinArmorFeatureRenderer {
 
 	@Inject(at=@At("HEAD"), method="renderArmor(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/entity/EquipmentSlot;ILnet/minecraft/client/render/entity/model/BipedEntityModel;)V",
-			cancellable=true, expect=1)
+			cancellable=true)
 	private void renderArmor(MatrixStack matrices, VertexConsumerProvider vertexConsumers, LivingEntity entity, EquipmentSlot slot, int i, BipedEntityModel<? extends LivingEntity> model, CallbackInfo ci) {
 		if (MixinConfigPlugin.isEnabled("*.hide_armor") && entity instanceof GetSuppressedSlots
 				&& ((GetSuppressedSlots)entity).fabrication$getSuppressedSlots().contains(slot)) {

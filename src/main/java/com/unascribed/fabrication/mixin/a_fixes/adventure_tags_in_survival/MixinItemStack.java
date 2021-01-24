@@ -18,7 +18,7 @@ import net.minecraft.util.ActionResult;
 public class MixinItemStack {
 
 	@Inject(at=@At("HEAD"), method="useOnBlock(Lnet/minecraft/item/ItemUsageContext;)Lnet/minecraft/util/ActionResult;",
-			cancellable=true, expect=1)
+			cancellable=true)
 	public void useOnBlock(ItemUsageContext iuc, CallbackInfoReturnable<ActionResult> ci) {
 		if (!MixinConfigPlugin.isEnabled("*.adventure_tags_in_survival")) return;
 		PlayerEntity player = iuc.getPlayer();

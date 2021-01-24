@@ -27,7 +27,7 @@ public class MixinItemEntityRenderer {
 	private ItemRenderer itemRenderer;
 	
 	@Inject(at=@At(value="INVOKE", target="net/minecraft/client/util/math/MatrixStack.push()V", shift=Shift.AFTER, ordinal=1),
-			method="render(Lnet/minecraft/entity/ItemEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", expect=1)
+			method="render(Lnet/minecraft/entity/ItemEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")
 	public void render(ItemEntity entity, float f, float g, MatrixStack matrices, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci) {
 		if (MixinConfigPlugin.isEnabled("*.billboard_drops") && FlatItems.hasGeneratedModel(entity.getStack())) {
 			// multiply the model matrix directly to avoid corrupting normals

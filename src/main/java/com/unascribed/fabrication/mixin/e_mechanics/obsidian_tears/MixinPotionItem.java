@@ -18,7 +18,7 @@ import net.minecraft.world.World;
 @EligibleIf(configEnabled="*.obsidian_tears")
 public class MixinPotionItem {
 
-	@Inject(at=@At("HEAD"), method="finishUsing(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/LivingEntity;)Lnet/minecraft/item/ItemStack;", expect=1)
+	@Inject(at=@At("HEAD"), method="finishUsing(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/LivingEntity;)Lnet/minecraft/item/ItemStack;")
 	public void finishUsing(ItemStack stack, World world, LivingEntity quaffer, CallbackInfoReturnable<ItemStack> ci) {
 		if (!MixinConfigPlugin.isEnabled("*.obsidian_tears")) return;
 		if (quaffer instanceof ServerPlayerEntity && !world.isClient && stack.hasTag() && stack.getTag().getBoolean("fabrication:ObsidianTears")) {

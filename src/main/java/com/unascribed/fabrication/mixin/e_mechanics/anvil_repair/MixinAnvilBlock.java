@@ -26,7 +26,7 @@ import net.minecraft.world.World;
 public class MixinAnvilBlock {
 
 	@Inject(at=@At("HEAD"), method="onUse(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;",
-			cancellable=true, expect=1)
+			cancellable=true)
 	public void onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, CallbackInfoReturnable<ActionResult> ci) {
 		if (!MixinConfigPlugin.isEnabled("*.anvil_repair")) return;
 		if (!world.isClient) {

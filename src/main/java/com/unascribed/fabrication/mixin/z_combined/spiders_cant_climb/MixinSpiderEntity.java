@@ -31,7 +31,7 @@ public abstract class MixinSpiderEntity extends HostileEntity {
 	@Shadow
 	public abstract boolean isClimbingWall();
 	
-	@Inject(at=@At("TAIL"), method="tick()V", expect=1)
+	@Inject(at=@At("TAIL"), method="tick()V")
 	public void tickTail(CallbackInfo ci) {
 		if (!world.isClient) {
 			if (isClimbingWall()) {

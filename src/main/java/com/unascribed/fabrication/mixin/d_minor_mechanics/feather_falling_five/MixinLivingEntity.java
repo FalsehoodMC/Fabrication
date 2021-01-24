@@ -18,7 +18,7 @@ import net.minecraft.item.ItemStack;
 @EligibleIf(configEnabled="*.feather_falling_five")
 public class MixinLivingEntity {
 
-	@Inject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", cancellable=true, expect=1)
+	@Inject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", cancellable=true)
 	public void damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
 		if (!MixinConfigPlugin.isEnabled("*.feather_falling_five")) return;
 		LivingEntity self = ((LivingEntity)(Object)this);

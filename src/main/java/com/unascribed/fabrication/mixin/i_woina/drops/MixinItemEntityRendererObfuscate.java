@@ -21,13 +21,13 @@ import net.minecraft.item.ItemStack;
 public class MixinItemEntityRendererObfuscate {
 	
 	@ModifyVariable(at=@At("HEAD"), method="fireRenderEntityItem",
-			index=7, argsOnly=true, expect=1, remap=false)
+			index=7, argsOnly=true, remap=false)
 	private static int modifyOverlay(int orig, ItemRenderer subject, ItemStack stack) {
 		return WoinaDrops.modifyOverlay(stack, orig);
 	}
 	
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/client/render/item/ItemRenderer.renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformation$Mode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/render/model/BakedModel;)V"),
-			method="fireRenderEntityItem", expect=1)
+			method="fireRenderEntityItem")
 	private static void interceptRender(ItemRenderer subject, ItemStack stack, ModelTransformation.Mode renderMode, boolean leftHanded, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, BakedModel model) {
 		WoinaDrops.interceptRender(subject, stack, renderMode, leftHanded, matrices, vertexConsumers, light, overlay, model);
 	}

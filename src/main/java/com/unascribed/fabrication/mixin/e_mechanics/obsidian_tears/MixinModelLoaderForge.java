@@ -21,7 +21,7 @@ public class MixinModelLoaderForge {
 	@Shadow
 	private void addModel(ModelIdentifier modelId) {}
 	
-	@Inject(at=@At(value="CONSTANT", args="stringValue=special"), method="processLoading", remap=false, expect=1)
+	@Inject(at=@At(value="CONSTANT", args="stringValue=special"), method="processLoading", remap=false)
 	public void construct(CallbackInfo ci) {
 		addModel(new ModelIdentifier(new Identifier("fabrication", "obsidian_tears"), "inventory"));
 	}

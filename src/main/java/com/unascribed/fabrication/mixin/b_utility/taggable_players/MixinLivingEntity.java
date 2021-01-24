@@ -24,7 +24,7 @@ public abstract class MixinLivingEntity extends Entity {
 		super(entityType, world);
 	}
 
-	@Inject(at=@At("HEAD"), method="canTarget(Lnet/minecraft/entity/LivingEntity;)Z", cancellable=true, expect=1)
+	@Inject(at=@At("HEAD"), method="canTarget(Lnet/minecraft/entity/LivingEntity;)Z", cancellable=true)
 	public void canTarget(LivingEntity other, CallbackInfoReturnable<Boolean> ci) {
 		if (MixinConfigPlugin.isEnabled("*.taggable_players") && other instanceof TaggablePlayer) {
 			TaggablePlayer tp = ((TaggablePlayer)other);

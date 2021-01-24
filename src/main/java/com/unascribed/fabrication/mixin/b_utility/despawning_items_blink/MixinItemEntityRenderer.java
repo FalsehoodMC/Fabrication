@@ -19,7 +19,7 @@ import net.minecraft.entity.ItemEntity;
 public class MixinItemEntityRenderer {
 
 	@Inject(at=@At("HEAD"), method="render(Lnet/minecraft/entity/ItemEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",
-			cancellable=true, expect=1)
+			cancellable=true)
 	public void render(ItemEntity entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
 		if (MixinConfigPlugin.isEnabled("*.despawning_items_blink") && !MixinConfigPlugin.isEnabled("*.blinking_drops") && entity instanceof RenderingAgeAccess) {
 			RenderingAgeAccess aa = (RenderingAgeAccess)entity;

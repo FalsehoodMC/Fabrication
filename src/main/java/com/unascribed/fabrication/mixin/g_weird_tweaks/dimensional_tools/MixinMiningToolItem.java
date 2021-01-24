@@ -31,7 +31,7 @@ import net.minecraft.world.World;
 public class MixinMiningToolItem {
 	
 	@Inject(at=@At("HEAD"), method="postMine(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/LivingEntity;)Z",
-			cancellable=true, expect=1)
+			cancellable=true)
 	public void postMine(ItemStack stack, World world, BlockState state, BlockPos pos, LivingEntity miner, CallbackInfoReturnable<Boolean> ci) {
 		if (!MixinConfigPlugin.isEnabled("*.dimensional_tools")) return;
 		if (world.isClient) return;

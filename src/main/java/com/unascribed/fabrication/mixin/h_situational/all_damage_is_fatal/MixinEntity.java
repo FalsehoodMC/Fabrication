@@ -19,7 +19,7 @@ public abstract class MixinEntity extends Entity {
 		super(type, world);
 	}
 
-	@ModifyVariable(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", index=2, argsOnly=true, expect=1)
+	@ModifyVariable(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", index=2, argsOnly=true)
 	public float adjustDamage(float amount) {
 		if (amount == 0) return 0;
 		return MixinConfigPlugin.isEnabled("*.all_damage_is_fatal") ? ((LivingEntity)(Object)this).getHealth()*20 : amount;

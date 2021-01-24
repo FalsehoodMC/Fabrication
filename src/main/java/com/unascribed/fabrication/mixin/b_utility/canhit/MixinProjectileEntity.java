@@ -25,7 +25,7 @@ public class MixinProjectileEntity implements SetCanHitList {
 	private ListTag fabrication$canHitList;
 	private ListTag fabrication$canHitList2;
 	
-	@Inject(at=@At("HEAD"), method="onCollision(Lnet/minecraft/util/hit/HitResult;)V", cancellable=true, expect=1)
+	@Inject(at=@At("HEAD"), method="onCollision(Lnet/minecraft/util/hit/HitResult;)V", cancellable=true)
 	public void onCollision(HitResult result, CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.canhit")) return;
 		if (result.getType() == Type.ENTITY) {
@@ -36,7 +36,7 @@ public class MixinProjectileEntity implements SetCanHitList {
 		}
 	}
 	
-	@Inject(at=@At("TAIL"), method="writeCustomDataToTag(Lnet/minecraft/nbt/CompoundTag;)V", expect=1)
+	@Inject(at=@At("TAIL"), method="writeCustomDataToTag(Lnet/minecraft/nbt/CompoundTag;)V")
 	public void writeCustomDataToTag(CompoundTag tag, CallbackInfo ci) {
 		if (fabrication$canHitList != null) {
 			tag.put("fabrication:CanHitList", fabrication$canHitList);
@@ -46,7 +46,7 @@ public class MixinProjectileEntity implements SetCanHitList {
 		}
 	}
 	
-	@Inject(at=@At("TAIL"), method="readCustomDataFromTag(Lnet/minecraft/nbt/CompoundTag;)V", expect=1)
+	@Inject(at=@At("TAIL"), method="readCustomDataFromTag(Lnet/minecraft/nbt/CompoundTag;)V")
 	public void readCustomDataFromTag(CompoundTag tag, CallbackInfo ci) {
 		if (tag.contains("fabrication:CanHitList")) {
 			fabrication$canHitList = tag.getList("fabrication:CanHitList", NbtType.STRING);

@@ -35,7 +35,7 @@ public class MixinGrindstoneScreenHandlerResultSlot implements SetOwner<Grindsto
 		fabrication$owner = owner;
 	}
 	
-	@Inject(at=@At("HEAD"), method="onTakeItem(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;", expect=1)
+	@Inject(at=@At("HEAD"), method="onTakeItem(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;")
 	public void onTakeItemPre(PlayerEntity player, ItemStack stack, CallbackInfoReturnable<ItemStack> ci) {
 		fabrication$storedResultBook = null;
 		if (MixinConfigPlugin.isEnabled("*.grindstone_disenchanting") && fabrication$owner.getSlot(1).getStack().getItem() == Items.BOOK) {
@@ -50,7 +50,7 @@ public class MixinGrindstoneScreenHandlerResultSlot implements SetOwner<Grindsto
 		}
 	}
 	
-	@Inject(at=@At("TAIL"), method="onTakeItem(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;", expect=1)
+	@Inject(at=@At("TAIL"), method="onTakeItem(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;")
 	public void onTakeItemPost(PlayerEntity player, ItemStack stack, CallbackInfoReturnable<ItemStack> ci) {
 		if (fabrication$storedResultBook != null) {
 			fabrication$owner.getSlot(1).setStack(fabrication$storedResultBook);
@@ -58,7 +58,7 @@ public class MixinGrindstoneScreenHandlerResultSlot implements SetOwner<Grindsto
 		}
 	}
 	
-	@Inject(at=@At("HEAD"), method="getExperience(Lnet/minecraft/world/World;)I", cancellable=true, expect=1)
+	@Inject(at=@At("HEAD"), method="getExperience(Lnet/minecraft/world/World;)I", cancellable=true)
 	private void getExperience(World world, CallbackInfoReturnable<Integer> ci) {
 		if (fabrication$storedResultBook != null) ci.setReturnValue(0);
 	}

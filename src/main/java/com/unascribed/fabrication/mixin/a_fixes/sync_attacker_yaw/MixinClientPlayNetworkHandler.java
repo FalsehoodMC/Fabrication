@@ -29,7 +29,7 @@ public class MixinClientPlayNetworkHandler {
 	@Shadow @Final
 	private ClientConnection connection;
 	
-	@Inject(at=@At("TAIL"), method="onGameJoin(Lnet/minecraft/network/packet/s2c/play/GameJoinS2CPacket;)V", expect=1)
+	@Inject(at=@At("TAIL"), method="onGameJoin(Lnet/minecraft/network/packet/s2c/play/GameJoinS2CPacket;)V")
 	public void onGameJoin(GameJoinS2CPacket packet, CallbackInfo ci) {
 		// this *should* use minecraft:register but it is unclear what format that packet is
 		// intended to have in an Identifier-based world; Dinnerbone's original post says
@@ -40,7 +40,7 @@ public class MixinClientPlayNetworkHandler {
 		connection.send(new CustomPayloadC2SPacket(new Identifier("fabrication", "attacker_yaw"), new PacketByteBuf(Unpooled.buffer())));
 	}
 	
-	@Inject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/s2c/play/CustomPayloadS2CPacket;)V", cancellable=true, expect=1)
+	@Inject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/s2c/play/CustomPayloadS2CPacket;)V", cancellable=true)
 	public void onCustomPayload(CustomPayloadS2CPacket packet, CallbackInfo ci) {
 		if (packet.getChannel().getNamespace().equals("fabrication") && packet.getChannel().getPath().equals("attacker_yaw")) {
 			if (MixinConfigPlugin.isEnabled("*.sync_attacker_yaw")) {

@@ -16,7 +16,7 @@ import net.minecraft.client.texture.TextureManager;
 @EligibleIf(configEnabled="*.better_pause_freezing", envMatches=Env.CLIENT)
 public class MixinTextureManager {
 
-	@Inject(at=@At("HEAD"), method="tick()V", cancellable=true, expect=1)
+	@Inject(at=@At("HEAD"), method="tick()V", cancellable=true)
 	public void tick(CallbackInfo ci) {
 		if (MixinConfigPlugin.isEnabled("*.better_pause_freezing") && MinecraftClient.getInstance().isPaused() && !(MinecraftClient.getInstance().currentScreen instanceof AtlasViewerScreen)) {
 			ci.cancel();

@@ -30,7 +30,7 @@ public abstract class MixinPotionEntity extends ThrownItemEntity {
 		super(entityType, d, e, f, world);
 	}
 
-	@Inject(at=@At("TAIL"), method= "applySplashPotion(Ljava/util/List;Lnet/minecraft/entity/Entity;)V", locals=LocalCapture.CAPTURE_FAILHARD, expect=1)
+	@Inject(at=@At("TAIL"), method= "applySplashPotion(Ljava/util/List;Lnet/minecraft/entity/Entity;)V", locals=LocalCapture.CAPTURE_FAILHARD)
 	public void applySplashPotion(List<StatusEffectInstance> effects, Entity hit, CallbackInfo ci, Box box) {
 		if (!MixinConfigPlugin.isEnabled("*.invisibility_splash_on_inanimates") || world.isClient) return;
 		boolean invis = false;

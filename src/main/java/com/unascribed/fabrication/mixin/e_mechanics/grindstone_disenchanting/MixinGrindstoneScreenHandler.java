@@ -27,7 +27,7 @@ public abstract class MixinGrindstoneScreenHandler extends ScreenHandler {
 	@Shadow
 	private ItemStack grind(ItemStack item, int damage, int amount) { return null; }
 	
-	@Inject(at=@At("TAIL"), method="<init>(ILnet/minecraft/entity/player/PlayerInventory;Lnet/minecraft/screen/ScreenHandlerContext;)V", expect=1)
+	@Inject(at=@At("TAIL"), method="<init>(ILnet/minecraft/entity/player/PlayerInventory;Lnet/minecraft/screen/ScreenHandlerContext;)V")
 	private void construct(CallbackInfo ci) {
 		for (Slot s : slots) {
 			if (s instanceof SetOwner) {
@@ -36,7 +36,7 @@ public abstract class MixinGrindstoneScreenHandler extends ScreenHandler {
 		}
 	}
 
-	@Inject(at=@At("HEAD"), method="updateResult()V", cancellable=true, expect=1)
+	@Inject(at=@At("HEAD"), method="updateResult()V", cancellable=true)
 	private void updateResult(CallbackInfo ci) {
 		if (getSlot(1).getStack().getItem() == Items.BOOK && getSlot(1).getStack().getCount() == 1 && getSlot(0).getStack().hasEnchantments()) {
 			getSlot(2).setStack(grind(getSlot(0).getStack(), getSlot(0).getStack().getDamage(), getSlot(0).getStack().getCount()));

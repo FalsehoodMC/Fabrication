@@ -24,7 +24,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 	}
 
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/entity/Entity.isAttackable()Z"),
-			method="attack(Lnet/minecraft/entity/Entity;)V", expect=1)
+			method="attack(Lnet/minecraft/entity/Entity;)V")
 	public boolean isAttackable(Entity entity) {
 		if (!MixinConfigPlugin.isEnabled("*.canhit") || CanHitUtil.isExempt(this)) return entity.isAttackable();
 		if (!entity.isAttackable()) return false;

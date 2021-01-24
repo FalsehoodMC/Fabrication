@@ -27,7 +27,7 @@ public class MixinItemStackClient {
 
 	@Inject(at=@At(value="INVOKE", target="net/minecraft/client/item/TooltipContext.isAdvanced()Z", ordinal=2),
 			method="getTooltip(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/client/item/TooltipContext;)Ljava/util/List;",
-			locals=LocalCapture.CAPTURE_FAILHARD, expect=1)
+			locals=LocalCapture.CAPTURE_FAILHARD)
 	public void getTooltip(PlayerEntity player, TooltipContext ctx, CallbackInfoReturnable<List<Text>> ci, List<Text> list) {
 		if (!MixinConfigPlugin.isEnabled("*.canhit")) return;
 		ItemStack self = (ItemStack)(Object)this;

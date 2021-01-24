@@ -21,7 +21,7 @@ public abstract class MixinItemEntity {
 	@Shadow
 	public ItemStack getStack() { return null; }
 	
-	@Inject(at=@At("HEAD"), method="method_27314(F)F", cancellable=true, expect=1)
+	@Inject(at=@At("HEAD"), method="method_27314(F)F", cancellable=true)
 	public void getRotation(float partialTicks, CallbackInfoReturnable<Float> ci) {
 		if (MixinConfigPlugin.isEnabled("*.billboard_drops") && FlatItems.hasGeneratedModel(getStack())) {
 			ci.setReturnValue((float)Math.toRadians((-MinecraftClient.getInstance().gameRenderer.getCamera().getYaw())+180));

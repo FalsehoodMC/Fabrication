@@ -31,7 +31,7 @@ public abstract class MixinItemModels {
 	public abstract BakedModelManager getModelManager();
 	
 	@Inject(at=@At("HEAD"), method="getModel(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/client/render/model/BakedModel;",
-			cancellable=true, expect=1)
+			cancellable=true)
 	public void getModel(ItemStack stack, CallbackInfoReturnable<BakedModel> ci) {
 		if (!MixinConfigPlugin.isEnabled("*.obsidian_tears")) return;
 		if (stack.getItem() == Items.POTION && stack.hasTag() && stack.getTag().getBoolean("fabrication:ObsidianTears") && fabrication$obsidianTearsModel != null) {
@@ -39,7 +39,7 @@ public abstract class MixinItemModels {
 		}
 	}
 	
-	@Inject(at=@At("TAIL"), method="reloadModels()V", expect=1)
+	@Inject(at=@At("TAIL"), method="reloadModels()V")
 	public void reloadModels(CallbackInfo ci) {
 		fabrication$obsidianTearsModel = getModelManager().getModel(new ModelIdentifier(new Identifier("fabrication", "obsidian_tears"), "inventory"));
 	}

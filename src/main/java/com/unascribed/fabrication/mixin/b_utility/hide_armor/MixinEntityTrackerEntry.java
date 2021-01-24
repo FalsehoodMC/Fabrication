@@ -24,7 +24,7 @@ public class MixinEntityTrackerEntry {
 	private Entity entity;
 	
 	@Redirect(at=@At(value="NEW", target="net/minecraft/network/packet/s2c/play/EntityEquipmentUpdateS2CPacket"),
-			method="sendPackets(Ljava/util/function/Consumer;)V", expect=1)
+			method="sendPackets(Ljava/util/function/Consumer;)V")
 	public EntityEquipmentUpdateS2CPacket constructUpdatePacket(int id, List<Pair<EquipmentSlot, ItemStack>> equipmentList) {
 		return new EntityEquipmentUpdateS2CPacket(id, FeatureHideArmor.muddle(entity, equipmentList));
 	}

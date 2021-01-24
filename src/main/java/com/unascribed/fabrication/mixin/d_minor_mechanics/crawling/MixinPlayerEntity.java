@@ -17,7 +17,7 @@ public class MixinPlayerEntity implements SetCrawling {
 	
 	private boolean fabrication$crawling;
 	
-	@Inject(at=@At("HEAD"), method="updateSwimming()V", cancellable=true, expect=1)
+	@Inject(at=@At("HEAD"), method="updateSwimming()V", cancellable=true)
 	public void updateSwimming(CallbackInfo ci) {
 		if (MixinConfigPlugin.isEnabled("*.crawling") && fabrication$crawling) {
 			((PlayerEntity)(Object)this).setSwimming(true);

@@ -39,7 +39,7 @@ public abstract class MixinSignEditScreen extends Screen {
 	@Shadow
 	private int currentRow;
 
-	@Inject(at=@At("TAIL"), method="init()V", expect=1)
+	@Inject(at=@At("TAIL"), method="init()V")
 	public void init(CallbackInfo ci) {
 		this.selectionManager = new SelectionManager(() -> text[currentRow], pasted -> {
 			if (pasted.contains("\n")) {
@@ -69,7 +69,7 @@ public abstract class MixinSignEditScreen extends Screen {
 				});
 	}
 	
-	@Inject(at=@At("HEAD"), method="keyPressed(III)Z", cancellable=true, expect=1)
+	@Inject(at=@At("HEAD"), method="keyPressed(III)Z", cancellable=true)
 	public void keyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> ci) {
 		if (keyCode == GLFW.GLFW_KEY_C && hasControlDown() && hasShiftDown() && !hasAltDown()) {
 			SelectionManager.setClipboard(client, Joiner.on(Platform.isWindows() ? "\r\n" : "\n").join(text));

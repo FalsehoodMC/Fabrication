@@ -27,7 +27,7 @@ public class MixinDamageEnchantment extends Enchantment {
 		super(weight, type, slotTypes);
 	}
 
-	@Inject(at=@At("HEAD"), method="canAccept(Lnet/minecraft/enchantment/Enchantment;)Z", cancellable=true, expect=1)
+	@Inject(at=@At("HEAD"), method="canAccept(Lnet/minecraft/enchantment/Enchantment;)Z", cancellable=true)
 	public void canAccept(Enchantment other, CallbackInfoReturnable<Boolean> ci) {
 		if (!MixinConfigPlugin.isEnabled("*.tridents_accept_sharpness")) return;
 		if (other instanceof PowerEnchantment || other instanceof ImpalingEnchantment) {
@@ -35,7 +35,7 @@ public class MixinDamageEnchantment extends Enchantment {
 		}
 	}
 	
-	@Inject(at=@At("HEAD"), method="isAcceptableItem(Lnet/minecraft/item/ItemStack;)Z", cancellable=true, expect=1)
+	@Inject(at=@At("HEAD"), method="isAcceptableItem(Lnet/minecraft/item/ItemStack;)Z", cancellable=true)
 	public void isAcceptableItem(ItemStack stack, CallbackInfoReturnable<Boolean> ci) {
 		if (MixinConfigPlugin.isEnabled("*.tridents_accept_sharpness") && this == Enchantments.SHARPNESS && stack.getItem() == Items.TRIDENT) {
 			ci.setReturnValue(true);

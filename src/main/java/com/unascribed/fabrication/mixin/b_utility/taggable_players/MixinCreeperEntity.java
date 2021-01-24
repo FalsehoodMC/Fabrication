@@ -27,7 +27,7 @@ public abstract class MixinCreeperEntity extends HostileEntity {
 		super(entityType, world);
 	}
 
-	@Inject(at=@At("TAIL"), method="initGoals()V", expect=1)
+	@Inject(at=@At("TAIL"), method="initGoals()V")
 	protected void initGoals(CallbackInfo ci) {
 		FleeEntityGoal<ServerPlayerEntity> goal = new FleeEntityGoal<>(this, ServerPlayerEntity.class,
 				spe -> spe instanceof TaggablePlayer && ((TaggablePlayer)spe).fabrication$hasTag(PlayerTag.SCARES_CREEPERS), 8, 1, 2,

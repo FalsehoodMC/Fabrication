@@ -15,7 +15,7 @@ import net.minecraft.world.explosion.Explosion.DestructionType;
 public class MixinCreeperEntity {
 
 	@Redirect(at=@At(value="FIELD", opcode=Opcodes.GETSTATIC, target="net/minecraft/world/explosion/Explosion$DestructionType.DESTROY:Lnet/minecraft/world/explosion/Explosion$DestructionType;"),
-			method="explode()V", expect=1)
+			method="explode()V")
 	public DestructionType nonMobGriefingDestructionType() {
 		return MixinConfigPlugin.isEnabled("*.environmentally_friendly_creepers") ? DestructionType.NONE : DestructionType.DESTROY;
 	}

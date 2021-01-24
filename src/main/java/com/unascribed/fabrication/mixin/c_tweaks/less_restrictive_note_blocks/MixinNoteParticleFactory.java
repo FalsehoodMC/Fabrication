@@ -19,7 +19,7 @@ import net.minecraft.util.math.Direction;
 @EligibleIf(configEnabled="*.less_restrictive_note_blocks", envMatches=Env.CLIENT)
 public class MixinNoteParticleFactory {
 
-	@Inject(at=@At("RETURN"), method="createParticle(Lnet/minecraft/particle/DefaultParticleType;Lnet/minecraft/client/world/ClientWorld;DDDDDD)Lnet/minecraft/client/particle/Particle;", expect=1)
+	@Inject(at=@At("RETURN"), method="createParticle(Lnet/minecraft/particle/DefaultParticleType;Lnet/minecraft/client/world/ClientWorld;DDDDDD)Lnet/minecraft/client/particle/Particle;")
 	public void createParticle(DefaultParticleType type, ClientWorld world, double x, double y, double z, double vX, double vY, double vZ, CallbackInfoReturnable<Particle> ci) {
 		Direction dir = Direction.byId((int)vZ+1);
 		Particle p = ci.getReturnValue();

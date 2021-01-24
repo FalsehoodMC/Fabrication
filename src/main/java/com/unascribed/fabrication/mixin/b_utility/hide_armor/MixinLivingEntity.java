@@ -19,7 +19,7 @@ import net.minecraft.network.packet.s2c.play.EntityEquipmentUpdateS2CPacket;
 public class MixinLivingEntity {
 
 	@Redirect(at=@At(value="NEW", target="net/minecraft/network/packet/s2c/play/EntityEquipmentUpdateS2CPacket"),
-			method="method_30123(Ljava/util/Map;)V", expect=1)
+			method="method_30123(Ljava/util/Map;)V")
 	public EntityEquipmentUpdateS2CPacket constructUpdatePacket(int id, List<Pair<EquipmentSlot, ItemStack>> equipmentList) {
 		return new EntityEquipmentUpdateS2CPacket(id, FeatureHideArmor.muddle((Entity)(Object)this, equipmentList));
 	}
