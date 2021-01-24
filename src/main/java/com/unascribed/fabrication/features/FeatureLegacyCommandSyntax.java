@@ -71,7 +71,8 @@ public class FeatureLegacyCommandSyntax implements Feature {
 									serverPlayerEntity.addExperience(amount);
 									c.getSource().sendFeedback(new TranslatableText("commands.experience.add.points.success.single", amount, serverPlayerEntity.getDisplayName()), true);
 									return 1;
-								})).then(CommandManager.argument("lvlAmount", StringArgumentType.word()).executes((c) -> {
+								}))
+							.then(CommandManager.argument("lvlAmount", StringArgumentType.word()).executes((c) -> {
 							ServerPlayerEntity serverPlayerEntity = c.getSource().getPlayer();
 							String str = StringArgumentType.getString(c, "lvlAmount");
 							int amount = Integer.parseInt(str.substring(0,str.length()-1));
