@@ -82,8 +82,8 @@ public class FabricationMod implements ModInitializer {
 			}
 		}
 		if (MixinConfigPlugin.getValue("*.long_levelup_sound_at_30") != Trilean.FALSE && Agnos.eventsAvailable() && Agnos.getCurrentEnv() == Env.CLIENT) {
-			LEVELUP_LONG = Agnos.registerSoundEvent("fabrication:levelup_long", new SoundEvent(new Identifier("fabrication", "levelup_long")));
-			OOF = Agnos.registerSoundEvent("fabrication:oof", new SoundEvent(new Identifier("fabrication", "oof")));
+			LEVELUP_LONG = Agnos.registerSoundEvent(new Identifier("fabrication", "levelup_long"), new SoundEvent(new Identifier("fabrication", "levelup_long")));
+			OOF = Agnos.registerSoundEvent(new Identifier("fabrication", "oof"), new SoundEvent(new Identifier("fabrication", "oof")));
 		}
 	}
 	

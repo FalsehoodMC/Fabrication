@@ -10,13 +10,20 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.unascribed.fabrication.support.Env;
 
 import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.tag.TagRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.launch.common.FabricLauncherBase;
+import net.minecraft.block.Block;
+import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.tag.Tag;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -40,24 +47,40 @@ public final class Agnos {
 		void render(ItemStack stack, List<Text> lines);
 	}
 	
+	public interface HudRenderCallback {
+		void render(MatrixStack matrixStack, float tickDelta);
+	}
+	
 	public static void runForCommandRegistration(CommandRegistrationCallback r) {
 		net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback.EVENT.register(r::register);
 	}
 	
+	@Environment(EnvType.CLIENT)
 	public static void runForTooltipRender(TooltipRenderCallback r) {
 		ItemTooltipCallback.EVENT.register((stack, ctx, lines) -> r.render(stack, lines));
 	}
 	
-	public static <T> T registerSoundEvent(String id, T soundEvent) {
-		return (T)Registry.register(Registry.SOUND_EVENT, new Identifier(id), (SoundEvent)soundEvent);
+	@Environment(EnvType.CLIENT)
+	public static void runForHudRender(HudRenderCallback r) {
+		net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback.EVENT.register((ms, d) -> r.render(ms, d));
 	}
 	
-	public static <T> T registerBlockTag(String id) {
-		return (T)TagRegistry.block(new Identifier(id));
+	public static SoundEvent registerSoundEvent(Identifier id, SoundEvent soundEvent) {
+		return Registry.register(Registry.SOUND_EVENT, id, soundEvent);
+	}
+	
+	public static Tag<Block> registerBlockTag(Identifier id) {
+		return TagRegistry.block(id);
 	}
 
-	public static <T> T registerItemTag(String id) {
-		return (T)TagRegistry.item(new Identifier(id));
+	public static Tag<Item> registerItemTag(Identifier id) {
+		return TagRegistry.item(id);
+	}
+	
+	@Environment(EnvType.CLIENT)
+	public static KeyBinding registerKeyBinding(KeyBinding kb) {
+		KeyBindingHelper.registerKeyBinding(kb);
+		return kb;
 	}
 	
 	public static boolean eventsAvailable() {

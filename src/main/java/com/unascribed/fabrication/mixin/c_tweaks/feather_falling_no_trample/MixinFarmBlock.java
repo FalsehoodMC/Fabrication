@@ -25,7 +25,7 @@ public abstract class MixinFarmBlock extends Block {
 	}
 
 	@Inject(method="onLandedUpon(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/Entity;F)V",
-			at=@At("HEAD"), cancellable=true)
+			at=@At("HEAD"), cancellable=true, expect=1)
 	public void onLandedUpon(World world, BlockPos pos, Entity entity, float distance, CallbackInfo ci) {
 		if (MixinConfigPlugin.isEnabled("*.feather_falling_no_trample") && entity instanceof LivingEntity
 				&& EnchantmentHelper.getEquipmentLevel(Enchantments.FEATHER_FALLING, (LivingEntity)entity) >= 1) {

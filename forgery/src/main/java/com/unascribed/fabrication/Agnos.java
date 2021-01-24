@@ -13,22 +13,30 @@ import java.util.function.Function;
 
 import org.apache.logging.log4j.LogManager;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.brigadier.CommandDispatcher;
 import com.unascribed.fabrication.support.Env;
 
 import cpw.mods.modlauncher.TransformingClassLoader;
+import net.minecraft.block.Block;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.command.CommandSource;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tags.ITag;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.common.ForgeTagHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
@@ -47,6 +55,10 @@ public final class Agnos {
 		void render(ItemStack stack, List<ITextComponent> lines);
 	}
 	
+	public interface HudRenderCallback {
+		void render(MatrixStack matrixStack, float tickDelta);
+	}
+	
 	public static void runForCommandRegistration(CommandRegistrationCallback r) {
 		MinecraftForge.EVENT_BUS.addListener((FMLServerAboutToStartEvent e) -> {
 			r.register(e.getServer().getCommandManager().getDispatcher(), e.getServer().isDedicatedServer());
@@ -60,20 +72,35 @@ public final class Agnos {
 		});
 	}
 	
-	public static <T> T registerSoundEvent(String id, T soundEvent) {
+	@OnlyIn(Dist.CLIENT)
+	public static void runForHudRender(HudRenderCallback r) {
+		MinecraftForge.EVENT_BUS.addListener((RenderGameOverlayEvent.Post e) -> {
+			if (e.getType() == ElementType.ALL) {
+				r.render(e.getMatrixStack(), e.getPartialTicks());
+			}
+		});
+	}
+	
+	public static SoundEvent registerSoundEvent(ResourceLocation id, SoundEvent soundEvent) {
 		FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(SoundEvent.class, (RegistryEvent.Register<SoundEvent> e) -> {
-			((SoundEvent)soundEvent).setRegistryName(id);
-			e.getRegistry().register((SoundEvent)soundEvent);
+			soundEvent.setRegistryName(id);
+			e.getRegistry().register(soundEvent);
 		});
 		return soundEvent;
 	}
 	
-	public static <T> T registerBlockTag(String id) {
-		return (T)ForgeTagHandler.createOptionalTag(ForgeRegistries.BLOCKS, new ResourceLocation(id));
+	public static ITag<Block> registerBlockTag(ResourceLocation id) {
+		return ForgeTagHandler.createOptionalTag(ForgeRegistries.BLOCKS, id);
 	}
 
-	public static <T> T registerItemTag(String id) {
-		return (T)ForgeTagHandler.createOptionalTag(ForgeRegistries.ITEMS, new ResourceLocation(id));
+	public static ITag<Item> registerItemTag(ResourceLocation id) {
+		return ForgeTagHandler.createOptionalTag(ForgeRegistries.ITEMS, id);
+	}
+	
+	@OnlyIn(Dist.CLIENT)
+	public static KeyBinding registerKeyBinding(KeyBinding kb) {
+		ClientRegistry.registerKeyBinding(kb);
+		return kb;
 	}
 
 	public static boolean eventsAvailable() {
@@ -89,6 +116,7 @@ public final class Agnos {
 	}
 
 	public static boolean isModLoaded(String modid) {
+		if (ModList.get() != null) return ModList.get().isLoaded(modid);
 		return FMLLoader.getLoadingModList().getModFileById(modid) != null;
 	}
 	
