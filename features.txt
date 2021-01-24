@@ -347,8 +347,8 @@ utility.legacy_command_syntax
 	short_desc: Brings back various kinds of old command syntax; old habits die hard
 	desc:
 		Allows numeric arguments to /gamemode and /difficulty, re-adds /toggledownfall, allows
-		TitleCase arguments to /summon, and allows numeric arguments to commands that accept items
-		like /give.
+		TitleCase arguments to /summon, allows numeric arguments to commands that accept items
+		like /give, and re-adds shorthand to /xp.
 		
 		Old habits die hard.
 
