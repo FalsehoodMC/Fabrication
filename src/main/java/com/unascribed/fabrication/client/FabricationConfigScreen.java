@@ -1025,7 +1025,7 @@ public class FabricationConfigScreen extends Screen {
 				prefix += "§r\n";
 			}
 			renderWrappedTooltip(matrices, prefix+desc, mouseX, mouseY);
-		} else if (mouseX >= 134 && mouseX <= 134+45 && mouseY >= y && mouseY <= y+10) {
+		} else if (mouseX >= 134 && mouseX <= 134+45 && mouseY >= startY && mouseY <= startY+10) {
 			if (disabled) {
 				if (noFabricApi) {
 					renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"This option requires Fabric API"), (int)mouseX, (int)mouseY);
