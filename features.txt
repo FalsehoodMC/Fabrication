@@ -461,6 +461,16 @@ utility.toggle_stance
 		Interacts with Minor Mechanics > Crawling; if they are both enabled, the Toggle Stance key
 		will cycle between standing, sneaking, and crawling.
 
+utility.hide_armor
+	name: Hide Armor
+	since: 1.3.0
+	sides: server_only_with_client_helper
+	needs: events
+	desc:
+		Adds /hidearmor and /showarmor commands to hide and show your armor. Works with vanilla
+		clients for hiding armor from others; for hiding armor from yourself to work, must be
+		present on client.
+
 tweaks
 	name: Tweaks
 	since: 1.0
