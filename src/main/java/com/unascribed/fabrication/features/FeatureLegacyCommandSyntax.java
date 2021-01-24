@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
 
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.unascribed.fabrication.Agnos;
@@ -15,14 +16,15 @@ import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.SpecialEligibility;
-
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.DifficultyCommand;
 import net.minecraft.server.command.GameModeCommand;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.level.ServerWorldProperties;
@@ -31,7 +33,7 @@ import net.minecraft.world.level.ServerWorldProperties;
 public class FeatureLegacyCommandSyntax implements Feature {
 
 	private boolean applied = false;
-	
+
 	@Override
 	public void apply() {
 		if (applied) return;
@@ -58,6 +60,29 @@ public class FeatureLegacyCommandSyntax implements Feature {
 							.executes(c -> DifficultyCommand.execute(c.getSource(), difficulty)));
 				}
 				dispatcher.register(diffCmd);
+
+				LiteralArgumentBuilder<ServerCommandSource> xpCmd = CommandManager.literal("xp")
+						.requires(scs -> MixinConfigPlugin.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2));
+				/*Assume levels since String argument
+				xpCmd.then(CommandManager.argument("amount", StringArgumentType.word())
+							.executes(c -> {
+								ServerPlayerEntity serverPlayerEntity = c.getSource().getPlayer();
+								String str = StringArgumentType.getString(c, "amount");
+								int amount = Integer.parseInt(str.substring(0,str.length()-1));
+								serverPlayerEntity.addExperienceLevels(amount);
+								c.getSource().sendFeedback(new TranslatableText("commands.experience.add.levels.success.single", amount, serverPlayerEntity.getDisplayName()), true);
+								return 1;
+							}));
+				*/
+				xpCmd.then(CommandManager.argument("amount", IntegerArgumentType.integer())
+						.executes(c -> {
+							ServerPlayerEntity serverPlayerEntity = c.getSource().getPlayer();
+							int amount = IntegerArgumentType.getInteger(c, "amount");
+							serverPlayerEntity.addExperience(amount);
+							c.getSource().sendFeedback(new TranslatableText("commands.experience.add.points.success.single", amount, serverPlayerEntity.getDisplayName()), true);
+							return 1;
+						}));
+				dispatcher.register(xpCmd);
 				
 				dispatcher.register(CommandManager.literal("toggledownfall")
 						.requires(scs -> MixinConfigPlugin.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2))
