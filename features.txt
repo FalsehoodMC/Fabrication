@@ -299,13 +299,6 @@ fixes.silverfish_step
 		possible it's not an oversight and that Mojang simply deemed the silverfish step sound too
 		horrible and dummied it out.
 
-fixes.nether_cauldron
-	name: Nether Cauldron
-	since: 1.3.0
-	sides: server_only
-	desc:
-		Water evaporates when being placed inside a cauldron in the nether.
-
 utility
 	name: Utility
 	since: 1.0
@@ -675,6 +668,13 @@ tweaks.no_sneak_bypass
 	sides: server_only
 	desc:
 		Blocks which would normally not affect players when sneaking will.
+
+tweaks.nether_cauldron
+	name: Nether Cauldron
+	since: 1.3.0
+	sides: server_only
+	desc:
+		Water evaporates when being placed inside a cauldron in the nether.
 
 minor_mechanics
 	name: Minor Mechanics
