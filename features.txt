@@ -1097,6 +1097,13 @@ balance.food_always_edible
 	desc:
 		Allows players to eat unconditionally.
 
+balance.player_free_spawners
+	name: Player Free Spawners
+	since: 1.3.0
+	sides: server_only
+	desc:
+		Mob spawners don't require a player nearby to spawn.
+
 weird_tweaks
 	name: Weird Tweaks
 	since: 1.0
