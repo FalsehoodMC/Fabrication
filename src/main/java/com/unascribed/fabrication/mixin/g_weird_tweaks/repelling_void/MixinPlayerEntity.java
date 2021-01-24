@@ -59,7 +59,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 	@Override
 	protected void destroy() {
 		Vec3d pos = fabrication$lastGroundPos;
-		if (MixinConfigPlugin.isEnabled("*.repelling_void") && pos != null) {
+		if (MixinConfigPlugin.isEnabled("*.repelling_void") && pos != null && !fabrication$debted) {
 			BlockPos bp = new BlockPos(pos).down();
 			if (!world.getBlockState(bp).isSideSolid(world, bp, Direction.UP, SideShapeType.CENTER)) {
 				boolean foundOne = false;
