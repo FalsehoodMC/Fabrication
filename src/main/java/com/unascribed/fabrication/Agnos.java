@@ -96,6 +96,8 @@ public final class Agnos {
 	}
 
 	public static boolean isModLoaded(String modid) {
+		if (modid.startsWith("forge:")) return false;
+		if (modid.startsWith("fabric:")) modid = modid.substring(7);
 		return FabricLoader.getInstance().isModLoaded(modid);
 	}
 	
