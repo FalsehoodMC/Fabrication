@@ -61,7 +61,7 @@ public class FeatureLegacyCommandSyntax implements Feature {
 				}
 				dispatcher.register(diffCmd);
 
-				LiteralArgumentBuilder<ServerCommandSource> xpCmd = CommandManager.literal("xp")
+				LiteralArgumentBuilder<ServerCommandSource> xpCmd = CommandManager.literal("experience")
 						.requires(scs -> MixinConfigPlugin.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2));
 				/*Assume levels since String argument
 				xpCmd.then(CommandManager.argument("amount", StringArgumentType.word())
