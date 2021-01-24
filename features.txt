@@ -1097,12 +1097,16 @@ balance.food_always_edible
 	desc:
 		Allows players to eat unconditionally.
 
-balance.player_free_spawners
-	name: Player Free Spawners
+balance.spawners_always_tick
+	name: Spawners Always Tick
 	since: 1.3.0
 	sides: server_only
 	desc:
-		Mob spawners don't require a player nearby to spawn.
+		Spawners always count down their spawn timers, even if no player is nearby. This means a
+		spawner that is left alone for a while will spawn *instantly* when a player comes in range.
+		Allows shuttling a player between spawners with a minecart or water stream to efficiently
+		make use of spawners that are close together, but not quite close enough to all be activated
+		at the same time.
 
 weird_tweaks
 	name: Weird Tweaks
@@ -1353,6 +1357,18 @@ situational.weapons_accept_silk
 		Weapons can be enchanted with Silk Touch, and Silk Touch becomes incompatible with Looting.
 		
 		Can be used with datapacks and loot tables (or so I'm told).
+
+situational.player_free_spawners
+	name: Player Free Spawners
+	since: 1.3.0
+	sides: server_only
+	desc:
+		Mob spawners don't require a player nearby to spawn. This can be dangerous on a normal world
+		as it means all loaded spawners will constantly spawn mobs, which makes dungeons pre-loaded
+		monsterboxes and floods abandoned mineshafts with cave spiders. Use carefully, preferably in
+		worlds with structures disabled.
+		
+		See Balance > Spawners Always Tick for a less extreme, safer version of this.
 
 experiments
 	name: Experiments
