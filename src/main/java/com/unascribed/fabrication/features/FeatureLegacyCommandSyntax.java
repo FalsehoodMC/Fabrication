@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.unascribed.fabrication.Agnos;
@@ -61,29 +62,24 @@ public class FeatureLegacyCommandSyntax implements Feature {
 				}
 				dispatcher.register(diffCmd);
 
-				LiteralArgumentBuilder<ServerCommandSource> xpCmd = CommandManager.literal("experience")
-						.requires(scs -> MixinConfigPlugin.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2));
-				/*Assume levels since String argument
-				xpCmd.then(CommandManager.argument("amount", StringArgumentType.word())
-							.executes(c -> {
-								ServerPlayerEntity serverPlayerEntity = c.getSource().getPlayer();
-								String str = StringArgumentType.getString(c, "amount");
-								int amount = Integer.parseInt(str.substring(0,str.length()-1));
-								serverPlayerEntity.addExperienceLevels(amount);
-								c.getSource().sendFeedback(new TranslatableText("commands.experience.add.levels.success.single", amount, serverPlayerEntity.getDisplayName()), true);
-								return 1;
-							}));
-				*/
-				xpCmd.then(CommandManager.argument("amount", IntegerArgumentType.integer())
-						.executes(c -> {
+				dispatcher.register(CommandManager.literal("experience")
+						.requires(scs -> MixinConfigPlugin.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2))
+						.then(CommandManager.argument("amount", IntegerArgumentType.integer())
+								.executes(c -> {
+									ServerPlayerEntity serverPlayerEntity = c.getSource().getPlayer();
+									int amount = IntegerArgumentType.getInteger(c, "amount");
+									serverPlayerEntity.addExperience(amount);
+									c.getSource().sendFeedback(new TranslatableText("commands.experience.add.points.success.single", amount, serverPlayerEntity.getDisplayName()), true);
+									return 1;
+								})).then(CommandManager.argument("lvlAmount", StringArgumentType.word()).executes((c) -> {
 							ServerPlayerEntity serverPlayerEntity = c.getSource().getPlayer();
-							int amount = IntegerArgumentType.getInteger(c, "amount");
-							serverPlayerEntity.addExperience(amount);
-							c.getSource().sendFeedback(new TranslatableText("commands.experience.add.points.success.single", amount, serverPlayerEntity.getDisplayName()), true);
+							String str = StringArgumentType.getString(c, "lvlAmount");
+							int amount = Integer.parseInt(str.substring(0,str.length()-1));
+							serverPlayerEntity.addExperienceLevels(amount);
+							c.getSource().sendFeedback(new TranslatableText("commands.experience.add.levels.success.single", amount, serverPlayerEntity.getDisplayName()), true);
 							return 1;
-						}));
-				dispatcher.register(xpCmd);
-				
+						})));
+
 				dispatcher.register(CommandManager.literal("toggledownfall")
 						.requires(scs -> MixinConfigPlugin.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2))
 						.executes(c -> {
