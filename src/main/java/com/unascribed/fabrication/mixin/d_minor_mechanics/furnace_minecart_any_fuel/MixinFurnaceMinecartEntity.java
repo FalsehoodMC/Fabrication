@@ -57,7 +57,8 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/recipe/Ingredient.test(Lnet/minecraft/item/ItemStack;)Z"),
 			method="interact(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;")
 	public boolean testFuel(Ingredient subject, ItemStack stack) {
-		return MixinConfigPlugin.isEnabled("*.furnace_minecart_any_fuel") ? false : subject.test(stack);
+		if (!MixinConfigPlugin.isEnabled("*.furnace_minecart_any_fuel")) return subject.test(stack);
+		return false;
 	}
 	
 }

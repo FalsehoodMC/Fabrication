@@ -224,7 +224,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			return false;
 		}
 		if (!config.containsKey(configKey))
-			return defaults == null ? false : defaults.get(configKey);
+			return defaults != null && defaults.get(configKey);
 		return config.get(configKey).resolve(defaults == null ? false : defaults.get(configKey));
 	}
 	
@@ -239,7 +239,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	
 	public static ResolvedTrilean getResolvedValue(String configKey) {
 		if (isFailed(configKey)) return ResolvedTrilean.FALSE;
-		return config.getOrDefault(remap(configKey), Trilean.UNSET).resolveSemantically(defaults == null ? false : defaults.get(configKey));
+		return config.getOrDefault(remap(configKey), Trilean.UNSET).resolveSemantically(defaults != null && defaults.get(configKey));
 	}
 	
 	public static boolean isTrilean(String s) {
@@ -260,7 +260,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	}
 	
 	public static boolean getDefault(String configKey) {
-		return defaults == null ? false : defaults.get(remap(configKey));
+		return defaults != null && defaults.get(remap(configKey));
 	}
 	
 	public static ImmutableSet<String> getAllKeys() {
