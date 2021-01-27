@@ -25,7 +25,7 @@ public class MixinItemEntityRenderer {
 			RenderingAgeAccess aa = (RenderingAgeAccess)entity;
 			int age = aa.fabrication$getRenderingAge();
 			int timeUntilDespawn = 6000-age;
-			if (timeUntilDespawn < 40) {
+			if (timeUntilDespawn < 20) {
 				// 1 second; blink every tick
 				if (age%2 == 0) {
 					ci.cancel();

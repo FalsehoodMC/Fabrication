@@ -311,10 +311,8 @@ public class FeatureFabricationCommand implements Feature {
 			if (scs.getMinecraftServer().isSinglePlayer() && scs.getEntity() != null) {
 				Entity e = scs.getEntity();
 				if (e instanceof PlayerEntity) {
-					if (scs.getMinecraftServer().getUserName().equals(((PlayerEntity)e).getGameProfile().getName())) {
-						// always allow in singleplayer, even if cheats are off
-						return true;
-					}
+					// always allow in singleplayer, even if cheats are off
+					return scs.getMinecraftServer().getUserName().equals(((PlayerEntity)e).getGameProfile().getName());
 				}
 			}
 			return false;

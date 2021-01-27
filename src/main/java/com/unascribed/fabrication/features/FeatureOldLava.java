@@ -98,9 +98,9 @@ public class FeatureOldLava implements Feature {
 			for (int x = 0; x < w; ++x) {
 				for (int y = 0; y < h; ++y) {
 					mip.setPixelColor(x, y, FabRefl.Client.MipmapHelper_blend(
-							src.getPixelColor(x * 2 + 0, y * 2 + 0),
-							src.getPixelColor(x * 2 + 1, y * 2 + 0),
-							src.getPixelColor(x * 2 + 0, y * 2 + 1),
+							src.getPixelColor(x * 2    , y * 2    ),
+							src.getPixelColor(x * 2 + 1, y * 2    ),
+							src.getPixelColor(x * 2    , y * 2 + 1),
 							src.getPixelColor(x * 2 + 1, y * 2 + 1), false));
 				}
 			}

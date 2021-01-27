@@ -36,10 +36,10 @@ public class MixinExperienceOrbEntityRenderer {
 			int color2 = MathHelper.hsvToRgb(hue+(fabrication$colorDecider.nextBoolean() ? -0.08f : 0.08f), 0.8f, 1);
 			float r1 = ((color1>>16)&0xFF)/255f;
 			float g1 = ((color1>>8)&0xFF)/255f;
-			float b1 = ((color1>>0)&0xFF)/255f;
+			float b1 = (color1&0xFF)/255f;
 			float r2 = ((color2>>16)&0xFF)/255f;
 			float g2 = ((color2>>8)&0xFF)/255f;
-			float b2 = ((color2>>0)&0xFF)/255f;
+			float b2 = (color2&0xFF)/255f;
 			float a = r/255f;
 			r = (int)((r1+((r2-r1)*a))*255);
 			g = (int)((g1+((g2-g1)*a))*255);

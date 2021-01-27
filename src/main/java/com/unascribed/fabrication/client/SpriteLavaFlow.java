@@ -55,7 +55,7 @@ public class SpriteLavaFlow extends Sprite
 					}
 				}
 
-				this.field_76874_h[var1 + var2 * 16] = var3 / 10.0F + (this.field_76875_i[(var1 + 0 & 15) + (var2 + 0 & 15) * 16] + this.field_76875_i[(var1 + 1 & 15) + (var2 + 0 & 15) * 16] + this.field_76875_i[(var1 + 1 & 15) + (var2 + 1 & 15) * 16] + this.field_76875_i[(var1 + 0 & 15) + (var2 + 1 & 15) * 16]) / 4.0F * 0.8F;
+				this.field_76874_h[var1 + var2 * 16] = var3 / 10.0F + (this.field_76875_i[(var1 & 15) + (var2 & 15) * 16] + this.field_76875_i[(var1 + 1 & 15) + (var2 & 15) * 16] + this.field_76875_i[(var1 + 1 & 15) + (var2 + 1 & 15) * 16] + this.field_76875_i[(var1 & 15) + (var2 + 1 & 15) * 16]) / 4.0F * 0.8F;
 				this.field_76875_i[var1 + var2 * 16] += this.field_76872_j[var1 + var2 * 16] * 0.01F;
 
 				if (this.field_76875_i[var1 + var2 * 16] < 0.0F)

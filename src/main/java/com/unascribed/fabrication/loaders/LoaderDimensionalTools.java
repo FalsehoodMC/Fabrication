@@ -106,8 +106,7 @@ public class LoaderDimensionalTools implements ConfigLoader {
 			if (getClass() != obj.getClass()) return false;
 			MohsIdentifier that = (MohsIdentifier) obj;
 			if (this.hard != that.hard) return false;
-			if (!Objects.equals(this.id, that.id)) return false;
-			return true;
+			return Objects.equals(this.id, that.id);
 		}
 		
 	}

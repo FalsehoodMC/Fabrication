@@ -91,8 +91,7 @@ public class Resolvable<T> {
 		if (getClass() != obj.getClass()) return false;
 		Resolvable<?> other = (Resolvable<?>) obj;
 		if (!Objects.equal(id, other.id)) return false;
-		if (registry != other.registry) return false;
-		return true;
+		return registry == other.registry;
 	}
 	
 }

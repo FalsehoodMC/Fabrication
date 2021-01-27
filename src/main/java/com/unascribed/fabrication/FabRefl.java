@@ -415,7 +415,7 @@ public class FabRefl {
 		}
 		
 		public UnreflResult requiredBy(String... features) {
-			for (String f : features) requiredBy.add(f);
+			requiredBy.addAll(Arrays.asList(features));
 			return this;
 		}
 		

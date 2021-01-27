@@ -71,7 +71,7 @@ public class FabricationConfigScreen extends Screen {
 
 	private final Map<String, String> SECTION_DESCRIPTIONS = Maps.newHashMap();
 	private final Map<Profile, String> PROFILE_DESCRIPTIONS = Maps.newHashMap();
-	
+
 	private static final ImmutableMap<Profile, Integer> PROFILE_COLORS = ImmutableMap.<Profile, Integer>builder()
 			.put(Profile.GREEN, 0xFF8BC34A)
 			.put(Profile.BLONDE, 0xFFFFCC80)
@@ -387,13 +387,13 @@ public class FabricationConfigScreen extends Screen {
 	private int lerpColor(int from, int to, float delta) {
 		float a = MathHelper.lerp(delta, ((from>>24)&0xFF)/255f, ((to>>24)&0xFF)/255f);
 		float r = MathHelper.lerp(delta, ((from>>16)&0xFF)/255f, ((to>>16)&0xFF)/255f);
-		float g = MathHelper.lerp(delta, ((from>>8 )&0xFF)/255f, ((to>>8 )&0xFF)/255f);
-		float b = MathHelper.lerp(delta, ((from>>0 )&0xFF)/255f, ((to>>0 )&0xFF)/255f);
+		float g = MathHelper.lerp(delta, ((from>>8)&0xFF)/255f, ((to>>8)&0xFF)/255f);
+		float b = MathHelper.lerp(delta, (from&0xFF)/255f, (to&0xFF)/255f);
 		int c = 0;
 		c |= ((int)(a*255)&0xFF)<<24;
 		c |= ((int)(r*255)&0xFF)<<16;
 		c |= ((int)(g*255)&0xFF)<<8;
-		c |= ((int)(b*255)&0xFF)<<0;
+		c |= ((int)(b*255)&0xFF);
 		return c;
 	}
 
@@ -667,7 +667,7 @@ public class FabricationConfigScreen extends Screen {
 					msg += "\n§oMismatch: Server has "+srv+" options. Client has "+cli+".";
 					if (srv > cli) {
 						msg += "\n§cOptions unknown to the client will not appear.";
-					} else if (cli > srv) {
+					} else {
 						msg += "\n§eOptions unknown to the server will be disabled.";
 					}
 				}
@@ -689,7 +689,7 @@ public class FabricationConfigScreen extends Screen {
 	
 	private void checkServerData() {
 		ClientPlayNetworkHandler cpnh = client.getNetworkHandler();
-		if (cpnh != null && cpnh instanceof GetServerConfig) {
+		if (cpnh instanceof GetServerConfig) {
 			long launchId = ((GetServerConfig)cpnh).fabrication$getLaunchId();
 			if (launchId != serverLaunchId) {
 				newlyFalseKeysServer.clear();
@@ -1058,7 +1058,7 @@ public class FabricationConfigScreen extends Screen {
 	}
 	
 	private void color(int packed, float alpha) {
-		GlStateManager.color4f(((packed>>16)&0xFF)/255f, ((packed>>8)&0xFF)/255f, ((packed>>0)&0xFF)/255f, alpha);
+		GlStateManager.color4f(((packed>>16)&0xFF)/255f, ((packed>>8)&0xFF)/255f, (packed&0xFF)/255f, alpha);
 	}
 
 	@Override
