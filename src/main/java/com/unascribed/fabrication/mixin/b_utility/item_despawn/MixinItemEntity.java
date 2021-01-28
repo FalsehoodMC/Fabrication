@@ -7,7 +7,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -97,6 +99,13 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 		calculateDespawn();
 	}
 	
+	@ModifyConstant(constant=@Constant(intValue=-32768), method="canMerge()Z")
+	public int modifyIllegalAge(int orig) {
+		// age-1 will never be equal to age; short-circuits the "age != -32768" check and allows
+		// items set to "invincible" to stack together
+		return fabrication$invincible ? age-1 : orig;
+	}
+	
 	@Override
 	public void fabrication$setFromPlayerDeath(boolean b) {
 		fabrication$fromPlayerDeath = b;
@@ -106,30 +115,37 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 	@Unique
 	private void calculateDespawn() {
 		if (world.isClient) return;
+		final boolean debug = false;
 		ItemStack stack = getStack();
 		ParsedTime time = ParsedTime.UNSET;
 		ParsedTime itemTime = LoaderItemDespawn.itemDespawns.get(Resolvable.mapKey(stack.getItem(), Registry.ITEM));
+		if (debug) System.out.println("itemTime: "+itemTime);
 		if (itemTime != null) {
 			time = itemTime;
 		}
 		if (!time.priority) {
+			if (debug) System.out.println("Not priority, check enchantments");
 			for (Enchantment e : EnchantmentHelper.get(stack).keySet()) {
 				if (e.isCursed()) {
 					if (LoaderItemDespawn.curseDespawn.overshadows(time)) {
+						if (debug) System.out.println("Found a curse; curseDespawn overshadows: "+LoaderItemDespawn.curseDespawn);
 						time = LoaderItemDespawn.curseDespawn;
 					}
 				} else {
 					if (LoaderItemDespawn.normalEnchDespawn.overshadows(time)) {
+						if (debug) System.out.println("Found an enchantment; normalEnchDespawn overshadows: "+LoaderItemDespawn.normalEnchDespawn);
 						time = LoaderItemDespawn.normalEnchDespawn;
 					}
 					if (e.isTreasure()) {
 						if (LoaderItemDespawn.treasureDespawn.overshadows(time)) {
+							if (debug) System.out.println("Found a treasure enchantment; treasureDespawn overshadows: "+LoaderItemDespawn.treasureDespawn);
 							time = LoaderItemDespawn.treasureDespawn;
 						}
 					}
 				}
 				ParsedTime enchTime = LoaderItemDespawn.enchDespawns.get(Resolvable.mapKey(e, Registry.ENCHANTMENT));
 				if (enchTime != null && enchTime.overshadows(time)) {
+					if (debug) System.out.println("Found a specific enchantment; it overshadows: "+enchTime);
 					time = enchTime;
 				}
 			}
@@ -137,6 +153,7 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 				Tag<Item> itemTag = ItemTags.getTagGroup().getTag(en.getKey());
 				if (itemTag != null && itemTag.contains(stack.getItem())) {
 					if (en.getValue().overshadows(time)) {
+						if (debug) System.out.println("Found a tag; it overshadows: "+en.getValue());
 						time = en.getValue();
 					}
 				}
@@ -145,6 +162,7 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 					Tag<Block> blockTag = BlockTags.getTagGroup().getTag(en.getKey());
 					if (blockTag != null && blockTag.contains(bi.getBlock())) {
 						if (en.getValue().overshadows(time)) {
+							if (debug) System.out.println("Found a tag; it overshadows: "+en.getValue());
 							time = en.getValue();
 						}
 					}
@@ -154,6 +172,7 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 				for (Map.Entry<String, ParsedTime> en : LoaderItemDespawn.nbtBools.entrySet()) {
 					if (stack.getTag().getBoolean(en.getKey())) {
 						if (en.getValue().overshadows(time)) {
+							if (debug) System.out.println("Found an NBT tag; it overshadows: "+en.getValue());
 							time = en.getValue();
 						}
 					}
@@ -161,11 +180,14 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 			}
 		}
 		if (fabrication$fromPlayerDeath && LoaderItemDespawn.playerDeathDespawn.overshadows(time)) {
+			if (debug) System.out.println("Item is from player death; playerDeathDespawn overshadows: "+LoaderItemDespawn.playerDeathDespawn);
 			time = LoaderItemDespawn.playerDeathDespawn;
 		}
 		if (time == ParsedTime.UNSET) {
+			if (debug) System.out.println("Time is unset, using default");
 			time = thrower == null ? LoaderItemDespawn.dropsDespawn : LoaderItemDespawn.defaultDespawn;
 		}
+		if (debug) System.out.println("Final time: "+time);
 		fabrication$invincible = false;
 		if (time == ParsedTime.FOREVER) {
 			fabrication$extraTime = 0;
