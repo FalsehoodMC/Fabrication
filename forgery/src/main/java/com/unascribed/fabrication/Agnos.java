@@ -21,6 +21,7 @@ import cpw.mods.modlauncher.TransformingClassLoader;
 import net.minecraft.block.Block;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands.EnvironmentType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tags.ITag;
@@ -33,11 +34,11 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.common.ForgeTagHandler;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
-import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLLoader;
@@ -60,8 +61,8 @@ public final class Agnos {
 	}
 	
 	public static void runForCommandRegistration(CommandRegistrationCallback r) {
-		MinecraftForge.EVENT_BUS.addListener((FMLServerAboutToStartEvent e) -> {
-			r.register(e.getServer().getCommandManager().getDispatcher(), e.getServer().isDedicatedServer());
+		MinecraftForge.EVENT_BUS.addListener((RegisterCommandsEvent e) -> {
+			r.register(e.getDispatcher(), e.getEnvironment() == EnvironmentType.DEDICATED);
 		});
 	}
 	
