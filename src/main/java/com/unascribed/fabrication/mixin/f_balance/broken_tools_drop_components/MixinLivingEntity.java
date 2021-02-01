@@ -24,12 +24,14 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
@@ -61,13 +63,6 @@ public abstract class MixinLivingEntity extends Entity {
 		stack.getTag().putBoolean("fabrication:ShatteredAlready", true);
 		List<ItemStack> enchantables = Lists.newArrayList();
 		for (ItemMaterialValue imv : LoaderGearComponents.items.get(Resolvable.mapKey(Registry.ITEM.getId(item), Registry.ITEM))) {
-			MaterialData md = LoaderGearComponents.materials.get(imv.materialName);
-			if (md == null) continue;
-			Item ingot = md.ingotGetter.get();
-			Item nugget = md.nuggetGetter.get();
-			int nuggetsPerIngot = md.nuggetsPerIngot;
-			double value = imv.valueInIngots;
-			int valueInNuggets = (int)(value*nuggetsPerIngot);
 			double dropChance = 1;
 			Object self = this;
 			if (self instanceof MobEntity) {
@@ -76,41 +71,58 @@ public abstract class MixinLivingEntity extends Entity {
 				if (dropChance <= 0) continue;
 			}
 			double dropRate = imv.ignoreDropRate ? 1 : LoaderGearComponents.dropRate.getAsDouble();
-			int nuggetsToReturn = (int)(valueInNuggets*(dropRate*dropChance));
-			if (!imv.ignoreDropRate) {
-				nuggetsToReturn -= LoaderGearComponents.cheat;
-			}
-			if (nuggetsToReturn <= 0) continue;
-			if (ingot != null) {
-				int guaranteed = LoaderGearComponents.guaranteedIngots;
-				int maxIngotsToReturn = nuggetsToReturn/nuggetsPerIngot;
-				int ingotsToReturn;
-				if (maxIngotsToReturn <= 0) {
-					ingotsToReturn = 0;
-				} else if (guaranteed >= maxIngotsToReturn) {
-					ingotsToReturn = maxIngotsToReturn;
-				} else {
-					ingotsToReturn = world.random.nextInt(maxIngotsToReturn+1-guaranteed)+guaranteed;
+			if (imv.materialName.equals("xp")) {
+				int xpAmt = (int)Math.round(imv.valueInIngots*(dropRate*dropChance));
+				Vec3d c = getBoundingBox().getCenter();
+				while (xpAmt > 0) {
+					int thisOrb = ExperienceOrbEntity.roundToOrbSize(xpAmt);
+					xpAmt -= thisOrb;
+					world.spawnEntity(new ExperienceOrbEntity(world, c.x, c.y, c.z, thisOrb));
 				}
-				nuggetsToReturn -= ingotsToReturn * nuggetsPerIngot;
-				if (imv.enchant && stack.hasEnchantments()) {
-					for (int i = 0; i < ingotsToReturn; i++) {
-						enchantables.add(new ItemStack(ingot));
+			} else {
+				MaterialData md = LoaderGearComponents.materials.get(imv.materialName);
+				if (md == null) continue;
+				Item ingot = md.ingotGetter.get();
+				Item nugget = md.nuggetGetter.get();
+				int nuggetsPerIngot = md.nuggetsPerIngot;
+				double value = imv.valueInIngots;
+				int valueInNuggets = (int)(value*nuggetsPerIngot);
+				int nuggetsToReturn = (int)(valueInNuggets*(dropRate*dropChance));
+				if (!imv.ignoreDropRate) {
+					nuggetsToReturn -= LoaderGearComponents.cheat;
+				}
+				if (nuggetsToReturn <= 0) continue;
+				if (ingot != null) {
+					int guaranteed = LoaderGearComponents.guaranteedIngots;
+					int maxIngotsToReturn = nuggetsToReturn/nuggetsPerIngot;
+					int ingotsToReturn;
+					if (maxIngotsToReturn <= 0) {
+						ingotsToReturn = 0;
+					} else if (guaranteed >= maxIngotsToReturn) {
+						ingotsToReturn = maxIngotsToReturn;
+					} else {
+						ingotsToReturn = world.random.nextInt(maxIngotsToReturn+1-guaranteed)+guaranteed;
 					}
-				} else {
-					for (int i = 0; i < ingotsToReturn; i++) {
-						dropItem(ingot);
+					nuggetsToReturn -= ingotsToReturn * nuggetsPerIngot;
+					if (imv.enchant && stack.hasEnchantments()) {
+						for (int i = 0; i < ingotsToReturn; i++) {
+							enchantables.add(new ItemStack(ingot));
+						}
+					} else {
+						for (int i = 0; i < ingotsToReturn; i++) {
+							dropItem(ingot);
+						}
 					}
 				}
-			}
-			if (nugget != null) {
-				if (imv.enchant && stack.hasEnchantments()) {
-					for (int i = 0; i < nuggetsToReturn; i++) {
-						enchantables.add(new ItemStack(nugget));
-					}
-				} else {
-					for (int i = 0; i < nuggetsToReturn; i++) {
-						dropItem(nugget);
+				if (nugget != null) {
+					if (imv.enchant && stack.hasEnchantments()) {
+						for (int i = 0; i < nuggetsToReturn; i++) {
+							enchantables.add(new ItemStack(nugget));
+						}
+					} else {
+						for (int i = 0; i < nuggetsToReturn; i++) {
+							dropItem(nugget);
+						}
 					}
 				}
 			}

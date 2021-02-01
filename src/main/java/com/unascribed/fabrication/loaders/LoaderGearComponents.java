@@ -128,6 +128,10 @@ public class LoaderGearComponents implements ConfigLoader {
 				String id = k.substring(11);
 				String namespace = id.contains(":") ? id.substring(0, id.indexOf(':')) : "minecraft";
 				String name = id.substring(id.indexOf(':')+1);
+				if (name.equals("xp")) {
+					FabLog.warn(k+" is not a valid material definition (xp is a reserved name) at "+config.getBlame(k));
+					continue;
+				}
 				List<String> split = SPACE_SPLITTER.splitToList(v);
 				if (split.size() < 2) {
 					FabLog.warn(k+" is not a valid material definition (got "+v+" which only has "+split.size()+" elements, need 2 or 3) at "+config.getBlame(k));
@@ -170,7 +174,7 @@ public class LoaderGearComponents implements ConfigLoader {
 			}
 		}
 		for (Map.Entry<Resolvable<Item>, ItemMaterialValue> en : items.entries()) {
-			if (!materials.containsKey(en.getValue().materialName)) {
+			if (!materials.containsKey(en.getValue().materialName) && !"xp".equals(en.getValue().materialName)) {
 				FabLog.warn("Unknown material name "+en.getValue().materialName+" in drops for item "+en.getKey().getId());
 			}
 		}
