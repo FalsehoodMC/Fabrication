@@ -29,9 +29,11 @@ dependencies {
 
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	modImplementation "io.github.cottonmc:cotton-client-commands:1.0.1+1.16-rc1"
-	modImplementation "io.github.prospector:modmenu:1.14.6+build.31"
+	modImplementation "io.github.prospector:modmenu:1.16.1"
 	
-	modImplementation include("com.github.Queerbric:pridelib:v1.0.0")
+	modImplementation(include("com.github.Queerbric:pridelib:v1.0.0")) {
+		transitive = false
+	}
 	
 	modRuntime("com.github.SuperCoder7979:databreaker:715b589") {
 		exclude module: "fabric-loader"

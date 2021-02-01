@@ -23,8 +23,13 @@ public abstract class MixinItemEntity {
 	
 	@Inject(at=@At("HEAD"), method="method_27314(F)F", cancellable=true)
 	public void getRotation(float partialTicks, CallbackInfoReturnable<Float> ci) {
-		if (MixinConfigPlugin.isEnabled("*.billboard_drops") && FlatItems.hasGeneratedModel(getStack())) {
-			ci.setReturnValue((float)Math.toRadians((-MinecraftClient.getInstance().gameRenderer.getCamera().getYaw())+180));
+		if (MixinConfigPlugin.isEnabled("*.billboard_drops")) {
+			// 0.5f exactly indicates re-entrancy by the compass sprite; calling hasGeneratedModel
+			// will result in a stack overflow. this exact value will not be produced even if the
+			// framerate is exactly 40.0 due to float inaccuracy, so it's a safe check
+			if (partialTicks == 0.5f || FlatItems.hasGeneratedModel(getStack())) {
+				ci.setReturnValue((float)Math.toRadians((-MinecraftClient.getInstance().gameRenderer.getCamera().getYaw())+180));
+			}
 		}
 	}
 	
