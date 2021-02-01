@@ -12,6 +12,7 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.brigadier.CommandDispatcher;
+import com.terraformersmc.modmenu.gui.ModsScreen;
 import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.FeaturesFile;
@@ -144,7 +145,7 @@ public class FabricationConfigScreen extends Screen {
 	public FabricationConfigScreen(Screen parent) {
 		super(new LiteralText("Fabrication configuration"));
 		this.parent = parent;
-		prideFlag = PrideFlags.isPrideMonth() ? PrideFlags.getRandomFlag() : null;
+		prideFlag = PrideFlags.isPrideMonth() ? PrideFlags.getFlag("demisexual") : null;
 		for (String sec : MixinConfigPlugin.getAllSections()) {
 			SECTION_DESCRIPTIONS.put(sec, FeaturesFile.get(sec).desc);
 		}
@@ -1004,6 +1005,13 @@ public class FabricationConfigScreen extends Screen {
 		} else {
 			client.openScreen(parent);
 		}
+		try {
+			// new modmenu re-uses screen instances aggressively. an individual instance of this
+			// screen is not designed to be (and cannot be) re-used. delete us from the cache.
+			if (parent instanceof ModsScreen) {
+				((ModsScreen)parent).configScreenCache.remove("fabrication");
+			}
+		} catch (Throwable t) {}
 	}
 	
 	@Override
