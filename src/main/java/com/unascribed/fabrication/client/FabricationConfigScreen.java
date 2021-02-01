@@ -145,7 +145,7 @@ public class FabricationConfigScreen extends Screen {
 	public FabricationConfigScreen(Screen parent) {
 		super(new LiteralText("Fabrication configuration"));
 		this.parent = parent;
-		prideFlag = PrideFlags.isPrideMonth() ? PrideFlags.getFlag("demisexual") : null;
+		prideFlag = PrideFlags.isPrideMonth() ? PrideFlags.getRandomFlag() : null;
 		for (String sec : MixinConfigPlugin.getAllSections()) {
 			SECTION_DESCRIPTIONS.put(sec, FeaturesFile.get(sec).desc);
 		}
