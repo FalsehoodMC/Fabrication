@@ -1,8 +1,5 @@
 package com.unascribed.fabrication.client;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -12,14 +9,10 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.apache.commons.lang3.ArrayUtils;
 import org.lwjgl.opengl.GL11;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.brigadier.CommandDispatcher;
 import com.unascribed.fabrication.Agnos;
-import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.FeaturesFile.FeatureEntry;
@@ -31,7 +24,6 @@ import com.unascribed.fabrication.support.ResolvedTrilean;
 import com.unascribed.fabrication.support.Trilean;
 
 import com.google.common.base.CharMatcher;
-import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
@@ -40,8 +32,10 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
+
+import io.github.queerbric.pride.PrideFlag;
+import io.github.queerbric.pride.PrideFlags;
 import io.netty.buffer.Unpooled;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.render.BufferBuilder;
@@ -83,13 +77,6 @@ public class FabricationConfigScreen extends Screen {
 			.build();
 	
 	private static final Identifier BG = new Identifier("fabrication", "bg.png");
-	private static final Identifier PRIDETEX = new Identifier("fabrication", "pride.png");
-	
-	private static final boolean PRIDE = Calendar.getInstance().get(Calendar.MONTH) == Calendar.JUNE
-			|| Boolean.getBoolean("com.unascribed.fabrication.everyMonthIsPrideMonth") || Boolean.getBoolean("fabrication.everyMonthIsPrideMonth")
-			|| System.getProperty("fabrication.pride") != null || System.getProperty("fabrication.iAm") != null || System.getProperty("fabrication.iAmA") != null;
-	private static final List<String> prideIdentifiers = Lists.newArrayList();
-	private static final Map<String, String> prideAliases = Maps.newHashMap();
 	
 	private static long serverLaunchId = -1;
 	
@@ -108,6 +95,8 @@ public class FabricationConfigScreen extends Screen {
 	private final int random = ThreadLocalRandom.current().nextInt();
 	
 	private final Screen parent;
+	
+	private final PrideFlag prideFlag;
 	
 	private float timeExisted;
 	private boolean leaving = false;
@@ -151,56 +140,16 @@ public class FabricationConfigScreen extends Screen {
 	private final List<Runnable> bufferedTooltips = Lists.newArrayList();
 	
 	private int noteIndex = 0;
-	private int fixedPrideFlag = -1;
 	
 	public FabricationConfigScreen(Screen parent) {
 		super(new LiteralText("Fabrication configuration"));
 		this.parent = parent;
-		if (PRIDE && prideIdentifiers.isEmpty()) {
-			try (InputStream is = MinecraftClient.getInstance().getResourceManager().getResource(new Identifier("fabrication", "pride.json")).getInputStream()) {
-				JsonArray arr = new Gson().fromJson(new InputStreamReader(is, Charsets.UTF_8), JsonArray.class);
-				for (JsonElement je : arr) {
-					if (je.isJsonArray()) {
-						JsonArray child = (JsonArray)je;
-						String main = child.get(0).getAsString();
-						prideIdentifiers.add(main);
-						for (int i = 1; i < child.size(); i++) {
-							prideAliases.put(child.get(i).getAsString(), main);
-						}
-					} else {
-						prideIdentifiers.add(je.getAsString());
-					}
-				}
-			} catch (Throwable t) {}
-		}
+		prideFlag = PrideFlags.isPrideMonth() ? PrideFlags.getRandomFlag() : null;
 		for (String sec : MixinConfigPlugin.getAllSections()) {
 			SECTION_DESCRIPTIONS.put(sec, FeaturesFile.get(sec).desc);
 		}
 		for (Profile prof : Profile.values()) {
 			PROFILE_DESCRIPTIONS.put(prof, FeaturesFile.get("general.profile."+prof.name().toLowerCase(Locale.ROOT)).desc);
-		}
-	}
-	
-	@Override
-	public void init(MinecraftClient client, int width, int height) {
-		super.init(client, width, height);
-		String wantedFlag = null;
-		if (System.getProperty("fabrication.pride") != null) {
-			wantedFlag = System.getProperty("fabrication.pride");
-		} else if (System.getProperty("fabrication.iAm") != null) {
-			wantedFlag = System.getProperty("fabrication.iAm");
-		} else if (System.getProperty("fabrication.iAmA") != null) {
-			wantedFlag = System.getProperty("fabrication.iAmA");
-		}
-		if (wantedFlag != null) {
-			wantedFlag = wantedFlag.toLowerCase(Locale.ROOT).replace("-", "");
-			wantedFlag = prideAliases.getOrDefault(wantedFlag, wantedFlag);
-			int idx = prideIdentifiers.indexOf(wantedFlag);
-			if (idx == -1) {
-				FabLog.warn("Don't have a pride flag by the name of "+wantedFlag);
-			} else {
-				fixedPrideFlag = idx;
-			}
 		}
 	}
 	
@@ -320,23 +269,8 @@ public class FabricationConfigScreen extends Screen {
 				top = cutoffY;
 				flagCutoffV = 1-((bottom-top)/h);
 			}
-			if (PRIDE) {
-				client.getTextureManager().bindTexture(PRIDETEX);
-				int flags = 21;
-				int flag = fixedPrideFlag == -1 ? Math.abs(random)%flags : fixedPrideFlag;
-				float minU = (flag/(float)flags)+(0.5f/flags);
-				float maxU = (flag/(float)flags)+(0.75f/flags);
-				
-				float minV = flagCutoffV;
-				float maxV = 1;
-				
-				bb.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE);
-				bb.vertex(mat, brk, top, 0).texture(minU, minV).next();
-				bb.vertex(mat, brk2, top, 0).texture(maxU, minV).next();
-				bb.vertex(mat, brk2, bottom, 0).texture(maxU, maxV).next();
-				bb.vertex(mat, brk, bottom, 0).texture(minU, maxV).next();
-				bb.end();
-				BufferRenderer.draw(bb);
+			if (prideFlag != null) {
+				prideFlag.render(matrices, brk, top, w, bottom-top);
 			} else {
 				GlStateManager.shadeModel(GL11.GL_SMOOTH);
 				GlStateManager.disableTexture();
