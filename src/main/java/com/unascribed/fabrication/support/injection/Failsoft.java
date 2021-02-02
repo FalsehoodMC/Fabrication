@@ -15,18 +15,73 @@ import com.unascribed.fabrication.support.MixinErrorHandler;
 
 public class Failsoft {
 
+	// prevents pointless issue reports
+	public static RuntimeException hideOurselves(RuntimeException t) {
+		try {
+			StackTraceElement[] stackTrace = t.getStackTrace();
+			StackTraceElement[] newStackTrace = t.getStackTrace();
+			if (doctorStack(stackTrace, newStackTrace)) {
+				return new RuntimeException(t.getMessage(), t.getCause(), true, true) {
+					{
+						setStackTrace(newStackTrace);
+						for (Throwable s : t.getSuppressed()) {
+							addSuppressed(s);
+						}
+					}
+					@Override
+					public String toString() {
+						return t.toString();
+					}
+				};
+			}
+		} catch (Throwable ignore) {}
+		return t;
+	}
+	public static Error hideOurselves(Error t) {
+		try {
+			StackTraceElement[] stackTrace = t.getStackTrace();
+			StackTraceElement[] newStackTrace = t.getStackTrace();
+			if (doctorStack(stackTrace, newStackTrace)) {
+				return new Error(t.getMessage(), t.getCause(), true, true) {
+					{
+						setStackTrace(newStackTrace);
+						for (Throwable s : t.getSuppressed()) {
+							addSuppressed(s);
+						}
+					}
+					@Override
+					public String toString() {
+						return t.toString();
+					}
+				};
+			}
+		} catch (Throwable ignore) {}
+		return t;
+	}
+	
+	private static boolean doctorStack(StackTraceElement[] stackTrace, StackTraceElement[] newStackTrace) {
+		boolean needClone = false;
+		for (int i = 0; i < stackTrace.length; i++) {
+			StackTraceElement ste = stackTrace[i];
+			if (ste.getClassName().startsWith("com.unascribed.fabrication.support.injection.")) {
+				newStackTrace[i] = new StackTraceElement("org.spongepowered.asm.mixin.injection.struct.InjectionInfo", "postInject$failsoft", "gist.github.com/517e2d6d4c6a75303721b7e2e995a9f8", -1);
+				needClone = true;
+			}
+		}
+		return needClone;
+	}
 	// identical to InjectionInfo::postInject, but with usages of InjectionError replaced
 	public static boolean postInject(InjectionInfo ii, MixinTargetContext mixin, String description, String extraInfo) {
 		if (!mixin.getClassName().startsWith("com.unascribed.fabrication.mixin.")) {
 			return true;
 		}
-		int expectedCallbackCount = pluck(ii, "expectedCallbackCount");
-		int targetCount = pluck(ii, "targetCount");
-		int injectedCallbackCount = pluck(ii, "injectedCallbackCount");
-		int requiredCallbackCount = pluck(ii, "requiredCallbackCount");
-		int maxCallbackCount = pluck(ii, "maxCallbackCount");
+		int expectedCallbackCount = pluck(InjectionInfo.class, ii, "expectedCallbackCount");
+		int targetCount = pluck(InjectionInfo.class, ii, "targetCount");
+		int injectedCallbackCount = pluck(InjectionInfo.class, ii, "injectedCallbackCount");
+		int requiredCallbackCount = pluck(InjectionInfo.class, ii, "requiredCallbackCount");
+		int maxCallbackCount = pluck(InjectionInfo.class, ii, "maxCallbackCount");
 		
-		for (MethodNode method : (Iterable<MethodNode>)pluck(ii, "injectedMethods")) {
+		for (MethodNode method : (Iterable<MethodNode>)pluck(InjectionInfo.class, ii, "injectedMethods")) {
 			ii.getClassNode().methods.add(method);
 		}
 
@@ -62,19 +117,19 @@ public class Failsoft {
 		}
 	}
 
-	private static <T> T pluck(InjectionInfo ii, String field) {
+	private static <T, C> T pluck(Class<? super C> clazz, C c, String field) {
 		Field f = null;
-		Class<?> clazz = ii.getClass();
-		while (f == null && clazz != null) {
+		Class<?> cursor = clazz;
+		while (f == null && cursor != null) {
 			try {
-				f = clazz.getDeclaredField(field);
+				f = cursor.getDeclaredField(field);
 			} catch (NoSuchFieldException ignore) {}
-			clazz = clazz.getSuperclass();
+			cursor = cursor.getSuperclass();
 		}
 		if (f == null) throw new NoSuchFieldError(field);
 		f.setAccessible(true);
 		try {
-			return (T)f.get(ii);
+			return (T)f.get(c);
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
 		}

@@ -15,6 +15,7 @@ import com.google.common.collect.ImmutableMap;
 public class MixinErrorHandler implements IMixinErrorHandler {
 
 	public static final MixinErrorHandler INST = new MixinErrorHandler();
+	public static boolean actuallyItWasUs = false;
 	
 	@Override
 	public ErrorAction onPrepareError(IMixinConfig config, Throwable th, IMixinInfo mixin, ErrorAction action) {
@@ -47,6 +48,8 @@ public class MixinErrorHandler implements IMixinErrorHandler {
 						MixinConfigPlugin.addFailure(opt);
 					}
 					return ErrorAction.NONE;
+				} else {
+					actuallyItWasUs = true;
 				}
 			}
 		}

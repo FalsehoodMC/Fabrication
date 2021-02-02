@@ -19,7 +19,13 @@ public class FailsoftModifyArgInjectionInfo extends ModifyArgInjectionInfo {
 	@Override
 	public void postInject() {
 		if (Failsoft.postInject(this, mixin, getDescription(), getDynamicInfo() + getMessages())) {
-			super.postInject();
+			try {
+				super.postInject();
+			} catch (Error e) {
+				throw Failsoft.hideOurselves(e);
+			} catch (RuntimeException e) {
+				throw Failsoft.hideOurselves(e);
+			}
 		}
 	}
 
