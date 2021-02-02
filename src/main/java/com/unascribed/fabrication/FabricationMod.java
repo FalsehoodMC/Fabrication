@@ -18,8 +18,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import io.github.queerbric.pride.PrideClient;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketByteBuf;
@@ -87,8 +90,16 @@ public class FabricationMod implements ModInitializer {
 		}
 		MixinConfigPlugin.submitConfigAnalytics();
 		Analytics.submit("game_launch");
+		if (FabRefl.FORGE && Agnos.getCurrentEnv() == Env.CLIENT) {
+			initPrideLib();
+		}
 	}
 	
+	@Environment(EnvType.CLIENT)
+	private void initPrideLib() {
+		new PrideClient().onInitializeClient();
+	}
+
 	public static void featureError(Feature f, Throwable t) {
 		featureError(f.getClass(), f.getConfigKey(), t);
 	}

@@ -1,0 +1,34 @@
+plugins {
+	id 'com.github.johnrengelman.shadow' version '6.1.0'
+	id 'java'
+}
+
+archivesBaseName = "out"
+
+configurations {
+	shadow
+}
+
+repositories {
+	maven {
+		name = "JitPack"
+		url = "https://jitpack.io"
+	}
+}
+
+dependencies {
+	shadow("com.github.Queerbric:pridelib:v1.0.0") {
+		transitive = false
+	}
+}
+
+task shadowHack(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+	from file("in.jar")
+	configurations = [project.configurations.shadow]
+	relocate 'io.github.queerbric', 'com.unascribed.fabrication.repackage.io.github.queerbric'
+	relocate 'net.fabricmc.api.ClientModInitializer', 'com.unascribed.fabrication.compat.ClientModInitializer'
+	relocate 'net.fabricmc.fabric.api.resource.SimpleResourceReloadListener', 'com.unascribed.fabrication.compat.SimpleResourceReloadListener'
+	relocate 'net.fabricmc.loader.api.FabricLoader', 'com.unascribed.fabrication.compat.FabricLoader'
+	exclude 'fabric.mod.json'
+	exclude 'pride.mixins.json'
+}
