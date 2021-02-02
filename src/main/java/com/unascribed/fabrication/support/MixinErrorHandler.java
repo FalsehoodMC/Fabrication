@@ -10,6 +10,7 @@ import com.unascribed.fabrication.Analytics;
 import com.unascribed.fabrication.FabLog;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableMap;
 
 public class MixinErrorHandler implements IMixinErrorHandler {
 
@@ -27,10 +28,17 @@ public class MixinErrorHandler implements IMixinErrorHandler {
 		
 	public ErrorAction onError(Throwable th, IMixinInfo mixin, ErrorAction action, String verb) {
 		if (mixin.getClassName().startsWith("com.unascribed.fabrication.")) {
-			Analytics.submit("mixin_failure",
-					"targets", Joiner.on(",").join(mixin.getTargetClasses()),
-					"message", th.getMessage(),
-					"mixin", mixin.getClassName());
+			String msg = th.getMessage();
+			String msg1 = msg.length() > 200 ? msg.substring(0, 200) : msg;
+			String msg2 = msg.length() > 400 ? msg.substring(200, 400) : msg.length() > 200 ? msg.substring(200) : "";
+			String msg3 = msg.length() > 400 ? msg.substring(400) : "";
+			Analytics.submit("mixin_failure", ImmutableMap.<String, String>of(
+					"Targets", Joiner.on(",").join(mixin.getTargetClasses()),
+					"Message1", msg1,
+					"Message2", msg2,
+					"Message3", msg3,
+					"Mixin", mixin.getClassName()
+				));
 			if (action == ErrorAction.ERROR) {
 				Set<String> keys = MixinConfigPlugin.getConfigKeysForDiscoveredClass(mixin.getClassName());
 				if (!keys.isEmpty()) {

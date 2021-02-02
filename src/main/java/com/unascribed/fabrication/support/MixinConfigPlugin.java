@@ -194,10 +194,11 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	private static final Set<String> failures = Sets.newHashSet();
 	private static final Set<String> failuresReadOnly = Collections.unmodifiableSet(failures);
 	private static final SetMultimap<String, String> configKeysForDiscoveredClasses = HashMultimap.create();
+	private static boolean analyticsSafe = false;
 	
 	public static void submitConfigAnalytics() {
-		Analytics.submit("load_config_features",
-				"contents", rawConfig.toString());
+		Analytics.submitConfig();
+		analyticsSafe = true;
 	}
 	
 	public static String remap(String configKey) {
@@ -308,6 +309,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		}
 		if ("general.data_upload".equals(configKey) && "true".equals(newValue)) {
 			Analytics.submit("enable_analytics");
+			submitConfigAnalytics();
 		}
 		Path configFile = Agnos.getConfigDir().resolve("fabrication").resolve("features.ini");
 		Stopwatch watch = Stopwatch.createStarted();
@@ -449,6 +451,9 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 				FabLog.warn("Failed to transform configuration file", e);
 			}
 		});
+		if (analyticsSafe) {
+			submitConfigAnalytics();
+		}
 		for (ConfigLoader ldr : loaders) {
 			load(ldr);
 		}
@@ -462,8 +467,6 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		FabLog.timeAndCountWarnings("Loading of "+name+".ini", () -> {
 			try {
 				QDIni qd = QDIni.load(file);
-				Analytics.submit("load_config_"+name,
-						"contents", qd.toString());
 				qd.setYapLog(FabLog::warn);
 				ldr.load(dir, qd, false);
 			} catch (SyntaxErrorException e) {

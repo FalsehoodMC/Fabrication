@@ -86,6 +86,7 @@ public class FabricationMod implements ModInitializer {
 			OOF = Agnos.registerSoundEvent(new Identifier("fabrication", "oof"), new SoundEvent(new Identifier("fabrication", "oof")));
 		}
 		MixinConfigPlugin.submitConfigAnalytics();
+		Analytics.submit("game_launch");
 	}
 	
 	public static void featureError(Feature f, Throwable t) {

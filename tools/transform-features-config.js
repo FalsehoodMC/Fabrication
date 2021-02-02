@@ -35,6 +35,8 @@ lines.forEach((line) => {
 				val = "true";
 			} else if (k === "general.reduced_motion") {
 				val = "false";
+			} else if (k === "general.data_upload") {
+				val = "false";
 			}
 			desc = child.spawnSync('fold', ['-s', '-w', 78-(leadingTabs*8)], {input: desc}).stdout.toString('utf8');
 			desc = desc.replace(/\r?\n\*(.*?)\r?\n([^*].*?)/g, "\n*$1\n  $2");
