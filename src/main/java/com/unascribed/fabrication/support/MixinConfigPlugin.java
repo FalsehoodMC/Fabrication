@@ -307,11 +307,13 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		} else {
 			config.put(configKey, Trilean.parseTrilean(newValue));
 		}
-		if ("general.data_upload".equals(configKey) && "true".equals(newValue)) {
-			Analytics.submit("enable_analytics");
-			submitConfigAnalytics();
-		} else {
-			Analytics.deleteId();
+		if ("general.data_upload".equals(configKey)) {
+			if ("true".equals(newValue)) {
+				Analytics.submit("enable_analytics");
+				submitConfigAnalytics();
+			} else {
+				Analytics.deleteId();
+			}
 		}
 		Path configFile = Agnos.getConfigDir().resolve("fabrication").resolve("features.ini");
 		Stopwatch watch = Stopwatch.createStarted();
