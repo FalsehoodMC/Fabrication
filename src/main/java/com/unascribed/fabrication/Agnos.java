@@ -102,6 +102,7 @@ public final class Agnos {
 	}
 	
 	public static String getModVersion() {
+		if (FabRefl.DEV) return "DEV";
 		return FabricLoader.getInstance().getModContainer("fabrication").get().getMetadata().getVersion().getFriendlyString();
 	}
 	
@@ -114,6 +115,10 @@ public final class Agnos {
 			FabLog.warn("Failed to look up "+clazz, e);
 			return null;
 		}
+	}
+
+	public static String getLoaderVersion() {
+		return FabricLoader.getInstance().getModContainer("fabricloader").get().getMetadata().getVersion().getFriendlyString();
 	}
 	
 }

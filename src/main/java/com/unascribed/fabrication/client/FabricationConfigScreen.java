@@ -733,6 +733,8 @@ public class FabricationConfigScreen extends Screen {
 				y = drawTrilean(matrices, "general.runtime_checks", rchecks.name, rchecks.desc, y, mouseX, mouseY);
 				FeatureEntry rmot = FeaturesFile.get("general.reduced_motion");
 				y = drawTrilean(matrices, "general.reduced_motion", rmot.name, rmot.desc, y, mouseX, mouseY, CLIENT_ONLY);
+				FeatureEntry dup = FeaturesFile.get("general.data_upload");
+				y = drawTrilean(matrices, "general.data_upload", dup.name, dup.desc, y, mouseX, mouseY);
 			} else {
 				for (Map.Entry<String, FeatureEntry> en : FeaturesFile.getAll().entrySet()) {
 					if (en.getKey().startsWith(section+".")) {

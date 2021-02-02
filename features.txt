@@ -77,17 +77,17 @@ general.reduced_motion
 	desc:
 		Disables high-motion animations in the Fabrication config screen.
 
-#general.data_upload
-#	name: Data Upload
-#	since: 1.3.2
-#	meta: true
-#	desc:
-#		Enables submitting anonymous data to a self-hosted privacy-respecting Matomo instance run by
-#		unascribed. The data submitted is your Minecraft version, what loader you're using, the
-#		contents of your config files *minus comments*, and any mixins that failed to apply.
-#		
-#		Please enable this to give me insight into what features people use, how they use them, and
-#		what features conflict.
+general.data_upload
+	name: Data Upload
+	since: 1.3.2
+	meta: true
+	desc:
+		Enables submitting anonymous data to a self-hosted privacy-respecting Matomo instance run by
+		unascribed. The data submitted is your Minecraft version, what loader you're using, the
+		contents of your config files *minus comments*, and any mixins that failed to apply.
+		
+		Please enable this to give me insight into what features people use, how they use them, and
+		what features conflict.
 
 general.profile
 	name: Profile

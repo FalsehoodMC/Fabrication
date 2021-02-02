@@ -60,8 +60,8 @@ import net.minecraft.util.Identifier;
 
 public class FabRefl {
 
-	private static final boolean DEV;
-	private static final boolean FORGE;
+	public static final boolean DEV;
+	public static final boolean FORGE;
 	static {
 		boolean devTmp;
 		boolean forgeTmp;

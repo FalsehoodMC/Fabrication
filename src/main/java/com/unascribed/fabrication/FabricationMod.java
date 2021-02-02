@@ -85,6 +85,7 @@ public class FabricationMod implements ModInitializer {
 			LEVELUP_LONG = Agnos.registerSoundEvent(new Identifier("fabrication", "levelup_long"), new SoundEvent(new Identifier("fabrication", "levelup_long")));
 			OOF = Agnos.registerSoundEvent(new Identifier("fabrication", "oof"), new SoundEvent(new Identifier("fabrication", "oof")));
 		}
+		MixinConfigPlugin.submitConfigAnalytics();
 	}
 	
 	public static void featureError(Feature f, Throwable t) {

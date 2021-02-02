@@ -44,6 +44,7 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.versions.forge.ForgeVersion;
 
 // Forge implementation of Agnos. For linguistic and philosophical waffling, see the Fabric version.
 public final class Agnos {
@@ -146,6 +147,10 @@ public final class Agnos {
 			LogManager.getLogger("Fabrication").warn("Failed to look up "+clazz, t);
 			return null;
 		}
+	}
+	
+	public static String getLoaderVersion() {
+		return ForgeVersion.getVersion();
 	}
 
 }

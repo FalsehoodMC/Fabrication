@@ -5,6 +5,8 @@ import java.util.Set;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfig;
 import org.spongepowered.asm.mixin.extensibility.IMixinErrorHandler;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
+
+import com.unascribed.fabrication.Analytics;
 import com.unascribed.fabrication.FabLog;
 
 import com.google.common.base.Joiner;
@@ -25,6 +27,10 @@ public class MixinErrorHandler implements IMixinErrorHandler {
 		
 	public ErrorAction onError(Throwable th, IMixinInfo mixin, ErrorAction action, String verb) {
 		if (mixin.getClassName().startsWith("com.unascribed.fabrication.")) {
+			Analytics.submit("mixin_failure",
+					"targets", Joiner.on(",").join(mixin.getTargetClasses()),
+					"message", th.getMessage(),
+					"mixin", mixin.getClassName());
 			if (action == ErrorAction.ERROR) {
 				Set<String> keys = MixinConfigPlugin.getConfigKeysForDiscoveredClass(mixin.getClassName());
 				if (!keys.isEmpty()) {

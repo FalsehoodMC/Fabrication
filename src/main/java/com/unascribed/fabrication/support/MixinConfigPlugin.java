@@ -30,6 +30,7 @@ import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 import org.spongepowered.asm.mixin.injection.struct.InjectionInfo;
 import com.unascribed.fabrication.Agnos;
+import com.unascribed.fabrication.Analytics;
 import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.QDIni;
 import com.unascribed.fabrication.QDIni.BadValueException;
@@ -75,13 +76,15 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			"woina.janky_arm",
 			"woina.flat_items",
 			"woina.billboard_drops",
-			"woina.oof"
+			"woina.oof",
+			"general.data_upload"
 	);
 	private static final ImmutableSet<String> NON_TRILEANS = ImmutableSet.of(
 			"general.profile"
 	);
 	private static final ImmutableSet<String> RUNTIME_CONFIGURABLE = ImmutableSet.of(
 			"general.reduced_motion",
+			"general.data_upload",
 			"minor_mechanics.feather_falling_five_damages_boots",
 			"minor_mechanics.observers_see_entities_living_only"
 	);
@@ -192,6 +195,11 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	private static final Set<String> failuresReadOnly = Collections.unmodifiableSet(failures);
 	private static final SetMultimap<String, String> configKeysForDiscoveredClasses = HashMultimap.create();
 	
+	public static void submitConfigAnalytics() {
+		Analytics.submit("load_config_features",
+				"contents", rawConfig.toString());
+	}
+	
 	public static String remap(String configKey) {
 		return starMap.getOrDefault(configKey, configKey);
 	}
@@ -297,6 +305,9 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			defaults = defaultsByProfile.get(profile);
 		} else {
 			config.put(configKey, Trilean.parseTrilean(newValue));
+		}
+		if ("general.data_upload".equals(configKey) && "true".equals(newValue)) {
+			Analytics.submit("enable_analytics");
 		}
 		Path configFile = Agnos.getConfigDir().resolve("fabrication").resolve("features.ini");
 		Stopwatch watch = Stopwatch.createStarted();
@@ -451,6 +462,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		FabLog.timeAndCountWarnings("Loading of "+name+".ini", () -> {
 			try {
 				QDIni qd = QDIni.load(file);
+				Analytics.submit("load_config_"+name,
+						"contents", qd.toString());
 				qd.setYapLog(FabLog::warn);
 				ldr.load(dir, qd, false);
 			} catch (SyntaxErrorException e) {
