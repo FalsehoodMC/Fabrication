@@ -47,6 +47,15 @@ public class Analytics {
 	private static long last = -1;
 	private static long first = -1;
 	
+	public static void deleteId() {
+		userId = null;
+		last = -1;
+		first = -1;
+		timerFile().delete();
+		userIdFile().delete();
+		FabLog.info("Analytics user ID deleted due to opt-out");
+	}
+	
 	public static void submit(String action) {
 		submit(action, Collections.emptyMap());
 	}
@@ -64,7 +73,7 @@ public class Analytics {
 				params.put("_idts", Long.toString(first));
 				params.put("_viewts", Long.toString(last));
 				params.put("url", "https://unascribed.com/fabrication");
-				params.put("idsite", "1");
+				params.put("idsite", "2");
 				params.put("rec", "1");
 				params.put("apiv", "1");
 				params.put("action_name", action);
@@ -118,7 +127,7 @@ public class Analytics {
 					ResolvedTrilean rt = MixinConfigPlugin.getResolvedValue(key);
 					requests.add("?_id="+userId+"&_idts="+first+"&_viewts="+last+
 							"&url=https://unascribed.com/fabrication/value/"+rt.value+
-							"&idsite=1&rec=1&apiv=1&action_name="+ue.escape(key)+"&cookie=0"+
+							"&idsite=2&rec=1&apiv=1&action_name="+ue.escape(key)+"&cookie=0"+
 							"&cvar="+ue.escape("{\"1\":[\"By Profile\",\""+(rt.trilean == Trilean.UNSET ? "Yes" : "No")+"\"]}"));
 				}
 				JsonObject body = new JsonObject();
@@ -141,16 +150,28 @@ public class Analytics {
 		});
 	}
 	
+	private static File userHome() {
+		return new File(System.getProperty("user.home"));
+	}
+	
+	private static File timerFile() {
+		return new File(userHome(), ".fabrication-timer");
+	}
+	
+	private static File userIdFile() {
+		return new File(userHome(), ".fabrication-user-id");
+	}
+	
 	private static void touch() {
-		File timerFile = new File(new File(System.getProperty("user.home")), ".fabrication-timer");
+		File timerFile = timerFile();
 		last = System.currentTimeMillis()/1000L;
 		timerFile.setLastModified(System.currentTimeMillis());
 	}
 	
 	private static void ensureUserIdPresent() {
-		File timerFile = new File(new File(System.getProperty("user.home")), ".fabrication-timer");
+		File timerFile = timerFile();
 		if (userId == null) {
-			File userIdFile = new File(new File(System.getProperty("user.home")), ".fabrication-user-id");
+			File userIdFile = userIdFile();
 			if (!timerFile.exists()) {
 				try {
 					timerFile.createNewFile();
@@ -172,6 +193,7 @@ public class Analytics {
 			}
 			if (needGenerate) {
 				userId = BaseEncoding.base16().encode(SecureRandom.getSeed(8));
+				FabLog.info("Analytics user ID created: "+userId);
 				try {
 					Files.write(userId, userIdFile, Charsets.UTF_8);
 				} catch (IOException e) {
@@ -248,5 +270,5 @@ public class Analytics {
 		}
 		return new Gson().toJson(extraJson);
 	}
-	
+
 }

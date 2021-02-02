@@ -85,8 +85,8 @@ general.data_upload
 		Enables submitting anonymous data to a self-hosted privacy-respecting Matomo instance run by
 		unascribed. The following data is submitted: Fabrication version, Minecraft version,
 		Forge/Fabric version, Java version, approximate window aspect ratio, OpenGL version,
-		selected language, operating system name (no version), your selected profile, and current
-		status of all features.
+		selected language, operating system name (no version), your selected profile, current
+		status of all features, and any mixin failures.
 		
 		Please enable this to give me insight into what features people use, what features conflict,
 		and to help inform development decisions based on version information.

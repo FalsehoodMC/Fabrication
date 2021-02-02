@@ -310,6 +310,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		if ("general.data_upload".equals(configKey) && "true".equals(newValue)) {
 			Analytics.submit("enable_analytics");
 			submitConfigAnalytics();
+		} else {
+			Analytics.deleteId();
 		}
 		Path configFile = Agnos.getConfigDir().resolve("fabrication").resolve("features.ini");
 		Stopwatch watch = Stopwatch.createStarted();
