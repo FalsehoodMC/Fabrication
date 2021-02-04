@@ -17,12 +17,13 @@ import java.util.Optional;
 
 @Mixin(ExplosionBehavior.class)
 @EligibleIf(configEnabled="*.underwater_explosions")
-public abstract class MixinExplosionBehavior  {
+public abstract class MixinExplosionBehavior {
 
-	@Inject(method = "getBlastResistance", at=@At(value = "HEAD"), cancellable = true)
-	public void getBlastResistance(Explosion explosion, BlockView world, BlockPos pos, BlockState blockState, FluidState fluidState, CallbackInfoReturnable<Optional<Float>> cir) {
-		if (MixinConfigPlugin.isEnabled("*.underwater_explosions")&& !fluidState.isEmpty())
-				cir.setReturnValue(Optional.empty());
+	@Inject(at=@At(value="HEAD"), method="getBlastResistance(Lnet/minecraft/world/explosion/Explosion;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/fluid/FluidState;)Ljava/util/Optional;", cancellable=true)
+	public void getBlastResistance(Explosion explosion, BlockView world, BlockPos pos, BlockState blockState, FluidState fluidState, CallbackInfoReturnable<Optional<Float>> ci) {
+		if (MixinConfigPlugin.isEnabled("*.underwater_explosions") && !fluidState.isEmpty()) {
+			ci.setReturnValue(Optional.empty());
+		}
 	}
 
 }
