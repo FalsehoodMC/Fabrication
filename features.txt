@@ -1447,6 +1447,7 @@ experiments.packed_atlases
 	since: 1.2.8
 	sides: client_only
 	desc:
-		Disables rounding of atlases to the next power-of-two. GPU drivers have supported "NPOT" textures since forever.
+		Disables rounding of atlases to the next power-of-two. GPU drivers have supported "NPOT"
+		textures since forever.
 		
 		Possibly reduces VRAM usage. May reduce performance. Might cause incompatibilites.
