@@ -1258,12 +1258,12 @@ weird_tweaks.photoresistant_mobs
 		Mobs don't burn in sunlight.
 
 weird_tweaks.underwater_explosions
-        name: Underwater Explosions
-        since: 1.3.2
-        sides: server_only
-        endorsed: false
-        desc:
-                TNT and other explosives do block damage even underwater.
+	name: Underwater Explosions
+	since: 1.3.2
+	sides: server_only
+	endorsed: false
+	desc:
+		TNT and other explosives do block damage even underwater.
 
 woina
 	name: What's Old Is New Again
