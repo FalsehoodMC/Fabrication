@@ -54,6 +54,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
+import com.google.common.io.BaseEncoding;
 import com.google.common.io.MoreFiles;
 import com.google.common.io.Resources;
 import com.google.common.reflect.ClassPath;
@@ -139,7 +140,9 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	static {
 		setMet(SpecialEligibility.EVENTS_AVAILABLE, Agnos.eventsAvailable());
 		try {
-			Class.forName("net.fabricmc.loader.api.FabricLoader");
+			// net.fabricmc.loader.api.FabricLoader
+			// base64-encoded so that Shadow doesn't pick up on it and mess up the check
+			Class.forName(new String(BaseEncoding.base64().decode("bmV0LmZhYnJpY21jLmxvYWRlci5hcGkuRmFicmljTG9hZGVy"), Charsets.UTF_8));
 			setMet(SpecialEligibility.NOT_FORGE, true);
 		} catch (Throwable t) {
 			setMet(SpecialEligibility.FORGE, true);
