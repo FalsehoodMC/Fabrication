@@ -1265,6 +1265,14 @@ weird_tweaks.underwater_explosions
 	desc:
 		TNT and other explosives do block damage even underwater.
 
+weird_tweaks.instant_pickup
+	name: Instant Pickup
+	since: 1.3.2
+	sides: server_only
+	desc:
+		Drops from blocks and entities are instantly placed in your inventory if there's room. This
+		is animated and everything.
+
 woina
 	name: What's Old Is New Again
 	short_name: W.O.I.N.A.
@@ -1451,3 +1459,12 @@ experiments.packed_atlases
 		textures since forever.
 		
 		Possibly reduces VRAM usage. May reduce performance. Might cause incompatibilites.
+
+experiments.no_set_window_pos
+	name: No Set Window Pos
+	since: 1.3.2
+	sides: client_only
+	desc:
+		Prevents the game from manually modifying the window position. So if you have custom configs
+		or something that memorizes window positions, they will be honored instead of the window
+		always being centered.

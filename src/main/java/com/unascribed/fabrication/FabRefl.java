@@ -46,6 +46,7 @@ import net.minecraft.command.EntitySelector;
 import net.minecraft.command.argument.ItemStackArgument;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.ai.goal.FleeEntityGoal;
 import net.minecraft.entity.mob.MobEntity;
@@ -215,6 +216,16 @@ public class FabRefl {
 	public static int getColor(DyeColor subject) {
 		try {
 			return (int)checkHandle(dc_color).invokeExact(subject);
+		} catch (Throwable t) {
+			throw rethrow(t);
+		}
+	}
+	
+	private static final MethodHandle ie_pickupDelay = unreflectGetter(ItemEntity.class, "pickupDelay", "field_7202", "field_145804_b")
+			.requiredBy("*.instant_pickup").get();
+	public static int getPickupDelay(ItemEntity subject) {
+		try {
+			return (int)checkHandle(ie_pickupDelay).invokeExact(subject);
 		} catch (Throwable t) {
 			throw rethrow(t);
 		}
