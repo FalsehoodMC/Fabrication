@@ -498,6 +498,7 @@ utility.mob_ids
 	name: Mob IDs
 	since: 1.3.2
 	sides: client_only
+	media: https://unascribed.com/fabrication/mob_ids.mp4
 	desc:
 		Makes entities show their entity ID as a nametag in Creative when F3 is up. Originally a
 		vanilla feature; was removed in Beta 1.8 as nametags are visible through walls and it was
@@ -1262,6 +1263,7 @@ weird_tweaks.underwater_explosions
 	since: 1.3.2
 	sides: server_only
 	endorsed: false
+	media: https://unascribed.com/fabrication/underwater_explosions.mp4
 	desc:
 		TNT and other explosives do block damage even underwater.
 
@@ -1269,6 +1271,7 @@ weird_tweaks.instant_pickup
 	name: Instant Pickup
 	since: 1.3.2
 	sides: server_only
+	media: https://unascribed.com/fabrication/instant_pickup.mp4
 	desc:
 		Drops from blocks and entities are instantly placed in your inventory if there's room. This
 		is animated and everything.
