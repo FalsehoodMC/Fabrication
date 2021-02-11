@@ -1005,6 +1005,7 @@ mechanics.pursurvers
 	name: Pursurvers
 	since: 1.3.2
 	sides: server_only
+	media: https://unascribed.com/fabrication/pursurvers.mp4
 	desc:
 		Adds "Pursurvers", observers with a Purpur block next to them, that can detect left-clicks
 		on their watched block.

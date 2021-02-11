@@ -30,8 +30,8 @@ public abstract class MixinLivingEntity extends Entity {
 	
 	@Inject(at=@At("TAIL"), method="onDeath(Lnet/minecraft/entity/damage/DamageSource;)V")
 	public void onDeath(DamageSource src, CallbackInfo ci) {
-		if (MixinConfigPlugin.isEnabled("*.instant_pickup") && attackingPlayer != null) {
-			InstantPickup.slurp(world, getBoundingBox().expand(0.25), attackingPlayer);
+		if (MixinConfigPlugin.isEnabled("*.instant_pickup") && src.getSource() instanceof PlayerEntity) {
+			InstantPickup.slurp(world, getBoundingBox().expand(0.25), (PlayerEntity)src.getSource());
 		}
 	}
 	

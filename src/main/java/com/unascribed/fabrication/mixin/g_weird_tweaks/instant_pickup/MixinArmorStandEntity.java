@@ -28,8 +28,8 @@ public abstract class MixinArmorStandEntity extends LivingEntity {
 	
 	@Inject(at=@At("TAIL"), method="onBreak(Lnet/minecraft/entity/damage/DamageSource;)V")
 	private void onBreak(DamageSource src, CallbackInfo ci) {
-		if (MixinConfigPlugin.isEnabled("*.instant_pickup") && src.getAttacker() instanceof PlayerEntity) {
-			InstantPickup.slurp(world, getBoundingBox().expand(0.25), (PlayerEntity)src.getAttacker());
+		if (MixinConfigPlugin.isEnabled("*.instant_pickup") && src.getSource() instanceof PlayerEntity) {
+			InstantPickup.slurp(world, getBoundingBox().expand(0.25), (PlayerEntity)src.getSource());
 		}
 	}
 	
