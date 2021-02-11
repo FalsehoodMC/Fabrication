@@ -10,8 +10,6 @@ import com.unascribed.fabrication.loaders.LoaderDimensionalTools.NameSubstitutio
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Feature;
-import com.unascribed.fabrication.support.SpecialEligibility;
-
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
@@ -26,7 +24,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Language;
 
-@EligibleIf(configEnabled="*.dimensional_tools", specialConditions=SpecialEligibility.EVENTS_AVAILABLE)
+@EligibleIf(configEnabled="*.dimensional_tools")
 public class FeatureDimensionalTools implements Feature {
 
 	private static final NumberFormat format = NumberFormat.getNumberInstance();

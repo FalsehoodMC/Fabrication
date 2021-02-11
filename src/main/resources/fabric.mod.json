@@ -28,10 +28,14 @@
 
   "depends": {
     "fabricloader": ">=0.7.4",
-    "minecraft": ">=1.16"
+    "minecraft": ">=1.16",
+    "fabric-resource-loader-v0": "*",
+    "fabric-command-api-v1": "*",
+    "fabric-key-binding-api-v1": "*",
+    "fabric-rendering-v1": "*",
+    "fablabs-client-command-api-v1": "*",
+    "pride": "*"
   },
   "suggests": {
-    "cotton-client-commands": "^1.0.0",
-    "fabric": "*"
   }
 }

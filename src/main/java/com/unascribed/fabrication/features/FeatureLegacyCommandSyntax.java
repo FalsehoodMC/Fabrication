@@ -19,8 +19,6 @@ import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
-import com.unascribed.fabrication.support.SpecialEligibility;
-
 import com.google.common.collect.Iterables;
 import com.google.common.primitives.Ints;
 
@@ -37,7 +35,7 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.level.ServerWorldProperties;
 
-@EligibleIf(configEnabled="*.legacy_command_syntax", specialConditions=SpecialEligibility.EVENTS_AVAILABLE)
+@EligibleIf(configEnabled="*.legacy_command_syntax")
 public class FeatureLegacyCommandSyntax implements Feature {
 
 	private boolean applied = false;

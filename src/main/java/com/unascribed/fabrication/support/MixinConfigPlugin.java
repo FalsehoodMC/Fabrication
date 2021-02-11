@@ -138,7 +138,6 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	private static final List<ConfigLoader> loaders = Lists.newArrayList();
 	
 	static {
-		setMet(SpecialEligibility.EVENTS_AVAILABLE, Agnos.eventsAvailable());
 		try {
 			// net.fabricmc.loader.api.FabricLoader
 			// base64-encoded so that Shadow doesn't pick up on it and mess up the check

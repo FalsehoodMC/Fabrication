@@ -9,8 +9,6 @@ import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
-import com.unascribed.fabrication.support.SpecialEligibility;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.sound.SoundCategory;
@@ -18,7 +16,7 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 
 @Mixin(ClientWorld.class)
-@EligibleIf(configEnabled="*.long_levelup_sound_at_30", envMatches=Env.CLIENT, specialConditions=SpecialEligibility.EVENTS_AVAILABLE)
+@EligibleIf(configEnabled="*.long_levelup_sound_at_30", envMatches=Env.CLIENT)
 public class MixinClientWorld {
 
 	@Inject(at=@At("HEAD"), method="playSound(DDDLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FFZ)V", cancellable=true)

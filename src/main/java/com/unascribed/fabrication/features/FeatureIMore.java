@@ -12,8 +12,6 @@ import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
-import com.unascribed.fabrication.support.SpecialEligibility;
-
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.argument.EntityArgumentType;
@@ -34,7 +32,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.registry.Registry;
 
-@EligibleIf(configEnabled="*.i_and_more", specialConditions=SpecialEligibility.EVENTS_AVAILABLE)
+@EligibleIf(configEnabled="*.i_and_more")
 public class FeatureIMore implements Feature {
 
 	private boolean applied = false;

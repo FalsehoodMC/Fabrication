@@ -19,9 +19,9 @@ if [ "$canforgery" == "1" ]; then
 	tmp=$(mktemp -d)
 	forgeryIn="$tmp/forgery-in.jar"
 	echo Processing JIJ dependencies...
-	zip -d "$fabrication" META-INF/jars/*
 	unzip -p "$fabrication" fabric.mod.json > forgery/shadow/fabric.mod.json
 	cp "$fabrication" forgery/shadow/in.jar
+	zip -d forgery/shadow/in.jar META-INF/jars/*
 	cd forgery/shadow
 	./gradlew clean shadowHack
 	cp fabric.mod.json build/libs

@@ -13,8 +13,6 @@ import com.unascribed.fabrication.interfaces.SetFabricationConfigAware;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
-import com.unascribed.fabrication.support.SpecialEligibility;
-
 import com.google.common.collect.Lists;
 
 import io.netty.buffer.Unpooled;
@@ -31,7 +29,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
 
-@EligibleIf(configEnabled="*.hide_armor", specialConditions=SpecialEligibility.EVENTS_AVAILABLE)
+@EligibleIf(configEnabled="*.hide_armor")
 public class FeatureHideArmor implements Feature {
 
 	private static final EquipmentSlot[] ALL_ARMOR = {EquipmentSlot.FEET, EquipmentSlot.LEGS, EquipmentSlot.CHEST, EquipmentSlot.HEAD};

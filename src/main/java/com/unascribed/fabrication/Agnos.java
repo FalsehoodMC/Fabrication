@@ -13,17 +13,13 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.tag.TagRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.launch.common.FabricLauncherBase;
-import net.minecraft.block.Block;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.tag.Tag;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -69,14 +65,6 @@ public final class Agnos {
 		return Registry.register(Registry.SOUND_EVENT, id, soundEvent);
 	}
 	
-	public static Tag<Block> registerBlockTag(Identifier id) {
-		return TagRegistry.block(id);
-	}
-
-	public static Tag<Item> registerItemTag(Identifier id) {
-		return TagRegistry.item(id);
-	}
-	
 	@Environment(EnvType.CLIENT)
 	public static KeyBinding registerKeyBinding(KeyBinding kb) {
 		KeyBindingHelper.registerKeyBinding(kb);
@@ -84,7 +72,7 @@ public final class Agnos {
 	}
 	
 	public static boolean eventsAvailable() {
-		return FabricLoader.getInstance().isModLoaded("fabric");
+		return true;
 	}
 
 	public static Path getConfigDir() {

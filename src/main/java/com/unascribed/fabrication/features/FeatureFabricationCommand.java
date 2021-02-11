@@ -17,16 +17,14 @@ import com.mojang.brigadier.context.CommandContext;
 import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.Cardinal;
 import com.unascribed.fabrication.FabLog;
-import com.unascribed.fabrication.FabricationClientCommands;
 import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.FeaturesFile.Sides;
+import com.unascribed.fabrication.client.FabricationModClient;
 import com.unascribed.fabrication.PlayerTag;
 import com.unascribed.fabrication.interfaces.TaggablePlayer;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
-import com.unascribed.fabrication.support.SpecialEligibility;
-import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin.Profile;
 
 import com.google.common.base.Charsets;
@@ -61,7 +59,6 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.ChunkStatus;
 
-@EligibleIf(specialConditions=SpecialEligibility.EVENTS_AVAILABLE)
 public class FeatureFabricationCommand implements Feature {
 	
 	@Override
@@ -381,12 +378,12 @@ public class FeatureFabricationCommand implements Feature {
 		if (c.getSource() instanceof ServerCommandSource) {
 			((ServerCommandSource)c.getSource()).sendFeedback(text, broadcast);
 		} else {
-			sendFeedbackCotton(c, text);
+			sendFeedbackClient(c, text);
 		}
 	}
 
-	private static void sendFeedbackCotton(CommandContext<? extends CommandSource> c, LiteralText text) {
-		FabricationClientCommands.sendFeedback(c, text);
+	private static void sendFeedbackClient(CommandContext<? extends CommandSource> c, LiteralText text) {
+		FabricationModClient.sendFeedback(c, text);
 	}
 
 	private int clearTags(CommandContext<ServerCommandSource> c, Collection<ServerPlayerEntity> players) {
