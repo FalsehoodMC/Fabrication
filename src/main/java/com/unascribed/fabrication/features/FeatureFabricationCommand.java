@@ -17,10 +17,10 @@ import com.mojang.brigadier.context.CommandContext;
 import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.Cardinal;
 import com.unascribed.fabrication.FabLog;
+import com.unascribed.fabrication.FabricationClientCommands;
 import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.FeaturesFile.Sides;
-import com.unascribed.fabrication.client.FabricationModClient;
 import com.unascribed.fabrication.PlayerTag;
 import com.unascribed.fabrication.interfaces.TaggablePlayer;
 import com.unascribed.fabrication.support.Feature;
@@ -383,7 +383,7 @@ public class FeatureFabricationCommand implements Feature {
 	}
 
 	private static void sendFeedbackClient(CommandContext<? extends CommandSource> c, LiteralText text) {
-		FabricationModClient.sendFeedback(c, text);
+		FabricationClientCommands.sendFeedback(c, text);
 	}
 
 	private int clearTags(CommandContext<ServerCommandSource> c, Collection<ServerPlayerEntity> players) {
