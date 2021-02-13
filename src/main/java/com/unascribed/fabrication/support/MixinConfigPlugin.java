@@ -79,6 +79,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			"woina.flat_items",
 			"woina.billboard_drops",
 			"woina.oof",
+			"woina.no_experience",
 			"general.data_upload"
 	);
 	private static final ImmutableSet<String> NON_TRILEANS = ImmutableSet.of(

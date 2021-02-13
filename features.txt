@@ -1399,6 +1399,14 @@ woina.oof
 		player-specific rather than replacing the generic fleshy damage sound, so it won't result
 		in random things Oof-ing.
 
+woina.no_experience
+	name: No Experience
+	since: 1.3.3
+	sides: server_only_with_client_helper
+	endorsed: false
+	desc:
+		Removes experience. Anvils become free and enchanting only costs lapis.
+
 pedantry
 	name: Pedantry
 	since: 1.0.1
