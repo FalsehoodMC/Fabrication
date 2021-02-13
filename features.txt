@@ -1467,7 +1467,7 @@ situational.disable_elytra
 	since: 1.3.3
 	sides: server_only
 	desc:
-		Prevents equipping Elytra, and therefore using them to glide.
+		Prevents using Elytra.
 
 experiments
 	name: Experiments
