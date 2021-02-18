@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.FabricationMod;
+import com.unascribed.fabrication.features.FeatureHideArmor;
 import com.unascribed.fabrication.interfaces.SetFabricationConfigAware;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 
@@ -40,6 +41,9 @@ public class MixinServerPlayNetworkHandler {
 				if (player instanceof SetFabricationConfigAware) {
 					((SetFabricationConfigAware)player).fabrication$setConfigAware(true);
 					FabricationMod.sendConfigUpdate(player.server, null, player);
+					if (MixinConfigPlugin.isEnabled("*.hide_armor")) {
+						FeatureHideArmor.sendSuppressedSlotsForSelf(player);
+					}
 				}
 			} else if (id == 1) {
 				// set
