@@ -9,16 +9,14 @@ import com.unascribed.fabrication.features.FeatureHideArmor;
 import com.unascribed.fabrication.interfaces.GetSuppressedSlots;
 import com.unascribed.fabrication.support.EligibleIf;
 
-import net.minecraft.network.Packet;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.ChunkPos;
 
 @Mixin(ServerPlayerEntity.class)
 @EligibleIf(configEnabled="*.hide_armor")
 public abstract class MixinServerPlayerEntity {
 
-	@Inject(at=@At("TAIL"), method="sendInitialChunkPackets(Lnet/minecraft/util/math/ChunkPos;Lnet/minecraft/network/Packet;Lnet/minecraft/network/Packet;)V")
-	public void sendInitialChunkPackets(ChunkPos pos, Packet<?> pkt1, Packet<?> pkt2, CallbackInfo ci) {
+	@Inject(at=@At("TAIL"), method="onSpawn()V")
+	public void onSpawn(CallbackInfo ci) {
 		FeatureHideArmor.sendSuppressedSlotsForSelf((ServerPlayerEntity)(Object)this);
 	}
 	
