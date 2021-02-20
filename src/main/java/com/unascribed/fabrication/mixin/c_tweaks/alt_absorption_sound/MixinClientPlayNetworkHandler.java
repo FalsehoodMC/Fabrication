@@ -20,7 +20,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 
 @Mixin(ClientPlayNetworkHandler.class)
-@EligibleIf(configEnabled="*.sync_attacker_yaw", envMatches=Env.CLIENT)
+@EligibleIf(configEnabled="*.alt_absorption_sound", envMatches=Env.CLIENT)
 public class MixinClientPlayNetworkHandler {
 	
 	@Shadow @Final
