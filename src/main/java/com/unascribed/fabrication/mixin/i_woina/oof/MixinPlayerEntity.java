@@ -16,7 +16,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 
-@Mixin(PlayerEntity.class)
+@Mixin(value=PlayerEntity.class, priority=1050)
 @EligibleIf(configEnabled="*.oof", envMatches=Env.CLIENT)
 public abstract class MixinPlayerEntity {
 

@@ -1,5 +1,6 @@
 package com.unascribed.fabrication;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -50,6 +51,7 @@ public class FabricationMod implements ModInitializer {
 	
 	public static SoundEvent LEVELUP_LONG;
 	public static SoundEvent OOF;
+	public static SoundEvent ABSORPTION_HURT;
 	
 	@Override
 	public void onInitialize() {
@@ -84,9 +86,16 @@ public class FabricationMod implements ModInitializer {
 				throw new RuntimeException("Failed to initialize feature "+s, e);
 			}
 		}
-		if (MixinConfigPlugin.getValue("*.long_levelup_sound_at_30") != Trilean.FALSE && Agnos.eventsAvailable() && Agnos.getCurrentEnv() == Env.CLIENT) {
-			LEVELUP_LONG = Agnos.registerSoundEvent(new Identifier("fabrication", "levelup_long"), new SoundEvent(new Identifier("fabrication", "levelup_long")));
-			OOF = Agnos.registerSoundEvent(new Identifier("fabrication", "oof"), new SoundEvent(new Identifier("fabrication", "oof")));
+		if (Agnos.eventsAvailable() && Agnos.getCurrentEnv() == Env.CLIENT) {
+			if (MixinConfigPlugin.getValue("*.long_levelup_sound_at_30") != Trilean.FALSE) {
+				LEVELUP_LONG = Agnos.registerSoundEvent(new Identifier("fabrication", "levelup_long"), new SoundEvent(new Identifier("fabrication", "levelup_long")));
+			}
+			if (MixinConfigPlugin.getValue("*.oof") != Trilean.FALSE) {
+				OOF = Agnos.registerSoundEvent(new Identifier("fabrication", "oof"), new SoundEvent(new Identifier("fabrication", "oof")));
+			}
+			if (MixinConfigPlugin.getValue("*.alt_absorption_sound") != Trilean.FALSE) {
+				ABSORPTION_HURT = Agnos.registerSoundEvent(new Identifier("fabrication", "absorption_hurt"), new SoundEvent(new Identifier("fabrication", "absorption_hurt")));
+			}
 		}
 		MixinConfigPlugin.submitConfigAnalytics();
 		Analytics.submit("game_launch");
@@ -141,14 +150,18 @@ public class FabricationMod implements ModInitializer {
 		}
 	}
 	
-	public static void sendToTrackersMatching(Entity entity, CustomPayloadS2CPacket pkt, Predicate<ServerPlayerEntity> predicate) {
-		if (entity.world.isClient) return;
+	public static Set<ServerPlayerEntity> getTrackers(Entity entity) {
 		ServerChunkManager cm = ((ServerWorld)entity.world).getChunkManager();
 		ThreadedAnvilChunkStorage tacs = cm.threadedAnvilChunkStorage;
 		Int2ObjectMap<EntityTracker> entityTrackers = FabRefl.getEntityTrackers(tacs);
 		EntityTracker tracker = entityTrackers.get(entity.getEntityId());
-		if (tracker == null) return;
-		Set<ServerPlayerEntity> playersTracking = FabRefl.getPlayersTracking(tracker);
+		if (tracker == null) return Collections.emptySet();
+		return FabRefl.getPlayersTracking(tracker);
+	}
+	
+	public static void sendToTrackersMatching(Entity entity, CustomPayloadS2CPacket pkt, Predicate<ServerPlayerEntity> predicate) {
+		if (entity.world.isClient) return;
+		Set<ServerPlayerEntity> playersTracking = getTrackers(entity);
 		if (entity instanceof ServerPlayerEntity) {
 			ServerPlayerEntity spe = (ServerPlayerEntity)entity;
 			if (predicate.test(spe)) {

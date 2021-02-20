@@ -1,4 +1,5 @@
 package com.unascribed.fabrication;
+
 public enum Cardinal {
 	NORTH( 0,-1),
 	EAST ( 1, 0),

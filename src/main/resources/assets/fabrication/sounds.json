@@ -10,5 +10,11 @@
 			"fabrication:oof"
 		],
 		"subtitle": "subtitles.entity.player.hurt"
+	},
+	"absorption_hurt": {
+		"sounds": [
+			"fabrication:absorption_hurt"
+		],
+		"subtitle": "Player absorps"
 	}
 }
