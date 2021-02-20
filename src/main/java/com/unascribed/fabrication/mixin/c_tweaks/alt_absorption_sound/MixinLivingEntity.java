@@ -5,11 +5,11 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.FabricationMod;
+import com.unascribed.fabrication.interfaces.DidJustAbsorp;
 import com.unascribed.fabrication.interfaces.SetFabricationConfigAware;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
@@ -29,7 +29,7 @@ import net.minecraft.world.World;
 
 @Mixin(LivingEntity.class)
 @EligibleIf(configEnabled="*.alt_absorption_sound")
-public abstract class MixinLivingEntity extends Entity {
+public abstract class MixinLivingEntity extends Entity implements DidJustAbsorp {
 	
 	public MixinLivingEntity(EntityType<?> type, World world) {
 		super(type, world);
@@ -55,17 +55,9 @@ public abstract class MixinLivingEntity extends Entity {
 		fabrication$absorptionAmountBeforeDamage = getAbsorptionAmount();
 	}
 	
-	@Redirect(at=@At(value="INVOKE", target="net/minecraft/world/World.sendEntityStatus(Lnet/minecraft/entity/Entity;B)V"),
-			method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z")
-	public void sendEntityStatus(World subject, Entity entity, byte status) {
-		if (MixinConfigPlugin.isEnabled("*.alt_absorption_sound")) {
-			if (status == 2 || status == 33 || status == 36 || status == 37 || status == 44) {
-				if (getAbsorptionAmount() < fabrication$absorptionAmountBeforeDamage && fabrication$absorptionAmountBeforeDamage >= lastDamageTaken && (entity instanceof ServerPlayerEntity)) {
-					return;
-				}
-			}
-		}
-		subject.sendEntityStatus(entity, status);
+	@Override
+	public boolean fabrication$didJustAbsorp() {
+		return getAbsorptionAmount() < fabrication$absorptionAmountBeforeDamage && fabrication$absorptionAmountBeforeDamage >= lastDamageTaken;
 	}
 	
 	@Inject(at=@At("HEAD"), method="playHurtSound(Lnet/minecraft/entity/damage/DamageSource;)V",
@@ -73,8 +65,7 @@ public abstract class MixinLivingEntity extends Entity {
 	public void playHurtSound(DamageSource src, CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.alt_absorption_sound")) return;
 		Object self = this;
-		if (getAbsorptionAmount() < fabrication$absorptionAmountBeforeDamage && fabrication$absorptionAmountBeforeDamage >= lastDamageTaken && (self instanceof ServerPlayerEntity)) {
-			ServerPlayerEntity selfp = (ServerPlayerEntity)self;
+		if (fabrication$didJustAbsorp()) {
 			PacketByteBuf data = new PacketByteBuf(Unpooled.buffer(4));
 			data.writeInt(getEntityId());
 			CustomPayloadS2CPacket fabPkt = new CustomPayloadS2CPacket(new Identifier("fabrication", "play_absorp_sound"), data);
@@ -87,10 +78,13 @@ public abstract class MixinLivingEntity extends Entity {
 					spe.networkHandler.sendPacket(vanPkt);
 				}
 			}
-			if (selfp instanceof SetFabricationConfigAware && ((SetFabricationConfigAware) selfp).fabrication$isConfigAware()) {
-				selfp.networkHandler.sendPacket(fabPkt);
-			} else if (vanPkt != null) {
-				selfp.networkHandler.sendPacket(vanPkt);
+			if (self instanceof ServerPlayerEntity) {
+				ServerPlayerEntity selfp = (ServerPlayerEntity)self;
+				if (selfp instanceof SetFabricationConfigAware && ((SetFabricationConfigAware) selfp).fabrication$isConfigAware()) {
+					selfp.networkHandler.sendPacket(fabPkt);
+				} else if (vanPkt != null) {
+					selfp.networkHandler.sendPacket(vanPkt);
+				}
 			}
 			ci.cancel();
 		}
