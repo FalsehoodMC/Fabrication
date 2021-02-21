@@ -1300,6 +1300,13 @@ weird_tweaks.instant_pickup
 		Drops from blocks and entities are instantly placed in your inventory if there's room. This
 		is animated and everything.
 
+weird_tweaks.endermen_dont_grief
+	name: Endermen Don't Grief
+	since: 1.3.4
+	sides: server_only
+	desc:
+		Endermen no longer place or pickup blocks.
+
 woina
 	name: What's Old Is New Again
 	short_name: W.O.I.N.A.
