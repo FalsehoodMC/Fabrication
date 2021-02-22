@@ -54,13 +54,11 @@ public abstract class MixinSheepEntity extends AnimalEntity {
 	public boolean damage(DamageSource source, float amount) {
 		if (MixinConfigPlugin.isEnabled("*.old_sheep_shear") && this.isShearable() && source.getAttacker() instanceof PlayerEntity) {
 			this.setSheared(true);
-			int i = 1 + this.random.nextInt(3);
-
-			for(int j = 0; j < i; ++j) {
-				ItemEntity itemEntity = this.dropItem(DROPS.get(this.getColor()), 1);
-				if (itemEntity != null) {
-					itemEntity.setVelocity(itemEntity.getVelocity().add((this.random.nextFloat() - this.random.nextFloat()) * 0.1F, this.random.nextFloat() * 0.05F, (this.random.nextFloat() - this.random.nextFloat()) * 0.1F));
-				}
+			ItemStack wool = DROPS.get(this.getColor()).asItem().getDefaultStack();
+			wool.setCount(1 + this.random.nextInt(3));
+			ItemEntity itemEntity = this.dropStack(wool, 1);
+			if (itemEntity != null) {
+				itemEntity.setVelocity(itemEntity.getVelocity().add((this.random.nextFloat() - this.random.nextFloat()) * 0.1F, this.random.nextFloat() * 0.05F, (this.random.nextFloat() - this.random.nextFloat()) * 0.1F));
 			}
 		}
 		return super.damage(source, amount);
