@@ -1191,6 +1191,13 @@ balance.spawners_always_tick
 		make use of spawners that are close together, but not quite close enough to all be activated
 		at the same time.
 
+balance.loading_furnace_minecart
+	name: ChunkLoading Furnace Minecart
+	since: 1.3.4
+	sides: server_only
+	desc:
+		Makes furnace minecarts load chunks if they have fuel.
+
 weird_tweaks
 	name: Weird Tweaks
 	since: 1.0
