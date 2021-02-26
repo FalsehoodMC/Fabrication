@@ -70,6 +70,9 @@ public class ParsedTime {
 	
 	public static ParsedTime parse(String time) {
 		Preconditions.checkNotNull(time);
+		if (time.isEmpty()) {
+			throw new IllegalArgumentException("Timespec cannot be blank");
+		}
 		boolean priority = false;
 		if (time.endsWith("!")) {
 			priority = true;
