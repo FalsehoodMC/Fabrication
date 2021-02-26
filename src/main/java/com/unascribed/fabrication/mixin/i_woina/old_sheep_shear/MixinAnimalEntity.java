@@ -25,7 +25,7 @@ public abstract class MixinAnimalEntity extends PassiveEntity {
 		super(entityType, world);
 	}
 
-	@Inject(at=@At("HEAD"), method="damage", cancellable = true)
+	@Inject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", cancellable = true)
 	public void damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
 		Object self = this;
 		if (self instanceof SheepEntity && MixinConfigPlugin.isEnabled("*.old_sheep_shear") && ((SheepEntity)self).isShearable() && source.getAttacker() instanceof PlayerEntity) {
