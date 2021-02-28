@@ -12,9 +12,9 @@ import com.unascribed.fabrication.FabLog;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 
-public class MixinErrorHandler implements IMixinErrorHandler {
+public class MixinErrorHandler_THIS_ERROR_HANDLER_IS_FOR_SOFT_FAILURE_IN_FABRICATION_ITSELF_AND_DOES_NOT_IMPLY_FABRICATION_IS_RESPONSIBLE_FOR_THE_BELOW_ERROR implements IMixinErrorHandler {
 
-	public static final MixinErrorHandler INST = new MixinErrorHandler();
+	public static final MixinErrorHandler_THIS_ERROR_HANDLER_IS_FOR_SOFT_FAILURE_IN_FABRICATION_ITSELF_AND_DOES_NOT_IMPLY_FABRICATION_IS_RESPONSIBLE_FOR_THE_BELOW_ERROR INST = new MixinErrorHandler_THIS_ERROR_HANDLER_IS_FOR_SOFT_FAILURE_IN_FABRICATION_ITSELF_AND_DOES_NOT_IMPLY_FABRICATION_IS_RESPONSIBLE_FOR_THE_BELOW_ERROR();
 	public static boolean actuallyItWasUs = false;
 	
 	@Override
