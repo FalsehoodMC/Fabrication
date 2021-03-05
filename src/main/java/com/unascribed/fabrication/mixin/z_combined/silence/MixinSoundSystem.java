@@ -20,9 +20,11 @@ public class MixinSoundSystem {
 		if (si != null && si.getId().getNamespace().equals("minecraft")) {
 			if (MixinConfigPlugin.isEnabled("*.disable_equip_sound") && si.getId().getPath().equals("item.armor.equip_generic")) {
 				ci.cancel();
-			} else if (MixinConfigPlugin.isEnabled("*.endermen_dont_squeal") && si.getId().getPath().equals("entity.enderman.scream") || si.getId().getPath().equals("entity.enderman.stare")) {
+			} else if (MixinConfigPlugin.isEnabled("*.endermen_dont_squeal") && (si.getId().getPath().equals("entity.enderman.scream") || si.getId().getPath().equals("entity.enderman.stare"))) {
 				ci.cancel();
-			} else if (MixinConfigPlugin.isEnabled("*.silent_minecarts") && si.getId().getPath().equals("entity.minecart.inside") || si.getId().getPath().equals("entity.minecart.riding")) {
+			} else if (MixinConfigPlugin.isEnabled("*.silent_minecarts") && (si.getId().getPath().equals("entity.minecart.inside") || si.getId().getPath().equals("entity.minecart.riding"))) {
+				ci.cancel();
+			} else if (MixinConfigPlugin.isEnabled("*.disable_bees") && (si.getId().getPath().startsWith("entity.bee.") || si.getId().getPath().startsWith("block.beehive."))) {
 				ci.cancel();
 			}
 		}

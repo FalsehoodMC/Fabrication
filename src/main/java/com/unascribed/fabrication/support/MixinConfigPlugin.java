@@ -68,7 +68,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			"balance.food_always_edible",
 			"weird_tweaks.photoallergic_creepers",
 			"weird_tweaks.photoresistant_mobs",
-			"weird_tweaks.underwater_explosions"
+			"weird_tweaks.underwater_explosions",
+			"woina.old_sheep_shear"
 	);
 	private static final ImmutableSet<String> NEVER_DEFAULT_EXCEPT_BURNT = ImmutableSet.of(
 			"minor_mechanics.spiders_cant_climb_while_wet"

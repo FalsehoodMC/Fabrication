@@ -1434,6 +1434,7 @@ woina.old_sheep_shear
 	name: Old Sheep Shear
 	since: 1.3.4
 	sides: server_only
+	endorsed: false
 	desc:
 		Sheep drop wool when punched.
 
@@ -1506,6 +1507,18 @@ situational.disable_elytra
 	sides: server_only
 	desc:
 		Prevents using Elytra.
+
+situational.disable_bees
+	name: Disable Bees
+	since: 1.3.4
+	sides: either
+	desc:
+		Prevents bee nests generating. Also disables all bee sounds.
+		
+		Useful if you have a bee phobia. Makes honey inaccessible; you may want a datapack to make
+		it accessible again, and/or to make empty bee nests craftable for decor.
+		
+		Does not delete existing bee nests or bee entities; only fully effective in a new world.
 
 experiments
 	name: Experiments
