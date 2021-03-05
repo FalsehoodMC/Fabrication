@@ -81,7 +81,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			"woina.billboard_drops",
 			"woina.oof",
 			"woina.no_experience",
-			"general.data_upload"
+			"general.data_upload",
+			"balance.loading_furnace_minecart"
 	);
 	private static final ImmutableSet<String> NON_TRILEANS = ImmutableSet.of(
 			"general.profile"

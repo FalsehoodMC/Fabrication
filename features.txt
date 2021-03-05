@@ -1195,6 +1195,7 @@ balance.loading_furnace_minecart
 	name: ChunkLoading Furnace Minecart
 	since: 1.3.4
 	sides: server_only
+	endorsed: false
 	desc:
 		Makes furnace minecarts load chunks if they have fuel.
 
