@@ -11,6 +11,7 @@ public class InstantPickup {
 
 	public static void slurp(World world, Box box, PlayerEntity breaker) {
 		for (ItemEntity ie : world.getEntitiesByType(EntityType.ITEM, box, (e) -> ((Entity)e).age == 0)) {
+			if (!ie.isAlive()) continue;
 			int oldPickupDelay = FabRefl.getPickupDelay(ie);
 			ie.setPickupDelay(0);
 			ie.onPlayerCollision(breaker);
