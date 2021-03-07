@@ -1513,6 +1513,7 @@ situational.disable_bees
 	name: Disable Bees
 	since: 1.3.4
 	sides: either
+	short_desc: Disables bee nest generation and all bee sounds
 	desc:
 		Prevents bee nests generating. Also disables all bee sounds.
 		

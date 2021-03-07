@@ -21,7 +21,8 @@ import net.minecraft.world.gen.tree.BeehiveTreeDecorator;
 @EligibleIf(configEnabled="*.disable_bees")
 public class MixinBeehiveTreeDecorator {
 
-	@Inject(at=@At("HEAD"), method="generate(Lnet/minecraft/world/StructureWorldAccess;Ljava/util/Random;Ljava/util/List;Ljava/util/List;Ljava/util/Set;Lnet/minecraft/util/math/BlockBox;)V")
+	@Inject(at=@At("HEAD"), method="generate(Lnet/minecraft/world/StructureWorldAccess;Ljava/util/Random;Ljava/util/List;Ljava/util/List;Ljava/util/Set;Lnet/minecraft/util/math/BlockBox;)V",
+			cancellable=true)
 	public void generate(StructureWorldAccess world, Random random, List<BlockPos> logPositions, List<BlockPos> leavesPositions, Set<BlockPos> placedStates, BlockBox box, CallbackInfo ci) {
 		if (MixinConfigPlugin.isEnabled("*.disable_bees")) {
 			ci.cancel();
