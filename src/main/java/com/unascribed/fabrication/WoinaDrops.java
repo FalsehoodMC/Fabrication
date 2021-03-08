@@ -7,6 +7,7 @@ import java.nio.IntBuffer;
 import java.util.Random;
 
 import org.lwjgl.opengl.ARBCopyImage;
+import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.system.MemoryStack;
@@ -90,7 +91,7 @@ public class WoinaDrops {
 								SpriteAtlasTexture atlas = MinecraftClient.getInstance().getBakedModelManager().method_24153(new Identifier("textures/atlas/blocks.png"));
 								GlStateManager.bindTexture(atlas.getGlId());
 								int maxLevel = GL11.glGetTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LEVEL);
-								if (maxLevel == 0) {
+								if (maxLevel == 0 || !GL.getCapabilities().GL_ARB_copy_image) {
 									int w = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_WIDTH);
 									int h = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_HEIGHT);
 									ByteBuffer dest = MemoryUtil.memAlloc(w*h*4);
