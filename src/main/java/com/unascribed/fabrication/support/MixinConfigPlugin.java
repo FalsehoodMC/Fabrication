@@ -552,12 +552,15 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		reload();
 		RUNTIME_CHECKS_WAS_ENABLED = isEnabled("general.runtime_checks");
 		Mixins.registerErrorHandlerClass("com.unascribed.fabrication.support.MixinErrorHandler_THIS_ERROR_HANDLER_IS_FOR_SOFT_FAILURE_IN_FABRICATION_ITSELF_AND_DOES_NOT_IMPLY_FABRICATION_IS_RESPONSIBLE_FOR_THE_BELOW_ERROR");
+		FabLog.warn("Fabrication is about to inject into Mixin to add support for failsoft mixins.");
+		FabLog.warn("THE FOLLOWING WARNINGS ARE NOT AN ERROR AND DO NOT IMPLY FABRICATION IS RESPONSIBLE FOR A CRASH.");
 		InjectionInfo.register(FailsoftCallbackInjectionInfo.class);
 		InjectionInfo.register(FailsoftModifyArgInjectionInfo.class);
 		InjectionInfo.register(FailsoftModifyArgsInjectionInfo.class);
 		InjectionInfo.register(FailsoftRedirectInjectionInfo.class);
 		InjectionInfo.register(FailsoftModifyVariableInjectionInfo.class);
 		InjectionInfo.register(FailsoftModifyConstantInjectionInfo.class);
+		FabLog.warn("Injection complete.");
 	}
 
 	@Override
