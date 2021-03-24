@@ -169,6 +169,10 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 				}
 			}
 			if (stack.hasTag()) {
+				if (stack.hasCustomName() && LoaderItemDespawn.renamedDespawn.overshadows(time)) {
+					if (debug) System.out.println("Item is renamed; renamedDespawn overshadows: "+LoaderItemDespawn.renamedDespawn);
+					time = LoaderItemDespawn.renamedDespawn;
+				}
 				for (Map.Entry<String, ParsedTime> en : LoaderItemDespawn.nbtBools.entrySet()) {
 					if (stack.getTag().getBoolean(en.getKey())) {
 						if (en.getValue().overshadows(time)) {

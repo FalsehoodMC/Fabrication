@@ -27,6 +27,7 @@ public class LoaderItemDespawn implements ConfigLoader {
 	
 	public static ParsedTime defaultDespawn = ParsedTime.UNSET;
 	public static ParsedTime dropsDespawn = ParsedTime.UNSET;
+	public static ParsedTime renamedDespawn = ParsedTime.UNSET;
 	public static ParsedTime playerDeathDespawn = ParsedTime.UNSET;
 	
 	@Override
@@ -45,6 +46,7 @@ public class LoaderItemDespawn implements ConfigLoader {
 		treasureDespawn = ParsedTime.getFrom(config, "@enchantments.@treasure");
 		defaultDespawn = ParsedTime.getFrom(config, "@special.default");
 		dropsDespawn = ParsedTime.getFrom(config, "@special.drops");
+		renamedDespawn = ParsedTime.getFrom(config, "@special.renamed");
 		playerDeathDespawn = ParsedTime.getFrom(config, "@special.player_death");
 		for (String k : config.keySet()) {
 			ParsedTime time = ParsedTime.getFrom(config, k);
