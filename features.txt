@@ -504,6 +504,16 @@ utility.mob_ids
 		vanilla feature; was removed in Beta 1.8 as nametags are visible through walls and it was
 		a bit cheaty in Survival.
 
+utility.toggle_sprint
+	name: Toggle Sprint
+	since: 1.3.5
+	sides: client_only
+	needs: events
+	desc:
+		Adds a "Toggle Sprint" keybind.
+		Vanilla has an accessibility option to make the existing Sneak key work as a toggle,
+		but it can be useful to have a hold and toggle button at the same time.
+
 tweaks
 	name: Tweaks
 	since: 1.0
