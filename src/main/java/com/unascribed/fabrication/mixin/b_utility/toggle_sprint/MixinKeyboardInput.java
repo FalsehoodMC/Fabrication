@@ -4,7 +4,6 @@ import com.unascribed.fabrication.features.FeatureToggleSprint;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
-import net.minecraft.client.input.KeyboardInput;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.options.KeyBinding;
 import org.spongepowered.asm.mixin.Mixin;

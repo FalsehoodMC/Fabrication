@@ -1,22 +1,12 @@
 package com.unascribed.fabrication.features;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.unascribed.fabrication.Agnos;
-import com.unascribed.fabrication.client.FabricationConfigScreen;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Feature;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.client.util.Window;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Identifier;
-
-import java.util.Locale;
 
 @EligibleIf(configEnabled="*.toggle_sprint", envMatches=Env.CLIENT)
 public class FeatureToggleSprint implements Feature {
@@ -51,7 +41,7 @@ public class FeatureToggleSprint implements Feature {
 
 	@Override
 	public String getConfigKey() {
-		return "*.toggle_stance";
+		return "*.toggle_sprint";
 	}
 	
 }
