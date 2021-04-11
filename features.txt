@@ -510,9 +510,10 @@ utility.toggle_sprint
 	sides: client_only
 	needs: events
 	desc:
-		Adds a "Toggle Sprint" keybind.
-		Vanilla has an accessibility option to make the existing Sneak key work as a toggle,
-		but it can be useful to have a hold and toggle button at the same time.
+		Adds a "Toggle/Hold Sprint" keybind.
+		Vanilla has an accessibility option to make the Sneak key work as a toggle,
+		since it can be useful to have a hold and toggle button at the same time
+		this keybind will take the other mode of the accessibility setting.
 
 tweaks
 	name: Tweaks
