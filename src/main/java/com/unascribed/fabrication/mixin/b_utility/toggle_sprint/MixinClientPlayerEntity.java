@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(ClientPlayerEntity.class)
 @EligibleIf(configEnabled="*.toggle_sprint", envMatches=Env.CLIENT)
-public class MixinKeyboardInput {
+public class MixinClientPlayerEntity {
 
 	@Redirect(at=@At(value = "INVOKE", target = "Lnet/minecraft/client/options/KeyBinding;isPressed()Z"), method="tickMovement()V")
 	public boolean isPressed(KeyBinding keyBinding) {
