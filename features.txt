@@ -1439,6 +1439,13 @@ woina.old_sheep_shear
 	desc:
 		Sheep drop wool when punched.
 
+woina.no_sprint
+	name: No Sprint
+	since: 1.3.5
+	sides: server_only
+	desc:
+		Disable sprinting.
+
 pedantry
 	name: Pedantry
 	since: 1.0.1
