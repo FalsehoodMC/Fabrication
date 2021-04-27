@@ -950,6 +950,13 @@ minor_mechanics.crawling
 		
 		Honors the vanilla "Sneak" Accessibility Option. Interacts with Utility > Toggle Stance.
 
+minor_mechanics.unsaddle_creatures
+	name: Unsaddle Creatures
+	since: 1.3.5
+	sides: server_only
+	desc:
+		Shift right click with an empty hand to retrieve a saddle from a pig/strider.
+
 mechanics
 	name: Mechanics
 	since: 1.0
