@@ -1199,6 +1199,20 @@ balance.loading_furnace_minecart
 	desc:
 		Makes furnace minecarts load chunks if they have fuel.
 
+balance.ender_dragon_full_xp
+	name: Full Ender Dragon XP
+	since: 1.3.5
+	sides: server_only
+	desc:
+		Ender dragon always gives the same xp amount as it would the first time.
+
+balance.ender_dragon_always_spawn_egg
+	name: Ender Dragon Always Spawns Dragon Egg
+	since: 1.3.5
+	sides: server_only
+	desc:
+		Ender dragon always spawn a dragon egg when killed.
+
 weird_tweaks
 	name: Weird Tweaks
 	since: 1.0
