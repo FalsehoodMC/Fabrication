@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: Feature Requests
-    url: https://github.com/unascribed/Fabrication-Features/issues/new
-    about: Feature requests, ideas, questions, etc go here.
+    url: https://github.com/unascribed/Fabrication-Features/issues/new/choose
+    about: Feature requests, ideas, etc go here.
+  - name: Discussions
+    url: https://github.com/unascribed/Fabrication/discussions/new?category=questions
+    about: Questions go here.
