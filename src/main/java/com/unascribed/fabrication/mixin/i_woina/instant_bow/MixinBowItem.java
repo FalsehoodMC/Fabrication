@@ -1,7 +1,6 @@
 package com.unascribed.fabrication.mixin.i_woina.instant_bow;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BowItem;
