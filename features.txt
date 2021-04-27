@@ -1315,6 +1315,13 @@ weird_tweaks.endermen_dont_grief
 	desc:
 		Endermen no longer place or pickup blocks.
 
+weird_tweaks.item_safe_cactus
+	name: Item Safe Cactus
+	since: 1.3.5
+	sides: server_only
+	desc:
+		Items don't get destroyed by cactus blocks.
+
 weird_tweaks.blaze_fertilizer
 	name: Blaze Powder Grows Nether Wart
 	since: 1.3.5
