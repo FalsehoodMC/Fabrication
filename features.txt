@@ -1577,7 +1577,7 @@ situational.disable_bees
 
 situational.static_dragon_egg
 	name: Static Dragon Egg
-	since: 1.3.3
+	since: 1.3.5
 	sides: server_only
 	desc:
 		Prevents dragon egg from teleporting.
