@@ -1575,6 +1575,13 @@ situational.disable_bees
 		
 		Does not delete existing bee nests or bee entities; only fully effective in a new world.
 
+situational.static_dragon_egg
+	name: Static Dragon Egg
+	since: 1.3.3
+	sides: server_only
+	desc:
+		Prevents dragon egg from teleporting.
+
 experiments
 	name: Experiments
 	since: 1.2.8
