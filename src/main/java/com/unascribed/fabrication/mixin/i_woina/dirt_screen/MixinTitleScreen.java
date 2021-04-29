@@ -3,6 +3,7 @@ package com.unascribed.fabrication.mixin.i_woina.dirt_screen;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+import net.minecraft.client.gui.RotatingCubeMapRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.util.math.MatrixStack;
@@ -10,6 +11,7 @@ import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(TitleScreen.class)
@@ -20,8 +22,9 @@ public class MixinTitleScreen extends Screen {
         super(title);
     }
 
-    @Inject(at=@At(value="INVOKE", target="Lnet/minecraft/util/math/MathHelper;ceil(F)I"), method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
-    public void drawDirt(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+    // @Inject(at=@At(value="INVOKE", target="Lnet/minecraft/client/texture/TextureManager;bindTexture(Lnet/minecraft/util/Identifier;)V"), method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
+    @Redirect(method = "render", at = @At(value="INVOKE", target="Lnet/minecraft/client/gui/RotatingCubeMapRenderer;render(FF)V"))
+    public void drawDirt(RotatingCubeMapRenderer rotatingCubeMapRenderer, float delta, float alpha) {
         if (MixinConfigPlugin.isEnabled("*.dirt_screen")) {
             renderBackgroundTexture(0);
         }
