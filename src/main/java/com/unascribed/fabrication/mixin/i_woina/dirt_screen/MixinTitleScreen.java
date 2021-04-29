@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(TitleScreen.class)
-@EligibleIf(configEnabled="*.dirt_screen", envMatches=Env.CLIENT)
+@EligibleIf(envMatches=Env.CLIENT)
 public class MixinTitleScreen extends Screen {
 
     protected MixinTitleScreen(Text title) {
