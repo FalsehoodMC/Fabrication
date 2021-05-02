@@ -1506,6 +1506,13 @@ woina.old_tooltip
 	desc:
 		Ressurects the old inventory tooltip from the beta days.
 
+woina.instant_bow
+	name: Instant Bow
+	since: 1.3.5
+	sides: server_only
+	desc:
+		Bow fires arrows instantly upon clicking.
+
 pedantry
 	name: Pedantry
 	since: 1.0.1
@@ -1588,6 +1595,13 @@ situational.disable_bees
 		it accessible again, and/or to make empty bee nests craftable for decor.
 		
 		Does not delete existing bee nests or bee entities; only fully effective in a new world.
+
+situational.static_dragon_egg
+	name: Static Dragon Egg
+	since: 1.3.5
+	sides: server_only
+	desc:
+		Prevents dragon egg from teleporting.
 
 experiments
 	name: Experiments
