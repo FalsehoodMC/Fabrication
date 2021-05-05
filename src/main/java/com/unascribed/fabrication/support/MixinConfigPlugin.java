@@ -81,6 +81,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			"woina.billboard_drops",
 			"woina.oof",
 			"woina.no_experience",
+			"woina.no_sprint",
 			"general.data_upload",
 			"balance.loading_furnace_minecart"
 	);

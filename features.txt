@@ -1489,6 +1489,7 @@ woina.no_sprint
 	name: No Sprint
 	since: 1.3.5
 	sides: server_only
+	endorsed: false
 	desc:
 		Disable sprinting.
 
