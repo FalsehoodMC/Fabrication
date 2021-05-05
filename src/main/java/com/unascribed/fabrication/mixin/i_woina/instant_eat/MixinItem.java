@@ -21,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MixinItem {
 
 	@Inject(method="getMaxUseTime(Lnet/minecraft/item/ItemStack;)I", at=@At(value="HEAD"), cancellable = true)
-	private void renderArmHoldingItem(ItemStack stack, CallbackInfoReturnable<Integer> cir) {
+	private void getMaxUseTime(ItemStack stack, CallbackInfoReturnable<Integer> cir) {
 		if (MixinConfigPlugin.isEnabled("*.instant_eat") && stack.getItem().isFood()) cir.setReturnValue(1);
 	}
 }
