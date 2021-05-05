@@ -72,7 +72,9 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			"woina.old_sheep_shear"
 	);
 	private static final ImmutableSet<String> NEVER_DEFAULT_EXCEPT_BURNT = ImmutableSet.of(
-			"minor_mechanics.spiders_cant_climb_while_wet"
+			"minor_mechanics.spiders_cant_climb_while_wet",
+			"balance.ender_dragon_full_xp",
+			"balance.ender_dragon_always_spawn_egg"
 	);
 	private static final ImmutableSet<String> NEVER_DEFAULT = ImmutableSet.of(
 			"tweaks.ghost_chest_woo_woo",
@@ -82,6 +84,9 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			"woina.oof",
 			"woina.no_experience",
 			"woina.no_sprint",
+			"woina.dirt_screen",
+			"woina.old_tooltip",
+			"woina.instant_bow",
 			"general.data_upload",
 			"balance.loading_furnace_minecart"
 	);

@@ -1221,6 +1221,7 @@ balance.ender_dragon_full_xp
 	name: Full Ender Dragon XP
 	since: 1.3.5
 	sides: server_only
+	endorsed: false
 	desc:
 		Ender dragon always gives the same xp amount as it would the first time.
 
@@ -1228,6 +1229,7 @@ balance.ender_dragon_always_spawn_egg
 	name: Ender Dragon Always Spawns Dragon Egg
 	since: 1.3.5
 	sides: server_only
+	endorsed: false
 	desc:
 		Ender dragon always spawn a dragon egg when killed.
 
@@ -1497,13 +1499,15 @@ woina.dirt_screen
 	name: Dirt Screen
 	since: 1.3.5
 	sides: client_only
+	endorsed: false
 	desc:
 		Replaces the panorama background of the title screen with the old dirt one.
 
 woina.old_tooltip
-	name: Old tooltip
+	name: Old Tooltip
 	since: 1.3.5
 	sides: client_only
+	endorsed: false
 	desc:
 		Ressurects the old inventory tooltip from the beta days.
 
@@ -1511,6 +1515,7 @@ woina.instant_bow
 	name: Instant Bow
 	since: 1.3.5
 	sides: server_only
+	endorsed: false
 	desc:
 		Bow fires arrows instantly upon clicking.
 
