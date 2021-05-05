@@ -515,6 +515,13 @@ utility.toggle_sprint
 		since it can be useful to have a hold and toggle button at the same time
 		this keybind will take the other mode of the accessibility setting.
 
+utility.show_map_id
+	name: Show Map ID
+	since: 1.3.5
+	sides: client_only
+	desc:
+		Makes filled maps show their ID.
+
 tweaks
 	name: Tweaks
 	since: 1.0
