@@ -1502,6 +1502,13 @@ woina.no_sprint
 	desc:
 		Disable sprinting.
 
+woina.instant_eat
+	name: Instant Eat
+	since: 1.3.5
+	sides: server_only
+	desc:
+		Eating food is instant.
+
 woina.dirt_screen
 	name: Dirt Screen
 	since: 1.3.5
