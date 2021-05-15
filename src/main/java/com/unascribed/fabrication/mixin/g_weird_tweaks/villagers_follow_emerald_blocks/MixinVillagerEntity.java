@@ -13,7 +13,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import java.util.stream.StreamSupport;
 
 @Mixin(VillagerEntity.class)
 @EligibleIf(configEnabled="*.villagers_follow_emerald_blocks")
@@ -21,22 +20,20 @@ public abstract class MixinVillagerEntity extends MerchantEntity  {
 	private PlayerEntity fabrication$player = null;
 	private static final TargetPredicate FABRICATION$TARGET_PREDICATE =
 			(new TargetPredicate()).setBaseMaxDistance(10.0).includeInvulnerable().includeTeammates().ignoreDistanceScalingFactor().ignoreEntityTargetRules().setPredicate(
-					player -> StreamSupport.stream(player.getItemsHand().spliterator(), false).anyMatch(
-							stack -> stack.getItem().equals(Items.EMERALD_BLOCK)
-					)
+					player -> player.getMainHandStack().getItem().equals(Items.EMERALD_BLOCK) || player.getOffHandStack().getItem().equals(Items.EMERALD_BLOCK)
 			);
 
 	@Inject(method="mobTick()V", at=@At("TAIL"))
 	public void mobTick(CallbackInfo ci){
 		if(MixinConfigPlugin.isEnabled("*.villagers_follow_emerald_blocks") && !isAiDisabled()){
 			if (world.getTime()%40 == 0)
-				player = world.getClosestPlayer(TARGET_PREDICATE, this);
-			if (player != null) {
-				getLookControl().lookAt(player, getBodyYawSpeed(), getLookPitchSpeed());
-				if (squaredDistanceTo(player) < 6.25D)
+				fabrication$player = world.getClosestPlayer(FABRICATION$TARGET_PREDICATE, this);
+			if (fabrication$player != null) {
+				getLookControl().lookAt(fabrication$player, getBodyYawSpeed(), getLookPitchSpeed());
+				if (squaredDistanceTo(fabrication$player) < 6.25D)
 					getNavigation().stop();
 				else
-					getNavigation().startMovingTo(player, 0.6);
+					getNavigation().startMovingTo(fabrication$player, 0.6);
 			}
 		}
 	}
