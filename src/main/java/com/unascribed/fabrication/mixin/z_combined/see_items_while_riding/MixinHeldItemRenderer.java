@@ -1,4 +1,4 @@
-package com.unascribed.fabrication.mixin.b_utility.see_items_while_riding;
+package com.unascribed.fabrication.mixin.z_combined.see_items_while_riding;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;

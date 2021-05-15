@@ -1,4 +1,4 @@
-package com.unascribed.fabrication.mixin.f_balance.use_items_while_riding;
+package com.unascribed.fabrication.mixin.g_weird_tweaks.use_items_while_riding;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
