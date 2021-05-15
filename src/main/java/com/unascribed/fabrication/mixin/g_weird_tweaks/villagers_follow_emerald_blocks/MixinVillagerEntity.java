@@ -19,7 +19,7 @@ import java.util.stream.StreamSupport;
 @EligibleIf(configEnabled="*.villagers_follow_emerald_blocks")
 public abstract class MixinVillagerEntity extends MerchantEntity  {
 	PlayerEntity player = null;
-	private static final TargetPredicate TARGET_PREDICATE =
+	private static final TargetPredicate FABRICATION$TARGET_PREDICATE =
 			(new TargetPredicate()).setBaseMaxDistance(10.0).includeInvulnerable().includeTeammates().ignoreDistanceScalingFactor().ignoreEntityTargetRules().setPredicate(
 					player -> StreamSupport.stream(player.getItemsHand().spliterator(), false).anyMatch(
 							stack -> stack.getItem().equals(Items.EMERALD_BLOCK)
