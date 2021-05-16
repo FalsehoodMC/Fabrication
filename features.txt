@@ -1377,6 +1377,13 @@ weird_tweaks.blaze_fertilizer
 	desc:
 		Blaze powder behaves as bone meal for nether wart.
 
+weird_tweaks.villagers_follow_emerald_blocks
+	name: Villagers Follow Emerald Blocks
+	since: 1.3.5
+	sides: server_only
+	desc:
+		Villagers will follow players holding emerald blocks.
+
 woina
 	name: What's Old Is New Again
 	short_name: W.O.I.N.A.
