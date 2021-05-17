@@ -40,6 +40,7 @@ public class MixinBannerBlockEntityRenderer {
 			shift=Shift.AFTER, ordinal=0), method=RENDER_CANVAS, cancellable=true)
 	private static void renderCanvasHead(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, ModelPart canvas, SpriteIdentifier baseSprite, boolean isBanner, List<Pair<BannerPattern, DyeColor>> patterns, boolean bl2, CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.fullres_banner_shields")) return;
+		if (!(vertexConsumers instanceof Immediate)) return;
 		if (!isBanner) {
 			((Immediate)vertexConsumers).draw();
 			GlStateManager.enablePolygonOffset();

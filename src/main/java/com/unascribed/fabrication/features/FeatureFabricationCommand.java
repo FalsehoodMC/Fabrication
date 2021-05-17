@@ -170,9 +170,14 @@ public class FeatureFabricationCommand implements Feature {
 	}
 
 	private int analyzeBlockDistribution(CommandContext<ServerCommandSource> c, World world, Set<Identifier> biomesIn) {
-		Set<Biome> biomes = Sets.newHashSet();
-		for (Identifier b : biomesIn) {
-			biomes.add(c.getSource().getMinecraftServer().getRegistryManager().get(Registry.BIOME_KEY).get(b));
+		Set<Biome> biomes;
+		if (biomesIn != null) {
+			biomes = Sets.newHashSet();
+			for (Identifier b : biomesIn) {
+				biomes.add(c.getSource().getMinecraftServer().getRegistryManager().get(Registry.BIOME_KEY).get(b));
+			}
+		} else {
+			biomes = null;
 		}
 		String name = "fabrication_block_distribution_"+System.currentTimeMillis()+".tsv";
 		c.getSource().sendFeedback(new LiteralText("Starting background block distribution analysis"), false);
@@ -191,7 +196,7 @@ public class FeatureFabricationCommand implements Feature {
 
 			long scanned = 0;
 			long skipped = 0;
-			long goal = (biomes.isEmpty() ? 8000 : 1000)*16*16*world.getHeight();
+			long goal = (biomes == null ? 8000 : 1000)*16*16*world.getHeight();
 			
 			class MutableLong { long value = 1; }
 			
