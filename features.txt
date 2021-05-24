@@ -777,6 +777,13 @@ tweaks.alt_absorption_sound
 		
 		Required on both sides, but doesn't break vanilla clients.
 
+tweaks.no_hand_sway
+	name: Silent Minecarts
+	since: 1.3.5
+	sides: client_only
+	desc:
+		Prevents first-person hands from gradually transitioning from the last camera position.
+
 minor_mechanics
 	name: Minor Mechanics
 	since: 1.0
