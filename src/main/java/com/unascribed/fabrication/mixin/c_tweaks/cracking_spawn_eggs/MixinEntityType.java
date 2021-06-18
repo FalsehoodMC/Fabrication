@@ -27,7 +27,7 @@ public class MixinEntityType {
 
 	@Inject(at=@At("RETURN"), method="spawnFromItemStack(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/SpawnReason;ZZ)Lnet/minecraft/entity/Entity;")
 	public void spawnFromItemStack(ServerWorld world, ItemStack stack, PlayerEntity player, BlockPos pos, SpawnReason reason, boolean alignPosition, boolean invertY, CallbackInfoReturnable<Entity> ci) {
-		if (!MixinConfigPlugin.isEnabled("*.cracking_spawn_eggs")) return;
+		if (!MixinConfigPlugin.isEnabled("*.cracking_spawn_eggs") || stack == null) return;
 		if (stack.getItem() instanceof SpawnEggItem) {
 			Entity e = ci.getReturnValue();
 			Box box = e.getBoundingBox();

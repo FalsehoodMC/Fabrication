@@ -784,6 +784,13 @@ tweaks.no_hand_sway
 	desc:
 		Prevents first-person hands from gradually transitioning from the last camera position.
 
+tweaks.see_items_while_riding
+	name: See Held Items While Riding
+	since: 1.3.5
+	sides: client_only
+	desc:
+		Allows players to see held items while riding entities like boats.
+
 minor_mechanics
 	name: Minor Mechanics
 	since: 1.0
@@ -1384,6 +1391,13 @@ weird_tweaks.blaze_fertilizer
 	desc:
 		Blaze powder behaves as bone meal for nether wart.
 
+weird_tweaks.use_items_while_riding
+	name: Use Items While Riding
+	since: 1.3.5
+	sides: client_only
+	desc:
+		Allows players to use items and attack while riding entities like boats.
+
 weird_tweaks.villagers_follow_emerald_blocks
 	name: Villagers Follow Emerald Blocks
 	since: 1.3.5
@@ -1636,6 +1650,13 @@ situational.disable_bees
 		it accessible again, and/or to make empty bee nests craftable for decor.
 		
 		Does not delete existing bee nests or bee entities; only fully effective in a new world.
+
+situational.item_frame_no_name_display
+	name: Item Frames Don't Display Name Tags
+	since: 1.3.5
+	sides: client_only
+	desc:
+		Item frames will not display the names of the item inside them.
 
 situational.static_dragon_egg
 	name: Static Dragon Egg
