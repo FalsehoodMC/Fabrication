@@ -295,7 +295,9 @@ public class MixinTitleScreen extends Screen {
 						mc.getTextureManager().bindTexture(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE);
 						Tessellator.getInstance().draw();
 					} else {
-						GlStateManager.color4f(0, 0, 0, 0.855f*alpha*fade);
+						GlStateManager.color4f(
+								LoaderBlockLogo.shadowRed, LoaderBlockLogo.shadowGreen, LoaderBlockLogo.shadowBlue,
+								LoaderBlockLogo.shadowAlpha*alpha*fade);
 						BufferBuilder bb = Tessellator.getInstance().getBuffer();
 						bb.begin(GL11.GL_QUADS, VertexFormats.POSITION);
 						bb.vertex(0, 0, 0).next();

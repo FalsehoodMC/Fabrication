@@ -7,15 +7,15 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import com.ibm.icu.impl.locale.XCldrStub.Splitter;
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.QDIni;
-import com.unascribed.fabrication.Resolvable;
 import com.unascribed.fabrication.support.ConfigLoader;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
@@ -26,13 +26,10 @@ import com.google.common.collect.Maps;
 import com.google.common.io.MoreFiles;
 import com.google.common.io.Resources;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.texture.NativeImage;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.InvalidIdentifierException;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.command.argument.BlockArgumentParser;
 
 @EligibleIf(envMatches=Env.CLIENT)
 public class LoaderBlockLogo implements ConfigLoader {
@@ -43,6 +40,10 @@ public class LoaderBlockLogo implements ConfigLoader {
 	public static BooleanSupplier getReverse = () -> false;
 	public static final Map<Integer, Supplier<BlockState>> colorToState = Maps.newHashMap();
 	public static boolean sound = false;
+	public static float shadowRed = 0.f;
+	public static float shadowGreen = 0.f;
+	public static float shadowBlue = 0.f;
+	public static float shadowAlpha = 0.f;
 	
 	public enum Reverse {
 		FALSE(() -> false),
@@ -67,6 +68,10 @@ public class LoaderBlockLogo implements ConfigLoader {
 		
 		getReverse = config.getEnum("general.reverse", Reverse.class).orElse(Reverse.FALSE).sup;
 		sound = config.getBoolean("general.sound").orElse(false);
+		shadowRed = config.getInt("shadow.red").orElse(0) / 255.f;
+		shadowGreen = config.getInt("shadow.green").orElse(0) / 255.f;
+		shadowBlue = config.getInt("shadow.blue").orElse(0) / 255.f;
+		shadowAlpha = config.getInt("shadow.alpha").orElse(225) / 255.f;
 		
 		if (loadError) {
 			unrecoverableLoadError = true;
@@ -113,22 +118,21 @@ public class LoaderBlockLogo implements ConfigLoader {
 				int swapped = colorInt&0x0000FF00;
 				swapped |= (colorInt&0x00FF0000) >> 16;
 				swapped |= (colorInt&0x000000FF) << 16;
-				List<Resolvable<Block>> blocks = Lists.newArrayList();
-				for (String s : Splitter.on(' ').split(config.get(key).orElse(""))) {
-					try {
-						blocks.add(Resolvable.of(new Identifier(s), Registry.BLOCK));
-					} catch (InvalidIdentifierException e) {
-						FabLog.warn(s+" is not a valid identifier at "+config.getBlame(key));
-					}
-				}
+				String[] blocks = config.get(key).orElse("").split(" ");
 				colorToState.put(swapped, () -> {
-					Resolvable<Block> res = blocks.get(ThreadLocalRandom.current().nextInt(blocks.size()));
-					Optional<Block> opt = res.get();
-					if (!opt.isPresent()) {
-						FabLog.warn("Couldn't find a block with ID "+res.getId()+" when rendering block logo");
+					// Since this Loader (like all loaders) is called on the mod's initialization,
+					// the block registry might not have been populated by other mods yet.
+					// Therefore late BlockState resolution is performed here; colorToState suppliers
+					// are called by MixinTitleScreen, which runs after game init is done.
+					String block = blocks[ThreadLocalRandom.current().nextInt(blocks.length)];
+					try {
+						BlockArgumentParser parser = new BlockArgumentParser(new StringReader(block), false);
+						parser.parse(false);
+						return parser.getBlockState();
+					} catch (CommandSyntaxException e) {
+						FabLog.warn(block+" is not a valid identifier at "+config.getBlame(key));
 						return Blocks.AIR.getDefaultState();
 					}
-					return opt.get().getDefaultState();
 				});
 			}
 		}
