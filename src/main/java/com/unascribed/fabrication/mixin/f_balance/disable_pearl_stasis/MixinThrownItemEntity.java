@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ThrownItemEntity.class)
 @EligibleIf(configEnabled="*.disable_pearl_stasis")
-public abstract class MixinLivingEntity  {
+public abstract class MixinThrownItemEntity {
     @Inject(at=@At("TAIL"), method= "writeCustomDataToTag(Lnet/minecraft/nbt/CompoundTag;)V")
     public void remove_pearl_owner(CompoundTag tag, CallbackInfo ci) {
         if(((Object)this) instanceof EnderPearlEntity && MixinConfigPlugin.isEnabled("*.disable_pearl_stasis"))
