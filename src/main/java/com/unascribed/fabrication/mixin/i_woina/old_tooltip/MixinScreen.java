@@ -7,7 +7,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.AbstractParentElement;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.TickableElement;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.OrderedText;
 import org.jetbrains.annotations.Nullable;
@@ -22,7 +21,7 @@ import java.util.List;
 
 @Mixin(Screen.class)
 @EligibleIf(configEnabled="*.old_tooltip", envMatches=Env.CLIENT)
-public abstract class MixinScreen extends AbstractParentElement implements TickableElement, Drawable {
+public abstract class MixinScreen extends AbstractParentElement implements Drawable {
 
     @Shadow
     public int width;

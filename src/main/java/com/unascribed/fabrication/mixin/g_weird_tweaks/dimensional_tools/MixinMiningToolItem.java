@@ -20,7 +20,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.MiningToolItem;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -35,7 +35,7 @@ public class MixinMiningToolItem {
 	public void postMine(ItemStack stack, World world, BlockState state, BlockPos pos, LivingEntity miner, CallbackInfoReturnable<Boolean> ci) {
 		if (!MixinConfigPlugin.isEnabled("*.dimensional_tools")) return;
 		if (world.isClient) return;
-		if ((!(miner instanceof PlayerEntity) || !((PlayerEntity)miner).abilities.creativeMode)) {
+		if ((!(miner instanceof PlayerEntity) || !((PlayerEntity)miner).getAbilities().creativeMode)) {
 			if (!stack.isDamageable()) return;
 			if (stack.getMiningSpeedMultiplier(state) <= 1) {
 				// tool is not effective against this block, don't penalize or reward
@@ -72,13 +72,13 @@ public class MixinMiningToolItem {
 				}
 			}
 			if (factor < 0) {
-				if (!stack.hasTag()) stack.setTag(new CompoundTag());
-				int legacyPartialDamage = stack.getTag().getInt("PartialDamage");
+				if (!stack.hasNbt()) stack.setNbt(new NbtCompound());
+				int legacyPartialDamage = stack.getNbt().getInt("PartialDamage");
 				if (legacyPartialDamage != 0) {
-					stack.getTag().putDouble("fabrication:PartialDamage", legacyPartialDamage/50D);
-					stack.getTag().remove("PartialDamage");
+					stack.getNbt().putDouble("fabrication:PartialDamage", legacyPartialDamage/50D);
+					stack.getNbt().remove("PartialDamage");
 				}
-				double partialDamage = stack.getTag().getDouble("fabrication:PartialDamage");
+				double partialDamage = stack.getNbt().getDouble("fabrication:PartialDamage");
 				if (stack.getDamage() == 0) {
 					// must have been repaired. reset for less jankiness
 					partialDamage = 0;
@@ -93,7 +93,7 @@ public class MixinMiningToolItem {
 				} else {
 					partialDamage = 0;
 				}
-				stack.getTag().putDouble("fabrication:PartialDamage", partialDamage);
+				stack.getNbt().putDouble("fabrication:PartialDamage", partialDamage);
 				ci.setReturnValue(true);
 			} else if (factor > 1) {
 				// BRING OUT THE WHEEL OF PUNISHMENT

@@ -4,6 +4,7 @@ import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Set;
 
+import net.minecraft.nbt.NbtString;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -16,9 +17,8 @@ import com.google.common.base.Enums;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 
 @Mixin(PlayerEntity.class)
 @EligibleIf(configEnabled="*.hide_armor")
@@ -31,21 +31,21 @@ public abstract class MixinPlayerEntity implements GetSuppressedSlots {
 		return fabrication$suppressedSlots;
 	}
 	
-	@Inject(at=@At("TAIL"), method="writeCustomDataToTag(Lnet/minecraft/nbt/CompoundTag;)V")
-	public void writeCustomDataToTag(CompoundTag tag, CallbackInfo ci) {
-		ListTag li = new ListTag();
+	@Inject(at=@At("TAIL"), method="writeCustomDataToNbt(Lnet/minecraft/nbt/NbtCompound;)V")
+	public void writeCustomDataToTag(NbtCompound tag, CallbackInfo ci) {
+		NbtList li = new NbtList();
 		for (EquipmentSlot pt : fabrication$suppressedSlots) {
-			li.add(StringTag.of(pt.name().toLowerCase(Locale.ROOT)));
+			li.add(NbtString.of(pt.name().toLowerCase(Locale.ROOT)));
 		}
 		if (!li.isEmpty()) {
 			tag.put("fabrication:SuppressedSlots", li);
 		}
 	}
 	
-	@Inject(at=@At("TAIL"), method="readCustomDataFromTag(Lnet/minecraft/nbt/CompoundTag;)V")
-	public void readCustomDataFromTag(CompoundTag tag, CallbackInfo ci) {
+	@Inject(at=@At("TAIL"), method="readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V")
+	public void readCustomDataFromTag(NbtCompound tag, CallbackInfo ci) {
 		fabrication$suppressedSlots.clear();
-		ListTag li = tag.getList("fabrication:SuppressedSlots", NbtType.STRING);
+		NbtList li = tag.getList("fabrication:SuppressedSlots", NbtType.STRING);
 		for (int i = 0; i < li.size(); i++) {
 			EquipmentSlot pt = Enums.getIfPresent(EquipmentSlot.class, li.getString(i).toUpperCase(Locale.ROOT)).orNull();
 			if (pt == null) {

@@ -17,7 +17,7 @@ public class FeatureTaggablePlayers implements Feature {
 	
 	@Override
 	public void apply() {
-		originalUntargetablePredicate = EntityPredicates.EXCEPT_CREATIVE_SPECTATOR_OR_PEACEFUL;
+		originalUntargetablePredicate = EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR;
 		amendUntargetablePredicate(e -> {
 			if (e instanceof TaggablePlayer && ((TaggablePlayer)e).fabrication$hasTag(PlayerTag.INVISIBLE_TO_MOBS)) return false;
 			return originalUntargetablePredicate.test(e);
@@ -25,7 +25,7 @@ public class FeatureTaggablePlayers implements Feature {
 	}
 
 	private void amendUntargetablePredicate(Predicate<Entity> p) {
-		EntityPredicates.EXCEPT_CREATIVE_SPECTATOR_OR_PEACEFUL = p;
+		EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR = p;
 	}
 
 	@Override

@@ -29,7 +29,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
@@ -58,9 +58,9 @@ public abstract class MixinLivingEntity extends Entity {
 		if (!MixinConfigPlugin.isEnabled("*.broken_tools_drop_components")) return;
 		Item item = stack.getItem();
 		if (LoaderGearComponents.ignoreVanishing && EnchantmentHelper.hasVanishingCurse(stack)) return;
-		if (stack.hasTag() && stack.getTag().getBoolean("fabrication:ShatteredAlready")) return;
-		if (!stack.hasTag()) stack.setTag(new CompoundTag());
-		stack.getTag().putBoolean("fabrication:ShatteredAlready", true);
+		if (stack.hasNbt() && stack.getNbt().getBoolean("fabrication:ShatteredAlready")) return;
+		if (!stack.hasNbt()) stack.setNbt(new NbtCompound());
+		stack.getNbt().putBoolean("fabrication:ShatteredAlready", true);
 		List<ItemStack> enchantables = Lists.newArrayList();
 		for (ItemMaterialValue imv : LoaderGearComponents.items.get(Resolvable.mapKey(Registry.ITEM.getId(item), Registry.ITEM))) {
 			double dropChance = 1;

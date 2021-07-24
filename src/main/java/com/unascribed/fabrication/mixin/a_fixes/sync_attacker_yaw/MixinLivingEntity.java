@@ -48,12 +48,12 @@ public abstract class MixinLivingEntity extends Entity implements SetAttackerYaw
 	public void damageReturn(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
 		if (!MixinConfigPlugin.isEnabled("*.sync_attacker_yaw")) return;
 		if (source == DamageSource.OUT_OF_WORLD && MixinConfigPlugin.isEnabled("*.repelling_void")) {
-			knockbackVelocity = yaw;
+			knockbackVelocity = getYaw();
 		}
 		Object self = this;
 		if (self instanceof PlayerEntity && knockbackVelocity != fabrication$lastAttackerYaw && world != null && !world.isClient) {
 			PacketByteBuf data = new PacketByteBuf(Unpooled.buffer(8));
-			data.writeInt(getEntityId());
+			data.writeInt(getId());
 			data.writeFloat(knockbackVelocity);
 			FabricationMod.sendToTrackersMatching(this, new CustomPayloadS2CPacket(FABRICATION$ATTACKER_YAW, data), spe -> spe instanceof SetAttackerYawAware && ((SetAttackerYawAware) spe).fabrication$isAttackerYawAware());
 		}

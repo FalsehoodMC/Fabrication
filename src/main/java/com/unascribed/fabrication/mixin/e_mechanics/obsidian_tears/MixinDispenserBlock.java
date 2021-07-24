@@ -21,7 +21,7 @@ public class MixinDispenserBlock {
 			cancellable=true)
 	public void getBehaviorForItem(ItemStack stack, CallbackInfoReturnable<DispenserBehavior> ci) {
 		if (!MixinConfigPlugin.isEnabled("*.obsidian_tears")) return;
-		if (stack.getItem() == Items.POTION && stack.hasTag() && stack.getTag().getBoolean("fabrication:ObsidianTears")) {
+		if (stack.getItem() == Items.POTION && stack.hasNbt() && stack.getNbt().getBoolean("fabrication:ObsidianTears")) {
 			ci.setReturnValue(ObsidianTears.DISPENSER_BEHAVIOR);
 		}
 	}

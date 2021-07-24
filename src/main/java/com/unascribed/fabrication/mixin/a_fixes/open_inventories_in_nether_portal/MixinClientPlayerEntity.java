@@ -27,6 +27,6 @@ public class MixinClientPlayerEntity {
 	@Redirect(method="updateNausea()V", at=@At(value="INVOKE", target="Lnet/minecraft/client/MinecraftClient;openScreen(Lnet/minecraft/client/gui/screen/Screen;)V"))
 	public void openScreen(MinecraftClient minecraftClient, Screen screen) {
 		if(!MixinConfigPlugin.isEnabled("*.open_inventories_in_nether_portal"))
-			client.openScreen(null);
+			client.setScreen(null);
 	}
 }

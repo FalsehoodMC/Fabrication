@@ -174,7 +174,7 @@ public class FeatureFabricationCommand implements Feature {
 		if (biomesIn != null) {
 			biomes = Sets.newHashSet();
 			for (Identifier b : biomesIn) {
-				biomes.add(c.getSource().getMinecraftServer().getRegistryManager().get(Registry.BIOME_KEY).get(b));
+				biomes.add(c.getSource().getServer().getRegistryManager().get(Registry.BIOME_KEY).get(b));
 			}
 		} else {
 			biomes = null;
@@ -310,10 +310,10 @@ public class FeatureFabricationCommand implements Feature {
 			
 			ServerCommandSource scs = (ServerCommandSource)s;
 			if (scs.hasPermissionLevel(2)) return true;
-			if (scs.getMinecraftServer().isSinglePlayer() && scs.getEntity() != null) {
+			if (scs.getServer().isSinglePlayer() && scs.getEntity() != null) {
 				Entity e = scs.getEntity();
 				if (e instanceof PlayerEntity) {
-					if (scs.getMinecraftServer().getUserName().equals(((PlayerEntity)e).getGameProfile().getName())) {
+					if (scs.getServer().getUserName().equals(((PlayerEntity)e).getGameProfile().getName())) {
 						// always allow in singleplayer, even if cheats are off
 						return true;
 					}
@@ -368,7 +368,7 @@ public class FeatureFabricationCommand implements Feature {
 				.executes((c) -> {
 					MixinConfigPlugin.reload();
 					if (c.getSource() instanceof ServerCommandSource) {
-						FabricationMod.sendConfigUpdate(((ServerCommandSource)c.getSource()).getMinecraftServer(), null);
+						FabricationMod.sendConfigUpdate(((ServerCommandSource)c.getSource()).getServer(), null);
 					}
 					sendFeedback(c, new LiteralText("Fabrication configuration reloaded"), true);
 					sendFeedback(c, new LiteralText("§eYou may need to restart the game for the changes to take effect."), false);
@@ -436,7 +436,7 @@ public class FeatureFabricationCommand implements Feature {
 		} else {
 			MixinConfigPlugin.set(key, value);
 			if (c.getSource() instanceof ServerCommandSource) {
-				FabricationMod.sendConfigUpdate(((ServerCommandSource)c.getSource()).getMinecraftServer(), key);
+				FabricationMod.sendConfigUpdate(((ServerCommandSource)c.getSource()).getServer(), key);
 			}
 			sendFeedback(c, new LiteralText(key+" is now set to "+value+(tri ? " (default "+def+")" : "")), true);
 			if (FabricationMod.isAvailableFeature(key)) {

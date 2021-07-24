@@ -8,7 +8,7 @@ import net.minecraft.block.dispenser.ItemDispenserBehavior;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.ItemStack.TooltipSection;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
@@ -30,7 +30,7 @@ public class ObsidianTears {
 
 		@Override
 		protected ItemStack dispenseSilently(BlockPointer pointer, ItemStack stack) {
-			BlockPos pos = pointer.getBlockPos().offset(pointer.getBlockState().get(DispenserBlock.FACING));
+			BlockPos pos = pointer.getPos().offset(pointer.getBlockState().get(DispenserBlock.FACING));
 			List<ServerPlayerEntity> players = pointer.getWorld().getEntitiesByClass(ServerPlayerEntity.class, new Box(pos), EntityPredicates.EXCEPT_SPECTATOR);
 			if (players.isEmpty()) {
 				return stack;
@@ -44,20 +44,20 @@ public class ObsidianTears {
 	
 	public static void setSpawnPoint(ServerPlayerEntity p, ItemStack stack) {
 		World world = p.world;
-		RegistryKey<World> key = RegistryKey.of(Registry.DIMENSION, new Identifier(stack.getTag().getString("fabrication:ObsidianTearsOriginDim")));
-		BlockPos pos = BlockPos.fromLong(stack.getTag().getLong("fabrication:ObsidianTearsOrigin"));
+		RegistryKey<World> key = RegistryKey.of(Registry.WORLD_KEY, new Identifier(stack.getNbt().getString("fabrication:ObsidianTearsOriginDim")));
+		BlockPos pos = BlockPos.fromLong(stack.getNbt().getLong("fabrication:ObsidianTearsOrigin"));
 		if (world instanceof ServerWorld) {
 			((ServerWorld)world).spawnParticles(ParticleTypes.FALLING_OBSIDIAN_TEAR, p.getPos().x, p.getPos().y+p.getBoundingBox().getYLength()/2, p.getPos().z, 16,
 					p.getBoundingBox().getXLength()/2, p.getBoundingBox().getYLength()/2, p.getBoundingBox().getZLength()/2,
 					0.5);
 		}
-		p.setSpawnPoint(key, pos, p.yaw, false, true);
+		p.setSpawnPoint(key, pos, p.getYaw(), false, true);
 	}
 	
 	public static ItemStack createStack(World world, BlockPos blockPos) {
 		ItemStack stack = PotionUtil.setPotion(new ItemStack(Items.POTION), Potions.THICK);
 		stack.setCustomName(new LiteralText("§fObsidian Tears"));
-		CompoundTag tag = stack.getOrCreateTag();
+		NbtCompound tag = stack.getOrCreateNbt();
 		tag.putBoolean("fabrication:ObsidianTears", true);
 		tag.putLong("fabrication:ObsidianTearsOrigin", blockPos.asLong());
 		tag.putString("fabrication:ObsidianTearsOriginDim", world.getRegistryKey().getValue().toString());

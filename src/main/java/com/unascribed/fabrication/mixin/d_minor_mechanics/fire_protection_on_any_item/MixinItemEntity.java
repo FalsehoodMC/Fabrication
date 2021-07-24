@@ -19,10 +19,7 @@ public abstract class MixinItemEntity {
 
 	@Shadow
 	public abstract ItemStack getStack();
-	
-	@Shadow
-	private int age;
-	
+
 	@Inject(at=@At("HEAD"), method="isFireImmune()Z", cancellable=true)
 	public void isFireImmune(CallbackInfoReturnable<Boolean> cir) {
 		if (MixinConfigPlugin.isEnabled("*.fire_protection_on_any_item") && EnchantmentHelper.getLevel(Enchantments.FIRE_PROTECTION, getStack()) > 0) {

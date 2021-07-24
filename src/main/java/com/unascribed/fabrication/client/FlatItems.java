@@ -8,7 +8,7 @@ public class FlatItems {
 
 	public static boolean hasGeneratedModel(ItemStack item) {
 		MinecraftClient mc = MinecraftClient.getInstance();
-		BakedModel bm = mc.getItemRenderer().getHeldItemModel(item, mc.world, null);
+		BakedModel bm = mc.getItemRenderer().getHeldItemModel(item, mc.world, null, 1);
 		return !bm.hasDepth();
 	}
 	

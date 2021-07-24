@@ -4,6 +4,7 @@ import static org.lwjgl.opengl.GL11.*;
 
 import java.util.function.BiConsumer;
 
+import net.minecraft.util.math.Vec3f;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -39,7 +40,6 @@ import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -75,7 +75,7 @@ public class MixinTitleScreen extends Screen {
 			method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V", expect=2)
 	public void drawLogo(TitleScreen subject, int x, int y, BiConsumer<Integer, Integer> callback) {
 		if (!MixinConfigPlugin.isEnabled("*.block_logo")) {
-			subject.method_29343(x, y, callback);
+			subject.drawWithOutline(x, y, callback);
 			return;
 		}
 		drawLogo(MinecraftClient.getInstance().getTickDelta());
@@ -116,7 +116,7 @@ public class MixinTitleScreen extends Screen {
 			float s = 1.8f - MathHelper.abs(MathHelper.sin(Util.getMeasuringTimeMs() % 1000 / 1000f * 6.28f) * 0.1f);
 			s = s * 100f / (textRenderer.getWidth(splashText) + 32);
 			RenderSystem.scalef(s, s, s);
-			drawCenteredString(matrices, textRenderer, splashText, 0, -8, 0xFFFF00 | l);
+			drawCenteredText(matrices, textRenderer, splashText, 0, -8, 0xFFFF00 | l);
 			RenderSystem.popMatrix();
 		}
 	}
@@ -193,8 +193,8 @@ public class MixinTitleScreen extends Screen {
 		GlStateManager.pushMatrix();
 		DiffuseLighting.enable();
 		RenderSystem.setupGui3DDiffuseLighting(
-				Util.make(new Vector3f(0f, -1.0f, -0.7f), Vector3f::normalize),
-				Util.make(new Vector3f(0f, -1.0f, -0.7f), Vector3f::normalize));
+				Util.make(new Vec3f(0f, -1.0f, -0.7f), Vec3f::normalize),
+				Util.make(new Vec3f(0f, -1.0f, -0.7f), Vec3f::normalize));
 		GlStateManager.popMatrix();
 		BlockRenderManager brm = mc.getBlockRenderManager();
 		MatrixStack matrices = new MatrixStack();

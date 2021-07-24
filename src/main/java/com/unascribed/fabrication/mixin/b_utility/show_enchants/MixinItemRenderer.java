@@ -25,8 +25,8 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.EnchantedBookItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
@@ -44,10 +44,10 @@ public class MixinItemRenderer {
 		matrixStack.translate(0, 0, zOffset + 200);
 		VertexConsumerProvider.Immediate vc = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
 		if (stack.getItem() == Items.ENCHANTED_BOOK && MixinConfigPlugin.isEnabled("*.books_show_enchants")) {
-			ListTag tag = EnchantedBookItem.getEnchantmentTag(stack);
+			NbtList tag = EnchantedBookItem.getEnchantmentNbt(stack);
 			List<Enchantment> valid = Lists.newArrayList();
 			for (int i = 0; i < tag.size(); i++) {
-				CompoundTag ct = tag.getCompound(i);
+				NbtCompound ct = tag.getCompound(i);
 				Identifier id = Identifier.tryParse(ct.getString("id"));
 				if (id != null) {
 					Enchantment e = Registry.ENCHANTMENT.get(id);

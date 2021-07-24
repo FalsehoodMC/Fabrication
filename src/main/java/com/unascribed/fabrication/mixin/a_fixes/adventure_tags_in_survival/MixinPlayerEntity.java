@@ -37,7 +37,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 		if (!MixinConfigPlugin.isEnabled("*.adventure_tags_in_survival") || mode.isCreative() || mode.isBlockBreakingRestricted()) return;
 		ItemStack stack = getMainHandStack();
 		if (!stack.isEmpty()) {
-			if (stack.hasTag() && stack.getTag().contains("CanDestroy")) {
+			if (stack.hasNbt() && stack.getNbt().contains("CanDestroy")) {
 				ci.setReturnValue(!stack.canDestroy(world.getTagManager(), new CachedBlockPosition(world, pos, false)));
 			}
 		}
@@ -50,7 +50,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 		// however, this *is* used for buckets, spawn eggs, etc, and may be used by other mods
 		if (!MixinConfigPlugin.isEnabled("*.adventure_tags_in_survival") || abilities.creativeMode || !abilities.allowModifyWorld) return;
 		if (!stack.isEmpty()) {
-			if (stack.hasTag() && stack.getTag().contains("CanPlaceOn")) {
+			if (stack.hasNbt() && stack.getNbt().contains("CanPlaceOn")) {
 				ci.setReturnValue(stack.canPlaceOn(world.getTagManager(), new CachedBlockPosition(world, pos.offset(dir.getOpposite()), false)));
 			}
 		}

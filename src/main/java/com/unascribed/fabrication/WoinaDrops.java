@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.Random;
 
+import net.minecraft.util.math.*;
 import org.lwjgl.opengl.ARBCopyImage;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
@@ -39,16 +40,10 @@ import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.texture.TextureUtil;
 import net.minecraft.client.texture.NativeImage.Format;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Vector3f;
-import net.minecraft.client.util.math.Vector4f;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3i;
 
 public class WoinaDrops {
 
@@ -88,7 +83,7 @@ public class WoinaDrops {
 							@Override
 							public void load(ResourceManager manager) throws IOException {
 								clearGlId();
-								SpriteAtlasTexture atlas = MinecraftClient.getInstance().getBakedModelManager().method_24153(new Identifier("textures/atlas/blocks.png"));
+								SpriteAtlasTexture atlas = MinecraftClient.getInstance().getBakedModelManager().getAtlas(new Identifier("textures/atlas/blocks.png"));
 								GlStateManager.bindTexture(atlas.getGlId());
 								int maxLevel = GL11.glGetTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LEVEL);
 								if (maxLevel == 0 || !GL.getCapabilities().GL_ARB_copy_image) {
@@ -159,7 +154,7 @@ public class WoinaDrops {
 		MatrixStack.Entry ent = matrices.peek();
 		int[] data = quad.getVertexData();
 		Vec3i faceVec = quad.getFace().getVector();
-		Vector3f normal = new Vector3f(faceVec.getX(), faceVec.getY(), faceVec.getZ());
+		Vec3f normal = new Vec3f(faceVec.getX(), faceVec.getY(), faceVec.getZ());
 		Vector4f pos = new Vector4f(0, 0, 0, 1);
 		Matrix4f mat = ent.getModel();
 		normal.transform(ent.getNormal());

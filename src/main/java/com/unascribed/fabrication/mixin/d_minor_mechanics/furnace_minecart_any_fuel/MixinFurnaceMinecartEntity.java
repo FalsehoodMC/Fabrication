@@ -46,7 +46,7 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 		if (FurnaceBlockEntity.canUseAsFuel(itemStack)) {
 			int value = FurnaceBlockEntity.createFuelTimeMap().get(itemStack.getItem())*2;
 			if (this.fuel + value <= 32000) {
-				if (!player.abilities.creativeMode) {
+				if (!player.getAbilities().creativeMode) {
 					itemStack.decrement(1);
 				}
 				this.fuel += value;

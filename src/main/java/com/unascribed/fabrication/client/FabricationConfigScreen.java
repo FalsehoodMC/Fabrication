@@ -235,7 +235,7 @@ public class FabricationConfigScreen extends Screen {
 			GlStateManager.popMatrix();
 		}
 		if (leaving && timeLeaving > 10) {
-			client.openScreen(parent);
+			client.setScreen(parent);
 		}
 	}
 	
@@ -1005,7 +1005,7 @@ public class FabricationConfigScreen extends Screen {
 			client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_BARREL_CLOSE, 0.7f));
 			client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_SHROOMLIGHT_PLACE, 2f, 1f));
 		} else {
-			client.openScreen(parent);
+			client.setScreen(parent);
 		}
 		try {
 			// new modmenu re-uses screen instances aggressively. an individual instance of this

@@ -18,8 +18,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtString;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Language;
@@ -50,10 +50,10 @@ public class FeatureDimensionalTools implements Feature {
 	@Environment(EnvType.CLIENT)
 	private void applyClient() {
 		Agnos.runForTooltipRender((stack, lines) -> {
-			if (active && !stack.isEmpty() && (stack.hasTag() && stack.getTag().contains("fabrication:PartialDamage"))) {
+			if (active && !stack.isEmpty() && (stack.hasNbt() && stack.getNbt().contains("fabrication:PartialDamage"))) {
 				for (int i = 0; i < lines.size(); i++) {
 					Object t = lines.get(i);
-					double part = stack.getTag().getDouble("fabrication:PartialDamage");
+					double part = stack.getNbt().getDouble("fabrication:PartialDamage");
 					if (t instanceof TranslatableText) {
 						if (((TranslatableText) t).getKey().equals("item.durability")) {
 							lines.set(i, new TranslatableText("item.durability",
@@ -107,11 +107,11 @@ public class FeatureDimensionalTools implements Feature {
 						}
 					}
 					stack.setCustomName(new LiteralText("§f"+s));
-					ListTag li = new ListTag();
+					NbtList li = new NbtList();
 					for (MohsIdentifier dim : finalDimensions) {
-						li.add(StringTag.of(dim.toString()));
+						li.add(NbtString.of(dim.toString()));
 					}
-					stack.getTag().put("fabrication:HonoraryDimensions", li);
+					stack.getNbt().put("fabrication:HonoraryDimensions", li);
 				}
 			}
 		}

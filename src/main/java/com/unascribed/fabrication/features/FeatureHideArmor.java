@@ -82,7 +82,7 @@ public class FeatureHideArmor implements Feature {
 					}
 				}
 			}
-			((ServerWorld)ent.world).getChunkManager().sendToOtherNearbyPlayers(ent, new EntityEquipmentUpdateS2CPacket(ent.getEntityId(), li));
+			((ServerWorld)ent.world).getChunkManager().sendToOtherNearbyPlayers(ent, new EntityEquipmentUpdateS2CPacket(ent.getId(), li));
 			sendSuppressedSlotsForSelf(ent);
 			String verb = hidden ? "hidden" : "shown";
 			if (amt == 4) {

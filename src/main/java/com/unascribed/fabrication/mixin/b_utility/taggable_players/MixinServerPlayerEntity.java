@@ -4,6 +4,7 @@ import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Set;
 
+import net.minecraft.nbt.NbtString;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,9 +26,8 @@ import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -103,21 +103,21 @@ public abstract class MixinServerPlayerEntity extends PlayerEntity implements Ta
 		fabrication$tags.addAll(((TaggablePlayer)oldPlayer).fabrication$getTags());
 	}
 	
-	@Inject(at=@At("TAIL"), method="writeCustomDataToTag(Lnet/minecraft/nbt/CompoundTag;)V")
-	public void writeCustomDataToTag(CompoundTag tag, CallbackInfo ci) {
-		ListTag li = new ListTag();
+	@Inject(at=@At("TAIL"), method="writeCustomDataToNbt(Lnet/minecraft/nbt/NbtCompound;)V")
+	public void writeCustomDataToTag(NbtCompound tag, CallbackInfo ci) {
+		NbtList li = new NbtList();
 		for (PlayerTag pt : fabrication$tags) {
-			li.add(StringTag.of(pt.lowerName()));
+			li.add(NbtString.of(pt.lowerName()));
 		}
 		if (!li.isEmpty()) {
 			tag.put("fabrication:Tags", li);
 		}
 	}
 	
-	@Inject(at=@At("TAIL"), method="readCustomDataFromTag(Lnet/minecraft/nbt/CompoundTag;)V")
-	public void readCustomDataFromTag(CompoundTag tag, CallbackInfo ci) {
+	@Inject(at=@At("TAIL"), method="readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V")
+	public void readCustomDataFromTag(NbtCompound tag, CallbackInfo ci) {
 		fabrication$tags.clear();
-		ListTag li = tag.getList("fabrication:Tags", NbtType.STRING);
+		NbtList li = tag.getList("fabrication:Tags", NbtType.STRING);
 		for (int i = 0; i < li.size(); i++) {
 			PlayerTag pt = Enums.getIfPresent(PlayerTag.class, li.getString(i).toUpperCase(Locale.ROOT)).orNull();
 			if (pt == null) {

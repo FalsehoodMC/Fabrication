@@ -27,16 +27,16 @@ public abstract class MixinTridentEntity extends Entity {
 	
 	
 	@Override
-	protected void destroy() {
+	public void remove(Entity.RemovalReason reason) {
 		TridentEntity self = (TridentEntity)(Object)this;
-		if (MixinConfigPlugin.isEnabled("*.tridents_in_void_return") && self.getOwner() != null) {
+		if (MixinConfigPlugin.isEnabled("*.tridents_in_void_return") && self.getOwner() != null && reason == RemovalReason.DISCARDED) {
 			int i = this.dataTracker.get(LOYALTY);
 			if (i > 0) {
 				this.dealtDamage = true;
 				return;
 			}
 		}
-		super.destroy();
+		super.remove(reason);
 	}
 
 }

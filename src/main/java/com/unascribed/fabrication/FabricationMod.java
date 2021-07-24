@@ -154,7 +154,7 @@ public class FabricationMod implements ModInitializer {
 		ServerChunkManager cm = ((ServerWorld)entity.world).getChunkManager();
 		ThreadedAnvilChunkStorage tacs = cm.threadedAnvilChunkStorage;
 		Int2ObjectMap<EntityTracker> entityTrackers = FabRefl.getEntityTrackers(tacs);
-		EntityTracker tracker = entityTrackers.get(entity.getEntityId());
+		EntityTracker tracker = entityTrackers.get(entity.getId());
 		if (tracker == null) return Collections.emptySet();
 		return FabRefl.getPlayersTracking(tracker);
 	}

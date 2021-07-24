@@ -33,7 +33,7 @@ public abstract class MixinItemModels {
 			cancellable=true, require=0)
 	public void getModel(ItemStack stack, CallbackInfoReturnable<BakedModel> ci) {
 		if (!MixinConfigPlugin.isEnabled("*.obsidian_tears")) return;
-		if (stack.getItem() == Items.POTION && stack.hasTag() && stack.getTag().getBoolean("fabrication:ObsidianTears") && fabrication$obsidianTearsModel != null) {
+		if (stack.getItem() == Items.POTION && stack.hasNbt() && stack.getNbt().getBoolean("fabrication:ObsidianTears") && fabrication$obsidianTearsModel != null) {
 			ci.setReturnValue(fabrication$obsidianTearsModel);
 		}
 	}
