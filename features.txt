@@ -1261,6 +1261,13 @@ balance.ender_dragon_always_spawn_egg
 	desc:
 		Ender dragon always spawn a dragon egg when killed.
 
+balance.anvil_full_repair
+	name: Anvil Fully Repairs
+	since: 1.3.5
+	sides: server_only
+	desc:
+		Any item repair in the anvil will restore item durability.
+
 weird_tweaks
 	name: Weird Tweaks
 	since: 1.0
