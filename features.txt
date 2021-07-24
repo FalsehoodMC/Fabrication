@@ -1268,6 +1268,28 @@ balance.mobs_dont_drop_ingots
 	desc:
 		All ingot mob drops are converted to nuggets where possible, otherwise voided.
 
+balance.disable_mending_trade
+	name: Disable Mending Trade
+	since: 1.3.5
+	sides: server_only
+	desc:
+		Stops new villagers from offering mending.
+
+balance.disable_mending
+	name: Disable Mending
+	since: 1.3.5
+	sides: server_only
+	desc:
+		Stops the mending enchantment from working.
+
+balance.disable_pearl_stasis
+	name: Disable Storing Thrown Ender Pearls
+	since: 1.3.5
+	sides: server_only
+	desc:
+		Ender pearls forget who threw them when being unloaded.
+		Which means saving a ender pearl in a bubble column becomes more difficult.
+
 weird_tweaks
 	name: Weird Tweaks
 	since: 1.0
@@ -1418,6 +1440,13 @@ weird_tweaks.disable_nether_fog
 	sides: client_only
 	desc:
 		Removes thick nether fog.
+
+weird_tweaks.disable_night_skip
+	name: Disable Night Skip
+	since: 1.3.5
+	sides: server_only
+	desc:
+		Prevents beds from skipping the night.
 
 woina
 	name: What's Old Is New Again
