@@ -1261,6 +1261,13 @@ balance.ender_dragon_always_spawn_egg
 	desc:
 		Ender dragon always spawn a dragon egg when killed.
 
+balance.mobs_dont_drop_ingots
+	name: Mobs Drop Less Metal
+	since: 1.3.5
+	sides: server_only
+	desc:
+		All ingot mob drops are converted to nuggets where possible, otherwise voided.
+
 balance.disable_mending_trade
 	name: Disable Mending Trade
 	since: 1.3.5
