@@ -27,15 +27,8 @@ public class MixinTitleScreen extends Screen {
         super(title);
     }
 
-    @Shadow
-    @Final
-    boolean doBackgroundFade;
-
-    @Shadow
-    long backgroundFadeStart;
-
     @Inject(method = "render", at = @At(value="INVOKE", target="Lnet/minecraft/client/gui/RotatingCubeMapRenderer;render(FF)V", shift = At.Shift.AFTER))
-    public void drawDirt(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+    public void drawDirt(CallbackInfo ci) {
         if (MixinConfigPlugin.isEnabled("*.dirt_screen")) {
             renderBackgroundTexture(0);
         }
