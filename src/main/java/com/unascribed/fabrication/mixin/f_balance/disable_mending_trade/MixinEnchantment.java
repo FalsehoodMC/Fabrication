@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Enchantment.class)
 @EligibleIf(configEnabled="*.disable_mending_trade")
-public class MixinItemStack {
+public class MixinEnchantment {
 
 	@Inject(at=@At("HEAD"), method= "isAvailableForEnchantedBookOffer()Z", cancellable=true)
 	public void getRepairCost(CallbackInfoReturnable<Boolean> cir) {
