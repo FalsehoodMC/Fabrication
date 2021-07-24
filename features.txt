@@ -1261,6 +1261,13 @@ balance.ender_dragon_always_spawn_egg
 	desc:
 		Ender dragon always spawn a dragon egg when killed.
 
+balance.disable_mending_trade
+	name: Disable Mending Trade
+	since: 1.3.5
+	sides: server_only
+	desc:
+		Stops new villagers from offering mending.
+
 balance.disable_mending
 	name: Disable Mending
 	since: 1.3.5
