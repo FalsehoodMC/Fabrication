@@ -27,21 +27,10 @@ public class MixinTitleScreen extends Screen {
         super(title);
     }
 
-    @Shadow
-    @Final
-    boolean doBackgroundFade;
-
-    @Shadow
-    long backgroundFadeStart;
-
-    @Redirect(method = "render", at = @At(value="INVOKE", target="Lnet/minecraft/client/gui/RotatingCubeMapRenderer;render(FF)V"))
-    public void drawDirt(RotatingCubeMapRenderer rotatingCubeMapRenderer, float delta, float alpha) {
+    @Inject(method = "render", at = @At(value="INVOKE", target="Lnet/minecraft/client/gui/RotatingCubeMapRenderer;render(FF)V", shift = At.Shift.AFTER))
+    public void drawDirt(CallbackInfo ci) {
         if (MixinConfigPlugin.isEnabled("*.dirt_screen")) {
             renderBackgroundTexture(0);
-        }
-        else {
-            float f = doBackgroundFade ? (float)(Util.getMeasuringTimeMs() - backgroundFadeStart) / 1000.0F : 1.0F;
-            rotatingCubeMapRenderer.render(delta, MathHelper.clamp(f,0.0F, 1.0F));
         }
     }
 }
