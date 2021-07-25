@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ThrownItemEntity.class)
 @EligibleIf(configEnabled="*.disable_pearl_stasis")
 public abstract class MixinThrownItemEntity {
-    @Inject(at=@At("TAIL"), method= "writeCustomDataToTag(Lnet/minecraft/nbt/NbtCompound;)V")
+    @Inject(at=@At("TAIL"), method= "writeCustomDataToNbt(Lnet/minecraft/nbt/NbtCompound;)V")
     public void remove_pearl_owner(NbtCompound tag, CallbackInfo ci) {
         if(((Object)this) instanceof EnderPearlEntity && MixinConfigPlugin.isEnabled("*.disable_pearl_stasis"))
             tag.remove("Owner");

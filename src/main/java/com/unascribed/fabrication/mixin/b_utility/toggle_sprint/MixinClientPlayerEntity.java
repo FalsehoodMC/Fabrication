@@ -8,17 +8,20 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientPlayerEntity.class)
 @EligibleIf(configEnabled="*.toggle_sprint", envMatches=Env.CLIENT)
 public class MixinClientPlayerEntity {
 
-	@Redirect(at=@At(value = "INVOKE", target = "Lnet/minecraft/client/options/KeyBinding;isPressed()Z"), method="tickMovement()V")
+	@Redirect(at=@At(value="INVOKE", target="Lnet/minecraft/client/option/KeyBinding;isPressed()Z"), method="tickMovement()V")
 	public boolean isPressed(KeyBinding keyBinding) {
 		if (MixinConfigPlugin.isEnabled("*.toggle_sprint") && keyBinding.getTranslationKey().equals("key.sprint") && FeatureToggleSprint.sprinting) {
 			return true;
 		}
 		return keyBinding.isPressed();
 	}
+
 }

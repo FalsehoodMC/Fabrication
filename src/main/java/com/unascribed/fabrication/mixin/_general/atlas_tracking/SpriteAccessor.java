@@ -9,6 +9,8 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 @Mixin(Sprite.class)
 @EligibleIf(envMatches= Env.CLIENT)
 public interface SpriteAccessor {
+    //TODO
+    //I assume this kind of thing is supposed to be handled by unreflectGetter in FabRefl ??? no clue
     @Invoker("getFrameCount")
     int getFrameCount();
 }

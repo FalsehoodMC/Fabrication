@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
+import net.minecraft.client.render.*;
 import org.apache.commons.lang3.ArrayUtils;
 import org.lwjgl.opengl.GL11;
 
@@ -39,11 +40,6 @@ import io.github.queerbric.pride.PrideFlags;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.PacketByteBuf;
@@ -196,6 +192,7 @@ public class FabricationConfigScreen extends Screen {
 		if (leaving) {
 			timeLeaving += delta;
 		}
+		/*TODO
 		if (parent != null && (leaving || timeExisted < 10) && !MixinConfigPlugin.isEnabled("*.reduced_motion")) {
 			float a = sCurve5((leaving ? Math.max(0, 10-timeLeaving) : timeExisted)/10);
 			GlStateManager.pushMatrix();
@@ -234,6 +231,7 @@ public class FabricationConfigScreen extends Screen {
 			drawForeground(matrices, mouseX, mouseY, delta);
 			GlStateManager.popMatrix();
 		}
+		*/
 		if (leaving && timeLeaving > 10) {
 			client.setScreen(parent);
 		}
@@ -253,12 +251,12 @@ public class FabricationConfigScreen extends Screen {
 		
 		Matrix4f mat = matrices.peek().getModel();
 		
-		GlStateManager.enableBlend();
+		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 		float time = selectedSection == null ? 10-selectTime : prevSelectedSection == null ? selectTime : 0;
-		GlStateManager.color4f(1, 1, 1, 1);
-		
-		GlStateManager.disableCull();
+		RenderSystem.setShaderColor(1, 1, 1, 1);
+
+		RenderSystem.disableCull();
 		BufferBuilder bb = Tessellator.getInstance().getBuffer();
 
 		float top = (570/1080f)*height;
@@ -273,9 +271,10 @@ public class FabricationConfigScreen extends Screen {
 			if (prideFlag != null) {
 				prideFlag.render(matrices, brk, top, w, bottom-top);
 			} else {
+				/*TODO
 				GlStateManager.shadeModel(GL11.GL_SMOOTH);
-				GlStateManager.disableTexture();
-				bb.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
+				RenderSystem.disableTexture();
+				bb.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 				float r = MathHelper.lerp(flagCutoffV, 0.298f, 0.475f);
 				float g = MathHelper.lerp(flagCutoffV, 0.686f, 0.333f);
 				float b = MathHelper.lerp(flagCutoffV, 0.314f, 0.282f);
@@ -285,15 +284,18 @@ public class FabricationConfigScreen extends Screen {
 				bb.vertex(mat, brk, bottom, 0).color(0.475f, 0.333f, 0.282f, 1).next();
 				bb.end();
 				BufferRenderer.draw(bb);
-				GlStateManager.enableTexture();
+				RenderSystem.enableTexture();
 				GlStateManager.shadeModel(GL11.GL_FLAT);
+				*/
 			}
 		}
 		
 		client.getTextureManager().bindTexture(BG);
+		/*TODO
 		GlStateManager.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 		GlStateManager.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-		bb.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE);
+		 */
+		bb.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
 		bb.vertex(mat, Math.max(cutoffX, border), cutoffY, 0).texture(0, cutoffV).next();
 		bb.vertex(mat, brk, cutoffY, 0).texture(0, cutoffV).next();
 		bb.vertex(mat, brk, height, 0).texture(0, 1).next();
@@ -370,6 +372,7 @@ public class FabricationConfigScreen extends Screen {
 		int i = 0;
 		float selectedChoiceY = -60;
 		float prevSelectedChoiceY = -60;
+		/*TODO
 		for (String s : options.keySet()) {
 			float selectA;
 			if (s.equals(selectedSection)) {
@@ -382,10 +385,10 @@ public class FabricationConfigScreen extends Screen {
 				selectA = 0;
 			}
 			if (selectA > 0) {
-				GlStateManager.disableCull();
-				GlStateManager.enableBlend();
+				RenderSystem.disableCull();
+				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
-				GlStateManager.disableTexture();
+				RenderSystem.disableTexture();
 				GlStateManager.disableAlphaTest();
 				GlStateManager.shadeModel(GL11.GL_SMOOTH);
 				GL11.glBegin(GL11.GL_QUADS);
@@ -399,11 +402,11 @@ public class FabricationConfigScreen extends Screen {
 				GL11.glVertex2f(0, y+36);
 				GL11.glEnd();
 				GlStateManager.shadeModel(GL11.GL_FLAT);
-				GlStateManager.enableTexture();
+				RenderSystem.enableTexture();
 			}
 			float startY = y;
 			if (y >= -24 && y < height) {
-				GlStateManager.enableBlend();
+				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
 				client.getTextureManager().bindTexture(new Identifier("fabrication", "category/"+s+".png"));
 				GlStateManager.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
@@ -414,6 +417,7 @@ public class FabricationConfigScreen extends Screen {
 				drawTexture(matrices, (130-26), 0, 0, 0, 0, 24, Math.min(24, (int)Math.ceil(height-y)), 24, 24);
 				GlStateManager.popMatrix();
 			}
+
 			if (y >= -12 && y < height) {
 				textRenderer.draw(matrices, "§l"+FeaturesFile.get(s).shortName, 4, y, -1);
 			}
@@ -472,7 +476,7 @@ public class FabricationConfigScreen extends Screen {
 		}
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.disableDepthTest();
+		RenderSystem.disableDepthTest();
 		fill(matrices, width-120, 0, width*2, 16, 0x33000000);
 		GlStateManager.pushMatrix();
 			GlStateManager.translatef(width-60, 8, 0);
@@ -620,6 +624,8 @@ public class FabricationConfigScreen extends Screen {
 					s -> new LiteralText(s)), mouseX+10, 20+mouseY);
 		}
 		GlStateManager.popMatrix();
+
+			 */
 	}
 	
 	private void checkServerData() {
@@ -653,6 +659,7 @@ public class FabricationConfigScreen extends Screen {
 
 	private void drawSection(MatrixStack matrices, String section, float mouseX, float mouseY, float choiceY, float a, boolean selected) {
 		if (a <= 0) return;
+		/*TODO
 		if (MixinConfigPlugin.isEnabled("general.reduced_motion")) {
 			a = 1;
 		}
@@ -676,7 +683,7 @@ public class FabricationConfigScreen extends Screen {
 			y += height;
 			y += 22;
 		} else {
-			GlStateManager.enableBlend();
+			RenderSystem.enableBlend();
 			RenderSystem.defaultBlendFunc();
 			client.getTextureManager().bindTexture(new Identifier("fabrication", "category/"+section+".png"));
 			GlStateManager.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
@@ -691,7 +698,7 @@ public class FabricationConfigScreen extends Screen {
 			GlStateManager.disableAlphaTest();
 			GlStateManager.popMatrix();
 			if ("general".equals(section)) {
-				GlStateManager.enableBlend();
+				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
 				client.getTextureManager().bindTexture(new Identifier("fabrication", "coffee_bean.png"));
 				GlStateManager.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
@@ -763,6 +770,7 @@ public class FabricationConfigScreen extends Screen {
 			fill(matrices, width-2, Math.max(16, (int)knobY), width, Math.min(height-20, (int)(knobY+knobHeight)), 0xAAFFFFFF);
 		}
 		GlStateManager.popMatrix();
+		*/
 	}
 
 	private boolean drawButton(MatrixStack matrices, int x, int y, int w, int h, String text, float mouseX, float mouseY) {
@@ -840,6 +848,7 @@ public class FabricationConfigScreen extends Screen {
 				disappearAnimationTime.put(key, disappearTime);
 			}
 		}
+		/*TODO
 		GlStateManager.pushMatrix();
 		GlStateManager.translatef(0, y, 0);
 		float dia = sCurve5((5-disappearTime)/5f);
@@ -849,6 +858,7 @@ public class FabricationConfigScreen extends Screen {
 		} else {
 			GlStateManager.scalef(1, scale = dia, 1);
 		}
+		*/
 		boolean noUnset = key.startsWith("general.");
 		Trilean currentValue = noUnset ? (isEnabled(key) ? Trilean.TRUE : Trilean.FALSE) : getValue(key);
 		boolean keyEnabled = isEnabled(key);
@@ -869,6 +879,7 @@ public class FabricationConfigScreen extends Screen {
 		}
 		fill(matrices, 134, 1, 134+45, 10, 0x66000000);
 		if (!noUnset) fill(matrices, 134+15, 1, 134+15+15, 10, 0x33000000);
+		/*TODO
 		GlStateManager.pushMatrix();
 		GlStateManager.translatef(134+(prevX+((curX-prevX)*a)), 0, 0);
 		int knobAlpha = ((int)((noValue ? 1-da : 1) * 255))<<24;
@@ -877,11 +888,11 @@ public class FabricationConfigScreen extends Screen {
 			fill(matrices, keyEnabled ? 15 : -1, 1, keyEnabled ? 16 : 0, 10, MathHelper.hsvToRgb((keyEnabled ? 120 : 0)/360f, 0.9f, 0.8f)|knobAlpha);
 		}
 		GlStateManager.popMatrix();
-		GlStateManager.enableBlend();
+		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 		client.getTextureManager().bindTexture(new Identifier("fabrication", "trilean.png"));
 		GlStateManager.color4f(1, 1, 1, 0.5f+((1-da)*0.5f));
-		GlStateManager.enableTexture();
+		RenderSystem.enableTexture();
 		if (noUnset) {
 			drawTexture(matrices, 134+3, 1, 0, 0, 15, 9, 45, 9);
 			drawTexture(matrices, 134+4+22, 1, 30, 0, 15, 9, 45, 9);
@@ -960,6 +971,7 @@ public class FabricationConfigScreen extends Screen {
 				}
 			}
 		}
+		*/
 		return (y+2);
 	}
 
@@ -995,7 +1007,7 @@ public class FabricationConfigScreen extends Screen {
 	}
 	
 	private void color(int packed, float alpha) {
-		GlStateManager.color4f(((packed>>16)&0xFF)/255f, ((packed>>8)&0xFF)/255f, ((packed>>0)&0xFF)/255f, alpha);
+		RenderSystem.setShaderColor(((packed>>16)&0xFF)/255f, ((packed>>8)&0xFF)/255f, ((packed>>0)&0xFF)/255f, alpha);
 	}
 
 	@Override
@@ -1011,7 +1023,8 @@ public class FabricationConfigScreen extends Screen {
 			// new modmenu re-uses screen instances aggressively. an individual instance of this
 			// screen is not designed to be (and cannot be) re-used. delete us from the cache.
 			if (parent instanceof ModsScreen) {
-				((ModsScreen)parent).configScreenCache.remove("fabrication");
+				//TODO
+				//((ModsScreen)parent).configScreenCache.remove("fabrication");
 			}
 		} catch (Throwable t) {}
 	}

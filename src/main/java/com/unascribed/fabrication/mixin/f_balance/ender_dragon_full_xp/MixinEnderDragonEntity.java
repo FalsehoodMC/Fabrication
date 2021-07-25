@@ -6,14 +6,15 @@ import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.boss.dragon.EnderDragonFight;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(EnderDragonEntity.class)
 @EligibleIf(configEnabled="*.ender_dragon_full_xp")
 public class MixinEnderDragonEntity {
 
-	@Redirect(method = "updatePostDeath", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/boss/dragon/EnderDragonFight;hasPreviouslyKilled()Z"))
-	public boolean hasPreviouslyKilled(EnderDragonFight enderDragonFight){
-		return !MixinConfigPlugin.isEnabled("*.ender_dragon_full_xp") && enderDragonFight.hasPreviouslyKilled();
+	@ModifyVariable(method="updatePostDeath", at=@At(value="STORE", ordinal=0), ordinal=0)
+	private int fullXp(int old){
+		return MixinConfigPlugin.isEnabled("*.ender_dragon_full_xp") && old == 500 ? 1500 : old;
 	}
 }

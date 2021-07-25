@@ -5,11 +5,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -146,7 +142,9 @@ public class FabRefl {
 			.requiredBy("*.sync_attacker_yaw", "*.despawning_items_blink").get();
 	public static Set<ServerPlayerEntity> getPlayersTracking(EntityTracker subject) {
 		try {
-			return (Set<ServerPlayerEntity>)checkHandle(et_playersTracking).invokeExact(subject);
+			return Collections.emptySet();
+			//TODO fix et_playersTracking unreflectGetter
+			//return (Set<ServerPlayerEntity>)checkHandle(et_playersTracking).invokeExact(subject);
 		} catch (Throwable t) {
 			throw rethrow(t);
 		}
@@ -216,7 +214,9 @@ public class FabRefl {
 			.requiredBy("*.legible_signs").get();
 	public static int getColor(DyeColor subject) {
 		try {
-			return (int)checkHandle(dc_color).invokeExact(subject);
+			return 20;
+			//TODO fix dc_color unreflectGetter
+			//return (int)checkHandle(dc_color).invokeExact(subject);
 		} catch (Throwable t) {
 			throw rethrow(t);
 		}

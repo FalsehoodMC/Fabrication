@@ -107,6 +107,7 @@ public class MixinTitleScreen extends Screen {
 	@Inject(at=@At("TAIL"), method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
 	public void renderTail(MatrixStack matrices, int mouseX, int mouseY, float tickDelta, CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.block_logo")) return;
+		/*TODO
 		if (splashText != null) {
 			float fade = doBackgroundFade ? MathHelper.clamp(((Util.getMeasuringTimeMs() - backgroundFadeStart) / 1000f)-1, 0, 1) : 1;
 			int l = MathHelper.ceil(fade * 255.0f) << 24;
@@ -119,6 +120,8 @@ public class MixinTitleScreen extends Screen {
 			drawCenteredText(matrices, textRenderer, splashText, 0, -8, 0xFFFF00 | l);
 			RenderSystem.popMatrix();
 		}
+
+		 */
 	}
 	
 	
@@ -138,6 +141,7 @@ public class MixinTitleScreen extends Screen {
 	
 	@Unique
 	private void drawLogo(float partialTicks) {
+		/*TODO
 		MinecraftClient mc = MinecraftClient.getInstance();
 		float fade = doBackgroundFade ? MathHelper.clamp(((Util.getMeasuringTimeMs() - backgroundFadeStart) / 1000f)-1, 0, 1) : 1;
 		int logoDataWidth = LoaderBlockLogo.unrecoverableLoadError ? 48 : LoaderBlockLogo.image.getWidth();
@@ -188,7 +192,7 @@ public class MixinTitleScreen extends Screen {
 		GlStateManager.matrixMode(GL_MODELVIEW);
 		GlStateManager.pushMatrix();
 		GlStateManager.loadIdentity();
-		GlStateManager.disableCull();
+		RenderSystem.disableCull();
 		GlStateManager.depthMask(true);
 		GlStateManager.pushMatrix();
 		DiffuseLighting.enable();
@@ -205,7 +209,7 @@ public class MixinTitleScreen extends Screen {
 				GlStateManager.clear(GL_DEPTH_BUFFER_BIT, false);
 				GlStateManager.translatef(0, -0.4f, 0);
 				GlStateManager.scalef(0.98f, 1, 1);
-				GlStateManager.enableBlend();
+				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
 			}
 			if (pass == 1) {
@@ -213,7 +217,7 @@ public class MixinTitleScreen extends Screen {
 				GlStateManager.clear(GL_DEPTH_BUFFER_BIT, false);
 			}
 			if (pass == 2) {
-				GlStateManager.enableBlend();
+				RenderSystem.enableBlend();
 				GlStateManager.blendFunc(GL_SRC_COLOR, GL_ONE);
 			}
 			GlStateManager.scalef(1, -1, 1);
@@ -221,10 +225,10 @@ public class MixinTitleScreen extends Screen {
 			GlStateManager.scalef(0.89f, 1, 0.4f);
 			GlStateManager.translatef(-logoDataWidth * 0.5f, -logoDataHeight * 0.5f, 0);
 			if (pass == 0) {
-				GlStateManager.disableTexture();
+				RenderSystem.disableTexture();
 				GlStateManager.color4f(1, 1, 1, 1);
 			} else {
-				GlStateManager.enableTexture();
+				RenderSystem.enableTexture();
 				GlStateManager.color4f(1, 1, 1, 1);
 			}
 			
@@ -340,13 +344,14 @@ public class MixinTitleScreen extends Screen {
 		}
 
 		DiffuseLighting.disable();
-		GlStateManager.disableBlend();
+		RenderSystem.disableBlend();
 		GlStateManager.matrixMode(GL_PROJECTION);
 		GlStateManager.popMatrix();
 		GlStateManager.viewport(0, 0, mc.getWindow().getFramebufferWidth(), mc.getWindow().getFramebufferHeight());
 		GlStateManager.matrixMode(GL_MODELVIEW);
 		GlStateManager.popMatrix();
-		GlStateManager.enableCull();
+		RenderSystem.enableCull();
+		*/
 	}
 	
 }
