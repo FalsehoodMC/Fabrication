@@ -209,14 +209,12 @@ public class FabRefl {
 			throw rethrow(t);
 		}
 	}
-	
-	private static final MethodHandle dc_color = unreflectGetter("DyeColor", () -> DyeColor.class, "color", "field_7949", "field_193351_w")
+
+	private static final MethodHandle dc_color = unreflectGetter("DyeColor", () -> DyeColor.class, "signColor", "field_16537", "")
 			.requiredBy("*.legible_signs").get();
-	public static int getColor(DyeColor subject) {
+	public static int getOriginalSignColor(DyeColor subject) {
 		try {
-			return 20;
-			//TODO fix dc_color unreflectGetter
-			//return (int)checkHandle(dc_color).invokeExact(subject);
+			return (int)checkHandle(dc_color).invokeExact(subject);
 		} catch (Throwable t) {
 			throw rethrow(t);
 		}
