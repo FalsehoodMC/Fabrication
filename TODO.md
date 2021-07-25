@@ -19,27 +19,25 @@
 - utility.despawning_items_blink
 - fixes.sync_attacker_yaw
 - woina.blinking_drop
+- mechanics.grindstone_disenchanting
+- mechanics.slowfall_splash_on_inanimates
 
 ### Visually Broken
 - utility.toggle_stance
 - woina.old_tooltip (has a darker background in trading screen)
-- tweaks.cracking_spawn_eggs
+- pedantry.oak_is_apple & tnt_is_dynamite
+  - Shows up in resource pack menu don't know if intended or not
 
 
-### Tested
+### Untested
 
 - [ ] experiments.packed_atlases
-- [ ] mechanics.grindstone_disenchanting
-- [ ] mechanics.obsidian_tears
-- [ ] mechanics.slowfall_splash_on_inanimates
-- [ ]   minor_mechanics.exact_note_block_tuning
-- [ ]   minor_mechanics.feather_falling_five
+- [ ] minor_mechanics.feather_falling_five
 - [ ]   minor_mechanics.feather_falling_five_damages_boots
 - [ ]   minor_mechanics.fire_aspect_is_flint_and_steel
 - [ ]   minor_mechanics.fire_protection_on_any_item
 - [ ]   minor_mechanics.furnace_minecart_any_fuel
 - [ ]   minor_mechanics.infibows
-- [ ]   minor_mechanics.mechanism_muffling
 - [ ]   minor_mechanics.note_block_notes
 - [ ]   minor_mechanics.note_blocks_play_on_landing
 - [ ]   minor_mechanics.observers_see_entities
@@ -48,34 +46,17 @@
 - [ ]   minor_mechanics.spiders_cant_climb_while_wet
 - [ ]   minor_mechanics.unsaddle_creatures
 - [ ]   minor_mechanics.water_fills_on_break
-- [ ]   pedantry.oak_is_apple
-- [ ]   pedantry.tnt_is_dynamite
-- [ ]   situational.all_damage_is_fatal
 - [ ]   situational.disable_bees
-- [ ]   situational.disable_elytra
-- [ ]   situational.item_frame_no_name_display
-- [ ]   situational.player_free_spawners
-- [ ]   situational.static_dragon_egg
 - [ ]   situational.weapons_accept_silk
-- [ ]   tweaks.creepers_explode_when_on_fire
 - [ ]   tweaks.feather_falling_no_trample
-- [ ]   tweaks.flammable_cobwebs
 - [ ]   tweaks.fullres_banner_shields
 - [ ]   tweaks.ghast_panic
 - [ ]   tweaks.ghost_chest_woo_woo
 - [ ]   tweaks.legible_signs
-- [ ]   tweaks.less_annoying_fire
-- [ ]   tweaks.less_restrictive_note_blocks
-- [ ]   tweaks.long_levelup_sound_at_30
+- [ ] tweaks.less_restrictive_note_blocks
 - [ ]   tweaks.nether_cauldron
 - [ ]   tweaks.no_dinnerlava
-- [ ]   tweaks.no_hand_sway
-- [ ]   tweaks.no_sneak_bypass
 - [ ]   tweaks.normal_fog_with_night_vision
-- [ ]   tweaks.play_note_blocks_in_creative
-- [ ]   tweaks.rainbow_experience
-- [ ]   tweaks.reverse_note_block_tuning
-- [ ]   tweaks.see_items_while_riding
 - [ ]   tweaks.shulker_bullets_despawn_on_death
 - [ ]   tweaks.silent_minecarts
 - [ ]   tweaks.tridents_in_void_return
@@ -98,7 +79,4 @@
 - [ ]   weird_tweaks.item_safe_cactus
 - [ ]   weird_tweaks.photoallergic_creepers
 - [ ]   weird_tweaks.photoresistant_mobs
-- [ ]   weird_tweaks.repelling_void
-- [ ]   weird_tweaks.underwater_explosions
-- [ ]   weird_tweaks.use_items_while_riding
-- [ ]   weird_tweaks.villagers_follow_emerald_blocks
+- [ ] weird_tweaks.repelling_void
