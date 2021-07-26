@@ -1,6 +1,5 @@
 package com.unascribed.fabrication.mixin.c_tweaks.legible_signs;
 
-import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
@@ -18,13 +17,17 @@ public class MixinSignBlockEntityRenderer {
 
 	@Inject(at=@At("HEAD"), method= "getColor(Lnet/minecraft/block/entity/SignBlockEntity;)I", cancellable = true)
 	private static void modifySignTextColor(SignBlockEntity sign, CallbackInfoReturnable<Integer> cir) {
-		if (MixinConfigPlugin.isEnabled("*.legible_signs")){
+		if (MixinConfigPlugin.isEnabled("*.legible_signs") && !sign.isGlowingText()){
 			DyeColor dc = sign.getTextColor();
+
 			cir.setReturnValue(switch (dc) {
 				case BLACK -> 0x000000;
 				case GRAY -> 0x333333;
-				case BROWN -> FabRefl.getOriginalSignColor(dc);
-				default -> dc.getSignColor();
+				case BROWN -> dc.getSignColor();
+				default -> {
+					float[] bgr = dc.getColorComponents();
+					yield  Math.round(bgr[0]*255.0F) << 16 | Math.round(bgr[1]*255.0F) << 8 | Math.round(bgr[2]*255);
+				}
 			});
 		}
 	}

@@ -210,16 +210,6 @@ public class FabRefl {
 		}
 	}
 
-	private static final MethodHandle dc_color = unreflectGetter("DyeColor", () -> DyeColor.class, "signColor", "field_16537", "")
-			.requiredBy("*.legible_signs").get();
-	public static int getOriginalSignColor(DyeColor subject) {
-		try {
-			return (int)checkHandle(dc_color).invokeExact(subject);
-		} catch (Throwable t) {
-			throw rethrow(t);
-		}
-	}
-	
 	private static final MethodHandle ie_pickupDelay = unreflectGetter("ItemEntity", () -> ItemEntity.class, "pickupDelay", "field_7202", "field_145804_b")
 			.requiredBy("*.instant_pickup").get();
 	public static int getPickupDelay(ItemEntity subject) {

@@ -12,6 +12,7 @@ import com.google.common.collect.Sets;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.resource.ClientBuiltinResourcePackProvider;
 import net.minecraft.resource.ResourcePack;
 import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.resource.ResourcePackProvider;
@@ -56,7 +57,7 @@ public abstract class ResourcePackFeature implements Feature, ResourcePackProvid
 		if (active) {
 			Supplier<ResourcePack> f = () -> new FabricationResourcePack(path);
 			consumer.accept(factory.create("Fabrication "+path, new LiteralText("Internal Fabrication resources"),true, f,
-					new PackResourceMetadata(new LiteralText("Internal Fabrication resources"), 6),
+					new PackResourceMetadata(new LiteralText("Internal Fabrication resources"), 7),
 					InsertionPosition.TOP, ResourcePackSource.PACK_SOURCE_BUILTIN));
 		}
 	}
