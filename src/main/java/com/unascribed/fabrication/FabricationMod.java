@@ -30,6 +30,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.EntityTrackingListener;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage;
@@ -150,7 +151,7 @@ public class FabricationMod implements ModInitializer {
 		}
 	}
 	
-	public static Set<ServerPlayerEntity> getTrackers(Entity entity) {
+	public static Set<EntityTrackingListener> getTrackers(Entity entity) {
 		ServerChunkManager cm = ((ServerWorld)entity.world).getChunkManager();
 		ThreadedAnvilChunkStorage tacs = cm.threadedAnvilChunkStorage;
 		Int2ObjectMap<EntityTracker> entityTrackers = FabRefl.getEntityTrackers(tacs);
@@ -161,14 +162,15 @@ public class FabricationMod implements ModInitializer {
 	
 	public static void sendToTrackersMatching(Entity entity, CustomPayloadS2CPacket pkt, Predicate<ServerPlayerEntity> predicate) {
 		if (entity.world.isClient) return;
-		Set<ServerPlayerEntity> playersTracking = getTrackers(entity);
+		Set<EntityTrackingListener> playersTracking = getTrackers(entity);
 		if (entity instanceof ServerPlayerEntity) {
 			ServerPlayerEntity spe = (ServerPlayerEntity)entity;
 			if (predicate.test(spe)) {
 				spe.networkHandler.sendPacket(pkt);
 			}
 		}
-		for (ServerPlayerEntity spe : playersTracking) {
+		for (EntityTrackingListener etl : playersTracking) {
+			ServerPlayerEntity spe = etl.getPlayer();
 			if (predicate.test(spe)) {
 				spe.networkHandler.sendPacket(pkt);
 			}

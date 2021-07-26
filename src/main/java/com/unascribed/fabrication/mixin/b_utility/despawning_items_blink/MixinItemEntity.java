@@ -39,7 +39,7 @@ public abstract class MixinItemEntity extends Entity implements RenderingAgeAcce
 	public void tick(CallbackInfo ci) {
 		Object self = this;
 		if (!world.isClient) {
-			if (((Entity)self).age % 10 == 0) {
+			if (itemAge % 10 == 0) {
 				PacketByteBuf data = new PacketByteBuf(Unpooled.buffer(8));
 				data.writeInt(getId());
 				data.writeInt(itemAge);

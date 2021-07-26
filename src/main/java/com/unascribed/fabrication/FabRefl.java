@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import net.minecraft.server.world.EntityTrackingListener;
 import org.spongepowered.asm.mixin.throwables.MixinError;
 import org.spongepowered.asm.mixin.throwables.MixinException;
 
@@ -138,13 +139,11 @@ public class FabRefl {
 		}
 	}
 
-	private static final MethodHandle et_playersTracking = unreflectGetter("EntityTracker", () -> EntityTracker.class, "playersTracking", "field_18250", "field_219406_f")
+	private static final MethodHandle et_playersTracking = unreflectGetter("EntityTracker", () -> EntityTracker.class, "listeners", "field_18250", "field_219406_f")
 			.requiredBy("*.sync_attacker_yaw", "*.despawning_items_blink").get();
-	public static Set<ServerPlayerEntity> getPlayersTracking(EntityTracker subject) {
+	public static Set<EntityTrackingListener> getPlayersTracking(EntityTracker subject) {
 		try {
-			return Collections.emptySet();
-			//TODO fix et_playersTracking unreflectGetter
-			//return (Set<ServerPlayerEntity>)checkHandle(et_playersTracking).invokeExact(subject);
+			return (Set<EntityTrackingListener>)checkHandle(et_playersTracking).invokeExact(subject);
 		} catch (Throwable t) {
 			throw rethrow(t);
 		}

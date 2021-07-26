@@ -499,7 +499,7 @@ utility.yeet_recipes
 	since: 1.3.2
 	sides: server_only
 	desc:
-		Adds a yeet_recipes.ini that can be used to completely hide any recipe.
+		Adds a yeet_recipes.ini that can be used to completely remove any recipe.
 
 utility.mob_ids
 	name: Mob IDs

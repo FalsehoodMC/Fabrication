@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.c_tweaks.alt_absorption_sound;
 
+import net.minecraft.server.world.EntityTrackingListener;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -71,7 +72,9 @@ public abstract class MixinLivingEntity extends Entity implements DidJustAbsorp 
 			CustomPayloadS2CPacket fabPkt = new CustomPayloadS2CPacket(new Identifier("fabrication", "play_absorp_sound"), data);
 			SoundEvent defHurtSound = getHurtSound(src);
 			PlaySoundFromEntityS2CPacket vanPkt = defHurtSound == null ? null : new PlaySoundFromEntityS2CPacket(defHurtSound, getSoundCategory(), this, getSoundVolume(), getSoundPitch());
-			for (ServerPlayerEntity spe : FabricationMod.getTrackers(this)) {
+			for (EntityTrackingListener etl : FabricationMod.getTrackers(this)) {
+				ServerPlayerEntity spe = etl.getPlayer();
+				//TODO access spe.entity for instanceof check
 				if (spe instanceof SetFabricationConfigAware && ((SetFabricationConfigAware) spe).fabrication$isConfigAware()) {
 					spe.networkHandler.sendPacket(fabPkt);
 				} else if (vanPkt != null) {
