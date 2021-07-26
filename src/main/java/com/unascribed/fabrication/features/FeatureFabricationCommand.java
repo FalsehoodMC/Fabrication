@@ -12,8 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import com.mojang.brigadier.Command;
+import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.tree.CommandNode;
 import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.Cardinal;
 import com.unascribed.fabrication.FabLog;
@@ -340,12 +342,15 @@ public class FeatureFabricationCommand implements Feature {
 					return 1;
 				});
 				get.then(key);
+				if (s.contains("."))
+					get.then(LiteralArgumentBuilder.<T>literal("*"+s.substring(s.indexOf('.'))).executes(key.getCommand()));
 			}
 			config.then(get);
 			LiteralArgumentBuilder<T> set = LiteralArgumentBuilder.<T>literal("set");
 			for (String s : MixinConfigPlugin.getAllKeys()) {
 				if (dediServer && FeaturesFile.get(s).sides == Sides.CLIENT_ONLY) continue;
 				LiteralArgumentBuilder<T> key = LiteralArgumentBuilder.<T>literal(s);
+
 				String[] values;
 				if (s.equals("general.runtime_checks")) {
 					values = new String[]{"true", "false"};
@@ -355,13 +360,21 @@ public class FeatureFabricationCommand implements Feature {
 					values = new String[]{"unset", "true", "false"};
 				}
 				for (String v : values) {
-					key.then(LiteralArgumentBuilder.<T>literal(v)
+					LiteralArgumentBuilder<T> value =
+					LiteralArgumentBuilder.<T>literal(v)
 							.executes((c) -> {
 								setKeyWithFeedback(c, s, v);
 								return 1;
-							}));
+							});
+					key.then(value);
 				}
 				set.then(key);
+				if (s.contains(".")) {
+					LiteralArgumentBuilder<T> short_key = LiteralArgumentBuilder.<T>literal("*" + s.substring(s.indexOf('.')));
+					for (CommandNode<T> arg : key.getArguments())
+						short_key.then(arg);
+					set.then(short_key);
+				}
 			}
 			config.then(set);
 			config.then(LiteralArgumentBuilder.<T>literal("reload")

@@ -4,7 +4,7 @@
   "package": "com.unascribed.fabrication.mixin",
   "plugin": "com.unascribed.fabrication.support.MixinConfigPlugin",
   "refmap": "fabrication-refmap.json",
-  "compatibilityLevel": "JAVA_8",
+  "compatibilityLevel": "JAVA_16",
   "injectors": {
     "defaultRequire": 1
   }
