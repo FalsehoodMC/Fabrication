@@ -4,15 +4,14 @@ import static org.lwjgl.opengl.GL11.*;
 
 import java.util.function.BiConsumer;
 
+import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec3f;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -70,7 +69,7 @@ public class MixinTitleScreen extends Screen {
 	private boolean doBackgroundFade;
 	@Shadow
 	private long backgroundFadeStart;
-	
+
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/client/gui/screen/TitleScreen.method_29343(IILjava/util/function/BiConsumer;)V"),
 			method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V", expect=2)
 	public void drawLogo(TitleScreen subject, int x, int y, BiConsumer<Integer, Integer> callback) {
@@ -80,14 +79,14 @@ public class MixinTitleScreen extends Screen {
 		}
 		drawLogo(MinecraftClient.getInstance().getTickDelta());
 	}
-	
-	@Redirect(at=@At(value="INVOKE", target="net/minecraft/client/texture/TextureManager.bindTexture(Lnet/minecraft/util/Identifier;)V"),
+
+	@ModifyArg(at=@At(value="INVOKE", target="Lcom/mojang/blaze3d/systems/RenderSystem;setShaderTexture(ILnet/minecraft/util/Identifier;)V", ordinal=2),
 			method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
-	public void bindTexture(TextureManager subject, Identifier id) {
+	public Identifier bindTexture(Identifier id) {
 		if (MixinConfigPlugin.isEnabled("*.block_logo") && id == EDITION_TITLE_TEXTURE) {
 			id = FABRICATION$EMPTY;
 		}
-		subject.bindTexture(id);
+		return id;
 	}
 	
 	@Inject(at=@At("HEAD"), method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
@@ -107,30 +106,27 @@ public class MixinTitleScreen extends Screen {
 	@Inject(at=@At("TAIL"), method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
 	public void renderTail(MatrixStack matrices, int mouseX, int mouseY, float tickDelta, CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.block_logo")) return;
-		/*TODO
 		if (splashText != null) {
 			float fade = doBackgroundFade ? MathHelper.clamp(((Util.getMeasuringTimeMs() - backgroundFadeStart) / 1000f)-1, 0, 1) : 1;
 			int l = MathHelper.ceil(fade * 255.0f) << 24;
-			RenderSystem.pushMatrix();
-			RenderSystem.translatef(this.width / 2 + ((LoaderBlockLogo.unrecoverableLoadError ? 48 : LoaderBlockLogo.image.getWidth())*2.307692307692308f), 70, 0);
-			RenderSystem.rotatef(-20, 0, 0, 1);
+			matrices.push();
+			matrices.translate(this.width / 2.0 + ((LoaderBlockLogo.unrecoverableLoadError ? 48 : LoaderBlockLogo.image.getWidth())*2.307692307692308f), 70, 0);
+			matrices.multiply(new Quaternion(0,0,-20, true));
 			float s = 1.8f - MathHelper.abs(MathHelper.sin(Util.getMeasuringTimeMs() % 1000 / 1000f * 6.28f) * 0.1f);
 			s = s * 100f / (textRenderer.getWidth(splashText) + 32);
-			RenderSystem.scalef(s, s, s);
+			matrices.scale(s, s, s);
 			drawCenteredText(matrices, textRenderer, splashText, 0, -8, 0xFFFF00 | l);
-			RenderSystem.popMatrix();
+			matrices.pop();
 		}
 
-		 */
 	}
 	
 	
 	@Inject(at=@At("TAIL"), method="tick()V")
 	public void tick(CallbackInfo ci) {
 		if (fabrication$blocks != null) {
-			for (int y = 0; y < fabrication$blocks.length; y++) {
-				for (int x = 0; x < fabrication$blocks[y].length; x++) {
-					LogoBlock blk = fabrication$blocks[y][x];
+			for (LogoBlock[] fabrication$block : fabrication$blocks) {
+				for (LogoBlock blk : fabrication$block) {
 					if (blk != null) {
 						blk.tick();
 					}
@@ -141,7 +137,7 @@ public class MixinTitleScreen extends Screen {
 	
 	@Unique
 	private void drawLogo(float partialTicks) {
-		/*TODO
+
 		MinecraftClient mc = MinecraftClient.getInstance();
 		float fade = doBackgroundFade ? MathHelper.clamp(((Util.getMeasuringTimeMs() - backgroundFadeStart) / 1000f)-1, 0, 1) : 1;
 		int logoDataWidth = LoaderBlockLogo.unrecoverableLoadError ? 48 : LoaderBlockLogo.image.getWidth();
@@ -182,7 +178,7 @@ public class MixinTitleScreen extends Screen {
 	
 		// ported from beta 1.2_01. hell yeah
 		// getting MCP for that version to work was actually pretty easy
-		
+		/* TODO
 		GlStateManager.matrixMode(GL_PROJECTION);
 		GlStateManager.pushMatrix();
 		GlStateManager.loadIdentity();
@@ -193,7 +189,7 @@ public class MixinTitleScreen extends Screen {
 		GlStateManager.pushMatrix();
 		GlStateManager.loadIdentity();
 		RenderSystem.disableCull();
-		GlStateManager.depthMask(true);
+		RenderSystem.depthMask(true);
 		GlStateManager.pushMatrix();
 		DiffuseLighting.enable();
 		RenderSystem.setupGui3DDiffuseLighting(
@@ -213,12 +209,12 @@ public class MixinTitleScreen extends Screen {
 				RenderSystem.defaultBlendFunc();
 			}
 			if (pass == 1) {
-				GlStateManager.disableBlend();
+				RenderSystem.disableBlend();
 				GlStateManager.clear(GL_DEPTH_BUFFER_BIT, false);
 			}
 			if (pass == 2) {
 				RenderSystem.enableBlend();
-				GlStateManager.blendFunc(GL_SRC_COLOR, GL_ONE);
+				RenderSystem.blendFunc(GL_SRC_COLOR, GL_ONE);
 			}
 			GlStateManager.scalef(1, -1, 1);
 			GlStateManager.rotatef(15, 1, 0, 0);

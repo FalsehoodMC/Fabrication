@@ -1,6 +1,5 @@
 package com.unascribed.fabrication.client;
 
-import com.unascribed.fabrication.mixin._general.atlas_tracking.SpriteAccessor;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
@@ -14,7 +13,6 @@ import static org.lwjgl.opengl.GL14.*;
 
 import java.util.List;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.unascribed.fabrication.FabRefl;
 
@@ -174,7 +172,7 @@ public class AtlasViewerScreen extends Screen {
 			}
 			renderTooltip(matrices, Lists.<Text>newArrayList(
 				new LiteralText(s.getId().toString()),
-				new LiteralText("§7At "+x+","+y+" "+w+"×"+h+"×"+((SpriteAccessor)s).getFrameCount()+" @"+FabRefl.Client.getFrameIndex(s)+"."+FabRefl.Client.getFrameTicks(s)),
+				new LiteralText("§7At "+x+","+y+" "+w+"×"+h+"×"+FabRefl.Client.Sprite_getFrameCount()+" @"+FabRefl.Client.getFrameIndex(s)+"."+FabRefl.Client.getFrameTicks(s)),
 				new LiteralText("§7From §f"+src)
 			), (int)(mouseX+panX), (int)(mouseY+panY));
 		} else {
@@ -187,7 +185,7 @@ public class AtlasViewerScreen extends Screen {
 				int w = s.getWidth();
 				int h = s.getHeight();
 				li.add(new LiteralText(s.getId().toString()));
-				li.add(new LiteralText("§7At "+x+","+y+" "+w+"×"+h+"×"+((SpriteAccessor)s).getFrameCount()+" @"+FabRefl.Client.getFrameIndex(s)+"."+FabRefl.Client.getFrameTicks(s)));
+				li.add(new LiteralText("§7At "+x+","+y+" "+w+"×"+h+"×"+FabRefl.Client.Sprite_getFrameCount()+" @"+FabRefl.Client.getFrameIndex(s)+"."+FabRefl.Client.getFrameTicks(s)));
 			}
 			renderTooltip(matrices, li, (int)(mouseX+panX), (int)(mouseY+panY));
 		}

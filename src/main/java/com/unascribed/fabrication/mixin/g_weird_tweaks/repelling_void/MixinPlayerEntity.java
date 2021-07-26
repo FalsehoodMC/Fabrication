@@ -2,6 +2,7 @@ package com.unascribed.fabrication.mixin.g_weird_tweaks.repelling_void;
 
 import java.util.List;
 
+import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -27,6 +28,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PlayerEntity.class)
 @EligibleIf(configEnabled="*.repelling_void")
@@ -56,11 +58,10 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 	}
 	
 	
-	@Override
-	public void remove(RemovalReason reason) {
+	@Inject(at=@At("HEAD"), method= "damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", cancellable=true)
+	public void remove(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
 		Vec3d pos = fabrication$lastGroundPos;
-		if (MixinConfigPlugin.isEnabled("*.repelling_void") && pos != null) {
-			if (fabrication$debted) return;
+		if (MixinConfigPlugin.isEnabled("*.repelling_void") && !fabrication$debted && source.isOutOfWorld() && pos != null && this.getY() < -10) {
 			BlockPos bp = new BlockPos(pos).down();
 			if (!world.getBlockState(bp).isSideSolid(world, bp, Direction.UP, SideShapeType.CENTER)) {
 				boolean foundOne = false;
@@ -97,8 +98,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 				}
 			}
 			fabrication$debted = true;
-		} else {
-			super.remove(reason);
+			cir.setReturnValue(false);
 		}
 	}
 	

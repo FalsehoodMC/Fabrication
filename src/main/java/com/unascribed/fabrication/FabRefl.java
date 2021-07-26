@@ -259,7 +259,7 @@ public class FabRefl {
 
 	@Environment(EnvType.CLIENT)
 	public static final class Client {
-	
+
 		private static final MethodHandle satd_width = unreflectGetter("SpriteAtlasTexture.Data", () -> SpriteAtlasTexture.Data.class, "width", "field_17901", "field_217806_b")
 				.requiredBy("*.old_lava").get();
 		public static int getWidth(SpriteAtlasTexture.Data subject) {
@@ -396,7 +396,19 @@ public class FabRefl {
 				throw rethrow(t);
 			}
 		}
-		
+
+		private static final MethodHandle s_getFrameCount = unreflectMethod("Sprite", () -> Sprite.class, "getFrameCount", "method_4592", "",
+				int.class,
+				int.class, int.class, int.class, int.class, boolean.class)
+				.requiredBy("*.old_lava").get();
+		public static int Sprite_getFrameCount() {
+			try {
+				return (int)checkHandle(s_getFrameCount).invokeExact();
+			} catch (Throwable t) {
+				throw rethrow(t);
+			}
+		}
+
 	}
 	
 	private static MethodHandle checkHandle(MethodHandle handle) {
