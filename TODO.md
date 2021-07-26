@@ -18,11 +18,8 @@
 
 com.unascribed.fabrication.mixin.f_balance.anvil_damage_only_on_fall.MixinAnvilScreenHandler failed to apply! Force-disabling *.anvil_damage_only_on_fall
 
-Failed to retrieve field EntityTracker#playersTracking (deobf name playersTracking) - force-disabling *.despawning_items_blink, *.sync_attacker_yaw
-
 
 ### Visually Broken
-- utility.toggle_stance
 - woina.old_tooltip (has a darker background in trading screen)
 - pedantry.oak_is_apple & tnt_is_dynamite
   - Shows up in resource pack menu don't know if intended or not

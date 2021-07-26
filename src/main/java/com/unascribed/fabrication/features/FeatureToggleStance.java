@@ -2,7 +2,6 @@ package com.unascribed.fabrication.features;
 
 import java.util.Locale;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.client.FabricationConfigScreen;
@@ -80,7 +79,7 @@ public class FeatureToggleStance implements Feature {
 				RenderSystem.enableBlend();
 				RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
 				//GlStateManager.disableAlphaTest();
-				mc.getTextureManager().bindTexture(tex);
+				RenderSystem.setShaderTexture(0, tex);
 				RenderSystem.setShaderColor(1, 1, 1, a);
 				DrawableHelper.drawTexture(ms, (w.getScaledWidth()/2)-48, (w.getScaledHeight()-32)/2, 0, 0, 0, 32, 32, 32, 32);
 				RenderSystem.disableBlend();
