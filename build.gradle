@@ -1,6 +1,7 @@
 plugins {
 	id 'fabric-loom' version '0.8-SNAPSHOT'
 	id 'maven-publish'
+	id "io.github.juuxel.loom-quiltflower" version "1.1.1"
 }
 
 sourceCompatibility = JavaVersion.VERSION_16
@@ -38,16 +39,13 @@ dependencies {
 	modImplementation include(fabricApi.module("fabric-rendering-v1", "${project.fabric_version}"))
 	modImplementation include(fabricApi.module("fabric-rendering-v1", "${project.fabric_version}"))
 	modImplementation include(fabricApi.module("fabric-command-api-v1", "${project.fabric_version}"))
-	modImplementation(include("com.github.Queerbric:pridelib:87d9cb94cb")) {
+	
+	modImplementation(include("com.github.Queerbric:pridelib:d8ead31410")) {
 		transitive = false
 	}
 	modImplementation("com.terraformersmc:modmenu:2.0.3") {
 		transitive = false
 	}
-	/*TODO
-	modRuntime("com.github.SuperCoder7979:databreaker:715b589") {
-		transitive = false
-	}*/
 	modRuntime fabricApi.module("fabric-screen-api-v1", "${project.fabric_version}")
 }
 

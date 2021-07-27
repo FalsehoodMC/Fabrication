@@ -21,7 +21,7 @@ public abstract class MixinItemEntity {
 	@Shadow
 	public ItemStack getStack() { return null; }
 	
-	@Inject(at=@At("HEAD"), method="method_27314(F)F", cancellable=true)
+	@Inject(at=@At("HEAD"), method="getRotation(F)F", cancellable=true)
 	public void getRotation(float partialTicks, CallbackInfoReturnable<Float> ci) {
 		if (MixinConfigPlugin.isEnabled("*.billboard_drops")) {
 			// 0.5f exactly indicates re-entrancy by the compass sprite; calling hasGeneratedModel

@@ -6,14 +6,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
-import net.minecraft.client.render.*;
 import org.apache.commons.lang3.ArrayUtils;
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.brigadier.CommandDispatcher;
-import com.terraformersmc.modmenu.gui.ModsScreen;
 import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.FeaturesFile;
@@ -40,6 +37,13 @@ import io.github.queerbric.pride.PrideFlags;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.render.VertexFormat.DrawMode;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.PacketByteBuf;
@@ -51,6 +55,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Matrix4f;
+import net.minecraft.util.math.Vec3f;
 
 import static com.unascribed.fabrication.client.FabricationConfigScreen.TrileanFlag.*;
 
@@ -192,51 +197,57 @@ public class FabricationConfigScreen extends Screen {
 		if (leaving) {
 			timeLeaving += delta;
 		}
-		/*TODO
 		if (parent != null && (leaving || timeExisted < 10) && !MixinConfigPlugin.isEnabled("*.reduced_motion")) {
 			float a = sCurve5((leaving ? Math.max(0, 10-timeLeaving) : timeExisted)/10);
-			GlStateManager.pushMatrix();
-//				GlStateManager.clear(GL11.GL_COLOR_BUFFER_BIT, false);
-//				GlStateManager.translatef(realWidth/2f, realHeight/2f, 0);
-//				GlStateManager.scalef(0.5f, 0.5f, 0.5f);
-//				GlStateManager.translatef(-realWidth/2f, -realHeight/2f, 0);
-				GlStateManager.translatef(width/2f, height, 0);
-				GlStateManager.rotatef(a*(leaving ? -180 : 180), 0, 0, 1);
-				GlStateManager.translatef(-width/2, -height, 0);
-				GlStateManager.pushMatrix();
-					GlStateManager.translatef(0, height, 0);
-					GlStateManager.translatef(width/2f, height/2f, 0);
-					GlStateManager.rotatef(180, 0, 0, 1);
-					GlStateManager.translatef(-width/2f, -height/2f, 0);
+			matrices.push();
+				matrices.translate(width/2f, height, 0);
+				matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(a*(leaving ? -180 : 180)));
+				matrices.translate(-width/2, -height, 0);
+				matrices.push();
+					matrices.translate(0, height, 0);
+					matrices.translate(width/2f, height/2f, 0);
+					matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(180));
+					matrices.translate(-width/2f, -height/2f, 0);
 					fill(matrices, -width, -height, width*2, 0, 0xFF2196F3);
-					GlStateManager.pushMatrix();
+					matrices.push();
 						drawBackground(matrices, -200, -200, delta, 0, 0);
 						drawForeground(matrices, -200, -200, delta);
-					GlStateManager.popMatrix();
-				GlStateManager.popMatrix();
+					matrices.pop();
+				matrices.pop();
+			matrices.pop();
+			
+			// background rendering ignores the matrixstack, so we have to Make A Mess in the projection matrix instead
+			MatrixStack projection = new MatrixStack();
+			projection.method_34425(RenderSystem.getProjectionMatrix());
+			projection.push();
+				projection.translate(width/2f, height, 0);
+				projection.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(a*(leaving ? -180 : 180)));
+				projection.translate(-width/2, -height, 0);
 				for (int x = -1; x <= 1; x++) {
 					for (int y = -1; y <= 0; y++) {
 						if (x == 0 && y == 0) continue;
-						GlStateManager.pushMatrix();
-						GlStateManager.translatef(width*x, height*y, 0);
-						parent.renderBackgroundTexture(0);
-						GlStateManager.popMatrix();
+						projection.push();
+						projection.translate(width*x, height*y, 0);
+						RenderSystem.setProjectionMatrix(projection.peek().getModel());
+						parent.renderBackground(matrices, 0);
+						projection.pop();
 					}
 				}
+				RenderSystem.setProjectionMatrix(projection.peek().getModel());
 				parent.render(matrices, -200, -200, delta);
-			GlStateManager.popMatrix();
+			projection.pop();
+			RenderSystem.setProjectionMatrix(projection.peek().getModel());
 		} else {
-			GlStateManager.pushMatrix();
+			matrices.push();
 			drawBackground(matrices, mouseX, mouseY, delta, 0, 0);
 			drawForeground(matrices, mouseX, mouseY, delta);
-			GlStateManager.popMatrix();
+			matrices.pop();
 		}
-		*/
 		if (leaving && timeLeaving > 10) {
 			client.setScreen(parent);
 		}
 	}
-	
+
 	private void drawBackground(MatrixStack matrices, int mouseX, int mouseY, float delta, int cutoffX, int cutoffY) {
 		float cutoffV = cutoffY/(float)height;
 		
@@ -255,7 +266,7 @@ public class FabricationConfigScreen extends Screen {
 		RenderSystem.defaultBlendFunc();
 		float time = selectedSection == null ? 10-selectTime : prevSelectedSection == null ? selectTime : 0;
 		RenderSystem.setShaderColor(1, 1, 1, 1);
-
+		
 		RenderSystem.disableCull();
 		BufferBuilder bb = Tessellator.getInstance().getBuffer();
 
@@ -271,10 +282,9 @@ public class FabricationConfigScreen extends Screen {
 			if (prideFlag != null) {
 				prideFlag.render(matrices, brk, top, w, bottom-top);
 			} else {
-				/*TODO
-				GlStateManager.shadeModel(GL11.GL_SMOOTH);
+				RenderSystem.setShader(GameRenderer::getPositionColorShader);
 				RenderSystem.disableTexture();
-				bb.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+				bb.begin(DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 				float r = MathHelper.lerp(flagCutoffV, 0.298f, 0.475f);
 				float g = MathHelper.lerp(flagCutoffV, 0.686f, 0.333f);
 				float b = MathHelper.lerp(flagCutoffV, 0.314f, 0.282f);
@@ -285,17 +295,14 @@ public class FabricationConfigScreen extends Screen {
 				bb.end();
 				BufferRenderer.draw(bb);
 				RenderSystem.enableTexture();
-				GlStateManager.shadeModel(GL11.GL_FLAT);
-				*/
 			}
 		}
 		
-		client.getTextureManager().bindTexture(BG);
-		/*TODO
-		GlStateManager.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-		GlStateManager.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-		 */
-		bb.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+		RenderSystem.setShaderTexture(0, BG);
+		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
+		bb.begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
 		bb.vertex(mat, Math.max(cutoffX, border), cutoffY, 0).texture(0, cutoffV).next();
 		bb.vertex(mat, brk, cutoffY, 0).texture(0, cutoffV).next();
 		bb.vertex(mat, brk, height, 0).texture(0, 1).next();
@@ -372,7 +379,6 @@ public class FabricationConfigScreen extends Screen {
 		int i = 0;
 		float selectedChoiceY = -60;
 		float prevSelectedChoiceY = -60;
-		/*TODO
 		for (String s : options.keySet()) {
 			float selectA;
 			if (s.equals(selectedSection)) {
@@ -389,35 +395,31 @@ public class FabricationConfigScreen extends Screen {
 				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
 				RenderSystem.disableTexture();
-				GlStateManager.disableAlphaTest();
-				GlStateManager.shadeModel(GL11.GL_SMOOTH);
-				GL11.glBegin(GL11.GL_QUADS);
-				GL11.glColor4f(1, 1, 1, 0.2f);
-				GL11.glVertex2f(0, y-4);
-				GL11.glColor4f(1, 1, 1, 0.2f+((1-selectA)*0.8f));
-				GL11.glVertex2f(130*selectA, y-4);
-				GL11.glColor4f(1, 1, 1, 0.2f+((1-selectA)*0.8f));
-				GL11.glVertex2f(130*selectA, y+36);
-				GL11.glColor4f(1, 1, 1, 0.2f);
-				GL11.glVertex2f(0, y+36);
-				GL11.glEnd();
-				GlStateManager.shadeModel(GL11.GL_FLAT);
+				RenderSystem.setShader(GameRenderer::getPositionColorShader);
+				BufferBuilder bb = Tessellator.getInstance().getBuffer();
+				Matrix4f mat = matrices.peek().getModel();
+				bb.begin(DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+				bb.vertex(mat, 0, y-4, 0).color(1, 1, 1, 0.2f).next();
+				bb.vertex(mat, 130*selectA, y-4, 0).color(1, 1, 1, 0.2f+((1-selectA)*0.8f)).next();
+				bb.vertex(mat, 130*selectA, y+36, 0).color(1, 1, 1, 0.2f+((1-selectA)*0.8f)).next();
+				bb.vertex(mat, 0, y+36, 0).color(1, 1, 1, 0.2f).next();
+				bb.end();
+				BufferRenderer.draw(bb);
 				RenderSystem.enableTexture();
 			}
 			float startY = y;
 			if (y >= -24 && y < height) {
 				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
-				client.getTextureManager().bindTexture(new Identifier("fabrication", "category/"+s+".png"));
-				GlStateManager.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-				GlStateManager.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-				GlStateManager.color4f(1, 1, 1, 0.4f);
-				GlStateManager.pushMatrix();
-				GlStateManager.translatef(0, y, 0);
+				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+				RenderSystem.setShaderColor(1, 1, 1, 0.4f);
+				RenderSystem.setShaderTexture(0, new Identifier("fabrication", "category/"+s+".png"));
+				matrices.push();
+				matrices.translate(0, y, 0);
 				drawTexture(matrices, (130-26), 0, 0, 0, 0, 24, Math.min(24, (int)Math.ceil(height-y)), 24, 24);
-				GlStateManager.popMatrix();
+				matrices.pop();
 			}
-
 			if (y >= -12 && y < height) {
 				textRenderer.draw(matrices, "§l"+FeaturesFile.get(s).shortName, 4, y, -1);
 			}
@@ -475,43 +477,43 @@ public class FabricationConfigScreen extends Screen {
 			drawSection(matrices, prevSelectedSection, -200, -200, prevSelectedChoiceY, sCurve5(selectTime/10f), false);
 		}
 		
-		GlStateManager.pushMatrix();
+		matrices.push();
 		RenderSystem.disableDepthTest();
 		fill(matrices, width-120, 0, width*2, 16, 0x33000000);
-		GlStateManager.pushMatrix();
-			GlStateManager.translatef(width-60, 8, 0);
-			GlStateManager.pushMatrix();
-				GlStateManager.rotatef(a*-180, 0, 0, 1);
+		matrices.push();
+			matrices.translate(width-60, 8, 0);
+			matrices.push();
+				matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(a*-180));
 				float h = (40+(a*-100))/360f;
 				if (h < 0) {
 					h = 1+h;
 				}
-				GlStateManager.pushMatrix();
-					GlStateManager.scalef((float)(1-(Math.abs(Math.sin(a*Math.PI))/2)), 1, 1);
+				matrices.push();
+					matrices.scale((float)(1-(Math.abs(Math.sin(a*Math.PI))/2)), 1, 1);
 					fill(matrices, -60, -8, 0, 8, MathHelper.hsvToRgb(h, 0.9f, 0.9f)|0xFF000000);
 					if (isSingleplayer) {
 						fill(matrices, 0, -8, 60, 8, MathHelper.hsvToRgb(0.833333f, 0.9f, 0.9f)|0xFF000000);
 					}
-				GlStateManager.popMatrix();
-				GlStateManager.pushMatrix();
-					GlStateManager.rotatef(45, 0, 0, 1);
+				matrices.pop();
+				matrices.push();
+					matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(45));
 					// 8 / sqrt(2)
 					float f = 5.6568542f;
-					GlStateManager.scalef(f, f, 1);
+					matrices.scale(f, f, 1);
 					fill(matrices, -1, -1, 1, 1, 0xFFFFFFFF);
-				GlStateManager.popMatrix();
+				matrices.pop();
 				if (!isSingleplayer) {
 					fill(matrices, -6, -1, -2, 1, 0xFF000000);
 				}
-			GlStateManager.popMatrix();
+			matrices.pop();
 			fill(matrices, -2, -2, 2, 2, 0xFF000000);
-		GlStateManager.popMatrix();
+		matrices.pop();
 		
 		textRenderer.draw(matrices, "CLIENT", width-115, 4, 0xFF000000);
 		textRenderer.draw(matrices, "SERVER", width-40, 4, whyCantConfigureServer == null || isSingleplayer ? 0xFF000000 : 0x44000000);
 		if (serverReadOnly && whyCantConfigureServer == null) {
-			client.getTextureManager().bindTexture(new Identifier("fabrication", "lock.png"));
-			GlStateManager.color4f(0, 0, 0, 1);
+			RenderSystem.setShaderTexture(0, new Identifier("fabrication", "lock.png"));
+			RenderSystem.setShaderColor(0, 0, 0, 1);
 			drawTexture(matrices, width-49, 3, 0, 0, 0, 8, 8, 8, 8);
 		}
 		
@@ -623,9 +625,7 @@ public class FabricationConfigScreen extends Screen {
 			renderTooltip(matrices, Lists.transform(Lists.newArrayList(msg.split("\n")),
 					s -> new LiteralText(s)), mouseX+10, 20+mouseY);
 		}
-		GlStateManager.popMatrix();
-
-			 */
+		matrices.pop();
 	}
 	
 	private void checkServerData() {
@@ -659,14 +659,13 @@ public class FabricationConfigScreen extends Screen {
 
 	private void drawSection(MatrixStack matrices, String section, float mouseX, float mouseY, float choiceY, float a, boolean selected) {
 		if (a <= 0) return;
-		/*TODO
 		if (MixinConfigPlugin.isEnabled("general.reduced_motion")) {
 			a = 1;
 		}
-		GlStateManager.pushMatrix();
-		GlStateManager.translatef(60, choiceY+16, 0);
-		GlStateManager.scalef(a, a, 1);
-		GlStateManager.translatef(-60, -(choiceY+16), 0);
+		matrices.push();
+		matrices.translate(60, choiceY+16, 0);
+		matrices.scale(a, a, 1);
+		matrices.translate(-60, -(choiceY+16), 0);
 		float lastScrollOfs = (selected ? lastSelectedSectionScroll : lastPrevSelectedSectionScroll);
 		float scrollOfs = (selected ? selectedSectionScroll : prevSelectedSectionScroll);
 		float scroll = (selected ? selectedSectionHeight : prevSelectedSectionHeight) < height-36 ? 0 : lastScrollOfs+((scrollOfs-lastScrollOfs)*client.getTickDelta());
@@ -674,7 +673,7 @@ public class FabricationConfigScreen extends Screen {
 		int y = startY;
 		if (section == null) {
 			String v = getVersion();
-			String blurb = "§lFabrication v"+v+" §rby unascribed\n"+(configuringServer ? "(Local version: v"+Agnos.getModVersion()+")" : "")
+			String blurb = "§lFabrication v"+v+" §rby unascribed and SFort\n"+(configuringServer ? "(Local version: v"+Agnos.getModVersion()+")" : "")
 					+ "\nClick a category on the left to change settings.";
 			int height = drawWrappedText(matrices, 140, 20, blurb, width-130, -1, false);
 			if (drawButton(matrices, 140, 20+height+32, 120, 20, "Reload files", mouseX, mouseY)) {
@@ -685,24 +684,20 @@ public class FabricationConfigScreen extends Screen {
 		} else {
 			RenderSystem.enableBlend();
 			RenderSystem.defaultBlendFunc();
-			client.getTextureManager().bindTexture(new Identifier("fabrication", "category/"+section+".png"));
-			GlStateManager.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-			GlStateManager.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-			GlStateManager.color4f(1, 1, 1, 0.1f);
-			GlStateManager.pushMatrix();
-			GlStateManager.translatef(130+((width-130)/2f), height/2f, 0);
-			// Desyncing the state manager for fun and profit
-			GlStateManager.enableAlphaTest();
-			GL11.glDisable(GL11.GL_ALPHA_TEST);
+			RenderSystem.setShaderTexture(0, new Identifier("fabrication", "category/"+section+".png"));
+			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+			RenderSystem.setShaderColor(1, 1, 1, 0.1f);
+			matrices.push();
+			matrices.translate(130+((width-130)/2f), height/2f, 0);
 			drawTexture(matrices, -80, -80, 0, 0, 0, 160, 160, 160, 160);
-			GlStateManager.disableAlphaTest();
-			GlStateManager.popMatrix();
+			matrices.pop();
 			if ("general".equals(section)) {
 				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
-				client.getTextureManager().bindTexture(new Identifier("fabrication", "coffee_bean.png"));
-				GlStateManager.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-				GlStateManager.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+				RenderSystem.setShaderTexture(0, new Identifier("fabrication", "coffee_bean.png"));
+				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 				int x = 0;
 				Profile hovered = null;
 				for (Profile p : Profile.values()) {
@@ -743,6 +738,7 @@ public class FabricationConfigScreen extends Screen {
 				FeatureEntry dup = FeaturesFile.get("general.data_upload");
 				y = drawTrilean(matrices, "general.data_upload", dup.name, dup.desc, y, mouseX, mouseY);
 			} else {
+				RenderSystem.setShaderColor(1, 1, 1, 1);
 				for (Map.Entry<String, FeatureEntry> en : FeaturesFile.getAll().entrySet()) {
 					if (en.getKey().startsWith(section+".")) {
 						FeatureEntry fe = en.getValue();
@@ -769,8 +765,7 @@ public class FabricationConfigScreen extends Screen {
 			float knobY = ((selected ? selectedSectionScroll : prevSelectedSectionScroll)/(h-sh))*(sh-knobHeight)+16;
 			fill(matrices, width-2, Math.max(16, (int)knobY), width, Math.min(height-20, (int)(knobY+knobHeight)), 0xAAFFFFFF);
 		}
-		GlStateManager.popMatrix();
-		*/
+		matrices.pop();
 	}
 
 	private boolean drawButton(MatrixStack matrices, int x, int y, int w, int h, String text, float mouseX, float mouseY) {
@@ -848,17 +843,15 @@ public class FabricationConfigScreen extends Screen {
 				disappearAnimationTime.put(key, disappearTime);
 			}
 		}
-		/*TODO
-		GlStateManager.pushMatrix();
-		GlStateManager.translatef(0, y, 0);
+		matrices.push();
+		matrices.translate(0, y, 0);
 		float dia = sCurve5((5-disappearTime)/5f);
 		float scale;
 		if (disappear) {
-			GlStateManager.scalef(1, scale = 1-dia, 1);
+			matrices.scale(1, scale = 1-dia, 1);
 		} else {
-			GlStateManager.scalef(1, scale = dia, 1);
+			matrices.scale(1, scale = dia, 1);
 		}
-		*/
 		boolean noUnset = key.startsWith("general.");
 		Trilean currentValue = noUnset ? (isEnabled(key) ? Trilean.TRUE : Trilean.FALSE) : getValue(key);
 		boolean keyEnabled = isEnabled(key);
@@ -879,19 +872,18 @@ public class FabricationConfigScreen extends Screen {
 		}
 		fill(matrices, 134, 1, 134+45, 10, 0x66000000);
 		if (!noUnset) fill(matrices, 134+15, 1, 134+15+15, 10, 0x33000000);
-		/*TODO
-		GlStateManager.pushMatrix();
-		GlStateManager.translatef(134+(prevX+((curX-prevX)*a)), 0, 0);
+		matrices.push();
+		matrices.translate(134+(prevX+((curX-prevX)*a)), 0, 0);
 		int knobAlpha = ((int)((noValue ? 1-da : 1) * 255))<<24;
 		fill(matrices, 0, 1, noUnset ? 22 : 15, 10, MathHelper.hsvToRgb((prevHue+((curHue-prevHue)*a))/360f, 0.9f, 0.8f)|knobAlpha);
 		if (!noUnset && a >= 1 && currentValue == Trilean.UNSET) {
 			fill(matrices, keyEnabled ? 15 : -1, 1, keyEnabled ? 16 : 0, 10, MathHelper.hsvToRgb((keyEnabled ? 120 : 0)/360f, 0.9f, 0.8f)|knobAlpha);
 		}
-		GlStateManager.popMatrix();
+		matrices.pop();
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
-		client.getTextureManager().bindTexture(new Identifier("fabrication", "trilean.png"));
-		GlStateManager.color4f(1, 1, 1, 0.5f+((1-da)*0.5f));
+		RenderSystem.setShaderTexture(0, new Identifier("fabrication", "trilean.png"));
+		RenderSystem.setShaderColor(1, 1, 1, 0.5f+((1-da)*0.5f));
 		RenderSystem.enableTexture();
 		if (noUnset) {
 			drawTexture(matrices, 134+3, 1, 0, 0, 15, 9, 45, 9);
@@ -899,7 +891,7 @@ public class FabricationConfigScreen extends Screen {
 		} else {
 			drawTexture(matrices, 134, 1, 0, 0, 45, 9, 45, 9);
 		}
-		GlStateManager.disableTexture();
+		RenderSystem.disableTexture();
 		if (didClick) {
 			if (mouseX >= 134 && mouseX <= 134+45 && mouseY >= y+1 && mouseY <= y+10) {
 				float pitch = y*0.005f;
@@ -929,7 +921,7 @@ public class FabricationConfigScreen extends Screen {
 		y += drawWrappedText(matrices, startX, 2, title, width-startX-6, 0xFFFFFF | textAlpha, false)*scale;
 		int endX = width-6;
 //		int endX = textRenderer.draw(matrices, title, startX, 2, 0xFFFFFF | textAlpha);
-		GlStateManager.popMatrix();
+		matrices.pop();
 		if (mouseX >= startX && mouseX <= endX && mouseY >= startY && mouseY <= y) {
 			String prefix = "";
 			if (clientOnly) {
@@ -971,7 +963,6 @@ public class FabricationConfigScreen extends Screen {
 				}
 			}
 		}
-		*/
 		return (y+2);
 	}
 
@@ -1019,14 +1010,6 @@ public class FabricationConfigScreen extends Screen {
 		} else {
 			client.setScreen(parent);
 		}
-		try {
-			// new modmenu re-uses screen instances aggressively. an individual instance of this
-			// screen is not designed to be (and cannot be) re-used. delete us from the cache.
-			if (parent instanceof ModsScreen) {
-				//TODO
-				//((ModsScreen)parent).configScreenCache.remove("fabrication");
-			}
-		} catch (Throwable t) {}
 	}
 	
 	@Override
