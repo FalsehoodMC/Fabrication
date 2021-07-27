@@ -49,10 +49,14 @@ public class FeatureOldLava implements Feature {
 				} else {
 					FabRefl.Client.getAnimatedSprites(atlas).add(newLavaFlow);
 				}
-				newLava.tickAnimation();
-				newLava.upload();
-				newLavaFlow.tickAnimation();
-				newLavaFlow.upload();
+				// simulate the automata for 100 ticks to prevent a "fade-in" effect
+				for (int i = 0; i < 100; i++) {
+					newLava.tickAnimation();
+					newLavaFlow.tickAnimation();
+				}
+				// now tick it for real so it mips and uploads
+				newLavaFlow.tick();
+				newLava.tick();
 			}
 		} catch (Throwable t) {
 			applied = false;

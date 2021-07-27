@@ -58,7 +58,6 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage.EntityTracker;
-import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
 
 public class FabRefl {
@@ -398,8 +397,7 @@ public class FabRefl {
 		}
 
 		private static final MethodHandle s_getFrameCount = unreflectMethod("Sprite", () -> Sprite.class, "getFrameCount", "method_4592", "",
-				int.class,
-				int.class, int.class, int.class, int.class, boolean.class)
+				int.class)
 				.requiredBy("*.old_lava").get();
 		public static int Sprite_getFrameCount() {
 			try {

@@ -5,10 +5,10 @@ import com.unascribed.fabrication.features.FeatureOldLava;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.texture.TextureTickListener;
 import net.minecraft.util.math.MathHelper;
 
-public class SpriteLava extends Sprite
-{
+public class SpriteLava extends Sprite implements TextureTickListener {
 	protected float[] field_76876_g = new float[256];
 	protected float[] field_76878_h = new float[256];
 	protected float[] field_76879_i = new float[256];
@@ -22,10 +22,16 @@ public class SpriteLava extends Sprite
 	}
 
 
-	//TODO @Override
+	@Override
+	public void tick() {
+		tickAnimation();
+		FeatureOldLava.mip(images);
+		upload();
+	}
+	
 	public void tickAnimation() {
 		// I cannot be bothered to deobfuscate this the rest of the way.
-		
+
 		int var2;
 		float var3;
 		int var5;
@@ -93,7 +99,5 @@ public class SpriteLava extends Sprite
 
 			images[0].setPixelColor(var2%16, var2/16, (var5) | (var6 << 8) | (var7 << 16) | 0xFF000000);
 		}
-		FeatureOldLava.mip(images);
-		upload();
 	}
 }

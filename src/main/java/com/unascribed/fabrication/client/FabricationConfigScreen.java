@@ -35,6 +35,7 @@ import com.google.common.collect.Sets;
 import io.github.queerbric.pride.PrideFlag;
 import io.github.queerbric.pride.PrideFlags;
 import io.netty.buffer.Unpooled;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.render.BufferBuilder;
@@ -673,7 +674,7 @@ public class FabricationConfigScreen extends Screen {
 		int y = startY;
 		if (section == null) {
 			String v = getVersion();
-			String blurb = "§lFabrication v"+v+" §rby unascribed and SFort\n"+(configuringServer ? "(Local version: v"+Agnos.getModVersion()+")" : "")
+			String blurb = "§lFabrication v"+v+" §rby unascribed and SFort\nRunning under Minecraft "+SharedConstants.getGameVersion().getName()+"\n"+(configuringServer ? "(Local version: v"+Agnos.getModVersion()+")" : "")
 					+ "\nClick a category on the left to change settings.";
 			int height = drawWrappedText(matrices, 140, 20, blurb, width-130, -1, false);
 			if (drawButton(matrices, 140, 20+height+32, 120, 20, "Reload files", mouseX, mouseY)) {
