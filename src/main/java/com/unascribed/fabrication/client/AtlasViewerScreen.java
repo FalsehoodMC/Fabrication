@@ -159,7 +159,8 @@ public class AtlasViewerScreen extends Screen {
 			if (mouseX >= 0 && mouseY >= 0 && mouseX < atlasWidth && mouseY < atlasHeight) {
 				renderTooltip(matrices, Lists.<Text>newArrayList(
 						new LiteralText("<nothing>"),
-						new LiteralText("§7"+mouseX+", "+mouseY)
+						new LiteralText("§7"+mouseX+", "+mouseY),
+						new LiteralText("If there is something here, it's either garbage from your graphics driver or an unregistered sprite")
 					), (int)(mouseX+panX), (int)(mouseY+panY));
 			}
 		} else if (sprites.size() == 1) {
