@@ -1,6 +1,12 @@
 package com.unascribed.fabrication.client;
 
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat.DrawMode;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
@@ -8,8 +14,9 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Matrix4f;
 
-import static org.lwjgl.opengl.GL14.*;
+import static org.lwjgl.opengl.GL30C.*;
 
 import java.util.List;
 
@@ -44,69 +51,68 @@ public class AtlasViewerScreen extends Screen {
 	
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		// GlStateManager can get fucked
-		glPushAttrib(GL_ALL_ATTRIB_BITS);
-			glPushMatrix();
-			glClearColor(0.3f, 0.3f, 0.3f, 1);
-			glClear(GL_COLOR_BUFFER_BIT);
+		matrices.push();
+		RenderSystem.clearColor(0.3f, 0.3f, 0.3f, 1);
+		RenderSystem.clear(GL_COLOR_BUFFER_BIT, false);
 
-			glDisable(GL_DEPTH_TEST);
-			glDisable(GL_CULL_FACE);
-			glDisable(GL_BLEND);
-			glDisable(GL_ALPHA_TEST);
-			
-			client.getTextureManager().bindTexture(CHECKER);
-			glEnable(GL_TEXTURE_2D);
-			glColor4f(1, 1, 1, 1);
-			glBegin(GL_QUADS);
-				glTexCoord2f(0, 0);
-				glVertex2f(0, 0);
-				glTexCoord2f(width/8, 0);
-				glVertex2f(width, 0);
-				glTexCoord2f(width/8, height/8);
-				glVertex2f(width, height);
-				glTexCoord2f(0, height/8);
-				glVertex2f(0, height);
-			glEnd();
-			
-			client.getTextureManager().bindTexture(atlas);
-			glDisable(GL_POLYGON_STIPPLE);
-			
-			glTranslatef(panX, panY, 0);
-			
-			int atlasWidth = glGetTexLevelParameteri(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH);
-			int atlasHeight = glGetTexLevelParameteri(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT);
-			int atlasMaxLevel = glGetTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL);
-			
-			glDisable(GL_TEXTURE_2D);
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			glColor4f(1f, 1f, 1f, 0.15f);
-			glBegin(GL_QUADS);
-				glVertex2f(0, 0);
-				glVertex2f(atlasWidth, 0);
-				glVertex2f(atlasWidth, atlasHeight);
-				glVertex2f(0, atlasHeight);
-			glEnd();
-			
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, level);
-			
-			glEnable(GL_TEXTURE_2D);
-			glColor4f(1, 1, 1, 1);
-			glBegin(GL_QUADS);
-				glTexCoord2f(0, 0);
-				glVertex2f(0, 0);
-				glTexCoord2f(1, 0);
-				glVertex2f(atlasWidth, 0);
-				glTexCoord2f(1, 1);
-				glVertex2f(atlasWidth, atlasHeight);
-				glTexCoord2f(0, 1);
-				glVertex2f(0, atlasHeight);
-			glEnd();
-			
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-			glPopMatrix();
-		glPopAttrib();
+		RenderSystem.disableDepthTest();
+		RenderSystem.disableCull();
+		RenderSystem.disableBlend();
+
+		client.getTextureManager().bindTexture(CHECKER);
+		RenderSystem.enableTexture();
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
+		RenderSystem.setShaderTexture(0, CHECKER);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
+		BufferBuilder bb = Tessellator.getInstance().getBuffer();
+		Matrix4f mat = matrices.peek().getModel();
+		bb.begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+			bb.vertex(mat, 0, 0, 0).texture(0, 0).next();
+			bb.vertex(mat, width, 0, 0).texture(width/8, 0).next();
+			bb.vertex(mat, width, height, 0).texture(width/8, height/8).next();
+			bb.vertex(mat, 0, height, 0).texture(0, height/8).next();
+		bb.end();
+		BufferRenderer.draw(bb);
+		
+		client.getTextureManager().bindTexture(atlas);
+		
+		matrices.translate(panX, panY, 0);
+		
+		int atlasWidth = glGetTexLevelParameteri(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH);
+		int atlasHeight = glGetTexLevelParameteri(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT);
+		int atlasMaxLevel = glGetTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL);
+		
+		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.disableTexture();
+		RenderSystem.enableBlend();
+		RenderSystem.defaultBlendFunc();
+		RenderSystem.setShaderColor(1f, 1f, 1f, 0.15f);
+		mat = matrices.peek().getModel();
+		bb.begin(DrawMode.QUADS, VertexFormats.POSITION);
+			bb.vertex(mat, 0, 0, 0).next();
+			bb.vertex(mat, atlasWidth, 0, 0).next();
+			bb.vertex(mat, atlasWidth, atlasHeight, 0).next();
+			bb.vertex(mat, 0, atlasHeight, 0).next();
+		bb.end();
+		BufferRenderer.draw(bb);
+		
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, level);
+		
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
+		RenderSystem.enableTexture();
+		RenderSystem.setShaderTexture(0, atlas);
+		RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+		mat = matrices.peek().getModel();
+		bb.begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+			bb.vertex(mat, 0, 0, 0).texture(0, 0).next();
+			bb.vertex(mat, atlasWidth, 0, 0).texture(1, 0).next();
+			bb.vertex(mat, atlasWidth, atlasHeight, 0).texture(1, 1).next();
+			bb.vertex(mat, 0, atlasHeight, 0).texture(0, 1).next();
+		bb.end();
+		BufferRenderer.draw(bb);
+		
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+		matrices.pop();
 		
 		mouseX -= panX;
 		mouseY -= panY;
@@ -131,19 +137,23 @@ public class AtlasViewerScreen extends Screen {
 		}
 		RenderSystem.disableCull();
 		RenderSystem.disableTexture();
+		RenderSystem.setShader(GameRenderer::getPositionShader);
 		for (Sprite s : sprites) {
 			int x = FabRefl.Client.getX(s);
 			int y = FabRefl.Client.getY(s);
 			int w = s.getWidth();
 			int h = s.getHeight();
 			RenderSystem.setShaderColor(1, 0, 0, 0.2f);
-			glBegin(GL_QUADS);
-				glVertex2f(panX+x, panY+y);
-				glVertex2f(panX+x+w, panY+y);
-				glVertex2f(panX+x+w, panY+y+h);
-				glVertex2f(panX+x, panY+y+h);
-			glEnd();
+			mat = matrices.peek().getModel();
+			bb.begin(DrawMode.QUADS, VertexFormats.POSITION);
+				bb.vertex(mat, panX+x, panY+y, 0).next();
+				bb.vertex(mat, panX+x+w, panY+y, 0).next();
+				bb.vertex(mat, panX+x+w, panY+y+h, 0).next();
+				bb.vertex(mat, panX+x, panY+y+h, 0).next();
+			bb.end();
+			BufferRenderer.draw(bb);
 		}
+		RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 		RenderSystem.enableTexture();
 		if (sprites.isEmpty()) {
 			if (mouseX >= 0 && mouseY >= 0 && mouseX < atlasWidth && mouseY < atlasHeight) {
@@ -170,9 +180,14 @@ public class AtlasViewerScreen extends Screen {
 			} else {
 				src = "Custom Sprite subclass "+s.getClass().getName();
 			}
+			String anim = "";
+			if (s.getAnimation() != null) {
+				Sprite.Animation sa = (Sprite.Animation)s.getAnimation();
+				anim = " @"+FabRefl.Client.getFrameIndex(sa)+"."+FabRefl.Client.getFrameTicks(sa);
+			}
 			renderTooltip(matrices, Lists.<Text>newArrayList(
 				new LiteralText(s.getId().toString()),
-				new LiteralText("§7At "+x+","+y+" "+w+"×"+h+"×"+FabRefl.Client.Sprite_getFrameCount()+" @"+FabRefl.Client.getFrameIndex(s)+"."+FabRefl.Client.getFrameTicks(s)),
+				new LiteralText("§7At "+x+","+y+" "+w+"×"+h+"×"+FabRefl.Client.getFrameCount(s)+anim),
 				new LiteralText("§7From §f"+src)
 			), (int)(mouseX+panX), (int)(mouseY+panY));
 		} else {
@@ -185,7 +200,12 @@ public class AtlasViewerScreen extends Screen {
 				int w = s.getWidth();
 				int h = s.getHeight();
 				li.add(new LiteralText(s.getId().toString()));
-				li.add(new LiteralText("§7At "+x+","+y+" "+w+"×"+h+"×"+FabRefl.Client.Sprite_getFrameCount()+" @"+FabRefl.Client.getFrameIndex(s)+"."+FabRefl.Client.getFrameTicks(s)));
+				String anim = "";
+				if (s.getAnimation() != null) {
+					Sprite.Animation sa = (Sprite.Animation)s.getAnimation();
+					anim = " @"+FabRefl.Client.getFrameIndex(sa)+"."+FabRefl.Client.getFrameTicks(sa);
+				}
+				li.add(new LiteralText("§7At "+x+","+y+" "+w+"×"+h+"×"+FabRefl.Client.getFrameCount(s)+anim));
 			}
 			renderTooltip(matrices, li, (int)(mouseX+panX), (int)(mouseY+panY));
 		}

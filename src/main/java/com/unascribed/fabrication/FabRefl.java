@@ -309,21 +309,21 @@ public class FabRefl {
 			}
 		}
 		
-		private static final MethodHandle sprite_frameIndex = unreflectGetter("Sprite", () -> Sprite.class, "frameIndex", "field_5273", "field_110973_g")
+		private static final MethodHandle spriteAnimation_frameIndex = unreflectGetter("Sprite.Animation", () -> Sprite.Animation.class, "frameIndex", "field_5273", "field_110973_g")
 				.requiredBy("atlas_viewer").get();
-		public static int getFrameIndex(Sprite subject) {
+		public static int getFrameIndex(Sprite.Animation subject) {
 			try {
-				return (int)checkHandle(sprite_frameIndex).invokeExact(subject);
+				return (int)checkHandle(spriteAnimation_frameIndex).invokeExact(subject);
 			} catch (Throwable t) {
 				throw rethrow(t);
 			}
 		}
 		
-		private static final MethodHandle sprite_frameTicks = unreflectGetter("Sprite", () -> Sprite.class, "frameTicks", "field_5272", "field_110983_h")
+		private static final MethodHandle spriteAnimation_frameTicks = unreflectGetter("Sprite.Animation", () -> Sprite.Animation.class, "frameTicks", "field_5272", "field_110983_h")
 				.requiredBy("atlas_viewer").get();
-		public static int getFrameTicks(Sprite subject) {
+		public static int getFrameTicks(Sprite.Animation subject) {
 			try {
-				return (int)checkHandle(sprite_frameTicks).invokeExact(subject);
+				return (int)checkHandle(spriteAnimation_frameTicks).invokeExact(subject);
 			} catch (Throwable t) {
 				throw rethrow(t);
 			}
@@ -358,8 +358,6 @@ public class FabRefl {
 				throw rethrow(t);
 			}
 		}
-		
-		
 		
 		private static final MethodHandle mh_blend = unreflectMethod("MipmapHelper", () -> MipmapHelper.class, "blend", "method_24101", "func_229172_a_",
 					int.class,
@@ -398,10 +396,10 @@ public class FabRefl {
 
 		private static final MethodHandle s_getFrameCount = unreflectMethod("Sprite", () -> Sprite.class, "getFrameCount", "method_4592", "",
 				int.class)
-				.requiredBy("*.old_lava").get();
-		public static int Sprite_getFrameCount() {
+				.requiredBy("*.atlas_viewer").get();
+		public static int getFrameCount(Sprite subject) {
 			try {
-				return (int)checkHandle(s_getFrameCount).invokeExact();
+				return (int)checkHandle(s_getFrameCount).invokeExact(subject);
 			} catch (Throwable t) {
 				throw rethrow(t);
 			}

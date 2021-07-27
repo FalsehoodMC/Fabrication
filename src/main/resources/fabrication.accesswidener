@@ -5,3 +5,4 @@ mutable field net/minecraft/predicate/entity/EntityPredicates EXCEPT_CREATIVE_OR
 mutable field net/minecraft/world/gen/feature/SpringFeatureConfig validBlocks Ljava/util/Set;
 
 accessible class net/minecraft/server/world/ThreadedAnvilChunkStorage$EntityTracker
+accessible class net/minecraft/client/texture/Sprite$Animation
