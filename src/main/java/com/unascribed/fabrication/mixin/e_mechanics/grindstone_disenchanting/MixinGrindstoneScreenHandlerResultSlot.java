@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.interfaces.SetOwner;
@@ -34,9 +35,9 @@ public class MixinGrindstoneScreenHandlerResultSlot implements SetOwner<Grindsto
 	public void fabrication$setOwner(GrindstoneScreenHandler owner) {
 		fabrication$owner = owner;
 	}
-	
-	@Inject(at=@At("HEAD"), method="onTakeItem(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;")
-	public void onTakeItemPre(PlayerEntity player, ItemStack stack, CallbackInfoReturnable<ItemStack> ci) {
+
+	@Inject(at=@At("HEAD"), method="onTakeItem(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/item/ItemStack;)V")
+	public void onTakeItemPre(PlayerEntity player, ItemStack stack, CallbackInfo ci) {
 		fabrication$storedResultBook = null;
 		if (MixinConfigPlugin.isEnabled("*.grindstone_disenchanting") && fabrication$owner.getSlot(1).getStack().getItem() == Items.BOOK) {
 			fabrication$storedResultBook = fabrication$owner.getSlot(1).getStack();
@@ -50,8 +51,8 @@ public class MixinGrindstoneScreenHandlerResultSlot implements SetOwner<Grindsto
 		}
 	}
 	
-	@Inject(at=@At("TAIL"), method="onTakeItem(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;")
-	public void onTakeItemPost(PlayerEntity player, ItemStack stack, CallbackInfoReturnable<ItemStack> ci) {
+	@Inject(at=@At("TAIL"), method="onTakeItem(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/item/ItemStack;)V")
+	public void onTakeItemPost(PlayerEntity player, ItemStack stack, CallbackInfo ci) {
 		if (fabrication$storedResultBook != null) {
 			fabrication$owner.getSlot(1).setStack(fabrication$storedResultBook);
 			fabrication$storedResultBook = null;

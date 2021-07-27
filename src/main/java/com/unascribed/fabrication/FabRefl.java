@@ -5,14 +5,11 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import net.minecraft.server.world.EntityTrackingListener;
 import org.spongepowered.asm.mixin.throwables.MixinError;
 import org.spongepowered.asm.mixin.throwables.MixinException;
 
@@ -142,11 +139,11 @@ public class FabRefl {
 		}
 	}
 
-	private static final MethodHandle et_playersTracking = unreflectGetter("EntityTracker", () -> EntityTracker.class, "playersTracking", "field_18250", "field_219406_f")
+	private static final MethodHandle et_playersTracking = unreflectGetter("EntityTracker", () -> EntityTracker.class, "listeners", "field_18250", "field_219406_f")
 			.requiredBy("*.sync_attacker_yaw", "*.despawning_items_blink").get();
-	public static Set<ServerPlayerEntity> getPlayersTracking(EntityTracker subject) {
+	public static Set<EntityTrackingListener> getPlayersTracking(EntityTracker subject) {
 		try {
-			return (Set<ServerPlayerEntity>)checkHandle(et_playersTracking).invokeExact(subject);
+			return (Set<EntityTrackingListener>)checkHandle(et_playersTracking).invokeExact(subject);
 		} catch (Throwable t) {
 			throw rethrow(t);
 		}
@@ -211,17 +208,7 @@ public class FabRefl {
 			throw rethrow(t);
 		}
 	}
-	
-	private static final MethodHandle dc_color = unreflectGetter("DyeColor", () -> DyeColor.class, "color", "field_7949", "field_193351_w")
-			.requiredBy("*.legible_signs").get();
-	public static int getColor(DyeColor subject) {
-		try {
-			return (int)checkHandle(dc_color).invokeExact(subject);
-		} catch (Throwable t) {
-			throw rethrow(t);
-		}
-	}
-	
+
 	private static final MethodHandle ie_pickupDelay = unreflectGetter("ItemEntity", () -> ItemEntity.class, "pickupDelay", "field_7202", "field_145804_b")
 			.requiredBy("*.instant_pickup").get();
 	public static int getPickupDelay(ItemEntity subject) {
@@ -272,7 +259,7 @@ public class FabRefl {
 
 	@Environment(EnvType.CLIENT)
 	public static final class Client {
-	
+
 		private static final MethodHandle satd_width = unreflectGetter("SpriteAtlasTexture.Data", () -> SpriteAtlasTexture.Data.class, "width", "field_17901", "field_217806_b")
 				.requiredBy("*.old_lava").get();
 		public static int getWidth(SpriteAtlasTexture.Data subject) {
@@ -409,7 +396,19 @@ public class FabRefl {
 				throw rethrow(t);
 			}
 		}
-		
+
+		private static final MethodHandle s_getFrameCount = unreflectMethod("Sprite", () -> Sprite.class, "getFrameCount", "method_4592", "",
+				int.class,
+				int.class, int.class, int.class, int.class, boolean.class)
+				.requiredBy("*.old_lava").get();
+		public static int Sprite_getFrameCount() {
+			try {
+				return (int)checkHandle(s_getFrameCount).invokeExact();
+			} catch (Throwable t) {
+				throw rethrow(t);
+			}
+		}
+
 	}
 	
 	private static MethodHandle checkHandle(MethodHandle handle) {

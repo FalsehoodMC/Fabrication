@@ -31,7 +31,7 @@ public abstract class MixinItemEntity extends Entity implements RenderingAgeAcce
 	private static final Identifier FABRICATION$ITEM_DESPAWN = new Identifier("fabrication", "item_despawn");
 	
 	@Shadow
-	private int age;
+	private int itemAge;
 	
 	private int fabrication$renderingAge = -1000000;
 
@@ -39,10 +39,10 @@ public abstract class MixinItemEntity extends Entity implements RenderingAgeAcce
 	public void tick(CallbackInfo ci) {
 		Object self = this;
 		if (!world.isClient) {
-			if (((Entity)self).age % 10 == 0) {
+			if (itemAge % 10 == 0) {
 				PacketByteBuf data = new PacketByteBuf(Unpooled.buffer(8));
-				data.writeInt(getEntityId());
-				data.writeInt(age);
+				data.writeInt(getId());
+				data.writeInt(itemAge);
 				FabricationMod.sendToTrackersMatching(this, new CustomPayloadS2CPacket(FABRICATION$ITEM_DESPAWN, data), spe -> spe instanceof SetAttackerYawAware && ((SetAttackerYawAware) spe).fabrication$isAttackerYawAware());
 			}
 		}

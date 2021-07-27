@@ -13,8 +13,7 @@ import net.minecraft.screen.AnvilScreenHandler;
 @EligibleIf(configEnabled="*.anvil_damage_only_on_fall", specialConditions=SpecialEligibility.NOT_FORGE)
 public class MixinAnvilScreenHandler {
 
-	@ModifyConstant(constant=@Constant(floatValue=0.12f),
-			method="method_24922(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V")
+	@ModifyConstant(constant=@Constant(floatValue=0.12f), method="method_24922")
 	private static float modifyDamageChance(float chance) {
 		return MixinConfigPlugin.isEnabled("*.anvil_damage_only_on_fall") ? 0 : chance;
 	}

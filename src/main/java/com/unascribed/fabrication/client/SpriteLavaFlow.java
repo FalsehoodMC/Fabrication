@@ -24,7 +24,7 @@ public class SpriteLavaFlow extends Sprite
 	int field_76873_k = 0;
 	
 
-	@Override
+	//TODO @Override
 	public void tickAnimation() {
 		// I cannot be bothered to deobfuscate this the rest of the way.
 		

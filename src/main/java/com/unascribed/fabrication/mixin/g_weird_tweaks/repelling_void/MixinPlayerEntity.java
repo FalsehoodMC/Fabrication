@@ -2,6 +2,7 @@ package com.unascribed.fabrication.mixin.g_weird_tweaks.repelling_void;
 
 import java.util.List;
 
+import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -16,7 +17,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -27,6 +28,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PlayerEntity.class)
 @EligibleIf(configEnabled="*.repelling_void")
@@ -56,11 +58,10 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 	}
 	
 	
-	@Override
-	protected void destroy() {
+	@Inject(at=@At("HEAD"), method= "damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", cancellable=true)
+	public void remove(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
 		Vec3d pos = fabrication$lastGroundPos;
-		if (MixinConfigPlugin.isEnabled("*.repelling_void") && pos != null) {
-			if (fabrication$debted) return;
+		if (MixinConfigPlugin.isEnabled("*.repelling_void") && !fabrication$debted && source.isOutOfWorld() && pos != null && this.getY() < -10) {
 			BlockPos bp = new BlockPos(pos).down();
 			if (!world.getBlockState(bp).isSideSolid(world, bp, Direction.UP, SideShapeType.CENTER)) {
 				boolean foundOne = false;
@@ -97,13 +98,12 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 				}
 			}
 			fabrication$debted = true;
-		} else {
-			super.destroy();
+			cir.setReturnValue(false);
 		}
 	}
 	
-	@Inject(at = @At("TAIL"), method = "writeCustomDataToTag(Lnet/minecraft/nbt/CompoundTag;)V")
-	public void writeCustomDataToTag(CompoundTag tag, CallbackInfo ci) {
+	@Inject(at = @At("TAIL"), method = "writeCustomDataToNbt(Lnet/minecraft/nbt/NbtCompound;)V")
+	public void writeCustomDataToTag(NbtCompound tag, CallbackInfo ci) {
 		if (fabrication$lastGroundPos != null) {
 			Vec3d pos = fabrication$lastGroundPos;
 			tag.putDouble("fabrication:LastGroundPosX", pos.x);
@@ -115,8 +115,8 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 		}
 	}
 	
-	@Inject(at = @At("TAIL"), method = "readCustomDataFromTag(Lnet/minecraft/nbt/CompoundTag;)V")
-	public void readCustomDataFromTag(CompoundTag tag, CallbackInfo ci) {
+	@Inject(at = @At("TAIL"), method = "readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V")
+	public void readCustomDataFromTag(NbtCompound tag, CallbackInfo ci) {
 		if (tag.contains("fabrication:LastGroundPosX")) {
 			fabrication$lastGroundPos = new Vec3d(
 					tag.getDouble("fabrication:LastGroundPosX"),

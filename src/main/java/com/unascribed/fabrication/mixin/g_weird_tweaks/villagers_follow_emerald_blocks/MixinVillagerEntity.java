@@ -18,16 +18,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @EligibleIf(configEnabled="*.villagers_follow_emerald_blocks")
 public abstract class MixinVillagerEntity extends MerchantEntity  {
 	private PlayerEntity fabrication$player = null;
-	private static final TargetPredicate FABRICATION$TARGET_PREDICATE =
-			(new TargetPredicate()).setBaseMaxDistance(10.0).includeInvulnerable().includeTeammates().ignoreDistanceScalingFactor().ignoreEntityTargetRules().setPredicate(
-					player -> player.getMainHandStack().getItem().equals(Items.EMERALD_BLOCK) || player.getOffHandStack().getItem().equals(Items.EMERALD_BLOCK)
-			);
 
 	@Inject(method="mobTick()V", at=@At("TAIL"))
 	public void mobTick(CallbackInfo ci){
 		if(MixinConfigPlugin.isEnabled("*.villagers_follow_emerald_blocks") && !isAiDisabled()){
 			if (world.getTime()%40 == 0)
-				fabrication$player = world.getClosestPlayer(FABRICATION$TARGET_PREDICATE, this);
+				fabrication$player = world.getClosestPlayer(getX(), getY(), getZ(), 10, (player) -> player instanceof PlayerEntity && !player.isSpectator() && ((PlayerEntity)player).isHolding(Items.EMERALD_BLOCK));
 			if (fabrication$player != null) {
 				getLookControl().lookAt(fabrication$player, getBodyYawSpeed(), getLookPitchSpeed());
 				if (squaredDistanceTo(fabrication$player) < 6.25D)

@@ -11,7 +11,7 @@ import com.unascribed.fabrication.support.EligibleIf;
 
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.entity.Entity;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 
 @Mixin(Entity.class)
 @EligibleIf(configEnabled="*.killmessage")
@@ -24,15 +24,15 @@ public abstract class MixinEntity implements GetKillMessage {
 		return fabrication$killmessage;
 	}
 	
-	@Inject(at=@At("TAIL"), method="toTag(Lnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/nbt/CompoundTag;")
-	public void toTag(CompoundTag tag, CallbackInfoReturnable<CompoundTag> ci) {
+	@Inject(at=@At("TAIL"), method="writeNbt(Lnet/minecraft/nbt/NbtCompound;)Lnet/minecraft/nbt/NbtCompound;")
+	public void toTag(NbtCompound tag, CallbackInfoReturnable<NbtCompound> ci) {
 		if (fabrication$killmessage != null) {
 			tag.putString("KillMessage", fabrication$killmessage);
 		}
 	}
 	
-	@Inject(at=@At("TAIL"), method="fromTag(Lnet/minecraft/nbt/CompoundTag;)V")
-	public void fromTag(CompoundTag tag, CallbackInfo ci) {
+	@Inject(at=@At("TAIL"), method="readNbt(Lnet/minecraft/nbt/NbtCompound;)V")
+	public void fromTag(NbtCompound tag, CallbackInfo ci) {
 		if (tag.contains("KillMessage", NbtType.STRING) ) {
 			fabrication$killmessage = tag.getString("KillMessage");
 		}

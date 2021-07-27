@@ -29,7 +29,7 @@ public class MixinGlassBottleDispenserBehavior extends FallibleItemDispenserBeha
 			cancellable=true)
 	public void dispenseSilently(BlockPointer pointer, ItemStack stack, CallbackInfoReturnable<ItemStack> ci) {
 		ServerWorld w = pointer.getWorld();
-		BlockPos pos = pointer.getBlockPos().offset(pointer.getBlockState().get(DispenserBlock.FACING));
+		BlockPos pos = pointer.getPos().offset(pointer.getBlockState().get(DispenserBlock.FACING));
 		BlockState state = w.getBlockState(pos);
 		if (state.getBlock() == Blocks.CRYING_OBSIDIAN) {
 			setSuccess(true);

@@ -22,7 +22,7 @@ public class SpriteLava extends Sprite
 	}
 
 
-	@Override
+	//TODO @Override
 	public void tickAnimation() {
 		// I cannot be bothered to deobfuscate this the rest of the way.
 		

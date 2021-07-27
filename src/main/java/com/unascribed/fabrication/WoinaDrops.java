@@ -6,6 +6,9 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.Random;
 
+import com.mojang.blaze3d.platform.TextureUtil;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.util.math.*;
 import org.lwjgl.opengl.ARBCopyImage;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
@@ -36,19 +39,12 @@ import net.minecraft.client.texture.AbstractTexture;
 import net.minecraft.client.texture.MipmapHelper;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.client.texture.TextureUtil;
 import net.minecraft.client.texture.NativeImage.Format;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Vector3f;
-import net.minecraft.client.util.math.Vector4f;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3i;
 
 public class WoinaDrops {
 
@@ -88,8 +84,8 @@ public class WoinaDrops {
 							@Override
 							public void load(ResourceManager manager) throws IOException {
 								clearGlId();
-								SpriteAtlasTexture atlas = MinecraftClient.getInstance().getBakedModelManager().method_24153(new Identifier("textures/atlas/blocks.png"));
-								GlStateManager.bindTexture(atlas.getGlId());
+								SpriteAtlasTexture atlas = MinecraftClient.getInstance().getBakedModelManager().getAtlas(new Identifier("textures/atlas/blocks.png"));
+								RenderSystem.bindTexture(atlas.getGlId());
 								int maxLevel = GL11.glGetTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LEVEL);
 								if (maxLevel == 0 || !GL.getCapabilities().GL_ARB_copy_image) {
 									int w = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_WIDTH);
@@ -105,8 +101,8 @@ public class WoinaDrops {
 									try {
 										NativeImage mipped = MipmapHelper.getMipmapLevelsImages(img, 1)[1];
 										try {
-											TextureUtil.allocate(getGlId(), mipped.getWidth(), mipped.getHeight());
-											GlStateManager.bindTexture(getGlId());
+											TextureUtil.prepareImage(getGlId(), mipped.getWidth(), mipped.getHeight());
+											RenderSystem.bindTexture(getGlId());
 											mipped.upload(0, 0, 0, true);
 										} finally {
 											mipped.close();
@@ -117,7 +113,7 @@ public class WoinaDrops {
 								} else {
 									int w = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 1, GL11.GL_TEXTURE_WIDTH);
 									int h = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 1, GL11.GL_TEXTURE_HEIGHT);
-									TextureUtil.allocate(getGlId(), w, h);
+									TextureUtil.prepareImage(getGlId(), w, h);
 									ARBCopyImage.glCopyImageSubData(
 											atlas.getGlId(), GL11.GL_TEXTURE_2D, 1, 0, 0, 0,
 											getGlId(), GL11.GL_TEXTURE_2D, 0, 0, 0, 0,
@@ -159,7 +155,7 @@ public class WoinaDrops {
 		MatrixStack.Entry ent = matrices.peek();
 		int[] data = quad.getVertexData();
 		Vec3i faceVec = quad.getFace().getVector();
-		Vector3f normal = new Vector3f(faceVec.getX(), faceVec.getY(), faceVec.getZ());
+		Vec3f normal = new Vec3f(faceVec.getX(), faceVec.getY(), faceVec.getZ());
 		Vector4f pos = new Vector4f(0, 0, 0, 1);
 		Matrix4f mat = ent.getModel();
 		normal.transform(ent.getNormal());

@@ -12,8 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import com.mojang.brigadier.Command;
+import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.tree.CommandNode;
 import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.Cardinal;
 import com.unascribed.fabrication.FabLog;
@@ -174,7 +176,7 @@ public class FeatureFabricationCommand implements Feature {
 		if (biomesIn != null) {
 			biomes = Sets.newHashSet();
 			for (Identifier b : biomesIn) {
-				biomes.add(c.getSource().getMinecraftServer().getRegistryManager().get(Registry.BIOME_KEY).get(b));
+				biomes.add(c.getSource().getServer().getRegistryManager().get(Registry.BIOME_KEY).get(b));
 			}
 		} else {
 			biomes = null;
@@ -310,10 +312,10 @@ public class FeatureFabricationCommand implements Feature {
 			
 			ServerCommandSource scs = (ServerCommandSource)s;
 			if (scs.hasPermissionLevel(2)) return true;
-			if (scs.getMinecraftServer().isSinglePlayer() && scs.getEntity() != null) {
+			if (scs.getServer().isSinglePlayer() && scs.getEntity() != null) {
 				Entity e = scs.getEntity();
 				if (e instanceof PlayerEntity) {
-					if (scs.getMinecraftServer().getUserName().equals(((PlayerEntity)e).getGameProfile().getName())) {
+					if (scs.getServer().getUserName().equals(((PlayerEntity)e).getGameProfile().getName())) {
 						// always allow in singleplayer, even if cheats are off
 						return true;
 					}
@@ -340,12 +342,15 @@ public class FeatureFabricationCommand implements Feature {
 					return 1;
 				});
 				get.then(key);
+				if (s.contains("."))
+					get.then(LiteralArgumentBuilder.<T>literal("*"+s.substring(s.indexOf('.'))).executes(key.getCommand()));
 			}
 			config.then(get);
 			LiteralArgumentBuilder<T> set = LiteralArgumentBuilder.<T>literal("set");
 			for (String s : MixinConfigPlugin.getAllKeys()) {
 				if (dediServer && FeaturesFile.get(s).sides == Sides.CLIENT_ONLY) continue;
 				LiteralArgumentBuilder<T> key = LiteralArgumentBuilder.<T>literal(s);
+
 				String[] values;
 				if (s.equals("general.runtime_checks")) {
 					values = new String[]{"true", "false"};
@@ -355,20 +360,28 @@ public class FeatureFabricationCommand implements Feature {
 					values = new String[]{"unset", "true", "false"};
 				}
 				for (String v : values) {
-					key.then(LiteralArgumentBuilder.<T>literal(v)
+					LiteralArgumentBuilder<T> value =
+					LiteralArgumentBuilder.<T>literal(v)
 							.executes((c) -> {
 								setKeyWithFeedback(c, s, v);
 								return 1;
-							}));
+							});
+					key.then(value);
 				}
 				set.then(key);
+				if (s.contains(".")) {
+					LiteralArgumentBuilder<T> short_key = LiteralArgumentBuilder.<T>literal("*" + s.substring(s.indexOf('.')));
+					for (CommandNode<T> arg : key.getArguments())
+						short_key.then(arg);
+					set.then(short_key);
+				}
 			}
 			config.then(set);
 			config.then(LiteralArgumentBuilder.<T>literal("reload")
 				.executes((c) -> {
 					MixinConfigPlugin.reload();
 					if (c.getSource() instanceof ServerCommandSource) {
-						FabricationMod.sendConfigUpdate(((ServerCommandSource)c.getSource()).getMinecraftServer(), null);
+						FabricationMod.sendConfigUpdate(((ServerCommandSource)c.getSource()).getServer(), null);
 					}
 					sendFeedback(c, new LiteralText("Fabrication configuration reloaded"), true);
 					sendFeedback(c, new LiteralText("§eYou may need to restart the game for the changes to take effect."), false);
@@ -436,7 +449,7 @@ public class FeatureFabricationCommand implements Feature {
 		} else {
 			MixinConfigPlugin.set(key, value);
 			if (c.getSource() instanceof ServerCommandSource) {
-				FabricationMod.sendConfigUpdate(((ServerCommandSource)c.getSource()).getMinecraftServer(), key);
+				FabricationMod.sendConfigUpdate(((ServerCommandSource)c.getSource()).getServer(), key);
 			}
 			sendFeedback(c, new LiteralText(key+" is now set to "+value+(tri ? " (default "+def+")" : "")), true);
 			if (FabricationMod.isAvailableFeature(key)) {

@@ -14,11 +14,11 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtList;
 
 public class CanHitUtil {
 
-	public static boolean canHit(ListTag list, Entity entity) {
+	public static boolean canHit(NbtList list, Entity entity) {
 		if (list == null) return true;
 		try {
 			for (int i = 0; i < list.size(); i++) {
@@ -55,8 +55,8 @@ public class CanHitUtil {
 	}
 	
 	public static boolean canHit(ItemStack stack, Entity entity) {
-		if (stack.hasTag() && stack.getTag().contains("CanHit", NbtType.LIST)) {
-			ListTag canhit = stack.getTag().getList("CanHit", NbtType.STRING);
+		if (stack.hasNbt() && stack.getNbt().contains("CanHit", NbtType.LIST)) {
+			NbtList canhit = stack.getNbt().getList("CanHit", NbtType.STRING);
 			return canHit(canhit, entity);
 		}
 		return true;
@@ -65,7 +65,7 @@ public class CanHitUtil {
 	public static boolean isExempt(Entity shooter) {
 		if (shooter instanceof PlayerEntity) {
 			PlayerEntity p = (PlayerEntity)shooter;
-			return p.abilities.creativeMode || (!MixinConfigPlugin.isEnabled("*.adventure_tags_in_survival") && p.canModifyBlocks());
+			return p.getAbilities().creativeMode || (!MixinConfigPlugin.isEnabled("*.adventure_tags_in_survival") && p.canModifyBlocks());
 		}
 		return false;
 	}

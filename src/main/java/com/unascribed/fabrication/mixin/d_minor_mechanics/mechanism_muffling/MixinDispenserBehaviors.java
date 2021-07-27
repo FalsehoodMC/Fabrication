@@ -20,7 +20,7 @@ public class MixinDispenserBehaviors {
 
 	@Inject(at=@At("HEAD"), method="playSound(Lnet/minecraft/util/math/BlockPointer;)V", cancellable=true)
 	public void playSound(BlockPointer ptr, CallbackInfo ci) {
-		if (MixinConfigPlugin.isEnabled("*.mechanism_muffling") && MechanismMuffling.isMuffled(ptr.getWorld(), ptr.getBlockPos())) {
+		if (MixinConfigPlugin.isEnabled("*.mechanism_muffling") && MechanismMuffling.isMuffled(ptr.getWorld(), ptr.getPos())) {
 			ci.cancel();
 		}
 	}

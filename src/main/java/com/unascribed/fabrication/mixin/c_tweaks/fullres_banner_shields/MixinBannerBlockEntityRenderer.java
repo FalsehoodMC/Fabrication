@@ -2,6 +2,7 @@ package com.unascribed.fabrication.mixin.c_tweaks.fullres_banner_shields;
 
 import java.util.List;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -43,8 +44,8 @@ public class MixinBannerBlockEntityRenderer {
 		if (!(vertexConsumers instanceof Immediate)) return;
 		if (!isBanner) {
 			((Immediate)vertexConsumers).draw();
-			GlStateManager.enablePolygonOffset();
-			GlStateManager.polygonOffset(-3, -3);
+			RenderSystem.enablePolygonOffset();
+			RenderSystem.polygonOffset(-3, -3);
 			Matrix4f mdl = matrices.peek().getModel();
 			Matrix3f nrm = matrices.peek().getNormal();
 			for (Pair<BannerPattern, DyeColor> pattern : patterns) {
@@ -73,7 +74,7 @@ public class MixinBannerBlockEntityRenderer {
 				vc.vertex(mdl, x, y+h, z).color(col[0], col[1], col[2], 1).texture(minU, maxV).overlay(overlay).light(light).normal(nrm, 0, 0, -1).next();
 			}
 			((Immediate)vertexConsumers).draw();
-			GlStateManager.disablePolygonOffset();
+			RenderSystem.disablePolygonOffset();
 			ci.cancel();
 		}
 	}

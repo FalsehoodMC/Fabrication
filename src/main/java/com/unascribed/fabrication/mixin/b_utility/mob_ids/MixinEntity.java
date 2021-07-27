@@ -24,7 +24,7 @@ public class MixinEntity {
 		if (!MixinConfigPlugin.isEnabled("*.mob_ids") || !e.world.isClient) return;
 		MinecraftClient mc = MinecraftClient.getInstance();
 		if (mc.player != null && mc.player.isCreative() && mc.options.debugEnabled) {
-			ci.setReturnValue(new LiteralText(Integer.toString(e.getEntityId())));
+			ci.setReturnValue(new LiteralText(Integer.toString(e.getId())));
 		}
 	}
 

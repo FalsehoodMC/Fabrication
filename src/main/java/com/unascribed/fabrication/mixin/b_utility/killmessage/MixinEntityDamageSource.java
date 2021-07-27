@@ -42,8 +42,8 @@ public abstract class MixinEntityDamageSource {
 				held = ItemStack.EMPTY;
 			}
 			String msg = null;
-			if (held.hasTag() && held.getTag().contains("KillMessage", NbtType.STRING)) {
-				msg = held.getTag().getString("KillMessage");
+			if (held.hasNbt() && held.getNbt().contains("KillMessage", NbtType.STRING)) {
+				msg = held.getNbt().getString("KillMessage");
 			}
 			if (msg == null) {
 				msg = ((GetKillMessage)attacker).fabrication$getKillMessage();

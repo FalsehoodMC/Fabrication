@@ -1,10 +1,10 @@
 plugins {
-	id 'fabric-loom' version '0.5-SNAPSHOT'
+	id 'fabric-loom' version '0.8-SNAPSHOT'
 	id 'maven-publish'
 }
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = JavaVersion.VERSION_16
+targetCompatibility = JavaVersion.VERSION_16
 
 archivesBaseName = project.archives_base_name
 version = project.version
@@ -19,6 +19,10 @@ repositories {
 		name = "JitPack"
 		url = "https://jitpack.io"
 	}
+	maven {
+		name = "TerraformersMC"
+		url = "https://maven.terraformersmc.com/releases"
+	}
 }
 
 dependencies {
@@ -32,19 +36,18 @@ dependencies {
 	modImplementation include(fabricApi.module("fabric-item-api-v1", "${project.fabric_version}"))
 	modImplementation include(fabricApi.module("fabric-key-binding-api-v1", "${project.fabric_version}"))
 	modImplementation include(fabricApi.module("fabric-rendering-v1", "${project.fabric_version}"))
-	modImplementation(include("io.github.cottonmc:cotton-client-commands:1.0.1+1.16-rc1")) {
-		transitive = false
-	}
+	modImplementation include(fabricApi.module("fabric-rendering-v1", "${project.fabric_version}"))
+	modImplementation include(fabricApi.module("fabric-command-api-v1", "${project.fabric_version}"))
 	modImplementation(include("com.github.Queerbric:pridelib:87d9cb94cb")) {
 		transitive = false
 	}
-	modImplementation("io.github.prospector:modmenu:1.16.6") {
+	modImplementation("com.terraformersmc:modmenu:2.0.3") {
 		transitive = false
 	}
-	
+	/*TODO
 	modRuntime("com.github.SuperCoder7979:databreaker:715b589") {
 		transitive = false
-	}
+	}*/
 	modRuntime fabricApi.module("fabric-screen-api-v1", "${project.fabric_version}")
 }
 
@@ -55,13 +58,8 @@ minecraft {
 processResources {
 	inputs.property "version", project.version
 
-	from(sourceSets.main.resources.srcDirs) {
-		include "fabric.mod.json"
+	filesMatching("fabric.mod.json") {
 		expand "version": project.version
-	}
-
-	from(sourceSets.main.resources.srcDirs) {
-		exclude "fabric.mod.json"
 	}
 }
 

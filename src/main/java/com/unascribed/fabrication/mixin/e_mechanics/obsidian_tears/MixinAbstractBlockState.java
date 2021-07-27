@@ -37,7 +37,7 @@ public class MixinAbstractBlockState {
 					user.incrementStat(Stats.USED.getOrCreateStat(Items.GLASS_BOTTLE));
 				}
 				ItemStack stack = ObsidianTears.createStack(world, hit.getBlockPos());
-				user.setStackInHand(hand, ItemUsage.method_30012(held, user, stack));
+				user.setStackInHand(hand, ItemUsage.exchangeStack(held, user, stack));
 				ci.setReturnValue(ActionResult.SUCCESS);
 			}
 		}

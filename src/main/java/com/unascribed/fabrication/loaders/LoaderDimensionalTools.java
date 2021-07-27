@@ -33,7 +33,7 @@ import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.tag.ItemTags;
 import net.minecraft.tag.Tag;
@@ -182,20 +182,20 @@ public class LoaderDimensionalTools implements ConfigLoader {
 	}
 	
 	public static Set<MohsIdentifier> getAssociatedDimensionsForTool(ItemStack stack) {
-		Set<MohsIdentifier> dims = processTags(toolAssociations.get(Registry.ITEM.getId(stack.getItem())), toolTagAssociations, ItemTags.getTagGroup(), stack.getItem()::isIn);
-		if (stack.hasTag()) {
-			if (stack.getTag().getBoolean("fabrication:ActLikeGold")) {
+		Set<MohsIdentifier> dims = processTags(toolAssociations.get(Registry.ITEM.getId(stack.getItem())), toolTagAssociations, ItemTags.getTagGroup(), stack.getItem());
+		if (stack.hasNbt()) {
+			if (stack.getNbt().getBoolean("fabrication:ActLikeGold")) {
 				dims = Sets.newHashSet(dims);
 				dims.add(new MohsIdentifier(true, DimensionType.THE_NETHER_ID));
 			}
-			if (stack.getTag().contains("fabrication:HonoraryDimensions", NbtType.LIST)) {
+			if (stack.getNbt().contains("fabrication:HonoraryDimensions", NbtType.LIST)) {
 				dims = Sets.newHashSet(dims);
-				ListTag li = stack.getTag().getList("fabrication:HonoraryDimensions", NbtType.STRING);
+				NbtList li = stack.getNbt().getList("fabrication:HonoraryDimensions", NbtType.STRING);
 				for (int i = 0; i < li.size(); i++) {
 					try {
 						dims.add(MohsIdentifier.parse(li.getString(i)));
 					} catch (InvalidIdentifierException e) {
-						FabLog.warn("Bad honorary dimension "+li.getString(i)+" in stack "+Registry.ITEM.getId(stack.getItem())+stack.getTag());
+						FabLog.warn("Bad honorary dimension "+li.getString(i)+" in stack "+Registry.ITEM.getId(stack.getItem())+stack.getNbt());
 					}
 				}
 			}
@@ -204,18 +204,18 @@ public class LoaderDimensionalTools implements ConfigLoader {
 	}
 	
 	public static Set<MohsIdentifier> getAssociatedDimensionsForIngredient(ItemStack stack) {
-		return processTags(ingredientAssociations.get(Registry.ITEM.getId(stack.getItem())), ingredientTagAssociations, ItemTags.getTagGroup(), stack.getItem()::isIn);
+		return processTags(ingredientAssociations.get(Registry.ITEM.getId(stack.getItem())), ingredientTagAssociations, ItemTags.getTagGroup(), stack.getItem());
 	}
 	
 	public static Set<MohsIdentifier> getAssociatedDimensions(Block block) {
-		return processTags(blockAssociations.get(Registry.BLOCK.getId(block)), blockTagAssociations, BlockTags.getTagGroup(), block::isIn);
+		return processTags(blockAssociations.get(Registry.BLOCK.getId(block)), blockTagAssociations, BlockTags.getTagGroup(), block);
 	}
 
-	private static <T, U> Set<U> processTags(Set<U> out, SetMultimap<Identifier, U> assoc, TagGroup<T> tagGroup, Predicate<Tag<T>> isIn) {
+	private static <T, U> Set<U> processTags(Set<U> out, SetMultimap<Identifier, U> assoc, TagGroup<T> tagGroup, T entry) {
 		boolean cloned = false;
 		for (Map.Entry<Identifier, U> en : assoc.entries()) {
 			Tag<T> tag = tagGroup.getTag(en.getKey());
-			if (tag != null && isIn.test(tag)) {
+			if (tag != null && tag.contains(entry)) {
 				if (!cloned) {
 					out = Sets.newHashSet(out);
 					cloned = true;
@@ -230,7 +230,7 @@ public class LoaderDimensionalTools implements ConfigLoader {
 		if (substitutableItems.contains(Registry.ITEM.getId(item))) return true;
 		for (Identifier id : substitutableItemTags) {
 			Tag<Item> tag = ItemTags.getTagGroup().getTag(id);
-			if (tag != null && item.isIn(tag)) return true;
+			if (tag != null && tag.contains(item)) return true;
 		}
 		return false;
 	}

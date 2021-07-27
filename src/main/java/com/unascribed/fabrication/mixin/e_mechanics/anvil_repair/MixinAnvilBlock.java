@@ -43,7 +43,7 @@ public class MixinAnvilBlock {
 				}
 				if (consume) {
 					world.playSound(null, pos, SoundEvents.BLOCK_ANVIL_USE, SoundCategory.BLOCKS, 1, 1);
-					if (!player.abilities.creativeMode) {
+					if (!player.getAbilities().creativeMode) {
 						held.decrement(1);
 					}
 					ci.setReturnValue(ActionResult.SUCCESS);

@@ -25,6 +25,7 @@ public class MixinItemEntityRenderer {
 			cancellable=true)
 	public void render(ItemEntity entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
 		if (MixinConfigPlugin.isEnabled("*.blinking_drops")) {
+			WoinaDrops.curTimer = (entity.getItemAge()+tickDelta);
 			if (MixinConfigPlugin.isEnabled("*.despawning_items_blink") && entity instanceof RenderingAgeAccess) {
 				RenderingAgeAccess aa = (RenderingAgeAccess)entity;
 				float m = 1;
@@ -35,7 +36,7 @@ public class MixinItemEntityRenderer {
 				} else if (timeUntilDespawn < 200) {
 					m += (1-(timeUntilDespawn/200f));
 				}
-				WoinaDrops.curTimer = (((Entity)entity).age+tickDelta)*m;
+				WoinaDrops.curTimer*=m;
 			}
 		}
 	}
