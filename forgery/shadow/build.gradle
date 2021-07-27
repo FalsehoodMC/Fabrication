@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-	shadow("com.github.Queerbric:pridelib:v1.0.0") {
+	shadow("com.github.Queerbric:pridelib:87d9cb94cb") {
 		transitive = false
 	}
 }
