@@ -1,11 +1,10 @@
 package com.unascribed.fabrication.mixin.i_woina.block_logo;
 
-import static org.lwjgl.opengl.GL11.*;
-
 import java.util.function.BiConsumer;
 
 import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec3f;
+
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -14,7 +13,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.unascribed.fabrication.LogoBlock;
 import com.unascribed.fabrication.loaders.LoaderBlockLogo;
@@ -29,15 +27,17 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.DiffuseLighting;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.VertexConsumerProvider.Immediate;
+import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.render.VertexFormat.DrawMode;
 import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.text.Text;
@@ -70,7 +70,7 @@ public class MixinTitleScreen extends Screen {
 	@Shadow
 	private long backgroundFadeStart;
 
-	@Redirect(at=@At(value="INVOKE", target="net/minecraft/client/gui/screen/TitleScreen.method_29343(IILjava/util/function/BiConsumer;)V"),
+	@Redirect(at=@At(value="INVOKE", target="net/minecraft/client/gui/screen/TitleScreen.drawWithOutline(IILjava/util/function/BiConsumer;)V"),
 			method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V", expect=2)
 	public void drawLogo(TitleScreen subject, int x, int y, BiConsumer<Integer, Integer> callback) {
 		if (!MixinConfigPlugin.isEnabled("*.block_logo")) {
@@ -137,7 +137,6 @@ public class MixinTitleScreen extends Screen {
 	
 	@Unique
 	private void drawLogo(float partialTicks) {
-
 		MinecraftClient mc = MinecraftClient.getInstance();
 		float fade = doBackgroundFade ? MathHelper.clamp(((Util.getMeasuringTimeMs() - backgroundFadeStart) / 1000f)-1, 0, 1) : 1;
 		int logoDataWidth = LoaderBlockLogo.unrecoverableLoadError ? 48 : LoaderBlockLogo.image.getWidth();
@@ -178,54 +177,62 @@ public class MixinTitleScreen extends Screen {
 	
 		// ported from beta 1.2_01. hell yeah
 		// getting MCP for that version to work was actually pretty easy
-		/* TODO
-		GlStateManager.matrixMode(GL_PROJECTION);
-		GlStateManager.pushMatrix();
-		GlStateManager.loadIdentity();
+		MatrixStack matrices = new MatrixStack();
+		RenderSystem.backupProjectionMatrix();
 		int logoHeight = (int)(120 * mc.getWindow().getScaleFactor());
-		GlStateManager.multMatrix(Matrix4f.viewboxMatrix(70, (float)mc.getWindow().getFramebufferWidth()/logoHeight, 0.05f, 100));
-		GlStateManager.viewport(0, mc.getWindow().getFramebufferHeight() - logoHeight, mc.getWindow().getFramebufferWidth(), logoHeight);
-		GlStateManager.matrixMode(GL_MODELVIEW);
-		GlStateManager.pushMatrix();
-		GlStateManager.loadIdentity();
+		Matrix4f pmat = Matrix4f.viewboxMatrix(70, mc.getWindow().getFramebufferWidth()/(float)logoHeight, 0.05f, 100);
+		RenderSystem.setProjectionMatrix(pmat);
+		RenderSystem.viewport(0, mc.getWindow().getFramebufferHeight() - logoHeight, mc.getWindow().getFramebufferWidth(), logoHeight);
+		matrices.push();
+		matrices.loadIdentity();
+		matrices.translate(0.4f, 0.6f, 2000-13);
 		RenderSystem.disableCull();
 		RenderSystem.depthMask(true);
-		GlStateManager.pushMatrix();
-		DiffuseLighting.enable();
-		RenderSystem.setupGui3DDiffuseLighting(
+		RenderSystem.setupLevelDiffuseLighting(
 				Util.make(new Vec3f(0f, -1.0f, -0.7f), Vec3f::normalize),
-				Util.make(new Vec3f(0f, -1.0f, -0.7f), Vec3f::normalize));
-		GlStateManager.popMatrix();
+				Util.make(new Vec3f(0f, -1.0f, -0.7f), Vec3f::normalize), matrices.peek().getModel());
 		BlockRenderManager brm = mc.getBlockRenderManager();
-		MatrixStack matrices = new MatrixStack();
+		BufferBuilder bb = Tessellator.getInstance().getBuffer();
 		for (int pass = 0; pass < 2; pass++) {
-			GlStateManager.pushMatrix();
-			GlStateManager.translatef(0.4f, 0.6f, -13);
+			matrices.push();
 			if (pass == 0) {
-				GlStateManager.clear(GL_DEPTH_BUFFER_BIT, false);
-				GlStateManager.translatef(0, -0.4f, 0);
-				GlStateManager.scalef(0.98f, 1, 1);
+				RenderSystem.clear(GL11.GL_DEPTH_BUFFER_BIT, false);
+				matrices.translate(0, -0.4f, 0);
+				matrices.scale(0.98f, 1, 1);
 				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
 			}
 			if (pass == 1) {
 				RenderSystem.disableBlend();
-				GlStateManager.clear(GL_DEPTH_BUFFER_BIT, false);
+				RenderSystem.clear(GL11.GL_DEPTH_BUFFER_BIT, false);
 			}
 			if (pass == 2) {
 				RenderSystem.enableBlend();
-				RenderSystem.blendFunc(GL_SRC_COLOR, GL_ONE);
+				RenderSystem.blendFunc(GL11.GL_SRC_COLOR, GL11.GL_ONE);
 			}
-			GlStateManager.scalef(1, -1, 1);
-			GlStateManager.rotatef(15, 1, 0, 0);
-			GlStateManager.scalef(0.89f, 1, 0.4f);
-			GlStateManager.translatef(-logoDataWidth * 0.5f, -logoDataHeight * 0.5f, 0);
+			matrices.scale(1, -1, 1);
+			matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(15));
+			matrices.scale(0.89f, 1, 0.4f);
+			matrices.translate(-logoDataWidth * 0.5f, -logoDataHeight * 0.5f, 0);
+			
+//			RenderSystem.setShader(GameRenderer::getRenderTypeLinesShader);
+//			RenderSystem.setShaderColor(1, 1, 1, 1);
+//			RenderSystem.lineWidth(8);
+//			bb.begin(DrawMode.LINES, VertexFormats.LINES);
+//			bb.vertex(matrices.peek().getModel(), -400, 0, 0).color(1, 0, 0, 1f).normal(1, 0, 0).next();
+//			bb.vertex(matrices.peek().getModel(), 400, 0, 0).color(1, 0, 0, 1f).normal(1, 0, 0).next();
+//			bb.vertex(matrices.peek().getModel(), 0, -400, 0).color(0, 1, 0, 1f).normal(0, 1, 0).next();
+//			bb.vertex(matrices.peek().getModel(), 0, 400, 0).color(0, 1, 0, 1f).normal(0, 1, 0).next();
+//			bb.vertex(matrices.peek().getModel(), 0, 0, -400).color(0, 0, 1, 1f).normal(0, 0, 1).next();
+//			bb.vertex(matrices.peek().getModel(), 0, 0, 400).color(0, 0, 1, 1f).normal(0, 0, 1).next();
+//			Tessellator.getInstance().draw();
+			
 			if (pass == 0) {
 				RenderSystem.disableTexture();
-				GlStateManager.color4f(1, 1, 1, 1);
+				RenderSystem.setShaderColor(1, 1, 1, 1);
 			} else {
 				RenderSystem.enableTexture();
-				GlStateManager.color4f(1, 1, 1, 1);
+				RenderSystem.setShaderColor(1, 1, 1, 1);
 			}
 			
 			for (int y = 0; y < logoDataHeight; y++) {
@@ -233,7 +240,7 @@ public class MixinTitleScreen extends Screen {
 					LogoBlock blk = fabrication$blocks[x][y];
 					if (blk == null) continue;
 					BlockState state = blk.state;
-					GlStateManager.pushMatrix();
+					matrices.push();
 					float position = blk.lastPosition + (blk.position - blk.lastPosition) * partialTicks;
 					float scale = 1;
 					float alpha = 1;
@@ -243,13 +250,16 @@ public class MixinTitleScreen extends Screen {
 						alpha = 1 / scale;
 						position = 0;
 					}
-					GlStateManager.translatef(x, y, position);
-					GlStateManager.scalef(scale, scale, scale);
-					GlStateManager.rotatef(rot, 0, 1, 0);
+					matrices.translate(x, y, position);
+					matrices.scale(scale, scale, scale);
+					matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(rot));
 					if (pass != 0) {
+						mc.getTextureManager().bindTexture(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE);
+						RenderSystem.setShader(GameRenderer::getPositionTexColorNormalShader);
+						RenderSystem.setShaderTexture(0, PlayerScreenHandler.BLOCK_ATLAS_TEXTURE);
+						RenderSystem.setShaderColor(1, 1, 1, 1);
 						if (state == null) {
-							BufferBuilder bb = Tessellator.getInstance().getBuffer();
-							bb.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE_COLOR_NORMAL);
+							bb.begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR_NORMAL);
 							Sprite missing = mc.getSpriteAtlas(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE).apply(new Identifier("missingno", "missingno"));
 							
 							float minU = missing.getMinU();
@@ -257,97 +267,97 @@ public class MixinTitleScreen extends Screen {
 							float maxU = missing.getMaxU();
 							float maxV = missing.getMaxV();
 							
-							bb.vertex(0, 0, 0).texture(minU, minV).color(255, 255, 255, 255).normal(0, -1, 0).next();
-							bb.vertex(1, 0, 0).texture(maxU, minV).color(255, 255, 255, 255).normal(0, -1, 0).next();
-							bb.vertex(1, 0, 1).texture(maxU, maxV).color(255, 255, 255, 255).normal(0, -1, 0).next();
-							bb.vertex(0, 0, 1).texture(minU, maxV).color(255, 255, 255, 255).normal(0, -1, 0).next();
+							Matrix4f mat = matrices.peek().getModel();
+							bb.vertex(mat, 0, 0, 0).texture(minU, minV).color(255, 255, 255, 255).normal(0, -1, 0).next();
+							bb.vertex(mat, 1, 0, 0).texture(maxU, minV).color(255, 255, 255, 255).normal(0, -1, 0).next();
+							bb.vertex(mat, 1, 0, 1).texture(maxU, maxV).color(255, 255, 255, 255).normal(0, -1, 0).next();
+							bb.vertex(mat, 0, 0, 1).texture(minU, maxV).color(255, 255, 255, 255).normal(0, -1, 0).next();
 							
-							bb.vertex(0, 1, 0).texture(minU, minV).color(255, 255, 255, 255).normal(0,  1, 0).next();
-							bb.vertex(1, 1, 0).texture(maxU, minV).color(255, 255, 255, 255).normal(0,  1, 0).next();
-							bb.vertex(1, 1, 1).texture(maxU, maxV).color(255, 255, 255, 255).normal(0,  1, 0).next();
-							bb.vertex(0, 1, 1).texture(minU, maxV).color(255, 255, 255, 255).normal(0,  1, 0).next();
+							bb.vertex(mat, 0, 1, 0).texture(minU, minV).color(255, 255, 255, 255).normal(0,  1, 0).next();
+							bb.vertex(mat, 1, 1, 0).texture(maxU, minV).color(255, 255, 255, 255).normal(0,  1, 0).next();
+							bb.vertex(mat, 1, 1, 1).texture(maxU, maxV).color(255, 255, 255, 255).normal(0,  1, 0).next();
+							bb.vertex(mat, 0, 1, 1).texture(minU, maxV).color(255, 255, 255, 255).normal(0,  1, 0).next();
 							
-							bb.vertex(0, 0, 0).texture(minU, minV).color(255, 255, 255, 255).normal(0, 0, -1).next();
-							bb.vertex(1, 0, 0).texture(maxU, minV).color(255, 255, 255, 255).normal(0, 0, -1).next();
-							bb.vertex(1, 1, 0).texture(maxU, maxV).color(255, 255, 255, 255).normal(0, 0, -1).next();
-							bb.vertex(0, 1, 0).texture(minU, maxV).color(255, 255, 255, 255).normal(0, 0, -1).next();
+							bb.vertex(mat, 0, 0, 0).texture(minU, minV).color(255, 255, 255, 255).normal(0, 0, -1).next();
+							bb.vertex(mat, 1, 0, 0).texture(maxU, minV).color(255, 255, 255, 255).normal(0, 0, -1).next();
+							bb.vertex(mat, 1, 1, 0).texture(maxU, maxV).color(255, 255, 255, 255).normal(0, 0, -1).next();
+							bb.vertex(mat, 0, 1, 0).texture(minU, maxV).color(255, 255, 255, 255).normal(0, 0, -1).next();
 							
-							bb.vertex(0, 0, 1).texture(minU, minV).color(255, 255, 255, 255).normal(0, 0,  1).next();
-							bb.vertex(1, 0, 1).texture(maxU, minV).color(255, 255, 255, 255).normal(0, 0,  1).next();
-							bb.vertex(1, 1, 1).texture(maxU, maxV).color(255, 255, 255, 255).normal(0, 0,  1).next();
-							bb.vertex(0, 1, 1).texture(minU, maxV).color(255, 255, 255, 255).normal(0, 0,  1).next();
+							bb.vertex(mat, 0, 0, 1).texture(minU, minV).color(255, 255, 255, 255).normal(0, 0,  1).next();
+							bb.vertex(mat, 1, 0, 1).texture(maxU, minV).color(255, 255, 255, 255).normal(0, 0,  1).next();
+							bb.vertex(mat, 1, 1, 1).texture(maxU, maxV).color(255, 255, 255, 255).normal(0, 0,  1).next();
+							bb.vertex(mat, 0, 1, 1).texture(minU, maxV).color(255, 255, 255, 255).normal(0, 0,  1).next();
 							
-							bb.vertex(0, 0, 0).texture(minU, minV).color(255, 255, 255, 255).normal(-1, 0, 0).next();
-							bb.vertex(0, 1, 0).texture(maxU, minV).color(255, 255, 255, 255).normal(-1, 0, 0).next();
-							bb.vertex(0, 1, 1).texture(maxU, maxV).color(255, 255, 255, 255).normal(-1, 0, 0).next();
-							bb.vertex(0, 0, 1).texture(minU, maxV).color(255, 255, 255, 255).normal(-1, 0, 0).next();
+							bb.vertex(mat, 0, 0, 0).texture(minU, minV).color(255, 255, 255, 255).normal(-1, 0, 0).next();
+							bb.vertex(mat, 0, 1, 0).texture(maxU, minV).color(255, 255, 255, 255).normal(-1, 0, 0).next();
+							bb.vertex(mat, 0, 1, 1).texture(maxU, maxV).color(255, 255, 255, 255).normal(-1, 0, 0).next();
+							bb.vertex(mat, 0, 0, 1).texture(minU, maxV).color(255, 255, 255, 255).normal(-1, 0, 0).next();
 							
-							bb.vertex(1, 0, 0).texture(minU, minV).color(255, 255, 255, 255).normal( 1, 0, 0).next();
-							bb.vertex(1, 1, 0).texture(maxU, minV).color(255, 255, 255, 255).normal( 1, 0, 0).next();
-							bb.vertex(1, 1, 1).texture(maxU, maxV).color(255, 255, 255, 255).normal( 1, 0, 0).next();
-							bb.vertex(1, 0, 1).texture(minU, maxV).color(255, 255, 255, 255).normal( 1, 0, 0).next();
+							bb.vertex(mat, 1, 0, 0).texture(minU, minV).color(255, 255, 255, 255).normal( 1, 0, 0).next();
+							bb.vertex(mat, 1, 1, 0).texture(maxU, minV).color(255, 255, 255, 255).normal( 1, 0, 0).next();
+							bb.vertex(mat, 1, 1, 1).texture(maxU, maxV).color(255, 255, 255, 255).normal( 1, 0, 0).next();
+							bb.vertex(mat, 1, 0, 1).texture(minU, maxV).color(255, 255, 255, 255).normal( 1, 0, 0).next();
+							Tessellator.getInstance().draw();
 						} else {
 							Immediate vertexConsumer = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
-							GlStateManager.rotatef(90, 1, 0, 0);
-							GlStateManager.translatef(0, 0, -1);
-							brm.renderBlockAsEntity(state, matrices, vertexConsumer, 0, OverlayTexture.DEFAULT_UV);
+							matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(90));
+							matrices.translate(0, 0, -1);
+							brm.renderBlockAsEntity(state, matrices, vertexConsumer, LightmapTextureManager.pack(15, 15), OverlayTexture.DEFAULT_UV);
+							vertexConsumer.draw();
 						}
-						mc.getTextureManager().bindTexture(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE);
-						Tessellator.getInstance().draw();
 					} else {
-						GlStateManager.color4f(
+						RenderSystem.setShader(GameRenderer::getPositionShader);
+						RenderSystem.setShaderColor(
 								LoaderBlockLogo.shadowRed, LoaderBlockLogo.shadowGreen, LoaderBlockLogo.shadowBlue,
 								LoaderBlockLogo.shadowAlpha*alpha*fade);
-						BufferBuilder bb = Tessellator.getInstance().getBuffer();
-						bb.begin(GL11.GL_QUADS, VertexFormats.POSITION);
-						bb.vertex(0, 0, 0).next();
-						bb.vertex(1, 0, 0).next();
-						bb.vertex(1, 0, 1).next();
-						bb.vertex(0, 0, 1).next();
+						bb.begin(DrawMode.QUADS, VertexFormats.POSITION);
+						Matrix4f mat = matrices.peek().getModel();
+						bb.vertex(mat, 0, 0, 0).next();
+						bb.vertex(mat, 1, 0, 0).next();
+						bb.vertex(mat, 1, 0, 1).next();
+						bb.vertex(mat, 0, 0, 1).next();
 						
-						bb.vertex(0, 1, 0).next();
-						bb.vertex(1, 1, 0).next();
-						bb.vertex(1, 1, 1).next();
-						bb.vertex(0, 1, 1).next();
+						bb.vertex(mat, 0, 1, 0).next();
+						bb.vertex(mat, 1, 1, 0).next();
+						bb.vertex(mat, 1, 1, 1).next();
+						bb.vertex(mat, 0, 1, 1).next();
 						
-						bb.vertex(0, 0, 0).next();
-						bb.vertex(1, 0, 0).next();
-						bb.vertex(1, 1, 0).next();
-						bb.vertex(0, 1, 0).next();
+						bb.vertex(mat, 0, 0, 0).next();
+						bb.vertex(mat, 1, 0, 0).next();
+						bb.vertex(mat, 1, 1, 0).next();
+						bb.vertex(mat, 0, 1, 0).next();
 						
-						bb.vertex(0, 0, 1).next();
-						bb.vertex(1, 0, 1).next();
-						bb.vertex(1, 1, 1).next();
-						bb.vertex(0, 1, 1).next();
+						bb.vertex(mat, 0, 0, 1).next();
+						bb.vertex(mat, 1, 0, 1).next();
+						bb.vertex(mat, 1, 1, 1).next();
+						bb.vertex(mat, 0, 1, 1).next();
 						
-						bb.vertex(0, 0, 0).next();
-						bb.vertex(0, 1, 0).next();
-						bb.vertex(0, 1, 1).next();
-						bb.vertex(0, 0, 1).next();
+						bb.vertex(mat, 0, 0, 0).next();
+						bb.vertex(mat, 0, 1, 0).next();
+						bb.vertex(mat, 0, 1, 1).next();
+						bb.vertex(mat, 0, 0, 1).next();
 						
-						bb.vertex(1, 0, 0).next();
-						bb.vertex(1, 1, 0).next();
-						bb.vertex(1, 1, 1).next();
-						bb.vertex(1, 0, 1).next();
+						bb.vertex(mat, 1, 0, 0).next();
+						bb.vertex(mat, 1, 1, 0).next();
+						bb.vertex(mat, 1, 1, 1).next();
+						bb.vertex(mat, 1, 0, 1).next();
 						Tessellator.getInstance().draw();
 					}
-					GlStateManager.popMatrix();
+					matrices.pop();
 				}
 
 			}
 
-			GlStateManager.popMatrix();
+			matrices.pop();
 		}
 
-		DiffuseLighting.disable();
+		DiffuseLighting.disableGuiDepthLighting();
+		RenderSystem.lineWidth(1);
 		RenderSystem.disableBlend();
-		GlStateManager.matrixMode(GL_PROJECTION);
-		GlStateManager.popMatrix();
-		GlStateManager.viewport(0, 0, mc.getWindow().getFramebufferWidth(), mc.getWindow().getFramebufferHeight());
-		GlStateManager.matrixMode(GL_MODELVIEW);
-		GlStateManager.popMatrix();
+		RenderSystem.restoreProjectionMatrix();
+		RenderSystem.viewport(0, 0, mc.getWindow().getFramebufferWidth(), mc.getWindow().getFramebufferHeight());
+		matrices.pop();
 		RenderSystem.enableCull();
-		*/
 	}
 	
 }

@@ -87,6 +87,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			"woina.dirt_screen",
 			"woina.old_tooltip",
 			"woina.instant_bow",
+			"woina.no_hand_sway",
 			"general.data_upload",
 			"balance.loading_furnace_minecart"
 	);

@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
-import com.ibm.icu.impl.locale.XCldrStub.Splitter;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.unascribed.fabrication.FabLog;
@@ -21,7 +19,6 @@ import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.MoreFiles;
 import com.google.common.io.Resources;
@@ -51,7 +48,7 @@ public class LoaderBlockLogo implements ConfigLoader {
 		RANDOM(() -> ThreadLocalRandom.current().nextBoolean()),
 		;
 		public final BooleanSupplier sup;
-		private Reverse(BooleanSupplier sup) {
+		Reverse(BooleanSupplier sup) {
 			this.sup = sup;
 		}
 	}
