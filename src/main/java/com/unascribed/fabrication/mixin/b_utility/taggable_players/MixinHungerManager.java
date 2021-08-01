@@ -5,9 +5,10 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import com.unascribed.fabrication.PlayerTag;
+
 import com.unascribed.fabrication.interfaces.SetSaturation;
 import com.unascribed.fabrication.interfaces.TaggablePlayer;
+import com.unascribed.fabrication.logic.PlayerTag;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.entity.player.HungerManager;

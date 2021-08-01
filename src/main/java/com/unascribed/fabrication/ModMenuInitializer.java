@@ -1,9 +1,8 @@
 package com.unascribed.fabrication;
 
+import com.terraformersmc.modmenu.api.ConfigScreenFactory;
+import com.terraformersmc.modmenu.api.ModMenuApi;
 import com.unascribed.fabrication.client.FabricationConfigScreen;
-
-import io.github.prospector.modmenu.api.ConfigScreenFactory;
-import io.github.prospector.modmenu.api.ModMenuApi;
 
 public class ModMenuInitializer implements ModMenuApi {
 

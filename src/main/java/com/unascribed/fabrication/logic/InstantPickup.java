@@ -1,4 +1,6 @@
-package com.unascribed.fabrication;
+package com.unascribed.fabrication.logic;
+
+import com.unascribed.fabrication.FabRefl;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;

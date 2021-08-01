@@ -3,7 +3,8 @@ package com.unascribed.fabrication.mixin.i_woina.drops;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import com.unascribed.fabrication.WoinaDrops;
+
+import com.unascribed.fabrication.logic.WoinaDrops;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import net.minecraft.client.render.VertexConsumerProvider;

@@ -1,10 +1,11 @@
-package com.unascribed.fabrication;
+package com.unascribed.fabrication.logic;
 
 import java.util.UUID;
 import java.util.function.Predicate;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.fabricmc.fabric.api.util.NbtType;

@@ -13,12 +13,13 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import com.unascribed.fabrication.ParsedTime;
-import com.unascribed.fabrication.Resolvable;
 import com.unascribed.fabrication.interfaces.SetFromPlayerDeath;
 import com.unascribed.fabrication.loaders.LoaderItemDespawn;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+import com.unascribed.fabrication.util.ParsedTime;
+import com.unascribed.fabrication.util.Resolvable;
+
 import com.google.common.primitives.Ints;
 
 import net.minecraft.block.Block;

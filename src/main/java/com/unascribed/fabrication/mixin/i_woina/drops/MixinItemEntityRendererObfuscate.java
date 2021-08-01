@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import com.mrcrayfish.obfuscate.client.Hooks;
-import com.unascribed.fabrication.WoinaDrops;
+import com.unascribed.fabrication.logic.WoinaDrops;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import net.minecraft.client.render.VertexConsumerProvider;

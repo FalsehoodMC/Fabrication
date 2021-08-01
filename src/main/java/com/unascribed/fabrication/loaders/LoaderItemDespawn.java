@@ -3,10 +3,11 @@ package com.unascribed.fabrication.loaders;
 import java.nio.file.Path;
 import java.util.Map;
 
-import com.unascribed.fabrication.ParsedTime;
 import com.unascribed.fabrication.QDIni;
-import com.unascribed.fabrication.Resolvable;
 import com.unascribed.fabrication.support.ConfigLoader;
+import com.unascribed.fabrication.util.ParsedTime;
+import com.unascribed.fabrication.util.Resolvable;
+
 import com.google.common.collect.Maps;
 
 import net.minecraft.enchantment.Enchantment;

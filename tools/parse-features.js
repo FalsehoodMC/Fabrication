@@ -51,12 +51,13 @@ let defaults = (curKey, cur) => ({
 	name: curKey,
 	short_name: cur && cur.name || null,
 	meta: false,
+	section: false,
 	hidden: false,
 	since: null,
 	since_code: cur && cur.since ? versionNamesToCodes[cur.since] : null,
 	sides: "irrelevant",
 	needs: [],
-	endorsed: true,
+	default: "inherit",
 	parent: null,
 	media: null,
 	media_text: cur && cur.media ? (/\.mp4$/.exec(cur.media) ? 'Demonstration video' : 'Demonstration image') : null,
@@ -139,7 +140,7 @@ lines.forEach((line) => {
 					case 'needs':
 						v = v.split(' ');
 						break;
-					case 'endorsed': case 'hidden':
+					case 'endorsed': case 'hidden': case 'section': case 'meta':
 						v = (v === 'false' ? false : v === 'true' ? true : v);
 						break;
 				}

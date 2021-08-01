@@ -1,4 +1,4 @@
-package com.unascribed.fabrication;
+package com.unascribed.fabrication.logic;
 
 import java.io.IOException;
 import java.nio.Buffer;
@@ -14,6 +14,8 @@ import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.unascribed.fabrication.FabRefl;
+import com.unascribed.fabrication.FabRefl.Client;
 import com.unascribed.fabrication.loaders.LoaderClassicBlockDrops;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 

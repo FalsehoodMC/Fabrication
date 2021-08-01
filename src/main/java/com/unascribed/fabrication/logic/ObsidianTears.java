@@ -1,4 +1,4 @@
-package com.unascribed.fabrication;
+package com.unascribed.fabrication.logic;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;

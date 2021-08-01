@@ -1,7 +1,10 @@
-package com.unascribed.fabrication;
+package com.unascribed.fabrication.util;
 
 
 import java.math.BigDecimal;
+
+import com.unascribed.fabrication.FabLog;
+import com.unascribed.fabrication.QDIni;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Preconditions;
