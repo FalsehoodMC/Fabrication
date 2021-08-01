@@ -15,7 +15,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 @Mixin(PistonBlock.class)
-@EligibleIf(configEnabled="*.mechanism_muffling")
+@EligibleIf(configAvailable="*.mechanism_muffling")
 public class MixinPistonBlock {
 
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/world/World.playSound(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FF)V"),

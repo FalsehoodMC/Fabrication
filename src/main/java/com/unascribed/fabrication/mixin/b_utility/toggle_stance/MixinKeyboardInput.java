@@ -12,7 +12,7 @@ import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.client.input.KeyboardInput;
 
 @Mixin(KeyboardInput.class)
-@EligibleIf(configEnabled="*.toggle_stance", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.toggle_stance", envMatches=Env.CLIENT)
 public class MixinKeyboardInput {
 
 	@Inject(at=@At("TAIL"), method="tick(Z)V")

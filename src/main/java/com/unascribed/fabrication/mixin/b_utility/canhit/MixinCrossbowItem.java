@@ -22,7 +22,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 
 @Mixin(CrossbowItem.class)
-@EligibleIf(configEnabled="*.canhit")
+@EligibleIf(configAvailable="*.canhit")
 public class MixinCrossbowItem {
 
 	@Inject(at=@At(value="INVOKE", target="net/minecraft/item/ItemStack.damage(ILnet/minecraft/entity/LivingEntity;Ljava/util/function/Consumer;)V"),

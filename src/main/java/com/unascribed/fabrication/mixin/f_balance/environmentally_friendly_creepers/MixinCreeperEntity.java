@@ -11,7 +11,7 @@ import net.minecraft.entity.mob.CreeperEntity;
 import net.minecraft.world.explosion.Explosion.DestructionType;
 
 @Mixin(CreeperEntity.class)
-@EligibleIf(configEnabled="*.environmentally_friendly_creepers")
+@EligibleIf(configAvailable="*.environmentally_friendly_creepers")
 public class MixinCreeperEntity {
 
 	@Redirect(at=@At(value="FIELD", opcode=Opcodes.GETSTATIC, target="net/minecraft/world/explosion/Explosion$DestructionType.DESTROY:Lnet/minecraft/world/explosion/Explosion$DestructionType;"),

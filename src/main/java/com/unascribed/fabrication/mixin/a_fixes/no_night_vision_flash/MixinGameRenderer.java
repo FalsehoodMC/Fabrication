@@ -12,7 +12,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.MathHelper;
 
 @Mixin(GameRenderer.class)
-@EligibleIf(configEnabled="*.no_night_vision_flash", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.no_night_vision_flash", envMatches=Env.CLIENT)
 public class MixinGameRenderer {
 
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/util/math/MathHelper.sin(F)F"),

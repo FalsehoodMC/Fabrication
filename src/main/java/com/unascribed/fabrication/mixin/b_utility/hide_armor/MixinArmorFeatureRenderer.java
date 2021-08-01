@@ -18,7 +18,7 @@ import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 @Mixin(ArmorFeatureRenderer.class)
-@EligibleIf(configEnabled="*.hide_armor", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.hide_armor", envMatches=Env.CLIENT)
 public class MixinArmorFeatureRenderer {
 
 	@Inject(at=@At("HEAD"), method="renderArmor(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/entity/EquipmentSlot;ILnet/minecraft/client/render/entity/model/BipedEntityModel;)V",

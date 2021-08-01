@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(DragonEggBlock.class)
-@EligibleIf(configEnabled="*.static_dragon_egg")
+@EligibleIf(configAvailable="*.static_dragon_egg")
 public class MixinDragonEggBlock {
 	
 	@Inject(method= "teleport(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V",

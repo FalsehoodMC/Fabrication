@@ -31,7 +31,7 @@ import net.minecraft.util.math.Matrix3f;
 import net.minecraft.util.math.Matrix4f;
 
 @Mixin(BannerBlockEntityRenderer.class)
-@EligibleIf(configEnabled="*.fullres_banner_shields", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.fullres_banner_shields", envMatches=Env.CLIENT)
 public class MixinBannerBlockEntityRenderer {
 
 	@Unique

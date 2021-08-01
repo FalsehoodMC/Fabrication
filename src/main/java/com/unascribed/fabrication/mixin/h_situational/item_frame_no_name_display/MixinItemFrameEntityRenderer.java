@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value=ItemFrameEntityRenderer.class, priority=1004)
-@EligibleIf(configEnabled="*.item_frame_no_name_display", envMatches = Env.CLIENT)
+@EligibleIf(configAvailable="*.item_frame_no_name_display", envMatches = Env.CLIENT)
 public class MixinItemFrameEntityRenderer {
 
 	@Inject(at=@At("HEAD"), method= "hasLabel(Lnet/minecraft/entity/decoration/ItemFrameEntity;)Z", cancellable=true)

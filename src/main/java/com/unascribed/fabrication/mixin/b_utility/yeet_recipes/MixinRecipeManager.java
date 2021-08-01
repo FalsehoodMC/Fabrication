@@ -23,7 +23,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.profiler.Profiler;
 
 @Mixin(RecipeManager.class)
-@EligibleIf(configEnabled="*.yeet_recipes")
+@EligibleIf(configAvailable="*.yeet_recipes")
 public class MixinRecipeManager {
 	
 	@Shadow

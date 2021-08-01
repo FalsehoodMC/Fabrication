@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.Map;
 
 @Mixin(ExperienceOrbEntity.class)
-@EligibleIf(configEnabled="*.disable_mending")
+@EligibleIf(configAvailable="*.disable_mending")
 public class MixinExperienceOrbEntity {
 
 	@Inject(method = "repairPlayerGears(Lnet/minecraft/entity/player/PlayerEntity;I)I", at=@At("HEAD"), cancellable = true)

@@ -23,7 +23,7 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 
 @Mixin(EnchantmentScreen.class)
-@EligibleIf(configEnabled="*.no_experience", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.no_experience", envMatches=Env.CLIENT)
 public abstract class MixinEnchantmentScreen extends HandledScreen<EnchantmentScreenHandler> {
 
 	public MixinEnchantmentScreen(EnchantmentScreenHandler handler, PlayerInventory inventory, Text title) {

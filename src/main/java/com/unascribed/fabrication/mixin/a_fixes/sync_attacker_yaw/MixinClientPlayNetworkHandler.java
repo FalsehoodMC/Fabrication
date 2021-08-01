@@ -23,7 +23,7 @@ import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
 import net.minecraft.util.Identifier;
 
 @Mixin(ClientPlayNetworkHandler.class)
-@EligibleIf(configEnabled="*.sync_attacker_yaw", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.sync_attacker_yaw", envMatches=Env.CLIENT)
 public class MixinClientPlayNetworkHandler {
 	
 	@Shadow @Final

@@ -13,7 +13,7 @@ import net.minecraft.block.CampfireBlock;
 import net.minecraft.item.ItemPlacementContext;
 
 @Mixin(CampfireBlock.class)
-@EligibleIf(configEnabled="*.campfires_place_unlit")
+@EligibleIf(configAvailable="*.campfires_place_unlit")
 public class MixinCampfireBlock {
 
 	@Inject(at=@At("RETURN"), method="getPlacementState(Lnet/minecraft/item/ItemPlacementContext;)Lnet/minecraft/block/BlockState;", cancellable=true)

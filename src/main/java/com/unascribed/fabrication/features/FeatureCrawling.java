@@ -13,7 +13,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 import net.minecraft.util.Identifier;
 
-@EligibleIf(configEnabled="*.crawling", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.crawling", envMatches=Env.CLIENT)
 public class FeatureCrawling implements Feature {
 
 	public static KeyBinding keybind;

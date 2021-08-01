@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(FurnaceMinecartEntity.class)
-@EligibleIf(configEnabled="*.loading_furnace_minecart")
+@EligibleIf(configAvailable="*.loading_furnace_minecart")
 public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity {
 	@Shadow
 	private int fuel;

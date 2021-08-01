@@ -16,7 +16,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 
 @Mixin(PlayerEntity.class)
-@EligibleIf(configEnabled="*.canhit")
+@EligibleIf(configAvailable="*.canhit")
 public abstract class MixinPlayerEntity extends LivingEntity {
 
 	protected MixinPlayerEntity(EntityType<? extends LivingEntity> entityType, World world) {

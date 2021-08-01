@@ -21,7 +21,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
 @Mixin(ItemEntity.class)
-@EligibleIf(configEnabled="*.despawning_items_blink")
+@EligibleIf(configAvailable="*.despawning_items_blink")
 public abstract class MixinItemEntity extends Entity implements RenderingAgeAccess {
 	
 	public MixinItemEntity(EntityType<?> type, World world) {

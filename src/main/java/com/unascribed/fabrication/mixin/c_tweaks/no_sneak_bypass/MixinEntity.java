@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
-@EligibleIf(configEnabled="*.no_sneak_bypass")
+@EligibleIf(configAvailable="*.no_sneak_bypass")
 public class MixinEntity {
 	
 	@Inject(at=@At("INVOKE"), method="bypassesSteppingEffects()Z", cancellable=true)

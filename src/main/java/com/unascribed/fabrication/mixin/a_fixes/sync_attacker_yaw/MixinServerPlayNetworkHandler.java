@@ -17,7 +17,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
 @Mixin(ServerPlayNetworkHandler.class)
-@EligibleIf(configEnabled="*.sync_attacker_yaw")
+@EligibleIf(configAvailable="*.sync_attacker_yaw")
 public class MixinServerPlayNetworkHandler {
 	
 	@Shadow

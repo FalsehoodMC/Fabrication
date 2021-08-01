@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(value = ClientPlayNetworkHandler.class, priority = 1049)
-@EligibleIf(configEnabled="*.oof", envMatches= Env.CLIENT)
+@EligibleIf(configAvailable="*.oof", envMatches= Env.CLIENT)
 public class MixinClientPlayNetworkHandler {
 
 	@ModifyArg(method= "onPlaySound(Lnet/minecraft/network/packet/s2c/play/PlaySoundS2CPacket;)V", at=@At(value="INVOKE", target = "Lnet/minecraft/client/world/ClientWorld;playSound(Lnet/minecraft/entity/player/PlayerEntity;DDDLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FF)V"))

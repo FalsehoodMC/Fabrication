@@ -15,7 +15,7 @@ import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.util.math.BlockPos;
 
 @Mixin(ClientPlayerInteractionManager.class)
-@EligibleIf(configEnabled="*.play_note_blocks_in_creative", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.play_note_blocks_in_creative", envMatches=Env.CLIENT)
 public class MixinClientPlayerInteractionManager {
 
 	@Inject(at=@At("HEAD"), method="breakBlock(Lnet/minecraft/util/math/BlockPos;)Z", cancellable=true)

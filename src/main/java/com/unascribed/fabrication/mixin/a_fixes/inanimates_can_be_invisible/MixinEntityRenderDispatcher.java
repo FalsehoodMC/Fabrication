@@ -26,7 +26,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 
 @Mixin(EntityRenderDispatcher.class)
-@EligibleIf(configEnabled="*.inanimates_can_be_invisible", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.inanimates_can_be_invisible", envMatches=Env.CLIENT)
 public abstract class MixinEntityRenderDispatcher {
 
 	private final Map<Class<?>, Boolean> fabrication$renderersUseInvisibility = new HashMap<>();

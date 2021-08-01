@@ -13,7 +13,7 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 
 @Mixin(EndermanEntity.class)
-@EligibleIf(configEnabled="*.endermen_dont_squeal")
+@EligibleIf(configAvailable="*.endermen_dont_squeal")
 public class MixinEndermanEntity {
 
 	@Inject(at=@At("HEAD"), method="playAngrySound()V", cancellable=true)

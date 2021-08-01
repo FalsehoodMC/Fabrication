@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 @Mixin(LivingEntity.class)
-@EligibleIf(configEnabled="*.mobs_dont_drop_ingots")
+@EligibleIf(configAvailable="*.mobs_dont_drop_ingots")
 public class MixinLivingEntity {
 	@ModifyArg(method = "dropLoot(Lnet/minecraft/entity/damage/DamageSource;Z)V", at=@At(value = "INVOKE", target = "Lnet/minecraft/loot/LootTable;generateLoot(Lnet/minecraft/loot/context/LootContext;Ljava/util/function/Consumer;)V"))
 	public Consumer<ItemStack> generateLoot(Consumer<ItemStack> lootConsumer) {

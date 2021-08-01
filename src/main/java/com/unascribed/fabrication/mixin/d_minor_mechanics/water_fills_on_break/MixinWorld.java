@@ -19,7 +19,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 @Mixin(World.class)
-@EligibleIf(configEnabled="*.water_fills_on_break")
+@EligibleIf(configAvailable="*.water_fills_on_break")
 public class MixinWorld {
 
 	private static final ImmutableSet<Direction> FABRICATION$CHECKDIRECTIONS = ImmutableSet.of(

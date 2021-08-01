@@ -20,7 +20,7 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.util.Formatting;
 
-@EligibleIf(configEnabled="*.mods_command", specialConditions=SpecialEligibility.NOT_FORGE)
+@EligibleIf(configAvailable="*.mods_command", specialConditions=SpecialEligibility.NOT_FORGE)
 public class FeatureModsCommandFabric implements Feature {
 	
 	private boolean applied = false;

@@ -22,7 +22,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 
 @Mixin(FurnaceMinecartEntity.class)
-@EligibleIf(configEnabled="*.furnace_minecart_pushing")
+@EligibleIf(configAvailable="*.furnace_minecart_pushing")
 public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity implements WasShoved {
 
 	protected MixinFurnaceMinecartEntity(EntityType<?> entityType, World world) {

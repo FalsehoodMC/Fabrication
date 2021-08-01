@@ -13,7 +13,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 
 @Mixin(PlayerEntity.class)
-@EligibleIf(configEnabled="*.infinity_crossbows")
+@EligibleIf(configAvailable="*.infinity_crossbows")
 public class MixinPlayerEntity {
 
 	@Redirect(at=@At(value="FIELD", target="net/minecraft/entity/player/PlayerAbilities.creativeMode:Z"),

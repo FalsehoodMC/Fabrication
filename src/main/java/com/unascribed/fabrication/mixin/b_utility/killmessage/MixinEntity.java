@@ -14,7 +14,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NbtCompound;
 
 @Mixin(Entity.class)
-@EligibleIf(configEnabled="*.killmessage")
+@EligibleIf(configAvailable="*.killmessage")
 public abstract class MixinEntity implements GetKillMessage {
 	
 	private String fabrication$killmessage = null;

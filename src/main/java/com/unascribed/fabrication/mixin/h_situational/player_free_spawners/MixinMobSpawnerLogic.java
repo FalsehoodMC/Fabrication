@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(MobSpawnerLogic.class)
-@EligibleIf(configEnabled="*.player_free_spawners")
+@EligibleIf(configAvailable="*.player_free_spawners")
 public class MixinMobSpawnerLogic {
 	
 	@Inject(method="isPlayerInRange(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)Z", at=@At("HEAD"), cancellable=true)

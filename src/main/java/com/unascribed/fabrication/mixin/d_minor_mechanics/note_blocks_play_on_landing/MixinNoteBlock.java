@@ -19,7 +19,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 @Mixin(NoteBlock.class)
-@EligibleIf(configEnabled="*.note_blocks_play_on_landing")
+@EligibleIf(configAvailable="*.note_blocks_play_on_landing")
 public abstract class MixinNoteBlock extends Block {
 
 	public MixinNoteBlock(Settings settings) {

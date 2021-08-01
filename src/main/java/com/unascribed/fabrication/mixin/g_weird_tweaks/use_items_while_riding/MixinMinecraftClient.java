@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(MinecraftClient.class)
-@EligibleIf(configEnabled="*.use_items_while_riding", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.use_items_while_riding", envMatches=Env.CLIENT)
 public class MixinMinecraftClient {
 	@Redirect(method="doAttack()V", at=@At(value="INVOKE", target="Lnet/minecraft/client/network/ClientPlayerEntity;isRiding()Z"))
 	public boolean canAttack(ClientPlayerEntity clientPlayerEntity){

@@ -29,7 +29,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
 @Mixin(LivingEntity.class)
-@EligibleIf(configEnabled="*.alt_absorption_sound")
+@EligibleIf(configAvailable="*.alt_absorption_sound")
 public abstract class MixinLivingEntity extends Entity implements DidJustAbsorp {
 	
 	public MixinLivingEntity(EntityType<?> type, World world) {

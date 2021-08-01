@@ -23,7 +23,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
 @Mixin({EntityDamageSource.class, ProjectileDamageSource.class})
-@EligibleIf(configEnabled="*.killmessage")
+@EligibleIf(configAvailable="*.killmessage")
 public abstract class MixinEntityDamageSource {
 
 	@Unique

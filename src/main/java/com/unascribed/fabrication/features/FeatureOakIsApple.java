@@ -4,7 +4,7 @@ import com.unascribed.fabrication.ResourcePackFeature;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 
-@EligibleIf(configEnabled="*.oak_is_apple", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.oak_is_apple", envMatches=Env.CLIENT)
 public class FeatureOakIsApple extends ResourcePackFeature {
 
 	public FeatureOakIsApple() {

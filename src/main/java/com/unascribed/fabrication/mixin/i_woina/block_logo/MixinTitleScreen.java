@@ -47,7 +47,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Matrix4f;
 
 @Mixin(TitleScreen.class)
-@EligibleIf(configEnabled="*.block_logo", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.block_logo", envMatches=Env.CLIENT)
 public class MixinTitleScreen extends Screen {
 
 	private static final Identifier FABRICATION$EMPTY = new Identifier("fabrication", "empty.png");

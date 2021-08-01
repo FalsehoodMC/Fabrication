@@ -13,7 +13,7 @@ import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.client.util.Window;
 
 @Mixin(Window.class)
-@EligibleIf(configEnabled="*.no_set_window_pos", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.no_set_window_pos", envMatches=Env.CLIENT)
 public class MixinWindow {
 
 	@Shadow

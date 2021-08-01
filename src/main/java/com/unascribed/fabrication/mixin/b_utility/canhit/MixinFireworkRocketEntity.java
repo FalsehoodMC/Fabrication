@@ -13,7 +13,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.projectile.FireworkRocketEntity;
 
 @Mixin(FireworkRocketEntity.class)
-@EligibleIf(configEnabled="*.canhit")
+@EligibleIf(configAvailable="*.canhit")
 public class MixinFireworkRocketEntity {
 
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/entity/LivingEntity.damage(Lnet/minecraft/entity/damage/DamageSource;F)Z"),

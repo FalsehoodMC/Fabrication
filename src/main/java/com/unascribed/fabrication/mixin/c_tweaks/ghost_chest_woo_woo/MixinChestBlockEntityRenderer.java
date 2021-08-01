@@ -27,7 +27,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 @Mixin(ChestBlockEntityRenderer.class)
-@EligibleIf(configEnabled="*.ghost_chest_woo_woo", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.ghost_chest_woo_woo", envMatches=Env.CLIENT)
 public class MixinChestBlockEntityRenderer {
 
 	@Shadow

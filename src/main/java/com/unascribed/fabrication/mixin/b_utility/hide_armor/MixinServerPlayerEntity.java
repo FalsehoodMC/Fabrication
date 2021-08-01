@@ -12,7 +12,7 @@ import com.unascribed.fabrication.support.EligibleIf;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 @Mixin(ServerPlayerEntity.class)
-@EligibleIf(configEnabled="*.hide_armor")
+@EligibleIf(configAvailable="*.hide_armor")
 public abstract class MixinServerPlayerEntity {
 
 	@Inject(at=@At("TAIL"), method="onSpawn()V")

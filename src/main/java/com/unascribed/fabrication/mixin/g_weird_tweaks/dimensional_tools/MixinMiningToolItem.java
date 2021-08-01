@@ -27,7 +27,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 @Mixin(MiningToolItem.class)
-@EligibleIf(configEnabled="*.dimensional_tools")
+@EligibleIf(configAvailable="*.dimensional_tools")
 public class MixinMiningToolItem {
 	
 	@Inject(at=@At("HEAD"), method="postMine(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/LivingEntity;)Z",

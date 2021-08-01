@@ -17,7 +17,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 
 @Mixin(InventoryScreen.class)
-@EligibleIf(configEnabled="*.omniscent_player", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.omniscent_player", envMatches=Env.CLIENT)
 public class MixinInventoryScreen {
 	
 	private static float fabrication$mouseY;

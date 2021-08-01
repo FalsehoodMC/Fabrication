@@ -11,7 +11,7 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.server.world.ServerWorld;
 
 @Mixin(ServerWorld.class)
-@EligibleIf(configEnabled="*.item_despawn")
+@EligibleIf(configAvailable="*.item_despawn")
 public abstract class MixinServerWorld {
 
 	@Inject(at=@At("HEAD"), method="addEntity(Lnet/minecraft/entity/Entity;)Z", cancellable=true)

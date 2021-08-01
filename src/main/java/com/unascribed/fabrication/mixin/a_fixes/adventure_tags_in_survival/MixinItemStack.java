@@ -14,7 +14,7 @@ import net.minecraft.item.ItemUsageContext;
 import net.minecraft.util.ActionResult;
 
 @Mixin(ItemStack.class)
-@EligibleIf(configEnabled="*.adventure_tags_in_survival")
+@EligibleIf(configAvailable="*.adventure_tags_in_survival")
 public class MixinItemStack {
 
 	@Inject(at=@At("HEAD"), method="useOnBlock(Lnet/minecraft/item/ItemUsageContext;)Lnet/minecraft/util/ActionResult;",

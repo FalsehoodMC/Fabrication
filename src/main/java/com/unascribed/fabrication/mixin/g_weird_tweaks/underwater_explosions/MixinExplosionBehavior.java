@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.Optional;
 
 @Mixin(ExplosionBehavior.class)
-@EligibleIf(configEnabled="*.underwater_explosions")
+@EligibleIf(configAvailable="*.underwater_explosions")
 public abstract class MixinExplosionBehavior {
 
 	@Inject(at=@At(value="HEAD"), method="getBlastResistance(Lnet/minecraft/world/explosion/Explosion;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/fluid/FluidState;)Ljava/util/Optional;", cancellable=true)

@@ -11,7 +11,7 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 
 @Mixin(Entity.class)
-@EligibleIf(configEnabled="*.disable_equip_sound")
+@EligibleIf(configAvailable="*.disable_equip_sound")
 public class MixinEntity {
 
 	@Inject(at=@At("HEAD"), method="playSound(Lnet/minecraft/sound/SoundEvent;FF)V", cancellable=true)

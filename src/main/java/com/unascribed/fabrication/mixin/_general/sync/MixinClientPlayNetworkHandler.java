@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.unascribed.fabrication.interfaces.GetServerConfig;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.ResolvedTrilean;
+import com.unascribed.fabrication.support.ResolvedConfigValue;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -35,10 +35,11 @@ public class MixinClientPlayNetworkHandler implements GetServerConfig {
 	private ClientConnection connection;
 	
 	private boolean fabrication$hasHandshook = false;
-	private final Map<String, ResolvedTrilean> fabrication$serverTrileanConfig = Maps.newHashMap();
+	private final Map<String, ResolvedConfigValue> fabrication$serverTrileanConfig = Maps.newHashMap();
 	private final Map<String, String> fabrication$serverStringConfig = Maps.newHashMap();
 	private long fabrication$launchId;
 	private final Set<String> fabrication$serverFailedConfig = Sets.newHashSet();
+	private final Set<String> fabrication$serverBanned = Sets.newHashSet();
 	private String fabrication$serverVersion;
 	
 	@Inject(at=@At("TAIL"), method="onGameJoin(Lnet/minecraft/network/packet/s2c/play/GameJoinS2CPacket;)V")
@@ -58,20 +59,19 @@ public class MixinClientPlayNetworkHandler implements GetServerConfig {
 				for (int i = 0; i < trileanKeys; i++) {
 					String k = buf.readString(32767);
 					int v = buf.readUnsignedByte();
-//					System.out.println(k+" = "+v);
-					fabrication$serverTrileanConfig.put(k, ResolvedTrilean.values()[v]);
+					fabrication$serverTrileanConfig.put(k, ResolvedConfigValue.values()[v]);
 				}
 				int stringKeys = buf.readVarInt();
 				for (int i = 0; i < stringKeys; i++) {
 					String k = buf.readString(32767);
 					String v = buf.readString(32767);
-//					System.out.println(k+" = "+v);
 					fabrication$serverStringConfig.put(k, v);
 				}
 				if (buf.isReadable(8)) {
 					fabrication$launchId = buf.readLong();
 					if (buf.isReadable()) {
 						fabrication$serverVersion = buf.readString(32767);
+						fabrication$serverFailedConfig.clear();
 						int failedKeys = buf.readVarInt();
 						for (int i = 0; i < failedKeys; i++) {
 							fabrication$serverFailedConfig.add(buf.readString(32767));
@@ -82,6 +82,14 @@ public class MixinClientPlayNetworkHandler implements GetServerConfig {
 				} else if (fabrication$launchId == 0) {
 					fabrication$launchId = hashCode()*31L;
 					fabrication$serverVersion = "1.2 or earlier";
+				}
+				if (buf.isReadable()) {
+					fabrication$serverBanned.clear();
+					int bannedKeys = buf.readVarInt();
+					for (int i = 0; i < bannedKeys; i++) {
+						String k = buf.readString(32767);
+						fabrication$serverBanned.add(k);
+					}
 				}
 				ci.cancel();
 			} catch (RuntimeException e) {
@@ -97,7 +105,7 @@ public class MixinClientPlayNetworkHandler implements GetServerConfig {
 	}
 	
 	@Override
-	public Map<String, ResolvedTrilean> fabrication$getServerTrileanConfig() {
+	public Map<String, ResolvedConfigValue> fabrication$getServerTrileanConfig() {
 		return fabrication$serverTrileanConfig;
 	}
 	
@@ -119,6 +127,11 @@ public class MixinClientPlayNetworkHandler implements GetServerConfig {
 	@Override
 	public String fabrication$getServerVersion() {
 		return fabrication$serverVersion;
+	}
+	
+	@Override
+	public Set<String> fabrication$getServerBanned() {
+		return fabrication$serverBanned;
 	}
 	
 }

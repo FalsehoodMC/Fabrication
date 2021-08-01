@@ -22,7 +22,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
 @Mixin(EntityType.class)
-@EligibleIf(configEnabled="*.cracking_spawn_eggs")
+@EligibleIf(configAvailable="*.cracking_spawn_eggs")
 public class MixinEntityType {
 
 	@Inject(at=@At("RETURN"), method="spawnFromItemStack(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/SpawnReason;ZZ)Lnet/minecraft/entity/Entity;")

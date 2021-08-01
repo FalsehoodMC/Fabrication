@@ -10,6 +10,7 @@ import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -32,6 +33,7 @@ import org.spongepowered.asm.mixin.injection.struct.InjectionInfo;
 import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.Analytics;
 import com.unascribed.fabrication.FabLog;
+import com.unascribed.fabrication.FabricationModClient;
 import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.FeaturesFile.FeatureEntry;
 import com.unascribed.fabrication.QDIni;
@@ -49,6 +51,7 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Enums;
 import com.google.common.base.Joiner;
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -65,9 +68,12 @@ import com.google.common.io.Resources;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 public class MixinConfigPlugin implements IMixinConfigPlugin {
 
-	private static final ImmutableSet<String> NON_TRILEANS = ImmutableSet.of(
+	private static final ImmutableSet<String> NON_STANDARD = ImmutableSet.of(
 			"general.profile"
 	);
 	private static final ImmutableSet<String> RUNTIME_CONFIGURABLE = ImmutableSet.of(
@@ -180,16 +186,16 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		validKeys = ImmutableSet.copyOf(keys);
 		validSections = ImmutableSet.copyOf(sections);
 		defaultsByProfile = ImmutableTable.copyOf(profilesBldr);
-		System.out.println(defaultsByProfile);
 	}
 	
 	private static Profile profile;
 	private static QDIni rawConfig;
-	private static Map<String, Trilean> config;
+	private static Map<String, ConfigValue> config;
 	private static final Set<String> failures = Sets.newHashSet();
 	private static final Set<String> failuresReadOnly = Collections.unmodifiableSet(failures);
 	private static final SetMultimap<String, String> configKeysForDiscoveredClasses = HashMultimap.create();
 	private static boolean analyticsSafe = false;
+	public static boolean loadComplete = false;
 	
 	public static void submitConfigAnalytics() {
 		Analytics.submitConfig();
@@ -221,7 +227,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	}
 
 	public static boolean isEnabled(String configKey) {
-		if (isFailed(configKey)) return false;
+		if (isFailed(configKey) || isBanned(configKey)) return false;
 		configKey = remap(configKey);
 		if (!validKeys.contains(configKey)) {
 			FabLog.error("Cannot look up value for config key "+configKey+" with no default");
@@ -231,23 +237,40 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			return defaults != null && defaults.get(configKey);
 		return config.get(configKey).resolve(defaults == null ? false : defaults.get(configKey));
 	}
+
+	public static boolean isBanned(String configKey) {
+		String k = remap(configKey);
+		if (Agnos.getCurrentEnv() == Env.CLIENT && loadComplete) {
+			if (clientCheckBanned(k)) {
+				return true;
+			}
+		}
+		return config.get(k) == ConfigValue.BANNED;
+	}
 	
+	@Environment(EnvType.CLIENT)
+	private static boolean clientCheckBanned(String configKey) {
+		return FabricationModClient.isBannedByServer(configKey);
+	}
+
 	public static boolean isFailed(String configKey) {
 		return failures.contains(remap(configKey));
 	}
 	
-	public static Trilean getValue(String configKey) {
-		if (isFailed(configKey)) return Trilean.FALSE;
-		return config.getOrDefault(remap(configKey), Trilean.UNSET);
+	public static ConfigValue getValue(String configKey) {
+		if (isBanned(configKey)) return ConfigValue.BANNED;
+		if (isFailed(configKey)) return ConfigValue.FALSE;
+		return config.getOrDefault(remap(configKey), ConfigValue.UNSET);
 	}
 	
-	public static ResolvedTrilean getResolvedValue(String configKey) {
-		if (isFailed(configKey)) return ResolvedTrilean.FALSE;
-		return config.getOrDefault(remap(configKey), Trilean.UNSET).resolveSemantically(defaults != null && defaults.get(configKey));
+	public static ResolvedConfigValue getResolvedValue(String configKey) {
+		if (isBanned(configKey)) return ResolvedConfigValue.BANNED;
+		if (isFailed(configKey)) return ResolvedConfigValue.FALSE;
+		return config.getOrDefault(remap(configKey), ConfigValue.UNSET).resolveSemantically(defaults != null && defaults.get(configKey));
 	}
 	
-	public static boolean isTrilean(String s) {
-		return !NON_TRILEANS.contains(s);
+	public static boolean isStandardValue(String s) {
+		return !NON_STANDARD.contains(s);
 	}
 	
 	public static boolean isRuntimeConfigurable(String s) {
@@ -279,16 +302,20 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		return failuresReadOnly;
 	}
 	
+	public static Collection<String> getAllBanned() {
+		return Collections2.transform(Collections2.filter(config.entrySet(), en -> en.getValue() == ConfigValue.BANNED), en -> en.getKey());
+	}
+	
 	public static void addFailure(String configKey) {
 		failures.add(remap(configKey));
 	}
 	
 	public static void set(String configKey, String newValue) {
-		if (isTrilean(configKey)) {
+		if (isStandardValue(configKey)) {
 			switch (newValue) {
-				case "true": case "false": case "unset":
+				case "banned": case "true": case "false": case "unset":
 					break;
-				default: throw new IllegalArgumentException("Trilean key "+configKey+" cannot be set to "+newValue);
+				default: throw new IllegalArgumentException("Standard key "+configKey+" cannot be set to "+newValue);
 			}
 		} else if ("general.profile".equals(configKey)) {
 			if (!Enums.getIfPresent(Profile.class, newValue.toUpperCase(Locale.ROOT)).isPresent()) {
@@ -300,7 +327,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			profile = rawConfig.getEnum("general.profile", Profile.class).orElse(Profile.LIGHT);
 			defaults = defaultsByProfile.row(profile);
 		} else {
-			config.put(configKey, Trilean.parseTrilean(newValue));
+			config.put(configKey, ConfigValue.parseTrilean(newValue));
 		}
 		if ("general.data_upload".equals(configKey)) {
 			if ("true".equals(newValue)) {
@@ -428,21 +455,21 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 				defaults = defaultsByProfile.row(profile);
 				config = new HashMap<>();
 				for (String k : rawConfig.keySet()) {
-					if (isTrilean(k)) {
+					if (isStandardValue(k)) {
 						try {
-							config.put(k, rawConfig.getEnum(k, Trilean.class).get());
+							config.put(k, rawConfig.getEnum(k, ConfigValue.class).get());
 						} catch (BadValueException e) {
 							FabLog.warn(e.getMessage()+" - assuming unset");
-							config.put(k, Trilean.UNSET);
+							config.put(k, ConfigValue.UNSET);
 						}
 					}
 				}
 			} catch (SyntaxErrorException e) {
 				FabLog.warn("Failed to load configuration file: "+e.getMessage()+"; will assume defaults");
-				config = Maps.transformValues(defaults, v -> Trilean.UNSET);
+				config = Maps.transformValues(defaults, v -> ConfigValue.UNSET);
 			} catch (IOException e) {
 				FabLog.warn("Failed to load configuration file; will assume defaults", e);
-				config = Maps.transformValues(defaults, v -> Trilean.UNSET);
+				config = Maps.transformValues(defaults, v -> ConfigValue.UNSET);
 			}
 			try {
 				Files.write(configFile, sw.toString().getBytes(Charsets.UTF_8));
@@ -539,7 +566,6 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	@Override
 	public void onLoad(String mixinPackage) {
 		reload();
-		RUNTIME_CHECKS_WAS_ENABLED = isEnabled("general.runtime_checks");
 		Mixins.registerErrorHandlerClass("com.unascribed.fabrication.support.MixinErrorHandler_THIS_ERROR_HANDLER_IS_FOR_SOFT_FAILURE_IN_FABRICATION_ITSELF_AND_DOES_NOT_IMPLY_FABRICATION_IS_RESPONSIBLE_FOR_THE_BELOW_ERROR");
 		FabLog.warn("Fabrication is about to inject into Mixin to add support for failsoft mixins.");
 		FabLog.warn("THE FOLLOWING WARNINGS ARE NOT AN ERROR AND DO NOT IMPLY FABRICATION IS RESPONSIBLE FOR A CRASH.");
@@ -603,29 +629,18 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 								anyRestrictions = true;
 								String k = (String)an.values.get(i);
 								Object v = an.values.get(i+1);
-								if (k.equals("configEnabled")) {
+								if (k.equals("configAvailable")) {
 									if (!defaults.containsKey(remap((String)v))) {
 										FabLog.debug("🙈 Dev error! Exploding.");
 										throw devError(cn.name.substring(pkg.length()+1).replace('/', '.')+" references an unknown config key "+v+"\n\nDid you forget to add it to features.txt and run build-features.sh?");
 									}
-									if (getValue((String)v) == Trilean.UNSET && MixinConfigPlugin.RUNTIME_CHECKS_WAS_ENABLED) {
-										eligibilitySuccesses.add("Runtime checks is enabled and required config key "+remap((String)v)+" is unset");
-									} else if (!isEnabled((String)v)) {
-										eligibilityFailures.add("Required config setting "+remap((String)v)+" is disabled "+(config.get(remap((String)v)) == Trilean.FALSE ? "explicitly" : "by profile"));
+									if (isBanned((String)v)) {
+										eligibilityFailures.add("Required config setting "+remap((String)v)+" is banned");
 										eligible = false;
-									} else {
-										eligibilitySuccesses.add("Required config setting "+remap((String)v)+" is enabled "+(config.get(remap((String)v)) == Trilean.TRUE ? "explicitly" : "by profile"));
+									} else if (isBanned((String)v)) {
+										eligibilitySuccesses.add("Required config key "+remap((String)v)+" is not banned");
 									}
 									configKeysForDiscoveredClasses.put(ci.getName(), (String)v);
-								} else if (k.equals("configDisabled")) {
-									if (getValue((String)v) == Trilean.UNSET && MixinConfigPlugin.RUNTIME_CHECKS_WAS_ENABLED) {
-										eligibilitySuccesses.add("Runtime checks is enabled and conflicting config key "+remap((String)v)+" is unset");
-									} else if (!isEnabled((String)v)) {
-										eligibilitySuccesses.add("Conflicting config setting "+remap((String)v)+" is disabled "+(config.get(remap((String)v)) == Trilean.FALSE ? "explicitly" : "by profile"));
-									} else {
-										eligibilityFailures.add("Conflicting config setting "+remap((String)v)+" is enabled "+(config.get(remap((String)v)) == Trilean.TRUE ? "explicitly" : "by profile"));
-										eligible = false;
-									}
 								} else if (k.equals("envMatches")) {
 									String[] arr = (String[])v;
 									if (arr[0].equals("Lcom/unascribed/fabrication/support/Env;")) {
@@ -676,33 +691,21 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 											eligibilitySuccesses.add("Conflicting class "+s+" is not present");
 										}
 									}
-								} else if (k.equals("anyConfigEnabled")) {
-									boolean allDisabled = true;
-									boolean foundAny = false;
+								} else if (k.equals("anyConfigAvailable")) {
+									boolean allBanned = true;
 									for (String s : (List<String>)v) {
 										s = remap(s);
-										if (isEnabled(s)) {
-											foundAny = true;
-											allDisabled = false;
-											eligibilitySuccesses.add("Relevant config setting "+s+" is enabled "+(config.get(s) == Trilean.TRUE ? "explicitly" : "by profile"));
+										if (isBanned(s)) {
+											eligibilityNotes.add("Relevant config setting "+s+" is banned");
 										} else {
-											if (getValue(s) != Trilean.FALSE) {
-												allDisabled = false;
-											}
-											eligibilityNotes.add("Relevant config setting "+s+" is disabled "+(config.get(s) == Trilean.FALSE ? "explicitly" : "by profile"));
+											allBanned = false;
+											eligibilitySuccesses.add("Relevant config setting "+s+" is not banned");
 										}
 										configKeysForDiscoveredClasses.put(ci.getName(), s);
 									}
-									if (allDisabled) {
-										eligibilityFailures.add("All of the relevant config settings are explicitly disabled");
+									if (allBanned) {
+										eligibilityFailures.add("All of the relevant config settings are banned");
 										eligible = false;
-									} else if (!foundAny) {
-										if (MixinConfigPlugin.RUNTIME_CHECKS_WAS_ENABLED) {
-											eligibilityNotes.add("None of the relevant config settings are enabled, but runtime checks is enabled");
-										} else {
-											eligibilityFailures.add("None of the relevant config settings are enabled");
-											eligible = false;
-										}
 									}
 								} else if (k.equals("specialConditions")) {
 									List<String[]> li = (List<String[]>)v;
@@ -715,9 +718,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 											} else {
 												try {
 													SpecialEligibility se = SpecialEligibility.valueOf(e[1]);
-													if (MixinConfigPlugin.RUNTIME_CHECKS_WAS_ENABLED && se.ignorableWithRuntimeChecks) {
-														eligibilityNotes.add("Runtime checks is enabled, ignoring special condition "+se);
-													} else if (isMet(se)) {
+													if (isMet(se)) {
 														eligibilitySuccesses.add("Special condition "+se+" is met");
 													} else {
 														eligibilityFailures.add("Special condition "+se+" is not met");
@@ -799,7 +800,5 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	@Override
 	public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
 	}
-
-	public static boolean RUNTIME_CHECKS_WAS_ENABLED;
 	
 }

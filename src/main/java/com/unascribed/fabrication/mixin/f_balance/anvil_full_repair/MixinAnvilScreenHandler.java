@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(AnvilScreenHandler.class)
-@EligibleIf(configEnabled="*.anvil_full_repair")
+@EligibleIf(configAvailable="*.anvil_full_repair")
 public abstract class MixinAnvilScreenHandler {
 
 	@ModifyArg(method = "updateResult()V", at=@At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;setDamage(I)V"))

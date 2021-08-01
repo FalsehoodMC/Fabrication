@@ -14,7 +14,7 @@ import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.util.math.MatrixStack;
 
 @Mixin(InGameHud.class)
-@EligibleIf(configEnabled="*.no_experience", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.no_experience", envMatches=Env.CLIENT)
 public class MixinInGameHud {
 
 	@Inject(at=@At("HEAD"), method="renderExperienceBar(Lnet/minecraft/client/util/math/MatrixStack;I)V", cancellable=true)

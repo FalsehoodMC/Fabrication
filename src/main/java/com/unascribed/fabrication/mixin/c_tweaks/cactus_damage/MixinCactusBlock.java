@@ -16,7 +16,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 @Mixin(CactusBlock.class)
-@EligibleIf(anyConfigEnabled={"*.cactus_walk_doesnt_hurt_with_boots", "*.cactus_brush_doesnt_hurt_with_chest"})
+@EligibleIf(anyConfigAvailable={"*.cactus_walk_doesnt_hurt_with_boots", "*.cactus_brush_doesnt_hurt_with_chest"})
 public class MixinCactusBlock {
 
 	@Inject(at=@At("HEAD"), method="onEntityCollision(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/Entity;)V", cancellable=true)

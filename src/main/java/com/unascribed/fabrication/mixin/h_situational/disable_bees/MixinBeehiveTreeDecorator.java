@@ -16,7 +16,7 @@ import java.util.Random;
 import java.util.function.BiConsumer;
 
 @Mixin(BeehiveTreeDecorator.class)
-@EligibleIf(configEnabled="*.disable_bees")
+@EligibleIf(configAvailable="*.disable_bees")
 public class MixinBeehiveTreeDecorator {
 
 	@Inject(at=@At("HEAD"), method= "generate(Lnet/minecraft/world/TestableWorld;Ljava/util/function/BiConsumer;Ljava/util/Random;Ljava/util/List;Ljava/util/List;)V",

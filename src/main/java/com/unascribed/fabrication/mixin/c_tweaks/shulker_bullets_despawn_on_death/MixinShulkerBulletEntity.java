@@ -12,7 +12,7 @@ import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.projectile.ShulkerBulletEntity;
 
 @Mixin(ShulkerBulletEntity.class)
-@EligibleIf(configEnabled="*.shulker_bullets_despawn_on_death")
+@EligibleIf(configAvailable="*.shulker_bullets_despawn_on_death")
 public abstract class MixinShulkerBulletEntity {
 
 	@Inject(at=@At("HEAD"), method="tick()V", cancellable=true)

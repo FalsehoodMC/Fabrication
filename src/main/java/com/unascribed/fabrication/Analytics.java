@@ -21,8 +21,8 @@ import com.google.gson.JsonObject;
 import com.sun.jna.Platform;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
-import com.unascribed.fabrication.support.ResolvedTrilean;
-import com.unascribed.fabrication.support.Trilean;
+import com.unascribed.fabrication.support.ResolvedConfigValue;
+import com.unascribed.fabrication.support.ConfigValue;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Charsets;
@@ -124,11 +124,11 @@ public class Analytics {
 			try {
 				JsonArray requests = new JsonArray();
 				for (String key : MixinConfigPlugin.getAllKeys()) {
-					ResolvedTrilean rt = MixinConfigPlugin.getResolvedValue(key);
+					ResolvedConfigValue rt = MixinConfigPlugin.getResolvedValue(key);
 					requests.add("?_id="+userId+"&_idts="+first+"&_viewts="+last+
 							"&url=https://unascribed.com/fabrication/value/"+rt.value+
 							"&idsite=2&rec=1&apiv=1&action_name="+ue.escape(key)+"&cookie=0"+
-							"&cvar="+ue.escape("{\"1\":[\"By Profile\",\""+(rt.trilean == Trilean.UNSET ? "Yes" : "No")+"\"]}"));
+							"&cvar="+ue.escape("{\"1\":[\"By Profile\",\""+(rt.trilean == ConfigValue.UNSET ? "Yes" : "No")+"\"]}"));
 				}
 				JsonObject body = new JsonObject();
 				body.add("requests", requests);

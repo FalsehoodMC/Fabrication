@@ -18,7 +18,7 @@ import net.minecraft.util.math.Matrix3f;
 import net.minecraft.util.math.Matrix4f;
 
 @Mixin(ExperienceOrbEntityRenderer.class)
-@EligibleIf(configEnabled="*.rainbow_experience", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.rainbow_experience", envMatches=Env.CLIENT)
 public class MixinExperienceOrbEntityRenderer {
 
 	private final Random fabrication$colorDecider = new Random();

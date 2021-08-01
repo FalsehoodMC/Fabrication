@@ -10,7 +10,7 @@ import com.unascribed.fabrication.support.SpecialEligibility;
 import net.minecraft.screen.AnvilScreenHandler;
 
 @Mixin(AnvilScreenHandler.class)
-@EligibleIf(configEnabled="*.anvil_damage_only_on_fall", specialConditions=SpecialEligibility.NOT_FORGE)
+@EligibleIf(configAvailable="*.anvil_damage_only_on_fall", specialConditions=SpecialEligibility.NOT_FORGE)
 public class MixinAnvilScreenHandler {
 
 	@ModifyConstant(constant=@Constant(floatValue=0.12f), method="method_24922")

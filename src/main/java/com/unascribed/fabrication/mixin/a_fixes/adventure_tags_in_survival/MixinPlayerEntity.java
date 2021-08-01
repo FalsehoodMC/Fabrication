@@ -21,7 +21,7 @@ import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 
 @Mixin(PlayerEntity.class)
-@EligibleIf(configEnabled="*.adventure_tags_in_survival")
+@EligibleIf(configAvailable="*.adventure_tags_in_survival")
 public abstract class MixinPlayerEntity extends LivingEntity {
 
 	protected MixinPlayerEntity(EntityType<? extends LivingEntity> entityType, World world) {

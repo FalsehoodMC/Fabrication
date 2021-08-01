@@ -13,7 +13,7 @@ import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.util.Identifier;
 
 @Mixin(ModelLoader.class)
-@EligibleIf(configEnabled="*.obsidian_tears", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.obsidian_tears", envMatches=Env.CLIENT)
 public class MixinModelLoader {
 
 	@Shadow

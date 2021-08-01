@@ -12,7 +12,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.world.World;
 
 @Mixin(LivingEntity.class)
-@EligibleIf(configEnabled="*.all_damage_is_fatal")
+@EligibleIf(configAvailable="*.all_damage_is_fatal")
 public abstract class MixinEntity extends Entity {
 
 	public MixinEntity(EntityType<?> type, World world) {

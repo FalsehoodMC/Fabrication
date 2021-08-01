@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(VillagerEntity.class)
-@EligibleIf(configEnabled="*.villagers_follow_emerald_blocks")
+@EligibleIf(configAvailable="*.villagers_follow_emerald_blocks")
 public abstract class MixinVillagerEntity extends MerchantEntity  {
 	private PlayerEntity fabrication$player = null;
 

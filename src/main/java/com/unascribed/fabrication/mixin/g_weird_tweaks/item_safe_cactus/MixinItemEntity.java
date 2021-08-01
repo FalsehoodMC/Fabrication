@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ItemEntity.class)
-@EligibleIf(configEnabled="*.item_safe_cactus")
+@EligibleIf(configAvailable="*.item_safe_cactus")
 public class MixinItemEntity {
 
 	@Inject(method = "damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", at = @At("HEAD"), cancellable = true)

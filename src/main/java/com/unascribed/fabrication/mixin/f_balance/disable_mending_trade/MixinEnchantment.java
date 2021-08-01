@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Enchantment.class)
-@EligibleIf(configEnabled="*.disable_mending_trade")
+@EligibleIf(configAvailable="*.disable_mending_trade")
 public class MixinEnchantment {
 
 	@Inject(at=@At("HEAD"), method= "isAvailableForEnchantedBookOffer()Z", cancellable=true)

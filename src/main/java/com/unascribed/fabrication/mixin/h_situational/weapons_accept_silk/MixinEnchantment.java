@@ -13,7 +13,7 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;
 
 @Mixin(Enchantment.class)
-@EligibleIf(configEnabled="*.weapons_accept_silk")
+@EligibleIf(configAvailable="*.weapons_accept_silk")
 public class MixinEnchantment {
 
 	@Inject(at=@At("HEAD"), method="isAcceptableItem(Lnet/minecraft/item/ItemStack;)Z", cancellable=true)

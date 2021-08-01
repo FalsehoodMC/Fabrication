@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(SignBlockEntityRenderer.class)
-@EligibleIf(configEnabled="*.legible_signs", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.legible_signs", envMatches=Env.CLIENT)
 public class MixinSignBlockEntityRenderer {
 
 	@Inject(at=@At("HEAD"), method= "getColor(Lnet/minecraft/block/entity/SignBlockEntity;)I", cancellable = true)

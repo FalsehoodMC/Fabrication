@@ -12,7 +12,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 
 @Mixin(PlayerInventory.class)
-@EligibleIf(configEnabled="*.item_despawn")
+@EligibleIf(configAvailable="*.item_despawn")
 public abstract class MixinPlayerInventory {
 
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/entity/player/PlayerEntity.dropItem(Lnet/minecraft/item/ItemStack;ZZ)Lnet/minecraft/entity/ItemEntity;"),

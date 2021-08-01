@@ -16,7 +16,7 @@ import net.minecraft.client.texture.Sprite.Info;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.util.Identifier;
 
-@EligibleIf(configEnabled="*.old_lava", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.old_lava", envMatches=Env.CLIENT)
 public class FeatureOldLava implements Feature {
 
 	private static Sprite originalLava;

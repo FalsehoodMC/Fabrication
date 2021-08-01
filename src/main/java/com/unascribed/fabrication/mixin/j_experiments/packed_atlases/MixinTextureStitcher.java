@@ -11,7 +11,7 @@ import net.minecraft.client.texture.TextureStitcher;
 import net.minecraft.util.math.MathHelper;
 
 @Mixin(TextureStitcher.class)
-@EligibleIf(envMatches=Env.CLIENT, configEnabled="*.packed_atlases")
+@EligibleIf(envMatches=Env.CLIENT, configAvailable="*.packed_atlases")
 public class MixinTextureStitcher {
 
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/util/math/MathHelper.smallestEncompassingPowerOfTwo(I)I"),

@@ -15,7 +15,7 @@ import net.minecraft.entity.mob.MobEntity;
 
 // MobEntity is our best injection point because GhastEntity doesn't override tick
 @Mixin(MobEntity.class)
-@EligibleIf(configEnabled="*.ghast_charging", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.ghast_charging", envMatches=Env.CLIENT)
 public class MixinMobEntityClient implements GhastAttackTime {
 
 	@Unique

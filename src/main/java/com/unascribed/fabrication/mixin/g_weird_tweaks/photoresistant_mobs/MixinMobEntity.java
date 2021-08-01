@@ -13,7 +13,7 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.PhantomEntity;
 
 @Mixin(MobEntity.class)
-@EligibleIf(configEnabled="*.photoresistant_mobs")
+@EligibleIf(configAvailable="*.photoresistant_mobs")
 public abstract class MixinMobEntity {
 	
 	@Inject(at=@At("HEAD"), method="isAffectedByDaylight()Z", cancellable=true)

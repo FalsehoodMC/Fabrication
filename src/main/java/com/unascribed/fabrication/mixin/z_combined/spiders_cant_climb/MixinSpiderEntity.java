@@ -18,7 +18,7 @@ import net.minecraft.entity.mob.SpiderEntity;
 import net.minecraft.world.World;
 
 @Mixin(SpiderEntity.class)
-@EligibleIf(anyConfigEnabled={"*.spiders_cant_climb_glazed_terracotta", "*.spiders_cant_climb_while_wet"})
+@EligibleIf(anyConfigAvailable={"*.spiders_cant_climb_glazed_terracotta", "*.spiders_cant_climb_while_wet"})
 public abstract class MixinSpiderEntity extends HostileEntity {
 
 	protected MixinSpiderEntity(EntityType<? extends HostileEntity> entityType, World world) {

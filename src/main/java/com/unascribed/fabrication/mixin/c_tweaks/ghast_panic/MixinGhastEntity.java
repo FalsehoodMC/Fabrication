@@ -15,7 +15,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.world.World;
 
 @Mixin(GhastEntity.class)
-@EligibleIf(configEnabled="*.ghast_panic")
+@EligibleIf(configAvailable="*.ghast_panic")
 public abstract class MixinGhastEntity extends FlyingEntity {
 
 	protected MixinGhastEntity(EntityType<? extends FlyingEntity> arg, World arg2) {

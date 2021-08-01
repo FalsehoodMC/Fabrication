@@ -10,7 +10,7 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.option.Option;
 import net.minecraft.client.util.InputUtil;
 
-@EligibleIf(configEnabled="*.toggle_sprint", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.toggle_sprint", envMatches=Env.CLIENT)
 public class FeatureToggleSprint implements Feature {
 
 	public static KeyBinding keybind;

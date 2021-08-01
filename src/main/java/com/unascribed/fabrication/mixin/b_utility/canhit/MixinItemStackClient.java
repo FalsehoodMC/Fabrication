@@ -22,7 +22,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 @Mixin(ItemStack.class)
-@EligibleIf(configEnabled="*.canhit", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.canhit", envMatches=Env.CLIENT)
 public class MixinItemStackClient {
 
 	@Inject(at=@At(value="INVOKE", target="net/minecraft/client/item/TooltipContext.isAdvanced()Z", ordinal=2),

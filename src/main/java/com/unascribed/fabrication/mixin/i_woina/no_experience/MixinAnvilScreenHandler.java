@@ -13,7 +13,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.screen.AnvilScreenHandler;
 
 @Mixin(AnvilScreenHandler.class)
-@EligibleIf(configEnabled="*.no_experience")
+@EligibleIf(configAvailable="*.no_experience")
 public class MixinAnvilScreenHandler {
 
 	@ModifyArg(at=@At(value="INVOKE", target="net/minecraft/screen/Property.set(I)V"), method="updateResult()V")

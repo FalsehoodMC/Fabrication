@@ -11,7 +11,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.screen.EnchantmentScreenHandler;
 
 @Mixin(EnchantmentScreenHandler.class)
-@EligibleIf(configEnabled="*.no_experience")
+@EligibleIf(configAvailable="*.no_experience")
 public class MixinEnchantmentScreenHandler {
 
 	@Redirect(at=@At(value="FIELD", target="net/minecraft/entity/player/PlayerEntity.experienceLevel:I"),

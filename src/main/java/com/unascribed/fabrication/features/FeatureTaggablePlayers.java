@@ -10,7 +10,7 @@ import com.unascribed.fabrication.support.Feature;
 import net.minecraft.entity.Entity;
 import net.minecraft.predicate.entity.EntityPredicates;
 
-@EligibleIf(configEnabled="*.taggable_players")
+@EligibleIf(configAvailable="*.taggable_players")
 public class FeatureTaggablePlayers implements Feature {
 
 	private Predicate<Entity> originalUntargetablePredicate;

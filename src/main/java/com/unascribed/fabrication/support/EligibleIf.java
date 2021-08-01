@@ -15,17 +15,13 @@ import java.lang.annotation.Target;
 @Target(TYPE)
 public @interface EligibleIf {
 	/**
-	 * Only apply this if the given config key is true.
+	 * Only apply this if the given config key is not banned.
 	 */
-	String configEnabled() default "";
+	String configAvailable() default "";
 	/**
-	 * Only apply this if any of the given config keys are true.
+	 * Only apply this if any of the given config keys are not banned.
 	 */
-	String[] anyConfigEnabled() default "";
-	/**
-	 * Only apply this if the given config key is false.
-	 */
-	String configDisabled() default "";
+	String[] anyConfigAvailable() default "";
 	/**
 	 * Only apply this in the given environment.
 	 */

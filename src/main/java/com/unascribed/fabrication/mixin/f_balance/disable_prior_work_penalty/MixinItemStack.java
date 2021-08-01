@@ -11,7 +11,7 @@ import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 @Mixin(ItemStack.class)
-@EligibleIf(configEnabled="*.disable_prior_work_penalty")
+@EligibleIf(configAvailable="*.disable_prior_work_penalty")
 public class MixinItemStack {
 
 	@Inject(at=@At("HEAD"), method="getRepairCost()I", cancellable=true)

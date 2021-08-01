@@ -17,7 +17,7 @@ import net.minecraft.network.packet.s2c.play.EntityEquipmentUpdateS2CPacket;
 import net.minecraft.server.network.EntityTrackerEntry;
 
 @Mixin(EntityTrackerEntry.class)
-@EligibleIf(configEnabled="*.hide_armor")
+@EligibleIf(configAvailable="*.hide_armor")
 public class MixinEntityTrackerEntry {
 
 	@Shadow @Final

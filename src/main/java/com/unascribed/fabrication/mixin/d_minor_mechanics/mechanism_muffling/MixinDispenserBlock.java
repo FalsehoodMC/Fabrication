@@ -13,7 +13,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 
 @Mixin({DispenserBlock.class, DropperBlock.class})
-@EligibleIf(configEnabled="*.mechanism_muffling")
+@EligibleIf(configAvailable="*.mechanism_muffling")
 public class MixinDispenserBlock {
 
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/server/world/ServerWorld.syncWorldEvent(ILnet/minecraft/util/math/BlockPos;I)V"),

@@ -24,7 +24,7 @@ import net.minecraft.stat.Stats;
 import net.minecraft.world.World;
 
 @Mixin(PlayerEntity.class)
-@EligibleIf(configEnabled="*.taggable_players")
+@EligibleIf(configAvailable="*.taggable_players")
 public abstract class MixinPlayerEntity extends LivingEntity {
 
 	protected MixinPlayerEntity(EntityType<? extends LivingEntity> entityType, World world) {

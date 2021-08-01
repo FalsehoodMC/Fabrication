@@ -17,7 +17,7 @@ import net.minecraft.entity.mob.PhantomEntity;
 import net.minecraft.world.World;
 
 @Mixin(LivingEntity.class)
-@EligibleIf(configEnabled="*.taggable_players")
+@EligibleIf(configAvailable="*.taggable_players")
 public abstract class MixinLivingEntity extends Entity {
 
 	protected MixinLivingEntity(EntityType<? extends Entity> entityType, World world) {

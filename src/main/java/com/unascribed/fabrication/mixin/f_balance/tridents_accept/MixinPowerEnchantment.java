@@ -14,7 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 
 @Mixin(PowerEnchantment.class)
-@EligibleIf(configEnabled="*.tridents_accept_power")
+@EligibleIf(configAvailable="*.tridents_accept_power")
 public class MixinPowerEnchantment extends Enchantment {
 
 	// enchantment is implemented in MixinTridentEntity in z_combined.trident_enchantments

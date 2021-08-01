@@ -17,7 +17,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.ItemEntity;
 
 @Mixin(ItemEntityRenderer.class)
-@EligibleIf(anyConfigEnabled= {"*.blinking_drops", "*.classic_block_drops"}, envMatches=Env.CLIENT)
+@EligibleIf(anyConfigAvailable= {"*.blinking_drops", "*.classic_block_drops"}, envMatches=Env.CLIENT)
 public class MixinItemEntityRenderer {
 
 	@Inject(at=@At("HEAD"), method="render(Lnet/minecraft/entity/ItemEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",

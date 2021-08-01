@@ -13,7 +13,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.TextureManager;
 
 @Mixin(TextureManager.class)
-@EligibleIf(configEnabled="*.better_pause_freezing", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.better_pause_freezing", envMatches=Env.CLIENT)
 public class MixinTextureManager {
 
 	@Inject(at=@At("HEAD"), method="tick()V", cancellable=true)

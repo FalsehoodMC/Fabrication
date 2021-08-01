@@ -15,7 +15,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.ItemEntity;
 
 @Mixin(ItemEntityRenderer.class)
-@EligibleIf(configEnabled="*.despawning_items_blink", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.despawning_items_blink", envMatches=Env.CLIENT)
 public class MixinItemEntityRenderer {
 
 	@Inject(at=@At("HEAD"), method="render(Lnet/minecraft/entity/ItemEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",

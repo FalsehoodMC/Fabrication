@@ -15,7 +15,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 
 @Mixin(ModelPredicateProviderRegistry.class)
-@EligibleIf(configEnabled="*.disable_elytra", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.disable_elytra", envMatches=Env.CLIENT)
 public class MixinModelPredicateProviderRegistry {
 	
 	// "broken" predicate lambda

@@ -20,7 +20,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 @Mixin(PlayerEntity.class)
-@EligibleIf(configEnabled="*.obsidian_tears")
+@EligibleIf(configAvailable="*.obsidian_tears")
 public class MixinPlayerEntity {
 
 	@Inject(at=@At("HEAD"), method="findRespawnPosition(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;FZZ)Ljava/util/Optional;",

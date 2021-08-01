@@ -21,7 +21,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 
 @Mixin(ClientPlayNetworkHandler.class)
-@EligibleIf(configEnabled="*.hide_armor", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.hide_armor", envMatches=Env.CLIENT)
 public class MixinClientPlayNetworkHandler {
 	
 	@Shadow @Final

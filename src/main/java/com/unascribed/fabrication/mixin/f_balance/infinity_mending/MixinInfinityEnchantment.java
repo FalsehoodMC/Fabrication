@@ -14,7 +14,7 @@ import net.minecraft.enchantment.MendingEnchantment;
 import net.minecraft.entity.EquipmentSlot;
 
 @Mixin(InfinityEnchantment.class)
-@EligibleIf(configEnabled="*.infinity_mending")
+@EligibleIf(configAvailable="*.infinity_mending")
 public abstract class MixinInfinityEnchantment extends Enchantment {
 
 	protected MixinInfinityEnchantment(Rarity weight, EnchantmentTarget type, EquipmentSlot[] slotTypes) {

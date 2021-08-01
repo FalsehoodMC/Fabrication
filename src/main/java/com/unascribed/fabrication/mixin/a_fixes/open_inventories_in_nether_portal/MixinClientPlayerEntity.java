@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(ClientPlayerEntity.class)
-@EligibleIf(configEnabled="*.open_inventories_in_nether_portal", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.open_inventories_in_nether_portal", envMatches=Env.CLIENT)
 public class MixinClientPlayerEntity {
 	@Final
 	@Shadow

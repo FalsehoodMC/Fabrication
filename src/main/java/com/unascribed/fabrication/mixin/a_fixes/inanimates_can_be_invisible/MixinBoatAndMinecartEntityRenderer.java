@@ -14,7 +14,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 
 @Mixin({BoatEntityRenderer.class, MinecartEntityRenderer.class})
-@EligibleIf(configEnabled="*.inanimates_can_be_invisible", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.inanimates_can_be_invisible", envMatches=Env.CLIENT)
 public class MixinBoatAndMinecartEntityRenderer {
 
 	// for rendering a player's own mounted vehicle

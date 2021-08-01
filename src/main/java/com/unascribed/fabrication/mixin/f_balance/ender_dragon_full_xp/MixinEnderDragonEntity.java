@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(EnderDragonEntity.class)
-@EligibleIf(configEnabled="*.ender_dragon_full_xp")
+@EligibleIf(configAvailable="*.ender_dragon_full_xp")
 public class MixinEnderDragonEntity {
 
 	@ModifyVariable(method="updatePostDeath", at=@At(value="STORE", ordinal=0), ordinal=0)

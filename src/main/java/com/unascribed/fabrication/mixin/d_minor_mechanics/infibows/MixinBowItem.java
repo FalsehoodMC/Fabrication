@@ -17,7 +17,7 @@ import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 @Mixin(BowItem.class)
-@EligibleIf(configEnabled="*.infibows", classNotPresent="net.parker8283.bif.BowInfinityFix")
+@EligibleIf(configAvailable="*.infibows", classNotPresent="net.parker8283.bif.BowInfinityFix")
 public class MixinBowItem {
 	
 	@Inject(at = @At("HEAD"), cancellable = true, method = "use(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/TypedActionResult;")

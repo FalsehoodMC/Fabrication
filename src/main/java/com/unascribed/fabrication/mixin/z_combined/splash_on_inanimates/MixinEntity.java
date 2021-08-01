@@ -15,7 +15,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.world.World;
 
 @Mixin(Entity.class)
-@EligibleIf(anyConfigEnabled={"*.invisibility_splash_on_inanimates", "*.slowfall_splash_on_inanimates"})
+@EligibleIf(anyConfigAvailable={"*.invisibility_splash_on_inanimates", "*.slowfall_splash_on_inanimates"})
 public abstract class MixinEntity implements SetInvisNoGravReversible {
 
 	private boolean fabrication$invisibilityReversible;

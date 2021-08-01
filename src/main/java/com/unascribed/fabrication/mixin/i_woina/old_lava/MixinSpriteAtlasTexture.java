@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(SpriteAtlasTexture.class)
-@EligibleIf(configEnabled="*.old_lava", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.old_lava", envMatches=Env.CLIENT)
 public class MixinSpriteAtlasTexture {
 
 	@Inject(at=@At("TAIL"), method="upload(Lnet/minecraft/client/texture/SpriteAtlasTexture$Data;)V")

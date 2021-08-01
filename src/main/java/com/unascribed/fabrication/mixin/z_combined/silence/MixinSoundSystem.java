@@ -12,7 +12,7 @@ import net.minecraft.client.sound.SoundInstance;
 import net.minecraft.client.sound.SoundSystem;
 
 @Mixin(SoundSystem.class)
-@EligibleIf(anyConfigEnabled={"*.disable_equip_sound", "*.endermen_dont_squeal", "*.silent_minecarts"}, envMatches=Env.CLIENT)
+@EligibleIf(anyConfigAvailable={"*.disable_equip_sound", "*.endermen_dont_squeal", "*.silent_minecarts"}, envMatches=Env.CLIENT)
 public class MixinSoundSystem {
 
 	@Inject(at=@At("HEAD"), method="play(Lnet/minecraft/client/sound/SoundInstance;)V", cancellable=true)

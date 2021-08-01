@@ -12,7 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtList;
 
 @Mixin(TridentEntity.class)
-@EligibleIf(configEnabled="*.canhit")
+@EligibleIf(configAvailable="*.canhit")
 public abstract class MixinTridentEntity implements SetCanHitList {
 
 	@Shadow

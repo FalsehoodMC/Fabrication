@@ -15,7 +15,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
 @Mixin(Entity.class)
-@EligibleIf(configEnabled="*.mob_ids", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.mob_ids", envMatches=Env.CLIENT)
 public class MixinEntity {
 
 	@Inject(at=@At("HEAD"), method="getCustomName()Lnet/minecraft/text/Text;", cancellable=true)

@@ -17,7 +17,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
 @Mixin(ServerPlayNetworkHandler.class)
-@EligibleIf(configEnabled="*.crawling")
+@EligibleIf(configAvailable="*.crawling")
 public class MixinServerPlayNetworkHandler {
 	
 	@Shadow

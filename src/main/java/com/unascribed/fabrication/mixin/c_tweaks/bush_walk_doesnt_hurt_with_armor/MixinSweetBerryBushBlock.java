@@ -16,7 +16,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 @Mixin(SweetBerryBushBlock.class)
-@EligibleIf(configEnabled="*.bush_walk_doesnt_hurt_with_armor")
+@EligibleIf(configAvailable="*.bush_walk_doesnt_hurt_with_armor")
 public class MixinSweetBerryBushBlock {
 	
 	@Inject(at=@At(value="INVOKE", target="net/minecraft/entity/Entity.damage(Lnet/minecraft/entity/damage/DamageSource;F)Z"),

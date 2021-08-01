@@ -18,7 +18,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 
 @Mixin(PotionEntity.class)
-@EligibleIf(configEnabled="*.enhanced_moistness")
+@EligibleIf(configAvailable="*.enhanced_moistness")
 public abstract class MixinPotionEntity extends ThrownItemEntity {
 
 	public MixinPotionEntity(EntityType<? extends ThrownItemEntity> entityType, double d, double e, double f, World world) {

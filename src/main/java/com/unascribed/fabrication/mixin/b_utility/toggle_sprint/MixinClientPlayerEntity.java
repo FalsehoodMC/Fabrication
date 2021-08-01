@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientPlayerEntity.class)
-@EligibleIf(configEnabled="*.toggle_sprint", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.toggle_sprint", envMatches=Env.CLIENT)
 public class MixinClientPlayerEntity {
 
 	@Redirect(at=@At(value="INVOKE", target="Lnet/minecraft/client/option/KeyBinding;isPressed()Z"), method="tickMovement()V")

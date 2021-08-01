@@ -15,7 +15,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 @Mixin(NoteBlock.class)
-@EligibleIf(configEnabled="*.less_restrictive_note_blocks")
+@EligibleIf(configAvailable="*.less_restrictive_note_blocks")
 public abstract class MixinNoteBlock extends Block {
 
 	public MixinNoteBlock(Settings settings) {

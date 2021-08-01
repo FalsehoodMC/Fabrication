@@ -18,7 +18,7 @@ import net.minecraft.text.Text;
 import net.minecraft.world.World;
 
 @Mixin(PlayerEntity.class)
-@EligibleIf(configEnabled="*.use_player_list_name_in_tag", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.use_player_list_name_in_tag", envMatches=Env.CLIENT)
 public abstract class MixinPlayerEntity extends LivingEntity {
 
 	protected MixinPlayerEntity(EntityType<? extends LivingEntity> entityType, World world) {

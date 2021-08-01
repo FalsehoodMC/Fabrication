@@ -22,7 +22,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
 @Mixin(LivingEntity.class)
-@EligibleIf(configEnabled="*.sync_attacker_yaw")
+@EligibleIf(configAvailable="*.sync_attacker_yaw")
 public abstract class MixinLivingEntity extends Entity implements SetAttackerYawAware {
 
 	public MixinLivingEntity(EntityType<?> type, World world) {

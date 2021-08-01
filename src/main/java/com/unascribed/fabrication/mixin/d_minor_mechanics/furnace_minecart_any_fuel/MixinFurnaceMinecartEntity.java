@@ -22,7 +22,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 
 @Mixin(FurnaceMinecartEntity.class)
-@EligibleIf(configEnabled="*.furnace_minecart_any_fuel")
+@EligibleIf(configAvailable="*.furnace_minecart_any_fuel")
 public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity {
 
 	protected MixinFurnaceMinecartEntity(EntityType<?> entityType, World world) {

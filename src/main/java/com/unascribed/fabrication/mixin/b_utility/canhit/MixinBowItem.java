@@ -22,7 +22,7 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.world.World;
 
 @Mixin(BowItem.class)
-@EligibleIf(configEnabled="*.canhit")
+@EligibleIf(configAvailable="*.canhit")
 public class MixinBowItem {
 
 	@Inject(at=@At(value="INVOKE", target="net/minecraft/item/ItemStack.damage(ILnet/minecraft/entity/LivingEntity;Ljava/util/function/Consumer;)V"),

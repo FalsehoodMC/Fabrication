@@ -29,7 +29,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
 
-@EligibleIf(configEnabled="*.hide_armor")
+@EligibleIf(configAvailable="*.hide_armor")
 public class FeatureHideArmor implements Feature {
 
 	private static final EquipmentSlot[] ALL_ARMOR = {EquipmentSlot.FEET, EquipmentSlot.LEGS, EquipmentSlot.CHEST, EquipmentSlot.HEAD};

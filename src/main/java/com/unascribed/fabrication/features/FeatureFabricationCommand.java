@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import com.mojang.brigadier.Command;
-import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.CommandNode;
@@ -329,7 +328,7 @@ public class FeatureFabricationCommand implements Feature {
 				LiteralArgumentBuilder<T> key = LiteralArgumentBuilder.<T>literal(s);
 				key.executes((c) -> {
 					String value = MixinConfigPlugin.getRawValue(s);
-					boolean tri = MixinConfigPlugin.isTrilean(s);
+					boolean tri = MixinConfigPlugin.isStandardValue(s);
 					if (value.isEmpty() && tri) value = "unset";
 					boolean def = MixinConfigPlugin.getDefault(s);
 					LiteralText txt = new LiteralText(s+" = "+value+(tri ? " (default "+def+")" : ""));
@@ -352,12 +351,12 @@ public class FeatureFabricationCommand implements Feature {
 				LiteralArgumentBuilder<T> key = LiteralArgumentBuilder.<T>literal(s);
 
 				String[] values;
-				if (s.equals("general.runtime_checks")) {
+				if (s.equals("general.reduced_motion") || s.equals("general.data_upload")) {
 					values = new String[]{"true", "false"};
 				} else if (s.equals("general.profile")) {
 					values = Profile.stringValues();
 				} else {
-					values = new String[]{"unset", "true", "false"};
+					values = new String[]{"unset", "true", "false", "banned"};
 				}
 				for (String v : values) {
 					LiteralArgumentBuilder<T> value =
@@ -443,7 +442,7 @@ public class FeatureFabricationCommand implements Feature {
 	private static void setKeyWithFeedback(CommandContext<? extends CommandSource> c, String key, String value) {
 		String oldValue = MixinConfigPlugin.getRawValue(key);
 		boolean def = MixinConfigPlugin.getDefault(key);
-		boolean tri = MixinConfigPlugin.isTrilean(key);
+		boolean tri = MixinConfigPlugin.isStandardValue(key);
 		if (value.equals(oldValue)) {
 			sendFeedback(c, new LiteralText(key+" is already set to "+value+(tri ? " (default "+def+")" : "")), false);
 		} else {
@@ -456,11 +455,6 @@ public class FeatureFabricationCommand implements Feature {
 				if (FabricationMod.updateFeature(key)) {
 					return;
 				}
-			}
-			if ("general.runtime_checks".equals(key)) {
-				sendFeedback(c, new LiteralText("§cYou will need to restart the game for this change to take effect."), false);
-			} else if (!MixinConfigPlugin.RUNTIME_CHECKS_WAS_ENABLED && !MixinConfigPlugin.isRuntimeConfigurable(key)) {
-				sendFeedback(c, new LiteralText("§cgeneral.runtime_checks is disabled, you may need to restart the game for this change to take effect."), false);
 			}
 		}
 	}

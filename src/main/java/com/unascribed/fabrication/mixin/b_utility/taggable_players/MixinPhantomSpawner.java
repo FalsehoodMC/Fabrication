@@ -13,7 +13,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.gen.PhantomSpawner;
 
 @Mixin(PhantomSpawner.class)
-@EligibleIf(configEnabled="*.taggable_players")
+@EligibleIf(configAvailable="*.taggable_players")
 public class MixinPhantomSpawner {
 
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/entity/player/PlayerEntity.isSpectator()Z"),

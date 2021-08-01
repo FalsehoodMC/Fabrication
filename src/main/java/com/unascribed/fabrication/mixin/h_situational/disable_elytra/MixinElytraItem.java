@@ -12,7 +12,7 @@ import net.minecraft.item.ElytraItem;
 import net.minecraft.item.ItemStack;
 
 @Mixin(ElytraItem.class)
-@EligibleIf(configEnabled="*.disable_elytra")
+@EligibleIf(configAvailable="*.disable_elytra")
 public class MixinElytraItem {
 
 	@Inject(at=@At("HEAD"), method="isUsable(Lnet/minecraft/item/ItemStack;)Z", cancellable=true)

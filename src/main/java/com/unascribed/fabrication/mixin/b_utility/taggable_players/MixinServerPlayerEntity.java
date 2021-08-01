@@ -33,7 +33,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 @Mixin(ServerPlayerEntity.class)
-@EligibleIf(configEnabled="*.taggable_players")
+@EligibleIf(configAvailable="*.taggable_players")
 public abstract class MixinServerPlayerEntity extends PlayerEntity implements TaggablePlayer {
 
 	public MixinServerPlayerEntity(World world, BlockPos pos, float yaw, GameProfile profile) {

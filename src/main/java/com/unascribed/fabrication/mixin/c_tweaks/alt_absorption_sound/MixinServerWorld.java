@@ -13,7 +13,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.server.world.ServerWorld;
 
 @Mixin(ServerWorld.class)
-@EligibleIf(configEnabled="*.alt_absorption_sound")
+@EligibleIf(configAvailable="*.alt_absorption_sound")
 public class MixinServerWorld {
 	
 	@Inject(at=@At("HEAD"), method="sendEntityStatus(Lnet/minecraft/entity/Entity;B)V", cancellable=true)

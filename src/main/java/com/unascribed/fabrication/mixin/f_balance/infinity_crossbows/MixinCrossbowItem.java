@@ -22,7 +22,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 
 @Mixin(CrossbowItem.class)
-@EligibleIf(configEnabled="*.infinity_crossbows")
+@EligibleIf(configAvailable="*.infinity_crossbows")
 public class MixinCrossbowItem {
 
 	@ModifyVariable(at=@At("HEAD"), method="loadProjectile(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemStack;ZZ)Z",

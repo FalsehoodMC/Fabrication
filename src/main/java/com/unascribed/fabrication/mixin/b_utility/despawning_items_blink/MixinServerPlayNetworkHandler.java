@@ -17,7 +17,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
 @Mixin(ServerPlayNetworkHandler.class)
-@EligibleIf(configEnabled="*.despawning_items_blink")
+@EligibleIf(configAvailable="*.despawning_items_blink")
 public class MixinServerPlayNetworkHandler {
 	
 	@Shadow

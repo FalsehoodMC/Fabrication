@@ -17,7 +17,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 
 @Mixin(ArmorStandEntity.class)
-@EligibleIf(configEnabled="*.instant_pickup")
+@EligibleIf(configAvailable="*.instant_pickup")
 public abstract class MixinArmorStandEntity extends LivingEntity {
 
 	protected MixinArmorStandEntity(EntityType<? extends LivingEntity> arg, World arg2) {

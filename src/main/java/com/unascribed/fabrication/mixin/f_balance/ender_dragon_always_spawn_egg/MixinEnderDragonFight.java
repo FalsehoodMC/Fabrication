@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.UUID;
 
 @Mixin(EnderDragonFight.class)
-@EligibleIf(configEnabled="*.ender_dragon_always_spawn_egg")
+@EligibleIf(configAvailable="*.ender_dragon_always_spawn_egg")
 public class MixinEnderDragonFight {
 	@Shadow
 	private boolean previouslyKilled;

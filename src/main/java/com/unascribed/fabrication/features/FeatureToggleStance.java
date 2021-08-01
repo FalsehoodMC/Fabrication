@@ -18,7 +18,7 @@ import net.minecraft.client.util.Window;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 
-@EligibleIf(configEnabled="*.toggle_stance", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.toggle_stance", envMatches=Env.CLIENT)
 public class FeatureToggleStance implements Feature {
 
 	public enum Stance {

@@ -31,7 +31,7 @@ import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PlayerEntity.class)
-@EligibleIf(configEnabled="*.repelling_void")
+@EligibleIf(configAvailable="*.repelling_void")
 public abstract class MixinPlayerEntity extends LivingEntity {
 
 	protected MixinPlayerEntity(EntityType<? extends LivingEntity> entityType, World world) {

@@ -16,7 +16,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 
 @Mixin(ServerPlayerInteractionManager.class)
-@EligibleIf(configEnabled="*.play_note_blocks_in_creative")
+@EligibleIf(configAvailable="*.play_note_blocks_in_creative")
 public class MixinServerPlayerInteractionManager {
 
 	@Shadow

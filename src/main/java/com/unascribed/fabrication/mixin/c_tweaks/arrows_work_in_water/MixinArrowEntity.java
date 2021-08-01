@@ -10,7 +10,7 @@ import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.world.World;
 
 @Mixin(ArrowEntity.class)
-@EligibleIf(configEnabled="*.arrows_work_in_water")
+@EligibleIf(configAvailable="*.arrows_work_in_water")
 public abstract class MixinArrowEntity extends PersistentProjectileEntity {
 
 

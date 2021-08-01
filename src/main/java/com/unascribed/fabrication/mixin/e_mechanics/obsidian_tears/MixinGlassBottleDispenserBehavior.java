@@ -19,7 +19,7 @@ import net.minecraft.util.math.BlockPointer;
 import net.minecraft.util.math.BlockPos;
 
 @Mixin(targets="net.minecraft.block.dispenser.DispenserBehavior$17")
-@EligibleIf(configEnabled="*.obsidian_tears")
+@EligibleIf(configAvailable="*.obsidian_tears")
 public class MixinGlassBottleDispenserBehavior extends FallibleItemDispenserBehavior {
 
 	@Shadow

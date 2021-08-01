@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AnimalEntity.class)
-@EligibleIf(configEnabled="*.old_sheep_shear")
+@EligibleIf(configAvailable="*.old_sheep_shear")
 public abstract class MixinAnimalEntity extends PassiveEntity {
 
 	protected MixinAnimalEntity(EntityType<? extends PassiveEntity> entityType, World world) {

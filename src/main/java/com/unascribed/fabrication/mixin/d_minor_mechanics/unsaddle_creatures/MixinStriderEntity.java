@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(StriderEntity.class)
-@EligibleIf(configEnabled="*.unsaddle_creatures")
+@EligibleIf(configAvailable="*.unsaddle_creatures")
 public abstract class MixinStriderEntity implements Saddleable {
 	@Shadow
 	private SaddledComponent saddledComponent;

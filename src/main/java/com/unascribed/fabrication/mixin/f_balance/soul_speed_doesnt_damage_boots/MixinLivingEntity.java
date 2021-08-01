@@ -9,7 +9,7 @@ import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.entity.LivingEntity;
 
 @Mixin(LivingEntity.class)
-@EligibleIf(configEnabled="*.soul_speed_doesnt_damage_boots")
+@EligibleIf(configAvailable="*.soul_speed_doesnt_damage_boots")
 public class MixinLivingEntity {
 
 	@Inject(at=@At(value="INVOKE", target="net/minecraft/item/ItemStack.damage(ILnet/minecraft/entity/LivingEntity;Ljava/util/function/Consumer;)V"), method="addSoulSpeedBoostIfNeeded()V", cancellable=true)

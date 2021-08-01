@@ -14,7 +14,7 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
 
 @Mixin(ItemEntity.class)
-@EligibleIf(configEnabled="*.fire_protection_on_any_item")
+@EligibleIf(configAvailable="*.fire_protection_on_any_item")
 public abstract class MixinItemEntity {
 
 	@Shadow

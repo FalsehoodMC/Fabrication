@@ -9,7 +9,7 @@ import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.Block;
 import net.minecraft.world.gen.feature.ConfiguredFeatures.Configs;
 
-@EligibleIf(configEnabled="*.no_dinnerlava")
+@EligibleIf(configAvailable="*.no_dinnerlava")
 public class FeatureNoDinnerlava implements Feature {
 
 	private Set<Block> originalValidBlocks;

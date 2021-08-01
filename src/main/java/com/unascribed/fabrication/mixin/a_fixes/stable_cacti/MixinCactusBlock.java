@@ -24,7 +24,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.WorldAccess;
 
 @Mixin(CactusBlock.class)
-@EligibleIf(configEnabled="*.stable_cacti")
+@EligibleIf(configAvailable="*.stable_cacti")
 public class MixinCactusBlock extends Block {
 
 	public MixinCactusBlock(Settings settings) {

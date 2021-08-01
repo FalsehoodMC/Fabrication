@@ -20,7 +20,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Matrix4f;
 
 @Mixin(HeldItemRenderer.class)
-@EligibleIf(configEnabled="*.flat_items", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.flat_items", envMatches=Env.CLIENT)
 public class MixinHeldItemRenderer {
 
 	@Shadow @Final

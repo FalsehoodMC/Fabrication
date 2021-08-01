@@ -12,7 +12,7 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;
 
 @Mixin(Enchantment.class)
-@EligibleIf(configEnabled="*.fire_protection_on_any_item")
+@EligibleIf(configAvailable="*.fire_protection_on_any_item")
 public abstract class MixinEnchantment {
 
 	@Inject(at=@At("HEAD"), method="isAcceptableItem(Lnet/minecraft/item/ItemStack;)Z", cancellable=true)

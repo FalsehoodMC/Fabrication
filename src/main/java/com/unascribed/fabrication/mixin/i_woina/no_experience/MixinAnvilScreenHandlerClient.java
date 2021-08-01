@@ -12,7 +12,7 @@ import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.screen.AnvilScreenHandler;
 
 @Mixin(AnvilScreenHandler.class)
-@EligibleIf(configEnabled="*.no_experience", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.no_experience", envMatches=Env.CLIENT)
 public class MixinAnvilScreenHandlerClient {
 
 	@Inject(at=@At("HEAD"), method="getLevelCost()I", cancellable=true)

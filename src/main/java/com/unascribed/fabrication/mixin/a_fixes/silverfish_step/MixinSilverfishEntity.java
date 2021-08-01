@@ -11,7 +11,7 @@ import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.entity.mob.SilverfishEntity;
 
 @Mixin(SilverfishEntity.class)
-@EligibleIf(configEnabled="*.silverfish_step")
+@EligibleIf(configAvailable="*.silverfish_step")
 public class MixinSilverfishEntity {
 
 	// this method is poorly mapped. a better name is "hasStepSound"

@@ -31,7 +31,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 @Mixin(ItemRenderer.class)
-@EligibleIf(anyConfigEnabled={"*.books_show_enchants", "*.tools_show_important_enchant"}, envMatches=Env.CLIENT)
+@EligibleIf(anyConfigAvailable={"*.books_show_enchants", "*.tools_show_important_enchant"}, envMatches=Env.CLIENT)
 public class MixinItemRenderer {
 
 	@Shadow

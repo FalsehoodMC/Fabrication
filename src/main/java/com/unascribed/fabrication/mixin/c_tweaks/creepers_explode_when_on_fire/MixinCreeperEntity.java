@@ -12,7 +12,7 @@ import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.world.World;
 
 @Mixin(CreeperEntity.class)
-@EligibleIf(configEnabled="*.creepers_explode_when_on_fire")
+@EligibleIf(configAvailable="*.creepers_explode_when_on_fire")
 public abstract class MixinCreeperEntity extends HostileEntity {
 	
 	protected MixinCreeperEntity(EntityType<? extends HostileEntity> entityType, World world) {

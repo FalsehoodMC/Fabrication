@@ -13,7 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 
 @Mixin(Enchantment.class)
-@EligibleIf(configEnabled="*.infinity_crossbows")
+@EligibleIf(configAvailable="*.infinity_crossbows")
 public abstract class MixinEnchantment {
 	
 	@Inject(at=@At("HEAD"), method="isAcceptableItem(Lnet/minecraft/item/ItemStack;)Z", cancellable=true)

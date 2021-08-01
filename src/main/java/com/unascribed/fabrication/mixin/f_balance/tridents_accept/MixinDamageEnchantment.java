@@ -18,7 +18,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 
 @Mixin(DamageEnchantment.class)
-@EligibleIf(configEnabled="*.tridents_accept_sharpness")
+@EligibleIf(configAvailable="*.tridents_accept_sharpness")
 public class MixinDamageEnchantment extends Enchantment {
 
 	// enchantment is implemented in MixinTridentEntity in z_combined.trident_enchantments

@@ -11,7 +11,7 @@ import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.entity.vehicle.FurnaceMinecartEntity;
 
 @Mixin(FurnaceMinecartEntity.class)
-@EligibleIf(anyConfigEnabled={"*.hyperspeed_furnace_minecart", "*.furnace_minecart_pushing"})
+@EligibleIf(anyConfigAvailable={"*.hyperspeed_furnace_minecart", "*.furnace_minecart_pushing"})
 public abstract class MixinFurnaceMinecartEntity {
 
 	@ModifyArgs(at=@At(value="INVOKE", target="net/minecraft/util/math/Vec3d.add(DDD)Lnet/minecraft/util/math/Vec3d;"),

@@ -20,7 +20,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
 @Mixin(EntityRenderer.class)
-@EligibleIf(configEnabled="*.mob_ids", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.mob_ids", envMatches=Env.CLIENT)
 public abstract class MixinEntityRenderer {
 
 	@Unique

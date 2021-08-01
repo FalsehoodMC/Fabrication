@@ -37,7 +37,7 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 @Mixin(LivingEntity.class)
-@EligibleIf(configEnabled="*.broken_tools_drop_components")
+@EligibleIf(configAvailable="*.broken_tools_drop_components")
 public abstract class MixinLivingEntity extends Entity {
 
 	public MixinLivingEntity(EntityType<?> type, World world) {

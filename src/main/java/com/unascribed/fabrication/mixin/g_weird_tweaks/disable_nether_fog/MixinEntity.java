@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(SkyProperties.Nether.class)
-@EligibleIf(configEnabled="*.disable_nether_fog")
+@EligibleIf(configAvailable="*.disable_nether_fog")
 public class MixinEntity {
 
 	@Inject(at=@At("HEAD"), method= "useThickFog(II)Z", cancellable=true)

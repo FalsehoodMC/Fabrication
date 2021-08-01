@@ -22,7 +22,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 @Mixin(Entity.class)
-@EligibleIf(configEnabled="*.enhanced_moistness")
+@EligibleIf(configAvailable="*.enhanced_moistness")
 public abstract class MixinEntity implements MarkWet {
 
 	private int fabrication$wetTimer;

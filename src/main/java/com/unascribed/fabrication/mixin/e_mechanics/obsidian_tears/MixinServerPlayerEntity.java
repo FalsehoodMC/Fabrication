@@ -18,7 +18,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 @Mixin(ServerPlayerEntity.class)
-@EligibleIf(configEnabled="*.obsidian_tears")
+@EligibleIf(configAvailable="*.obsidian_tears")
 public abstract class MixinServerPlayerEntity extends PlayerEntity {
 
 	public MixinServerPlayerEntity(World world, BlockPos pos, float yaw, GameProfile profile) {

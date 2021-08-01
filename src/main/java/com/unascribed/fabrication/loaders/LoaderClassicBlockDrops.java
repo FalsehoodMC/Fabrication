@@ -13,7 +13,7 @@ import com.unascribed.fabrication.QDIni;
 import com.unascribed.fabrication.support.ConfigLoader;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.Trilean;
+import com.unascribed.fabrication.support.ConfigValue;
 
 import com.google.common.collect.Lists;
 import net.minecraft.block.Block;
@@ -23,16 +23,16 @@ import net.minecraft.util.registry.Registry;
 @EligibleIf(envMatches=Env.CLIENT)
 public class LoaderClassicBlockDrops implements ConfigLoader {
 
-	public static final List<Function<Identifier, Trilean>> rules = Lists.newArrayList();
+	public static final List<Function<Identifier, ConfigValue>> rules = Lists.newArrayList();
 	private static final Map<Block, Boolean> cache = new WeakHashMap<>();
 	
 	public static boolean isSafe(Block b) {
 		if (cache.containsKey(b)) return cache.get(b);
 		Identifier id = Registry.BLOCK.getId(b);
 		if (id == null) return false;
-		for (Function<Identifier, Trilean> rule : rules) {
-			Trilean t = rule.apply(id);
-			if (t != Trilean.UNSET) {
+		for (Function<Identifier, ConfigValue> rule : rules) {
+			ConfigValue t = rule.apply(id);
+			if (t != ConfigValue.UNSET) {
 				boolean r = t.resolve(true);
 				cache.put(b, r);
 				return r;
@@ -62,8 +62,8 @@ public class LoaderClassicBlockDrops implements ConfigLoader {
 				if (valueOpt.isPresent()) {
 					boolean value = valueOpt.get();
 					rules.add(id -> {
-						if (p.matcher(id.getPath()).matches()) return value ? Trilean.TRUE : Trilean.FALSE;
-						return Trilean.UNSET;
+						if (p.matcher(id.getPath()).matches()) return value ? ConfigValue.TRUE : ConfigValue.FALSE;
+						return ConfigValue.UNSET;
 					});
 				}
 			} else {
@@ -71,8 +71,8 @@ public class LoaderClassicBlockDrops implements ConfigLoader {
 				if (valueOpt.isPresent()) {
 					boolean value = valueOpt.get();
 					rules.add(id -> {
-						if (id.toString().equals(k)) return value ? Trilean.TRUE : Trilean.FALSE;
-						return Trilean.UNSET;
+						if (id.toString().equals(k)) return value ? ConfigValue.TRUE : ConfigValue.FALSE;
+						return ConfigValue.UNSET;
 					});
 				}
 			}

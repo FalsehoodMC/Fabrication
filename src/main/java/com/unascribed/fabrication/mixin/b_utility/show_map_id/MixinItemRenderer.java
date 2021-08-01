@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ItemRenderer.class)
-@EligibleIf(anyConfigEnabled={"*.show_map_id"}, envMatches=Env.CLIENT)
+@EligibleIf(anyConfigAvailable={"*.show_map_id"}, envMatches=Env.CLIENT)
 public class MixinItemRenderer {
 
 	@Shadow

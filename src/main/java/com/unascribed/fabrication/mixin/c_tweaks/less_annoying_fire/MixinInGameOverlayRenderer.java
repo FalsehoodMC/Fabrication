@@ -15,7 +15,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffects;
 
 @Mixin(InGameOverlayRenderer.class)
-@EligibleIf(configEnabled="*.less_annoying_fire", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.less_annoying_fire", envMatches=Env.CLIENT)
 public class MixinInGameOverlayRenderer {
 
 	@Inject(at=@At("HEAD"), method="renderFireOverlay(Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/util/math/MatrixStack;)V", cancellable=true)

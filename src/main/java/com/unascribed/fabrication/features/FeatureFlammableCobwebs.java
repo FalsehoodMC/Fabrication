@@ -7,7 +7,7 @@ import com.unascribed.fabrication.support.Feature;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FireBlock;
 
-@EligibleIf(configEnabled="*.flammable_cobwebs")
+@EligibleIf(configAvailable="*.flammable_cobwebs")
 public class FeatureFlammableCobwebs implements Feature {
 
 	@Override

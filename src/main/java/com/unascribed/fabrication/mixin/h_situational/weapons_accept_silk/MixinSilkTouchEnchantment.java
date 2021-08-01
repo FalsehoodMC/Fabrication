@@ -14,7 +14,7 @@ import net.minecraft.enchantment.SilkTouchEnchantment;
 import net.minecraft.entity.EquipmentSlot;
 
 @Mixin(SilkTouchEnchantment.class)
-@EligibleIf(configEnabled="*.weapons_accept_silk")
+@EligibleIf(configAvailable="*.weapons_accept_silk")
 public class MixinSilkTouchEnchantment extends Enchantment {
 
 	protected MixinSilkTouchEnchantment(Rarity weight, EnchantmentTarget type, EquipmentSlot[] slotTypes) {

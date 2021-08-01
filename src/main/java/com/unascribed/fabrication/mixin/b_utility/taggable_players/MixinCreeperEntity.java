@@ -20,7 +20,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
 
 @Mixin(CreeperEntity.class)
-@EligibleIf(configEnabled="*.taggable_players")
+@EligibleIf(configAvailable="*.taggable_players")
 public abstract class MixinCreeperEntity extends HostileEntity {
 
 	protected MixinCreeperEntity(EntityType<? extends HostileEntity> entityType, World world) {

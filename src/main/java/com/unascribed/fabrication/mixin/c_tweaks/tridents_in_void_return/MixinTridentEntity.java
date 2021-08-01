@@ -13,7 +13,7 @@ import net.minecraft.entity.projectile.TridentEntity;
 import net.minecraft.world.World;
 
 @Mixin(TridentEntity.class)
-@EligibleIf(configEnabled="*.tridents_in_void_return")
+@EligibleIf(configAvailable="*.tridents_in_void_return")
 public abstract class MixinTridentEntity extends Entity {
 
 	public MixinTridentEntity(EntityType<? extends ProjectileEntity> entityType, World world) {

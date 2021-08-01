@@ -33,7 +33,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 @Mixin(NoteBlock.class)
-@EligibleIf(anyConfigEnabled={"*.exact_note_block_tuning", "*.note_block_notes", "*.reverse_note_block_tuning"})
+@EligibleIf(anyConfigAvailable={"*.exact_note_block_tuning", "*.note_block_notes", "*.reverse_note_block_tuning"})
 public class MixinNoteBlock {
 	
 	private static final String FABRICATION$NOTE_COLORS = "aa66cccccdd559999bbbaaaaa";

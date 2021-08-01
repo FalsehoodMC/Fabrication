@@ -22,7 +22,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 @Mixin(AnvilBlock.class)
-@EligibleIf(configEnabled="*.anvil_repair")
+@EligibleIf(configAvailable="*.anvil_repair")
 public class MixinAnvilBlock {
 
 	@Inject(at=@At("HEAD"), method="onUse(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;",

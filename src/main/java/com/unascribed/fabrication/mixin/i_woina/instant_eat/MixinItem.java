@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Item.class)
-@EligibleIf(configEnabled="*.instant_eat", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.instant_eat", envMatches=Env.CLIENT)
 public class MixinItem {
 
 	@Inject(method="getMaxUseTime(Lnet/minecraft/item/ItemStack;)I", at=@At(value="HEAD"), cancellable = true)

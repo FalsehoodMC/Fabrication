@@ -19,7 +19,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.hit.HitResult.Type;
 
 @Mixin(ProjectileEntity.class)
-@EligibleIf(configEnabled="*.canhit")
+@EligibleIf(configAvailable="*.canhit")
 public class MixinProjectileEntity implements SetCanHitList {
 
 	private NbtList fabrication$canHitList;

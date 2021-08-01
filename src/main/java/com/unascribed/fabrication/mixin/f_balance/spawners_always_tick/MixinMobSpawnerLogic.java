@@ -12,7 +12,7 @@ import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.world.MobSpawnerLogic;
 
 @Mixin(MobSpawnerLogic.class)
-@EligibleIf(configEnabled="*.spawners_always_tick")
+@EligibleIf(configAvailable="*.spawners_always_tick")
 public class MixinMobSpawnerLogic {
 
 	@Shadow

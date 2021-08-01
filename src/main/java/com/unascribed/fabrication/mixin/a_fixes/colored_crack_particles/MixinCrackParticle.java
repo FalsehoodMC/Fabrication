@@ -16,7 +16,7 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.ItemStack;
 
 @Mixin(CrackParticle.class)
-@EligibleIf(configEnabled="*.colored_crack_particles", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.colored_crack_particles", envMatches=Env.CLIENT)
 public abstract class MixinCrackParticle extends SpriteBillboardParticle {
 
 	protected MixinCrackParticle(ClientWorld arg, double d, double e, double f) {

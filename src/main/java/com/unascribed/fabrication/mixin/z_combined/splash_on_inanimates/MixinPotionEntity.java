@@ -23,7 +23,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 
 @Mixin(PotionEntity.class)
-@EligibleIf(anyConfigEnabled={"*.invisibility_splash_on_inanimates", "*.slowfall_splash_on_inanimates"})
+@EligibleIf(anyConfigAvailable={"*.invisibility_splash_on_inanimates", "*.slowfall_splash_on_inanimates"})
 public abstract class MixinPotionEntity extends ThrownItemEntity {
 
 	public MixinPotionEntity(EntityType<? extends ThrownItemEntity> entityType, double d, double e, double f, World world) {

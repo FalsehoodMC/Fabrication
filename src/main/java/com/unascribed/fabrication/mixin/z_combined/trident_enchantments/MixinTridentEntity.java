@@ -16,7 +16,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.hit.EntityHitResult;
 
 @Mixin(TridentEntity.class)
-@EligibleIf(anyConfigEnabled={"*.tridents_accept_power", "*.tridents_accept_sharpness", "*.bedrock_impaling"})
+@EligibleIf(anyConfigAvailable={"*.tridents_accept_power", "*.tridents_accept_sharpness", "*.bedrock_impaling"})
 public class MixinTridentEntity {
 
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/enchantment/EnchantmentHelper.getAttackDamage(Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/EntityGroup;)F"),

@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LivingEntity.class)
-@EligibleIf(configEnabled="*.no_sprint")
+@EligibleIf(configAvailable="*.no_sprint")
 abstract public class MixinLivingEntity extends Entity {
 
 

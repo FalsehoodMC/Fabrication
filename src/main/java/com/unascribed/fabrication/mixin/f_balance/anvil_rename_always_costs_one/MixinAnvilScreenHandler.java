@@ -17,7 +17,7 @@ import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.ScreenHandlerType;
 
 @Mixin(AnvilScreenHandler.class)
-@EligibleIf(configEnabled="*.anvil_rename_always_costs_one")
+@EligibleIf(configAvailable="*.anvil_rename_always_costs_one")
 public abstract class MixinAnvilScreenHandler extends ForgingScreenHandler {
 
 	public MixinAnvilScreenHandler(ScreenHandlerType<?> type, int syncId, PlayerInventory playerInventory, ScreenHandlerContext context) {

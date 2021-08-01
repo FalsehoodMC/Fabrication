@@ -10,7 +10,7 @@ import net.minecraft.client.particle.Particle;
 import net.minecraft.client.world.ClientWorld;
 
 @Mixin(NoteParticle.class)
-@EligibleIf(configEnabled="*.less_restrictive_note_blocks", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.less_restrictive_note_blocks", envMatches=Env.CLIENT)
 public abstract class MixinNoteParticle extends Particle implements SetVelocity {
 
 	protected MixinNoteParticle(ClientWorld world, double x, double y, double z) {

@@ -12,7 +12,7 @@ import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.entity.player.PlayerEntity;
 
 @Mixin(PlayerEntity.class)
-@EligibleIf(configEnabled="*.crawling")
+@EligibleIf(configAvailable="*.crawling")
 public class MixinPlayerEntity implements SetCrawling {
 	
 	private boolean fabrication$crawling;

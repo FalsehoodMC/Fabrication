@@ -21,7 +21,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.DefaultedRegistry;
 
 @Mixin(ItemStringReader.class)
-@EligibleIf(configEnabled="*.legacy_command_syntax")
+@EligibleIf(configAvailable="*.legacy_command_syntax")
 public class MixinItemStringReader {
 
 	@Shadow

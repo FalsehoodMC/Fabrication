@@ -24,7 +24,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Language;
 
-@EligibleIf(configEnabled="*.dimensional_tools")
+@EligibleIf(configAvailable="*.dimensional_tools")
 public class FeatureDimensionalTools implements Feature {
 
 	private static final NumberFormat format = NumberFormat.getNumberInstance();

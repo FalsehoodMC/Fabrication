@@ -23,7 +23,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
 @Mixin(SignEditScreen.class)
-@EligibleIf(configEnabled="*.multiline_sign_paste", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.multiline_sign_paste", envMatches=Env.CLIENT)
 public abstract class MixinSignEditScreen extends Screen {
 
 	protected MixinSignEditScreen(Text title) {

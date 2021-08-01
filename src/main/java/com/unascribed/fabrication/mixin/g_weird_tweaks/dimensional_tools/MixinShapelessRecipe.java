@@ -13,7 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.ShapelessRecipe;
 
 @Mixin(ShapelessRecipe.class)
-@EligibleIf(configEnabled="*.dimensional_tools")
+@EligibleIf(configAvailable="*.dimensional_tools")
 public class MixinShapelessRecipe {
 
 	// even though this signature is identical to the one in ShapedRecipe, a multi-target mixin

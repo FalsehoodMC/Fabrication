@@ -16,7 +16,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 
 @Mixin(ItemEntityRenderer.class)
-@EligibleIf(anyConfigEnabled= {"*.blinking_drops", "*.classic_block_drops"}, envMatches=Env.CLIENT, modNotLoaded="forge:obfuscate")
+@EligibleIf(anyConfigAvailable= {"*.blinking_drops", "*.classic_block_drops"}, envMatches=Env.CLIENT, modNotLoaded="forge:obfuscate")
 public class MixinItemEntityRendererVanilla {
 	
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/client/render/item/ItemRenderer.renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformation$Mode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/render/model/BakedModel;)V"),

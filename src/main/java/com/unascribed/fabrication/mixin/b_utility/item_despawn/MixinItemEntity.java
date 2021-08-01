@@ -44,7 +44,7 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 @Mixin(ItemEntity.class)
-@EligibleIf(configEnabled="*.item_despawn")
+@EligibleIf(configAvailable="*.item_despawn")
 public abstract class MixinItemEntity extends Entity implements SetFromPlayerDeath {
 
 	public MixinItemEntity(EntityType<?> type, World world) {

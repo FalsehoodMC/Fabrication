@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
-
 import org.apache.commons.lang3.ArrayUtils;
 import org.lwjgl.opengl.GL11;
 
@@ -13,14 +11,15 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.brigadier.CommandDispatcher;
 import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.FabricationMod;
+import com.unascribed.fabrication.FabricationModClient;
 import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.FeaturesFile.FeatureEntry;
 import com.unascribed.fabrication.FeaturesFile.Sides;
 import com.unascribed.fabrication.interfaces.GetServerConfig;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.MixinConfigPlugin.Profile;
-import com.unascribed.fabrication.support.ResolvedTrilean;
-import com.unascribed.fabrication.support.Trilean;
+import com.unascribed.fabrication.support.ResolvedConfigValue;
+import com.unascribed.fabrication.support.ConfigValue;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Objects;
@@ -58,11 +57,11 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3f;
 
-import static com.unascribed.fabrication.client.FabricationConfigScreen.TrileanFlag.*;
+import static com.unascribed.fabrication.client.FabricationConfigScreen.ConfigValueFlag.*;
 
 public class FabricationConfigScreen extends Screen {
 
-	public enum TrileanFlag {
+	public enum ConfigValueFlag {
 		CLIENT_ONLY, REQUIRES_FABRIC_API
 	}
 
@@ -84,19 +83,11 @@ public class FabricationConfigScreen extends Screen {
 	
 	private static long serverLaunchId = -1;
 	
-	private static final Set<String> newlyFalseKeysClient = Sets.newHashSet();
-	private static final Set<String> newlyFalseKeysServer = Sets.newHashSet();
+	private static final Set<String> newlyBannedKeysClient = Sets.newHashSet();
+	private static final Set<String> newlyBannedKeysServer = Sets.newHashSet();
 	
-	private static final Set<String> newlyNotFalseKeysClient = Sets.newHashSet();
-	private static final Set<String> newlyNotFalseKeysServer = Sets.newHashSet();
-	
-	private static final Map<String, String> changedKeysWithoutRuntimeChecksClient = Maps.newHashMap();
-	private static final Map<String, String> changedKeysWithoutRuntimeChecksServer = Maps.newHashMap();
-	
-	private static boolean runtimeChecksToggledClient;
-	private static boolean runtimeChecksToggledServer;
-	
-	private final int random = ThreadLocalRandom.current().nextInt();
+	private static final Set<String> newlyUnbannedKeysClient = Sets.newHashSet();
+	private static final Set<String> newlyUnbannedKeysServer = Sets.newHashSet();
 	
 	private final Screen parent;
 	
@@ -133,12 +124,12 @@ public class FabricationConfigScreen extends Screen {
 	private Set<String> serverKnownConfigKeys = Sets.newHashSet();
 	private boolean serverReadOnly;
 	
-	private final Map<String, Trilean> optionPreviousValues = Maps.newHashMap();
+	private final Map<String, ConfigValue> optionPreviousValues = Maps.newHashMap();
 	private final Map<String, Float> optionAnimationTime = Maps.newHashMap();
 	private final Map<String, Float> disabledAnimationTime = Maps.newHashMap();
-	private final Map<String, Float> disappearAnimationTime = Maps.newHashMap();
+	private final Map<String, Float> becomeBanAnimationTime = Maps.newHashMap();
 	private final Set<String> knownDisabled = Sets.newHashSet();
-	private final Set<String> disappeared = Sets.newHashSet();
+	private final Set<String> onlyBannableds = Sets.newHashSet();
 	
 	private boolean bufferTooltips = false;
 	private final List<Runnable> bufferedTooltips = Lists.newArrayList();
@@ -523,41 +514,26 @@ public class FabricationConfigScreen extends Screen {
 		
 		List<String> notes = Lists.newArrayList();
 		
-		Set<String> newlyFalseKeys;
-		Set<String> newlyNotFalseKeys;
-		Map<String, String> changedKeysWithoutRuntimeChecks;
+		Set<String> newlyBannedKeys;
+		Set<String> newlyUnbannedKeys;
 		
-		boolean runtimeChecksToggled;
 		boolean hasYellowNote = false;
 		boolean hasRedNote = false;
 		
 		if (configuringServer) {
 			checkServerData();
-			newlyFalseKeys = newlyFalseKeysServer;
-			newlyNotFalseKeys = newlyNotFalseKeysServer;
-			changedKeysWithoutRuntimeChecks = changedKeysWithoutRuntimeChecksServer;
-			runtimeChecksToggled = runtimeChecksToggledServer;
+			newlyBannedKeys = newlyBannedKeysServer;
+			newlyUnbannedKeys = newlyUnbannedKeysServer;
 		} else {
-			newlyFalseKeys = newlyFalseKeysClient;
-			newlyNotFalseKeys = newlyNotFalseKeysClient;
-			changedKeysWithoutRuntimeChecks = changedKeysWithoutRuntimeChecksClient;
-			runtimeChecksToggled = runtimeChecksToggledClient;
+			newlyBannedKeys = newlyBannedKeysClient;
+			newlyUnbannedKeys = newlyUnbannedKeysClient;
 		}
-		if (!changedKeysWithoutRuntimeChecks.isEmpty()) {
-			notes.add("§c"+changedKeysWithoutRuntimeChecks.size()+" change"+(changedKeysWithoutRuntimeChecks.size() == 1 ? "" : "s")
-					+" made while Runtime Checks\n§cis disabled will not be applied until\n§cthe {} is restarted.");
+		if (!newlyUnbannedKeys.isEmpty()) {
+			notes.add("§c"+newlyUnbannedKeys.size()+" newly unbanned option"+(newlyUnbannedKeys.size() == 1 ? "" : "s")+" will\n§cnot activate until the {} is\n§crestarted.");
 			hasRedNote = true;
 		}
-		if (!newlyNotFalseKeys.isEmpty()) {
-			notes.add("§c"+newlyNotFalseKeys.size()+" newly undisabled option"+(newlyNotFalseKeys.size() == 1 ? "" : "s")+" will\n§cnot activate until the {} is\n§crestarted.");
-			hasRedNote = true;
-		}
-		if (runtimeChecksToggled) {
-			notes.add("§eThe {} must be restarted for\n§echanges to Runtime Checks to apply.");
-			hasYellowNote = true;
-		}
-		if (!newlyFalseKeys.isEmpty() && (isEnabled("general.runtime_checks") && !runtimeChecksToggled)) {
-			notes.add(newlyFalseKeys.size()+" newly disabled option"+(newlyFalseKeys.size() == 1 ? "" : "s")+" will be\nentirely unloaded when the {} is\nrestarted.");
+		if (!newlyBannedKeys.isEmpty()) {
+			notes.add(newlyBannedKeys.size()+" newly banned option"+(newlyBannedKeys.size() == 1 ? "" : "s")+" will be\nunloaded when the {} is\nrestarted.");
 		}
 		if (noteIndex < 0) {
 			noteIndex = 0;
@@ -635,10 +611,8 @@ public class FabricationConfigScreen extends Screen {
 		if (cpnh != null && cpnh instanceof GetServerConfig) {
 			long launchId = ((GetServerConfig)cpnh).fabrication$getLaunchId();
 			if (launchId != serverLaunchId) {
-				newlyFalseKeysServer.clear();
-				newlyNotFalseKeysServer.clear();
-				changedKeysWithoutRuntimeChecksServer.clear();
-				runtimeChecksToggledServer = false;
+				newlyBannedKeysServer.clear();
+				newlyUnbannedKeysServer.clear();
 				serverLaunchId = launchId;
 			}
 		}
@@ -739,21 +713,19 @@ public class FabricationConfigScreen extends Screen {
 					renderWrappedTooltip(matrices, "§l"+hoveredEntry.name+"\n§f"+hoveredEntry.desc, mouseX, mouseY);
 				}
 				y = 40;
-				FeatureEntry rchecks = FeaturesFile.get("general.runtime_checks");
-				y = drawTrilean(matrices, "general.runtime_checks", rchecks.name, rchecks.desc, y, mouseX, mouseY);
 				FeatureEntry rmot = FeaturesFile.get("general.reduced_motion");
-				y = drawTrilean(matrices, "general.reduced_motion", rmot.name, rmot.desc, y, mouseX, mouseY, CLIENT_ONLY);
+				y = drawConfigValue(matrices, "general.reduced_motion", rmot.name, rmot.desc, y, mouseX, mouseY, CLIENT_ONLY);
 				FeatureEntry dup = FeaturesFile.get("general.data_upload");
-				y = drawTrilean(matrices, "general.data_upload", dup.name, dup.desc, y, mouseX, mouseY);
+				y = drawConfigValue(matrices, "general.data_upload", dup.name, dup.desc, y, mouseX, mouseY);
 			} else {
 				RenderSystem.setShaderColor(1, 1, 1, 1);
 				for (Map.Entry<String, FeatureEntry> en : FeaturesFile.getAll().entrySet()) {
 					if (en.getKey().startsWith(section+".")) {
 						FeatureEntry fe = en.getValue();
 						if (fe.meta) continue;
-						TrileanFlag[] flags = {};
+						ConfigValueFlag[] flags = {};
 						if (fe.sides == Sides.CLIENT_ONLY) flags = ArrayUtils.add(flags, CLIENT_ONLY);
-						y = drawTrilean(matrices, en.getKey(), fe.name, fe.desc, y, mouseX, mouseY, flags);
+						y = drawConfigValue(matrices, en.getKey(), fe.name, fe.desc, y, mouseX, mouseY, flags);
 					}
 				}
 			}
@@ -795,27 +767,27 @@ public class FabricationConfigScreen extends Screen {
 		return click;
 	}
 
-	private int drawTrilean(MatrixStack matrices, String key, String title, String desc, int y, float mouseX, float mouseY, TrileanFlag... flags) {
+	private int drawConfigValue(MatrixStack matrices, String key, String title, String desc, int y, float mouseX, float mouseY, ConfigValueFlag... flags) {
 		if (y < -12 || y > height-16) return y+14;
 		boolean clientOnly = ArrayUtils.contains(flags, CLIENT_ONLY);
-		boolean disappear = clientOnly && configuringServer;
+		boolean onlyBannable = clientOnly && configuringServer;
 		boolean requiresFabricApi = ArrayUtils.contains(flags, REQUIRES_FABRIC_API);
 		// presence of Fabric API is implied by the fact you need ModMenu to access this menu
 		boolean noFabricApi = false; //!configuringServer && requiresFabricApi && !FabricLoader.getInstance().isModLoaded("fabric");
 		boolean failed = isFailed(key);
-		boolean disabled = failed || noFabricApi || (configuringServer && (serverReadOnly || clientOnly)) || !isValid(key);
+		boolean banned = !configuringServer && FabricationModClient.isBannedByServer(key);
+		boolean disabled = failed || banned || noFabricApi || (configuringServer && serverReadOnly) || !isValid(key);
 		boolean noValue = noFabricApi || (configuringServer && clientOnly || !isValid(key));
 		float time = optionAnimationTime.getOrDefault(key, 0f);
 		float disabledTime = disabledAnimationTime.getOrDefault(key, 0f);
-		float disappearTime = disappearAnimationTime.getOrDefault(key, 0f);
-		if (disappear && !disappeared.contains(key)) {
-			disappearTime = disappearAnimationTime.compute(key, (k, f) -> 5 - (f == null ? 0 : f));
-			disappeared.add(key);
-		} else if (!disappear && disappeared.contains(key)) {
-			disappearTime = disappearAnimationTime.compute(key, (k, f) -> 5 - (f == null ? 0 : f));
-			disappeared.remove(key);
+		float becomeBanTime = becomeBanAnimationTime.getOrDefault(key, 0f);
+		if (onlyBannable && !onlyBannableds.contains(key)) {
+			becomeBanTime = becomeBanAnimationTime.compute(key, (k, f) -> 5 - (f == null ? 0 : f));
+			onlyBannableds.add(key);
+		} else if (!onlyBannable && onlyBannableds.contains(key)) {
+			becomeBanTime = becomeBanAnimationTime.compute(key, (k, f) -> 5 - (f == null ? 0 : f));
+			onlyBannableds.remove(key);
 		}
-		if (disappear && disappearTime <= 0) return y;
 		boolean animateDisabled = disabledTime > 0;
 		if (disabled && !knownDisabled.contains(key)) {
 			disabledTime = disabledAnimationTime.compute(key, (k, f) -> 5 - (f == null ? 0 : f));
@@ -842,77 +814,117 @@ public class FabricationConfigScreen extends Screen {
 				disabledAnimationTime.put(key, disabledTime);
 			}
 		}
-		if (disappearTime > 0) {
-			disappearTime -= client.getLastFrameDuration();
-			if (disappearTime <= 0) {
-				disappearAnimationTime.remove(key);
-				disappearTime = 0;
+		if (becomeBanTime > 0) {
+			becomeBanTime -= client.getLastFrameDuration();
+			if (becomeBanTime <= 0) {
+				becomeBanAnimationTime.remove(key);
+				becomeBanTime = 0;
 			} else {
-				disappearAnimationTime.put(key, disappearTime);
+				becomeBanAnimationTime.put(key, becomeBanTime);
 			}
 		}
 		matrices.push();
 		matrices.translate(0, y, 0);
-		float dia = sCurve5((5-disappearTime)/5f);
-		float scale;
-		if (disappear) {
-			matrices.scale(1, scale = 1-dia, 1);
-		} else {
-			matrices.scale(1, scale = dia, 1);
-		}
+		float dia = sCurve5((5-becomeBanTime)/5f);
+		float scale = 1;
 		boolean noUnset = key.startsWith("general.");
-		Trilean currentValue = noUnset ? (isEnabled(key) ? Trilean.TRUE : Trilean.FALSE) : getValue(key);
+		ConfigValue currentValue = noUnset ? (isEnabled(key) ? ConfigValue.TRUE : ConfigValue.FALSE) : onlyBannable ? getValue(key) == ConfigValue.BANNED ? ConfigValue.BANNED : ConfigValue.UNSET : getValue(key);
 		boolean keyEnabled = isEnabled(key);
-		Trilean prevValue = animateDisabled ? currentValue : optionPreviousValues.getOrDefault(key, currentValue);
-		int prevX = prevValue == Trilean.FALSE ? 0 : prevValue == Trilean.TRUE ? noUnset ? 23 : 30 : 15;
-		int prevHue = prevValue == Trilean.FALSE ? 0 : prevValue == Trilean.TRUE ? 120 : 55;
-		int curX = currentValue == Trilean.FALSE ? 0 : currentValue == Trilean.TRUE ? noUnset ? 23 : 30 : 15;
-		int curHue = currentValue == Trilean.FALSE ? 0 : currentValue == Trilean.TRUE ? 120 : 55;
+		ConfigValue prevValue = animateDisabled ? currentValue : optionPreviousValues.getOrDefault(key, currentValue);
+		int[] xes;
+		if (noUnset) {
+			xes = new int[] { 0, 23, 0, 0 };
+		} else if (onlyBannable) {
+			xes = new int[] { 30, 30, 30, 0 };
+		} else {
+			xes = new int[] { 30, 45, 15, 0 };
+		}
+		int[] hues = { 50, 130, -10, -90 };
+		int[] values = { 90, 85, 90, 20 };
+		int prevX = xes[prevValue.ordinal()];
+		int prevHue = hues[prevValue.ordinal()];
+		int prevHSValue = values[prevValue.ordinal()];
+		int curX = xes[currentValue.ordinal()];
+		int curHue = hues[currentValue.ordinal()];
+		int curHSValue = values[currentValue.ordinal()];
 		float a = sCurve5((5-time)/5f);
 		float da = sCurve5((5-disabledTime)/5f);
 		if (!disabled) {
 			da = 1-da;
 		}
+		int trackSize = (noUnset?45:60);
 		if (clientOnly) {
-			fill(matrices, 133, 0, 134+46, 11, 0xFFFFAA00);
+			fill(matrices, 133, 0, 134+trackSize+1, 11, 0xFFFFAA00);
 		} else {
-			fill(matrices, 133, 0, 134+46, 11, 0xFFFFFFFF);
+			fill(matrices, 133, 0, 134+trackSize+1, 11, 0xFFFFFFFF);
 		}
-		fill(matrices, 134, 1, 134+45, 10, 0x66000000);
-		if (!noUnset) fill(matrices, 134+15, 1, 134+15+15, 10, 0x33000000);
+		fill(matrices, 134, 1, 134+trackSize, 10, 0x66000000);
+		if (!noUnset && !onlyBannable) {
+			fill(matrices, 134+15, 1, 134+15+15, 10, 0x33000000);
+			fill(matrices, 134+45, 1, 134+45+15, 10, 0x33000000);
+		}
 		matrices.push();
 		matrices.translate(134+(prevX+((curX-prevX)*a)), 0, 0);
 		int knobAlpha = ((int)((noValue ? 1-da : 1) * 255))<<24;
-		fill(matrices, 0, 1, noUnset ? 22 : 15, 10, MathHelper.hsvToRgb((prevHue+((curHue-prevHue)*a))/360f, 0.9f, 0.8f)|knobAlpha);
-		if (!noUnset && a >= 1 && currentValue == Trilean.UNSET) {
+		fill(matrices, 0, 1, noUnset ? 22 : onlyBannable ? 30 : 15, 10, MathHelper.hsvToRgb(Math.floorMod((int)(prevHue+((curHue-prevHue)*a)), 360)/360f, 0.9f, (prevHSValue+((curHSValue-prevHSValue)*a))/100f)|knobAlpha);
+		if (!noUnset && a >= 1 && currentValue == ConfigValue.UNSET && !onlyBannable) {
 			fill(matrices, keyEnabled ? 15 : -1, 1, keyEnabled ? 16 : 0, 10, MathHelper.hsvToRgb((keyEnabled ? 120 : 0)/360f, 0.9f, 0.8f)|knobAlpha);
 		}
 		matrices.pop();
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
-		RenderSystem.setShaderTexture(0, new Identifier("fabrication", "trilean.png"));
+		RenderSystem.setShaderTexture(0, new Identifier("fabrication", "configvalue.png"));
 		RenderSystem.setShaderColor(1, 1, 1, 0.5f+((1-da)*0.5f));
 		RenderSystem.enableTexture();
 		if (noUnset) {
-			drawTexture(matrices, 134+3, 1, 0, 0, 15, 9, 45, 9);
-			drawTexture(matrices, 134+4+22, 1, 30, 0, 15, 9, 45, 9);
+			drawTexture(matrices, 134+3, 1, 15, 0, 15, 9, 60, 9);
+			drawTexture(matrices, 134+4+22, 1, 45, 0, 15, 9, 60, 9);
 		} else {
-			drawTexture(matrices, 134, 1, 0, 0, 45, 9, 45, 9);
+			if (onlyBannable) {
+				drawTexture(matrices, 134+7, 1, 0, 0, 15, 9, 60, 9);
+				drawTexture(matrices, 134+38, 1, 30, 0, 15, 9, 60, 9);
+			} else {
+				drawTexture(matrices, 134, 1, 0, 0, 60, 9, 60, 9);
+			}
 		}
 		RenderSystem.disableTexture();
 		if (didClick) {
-			if (mouseX >= 134 && mouseX <= 134+45 && mouseY >= y+1 && mouseY <= y+10) {
+			if (mouseX >= 134 && mouseX <= 134+trackSize && mouseY >= y+1 && mouseY <= y+10) {
 				float pitch = y*0.005f;
 				if (disabled) {
 					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO, 0.8f, 1));
 					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO, 0.7f, 1));
 					tooltipBlinkTicks = 20;
 				} else {
-					int clickedIndex = (int)((mouseX-134)/(noUnset ? 22 : 15));
-					Trilean newValue = clickedIndex == 0 ? Trilean.FALSE : clickedIndex == 1 && !noUnset ? Trilean.UNSET : Trilean.TRUE;
+					int clickedIndex = (int)((mouseX-134)/(noUnset ? 22 : onlyBannable ? 30 : 15));
+					ConfigValue newValue;
+					if (noUnset) {
+						newValue = clickedIndex == 0 ? ConfigValue.FALSE : ConfigValue.TRUE;
+					} else if (onlyBannable) {
+						newValue = clickedIndex == 0 ? ConfigValue.BANNED : ConfigValue.UNSET;
+					} else {
+						switch (clickedIndex) {
+							case 0:
+								newValue = ConfigValue.BANNED;
+								break;
+							case 1:
+								newValue = ConfigValue.FALSE;
+								break;
+							case 2:
+								newValue = ConfigValue.UNSET;
+								break;
+							case 3:
+								newValue = ConfigValue.TRUE;
+								break;
+							default:
+								newValue = ConfigValue.UNSET;
+								break;
+						}
+					}
 					client.getSoundManager().play(PositionedSoundInstance.master(
-							newValue == Trilean.FALSE ? SoundEvents.BLOCK_NOTE_BLOCK_BASS :
-								newValue == Trilean.UNSET ? SoundEvents.BLOCK_NOTE_BLOCK_COW_BELL :
+							newValue == ConfigValue.BANNED ? SoundEvents.BLOCK_NOTE_BLOCK_BASEDRUM :
+							newValue == ConfigValue.FALSE ? SoundEvents.BLOCK_NOTE_BLOCK_BASS :
+								newValue == ConfigValue.UNSET ? SoundEvents.BLOCK_NOTE_BLOCK_COW_BELL :
 									SoundEvents.BLOCK_NOTE_BLOCK_CHIME,
 							0.6f+pitch, 1f));
 					if (newValue != currentValue) {
@@ -925,7 +937,7 @@ public class FabricationConfigScreen extends Screen {
 		}
 		int textAlpha = ((int)((0.7f+((1-da)*0.3f)) * 255))<<24;
 		int startY = y;
-		int startX = 136+50;
+		int startX = 136+(noUnset ? 45 : 60)+5;
 		y += drawWrappedText(matrices, startX, 2, title, width-startX-6, 0xFFFFFF | textAlpha, false)*scale;
 		int endX = width-6;
 //		int endX = textRenderer.draw(matrices, title, startX, 2, 0xFFFFFF | textAlpha);
@@ -942,7 +954,7 @@ public class FabricationConfigScreen extends Screen {
 				prefix += "§r\n";
 			}
 			renderWrappedTooltip(matrices, prefix+desc, mouseX, mouseY);
-		} else if (mouseX >= 134 && mouseX <= 134+45 && mouseY >= startY && mouseY <= startY+10) {
+		} else if (mouseX >= 134 && mouseX <= 134+trackSize && mouseY >= startY && mouseY <= startY+10) {
 			if (disabled) {
 				if (noFabricApi) {
 					renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"This option requires Fabric API"), (int)mouseX, (int)mouseY);
@@ -950,24 +962,45 @@ public class FabricationConfigScreen extends Screen {
 					renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"The server does not recognize this option"), (int)mouseX, (int)mouseY);
 				} else if (failed) {
 					renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"This feature failed to initialize"), (int)mouseX, (int)mouseY);
+				} else if (banned) {
+					renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"This feature is banned by the server"), (int)mouseX, (int)mouseY);
 				} else {
 					renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"You cannot configure this server"), (int)mouseX, (int)mouseY);
 				}
 			} else {
-				int index = (int)((mouseX-134)/(noUnset ? 22 : 15));
-				if (index == 0) {
-					renderTooltip(matrices, new LiteralText("§cDisable"), (int)mouseX, (int)mouseY);
-				} else if (index == 1 && !noUnset) {
-					if (currentValue == Trilean.UNSET) {
+				int index = (int)((mouseX-134)/(noUnset ? 22 : onlyBannable ? 30 : 15));
+				if (onlyBannable) {
+					if (index == 0) {
 						renderTooltip(matrices, Lists.newArrayList(
-								new LiteralText("§eUse default value §f(see General > Profile)"),
-								new LiteralText("§rCurrent default: "+(keyEnabled ? "§aEnabled" : "§cDisabled"))
+								new LiteralText("§7Ban"),
+								new LiteralText("Disallow use by clients")
 						), (int)mouseX, (int)mouseY);
 					} else {
-						renderTooltip(matrices, new LiteralText("§eUse default value §f(see General > Profile)"), (int)mouseX, (int)mouseY);
+						renderTooltip(matrices, Lists.newArrayList(
+								new LiteralText("§eUnset"),
+								new LiteralText("Allow use by clients")
+						), (int)mouseX, (int)mouseY);
 					}
 				} else {
-					renderTooltip(matrices, new LiteralText("§aEnable"), (int)mouseX, (int)mouseY);
+					if (index == (noUnset ? 0 : 1)) {
+						renderTooltip(matrices, new LiteralText("§cDisable"), (int)mouseX, (int)mouseY);
+					} else if (index == (noUnset ? -99 : 2)) {
+						if (currentValue == ConfigValue.UNSET) {
+							renderTooltip(matrices, Lists.newArrayList(
+									new LiteralText("§eUse default value §f(see General > Profile)"),
+									new LiteralText("§rCurrent default: "+(keyEnabled ? "§aEnabled" : "§cDisabled"))
+							), (int)mouseX, (int)mouseY);
+						} else {
+							renderTooltip(matrices, new LiteralText("§eUse default value §f(see General > Profile)"), (int)mouseX, (int)mouseY);
+						}
+					} else if (index == 0) {
+						renderTooltip(matrices, Lists.newArrayList(
+								new LiteralText("§7Ban"),
+								new LiteralText("Prevent feature from loading entirely"+(configuringServer ? " and disallow use by clients" : ""))
+						), (int)mouseX, (int)mouseY);
+					} else {
+						renderTooltip(matrices, new LiteralText("§aEnable"), (int)mouseX, (int)mouseY);
+					}
 				}
 			}
 		}
@@ -1117,19 +1150,19 @@ public class FabricationConfigScreen extends Screen {
 		if (configuringServer) {
 			return ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerTrileanConfig().containsKey(key);
 		} else {
-			return MixinConfigPlugin.isTrilean(key);
+			return MixinConfigPlugin.isStandardValue(key);
 		}
 	}
 	
-	private ResolvedTrilean getResolvedValue(String key) {
+	private ResolvedConfigValue getResolvedValue(String key) {
 		if (configuringServer) {
-			return ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerTrileanConfig().getOrDefault(key, ResolvedTrilean.DEFAULT_FALSE);
+			return ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerTrileanConfig().getOrDefault(key, ResolvedConfigValue.DEFAULT_FALSE);
 		} else {
 			return MixinConfigPlugin.getResolvedValue(key);
 		}
 	}
 	
-	private Trilean getValue(String key) {
+	private ConfigValue getValue(String key) {
 		return getResolvedValue(key).trilean;
 	}
 	
@@ -1150,60 +1183,40 @@ public class FabricationConfigScreen extends Screen {
 	}
 	
 	private void setValue(String key, String value) {
-		Set<String> newlyFalseKeys;
-		Set<String> newlyNotFalseKeys;
-		Map<String, String> changedKeysWithoutRuntimeChecks;
-		
-		boolean runtimeChecksToggled;
+		Set<String> newlyBannedKeys;
+		Set<String> newlyUnbannedKeys;
 		
 		if (configuringServer) {
 			checkServerData();
-			newlyFalseKeys = newlyFalseKeysServer;
-			newlyNotFalseKeys = newlyNotFalseKeysServer;
-			changedKeysWithoutRuntimeChecks = changedKeysWithoutRuntimeChecksServer;
-			runtimeChecksToggled = runtimeChecksToggledServer;
+			newlyBannedKeys = newlyBannedKeysServer;
+			newlyUnbannedKeys = newlyUnbannedKeysServer;
 		} else {
-			newlyFalseKeys = newlyFalseKeysClient;
-			newlyNotFalseKeys = newlyNotFalseKeysClient;
-			changedKeysWithoutRuntimeChecks = changedKeysWithoutRuntimeChecksClient;
-			runtimeChecksToggled = runtimeChecksToggledClient;
+			newlyBannedKeys = newlyBannedKeysClient;
+			newlyUnbannedKeys = newlyUnbannedKeysClient;
 		}
 		String oldValue = getRawValue(key);
-		if ("general.runtime_checks".equals(key)) {
-			runtimeChecksToggled = !runtimeChecksToggled;
-		} else if (!MixinConfigPlugin.isRuntimeConfigurable(key)) {
-			if (value.equals("false")) {
-				if (newlyNotFalseKeys.contains(key)) {
-					newlyNotFalseKeys.remove(key);
+		if (!MixinConfigPlugin.isRuntimeConfigurable(key)) {
+			if (value.equals("banned")) {
+				if (newlyUnbannedKeys.contains(key)) {
+					newlyUnbannedKeys.remove(key);
 				} else {
-					newlyFalseKeys.add(key);
+					newlyBannedKeys.add(key);
 				}
-			} else if (oldValue.equals("false")) {
-				if (newlyFalseKeys.contains(key)) {
-					newlyFalseKeys.remove(key);
+			} else if (oldValue.equals("banned")) {
+				if (newlyBannedKeys.contains(key)) {
+					newlyBannedKeys.remove(key);
 				} else {
-					newlyNotFalseKeys.add(key);
+					newlyUnbannedKeys.add(key);
 				}
-			}
-		}
-		if (!"general.runtime_checks".equals(key) && !isEnabled("general.runtime_checks") && !runtimeChecksToggled && !MixinConfigPlugin.isRuntimeConfigurable(key)) {
-			if (changedKeysWithoutRuntimeChecks.containsKey(key)) {
-				if (changedKeysWithoutRuntimeChecks.get(key).equals(value)) {
-					changedKeysWithoutRuntimeChecks.remove(key);
-				}
-			} else {
-				changedKeysWithoutRuntimeChecks.put(key, oldValue);
 			}
 		}
 		if (configuringServer) {
-			runtimeChecksToggledServer = runtimeChecksToggled;
 			PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
 			data.writeVarInt(1);
 			data.writeString(key);
 			data.writeString(value);
 			client.getNetworkHandler().sendPacket(new CustomPayloadC2SPacket(new Identifier("fabrication", "config"), data));
 		} else {
-			runtimeChecksToggledClient = runtimeChecksToggled;
 			MixinConfigPlugin.set(key, value);
 			if (FabricationMod.isAvailableFeature(key)) {
 				FabricationMod.updateFeature(key);

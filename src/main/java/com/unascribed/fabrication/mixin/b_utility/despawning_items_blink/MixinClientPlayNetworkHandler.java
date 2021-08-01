@@ -24,7 +24,7 @@ import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
 import net.minecraft.util.Identifier;
 
 @Mixin(ClientPlayNetworkHandler.class)
-@EligibleIf(configEnabled="*.despawning_items_blink", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.despawning_items_blink", envMatches=Env.CLIENT)
 public class MixinClientPlayNetworkHandler {
 	
 	@Shadow @Final

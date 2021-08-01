@@ -19,7 +19,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
 @Mixin(ServerPlayerInteractionManager.class)
-@EligibleIf(configEnabled="*.pursurvers")
+@EligibleIf(configAvailable="*.pursurvers")
 public class MixinServerPlayerInteractionManager {
 
 	@Shadow

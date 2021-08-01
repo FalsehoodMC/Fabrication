@@ -15,7 +15,7 @@ import net.minecraft.entity.player.HungerManager;
 import net.minecraft.entity.player.PlayerEntity;
 
 @Mixin(HungerManager.class)
-@EligibleIf(configEnabled="*.taggable_players")
+@EligibleIf(configAvailable="*.taggable_players")
 public abstract class MixinHungerManager implements SetSaturation {
 
 	@Shadow

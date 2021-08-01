@@ -10,7 +10,7 @@ import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 
 @Mixin(AbstractInventoryScreen.class)
-@EligibleIf(configEnabled="*.boundless_levels", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.boundless_levels", envMatches=Env.CLIENT)
 public class MixinAbstractInventoryScreen {
 
 	@ModifyConstant(constant=@Constant(intValue=9), method="drawStatusEffectDescriptions(Lnet/minecraft/client/util/math/MatrixStack;IILjava/lang/Iterable;)V")

@@ -14,7 +14,7 @@ import net.minecraft.command.argument.EntitySummonArgumentType;
 import net.minecraft.util.Identifier;
 
 @Mixin(EntitySummonArgumentType.class)
-@EligibleIf(configEnabled="*.legacy_command_syntax")
+@EligibleIf(configAvailable="*.legacy_command_syntax")
 public class MixinEntitySummonArgumentType {
 	
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/util/Identifier.fromCommandInput(Lcom/mojang/brigadier/StringReader;)Lnet/minecraft/util/Identifier;"),

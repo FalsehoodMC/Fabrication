@@ -4,7 +4,7 @@ import com.unascribed.fabrication.DelegateFeature;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.SpecialEligibility;
 
-@EligibleIf(configEnabled="*.mods_command", specialConditions=SpecialEligibility.FORGE)
+@EligibleIf(configAvailable="*.mods_command", specialConditions=SpecialEligibility.FORGE)
 public class FeatureModsCommandForge extends DelegateFeature {
 
 	public FeatureModsCommandForge() {

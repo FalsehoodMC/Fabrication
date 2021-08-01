@@ -15,7 +15,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Arm;
 
 @Mixin(HeldItemRenderer.class)
-@EligibleIf(configEnabled="*.janky_arm", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.janky_arm", envMatches=Env.CLIENT)
 public class MixinHeldItemRenderer {
 
 	@Inject(at=@At(value="CONSTANT", args="floatValue=-20"),

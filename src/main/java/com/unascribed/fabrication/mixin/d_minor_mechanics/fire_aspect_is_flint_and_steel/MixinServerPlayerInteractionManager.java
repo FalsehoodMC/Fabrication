@@ -21,7 +21,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.world.World;
 
 @Mixin(ServerPlayerInteractionManager.class)
-@EligibleIf(configEnabled="*.fire_aspect_is_flint_and_steel")
+@EligibleIf(configAvailable="*.fire_aspect_is_flint_and_steel")
 public class MixinServerPlayerInteractionManager {
 
 	@Inject(at=@At("RETURN"), method="interactBlock(Lnet/minecraft/server/network/ServerPlayerEntity;Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;",

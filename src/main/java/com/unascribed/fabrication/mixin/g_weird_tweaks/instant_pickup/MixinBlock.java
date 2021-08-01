@@ -20,7 +20,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 
 @Mixin(Block.class)
-@EligibleIf(configEnabled="*.instant_pickup")
+@EligibleIf(configAvailable="*.instant_pickup")
 public class MixinBlock {
 
 	@Inject(at=@At("TAIL"), method="dropStacks(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/entity/BlockEntity;Lnet/minecraft/entity/Entity;Lnet/minecraft/item/ItemStack;)V")

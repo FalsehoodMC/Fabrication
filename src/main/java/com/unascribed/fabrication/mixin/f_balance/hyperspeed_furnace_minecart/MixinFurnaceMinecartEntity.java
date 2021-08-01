@@ -15,7 +15,7 @@ import net.minecraft.entity.vehicle.FurnaceMinecartEntity;
 import net.minecraft.world.World;
 
 @Mixin(FurnaceMinecartEntity.class)
-@EligibleIf(configEnabled="*.hyperspeed_furnace_minecart")
+@EligibleIf(configAvailable="*.hyperspeed_furnace_minecart")
 public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity {
 
 	protected MixinFurnaceMinecartEntity(EntityType<?> entityType, World world) {

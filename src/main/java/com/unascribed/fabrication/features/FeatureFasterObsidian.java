@@ -11,7 +11,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Block;
 
-@EligibleIf(configEnabled="*.faster_obsidian")
+@EligibleIf(configAvailable="*.faster_obsidian")
 public class FeatureFasterObsidian implements Feature {
 
 	private final ImmutableList<Block> BLOCKS = ImmutableList.of(

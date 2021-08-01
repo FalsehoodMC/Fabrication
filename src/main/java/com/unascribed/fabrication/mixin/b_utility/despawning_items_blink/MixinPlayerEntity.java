@@ -7,7 +7,7 @@ import com.unascribed.fabrication.support.EligibleIf;
 import net.minecraft.entity.player.PlayerEntity;
 
 @Mixin(PlayerEntity.class)
-@EligibleIf(configEnabled="*.despawning_items_blink")
+@EligibleIf(configAvailable="*.despawning_items_blink")
 public class MixinPlayerEntity implements SetItemDespawnAware {
 	
 	private boolean fabrication$itemDespawnAware;

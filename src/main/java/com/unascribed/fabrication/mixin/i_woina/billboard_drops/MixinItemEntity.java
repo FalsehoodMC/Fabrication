@@ -15,7 +15,7 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
 
 @Mixin(ItemEntity.class)
-@EligibleIf(configEnabled="*.billboard_drops", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.billboard_drops", envMatches=Env.CLIENT)
 public abstract class MixinItemEntity {
 	
 	@Shadow

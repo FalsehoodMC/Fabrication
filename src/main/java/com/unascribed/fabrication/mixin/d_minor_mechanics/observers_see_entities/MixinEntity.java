@@ -22,7 +22,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 @Mixin(Entity.class)
-@EligibleIf(configEnabled="*.observers_see_entities")
+@EligibleIf(configAvailable="*.observers_see_entities")
 public abstract class MixinEntity {
 
 	@Shadow

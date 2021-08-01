@@ -20,7 +20,7 @@ import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 
 @Mixin(ItemModels.class)
-@EligibleIf(configEnabled="*.obsidian_tears", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.obsidian_tears", envMatches=Env.CLIENT)
 public abstract class MixinItemModels {
 	
 	@Unique

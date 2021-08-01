@@ -23,7 +23,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.world.World;
 
 @Mixin(AbstractBlockState.class)
-@EligibleIf(configEnabled="*.obsidian_tears")
+@EligibleIf(configAvailable="*.obsidian_tears")
 public class MixinAbstractBlockState {
 
 	@Inject(at=@At("HEAD"), method="onUse(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;",

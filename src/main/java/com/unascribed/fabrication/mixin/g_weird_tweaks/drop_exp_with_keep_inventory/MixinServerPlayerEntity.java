@@ -14,7 +14,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 @Mixin(ServerPlayerEntity.class)
-@EligibleIf(configEnabled="*.drop_exp_with_keep_inventory")
+@EligibleIf(configAvailable="*.drop_exp_with_keep_inventory")
 public abstract class MixinServerPlayerEntity extends PlayerEntity {
 
 	public MixinServerPlayerEntity(World world, BlockPos pos, float yaw, GameProfile profile) {

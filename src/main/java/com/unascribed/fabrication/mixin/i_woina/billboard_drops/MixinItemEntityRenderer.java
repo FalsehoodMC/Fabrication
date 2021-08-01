@@ -20,7 +20,7 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.util.math.Matrix4f;
 
 @Mixin(ItemEntityRenderer.class)
-@EligibleIf(configEnabled="*.billboard_drops", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.billboard_drops", envMatches=Env.CLIENT)
 public class MixinItemEntityRenderer {
 
 	@Shadow @Final

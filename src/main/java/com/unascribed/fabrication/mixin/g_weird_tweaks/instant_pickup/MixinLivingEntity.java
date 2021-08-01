@@ -18,7 +18,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 
 @Mixin(LivingEntity.class)
-@EligibleIf(configEnabled="*.instant_pickup")
+@EligibleIf(configAvailable="*.instant_pickup")
 public abstract class MixinLivingEntity extends Entity {
 
 	public MixinLivingEntity(EntityType<?> type, World world) {

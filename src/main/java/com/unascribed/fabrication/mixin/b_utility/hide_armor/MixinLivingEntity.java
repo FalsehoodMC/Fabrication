@@ -15,7 +15,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.EntityEquipmentUpdateS2CPacket;
 
 @Mixin(LivingEntity.class)
-@EligibleIf(configEnabled="*.hide_armor")
+@EligibleIf(configAvailable="*.hide_armor")
 public class MixinLivingEntity {
 
 	@Redirect(at=@At(value="NEW", target="net/minecraft/network/packet/s2c/play/EntityEquipmentUpdateS2CPacket"),

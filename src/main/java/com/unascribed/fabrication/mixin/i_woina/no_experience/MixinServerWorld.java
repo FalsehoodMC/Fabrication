@@ -13,7 +13,7 @@ import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.server.world.ServerWorld;
 
 @Mixin(ServerWorld.class)
-@EligibleIf(configEnabled="*.no_experience")
+@EligibleIf(configAvailable="*.no_experience")
 public class MixinServerWorld {
 
 	@Inject(at=@At("HEAD"), method="addEntity(Lnet/minecraft/entity/Entity;)Z", cancellable=true)

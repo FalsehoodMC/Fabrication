@@ -14,7 +14,7 @@ import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 
 @Mixin(PlayerEntity.class)
-@EligibleIf(anyConfigEnabled={"*.drop_more_exp_on_death", "*.drop_exp_with_keep_inventory"})
+@EligibleIf(anyConfigAvailable={"*.drop_more_exp_on_death", "*.drop_exp_with_keep_inventory"})
 public abstract class MixinPlayerEntity extends LivingEntity {
 
 	protected MixinPlayerEntity(EntityType<? extends LivingEntity> entityType, World world) {

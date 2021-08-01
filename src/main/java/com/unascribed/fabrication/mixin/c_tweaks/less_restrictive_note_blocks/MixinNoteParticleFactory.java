@@ -16,7 +16,7 @@ import net.minecraft.particle.DefaultParticleType;
 import net.minecraft.util.math.Direction;
 
 @Mixin(NoteParticle.Factory.class)
-@EligibleIf(configEnabled="*.less_restrictive_note_blocks", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.less_restrictive_note_blocks", envMatches=Env.CLIENT)
 public class MixinNoteParticleFactory {
 
 	@Inject(at=@At("RETURN"), method="createParticle(Lnet/minecraft/particle/DefaultParticleType;Lnet/minecraft/client/world/ClientWorld;DDDDDD)Lnet/minecraft/client/particle/Particle;")

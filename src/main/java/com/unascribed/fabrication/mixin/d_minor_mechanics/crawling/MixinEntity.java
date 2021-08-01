@@ -13,7 +13,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
 
 @Mixin(Entity.class)
-@EligibleIf(configEnabled="*.crawling")
+@EligibleIf(configAvailable="*.crawling")
 public class MixinEntity {
 	
 	@Inject(at=@At("HEAD"), method="wouldPoseNotCollide(Lnet/minecraft/entity/EntityPose;)Z", cancellable=true)

@@ -22,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.List;
 
 @Mixin(Screen.class)
-@EligibleIf(configEnabled="*.old_tooltip", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.old_tooltip", envMatches=Env.CLIENT)
 public abstract class MixinScreen extends AbstractParentElement implements Drawable {
 
     @Shadow

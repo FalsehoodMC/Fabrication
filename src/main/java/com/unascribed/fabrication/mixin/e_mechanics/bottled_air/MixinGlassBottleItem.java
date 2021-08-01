@@ -16,7 +16,7 @@ import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
 
 @Mixin(GlassBottleItem.class)
-@EligibleIf(configEnabled="*.bottled_air")
+@EligibleIf(configAvailable="*.bottled_air")
 public class MixinGlassBottleItem {
 
 	@Inject(at=@At("HEAD"), method="fill(Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;")

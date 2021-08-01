@@ -32,7 +32,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.registry.Registry;
 
-@EligibleIf(configEnabled="*.i_and_more")
+@EligibleIf(configAvailable="*.i_and_more")
 public class FeatureIMore implements Feature {
 
 	private boolean applied = false;

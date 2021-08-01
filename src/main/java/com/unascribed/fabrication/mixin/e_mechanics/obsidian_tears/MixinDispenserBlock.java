@@ -14,7 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 
 @Mixin(DispenserBlock.class)
-@EligibleIf(configEnabled="*.obsidian_tears")
+@EligibleIf(configAvailable="*.obsidian_tears")
 public class MixinDispenserBlock {
 
 	@Inject(at=@At("HEAD"), method="getBehaviorForItem(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/block/dispenser/DispenserBehavior;",

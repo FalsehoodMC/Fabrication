@@ -13,7 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.ShapedRecipe;
 
 @Mixin(ShapedRecipe.class)
-@EligibleIf(configEnabled="*.dimensional_tools")
+@EligibleIf(configAvailable="*.dimensional_tools")
 public class MixinShapedRecipe {
 
 	@Inject(at=@At("RETURN"), method="craft(Lnet/minecraft/inventory/CraftingInventory;)Lnet/minecraft/item/ItemStack;")

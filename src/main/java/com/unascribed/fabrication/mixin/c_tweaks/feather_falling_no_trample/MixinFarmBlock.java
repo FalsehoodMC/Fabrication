@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(FarmlandBlock.class)
-@EligibleIf(configEnabled="*.feather_falling_no_trample")
+@EligibleIf(configAvailable="*.feather_falling_no_trample")
 public abstract class MixinFarmBlock extends Block {
 
 	public MixinFarmBlock(Settings settings) {

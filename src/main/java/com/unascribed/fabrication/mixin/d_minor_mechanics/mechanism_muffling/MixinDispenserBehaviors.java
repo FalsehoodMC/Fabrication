@@ -15,7 +15,7 @@ import net.minecraft.block.dispenser.ProjectileDispenserBehavior;
 import net.minecraft.util.math.BlockPointer;
 
 @Mixin({ItemDispenserBehavior.class, FallibleItemDispenserBehavior.class, ProjectileDispenserBehavior.class, BoatDispenserBehavior.class})
-@EligibleIf(configEnabled="*.mechanism_muffling")
+@EligibleIf(configAvailable="*.mechanism_muffling")
 public class MixinDispenserBehaviors {
 
 	@Inject(at=@At("HEAD"), method="playSound(Lnet/minecraft/util/math/BlockPointer;)V", cancellable=true)

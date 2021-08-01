@@ -15,7 +15,7 @@ import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.util.Identifier;
 
 @Mixin(ModelLoader.class)
-@EligibleIf(configEnabled="*.obsidian_tears", envMatches=Env.CLIENT, specialConditions=SpecialEligibility.FORGE)
+@EligibleIf(configAvailable="*.obsidian_tears", envMatches=Env.CLIENT, specialConditions=SpecialEligibility.FORGE)
 public class MixinModelLoaderForge {
 
 	@Shadow

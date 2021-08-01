@@ -17,7 +17,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 
 @Mixin(value=Hooks.class)
-@EligibleIf(anyConfigEnabled= {"*.blinking_drops", "*.classic_block_drops"}, envMatches=Env.CLIENT, modLoaded="forge:obfuscate")
+@EligibleIf(anyConfigAvailable= {"*.blinking_drops", "*.classic_block_drops"}, envMatches=Env.CLIENT, modLoaded="forge:obfuscate")
 public class MixinItemEntityRendererObfuscate {
 	
 	@ModifyVariable(at=@At("HEAD"), method="fireRenderEntityItem",

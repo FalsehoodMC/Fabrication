@@ -14,7 +14,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.world.World;
 
 @Mixin(LivingEntity.class)
-@EligibleIf(configEnabled="*.sync_attacker_yaw", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.sync_attacker_yaw", envMatches=Env.CLIENT)
 public abstract class MixinLivingEntityClient extends Entity {
 
 	public MixinLivingEntityClient(EntityType<?> type, World world) {

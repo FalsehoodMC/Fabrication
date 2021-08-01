@@ -11,7 +11,7 @@ import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.client.MinecraftClient;
 
 @Mixin(MinecraftClient.class)
-@EligibleIf(configEnabled="*.uncap_menu_fps", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.uncap_menu_fps", envMatches=Env.CLIENT)
 public class MixinMinecraftClient {
 
 	@Inject(at=@At("HEAD"), method="getFramerateLimit()I", cancellable=true)

@@ -21,7 +21,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 
 @Mixin(PlayerEntity.class)
-@EligibleIf(configEnabled="*.hide_armor")
+@EligibleIf(configAvailable="*.hide_armor")
 public abstract class MixinPlayerEntity implements GetSuppressedSlots {
 
 	private final EnumSet<EquipmentSlot> fabrication$suppressedSlots = EnumSet.noneOf(EquipmentSlot.class);
