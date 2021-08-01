@@ -310,8 +310,12 @@ fixes.open_inventories_in_nether_portal
 	name: Open Inventories in Nether Portals
 	since: 1.3.5
 	sides: client_only
+	media: https://unascribed.com/fabrication/open_inventories_in_nether_portal.mp4
 	desc:
 		Allows players to open inventories while in a nether portal.
+		
+		Vanilla originally made this change to fix a dupe exploit in Beta. The underlying cause of
+		this dupe was fixed a very long time ago.
 
 utility
 	name: Utility
@@ -338,6 +342,7 @@ utility.taggable_players
 	name: Taggable Players
 	since: 1.0
 	sides: server_only
+	media: https://unascribed.com/fabrication/taggable_players.mp4
 	needs: events
 	short_desc: Allows assigning various "tags" to players, such as no_hunger or invisible_to_mobs
 	desc:
@@ -992,6 +997,7 @@ minor_mechanics.unsaddle_creatures
 	name: Unsaddle Creatures
 	since: 1.3.5
 	sides: server_only
+	media: https://unascribed.com/fabrication/unsaddle_creatures.mp4
 	desc:
 		Shift right click with an empty hand to retrieve a saddle from a pig/strider.
 
@@ -1088,6 +1094,7 @@ mechanics.bottled_air
 	name: Bottled Air
 	since: 1.3.3
 	sides: server_only
+	media: https://unascribed.com/fabrication/bottled_air.mp4
 	desc:
 		Filling a glass bottle underwater refills 1 air bubble.
 
@@ -1221,6 +1228,7 @@ balance.infinity_crossbows
 	name: Infinity Crossbows
 	since: 1.2.8
 	sides: server_only_with_client_helper
+	media: https://unascribed.com/fabrication/infinity_crossbows.mp4
 	desc:
 		Allow putting Infinity on crossbows. Only works for plain arrows.
 		
@@ -1230,6 +1238,7 @@ balance.anvil_rename_always_costs_one
 	name: Anvil Rename Always Costs One
 	since: 1.2.9
 	sides: server_only
+	media: https://unascribed.com/fabrication/anvil_rename_always_costs_one.mp4
 	desc:
 		Makes renaming an item on an anvil always cost one level.
 
@@ -1237,6 +1246,7 @@ balance.food_always_edible
 	name: Food Always Edible
 	since: 1.3.0
 	sides: server_only
+	default: burnt
 	desc:
 		Allows players to eat unconditionally.
 
@@ -1279,6 +1289,8 @@ balance.anvil_full_repair
 	name: Anvil Fully Repairs
 	since: 1.3.5
 	sides: server_only
+	media: https://unascribed.com/fabrication/anvil_full_repair.mp4
+	default: burnt
 	desc:
 		Any item repair in the anvil will restore item durability.
 
@@ -1286,6 +1298,8 @@ balance.mobs_dont_drop_ingots
 	name: Mobs Drop Less Metal
 	since: 1.3.5
 	sides: server_only
+	media: https://unascribed.com/fabrication/mobs_dont_drop_ingots.mp4
+	default: burnt
 	desc:
 		All ingot mob drops are converted to nuggets where possible, otherwise voided.
 
@@ -1293,6 +1307,7 @@ balance.disable_mending_trade
 	name: Disable Mending Trade
 	since: 1.3.5
 	sides: server_only
+	default: burnt
 	desc:
 		Stops new villagers from offering mending.
 
@@ -1300,6 +1315,8 @@ balance.disable_mending
 	name: Disable Mending
 	since: 1.3.5
 	sides: server_only
+	media: https://unascribed.com/fabrication/disable_mending.mp4
+	default: burnt
 	desc:
 		Stops the mending enchantment from working.
 
@@ -1307,6 +1324,7 @@ balance.disable_pearl_stasis
 	name: Disable Storing Thrown Ender Pearls
 	since: 1.3.5
 	sides: server_only
+	default: burnt
 	desc:
 		Ender pearls forget who threw them when being unloaded.
 		Which means saving a ender pearl in a bubble column becomes more difficult.
@@ -1433,6 +1451,7 @@ weird_tweaks.item_safe_cactus
 	name: Item Safe Cactus
 	since: 1.3.5
 	sides: server_only
+	media: https://unascribed.com/fabrication/item_safe_cactus.mp4
 	desc:
 		Items don't get destroyed by cactus blocks.
 
@@ -1440,6 +1459,7 @@ weird_tweaks.blaze_fertilizer
 	name: Blaze Powder Grows Nether Wart
 	since: 1.3.5
 	sides: server_only
+	media: https://unascribed.com/fabrication/blaze_fertilizer.mp4
 	desc:
 		Blaze powder behaves as bone meal for nether wart.
 
@@ -1461,6 +1481,7 @@ weird_tweaks.disable_nether_fog
 	name: Disable Nether Fog
 	since: 1.3.5
 	sides: client_only
+	media: https://unascribed.com/fabrication/disable_nether_fog.mp4
 	desc:
 		Removes thick nether fog.
 
@@ -1468,6 +1489,7 @@ weird_tweaks.disable_night_skip
 	name: Disable Night Skip
 	since: 1.3.5
 	sides: server_only
+	media: https://unascribed.com/fabrication/disable_night_skip.mp4
 	desc:
 		Prevents beds from skipping the night.
 
@@ -1593,6 +1615,7 @@ woina.old_sheep_shear
 	name: Old Sheep Shear
 	since: 1.3.4
 	sides: server_only
+	media: https://unascribed.com/fabrication/old_sheep_shear.mp4
 	default: ash
 	desc:
 		Sheep drop wool when punched.
@@ -1609,6 +1632,7 @@ woina.instant_eat
 	name: Instant Eat
 	since: 1.3.5
 	sides: server_only
+	media: https://unascribed.com/fabrication/instant_eat.mp4
 	default: ash
 	desc:
 		Eating food is instant.
@@ -1625,6 +1649,7 @@ woina.old_tooltip
 	name: Old Tooltip
 	since: 1.3.5
 	sides: client_only
+	media: https://unascribed.com/fabrication/old_tooltip.mp4
 	default: ash
 	desc:
 		Ressurects the old inventory tooltip from the beta days.
@@ -1633,6 +1658,7 @@ woina.instant_bow
 	name: Instant Bow
 	since: 1.3.5
 	sides: server_only
+	media: https://unascribed.com/fabrication/instant_bow.mp4
 	default: ash
 	desc:
 		Bow fires arrows instantly upon clicking.
@@ -1641,6 +1667,7 @@ woina.no_hand_sway
 	name: No Hand Sway
 	since: 1.3.5
 	sides: client_only
+	media: https://unascribed.com/fabrication/no_hand_sway.mp4
 	default: ash
 	desc:
 		Prevents first-person hands from gradually transitioning from the last camera position.
@@ -1687,6 +1714,7 @@ situational.all_damage_is_fatal
 	name: All Damage Is Fatal
 	since: 1.0.1
 	sides: server_only
+	default: never
 	media: https://unascribed.com/fabrication/all_damage_is_fatal.mp4
 	desc:
 		Any amount of damage done to an entity is unconditionally fatal.
@@ -1695,6 +1723,7 @@ situational.weapons_accept_silk
 	name: Weapons Accept Silk
 	since: 1.1.2
 	sides: server_only
+	media: https://unascribed.com/fabrication/weapons_accept_silk.mp4
 	desc:
 		Weapons can be enchanted with Silk Touch, and Silk Touch becomes incompatible with Looting.
 		
@@ -1716,6 +1745,7 @@ situational.disable_elytra
 	name: Disable Elytra
 	since: 1.3.3
 	sides: server_only
+	media: https://unascribed.com/fabrication/disable_elytra.mp4
 	desc:
 		Prevents using Elytra.
 
@@ -1736,6 +1766,7 @@ situational.item_frame_no_name_display
 	name: Item Frames Don't Display Name Tags
 	since: 1.3.5
 	sides: client_only
+	media: https://unascribed.com/fabrication/item_frame_no_name_display.mp4
 	desc:
 		Item frames will not display the names of the item inside them.
 
@@ -1743,6 +1774,7 @@ situational.static_dragon_egg
 	name: Static Dragon Egg
 	since: 1.3.5
 	sides: server_only
+	media: https://unascribed.com/fabrication/static_dragon_egg.mp4
 	default: burnt
 	desc:
 		Prevents dragon egg from teleporting.
