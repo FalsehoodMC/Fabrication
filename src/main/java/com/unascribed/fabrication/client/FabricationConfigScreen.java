@@ -1201,7 +1201,7 @@ public class FabricationConfigScreen extends Screen {
 			newlyUnbannedKeys = newlyUnbannedKeysClient;
 		}
 		String oldValue = getRawValue(key);
-		if (!MixinConfigPlugin.isRuntimeConfigurable(key)) {
+		if (!MixinConfigPlugin.isRuntimeConfigurable(key) && !(configuringServer && FeaturesFile.get(key).sides == Sides.CLIENT_ONLY)) {
 			if (value.equals("banned")) {
 				if (newlyUnbannedKeys.contains(key)) {
 					newlyUnbannedKeys.remove(key);
