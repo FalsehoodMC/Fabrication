@@ -926,44 +926,46 @@ public class FabricationConfigScreen extends Screen {
 		int endX = width-6;
 //		int endX = textRenderer.draw(matrices, title, startX, 2, 0xFFFFFF | textAlpha);
 		GlStateManager.popMatrix();
-		if (mouseX >= startX && mouseX <= endX && mouseY >= startY && mouseY <= y) {
-			String prefix = "";
-			if (clientOnly) {
-				prefix += "§6Client Only ";
-			}
-			if (requiresFabricApi) {
-				prefix += "§bRequires Fabric API ";
-			}
-			if (!prefix.isEmpty()) {
-				prefix += "§r\n";
-			}
-			renderWrappedTooltip(matrices, prefix+desc, mouseX, mouseY);
-		} else if (mouseX >= 134 && mouseX <= 134+45 && mouseY >= startY && mouseY <= startY+10) {
-			if (disabled) {
-				if (noFabricApi) {
-					renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"This option requires Fabric API"), (int)mouseX, (int)mouseY);
-				} else if (noValue) {
-					renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"The server does not recognize this option"), (int)mouseX, (int)mouseY);
-				} else if (failed) {
-					renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"This feature failed to initialize"), (int)mouseX, (int)mouseY);
-				} else {
-					renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"You cannot configure this server"), (int)mouseX, (int)mouseY);
+		if (mouseX <= width-120 || mouseY >= 16) {
+			if (mouseX >= startX && mouseX <= endX && mouseY >= startY && mouseY <= y) {
+				String prefix = "";
+				if (clientOnly) {
+					prefix += "§6Client Only ";
 				}
-			} else {
-				int index = (int)((mouseX-134)/(noUnset ? 22 : 15));
-				if (index == 0) {
-					renderTooltip(matrices, new LiteralText("§cDisable"), (int)mouseX, (int)mouseY);
-				} else if (index == 1 && !noUnset) {
-					if (currentValue == Trilean.UNSET) {
-						renderTooltip(matrices, Lists.newArrayList(
-								new LiteralText("§eUse default value §f(see General > Profile)"),
-								new LiteralText("§rCurrent default: "+(keyEnabled ? "§aEnabled" : "§cDisabled"))
-						), (int)mouseX, (int)mouseY);
+				if (requiresFabricApi) {
+					prefix += "§bRequires Fabric API ";
+				}
+				if (!prefix.isEmpty()) {
+					prefix += "§r\n";
+				}
+				renderWrappedTooltip(matrices, prefix+desc, mouseX, mouseY);
+			} else if (mouseX >= 134 && mouseX <= 134+45 && mouseY >= startY && mouseY <= startY+10) {
+				if (disabled) {
+					if (noFabricApi) {
+						renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"This option requires Fabric API"), (int)mouseX, (int)mouseY);
+					} else if (noValue) {
+						renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"The server does not recognize this option"), (int)mouseX, (int)mouseY);
+					} else if (failed) {
+						renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"This feature failed to initialize"), (int)mouseX, (int)mouseY);
 					} else {
-						renderTooltip(matrices, new LiteralText("§eUse default value §f(see General > Profile)"), (int)mouseX, (int)mouseY);
+						renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"You cannot configure this server"), (int)mouseX, (int)mouseY);
 					}
 				} else {
-					renderTooltip(matrices, new LiteralText("§aEnable"), (int)mouseX, (int)mouseY);
+					int index = (int)((mouseX-134)/(noUnset ? 22 : 15));
+					if (index == 0) {
+						renderTooltip(matrices, new LiteralText("§cDisable"), (int)mouseX, (int)mouseY);
+					} else if (index == 1 && !noUnset) {
+						if (currentValue == Trilean.UNSET) {
+							renderTooltip(matrices, Lists.newArrayList(
+									new LiteralText("§eUse default value §f(see General > Profile)"),
+									new LiteralText("§rCurrent default: "+(keyEnabled ? "§aEnabled" : "§cDisabled"))
+							), (int)mouseX, (int)mouseY);
+						} else {
+							renderTooltip(matrices, new LiteralText("§eUse default value §f(see General > Profile)"), (int)mouseX, (int)mouseY);
+						}
+					} else {
+						renderTooltip(matrices, new LiteralText("§aEnable"), (int)mouseX, (int)mouseY);
+					}
 				}
 			}
 		}
