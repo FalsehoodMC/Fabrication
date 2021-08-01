@@ -3,7 +3,7 @@
   "minVersion": "0.8",
   "package": "com.unascribed.fabrication.mixin",
   "plugin": "com.unascribed.fabrication.support.MixinConfigPlugin",
-  "refmap": "fabrication-refmap.json",
+  "refmap": "fabrication-1.17-refmap.json",
   "compatibilityLevel": "JAVA_16",
   "injectors": {
     "defaultRequire": 1

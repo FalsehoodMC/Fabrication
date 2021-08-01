@@ -5,10 +5,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import com.unascribed.fabrication.RomanNumeral;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+import com.unascribed.fabrication.util.RomanNumeral;
+
 import com.google.common.primitives.Ints;
 
 import net.minecraft.client.resource.language.TranslationStorage;

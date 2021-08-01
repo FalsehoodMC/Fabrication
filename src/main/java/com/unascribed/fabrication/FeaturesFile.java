@@ -33,11 +33,12 @@ public final class FeaturesFile {
 		public final String name;
 		public final String shortName;
 		public final boolean meta;
+		public final boolean section;
 		public final String since;
 		public final int sinceCode;
 		public final Sides sides;
 		public final ImmutableSet<String> needs;
-		public final boolean endorsed;
+		public final String def;
 		public final String parent;
 		public final String media;
 		public final String mediaText;
@@ -51,11 +52,12 @@ public final class FeaturesFile {
 			name = get(obj, "name", JsonElement::getAsString, null);
 			shortName = get(obj, "short_name", JsonElement::getAsString, null);
 			meta = get(obj, "meta", JsonElement::getAsBoolean, false);
+			section = get(obj, "section", JsonElement::getAsBoolean, false);
 			since = get(obj, "since", JsonElement::getAsString, null);
 			sinceCode = get(obj, "since_code", JsonElement::getAsInt, -1);
 			sides = Sides.valueOf(get(obj, "sides", JsonElement::getAsString, "irrelevant").toUpperCase(Locale.ROOT));
 			needs = ImmutableSet.copyOf(get(obj, "needs", FeatureEntry::getAsStringSet, Collections.emptySet()));
-			endorsed = get(obj, "endorsed", JsonElement::getAsBoolean, true);
+			def = get(obj, "default", JsonElement::getAsString, "inherit");
 			parent = get(obj, "parent", JsonElement::getAsString, null);
 			media = get(obj, "media", JsonElement::getAsString, null);
 			mediaText = get(obj, "media_text", JsonElement::getAsString, null);
@@ -78,9 +80,9 @@ public final class FeaturesFile {
 		@Override
 		public String toString() {
 			return "FeatureEntry [name=" + name + ", shortName=" + shortName
-					+ ", meta=" + meta + ", since=" + since + ", sinceCode="
-					+ sinceCode + ", sides=" + sides + ", needs=" + needs
-					+ ", endorsed=" + endorsed + ", parent=" + parent
+					+ ", meta=" + meta + ", section=" + section + ", since="
+					+ since + ", sinceCode=" + sinceCode + ", sides=" + sides
+					+ ", needs=" + needs + ", default=" + def + ", parent=" + parent
 					+ ", media=" + media + ", mediaText=" + mediaText
 					+ ", extraMedia=" + extraMedia + ", extraMediaText="
 					+ extraMediaText + ", linkUrl=" + linkUrl + ", linkText="

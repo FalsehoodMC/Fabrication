@@ -13,9 +13,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.mojang.authlib.GameProfile;
 import com.unascribed.fabrication.FabLog;
-import com.unascribed.fabrication.PlayerTag;
 import com.unascribed.fabrication.interfaces.SetSaturation;
 import com.unascribed.fabrication.interfaces.TaggablePlayer;
+import com.unascribed.fabrication.logic.PlayerTag;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.google.common.base.Enums;

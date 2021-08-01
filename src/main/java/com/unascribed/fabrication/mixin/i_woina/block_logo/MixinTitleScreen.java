@@ -14,8 +14,8 @@ import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.unascribed.fabrication.LogoBlock;
 import com.unascribed.fabrication.loaders.LoaderBlockLogo;
+import com.unascribed.fabrication.logic.LogoBlock;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;

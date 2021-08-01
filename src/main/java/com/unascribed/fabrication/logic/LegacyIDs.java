@@ -1,10 +1,11 @@
-package com.unascribed.fabrication;
+package com.unascribed.fabrication.logic;
 
 import java.util.Map;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.unascribed.fabrication.FabLog;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;

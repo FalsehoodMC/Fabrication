@@ -1,4 +1,4 @@
-package com.unascribed.fabrication;
+package com.unascribed.fabrication.util;
 
 public enum Cardinal {
 	NORTH( 0,-1),

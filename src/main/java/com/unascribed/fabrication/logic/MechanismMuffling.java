@@ -1,4 +1,4 @@
-package com.unascribed.fabrication;
+package com.unascribed.fabrication.logic;
 
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;

@@ -6,8 +6,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import com.unascribed.fabrication.CanHitUtil;
 import com.unascribed.fabrication.interfaces.SetCanHitList;
+import com.unascribed.fabrication.logic.CanHitUtil;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.fabricmc.fabric.api.util.NbtType;

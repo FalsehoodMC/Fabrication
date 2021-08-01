@@ -36,5 +36,8 @@
     "fabric-rendering-v1": "*"
   },
   "suggests": {
+  },
+  "conflicts": {
+  	"modmenu": "<2.0.2"
   }
 }

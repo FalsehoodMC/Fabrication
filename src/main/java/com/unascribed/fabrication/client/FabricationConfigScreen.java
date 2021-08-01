@@ -77,6 +77,7 @@ public class FabricationConfigScreen extends Screen {
 			.put(Profile.DARK, 0xFF4E342E)
 			.put(Profile.VIENNA, 0xFF2B1B18)
 			.put(Profile.BURNT, 0xFF12181B)
+			.put(Profile.ASH, 0xFFAAAAAA)
 			.build();
 	
 	private static final Identifier BG = new Identifier("fabrication", "bg.png");
@@ -707,7 +708,13 @@ public class FabricationConfigScreen extends Screen {
 						hovered = p;
 					}
 					if (didClick && mouseX >= 134+x && mouseX <= 134+x+16 && mouseY >= 18 && mouseY <= 18+16) {
-						if (p == Profile.BURNT) {
+						if (p == Profile.ASH) {
+							client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_CHIME, 2f, 1f));
+							client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_SAND_BREAK, 1f, 1f));
+							client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_SAND_BREAK, 1f, 1.2f));
+							client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_SAND_BREAK, 1f, 0.7f));
+							client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_SAND_BREAK, 1f, 0.5f));
+						} else if (p == Profile.BURNT) {
 							client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_CHIME, 1.8f, 1f));
 							client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.ITEM_FLINTANDSTEEL_USE, 1f));
 							client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_FIRE_AMBIENT, 1f, 1f));

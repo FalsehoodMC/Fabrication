@@ -50,6 +50,7 @@ atlas_viewer
 
 general
 	name: General
+	section: true
 	since: 1.0
 	desc:
 		Broad features and global settings.
@@ -57,7 +58,6 @@ general
 general.runtime_checks
 	name: Runtime Checks
 	since: 1.0
-	meta: true
 	desc:
 		Allows changing settings arbitrarily on-the-fly, but is very slightly slower and a fair bit
 		less compatible, as all options that are set to 'unset' but not enabled by the profile will
@@ -72,7 +72,6 @@ general.runtime_checks
 general.reduced_motion
 	name: Reduced Motion
 	since: 1.2
-	meta: true
 	sides: client_only
 	desc:
 		Disables high-motion animations in the Fabrication config screen.
@@ -80,7 +79,7 @@ general.reduced_motion
 general.data_upload
 	name: Data Upload
 	since: 1.3.2
-	meta: true
+	default: never
 	desc:
 		Enables submitting anonymous data to a self-hosted privacy-respecting Matomo instance run by
 		unascribed. The following data is submitted: Fabrication version, Minecraft version,
@@ -94,7 +93,6 @@ general.data_upload
 general.profile
 	name: Profile
 	since: 1.0
-	meta: true
 	desc:
 		To help with Fabrication's overwhelming number of options, Profiles let you pick what kinds
 		of features you want to be enabled by default. When a config value is set to 'unset', it is
@@ -142,18 +140,27 @@ general.profile.vienna
 	meta: true
 	parent: general.profile
 	desc:
-		Dark + balance tweaks, weird mechanic additions, and revivals of old features. Author's choice.
+		Dark + balance tweaks, weird mechanic additions, and some revivals of old features. Author's choice.
 
 general.profile.burnt
 	name: Burnt
 	meta: true
 	parent: general.profile
 	desc:
-		Just enable everything, except the "Situational" and "Experiments" sections.
+		Just enable everything, except the "Situational" and "Experiments" sections and most of WOINA. Vienna without the opinions.
+		
+general.profile.ash
+	name: Ash
+	meta: true
+	parent: general.profile
+	desc:
+		Really enable everything. (Except Experiments.)
 
 fixes
 	name: Fixes
+	section: true
 	since: 1.0
+	default: blonde
 	desc:
 		Fixes for bugs and weird behavior.
 
@@ -322,7 +329,9 @@ fixes.open_inventories_in_nether_portal
 
 utility
 	name: Utility
+	section: true
 	since: 1.0
+	default: blonde
 	desc:
 		Useful tidbits that don't modify gameplay.
 
@@ -531,7 +540,9 @@ utility.show_map_id
 
 tweaks
 	name: Tweaks
+	section: true
 	since: 1.0
+	default: light
 	desc:
 		Minor changes that fit with vanilla.
 
@@ -718,6 +729,7 @@ tweaks.cracking_spawn_eggs
 tweaks.ghost_chest_woo_woo
 	name: Ghost Chest Woo Woo
 	hidden: true
+	default: never
 	since: 1.0
 	sides: client_only
 	desc:
@@ -791,9 +803,21 @@ tweaks.see_items_while_riding
 	desc:
 		Allows players to see held items while riding entities like boats.
 
+tweaks.no_set_window_pos
+	name: No Set Window Pos
+	since: 1.3.2
+	sides: client_only
+	default: vienna
+	desc:
+		Prevents the game from manually modifying the window position. So if you have custom configs
+		or something that memorizes window positions, they will be honored instead of the window
+		always being centered.
+
 minor_mechanics
 	name: Minor Mechanics
+	section: true
 	since: 1.0
+	default: medium
 	desc:
 		Small additions to vanilla mechanics.
 
@@ -909,7 +933,7 @@ minor_mechanics.spiders_cant_climb_while_wet
 	name: Spiders Can't Climb While Wet
 	since: 1.2.3
 	sides: server_only
-	endorsed: false
+	default: burnt
 	media: https://unascribed.com/fabrication/spiders_cant_climb_while_wet.mp4
 	desc:
 		Makes spiders unable to climb while wet. Basically a more overpowered version of Spiders
@@ -987,7 +1011,9 @@ minor_mechanics.unsaddle_creatures
 
 mechanics
 	name: Mechanics
+	section: true
 	since: 1.0
+	default: dark
 	desc:
 		New mechanics and powerful additions.
 
@@ -1081,7 +1107,9 @@ mechanics.bottled_air
 
 balance
 	name: Balance
+	section: true
 	since: 1.0
+	default: vienna
 	desc:
 		Changes to vanilla balance.
 
@@ -1121,7 +1149,7 @@ balance.infinity_mending
 	name: Infinity & Mending
 	since: 1.0
 	sides: server_only
-	endorsed: false
+	default: burnt
 	media: https://unascribed.com/fabrication/infinity_mending.mp4
 	desc:
 		Makes Mending and Infinity compatible enchantments.
@@ -1190,7 +1218,7 @@ balance.anvil_damage_only_on_fall
 	name: Anvils Take Damage Only When Falling
 	since: 1.1
 	sides: server_only
-	endorsed: false
+	default: burnt
 	media: https://unascribed.com/fabrication/anvil_damage_only_on_fall.mp4
 	desc:
 		Anvils only take damage when falling from a height rather than randomly after being used.
@@ -1241,7 +1269,7 @@ balance.loading_furnace_minecart
 	name: ChunkLoading Furnace Minecart
 	since: 1.3.4
 	sides: server_only
-	endorsed: false
+	default: never
 	desc:
 		Makes furnace minecarts load chunks if they have fuel.
 
@@ -1249,7 +1277,7 @@ balance.ender_dragon_full_xp
 	name: Full Ender Dragon XP
 	since: 1.3.5
 	sides: server_only
-	endorsed: false
+	default: burnt
 	desc:
 		Ender dragon always gives the same xp amount as it would the first time.
 
@@ -1257,7 +1285,7 @@ balance.ender_dragon_always_spawn_egg
 	name: Ender Dragon Always Spawns Dragon Egg
 	since: 1.3.5
 	sides: server_only
-	endorsed: false
+	default: burnt
 	desc:
 		Ender dragon always spawn a dragon egg when killed.
 
@@ -1299,7 +1327,9 @@ balance.disable_pearl_stasis
 
 weird_tweaks
 	name: Weird Tweaks
+	section: true
 	since: 1.0
+	default: vienna
 	desc:
 		Opinionated changes.
 
@@ -1371,7 +1401,7 @@ weird_tweaks.photoallergic_creepers
 	name: Photoallergic Creepers
 	since: 1.2.4
 	sides: server_only
-	endorsed: false
+	default: burnt
 	media: https://unascribed.com/fabrication/photoallergic_creepers.mp4
 	desc:
 		Creepers burn in sunlight. Very dangerous in combination with Creepers Explode When On Fire.
@@ -1383,7 +1413,7 @@ weird_tweaks.photoresistant_mobs
 	name: Photoresistant Mobs
 	since: 1.2.4
 	sides: server_only
-	endorsed: false
+	default: burnt
 	media: https://unascribed.com/fabrication/photoresistant_mobs.mp4
 	desc:
 		Mobs don't burn in sunlight.
@@ -1392,7 +1422,7 @@ weird_tweaks.underwater_explosions
 	name: Underwater Explosions
 	since: 1.3.2
 	sides: server_only
-	endorsed: false
+	default: burnt
 	media: https://unascribed.com/fabrication/underwater_explosions.mp4
 	desc:
 		TNT and other explosives do block damage even underwater.
@@ -1457,8 +1487,10 @@ weird_tweaks.disable_night_skip
 
 woina
 	name: What's Old Is New Again
+	section: true
 	short_name: W.O.I.N.A.
 	since: 1.2.4
+	default: vienna
 	desc:
 		Forward ports of forgotten tidbits.
 
@@ -1522,7 +1554,7 @@ woina.janky_arm
 	name: Janky Arm
 	since: 1.2.8
 	sides: client_only
-	endorsed: false
+	default: ash
 	media: https://unascribed.com/fabrication/janky_arm.png
 	extra_media: https://unascribed.com/fabrication/survival_test.mp4
 	extra_media_text: Survival Test video, for reference
@@ -1535,7 +1567,7 @@ woina.flat_items
 	name: Flat Items
 	since: 1.2.8
 	sides: client_only
-	endorsed: false
+	default: ash
 	media: https://unascribed.com/fabrication/flat_items.png
 	desc:
 		Brings back Indev flat first-person item models.
@@ -1546,7 +1578,7 @@ woina.billboard_drops
 	name: Billboard Drops
 	since: 1.2.8
 	sides: client_only
-	endorsed: false
+	default: ash
 	media: https://unascribed.com/fabrication/billboard_drops.mp4
 	desc:
 		Brings back billboarded flat item drops like on Fast graphics prior to 1.8 or like always
@@ -1556,7 +1588,7 @@ woina.oof
 	name: Oof
 	since: 1.2.8
 	sides: client_only
-	endorsed: false
+	default: ash
 	media: https://unascribed.com/fabrication/oof.mp4
 	desc:
 		Brings back the old "Oof" hurt sound. Unlike the resource pack approach, this is
@@ -1567,7 +1599,7 @@ woina.no_experience
 	name: No Experience
 	since: 1.3.3
 	sides: server_only_with_client_helper
-	endorsed: false
+	default: ash
 	desc:
 		Removes experience. Anvils become free and enchanting only costs lapis.
 
@@ -1575,7 +1607,7 @@ woina.old_sheep_shear
 	name: Old Sheep Shear
 	since: 1.3.4
 	sides: server_only
-	endorsed: false
+	default: ash
 	desc:
 		Sheep drop wool when punched.
 
@@ -1583,7 +1615,7 @@ woina.no_sprint
 	name: No Sprint
 	since: 1.3.5
 	sides: server_only
-	endorsed: false
+	default: ash
 	desc:
 		Disable sprinting.
 
@@ -1591,6 +1623,7 @@ woina.instant_eat
 	name: Instant Eat
 	since: 1.3.5
 	sides: server_only
+	default: ash
 	desc:
 		Eating food is instant.
 
@@ -1598,7 +1631,7 @@ woina.dirt_screen
 	name: Dirt Screen
 	since: 1.3.5
 	sides: client_only
-	endorsed: false
+	default: ash
 	desc:
 		Replaces the panorama background of the title screen with the old dirt one.
 
@@ -1606,7 +1639,7 @@ woina.old_tooltip
 	name: Old Tooltip
 	since: 1.3.5
 	sides: client_only
-	endorsed: false
+	default: ash
 	desc:
 		Ressurects the old inventory tooltip from the beta days.
 
@@ -1614,7 +1647,7 @@ woina.instant_bow
 	name: Instant Bow
 	since: 1.3.5
 	sides: server_only
-	endorsed: false
+	default: ash
 	desc:
 		Bow fires arrows instantly upon clicking.
 
@@ -1622,13 +1655,15 @@ woina.no_hand_sway
 	name: No Hand Sway
 	since: 1.3.5
 	sides: client_only
-	endorsed: false
+	default: ash
 	desc:
 		Prevents first-person hands from gradually transitioning from the last camera position.
 
 pedantry
 	name: Pedantry
+	section: true
 	since: 1.0.1
+	default: never
 	desc:
 		Fixes for non-problems.
 
@@ -1656,7 +1691,9 @@ pedantry.oak_is_apple
 
 situational
 	name: Situational
+	section: true
 	since: 1.0.1
+	default: ash
 	desc:
 		Rarely useful small features.
 
@@ -1720,12 +1757,15 @@ situational.static_dragon_egg
 	name: Static Dragon Egg
 	since: 1.3.5
 	sides: server_only
+	default: burnt
 	desc:
 		Prevents dragon egg from teleporting.
 
 experiments
 	name: Experiments
+	section: true
 	since: 1.2.8
+	default: never
 	desc:
 		Bad ideas given form.
 
@@ -1738,12 +1778,3 @@ experiments.packed_atlases
 		textures since forever.
 		
 		Possibly reduces VRAM usage. May reduce performance. Might cause incompatibilites.
-
-experiments.no_set_window_pos
-	name: No Set Window Pos
-	since: 1.3.2
-	sides: client_only
-	desc:
-		Prevents the game from manually modifying the window position. So if you have custom configs
-		or something that memorizes window positions, they will be honored instead of the window
-		always being centered.

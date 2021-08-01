@@ -1,4 +1,4 @@
-package com.unascribed.fabrication;
+package com.unascribed.fabrication.util;
 
 import java.util.TreeMap;
 

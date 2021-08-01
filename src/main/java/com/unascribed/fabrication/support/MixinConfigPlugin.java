@@ -32,6 +32,8 @@ import org.spongepowered.asm.mixin.injection.struct.InjectionInfo;
 import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.Analytics;
 import com.unascribed.fabrication.FabLog;
+import com.unascribed.fabrication.FeaturesFile;
+import com.unascribed.fabrication.FeaturesFile.FeatureEntry;
 import com.unascribed.fabrication.QDIni;
 import com.unascribed.fabrication.QDIni.BadValueException;
 import com.unascribed.fabrication.QDIni.IniTransformer;
@@ -50,10 +52,13 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
+import com.google.common.collect.Table;
+import com.google.common.collect.Tables;
 import com.google.common.io.BaseEncoding;
 import com.google.common.io.MoreFiles;
 import com.google.common.io.Resources;
@@ -62,35 +67,6 @@ import com.google.common.reflect.ClassPath.ClassInfo;
 
 public class MixinConfigPlugin implements IMixinConfigPlugin {
 
-	private static final ImmutableSet<String> VIENNA_EXCEPTIONS = ImmutableSet.of(
-			"balance.infinity_mending",
-			"balance.anvil_damage_only_on_fall",
-			"balance.food_always_edible",
-			"weird_tweaks.photoallergic_creepers",
-			"weird_tweaks.photoresistant_mobs",
-			"weird_tweaks.underwater_explosions",
-			"woina.old_sheep_shear"
-	);
-	private static final ImmutableSet<String> NEVER_DEFAULT_EXCEPT_BURNT = ImmutableSet.of(
-			"minor_mechanics.spiders_cant_climb_while_wet",
-			"balance.ender_dragon_full_xp",
-			"balance.ender_dragon_always_spawn_egg"
-	);
-	private static final ImmutableSet<String> NEVER_DEFAULT = ImmutableSet.of(
-			"tweaks.ghost_chest_woo_woo",
-			"woina.janky_arm",
-			"woina.flat_items",
-			"woina.billboard_drops",
-			"woina.oof",
-			"woina.no_experience",
-			"woina.no_sprint",
-			"woina.dirt_screen",
-			"woina.old_tooltip",
-			"woina.instant_bow",
-			"woina.no_hand_sway",
-			"general.data_upload",
-			"balance.loading_furnace_minecart"
-	);
 	private static final ImmutableSet<String> NON_TRILEANS = ImmutableSet.of(
 			"general.profile"
 	);
@@ -103,13 +79,14 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	
 	
 	public enum Profile {
-		GREEN("general"),
-		BLONDE("general", "fixes", "utility"),
-		LIGHT("general", "fixes", "utility", "tweaks"),
-		MEDIUM("general", "fixes", "utility", "tweaks", "minor_mechanics"),
-		DARK("general", "fixes", "utility", "tweaks", "minor_mechanics", "mechanics"),
-		VIENNA("general", "fixes", "utility", "tweaks", "minor_mechanics", "mechanics", "balance", "weird_tweaks", "woina"),
-		BURNT("*", "!situational", "!experiments")
+		GREEN,
+		BLONDE,
+		LIGHT,
+		MEDIUM,
+		DARK,
+		VIENNA,
+		BURNT,
+		ASH
 		;
 		public final ImmutableSet<String> sections;
 		Profile(String... sections) {
@@ -125,7 +102,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		}
 	}
 	
-	private static final ImmutableMap<Profile, ImmutableMap<String, Boolean>> defaultsByProfile;
+	private static final ImmutableTable<Profile, String, Boolean> defaultsByProfile;
 	private static final ImmutableSet<String> validSections;
 	private static final ImmutableSet<String> validKeys;
 	private static final ImmutableMap<String, String> starMap;
@@ -164,41 +141,46 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		if (MixinConfigPlugin.class.getClassLoader().getResource("default_features_config.ini") == null) {
 			throw devError("You must run build-features.sh before running the game.");
 		}
-		try (InputStream is = MixinConfigPlugin.class.getClassLoader().getResourceAsStream("default_features_config.ini")) {
-			Set<String> keys = QDIni.load("default_features_config.ini", is).keySet();
-			Set<String> sections = Sets.newHashSet();
-			ImmutableMap.Builder<String, String> starMapBldr = ImmutableMap.builder();
-			for (String key : keys) {
-				int dot = key.indexOf('.');
-				if (dot != -1) {
-					starMapBldr.put("*"+key.substring(dot), key);
-				}
+		Map<String, String> starMapBldr = Maps.newLinkedHashMap();
+		Table<Profile, String, Boolean> profilesBldr = Tables.newCustomTable(Maps.newLinkedHashMap(), Maps::newLinkedHashMap);
+		Set<String> keys = Sets.newLinkedHashSet();
+		Set<String> sections = Sets.newLinkedHashSet();
+		for (Map.Entry<String, FeatureEntry> en : FeaturesFile.getAll().entrySet()) {
+			if (en.getValue().meta) {
+				continue;
 			}
-			starMap = starMapBldr.build();
-			ImmutableMap.Builder<Profile, ImmutableMap<String, Boolean>> profilesBuilder = ImmutableMap.builder();
+			if (en.getValue().section) {
+				sections.add(en.getKey());
+				continue;
+			}
+			String key = en.getKey();
+			keys.add(key);
+			int dot = key.indexOf('.');
+			String parent = null;
+			if (dot != -1) {
+				starMapBldr.put("*"+key.substring(dot), key);
+				parent = key.substring(0, dot);
+			}
+			Profile defAt = null;
+			String def = en.getValue().def;
+			if ("inherit".equals(def)) {
+				if (parent != null) {
+					FeatureEntry pfe = FeaturesFile.get(parent);
+					defAt = Enums.getIfPresent(Profile.class, pfe.def.toUpperCase(Locale.ROOT)).orNull();
+				}
+			} else {
+				defAt = Enums.getIfPresent(Profile.class, def.toUpperCase(Locale.ROOT)).orNull();
+			}
 			for (Profile p : Profile.values()) {
-				ImmutableMap.Builder<String, Boolean> defaultsBuilder = ImmutableMap.builder();
-				for (String key : keys) {
-					int dot = key.indexOf('.');
-					String section = dot != -1 ? key.substring(0, dot) : "";
-					if (!section.isEmpty()) sections.add(section);
-					boolean enabled;
-					if (NEVER_DEFAULT.contains(key) || (NEVER_DEFAULT_EXCEPT_BURNT.contains(key) && p != Profile.BURNT)) {
-						enabled = false;
-					} else {
-						enabled = (p.sections.contains("*") && !p.sections.contains("!"+section)) || p.sections.contains(section)
-								&& (p != Profile.VIENNA || !VIENNA_EXCEPTIONS.contains(key));
-					}
-					defaultsBuilder.put(key, enabled);
-				}
-				profilesBuilder.put(p, defaultsBuilder.build());
+				boolean enabled = defAt != null && p.ordinal() >= defAt.ordinal();
+				profilesBldr.put(p, en.getKey(), enabled);
 			}
-			validKeys = ImmutableSet.copyOf(keys);
-			validSections = ImmutableSet.copyOf(sections);
-			defaultsByProfile = profilesBuilder.build();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
 		}
+		starMap = ImmutableMap.copyOf(starMapBldr);
+		validKeys = ImmutableSet.copyOf(keys);
+		validSections = ImmutableSet.copyOf(sections);
+		defaultsByProfile = ImmutableTable.copyOf(profilesBldr);
+		System.out.println(defaultsByProfile);
 	}
 	
 	private static Profile profile;
@@ -316,7 +298,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		rawConfig.put(configKey, newValue);
 		if ("general.profile".equals(configKey)) {
 			profile = rawConfig.getEnum("general.profile", Profile.class).orElse(Profile.LIGHT);
-			defaults = defaultsByProfile.get(profile);
+			defaults = defaultsByProfile.row(profile);
 		} else {
 			config.put(configKey, Trilean.parseTrilean(newValue));
 		}
@@ -443,7 +425,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 					
 				}, sw);
 				profile = rawConfig.getEnum("general.profile", Profile.class).orElse(Profile.LIGHT);
-				defaults = defaultsByProfile.get(profile);
+				defaults = defaultsByProfile.row(profile);
 				config = new HashMap<>();
 				for (String k : rawConfig.keySet()) {
 					if (isTrilean(k)) {

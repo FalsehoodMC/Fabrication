@@ -12,12 +12,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.FabRefl;
-import com.unascribed.fabrication.Resolvable;
 import com.unascribed.fabrication.loaders.LoaderGearComponents;
 import com.unascribed.fabrication.loaders.LoaderGearComponents.ItemMaterialValue;
 import com.unascribed.fabrication.loaders.LoaderGearComponents.MaterialData;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+import com.unascribed.fabrication.util.Resolvable;
+
 import com.google.common.collect.Lists;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;

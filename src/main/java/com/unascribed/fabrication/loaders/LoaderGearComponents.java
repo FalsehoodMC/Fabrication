@@ -13,8 +13,8 @@ import java.util.regex.Pattern;
 import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.QDIni;
-import com.unascribed.fabrication.Resolvable;
 import com.unascribed.fabrication.support.ConfigLoader;
+import com.unascribed.fabrication.util.Resolvable;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.ArrayListMultimap;
