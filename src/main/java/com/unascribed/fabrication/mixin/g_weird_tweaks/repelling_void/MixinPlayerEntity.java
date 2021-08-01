@@ -2,7 +2,6 @@ package com.unascribed.fabrication.mixin.g_weird_tweaks.repelling_void;
 
 import java.util.List;
 
-import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -61,7 +60,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 	@Inject(at=@At("HEAD"), method= "damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", cancellable=true)
 	public void remove(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
 		Vec3d pos = fabrication$lastGroundPos;
-		if (MixinConfigPlugin.isEnabled("*.repelling_void") && !fabrication$debted && source.isOutOfWorld() && pos != null && this.getY() < -10) {
+		if (MixinConfigPlugin.isEnabled("*.repelling_void") && !fabrication$debted && source == DamageSource.OUT_OF_WORLD && pos != null && this.getY() < -10) {
 			BlockPos bp = new BlockPos(pos).down();
 			if (!world.getBlockState(bp).isSideSolid(world, bp, Direction.UP, SideShapeType.CENTER)) {
 				boolean foundOne = false;
