@@ -994,10 +994,14 @@ public class FabricationConfigScreen extends Screen {
 							renderTooltip(matrices, new LiteralText("§eUse default value §f(see General > Profile)"), (int)mouseX, (int)mouseY);
 						}
 					} else if (index == 0) {
-						renderTooltip(matrices, Lists.newArrayList(
+						List<Text> li = Lists.newArrayList(
 								new LiteralText("§7Ban"),
-								new LiteralText("Prevent feature from loading entirely"+(configuringServer ? " and disallow use by clients" : ""))
-						), (int)mouseX, (int)mouseY);
+								new LiteralText("Prevent feature from loading entirely")
+						);
+						if (configuringServer) {
+							li.add(new LiteralText("and disallow usage by clients"));
+						}
+						renderTooltip(matrices, li, (int)mouseX, (int)mouseY);
 					} else {
 						renderTooltip(matrices, new LiteralText("§aEnable"), (int)mouseX, (int)mouseY);
 					}
