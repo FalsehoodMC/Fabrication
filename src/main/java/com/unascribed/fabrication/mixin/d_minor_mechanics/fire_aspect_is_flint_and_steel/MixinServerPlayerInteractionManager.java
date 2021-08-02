@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;
@@ -31,15 +32,20 @@ public class MixinServerPlayerInteractionManager {
 			if (EnchantmentHelper.getLevel(Enchantments.FIRE_ASPECT, stack) > 0) {
 				ServerPlayerInteractionManager self = (ServerPlayerInteractionManager)(Object)this;
 				ItemStack flintAndSteel = new ItemStack(Items.FLINT_AND_STEEL);
-				ActionResult ar = self.interactBlock(player, world, flintAndSteel, hand, hitResult);
-				if (ar.isAccepted()) {
-					player.swingHand(hand, true);
-					world.playSound(null, hitResult.getBlockPos(), SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 1, world.random.nextFloat() * 0.4f + 0.8f);
+				try {
+					player.setStackInHand(hand, flintAndSteel);
+					ActionResult ar = self.interactBlock(player, world, flintAndSteel, hand, hitResult);
+					if (ar.isAccepted()) {
+						player.swingHand(hand, true);
+						world.playSound(null, hitResult.getBlockPos(), SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 1, world.random.nextFloat() * 0.4f + 0.8f);
+					}
+					if (flintAndSteel.getDamage() > 0) {
+						stack.damage(flintAndSteel.getDamage(), world.random, player);
+					}
+					ci.setReturnValue(ar);
+				} finally {
+					player.setStackInHand(hand, stack);
 				}
-				if (flintAndSteel.getDamage() > 0) {
-					stack.damage(flintAndSteel.getDamage(), world.random, player);
-				}
-				ci.setReturnValue(ar);
 			}
 		}
 	}
