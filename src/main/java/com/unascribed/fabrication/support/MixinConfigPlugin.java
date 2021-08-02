@@ -414,7 +414,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 								}
 							}
 							if (badKeys) {
-								notices.add("Consider updating this config file by renaming it to "+name+".ini.old");
+								notices.add("Consider updating this config file by renaming it to features.ini.old");
 							}
 							if (notices.isEmpty()) {
 								return NOTICES_HEADER+"\r\n; - No notices. You're in the clear!";
