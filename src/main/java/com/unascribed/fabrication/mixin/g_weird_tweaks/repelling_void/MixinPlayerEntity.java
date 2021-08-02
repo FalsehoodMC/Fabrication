@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
@@ -56,11 +57,10 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 	}
 	
 	
-	@Override
-	protected void destroy() {
+	@Inject(at=@At("HEAD"), method= "damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", cancellable=true)
+	public void damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
 		Vec3d pos = fabrication$lastGroundPos;
-		if (MixinConfigPlugin.isEnabled("*.repelling_void") && pos != null) {
-			if (fabrication$debted) return;
+		if (MixinConfigPlugin.isEnabled("*.repelling_void") && !fabrication$debted && pos != null && source == DamageSource.OUT_OF_WORLD && this.getY() < -10) {
 			BlockPos bp = new BlockPos(pos).down();
 			if (!world.getBlockState(bp).isSideSolid(world, bp, Direction.UP, SideShapeType.CENTER)) {
 				boolean foundOne = false;
@@ -97,8 +97,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 				}
 			}
 			fabrication$debted = true;
-		} else {
-			super.destroy();
+			cir.setReturnValue(false);
 		}
 	}
 	
