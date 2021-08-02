@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.features;
 
 import com.unascribed.fabrication.Agnos;
+import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Feature;
@@ -17,7 +18,7 @@ public class FeatureToggleSprint implements Feature {
 
 	@Override
 	public void apply() {
-		keybind = new KeyBinding("[Fabrication] Toggle/Hold Sprint", InputUtil.UNKNOWN_KEY.getCode(), "key.categories.movement") {
+		keybind = new KeyBinding("["+FabricationMod.MOD_NAME+"] Toggle/Hold Sprint", InputUtil.UNKNOWN_KEY.getCode(), "key.categories.movement") {
 			@Override
 			public void setPressed(boolean pressed) {
 				if (!pressed && MinecraftClient.getInstance().getNetworkHandler() == null) {

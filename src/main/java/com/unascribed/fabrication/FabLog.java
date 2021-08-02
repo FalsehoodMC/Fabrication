@@ -10,7 +10,7 @@ import com.google.common.base.Stopwatch;
 
 public class FabLog {
 
-	private static final Logger log = LogManager.getLogger("Fabrication");
+	private static final Logger log = LogManager.getLogger(MixinConfigPlugin.isMet(SpecialEligibility.FORGE) ? "Forgery" : "Fabrication");
 
 	// Fabric uses vanilla's log config, which doesn't print log tags, so we need to add our own prefix
 	// Forge modifies the log config to include log tags among other things, so the prefix is redundant there
@@ -42,7 +42,7 @@ public class FabLog {
 	}
 
 	private static String prefix(String message) {
-		return PREFIX ? "[Fabrication] "+message : message;
+		return PREFIX ? "["+log.getName()+"] "+message : message;
 	}
 
 	public static void debug(String message) {

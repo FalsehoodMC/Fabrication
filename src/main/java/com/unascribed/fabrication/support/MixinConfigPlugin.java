@@ -416,11 +416,24 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 
 	public static void reload() {
 		FabLog.info("Reloading configs...");
-		Path dir = Agnos.getConfigDir().resolve("fabrication");
+		String name = isMet(SpecialEligibility.FORGE) ? "forgery" : "fabrication";
+		Path dir = Agnos.getConfigDir().resolve(name);
+		if (isMet(SpecialEligibility.FORGE)) {
+			if (!Files.exists(dir)) {
+				Path fabrication = Agnos.getConfigDir().resolve("fabrication");
+				if (Files.exists(fabrication)) {
+					try {
+						Files.move(fabrication, dir);
+					} catch (IOException e) {
+						throw new RuntimeException("Failed to move fabrication config to forgery", e);
+					}
+				}
+			}
+		}
 		try {
 			Files.createDirectories(dir);
 		} catch (IOException e1) {
-			throw new RuntimeException("Failed to create fabrication config directory", e1);
+			throw new RuntimeException("Failed to create "+name+" config directory", e1);
 		}
 		Path configFile = dir.resolve("features.ini");
 		checkForAndSaveDefaultsOrUpgrade(configFile, "default_features_config.ini");
@@ -454,7 +467,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 								}
 							}
 							if (badKeys) {
-								notices.add("Consider updating this config file by renaming it to fabrication.ini.old");
+								notices.add("Consider updating this config file by renaming it to "+name+".ini.old");
 							}
 							if (notices.isEmpty()) {
 								return NOTICES_HEADER+"\r\n; - No notices. You're in the clear!";
@@ -512,7 +525,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 
 	private static void load(ConfigLoader ldr) {
 		String name = ldr.getConfigName();
-		Path dir = Agnos.getConfigDir().resolve("fabrication");
+		String modName = isMet(SpecialEligibility.FORGE) ? "forgery" : "fabrication";
+		Path dir = Agnos.getConfigDir().resolve(modName);
 		Path file = dir.resolve(name+".ini");
 		checkForAndSaveDefaultsOrUpgrade(file, "default_"+name+"_config.ini");
 		FabLog.timeAndCountWarnings("Loading of "+name+".ini", () -> {
@@ -592,8 +606,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	public void onLoad(String mixinPackage) {
 		reload();
 		Mixins.registerErrorHandlerClass("com.unascribed.fabrication.support.MixinErrorHandler_THIS_ERROR_HANDLER_IS_FOR_SOFT_FAILURE_IN_FABRICATION_ITSELF_AND_DOES_NOT_IMPLY_FABRICATION_IS_RESPONSIBLE_FOR_THE_BELOW_ERROR");
-		FabLog.warn("Fabrication is about to inject into Mixin to add support for failsoft mixins.");
-		FabLog.warn("THE FOLLOWING WARNINGS ARE NOT AN ERROR AND DO NOT IMPLY FABRICATION IS RESPONSIBLE FOR A CRASH.");
+		FabLog.warn((isMet(SpecialEligibility.FORGE) ? "Forgery" : "Fabrication")+" is about to inject into Mixin to add support for failsoft mixins.");
+		FabLog.warn("THE FOLLOWING WARNINGS ARE NOT AN ERROR AND DO NOT IMPLY "+(isMet(SpecialEligibility.FORGE) ? "FORGERY" : "FABRICATION")+" IS RESPONSIBLE FOR A CRASH.");
 		InjectionInfo.register(FailsoftCallbackInjectionInfo.class);
 		InjectionInfo.register(FailsoftModifyArgInjectionInfo.class);
 		InjectionInfo.register(FailsoftModifyArgsInjectionInfo.class);

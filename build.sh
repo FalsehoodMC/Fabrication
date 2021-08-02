@@ -16,7 +16,7 @@ if [ "$canforgery" == "1" ]; then
 	tmp=$(mktemp -d)
 	forgeryIn="$tmp/forgery-in.jar"
 	echo Processing JIJ dependencies...
-	unzip -p "$fabrication" fabric.mod.json > forgery/shadow/fabric.mod.json
+	unzip -p "$fabrication" fabric.mod.json |sed 's/"name": "Fabrication"/"name": "Forgery"/g' > forgery/shadow/fabric.mod.json
 	cp "$fabrication" forgery/shadow/in.jar
 	zip -d forgery/shadow/in.jar META-INF/jars/*
 	cd forgery/shadow
