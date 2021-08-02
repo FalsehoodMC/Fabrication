@@ -15,7 +15,6 @@ import org.lwjgl.system.MemoryUtil;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.unascribed.fabrication.FabRefl;
-import com.unascribed.fabrication.FabRefl.Client;
 import com.unascribed.fabrication.loaders.LoaderClassicBlockDrops;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 
@@ -57,6 +56,8 @@ public class WoinaDrops {
 	public static float curTimer;
 	
 	private static AbstractTexture mippedBlocks;
+	
+	public static boolean mippedBlocksInvalid = true;
 
 	public static int modifyOverlay(ItemStack stack, int overlay) {
 		if (MixinConfigPlugin.isEnabled("*.blinking_drops")) {
@@ -84,7 +85,8 @@ public class WoinaDrops {
 					r.setSeed(seed);
 					model.getQuads(null, null, r).forEach(q -> drawExaggeratedQuad(stack, matrices, vertices, q, light, overlayf));
 				} else {
-					if (mippedBlocks == null) {
+					if (mippedBlocks == null || mippedBlocksInvalid) {
+						mippedBlocksInvalid = false;
 						mippedBlocks = new AbstractTexture() {
 							
 							@Override
