@@ -144,7 +144,7 @@ public final class Agnos {
 			if (en == null) return null;
 			return en.getKey();
 		} catch (Throwable t) {
-			LogManager.getLogger("Fabrication").warn("Failed to look up "+clazz, t);
+			LogManager.getLogger("Forgery").warn("Failed to look up "+clazz, t);
 			return null;
 		}
 	}

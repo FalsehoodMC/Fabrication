@@ -96,7 +96,7 @@ public class FabricationResourcePack implements ResourcePack {
 
 	@Override
 	public String getName() {
-		return "Fabrication";
+		return FabricationMod.MOD_NAME;
 	}
 
 	@Override

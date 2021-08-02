@@ -13,6 +13,7 @@ import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.ResolvedTrilean;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.Trilean;
 
 import com.google.common.collect.Lists;
@@ -42,6 +43,10 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 public class FabricationMod implements ModInitializer {
+	
+	public static final String MOD_NAME = MixinConfigPlugin.isMet(SpecialEligibility.FORGE) ? "Forgery" : "Fabrication";
+	// NOT the modid. We keep the mod id as "fabrication" even on Forge to keep things from getting too nutty.
+	public static final String MOD_NAME_LOWER = MixinConfigPlugin.isMet(SpecialEligibility.FORGE) ? "forgery" : "fabrication";
 	
 	private static final Map<String, Feature> features = Maps.newHashMap();
 	private static final List<Feature> unconfigurableFeatures = Lists.newArrayList();

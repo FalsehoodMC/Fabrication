@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import com.mojang.brigadier.Command;
-import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.CommandNode;
@@ -67,7 +66,7 @@ public class FeatureFabricationCommand implements Feature {
 	public void apply() {
 		Agnos.runForCommandRegistration((dispatcher, dedi) -> {
 			try {
-				LiteralArgumentBuilder<ServerCommandSource> root = LiteralArgumentBuilder.<ServerCommandSource>literal("fabrication");
+				LiteralArgumentBuilder<ServerCommandSource> root = LiteralArgumentBuilder.<ServerCommandSource>literal(FabricationMod.MOD_NAME_LOWER);
 				addConfig(root, dedi);
 				
 				LiteralArgumentBuilder<ServerCommandSource> tag = LiteralArgumentBuilder.<ServerCommandSource>literal("tag");
@@ -181,7 +180,7 @@ public class FeatureFabricationCommand implements Feature {
 		} else {
 			biomes = null;
 		}
-		String name = "fabrication_block_distribution_"+System.currentTimeMillis()+".tsv";
+		String name = FabricationMod.MOD_NAME_LOWER+"_block_distribution_"+System.currentTimeMillis()+".tsv";
 		c.getSource().sendFeedback(new LiteralText("Starting background block distribution analysis"), false);
 		c.getSource().sendFeedback(new LiteralText("This could take a while, but the server should remain usable"), false);
 		c.getSource().sendFeedback(new LiteralText("Once complete a file named "+name+" will appear in the server directory"), false);
@@ -268,7 +267,7 @@ public class FeatureFabricationCommand implements Feature {
 				i++;
 			}
 			FabLog.info("Scanned "+scanned+"/"+goal+" blocks (skipped "+skipped+"), 100% done. Writing file");
-			FabLog.info("NOTE: Fabrication block distribution analysis is NOT A BENCHMARK. Chunk generation speed is intentionally limited to keep servers responsive and not crashing.");
+			FabLog.info("NOTE: "+FabricationMod.MOD_NAME+" block distribution analysis is NOT A BENCHMARK. Chunk generation speed is intentionally limited to keep servers responsive and not crashing.");
 			List<Map.Entry<BlockState, MutableLong>> sorted = Lists.newArrayList(counts.entrySet());
 			sorted.sort((a, b) -> Long.compare(b.getValue().value, a.getValue().value));
 			try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(new File(name)), Charsets.UTF_8)) {
@@ -300,7 +299,7 @@ public class FeatureFabricationCommand implements Feature {
 			} catch (IOException e) {
 				FabLog.error("Failed to save block distribution data", e);
 			}
-		}, "Fabrication block analysis").start();
+		}, FabricationMod.MOD_NAME+" block analysis").start();
 		return 1;
 	}
 
@@ -383,7 +382,7 @@ public class FeatureFabricationCommand implements Feature {
 					if (c.getSource() instanceof ServerCommandSource) {
 						FabricationMod.sendConfigUpdate(((ServerCommandSource)c.getSource()).getMinecraftServer(), null);
 					}
-					sendFeedback(c, new LiteralText("Fabrication configuration reloaded"), true);
+					sendFeedback(c, new LiteralText(FabricationMod.MOD_NAME+" configuration reloaded"), true);
 					sendFeedback(c, new LiteralText("§eYou may need to restart the game for the changes to take effect."), false);
 					return 1;
 				})

@@ -512,7 +512,7 @@ public class FabRefl {
 	private static RuntimeException rethrow(Throwable t) {
 		if (!MixinErrorHandler_THIS_ERROR_HANDLER_IS_FOR_SOFT_FAILURE_IN_FABRICATION_ITSELF_AND_DOES_NOT_IMPLY_FABRICATION_IS_RESPONSIBLE_FOR_THE_BELOW_ERROR.actuallyItWasUs && (t instanceof MixinError || t instanceof MixinException)) {
 			throw new RuntimeException("DO NOT REPORT THIS ERROR TO FABRICATION.\n"
-					+ "This is caused by ANOTHER MOD'S MIXIN FAILURE that was initiated by Fabrication initializing reflection.\n"
+					+ "This is caused by ANOTHER MOD'S MIXIN FAILURE that was initiated by "+(FORGE ? "Forgery" : "Fabrication")+" initializing reflection.\n"
 					+ "Errors like these show up attributed to whoever was the first person to load the class with the broken mixin.\n"
 					+ "!!!!! DO NOT REPORT THIS ERROR TO FABRICATION !!!!!");
 		}

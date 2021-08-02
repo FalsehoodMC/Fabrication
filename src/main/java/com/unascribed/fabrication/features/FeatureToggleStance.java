@@ -5,6 +5,7 @@ import java.util.Locale;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.unascribed.fabrication.Agnos;
+import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.client.FabricationConfigScreen;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
@@ -27,7 +28,7 @@ public class FeatureToggleStance implements Feature {
 		CRAWLING(false, true),
 		;
 		public final boolean sneaking, crawling;
-		private Stance(boolean sneaking, boolean crawling) {
+		Stance(boolean sneaking, boolean crawling) {
 			this.sneaking = sneaking;
 			this.crawling = crawling;
 		}
@@ -48,7 +49,7 @@ public class FeatureToggleStance implements Feature {
 	
 	@Override
 	public void apply() {
-		keybind = new KeyBinding("[Fabrication] Toggle Stance", InputUtil.UNKNOWN_KEY.getCode(), "key.categories.movement") {
+		keybind = new KeyBinding("["+FabricationMod.MOD_NAME+"] Toggle Stance", InputUtil.UNKNOWN_KEY.getCode(), "key.categories.movement") {
 			@Override
 			public void setPressed(boolean pressed) {
 				if (!pressed && MinecraftClient.getInstance().getNetworkHandler() == null) {

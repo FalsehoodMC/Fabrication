@@ -144,7 +144,7 @@ public class FabricationConfigScreen extends Screen {
 	private int noteIndex = 0;
 	
 	public FabricationConfigScreen(Screen parent) {
-		super(new LiteralText("Fabrication configuration"));
+		super(new LiteralText(FabricationMod.MOD_NAME+" configuration"));
 		this.parent = parent;
 		prideFlag = PrideFlags.isPrideMonth() ? PrideFlags.getRandomFlag() : null;
 		for (String sec : MixinConfigPlugin.getAllSections()) {
@@ -167,15 +167,15 @@ public class FabricationConfigScreen extends Screen {
 		} else {
 			CommandDispatcher<?> disp = client.player.networkHandler.getCommandDispatcher();
 			if (disp.getRoot().getChild("fabrication") == null) {
-				whyCantConfigureServer = "This server doesn't have Fabrication.";
+				whyCantConfigureServer = "This server doesn't have "+FabricationMod.MOD_NAME+".";
 			} else {
 				ClientPlayNetworkHandler cpnh = client.getNetworkHandler();
 				if (cpnh instanceof GetServerConfig) {
 					GetServerConfig gsc = (GetServerConfig)cpnh;
 					if (!gsc.fabrication$hasHandshook()) {
-						whyCantConfigureServer = "This server's version of Fabrication is too old.";
+						whyCantConfigureServer = "This server's version of "+FabricationMod.MOD_NAME+" is too old.";
 					} else {
-						serverReadOnly = (disp.getRoot().getChild("fabrication").getChild("config") == null);
+						serverReadOnly = (disp.getRoot().getChild(FabricationMod.MOD_NAME_LOWER).getChild("config") == null);
 						serverKnownConfigKeys.clear();
 						serverKnownConfigKeys.addAll(gsc.fabrication$getServerTrileanConfig().keySet());
 						serverKnownConfigKeys.addAll(gsc.fabrication$getServerStringConfig().keySet());
@@ -598,7 +598,7 @@ public class FabricationConfigScreen extends Screen {
 			} else {
 				int srv = serverKnownConfigKeys.size();
 				int cli = MixinConfigPlugin.getAllKeys().size();
-				msg = "§dServer has Fabrication and is recognized.";
+				msg = "§dServer has "+FabricationMod.MOD_NAME+" and is recognized.";
 				if (srv != cli) {
 					msg += "\n§oMismatch: Server has "+srv+" options. Client has "+cli+".";
 					if (srv > cli) {
@@ -668,7 +668,7 @@ public class FabricationConfigScreen extends Screen {
 		int y = startY;
 		if (section == null) {
 			String v = getVersion();
-			String blurb = "§lFabrication v"+v+" §rby unascribed\n"+(configuringServer ? "(Local version: v"+Agnos.getModVersion()+")" : "")
+			String blurb = "§l"+FabricationMod.MOD_NAME+" v"+v+" §rby unascribed\n"+(configuringServer ? "(Local version: v"+Agnos.getModVersion()+")" : "")
 					+ "\nClick a category on the left to change settings.";
 			int height = drawWrappedText(matrices, 140, 20, blurb, width-130, -1, false);
 			if (drawButton(matrices, 140, 20+height+32, 120, 20, "Reload files", mouseX, mouseY)) {
