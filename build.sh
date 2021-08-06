@@ -1,11 +1,15 @@
 #!/bin/bash -e
-if [ -f ~/ForgeryTools.jar ]; then
-	canforgery=1
-else
-	echo "Forgery tools not found. As of the time of writing, the Forgery tooling is not public."
+#if [ -f ~/ForgeryTools.jar ]; then
+#	canforgery=1
+#else
+#	echo "Forgery tools not found. As of the time of writing, the Forgery tooling is not public."
+	echo "Forgery does not yet support 1.17."
 	echo "Performing a Fabric build only."
 	echo
 	canforgery=0
+#fi
+if [ -n "$JAVA16_HOME" ]; then
+	export JAVA_HOME=$JAVA16_HOME
 fi
 ./build-features.sh
 rm -rf build/libs

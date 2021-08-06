@@ -309,7 +309,7 @@ public class FabRefl {
 			}
 		}
 		
-		private static final MethodHandle spriteAnimation_frameIndex = unreflectGetter("Sprite.Animation", () -> Sprite.Animation.class, "frameIndex", "field_5273", "field_110973_g")
+		private static final MethodHandle spriteAnimation_frameIndex = unreflectGetter("Sprite.Animation", () -> Sprite.Animation.class, "frameIndex", "field_28470", "field_110973_g")
 				.requiredBy("atlas_viewer").get();
 		public static int getFrameIndex(Sprite.Animation subject) {
 			try {
@@ -319,7 +319,7 @@ public class FabRefl {
 			}
 		}
 		
-		private static final MethodHandle spriteAnimation_frameTicks = unreflectGetter("Sprite.Animation", () -> Sprite.Animation.class, "frameTicks", "field_5272", "field_110983_h")
+		private static final MethodHandle spriteAnimation_frameTicks = unreflectGetter("Sprite.Animation", () -> Sprite.Animation.class, "frameTicks", "field_28471", "field_110983_h")
 				.requiredBy("atlas_viewer").get();
 		public static int getFrameTicks(Sprite.Animation subject) {
 			try {

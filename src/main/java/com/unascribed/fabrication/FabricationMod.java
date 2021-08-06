@@ -116,6 +116,7 @@ public class FabricationMod implements ModInitializer {
 	}
 	
 	public static void featureError(Class<?> clazz, String configKey, Throwable t) {
+		FabLog.debug("Original feature error", t);
 		if (configKey == null) {
 			FabLog.warn("Feature "+clazz.getName()+" failed to apply!");
 		} else {
