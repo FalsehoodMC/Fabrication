@@ -736,6 +736,7 @@ tweaks.ghost_chest_woo_woo
 	hidden: true
 	since: 1.0
 	sides: client_only
+	default: never
 	desc:
 		?
 
