@@ -21,7 +21,7 @@ public abstract class MixinShulkerBulletEntity {
 		if (MixinConfigPlugin.isEnabled("*.shulker_bullets_despawn_on_death") && !((Entity)self).world.isClient) {
 			Entity owner = ((ProjectileEntity)self).getOwner();
 			if (owner == null || !owner.isAlive()) {
-				((Entity)self).remove(Entity.RemovalReason.DISCARDED);
+				((Entity)self).discard();
 				ci.cancel();
 			}
 		}

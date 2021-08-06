@@ -202,7 +202,7 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 			itemAge = -32768;
 			fabrication$invincible = true;
 		} else if (time == ParsedTime.INSTANTLY) {
-			remove(RemovalReason.DISCARDED);
+			discard();
 		} else if (time == ParsedTime.UNSET) {
 			fabrication$extraTime = 0;
 		} else {
