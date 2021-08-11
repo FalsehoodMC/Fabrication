@@ -26,10 +26,10 @@ public class MixinEnderDragonFight {
 	@Shadow
 	private ServerWorld world;
 
-	@Inject(method = "dragonKilled(Lnet/minecraft/entity/boss/dragon/EnderDragonEntity;)V", at = @At(value = "TAIL"))
+	@Inject(method = "dragonKilled(Lnet/minecraft/entity/boss/dragon/EnderDragonEntity;)V", at=@At(value="INVOKE", target="Lnet/minecraft/entity/boss/dragon/EnderDragonFight;generateNewEndGateway()V"))
 	public void dragonKilled(EnderDragonEntity dragon, CallbackInfo ci){
-		if (MixinConfigPlugin.isEnabled("*.ender_dragon_always_spawn_egg") && previouslyKilled && dragon.getUuid().equals(this.dragonUuid)){
-			this.world.setBlockState(this.world.getTopPosition(Heightmap.Type.MOTION_BLOCKING, EndPortalFeature.ORIGIN), Blocks.DRAGON_EGG.getDefaultState());
+		if (MixinConfigPlugin.isEnabled("*.ender_dragon_always_spawn_egg")){
+			previouslyKilled = false;
 		}
 	}
 }
