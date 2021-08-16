@@ -242,7 +242,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	
 	public static ResolvedTrilean getResolvedValue(String configKey) {
 		if (isFailed(configKey)) return ResolvedTrilean.FALSE;
-		return config.getOrDefault(remap(configKey), Trilean.UNSET).resolveSemantically(defaults != null && defaults.get(configKey));
+		return config.getOrDefault(remap(configKey), Trilean.UNSET).resolveSemantically(defaults != null && defaults.getOrDefault(configKey, false));
 	}
 	
 	public static boolean isTrilean(String s) {

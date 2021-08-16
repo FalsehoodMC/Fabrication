@@ -5,6 +5,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.lwjgl.opengl.GL11;
@@ -38,6 +40,7 @@ import io.github.queerbric.pride.PrideFlag;
 import io.github.queerbric.pride.PrideFlags;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
@@ -61,7 +64,7 @@ import static com.unascribed.fabrication.client.FabricationConfigScreen.TrileanF
 public class FabricationConfigScreen extends Screen {
 
 	public enum TrileanFlag {
-		CLIENT_ONLY, REQUIRES_FABRIC_API
+		CLIENT_ONLY, REQUIRES_FABRIC_API, SHOW_SOURCE_SECTION, HIGHLIGHT_QUERY_MATCH
 	}
 
 	private final Map<String, String> SECTION_DESCRIPTIONS = Maps.newHashMap();
@@ -131,6 +134,9 @@ public class FabricationConfigScreen extends Screen {
 	private Set<String> serverKnownConfigKeys = Sets.newHashSet();
 	private boolean serverReadOnly;
 	
+	private final List<String> tabs = Lists.newArrayList();
+	private final Multimap<String, String> options = Multimaps.newMultimap(Maps.newLinkedHashMap(), Lists::newArrayList);
+	
 	private final Map<String, Trilean> optionPreviousValues = Maps.newHashMap();
 	private final Map<String, Float> optionAnimationTime = Maps.newHashMap();
 	private final Map<String, Float> disabledAnimationTime = Maps.newHashMap();
@@ -143,6 +149,10 @@ public class FabricationConfigScreen extends Screen {
 	
 	private int noteIndex = 0;
 	
+	private TextFieldWidget searchField;
+	private Pattern queryPattern = Pattern.compile("");
+	private boolean emptyQuery = true;
+	
 	public FabricationConfigScreen(Screen parent) {
 		super(new LiteralText(FabricationMod.MOD_NAME+" configuration"));
 		this.parent = parent;
@@ -153,6 +163,14 @@ public class FabricationConfigScreen extends Screen {
 		for (Profile prof : Profile.values()) {
 			PROFILE_DESCRIPTIONS.put(prof, FeaturesFile.get("general.profile."+prof.name().toLowerCase(Locale.ROOT)).desc);
 		}
+		for (String key : MixinConfigPlugin.getAllKeys()) {
+			int dot = key.indexOf('.');
+			String section = key.substring(0, dot);
+			String name = key.substring(dot+1);
+			options.put(section, name);
+		}
+		tabs.add("search");
+		tabs.addAll(options.keySet());
 	}
 	
 	@Override
@@ -185,6 +203,12 @@ public class FabricationConfigScreen extends Screen {
 				}
 			}
 		}
+		searchField = new TextFieldWidget(textRenderer, 131, 1, width-252, 14, searchField, new LiteralText("Search"));
+		searchField.setChangedListener((s) -> {
+			s = s.trim();
+			emptyQuery = s.isEmpty();
+			queryPattern = Pattern.compile(s, Pattern.LITERAL | Pattern.CASE_INSENSITIVE);
+		});
 	}
 
 	@Override
@@ -356,14 +380,6 @@ public class FabricationConfigScreen extends Screen {
 		}
 		
 		fill(matrices, -width, -height, 130, height, 0x44000000);
-		// TODO cache this
-		Multimap<String, String> options = Multimaps.newMultimap(Maps.newLinkedHashMap(), Lists::newArrayList);
-		for (String key : MixinConfigPlugin.getAllKeys()) {
-			int dot = key.indexOf('.');
-			String section = key.substring(0, dot);
-			String name = key.substring(dot+1);
-			options.put(section, name);
-		}
 		float scroll = sidebarHeight < height ? 0 : lastSidebarScroll+((sidebarScroll-lastSidebarScroll)*client.getTickDelta());
 		scroll = (float) (Math.floor((scroll*client.getWindow().getScaleFactor()))/client.getWindow().getScaleFactor());
 		float y = 8-scroll;
@@ -371,7 +387,8 @@ public class FabricationConfigScreen extends Screen {
 		int i = 0;
 		float selectedChoiceY = -60;
 		float prevSelectedChoiceY = -60;
-		for (String s : options.keySet()) {
+		for (String s : tabs) {
+			int thisHeight = 0;
 			float selectA;
 			if (s.equals(selectedSection)) {
 				selectA = sCurve5((10-selectTime)/10f);
@@ -382,63 +399,56 @@ public class FabricationConfigScreen extends Screen {
 			} else {
 				selectA = 0;
 			}
-			if (selectA > 0) {
-				GlStateManager.disableCull();
-				GlStateManager.enableBlend();
-				RenderSystem.defaultBlendFunc();
-				GlStateManager.disableTexture();
-				GlStateManager.disableAlphaTest();
-				GlStateManager.shadeModel(GL11.GL_SMOOTH);
-				GL11.glBegin(GL11.GL_QUADS);
-				GL11.glColor4f(1, 1, 1, 0.2f);
-				GL11.glVertex2f(0, y-4);
-				GL11.glColor4f(1, 1, 1, 0.2f+((1-selectA)*0.8f));
-				GL11.glVertex2f(130*selectA, y-4);
-				GL11.glColor4f(1, 1, 1, 0.2f+((1-selectA)*0.8f));
-				GL11.glVertex2f(130*selectA, y+36);
-				GL11.glColor4f(1, 1, 1, 0.2f);
-				GL11.glVertex2f(0, y+36);
-				GL11.glEnd();
-				GlStateManager.shadeModel(GL11.GL_FLAT);
-				GlStateManager.enableTexture();
-			}
 			float startY = y;
 			if (y >= -24 && y < height) {
-				GlStateManager.enableBlend();
+				int icoY = 0;
+				int size = 24;
+				if ("search".equals(s)) {
+					size = 12;
+					icoY = -4;
+				}
+				Identifier id = new Identifier("fabrication", "category/"+s+".png");
+				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
-				client.getTextureManager().bindTexture(new Identifier("fabrication", "category/"+s+".png"));
+				client.getTextureManager().bindTexture(id);
 				GlStateManager.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 				GlStateManager.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 				GlStateManager.color4f(1, 1, 1, 0.4f);
 				GlStateManager.pushMatrix();
 				GlStateManager.translatef(0, y, 0);
-				drawTexture(matrices, (130-26), 0, 0, 0, 0, 24, Math.min(24, (int)Math.ceil(height-y)), 24, 24);
+				drawTexture(matrices, (130-4-size), icoY, 0, 0, 0, size, Math.min(size, (int)Math.ceil(height-y)), size, size);
 				GlStateManager.popMatrix();
 			}
 			if (y >= -12 && y < height) {
 				textRenderer.draw(matrices, "§l"+FeaturesFile.get(s).shortName, 4, y, -1);
 			}
-			String desc = SECTION_DESCRIPTIONS.getOrDefault(s, "No description available");
 			y += 12;
-			newHeight += 12;
-			int x = 8;
-			int line = 0;
-			for (String word : Splitter.on(CharMatcher.whitespace()).split(desc)) {
-				int w = textRenderer.getWidth(word);
-				if (x+w > 100 && line == 0) {
-					x = 8;
-					y += 12;
-					newHeight += 12;
-					line = 1;
+			thisHeight += 12;
+			if (!"search".equals(s)) {
+				String desc = SECTION_DESCRIPTIONS.getOrDefault(s, "No description available");
+				int x = 8;
+				int line = 0;
+				for (String word : Splitter.on(CharMatcher.whitespace()).split(desc)) {
+					int w = textRenderer.getWidth(word);
+					if (x+w > 100 && line == 0) {
+						x = 8;
+						y += 12;
+						thisHeight += 12;
+						line = 1;
+					}
+					x = textRenderer.draw(matrices, word+" ", x, y, -1);
 				}
-				x = textRenderer.draw(matrices, word+" ", x, y, -1);
+				y += 12;
+				thisHeight += 12;
 			}
-			y += 12;
-			newHeight += 12;
 			if (didClick) {
 				if (mouseX >= 0 && mouseX <= 130 && mouseY > startY-4 && mouseY < y) {
 					boolean deselect = s.equals(selectedSection);
-					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_BELL, deselect ? 0.5f : 0.6f+(i*0.1f), 1f));
+					if ("search".equals(s) && !deselect) {
+						client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_PLING, 1.2f, 1f));
+					} else {
+						client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_BELL, deselect ? 0.5f : 0.6f+(i*0.1f), 1f));
+					}
 					prevSelectedSection = selectedSection;
 					selectedSection = deselect ? null : s;
 					
@@ -455,8 +465,24 @@ public class FabricationConfigScreen extends Screen {
 					selectTime = 10-selectTime;
 				}
 			}
+			if (selectA > 0) {
+				RenderSystem.disableCull();
+				RenderSystem.enableBlend();
+				RenderSystem.defaultBlendFunc();
+				RenderSystem.disableTexture();
+				BufferBuilder bb = Tessellator.getInstance().getBuffer();
+				Matrix4f mat = matrices.peek().getModel();
+				bb.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
+				bb.vertex(mat, 0, y-thisHeight-4, 0).color(1, 1, 1, 0.2f).next();
+				bb.vertex(mat, 130*selectA, y-thisHeight-4, 0).color(1, 1, 1, 0.2f+((1-selectA)*0.8f)).next();
+				bb.vertex(mat, 130*selectA, y, 0).color(1, 1, 1, 0.2f+((1-selectA)*0.8f)).next();
+				bb.vertex(mat, 0, y, 0).color(1, 1, 1, 0.2f).next();
+				bb.end();
+				BufferRenderer.draw(bb);
+				RenderSystem.enableTexture();
+			}
 			y += 8;
-			newHeight += 8;
+			newHeight += thisHeight;
 			i++;
 		}
 		sidebarHeight = newHeight;
@@ -467,10 +493,18 @@ public class FabricationConfigScreen extends Screen {
 		}
 		
 		bufferTooltips = true;
-		drawSection(matrices, selectedSection, mouseX, mouseY, selectedChoiceY, sCurve5((10-selectTime)/10f), true);
+		float selectedA = sCurve5((10-selectTime)/10f);
+		float prevSelectedA = sCurve5(selectTime/10f);
+		drawSection(matrices, selectedSection, mouseX, mouseY, selectedChoiceY, selectedA, true);
 		if (!MixinConfigPlugin.isEnabled("general.reduced_motion") && !Objects.equal(selectedSection, prevSelectedSection)) {
-			drawSection(matrices, prevSelectedSection, -200, -200, prevSelectedChoiceY, sCurve5(selectTime/10f), false);
+			drawSection(matrices, prevSelectedSection, -200, -200, prevSelectedChoiceY, prevSelectedA, false);
 		}
+		
+		boolean searchSelected = "search".equals(selectedSection);
+		if (searchSelected) {
+			searchField.render(matrices, mouseX, mouseY, delta);
+		}
+		searchField.setSelected(searchSelected);
 		
 		GlStateManager.pushMatrix();
 		GlStateManager.disableDepthTest();
@@ -736,22 +770,14 @@ public class FabricationConfigScreen extends Screen {
 					renderWrappedTooltip(matrices, "§l"+hoveredEntry.name+"\n§f"+hoveredEntry.desc, mouseX, mouseY);
 				}
 				y = 40;
-				FeatureEntry rchecks = FeaturesFile.get("general.runtime_checks");
-				y = drawTrilean(matrices, "general.runtime_checks", rchecks.name, rchecks.desc, y, mouseX, mouseY);
-				FeatureEntry rmot = FeaturesFile.get("general.reduced_motion");
-				y = drawTrilean(matrices, "general.reduced_motion", rmot.name, rmot.desc, y, mouseX, mouseY, CLIENT_ONLY);
-				FeatureEntry dup = FeaturesFile.get("general.data_upload");
-				y = drawTrilean(matrices, "general.data_upload", dup.name, dup.desc, y, mouseX, mouseY);
+				y = drawTrileans(matrices, y, mouseX, mouseY, (en) -> en.key.startsWith("general."));
+			} else if ("search".equals(section)) {
+				y += 4;
+				y = drawTrileans(matrices, y, mouseX, mouseY, (en) -> {
+					return emptyQuery || (queryPattern.matcher(en.name).find() || queryPattern.matcher(en.shortName).find() || queryPattern.matcher(en.desc).find());
+				}, SHOW_SOURCE_SECTION, emptyQuery ? null : HIGHLIGHT_QUERY_MATCH);
 			} else {
-				for (Map.Entry<String, FeatureEntry> en : FeaturesFile.getAll().entrySet()) {
-					if (en.getKey().startsWith(section+".")) {
-						FeatureEntry fe = en.getValue();
-						if (fe.meta) continue;
-						TrileanFlag[] flags = {};
-						if (fe.sides == Sides.CLIENT_ONLY) flags = ArrayUtils.add(flags, CLIENT_ONLY);
-						y = drawTrilean(matrices, en.getKey(), fe.name, fe.desc, y, mouseX, mouseY, flags);
-					}
-				}
+				y = drawTrileans(matrices, y, mouseX, mouseY, (en) -> en.key.startsWith(section+"."));
 			}
 		}
 		if (y == startY) {
@@ -770,6 +796,20 @@ public class FabricationConfigScreen extends Screen {
 			fill(matrices, width-2, Math.max(16, (int)knobY), width, Math.min(height-20, (int)(knobY+knobHeight)), 0xAAFFFFFF);
 		}
 		GlStateManager.popMatrix();
+	}
+
+	private int drawTrileans(MatrixStack matrices, int y, float mouseX, float mouseY, Predicate<FeatureEntry> pred, TrileanFlag... defaultFlags) {
+		RenderSystem.color4f(1, 1, 1, 1);
+		for (Map.Entry<String, FeatureEntry> en : FeaturesFile.getAll().entrySet()) {
+			if ("general.profile".equals(en.getKey())) continue;
+			FeatureEntry fe = en.getValue();
+			if (fe.meta || fe.section) continue;
+			if (!pred.test(fe)) continue;
+			TrileanFlag[] flags = defaultFlags;
+			if (fe.sides == Sides.CLIENT_ONLY) flags = ArrayUtils.add(flags, CLIENT_ONLY);
+			y = drawTrilean(matrices, en.getKey(), fe.name, fe.desc, y, mouseX, mouseY, flags);
+		}
+		return y;
 	}
 
 	private boolean drawButton(MatrixStack matrices, int x, int y, int w, int h, String text, float mouseX, float mouseY) {
@@ -796,6 +836,8 @@ public class FabricationConfigScreen extends Screen {
 		boolean clientOnly = ArrayUtils.contains(flags, CLIENT_ONLY);
 		boolean disappear = clientOnly && configuringServer;
 		boolean requiresFabricApi = ArrayUtils.contains(flags, REQUIRES_FABRIC_API);
+		boolean showSourceSection = ArrayUtils.contains(flags, SHOW_SOURCE_SECTION);
+		boolean highlightQueryMatch = ArrayUtils.contains(flags, HIGHLIGHT_QUERY_MATCH);
 		// presence of Fabric API is implied by the fact you need ModMenu to access this menu
 		boolean noFabricApi = false; //!configuringServer && requiresFabricApi && !FabricLoader.getInstance().isModLoaded("fabric");
 		boolean failed = isFailed(key);
@@ -921,13 +963,33 @@ public class FabricationConfigScreen extends Screen {
 		}
 		int textAlpha = ((int)((0.7f+((1-da)*0.3f)) * 255))<<24;
 		int startY = y;
-		int startX = 136+50;
-		y += drawWrappedText(matrices, startX, 2, title, width-startX-6, 0xFFFFFF | textAlpha, false)*scale;
-		int endX = width-6;
+		int startX = 136+45+5;
+		int startStartX = startX;
+		String section = null;
+		if (showSourceSection && key.contains(".")) {
+			section = key.substring(0, key.indexOf('.'));
+			Identifier id = new Identifier("fabrication", "category/"+section+".png");
+			RenderSystem.enableTexture();
+			client.getTextureManager().bindTexture(id);
+			RenderSystem.color4f(1, 1, 1, 1);
+			drawTexture(matrices, startX-2, 0, 0, 0, 12, 12, 12, 12);
+			startX += 14;
+			RenderSystem.disableTexture();
+		}
+		String drawTitle = title;
+		String drawDesc = desc;
+		if (highlightQueryMatch) {
+			drawTitle = queryPattern.matcher(drawTitle).replaceAll("§e§l$0§r");
+			drawDesc = queryPattern.matcher(drawDesc).replaceAll("§e§l$0§r");
+		}
+		y += drawWrappedText(matrices, startX, 2, drawTitle, width-startX-6, 0xFFFFFF | textAlpha, false)*scale;
+		int endX = startY == y-8 ? width - 6 : startX+textRenderer.getWidth(title);
 //		int endX = textRenderer.draw(matrices, title, startX, 2, 0xFFFFFF | textAlpha);
 		GlStateManager.popMatrix();
-		if (mouseX <= width-120 || mouseY >= 16) {
-			if (mouseX >= startX && mouseX <= endX && mouseY >= startY && mouseY <= y) {
+		if ((("search".equals(selectedSection) ? false : mouseX <= width-120) || mouseY >= 16) && mouseY < height-20) {
+			if (section != null && mouseX >= startStartX && mouseX <= startX && mouseY >= startY && mouseY <= y) {
+				renderWrappedTooltip(matrices, FeaturesFile.get(section).shortName, mouseX, mouseY);
+			} else if (mouseX >= startX && mouseX <= endX && mouseY >= startY && mouseY <= y) {
 				String prefix = "";
 				if (clientOnly) {
 					prefix += "§6Client Only ";
@@ -938,7 +1000,7 @@ public class FabricationConfigScreen extends Screen {
 				if (!prefix.isEmpty()) {
 					prefix += "§r\n";
 				}
-				renderWrappedTooltip(matrices, prefix+desc, mouseX, mouseY);
+				renderWrappedTooltip(matrices, prefix+drawDesc, mouseX, mouseY);
 			} else if (mouseX >= 134 && mouseX <= 134+45 && mouseY >= startY && mouseY <= startY+10) {
 				if (disabled) {
 					if (noFabricApi) {
@@ -1052,6 +1114,7 @@ public class FabricationConfigScreen extends Screen {
 		if (tooltipBlinkTicks > 0) {
 			tooltipBlinkTicks--;
 		}
+		searchField.tick();
 	}
 	
 	@Override
@@ -1090,7 +1153,58 @@ public class FabricationConfigScreen extends Screen {
 			}
 			didClick = true;
 		}
+		if ("search".equals(selectedSection)) {
+			searchField.mouseClicked(mouseX, mouseY, button);
+		}
 		return super.mouseClicked(mouseX, mouseY, button);
+	}
+	
+	@Override
+	public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+		if ("search".equals(selectedSection)) {
+			searchField.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+		}
+		return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+	}
+	
+	@Override
+	public void mouseMoved(double mouseX, double mouseY) {
+		if ("search".equals(selectedSection)) {
+			searchField.mouseMoved(mouseX, mouseY);
+		}
+		super.mouseMoved(mouseX, mouseY);
+	}
+	
+	@Override
+	public boolean mouseReleased(double mouseX, double mouseY, int button) {
+		if ("search".equals(selectedSection)) {
+			searchField.mouseReleased(mouseX, mouseY, button);
+		}
+		return super.mouseReleased(mouseX, mouseY, button);
+	}
+	
+	@Override
+	public boolean charTyped(char chr, int modifiers) {
+		if ("search".equals(selectedSection)) {
+			searchField.charTyped(chr, modifiers);
+		}
+		return super.charTyped(chr, modifiers);
+	}
+	
+	@Override
+	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+		if ("search".equals(selectedSection)) {
+			searchField.keyPressed(keyCode, scanCode, modifiers);
+		}
+		return super.keyPressed(keyCode, scanCode, modifiers);
+	}
+	
+	@Override
+	public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+		if ("search".equals(selectedSection)) {
+			searchField.keyReleased(keyCode, scanCode, modifiers);
+		}
+		return super.keyReleased(keyCode, scanCode, modifiers);
 	}
 	
 	private String getVersion() {

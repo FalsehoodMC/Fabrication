@@ -48,6 +48,12 @@ atlas_viewer
 		This is an invaluable debugging tool for various kinds of atlas disasters, and was added to
 		debug a sprite overwrite issue with Old Lava.
 
+search
+	name: Search
+	since: 1.3.5
+	meta: true
+	desc:
+
 general
 	name: General
 	section: true
