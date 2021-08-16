@@ -48,6 +48,12 @@ atlas_viewer
 		This is an invaluable debugging tool for various kinds of atlas disasters, and was added to
 		debug a sprite overwrite issue with Old Lava.
 
+search
+	name: Search
+	since: 2.0.0
+	meta: true
+	desc:
+
 general
 	name: General
 	section: true
@@ -61,6 +67,12 @@ general.reduced_motion
 	sides: client_only
 	desc:
 		Disables high-motion animations in the Fabrication config screen.
+
+general.dark_mode
+	name: Dark Mode
+	since: 2.0.0
+	desc:
+		Makes the config screen darker.
 
 general.data_upload
 	name: Data Upload

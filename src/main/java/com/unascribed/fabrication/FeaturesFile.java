@@ -30,6 +30,7 @@ public final class FeaturesFile {
 	}
 	
 	public static final class FeatureEntry {
+		public final String key;
 		public final String name;
 		public final String shortName;
 		public final boolean meta;
@@ -48,7 +49,8 @@ public final class FeaturesFile {
 		public final String linkText;
 		public final String desc;
 		
-		public FeatureEntry(JsonObject obj) {
+		public FeatureEntry(String key, JsonObject obj) {
+			this.key = key;
 			name = get(obj, "name", JsonElement::getAsString, null);
 			shortName = get(obj, "short_name", JsonElement::getAsString, null);
 			meta = get(obj, "meta", JsonElement::getAsBoolean, false);
@@ -97,7 +99,7 @@ public final class FeaturesFile {
 		try (Reader r = Resources.asCharSource(FeaturesFile.class.getClassLoader().getResource("features.json"), Charsets.UTF_8).openStream()) {
 			JsonObject obj = new Gson().fromJson(r, JsonObject.class);
 			for (Map.Entry<String, JsonElement> en : obj.entrySet()) {
-				bldr.put(en.getKey(), new FeatureEntry(en.getValue().getAsJsonObject()));
+				bldr.put(en.getKey(), new FeatureEntry(en.getKey(), en.getValue().getAsJsonObject()));
 			}
 		} catch (Throwable t) {
 			FabLog.warn("Failed to load features.json", t);
@@ -105,7 +107,7 @@ public final class FeaturesFile {
 		data = bldr.build();
 	}
 	
-	private static final FeatureEntry defaultEntry = new FeatureEntry(new JsonObject());
+	private static final FeatureEntry defaultEntry = new FeatureEntry("", new JsonObject());
 	
 	public static FeatureEntry get(String key) {
 		return data.getOrDefault(key, defaultEntry);

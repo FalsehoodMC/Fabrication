@@ -266,7 +266,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	public static ResolvedConfigValue getResolvedValue(String configKey) {
 		if (isBanned(configKey)) return ResolvedConfigValue.BANNED;
 		if (isFailed(configKey)) return ResolvedConfigValue.FALSE;
-		return config.getOrDefault(remap(configKey), ConfigValue.UNSET).resolveSemantically(defaults != null && defaults.get(configKey));
+		return config.getOrDefault(remap(configKey), ConfigValue.UNSET).resolveSemantically(defaults != null && defaults.getOrDefault(configKey, false));
 	}
 	
 	public static boolean isStandardValue(String s) {
