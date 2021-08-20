@@ -535,16 +535,19 @@ public class FabricationConfigScreen extends Screen {
 		}
 		
 		boolean searchSelected = "search".equals(selectedSection);
+		boolean searchWasSelected = "search".equals(prevSelectedSection);
 		if (searchSelected) {
 			RenderSystem.setShaderColor(1, 1, 1, selectedA);
 			searchField.setAlpha(selectedA);
 			searchField.render(matrices, mouseX, mouseY, delta);
-		} else if (prevSelectedA > 0) {
+		} else if (searchWasSelected && prevSelectedA > 0) {
 			RenderSystem.setShaderColor(1, 1, 1, prevSelectedA);
 			searchField.setAlpha(prevSelectedA);
 			searchField.render(matrices, mouseX, mouseY, delta);
 		}
 		searchField.setTextFieldFocused(searchSelected);
+		
+		RenderSystem.setShaderColor(1, 1, 1, 1);
 		
 		matrices.push();
 		RenderSystem.disableDepthTest();

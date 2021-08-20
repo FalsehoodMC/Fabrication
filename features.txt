@@ -71,6 +71,7 @@ general.reduced_motion
 general.dark_mode
 	name: Dark Mode
 	since: 2.0.0
+	sides: client_only
 	desc:
 		Makes the config screen darker.
 
