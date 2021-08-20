@@ -12,10 +12,6 @@ group = project.maven_group
 
 repositories {
 	maven {
-		name = 'CottonMC'
-		url = 'https://server.bbkr.space/artifactory/libs-release'
-	}
-	maven {
 		name = "JitPack"
 		url = "https://jitpack.io"
 	}
@@ -32,9 +28,6 @@ dependencies {
 	modImplementation include(fabricApi.module("fabric-item-api-v1", "${project.fabric_version}"))
 	modImplementation include(fabricApi.module("fabric-key-binding-api-v1", "${project.fabric_version}"))
 	modImplementation include(fabricApi.module("fabric-rendering-v1", "${project.fabric_version}"))
-	modImplementation(include("io.github.cottonmc:cotton-client-commands:1.0.1+1.16-rc1")) {
-		transitive = false
-	}
 	modImplementation(include("com.github.Queerbric:pridelib:87d9cb94cb")) {
 		transitive = false
 	}
