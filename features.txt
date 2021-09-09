@@ -337,6 +337,19 @@ fixes.open_inventories_in_nether_portal
 		Vanilla originally made this change to fix a dupe exploit in Beta. The underlying cause of
 		this dupe was fixed a very long time ago.
 
+fixes.fix_superflat_bad_structures
+	name: Fix Superflat Bad Structures
+	since: 1.3.5
+	sides: either
+	desc:
+		Fixes a bug that some biome-adding mods have that causes their structure features to be
+		added to a superflat world, which have a hardcoded list of supported structure features.
+		
+		This bug shows up as a "safe mode" error screen with an exception in the log showing a
+		NullPointerException in method_30979.
+		
+		This will not affect mods that properly patch the superflat structures map.
+
 utility
 	name: Utility
 	section: true
