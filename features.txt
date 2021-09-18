@@ -1795,6 +1795,17 @@ situational.disable_bees
 		
 		Does not delete existing bee nests or bee entities; only fully effective in a new world.
 
+situational.disable_villagers
+	name: Disable Villagers
+	since: 1.3.5
+	sides: either
+	desc:
+		Prevents villages from generating and zombie villagers from spawning.
+		
+		Villagers completely break game balance, among other issues.
+		
+		Will not fully take effect unless the game is restarted.
+
 situational.item_frame_no_name_display
 	name: Item Frames Don't Display Name Tags
 	since: 1.3.5
