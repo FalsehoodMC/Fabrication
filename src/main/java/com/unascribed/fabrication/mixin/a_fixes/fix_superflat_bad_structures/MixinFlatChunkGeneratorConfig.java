@@ -17,7 +17,7 @@ import net.minecraft.world.gen.chunk.FlatChunkGeneratorConfig;
 import net.minecraft.world.gen.feature.ConfiguredStructureFeature;
 
 @Mixin(FlatChunkGeneratorConfig.class)
-@EligibleIf(configEnabled="*.fix_superflat_bad_structures")
+@EligibleIf(configAvailable="*.fix_superflat_bad_structures")
 public class MixinFlatChunkGeneratorConfig {
 
 	@Shadow @Final

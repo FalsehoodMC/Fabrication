@@ -419,7 +419,7 @@ public class FabricationConfigScreen extends Screen {
 		float selectedChoiceY = -60;
 		float prevSelectedChoiceY = -60;
 		for (String s : tabs) {
-			int thisHeight = 0;
+			int thisHeight = 8;
 			float selectA;
 			if (s.equals(selectedSection)) {
 				selectA = sCurve5((10-selectTime)/10f);
