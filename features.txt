@@ -817,6 +817,13 @@ tweaks.no_set_window_pos
 		or something that memorizes window positions, they will be honored instead of the window
 		always being centered.
 
+tweaks.campfires_ignite_entities
+	name: Campfires Ignite Entities
+	since: 1.3.5
+	sides: server_only
+	desc:
+		Campfires will set fire to mobs standing on them, therefore also cooking them.
+
 minor_mechanics
 	name: Minor Mechanics
 	section: true
