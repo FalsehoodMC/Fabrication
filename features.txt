@@ -1506,6 +1506,15 @@ weird_tweaks.disable_night_skip
 	desc:
 		Prevents beds from skipping the night.
 
+weird_tweaks.leaves_grow_grass
+	name: Leaves Grow Grass
+	since: 1.3.5
+	sides: server_only
+	desc:
+		Grass and tall grass can be placed on leaves.
+
+		Using Bone Meal on leaves makes them grow grass.
+
 woina
 	name: What's Old Is New Again
 	section: true
