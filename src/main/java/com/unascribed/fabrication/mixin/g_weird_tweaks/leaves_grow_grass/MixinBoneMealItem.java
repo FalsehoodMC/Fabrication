@@ -23,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @EligibleIf(configAvailable="*.leaves_grow_grass", envMatches=Env.CLIENT)
 public abstract class MixinBoneMealItem {
 
-	@Inject(at=@At("HEAD"), method= "useOnBlock(Lnet/minecraft/item/ItemUsageContext;)Lnet/minecraft/util/ActionResult;", cancellable = true)
+	@Inject(at=@At("HEAD"), method="useOnBlock(Lnet/minecraft/item/ItemUsageContext;)Lnet/minecraft/util/ActionResult;", cancellable=true)
 	private void useOnBlock(ItemUsageContext context, CallbackInfoReturnable<ActionResult> cir) {
 		if (!MixinConfigPlugin.isEnabled("*.leaves_grow_grass")) return;
 

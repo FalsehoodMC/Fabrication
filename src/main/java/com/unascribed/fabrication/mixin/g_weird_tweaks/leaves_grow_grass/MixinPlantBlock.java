@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @EligibleIf(configAvailable="*.leaves_grow_grass", envMatches=Env.CLIENT)
 public abstract class MixinPlantBlock {
 
-	@Inject(at=@At("HEAD"), method= "canPlantOnTop(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)Z", cancellable = true)
+	@Inject(at=@At("HEAD"), method="canPlantOnTop(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)Z", cancellable=true)
 	private void canPlantOnTop(BlockState floor, BlockView world, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
 		if (!MixinConfigPlugin.isEnabled("*.leaves_grow_grass")) return;
 		if (floor.isIn(BlockTags.LEAVES) && (((Object)this) == Blocks.GRASS || ((Object)this) == Blocks.TALL_GRASS)){
