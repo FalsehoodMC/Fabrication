@@ -20,7 +20,7 @@ public abstract class MixinFireworkRocketItem {
 
 	@Inject(at=@At(value="INVOKE", target="Lnet/minecraft/world/World;spawnEntity(Lnet/minecraft/entity/Entity;)Z"),
 			method="use(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/TypedActionResult;", cancellable=true)
-	private void scriptCheck(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<TypedActionResult<ItemStack>> cir) {
+	private void use(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<TypedActionResult<ItemStack>> cir) {
 		if (MixinConfigPlugin.isEnabled("*.disable_elytra_boost")) cir.setReturnValue(TypedActionResult.pass(user.getStackInHand(hand)));
 	}
 	
