@@ -1404,6 +1404,13 @@ balance.disable_pearl_stasis
 		Ender pearls forget who threw them when being unloaded.
 		Which means saving a ender pearl in a bubble column becomes more difficult.
 
+balance.disable_elytra_boost
+	name: Disable Elytra Boost
+	since: 1.3.5
+	sides: server_only
+	desc:
+		Prevent Elytra boosting using firework rockets.
+
 balance.pickup_skeleton_arrows
 	name: Pickup Skeleton Arrows
 	since: 1.3.5
