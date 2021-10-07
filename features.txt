@@ -850,6 +850,14 @@ tweaks.no_set_window_pos
 		or something that memorizes window positions, they will be honored instead of the window
 		always being centered.
 
+
+tweaks.campfires_cook_entities
+	name: Campfires Cook Entities
+	since: 1.3.5
+	sides: server_only
+	desc:
+		Campfires will cook entities without setting them on fire.
+
 tweaks.campfires_ignite_entities
 	name: Campfires Ignite Entities
 	since: 1.3.5
