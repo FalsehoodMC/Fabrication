@@ -817,6 +817,21 @@ tweaks.no_set_window_pos
 		or something that memorizes window positions, they will be honored instead of the window
 		always being centered.
 
+
+tweaks.campfires_cook_entities
+	name: Campfires Cook Entities
+	since: 1.3.5
+	sides: server_only
+	desc:
+		Campfires will cook entities without setting them on fire.
+
+tweaks.campfires_ignite_entities
+	name: Campfires Ignite Entities
+	since: 1.3.5
+	sides: server_only
+	desc:
+		Campfires will set fire to mobs standing on them, therefore also cooking them.
+
 minor_mechanics
 	name: Minor Mechanics
 	section: true
@@ -1013,6 +1028,20 @@ minor_mechanics.unsaddle_creatures
 	media: https://unascribed.com/fabrication/unsaddle_creatures.mp4
 	desc:
 		Shift right click with an empty hand to retrieve a saddle from a pig/strider.
+
+minor_mechanics.cactus_punching_hurts
+	name: Cactus Punching Hurts
+	since: 1.3.5
+	sides: server_only
+	desc:
+		Breaking cactus with your hand will damage you the same as hugging it.
+
+minor_mechanics.tridents_activate_levers
+	name: Tridents Activate Levers
+	since: 1.3.5
+	sides: server_only
+	desc:
+		When a trident hits a lever it will toggle it.
 
 mechanics
 	name: Mechanics
@@ -1349,6 +1378,13 @@ balance.disable_elytra_boost
 	desc:
 		Prevent Elytra boosting using firework rockets.
 
+balance.pickup_skeleton_arrows
+	name: Pickup Skeleton Arrows
+	since: 1.3.5
+	sides: server_only
+	desc:
+		Arrows shot by skeletons can be picked up.
+
 weird_tweaks
 	name: Weird Tweaks
 	section: true
@@ -1512,6 +1548,15 @@ weird_tweaks.disable_night_skip
 	media: https://unascribed.com/fabrication/disable_night_skip.mp4
 	desc:
 		Prevents beds from skipping the night.
+
+weird_tweaks.leaves_grow_grass
+	name: Leaves Grow Grass
+	since: 1.3.5
+	sides: server_only
+	desc:
+		Grass and tall grass can be placed on leaves.
+
+		Using Bone Meal on leaves makes them grow grass.
 
 woina
 	name: What's Old Is New Again
