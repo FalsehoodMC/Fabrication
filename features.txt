@@ -1062,6 +1062,13 @@ minor_mechanics.unsaddle_creatures
 	desc:
 		Shift right click with an empty hand to retrieve a saddle from a pig/strider.
 
+minor_mechanics.cactus_punching_hurts
+	name: Cactus Punching Hurts
+	since: 1.3.5
+	sides: server_only
+	desc:
+		Breaking cactus with your hand will damage you the same as hugging it.
+
 minor_mechanics.tridents_activate_levers
 	name: Tridents Activate Levers
 	since: 1.3.5
