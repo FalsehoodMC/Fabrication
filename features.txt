@@ -546,6 +546,7 @@ utility.show_bee_count_on_item
 	name: Show Bee Count
 	since: 1.3.5
 	sides: client_only
+	default: never
 	desc:
 		Makes bee hive items show amount of contained bees.
 
