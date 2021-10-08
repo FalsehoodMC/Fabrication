@@ -20,9 +20,9 @@ import java.util.List;
 
 @Mixin(ItemStack.class)
 @EligibleIf(anyConfigAvailable={"*.show_bee_count_tooltip"}, envMatches=Env.CLIENT)
-public class MixinItemRenderer {
+public class MixinItemStack {
 
-	@Inject(at=@At("RETURN"), method= "getTooltip(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/client/item/TooltipContext;)Ljava/util/List;", cancellable = true)
+	@Inject(at=@At("RETURN"), method="getTooltip(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/client/item/TooltipContext;)Ljava/util/List;", cancellable=true)
 	public void getTooltip(PlayerEntity player, TooltipContext context, CallbackInfoReturnable<List<Text>> cir) {
 		ItemStack stack = (ItemStack)(Object)this;
 		if (!(MixinConfigPlugin.isEnabled("*.show_bee_count_tooltip") && stack.hasNbt())) return;
