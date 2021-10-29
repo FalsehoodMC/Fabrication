@@ -13,12 +13,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(CampfireBlock.class)
-@EligibleIf(configEnabled="*.campfires_ignite_mobs")
+@EligibleIf(configEnabled="*.campfires_ignite_entities")
 public class MixinCampfireBlock {
 
 	@Inject(at=@At(value="INVOKE", target="Lnet/minecraft/entity/Entity;damage(Lnet/minecraft/entity/damage/DamageSource;F)Z"), method="onEntityCollision(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/Entity;)V")
 	public void damage(BlockState state, World world, BlockPos pos, Entity entity, CallbackInfo ci) {
-		if (!MixinConfigPlugin.isEnabled("*.campfires_ignite_mobs")) return;
+		if (!MixinConfigPlugin.isEnabled("*.campfires_ignite_entities")) return;
 
 		entity.setFireTicks(entity.getFireTicks() + 1);
 		if (entity.getFireTicks() == 0) entity.setOnFireFor(8);
