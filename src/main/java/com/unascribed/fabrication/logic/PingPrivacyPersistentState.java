@@ -7,28 +7,22 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import com.unascribed.fabrication.FabricationMod;
-
 import com.google.common.collect.Maps;
 import net.fabricmc.fabric.api.util.NbtType;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.PersistentState;
 
 public class PingPrivacyPersistentState extends PersistentState {
 
-	private static final String name = FabricationMod.MOD_NAME_LOWER+"_ping_privacy";
+	private static final String name = "fabrication_ping_privacy";
 	
 	private final Map<InetAddress, Long> knownIps = Maps.newHashMap();
 	private final ReadWriteLock rwl = new ReentrantReadWriteLock();
 	
-	public PingPrivacyPersistentState() {
-		super(name);
-	}
-	
 	public static PingPrivacyPersistentState get(ServerWorld world) {
-		return world.getPersistentStateManager().getOrCreate(PingPrivacyPersistentState::new, name);
+		return world.getPersistentStateManager().getOrCreate(PingPrivacyPersistentState::fromNbt, PingPrivacyPersistentState::new, name);
 	}
 	
 	public void addKnownIp(InetAddress addr) {
@@ -50,16 +44,15 @@ public class PingPrivacyPersistentState extends PersistentState {
 		}
 	}
 	
-	private boolean isRecent(long time) {
+	private static boolean isRecent(long time) {
 		return System.currentTimeMillis()-time < TimeUnit.DAYS.toMillis(7);
 	}
 
-	@Override
-	public void fromTag(CompoundTag tag) {
-		knownIps.clear();
-		ListTag li = tag.getList("KnownIPs", NbtType.COMPOUND);
+	public static PingPrivacyPersistentState fromNbt(NbtCompound tag) {
+		PingPrivacyPersistentState rtrn = new PingPrivacyPersistentState();
+		NbtList li = tag.getList("KnownIPs", NbtType.COMPOUND);
 		for (int i = 0; i < li.size(); i++) {
-			CompoundTag c = li.getCompound(i);
+			NbtCompound c = li.getCompound(i);
 			long time = c.getLong("Time");
 			if (!isRecent(time)) {
 				// don't load it, it'll get dropped on next save
@@ -72,15 +65,16 @@ public class PingPrivacyPersistentState extends PersistentState {
 				// ????????
 				continue;
 			}
-			knownIps.put(addr, time);
+			rtrn.knownIps.put(addr, time);
 		}
+		return rtrn;
 	}
 
 	@Override
-	public CompoundTag toTag(CompoundTag tag) {
-		ListTag li = new ListTag();
+	public NbtCompound writeNbt(NbtCompound tag) {
+		NbtList li = new NbtList();
 		for (Map.Entry<InetAddress, Long> en : knownIps.entrySet()) {
-			CompoundTag c = new CompoundTag();
+			NbtCompound c = new NbtCompound();
 			c.putByteArray("IP", en.getKey().getAddress());
 			c.putLong("Time", en.getValue());
 			li.add(c);

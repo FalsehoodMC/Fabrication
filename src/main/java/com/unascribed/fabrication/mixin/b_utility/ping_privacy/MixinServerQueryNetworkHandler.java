@@ -31,7 +31,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
 
 @Mixin(ServerQueryNetworkHandler.class)
-@EligibleIf(configEnabled="*.ping_privacy")
+@EligibleIf(configAvailable="*.ping_privacy")
 public class MixinServerQueryNetworkHandler {
 
 	@Shadow @Final

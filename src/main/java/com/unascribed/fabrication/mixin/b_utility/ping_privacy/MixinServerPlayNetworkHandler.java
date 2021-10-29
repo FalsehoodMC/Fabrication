@@ -22,7 +22,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 
 @Mixin(ServerPlayNetworkHandler.class)
-@EligibleIf(configEnabled="*.ping_privacy")
+@EligibleIf(configAvailable="*.ping_privacy")
 public class MixinServerPlayNetworkHandler {
 
 	@Shadow @Final

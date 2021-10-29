@@ -11,7 +11,7 @@ import com.unascribed.fabrication.support.MixinConfigPlugin;
 import io.netty.channel.Channel;
 
 @Mixin(targets="net.minecraft.server.ServerNetworkIo$1")
-@EligibleIf(configEnabled="*.ping_privacy")
+@EligibleIf(configAvailable="*.ping_privacy")
 public class MixinServerChannelHandler {
 	
 	@Inject(at=@At(value="INVOKE", target="net/minecraft/server/MinecraftServer.getRateLimit()I"),
