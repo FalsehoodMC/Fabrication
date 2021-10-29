@@ -22,7 +22,7 @@ import net.minecraft.screen.GrindstoneScreenHandler;
 import net.minecraft.world.World;
 
 @Mixin(targets="net.minecraft.screen.GrindstoneScreenHandler$4")
-@EligibleIf(configEnabled="*.grindstone_disenchanting")
+@EligibleIf(configEnabled="*.grindstone_disenchanting", modNotLoaded="fabric:grindenchantments")
 public class MixinGrindstoneScreenHandlerResultSlot implements SetOwner<GrindstoneScreenHandler> {
 
 	@Unique
