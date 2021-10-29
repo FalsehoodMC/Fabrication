@@ -39,7 +39,7 @@ public class MixinClearItemFrames {
 			cancellable=true)
 	public void handleAttackEntity(PlayerEntity player, World world, Hand hand, Entity entity, @Nullable EntityHitResult hitResult, CallbackInfoReturnable<ActionResult> ci) {
 		if (!((SetInvisibleByCharm)entity).fabrication$isInvisibleByCharm()) {
-			ci.cancel();
+			ci.setReturnValue(ActionResult.PASS);
 		}
 	}
 	
