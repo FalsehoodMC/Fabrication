@@ -184,7 +184,7 @@ public class FabricationConfigScreen extends Screen {
 			isSingleplayer = true;
 		} else {
 			CommandDispatcher<?> disp = client.player.networkHandler.getCommandDispatcher();
-			if (disp.getRoot().getChild("fabrication") == null) {
+			if (disp.getRoot().getChild(FabricationMod.MOD_NAME_LOWER) == null) {
 				whyCantConfigureServer = "This server doesn't have "+FabricationMod.MOD_NAME+".";
 			} else {
 				ClientPlayNetworkHandler cpnh = client.getNetworkHandler();
