@@ -67,20 +67,22 @@ public class FeatureHideArmor implements Feature {
 	private int setArmorHidden(CommandContext<ServerCommandSource> c, boolean hidden, EquipmentSlot... slots) throws CommandSyntaxException {
 		ServerPlayerEntity ent = c.getSource().getPlayer();
 		if (ent instanceof GetSuppressedSlots) {
-			List<Pair<EquipmentSlot, ItemStack>> li = Lists.newArrayList();
+			Set<EquipmentSlot> suppressed = ((GetSuppressedSlots)ent).fabrication$getSuppressedSlots();
 			int amt = 0;
 			for (EquipmentSlot es : slots) {
 				if (hidden) {
-					if (((GetSuppressedSlots)ent).fabrication$getSuppressedSlots().add(es)) {
+					if (suppressed.add(es)) {
 						amt++;
-						li.add(Pair.of(es, ItemStack.EMPTY));
 					}
 				} else {
-					if (((GetSuppressedSlots)ent).fabrication$getSuppressedSlots().remove(es)) {
+					if (suppressed.remove(es)) {
 						amt++;
-						li.add(Pair.of(es, ent.getEquippedStack(es)));
 					}
 				}
+			}
+			List<Pair<EquipmentSlot, ItemStack>> li = Lists.newArrayList();
+			for (EquipmentSlot es : EquipmentSlot.values()) {
+				li.add(Pair.of(es, suppressed.contains(es) ? ItemStack.EMPTY : ent.getEquippedStack(es)));
 			}
 			((ServerWorld)ent.world).getChunkManager().sendToOtherNearbyPlayers(ent, new EntityEquipmentUpdateS2CPacket(ent.getEntityId(), li));
 			sendSuppressedSlotsForSelf(ent);
