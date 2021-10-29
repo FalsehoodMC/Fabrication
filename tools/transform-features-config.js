@@ -24,6 +24,18 @@ lines.forEach((line) => {
 			}
 			let val = "unset";
 			let desc = datum.desc;
+			let sides_friendly = null;
+			switch (datum.sides) {
+				case "irrelevant": break;
+				case "either": sides_friendly = "Server or Client"; break;
+				case "client_only": sides_friendly = "Client Only"; break;
+				case "server_only": sides_friendly = "Server Only"; break;
+				case "server_only_with_client_helper": sides_friendly = "Server & Client (Client Optional)"; break;
+				case "server_and_client": sides_friendly = "Server & Client"; break;
+			}
+			if (sides_friendly) {
+				desc = sides_friendly+"\n\n"+desc;
+			}
 			if (k === 'general.profile') {
 				desc += '\n\nThe available profiles are:\n';
 				['green', 'blonde', 'light', 'medium', 'dark', 'vienna', 'burnt'].forEach((p) => {
