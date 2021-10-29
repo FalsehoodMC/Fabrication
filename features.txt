@@ -50,7 +50,7 @@ atlas_viewer
 
 search
 	name: Search
-	since: 1.4.0
+	since: 2.0.0
 	meta: true
 	desc:
 
@@ -61,26 +61,19 @@ general
 	desc:
 		Broad features and global settings.
 
-general.runtime_checks
-	name: Runtime Checks
-	since: 1.0
-	desc:
-		Allows changing settings arbitrarily on-the-fly, but is very slightly slower and a fair bit
-		less compatible, as all options that are set to 'unset' but not enabled by the profile will
-		be initialized.
-		
-		You can still disable something completely if it's causing problems by setting it to false
-		explicitly.
-		
-		With this disabled, most changes to config options will not take effect until the game is
-		restarted.
-
 general.reduced_motion
 	name: Reduced Motion
 	since: 1.2
 	sides: client_only
 	desc:
 		Disables high-motion animations in the Fabrication config screen.
+
+general.dark_mode
+	name: Dark Mode
+	since: 2.0.0
+	sides: client_only
+	desc:
+		Makes the config screen darker.
 
 general.data_upload
 	name: Data Upload
@@ -328,7 +321,7 @@ fixes.silverfish_step
 
 fixes.open_inventories_in_nether_portal
 	name: Open Inventories in Nether Portals
-	since: 1.4.0
+	since: 1.3.5
 	sides: client_only
 	media: https://unascribed.com/fabrication/open_inventories_in_nether_portal.mp4
 	desc:
@@ -546,7 +539,7 @@ utility.mob_ids
 
 utility.toggle_sprint
 	name: Toggle Sprint
-	since: 1.4.0
+	since: 1.3.5
 	sides: client_only
 	needs: events
 	desc:
@@ -574,6 +567,14 @@ utility.ping_privacy
 		track their uptime and who's connected, which will then turn around and store the name
 		history of discovered users permanently and make their cape publicly searchable, among
 		other things.
+
+utility.show_bee_count_on_item
+	name: Show Bee Count
+	since: 1.3.5
+	sides: client_only
+	default: never
+	desc:
+		Makes bee hive items show amount of contained bees.
 
 tweaks
 	name: Tweaks
@@ -766,9 +767,9 @@ tweaks.cracking_spawn_eggs
 tweaks.ghost_chest_woo_woo
 	name: Ghost Chest Woo Woo
 	hidden: true
+	default: never
 	since: 1.0
 	sides: client_only
-	default: never
 	desc:
 		?
 
@@ -828,14 +829,14 @@ tweaks.alt_absorption_sound
 
 tweaks.silent_minecarts
 	name: Silent Minecarts
-	since: 1.4.0
+	since: 1.3.5
 	sides: client_only
 	desc:
 		Makes minecarts silent.
 
 tweaks.see_items_while_riding
 	name: See Held Items While Riding
-	since: 1.4.0
+	since: 1.3.5
 	sides: client_only
 	desc:
 		Allows players to see held items while riding entities like boats.
@@ -1056,7 +1057,7 @@ minor_mechanics.crawling
 
 minor_mechanics.unsaddle_creatures
 	name: Unsaddle Creatures
-	since: 1.4.0
+	since: 1.3.5
 	sides: server_only
 	media: https://unascribed.com/fabrication/unsaddle_creatures.mp4
 	desc:
@@ -1346,7 +1347,7 @@ balance.loading_furnace_minecart
 
 balance.ender_dragon_full_xp
 	name: Full Ender Dragon XP
-	since: 1.4.0
+	since: 1.3.5
 	sides: server_only
 	default: burnt
 	desc:
@@ -1354,7 +1355,7 @@ balance.ender_dragon_full_xp
 
 balance.ender_dragon_always_spawn_egg
 	name: Ender Dragon Always Spawns Dragon Egg
-	since: 1.4.0
+	since: 1.3.5
 	sides: server_only
 	default: burnt
 	desc:
@@ -1362,7 +1363,7 @@ balance.ender_dragon_always_spawn_egg
 
 balance.anvil_full_repair
 	name: Anvil Fully Repairs
-	since: 1.4.0
+	since: 1.3.5
 	sides: server_only
 	media: https://unascribed.com/fabrication/anvil_full_repair.mp4
 	default: burnt
@@ -1371,7 +1372,7 @@ balance.anvil_full_repair
 
 balance.mobs_dont_drop_ingots
 	name: Mobs Drop Less Metal
-	since: 1.4.0
+	since: 1.3.5
 	sides: server_only
 	media: https://unascribed.com/fabrication/mobs_dont_drop_ingots.mp4
 	default: burnt
@@ -1380,7 +1381,7 @@ balance.mobs_dont_drop_ingots
 
 balance.disable_mending_trade
 	name: Disable Mending Trade
-	since: 1.4.0
+	since: 1.3.5
 	sides: server_only
 	default: burnt
 	desc:
@@ -1388,7 +1389,7 @@ balance.disable_mending_trade
 
 balance.disable_mending
 	name: Disable Mending
-	since: 1.4.0
+	since: 1.3.5
 	sides: server_only
 	media: https://unascribed.com/fabrication/disable_mending.mp4
 	default: burnt
@@ -1397,7 +1398,7 @@ balance.disable_mending
 
 balance.disable_pearl_stasis
 	name: Disable Storing Thrown Ender Pearls
-	since: 1.4.0
+	since: 1.3.5
 	sides: server_only
 	default: burnt
 	desc:
@@ -1538,7 +1539,7 @@ weird_tweaks.endermen_dont_grief
 
 weird_tweaks.item_safe_cactus
 	name: Item Safe Cactus
-	since: 1.4.0
+	since: 1.3.5
 	sides: server_only
 	media: https://unascribed.com/fabrication/item_safe_cactus.mp4
 	desc:
@@ -1546,7 +1547,7 @@ weird_tweaks.item_safe_cactus
 
 weird_tweaks.blaze_fertilizer
 	name: Blaze Powder Grows Nether Wart
-	since: 1.4.0
+	since: 1.3.5
 	sides: server_only
 	media: https://unascribed.com/fabrication/blaze_fertilizer.mp4
 	desc:
@@ -1554,21 +1555,21 @@ weird_tweaks.blaze_fertilizer
 
 weird_tweaks.use_items_while_riding
 	name: Use Items While Riding
-	since: 1.4.0
+	since: 1.3.5
 	sides: client_only
 	desc:
 		Allows players to use items and attack while riding entities like boats.
 
 weird_tweaks.villagers_follow_emerald_blocks
 	name: Villagers Follow Emerald Blocks
-	since: 1.4.0
+	since: 1.3.5
 	sides: server_only
 	desc:
 		Villagers will follow players holding emerald blocks.
 
 weird_tweaks.disable_nether_fog
 	name: Disable Nether Fog
-	since: 1.4.0
+	since: 1.3.5
 	sides: client_only
 	media: https://unascribed.com/fabrication/disable_nether_fog.mp4
 	desc:
@@ -1576,7 +1577,7 @@ weird_tweaks.disable_nether_fog
 
 weird_tweaks.disable_night_skip
 	name: Disable Night Skip
-	since: 1.4.0
+	since: 1.3.5
 	sides: server_only
 	media: https://unascribed.com/fabrication/disable_night_skip.mp4
 	desc:
@@ -1720,7 +1721,7 @@ woina.old_sheep_shear
 
 woina.no_sprint
 	name: No Sprint
-	since: 1.4.0
+	since: 1.3.5
 	sides: server_only
 	default: ash
 	desc:
@@ -1728,7 +1729,7 @@ woina.no_sprint
 
 woina.instant_eat
 	name: Instant Eat
-	since: 1.4.0
+	since: 1.3.5
 	sides: server_only
 	media: https://unascribed.com/fabrication/instant_eat.mp4
 	default: ash
@@ -1737,7 +1738,7 @@ woina.instant_eat
 
 woina.dirt_screen
 	name: Dirt Screen
-	since: 1.4.0
+	since: 1.3.5
 	sides: client_only
 	default: ash
 	desc:
@@ -1745,7 +1746,7 @@ woina.dirt_screen
 
 woina.old_tooltip
 	name: Old Tooltip
-	since: 1.4.0
+	since: 1.3.5
 	sides: client_only
 	media: https://unascribed.com/fabrication/old_tooltip.mp4
 	default: ash
@@ -1754,7 +1755,7 @@ woina.old_tooltip
 
 woina.instant_bow
 	name: Instant Bow
-	since: 1.4.0
+	since: 1.3.5
 	sides: server_only
 	media: https://unascribed.com/fabrication/instant_bow.mp4
 	default: ash
@@ -1763,7 +1764,7 @@ woina.instant_bow
 
 woina.no_hand_sway
 	name: No Hand Sway
-	since: 1.4.0
+	since: 1.3.5
 	sides: client_only
 	media: https://unascribed.com/fabrication/no_hand_sway.mp4
 	default: ash
@@ -1880,7 +1881,7 @@ situational.disable_villagers
 
 situational.item_frame_no_name_display
 	name: Item Frames Don't Display Name Tags
-	since: 1.4.0
+	since: 1.3.5
 	sides: client_only
 	media: https://unascribed.com/fabrication/item_frame_no_name_display.mp4
 	desc:
@@ -1888,7 +1889,7 @@ situational.item_frame_no_name_display
 
 situational.static_dragon_egg
 	name: Static Dragon Egg
-	since: 1.4.0
+	since: 1.3.5
 	sides: server_only
 	media: https://unascribed.com/fabrication/static_dragon_egg.mp4
 	default: burnt
