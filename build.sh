@@ -17,7 +17,7 @@ echo Building Fabrication...
 ./gradlew clean build
 rm build/libs/*-dev.jar
 fabrication=$(echo build/libs/fabrication*.jar)
-zip -d "$fabrication" com/mrcrayfish/*
+zip -d "$fabrication" com/mrcrayfish/* svenhjol/charm/*
 if [ "$canforgery" == "1" ]; then
 	forgery=$(echo "$fabrication" | sed "s/fabrication/forgery/")
 	tmp=$(mktemp -d)
