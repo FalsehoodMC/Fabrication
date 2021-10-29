@@ -591,14 +591,6 @@ tweaks
 	desc:
 		Minor changes that fit with vanilla.
 
-tweaks.creepers_explode_when_on_fire
-	name: Creepers Explode When On Fire
-	since: 1.0
-	sides: server_only
-	media: https://unascribed.com/fabrication/creepers_explode_when_on_fire.mp4
-	desc:
-		Causes creepers to light their fuses when lit on fire. Just because.
-
 tweaks.tridents_in_void_return
 	name: Tridents In Void Return
 	since: 1.0
@@ -1441,6 +1433,15 @@ weird_tweaks
 	default: vienna
 	desc:
 		Opinionated changes.
+
+weird_tweaks.creepers_explode_when_on_fire
+	name: Creepers Explode When On Fire
+	since: 1.0
+	sides: server_only
+	default: never
+	media: https://unascribed.com/fabrication/creepers_explode_when_on_fire.mp4
+	desc:
+		Causes creepers to light their fuses when lit on fire. Just because.
 
 weird_tweaks.endermen_dont_squeal
 	name: Endermen Don't Squeal
