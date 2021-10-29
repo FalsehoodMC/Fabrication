@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(InventoryScreen.class)
-@EligibleIf(configAvailable="*.recipe_book_auto_craft", envMatches=Env.CLIENT)
+@EligibleIf(configEnabled="*.recipe_book_auto_craft", envMatches=Env.CLIENT)
 public abstract class MixinInventoryScreen extends AbstractInventoryScreen<PlayerScreenHandler> {
 
 	public MixinInventoryScreen(PlayerScreenHandler screenHandler, PlayerInventory playerInventory, Text text) {

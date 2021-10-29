@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ItemEntity.class)
-@EligibleIf(configAvailable="*.dropped_items_dont_stack")
+@EligibleIf(configEnabled="*.dropped_items_dont_stack")
 public abstract class MixinItemEntity {
 
 	@Inject(at=@At("HEAD"), method="canMerge()Z", cancellable=true)

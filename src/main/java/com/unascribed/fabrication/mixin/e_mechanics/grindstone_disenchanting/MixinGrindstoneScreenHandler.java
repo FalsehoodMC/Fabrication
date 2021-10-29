@@ -17,7 +17,7 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 
 @Mixin(GrindstoneScreenHandler.class)
-@EligibleIf(configAvailable="*.grindstone_disenchanting", modNotLoaded="fabric:grindenchantments")
+@EligibleIf(configEnabled="*.grindstone_disenchanting", modNotLoaded="fabric:grindenchantments")
 public abstract class MixinGrindstoneScreenHandler extends ScreenHandler {
 
 	protected MixinGrindstoneScreenHandler(ScreenHandlerType<?> type, int syncId) {

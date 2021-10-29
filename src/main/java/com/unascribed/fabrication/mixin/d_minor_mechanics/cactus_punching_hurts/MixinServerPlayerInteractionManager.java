@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ServerPlayerInteractionManager.class)
-@EligibleIf(configAvailable="*.cactus_punching_hurts")
+@EligibleIf(configEnabled="*.cactus_punching_hurts")
 public class MixinServerPlayerInteractionManager {
 
 	@Shadow @Final protected ServerPlayerEntity player;
