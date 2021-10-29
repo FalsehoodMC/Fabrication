@@ -840,17 +840,6 @@ tweaks.see_items_while_riding
 	desc:
 		Allows players to see held items while riding entities like boats.
 
-tweaks.no_set_window_pos
-	name: No Set Window Pos
-	since: 1.3.2
-	sides: client_only
-	default: vienna
-	desc:
-		Prevents the game from manually modifying the window position. So if you have custom configs
-		or something that memorizes window positions, they will be honored instead of the window
-		always being centered.
-
-
 tweaks.campfires_cook_entities
 	name: Campfires Cook Entities
 	since: 1.4.0
@@ -1929,3 +1918,12 @@ experiments.packed_atlases
 		textures since forever.
 		
 		Possibly reduces VRAM usage. May reduce performance. Might cause incompatibilites.
+
+experiments.no_set_window_pos
+	name: No Set Window Pos
+	since: 1.3.2
+	sides: client_only
+	desc:
+		Prevents the game from manually modifying the window position. So if you have custom configs
+		or something that memorizes window positions, they will be honored instead of the window
+		always being centered.
