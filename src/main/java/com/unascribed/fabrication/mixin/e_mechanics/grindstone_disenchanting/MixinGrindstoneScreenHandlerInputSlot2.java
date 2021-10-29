@@ -13,7 +13,7 @@ import net.minecraft.item.Items;
 import net.minecraft.screen.slot.Slot;
 
 @Mixin(targets="net.minecraft.screen.GrindstoneScreenHandler$3")
-@EligibleIf(configAvailable="*.grindstone_disenchanting")
+@EligibleIf(configAvailable="*.grindstone_disenchanting", modNotLoaded="fabric:grindenchantments")
 public class MixinGrindstoneScreenHandlerInputSlot2 extends Slot {
 
 	public MixinGrindstoneScreenHandlerInputSlot2(Inventory inventory, int index, int x, int y) {
