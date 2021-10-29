@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(BoneMealItem.class)
-@EligibleIf(configAvailable="*.leaves_grow_grass", envMatches=Env.CLIENT)
+@EligibleIf(configEnabled="*.leaves_grow_grass", envMatches=Env.CLIENT)
 public abstract class MixinBoneMealItem {
 
 	@Inject(at=@At("HEAD"), method="useOnBlock(Lnet/minecraft/item/ItemUsageContext;)Lnet/minecraft/util/ActionResult;", cancellable=true)

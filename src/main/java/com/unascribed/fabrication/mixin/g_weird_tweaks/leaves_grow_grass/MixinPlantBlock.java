@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PlantBlock.class)
-@EligibleIf(configAvailable="*.leaves_grow_grass", envMatches=Env.CLIENT)
+@EligibleIf(configEnabled="*.leaves_grow_grass", envMatches=Env.CLIENT)
 public abstract class MixinPlantBlock {
 
 	@Inject(at=@At("HEAD"), method="canPlantOnTop(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)Z", cancellable=true)

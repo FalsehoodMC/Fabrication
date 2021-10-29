@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LivingEntity.class)
-@EligibleIf(configAvailable="*.campfires_cook_entities")
+@EligibleIf(configEnabled="*.campfires_cook_entities")
 public class MixinLivingEntity {
 
 	@Inject(at=@At("HEAD"), method= "drop(Lnet/minecraft/entity/damage/DamageSource;)V")

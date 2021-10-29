@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(PersistentProjectileEntity.class)
-@EligibleIf(configAvailable="*.tridents_activate_levers")
+@EligibleIf(configEnabled="*.tridents_activate_levers")
 public abstract class MixinPersistentProjectileEntity {
 
 	@Inject(at=@At("HEAD"), method="onBlockHit(Lnet/minecraft/util/hit/BlockHitResult;)V")
