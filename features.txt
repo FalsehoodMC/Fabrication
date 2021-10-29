@@ -50,7 +50,7 @@ atlas_viewer
 
 search
 	name: Search
-	since: 2.0.0
+	since: 1.4.0
 	meta: true
 	desc:
 
@@ -332,7 +332,7 @@ fixes.open_inventories_in_nether_portal
 
 fixes.fix_superflat_bad_structures
 	name: Fix Superflat Bad Structures
-	since: 1.3.5
+	since: 1.4.0
 	sides: either
 	desc:
 		Fixes a bug that some biome-adding mods have that causes their structure features to be
@@ -555,16 +555,29 @@ utility.show_map_id
 	desc:
 		Makes filled maps show their ID.
 
+utility.ping_privacy
+	name: Ping Privacy
+	since: 1.4.0
+	sides: server_only
+	media: https://unascribed.com/fabrication/ping_privacy.png
+	desc:
+		Sends no ping data to IPs that have not successfully logged in in the last 7 days.
+		
+		Prevents scraping. There exist services that constantly ping servers they know about and
+		track their uptime and who's connected, which will then turn around and store the name
+		history of discovered users permanently and make their cape publicly searchable, among
+		other things.
+
 utility.show_bee_count_tooltip
 	name: Show Bee Count
-	since: 1.3.5
+	since: 1.4.0
 	sides: client_only
 	desc:
 		Makes bee hive tooltips show amount of contained bees.
 
 utility.show_bee_count_on_item
 	name: Show Bee Count
-	since: 1.3.5
+	since: 1.4.0
 	sides: client_only
 	default: never
 	desc:
@@ -848,21 +861,21 @@ tweaks.no_set_window_pos
 
 tweaks.campfires_cook_entities
 	name: Campfires Cook Entities
-	since: 1.3.5
+	since: 1.4.0
 	sides: server_only
 	desc:
 		Campfires will cook entities without setting them on fire.
 
 tweaks.campfires_ignite_entities
 	name: Campfires Ignite Entities
-	since: 1.3.5
+	since: 1.4.0
 	sides: server_only
 	desc:
 		Campfires will set fire to mobs standing on them, therefore also cooking them.
 
 tweaks.recipe_book_auto_craft
 	name: Recipe Book Auto Craft
-	since: 1.3.5
+	since: 1.4.0
 	sides: client_only
 	desc:
 		Recipe book crafts items instead of moving them to the crafting area.
@@ -1067,14 +1080,14 @@ minor_mechanics.unsaddle_creatures
 
 minor_mechanics.cactus_punching_hurts
 	name: Cactus Punching Hurts
-	since: 1.3.5
+	since: 1.4.0
 	sides: server_only
 	desc:
 		Breaking cactus with your hand will damage you the same as hugging it.
 
 minor_mechanics.tridents_activate_levers
 	name: Tridents Activate Levers
-	since: 1.3.5
+	since: 1.4.0
 	sides: server_only
 	desc:
 		When a trident hits a lever it will toggle it.
@@ -1409,14 +1422,14 @@ balance.disable_pearl_stasis
 
 balance.disable_elytra_boost
 	name: Disable Elytra Boost
-	since: 1.3.5
+	since: 1.4.0
 	sides: server_only
 	desc:
 		Prevent Elytra boosting using firework rockets.
 
 balance.pickup_skeleton_arrows
 	name: Pickup Skeleton Arrows
-	since: 1.3.5
+	since: 1.4.0
 	sides: server_only
 	desc:
 		Arrows shot by skeletons can be picked up.
@@ -1587,7 +1600,7 @@ weird_tweaks.disable_night_skip
 
 weird_tweaks.leaves_grow_grass
 	name: Leaves Grow Grass
-	since: 1.3.5
+	since: 1.4.0
 	sides: server_only
 	desc:
 		Grass and tall grass can be placed on leaves.
@@ -1775,7 +1788,7 @@ woina.no_hand_sway
 
 woina.dropped_items_dont_stack
 	name: Dropped Items Don't Stack
-	since: 1.3.5
+	since: 1.4.0
 	sides: server_only
 	desc:
 		When dropping items of the same type they don't merge into a bigger stack.
@@ -1872,7 +1885,7 @@ situational.disable_bees
 
 situational.disable_villagers
 	name: Disable Villagers
-	since: 1.3.5
+	since: 1.4.0
 	sides: either
 	desc:
 		Prevents villages from generating and zombie villagers from spawning.
