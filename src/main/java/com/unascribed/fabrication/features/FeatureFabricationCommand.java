@@ -12,7 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import com.mojang.brigadier.Command;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.CommandNode;
 import com.unascribed.fabrication.Agnos;
@@ -26,6 +28,7 @@ import com.unascribed.fabrication.logic.PlayerTag;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.MixinConfigPlugin.Profile;
+import com.unascribed.fabrication.support.OptionalFScript;
 import com.unascribed.fabrication.util.Cardinal;
 
 import com.google.common.base.Charsets;
@@ -68,6 +71,7 @@ public class FeatureFabricationCommand implements Feature {
 			try {
 				LiteralArgumentBuilder<ServerCommandSource> root = LiteralArgumentBuilder.<ServerCommandSource>literal("fabrication");
 				addConfig(root, dedi);
+				if (Agnos.isModLoaded("fscript")) addFScript(root, dedi);
 				
 				LiteralArgumentBuilder<ServerCommandSource> tag = LiteralArgumentBuilder.<ServerCommandSource>literal("tag");
 				tag.requires(scs -> MixinConfigPlugin.isEnabled("*.taggable_players") && scs.hasPermissionLevel(2));
@@ -391,7 +395,31 @@ public class FeatureFabricationCommand implements Feature {
 		root.then(config);
 	}
 
-	private static void sendFeedback(CommandContext<? extends CommandSource> c, LiteralText text, boolean broadcast) {
+	public static <T extends CommandSource> void addFScript(LiteralArgumentBuilder<T> root, boolean dediServer) {
+		LiteralArgumentBuilder<T> script = LiteralArgumentBuilder.<T>literal("fscript");
+		script.requires(s -> s.hasPermissionLevel(2));
+		{
+			LiteralArgumentBuilder<T> set = LiteralArgumentBuilder.<T>literal("set");
+			for (String s : OptionalFScript.predicateProviders.keySet()) {
+				if (dediServer && FeaturesFile.get(s).sides == FeaturesFile.Sides.CLIENT_ONLY) continue;
+				LiteralArgumentBuilder<T> key = LiteralArgumentBuilder.<T>literal(s);
+				RequiredArgumentBuilder<T, String> value =
+						RequiredArgumentBuilder.<T, String>argument("script", StringArgumentType.string())
+								.executes((c) -> {
+									OptionalFScript.setScript(c, s, c.getArgument("script", String.class));
+									return 1;
+								});
+				key.then(value);
+				set.then(key);
+				if (s.contains("."))
+					set.then(LiteralArgumentBuilder.<T>literal("*"+s.substring(s.indexOf('.'))).then(value));
+			}
+			script.then(set);
+		}
+		root.then(script);
+	}
+
+	public static void sendFeedback(CommandContext<? extends CommandSource> c, LiteralText text, boolean broadcast) {
 		if (c.getSource() instanceof ServerCommandSource) {
 			((ServerCommandSource)c.getSource()).sendFeedback(text, broadcast);
 		} else {

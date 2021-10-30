@@ -2,6 +2,7 @@ package com.unascribed.fabrication.mixin.i_woina.no_sprint;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+import com.unascribed.fabrication.support.MixinConfigPredicates;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -22,7 +23,7 @@ abstract public class MixinLivingEntity extends Entity {
 
 	@Inject(at=@At("HEAD"), method="setSprinting(Z)V", cancellable = true)
 	public void setSprinting(boolean sprinting, CallbackInfo ci) {
-		if (MixinConfigPlugin.isEnabled("*.no_sprint")) {
+		if (MixinConfigPlugin.isEnabled("*.no_sprint") && MixinConfigPredicates.shouldRun("*.no_sprint", (LivingEntity)(Object)this)) {
 			super.setSprinting(false);
 			ci.cancel();
 		}

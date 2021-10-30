@@ -2,6 +2,7 @@ package com.unascribed.fabrication.mixin.i_woina.instant_bow;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+import com.unascribed.fabrication.support.MixinConfigPredicates;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BowItem;
 import net.minecraft.item.ItemStack;
@@ -20,7 +21,7 @@ public class MixinBowItem {
 	@Inject(method = "use(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/TypedActionResult;",
 			at = @At("HEAD"), cancellable = true)
 	private void getUseAction(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<TypedActionResult<ItemStack>> cir){
-		if(MixinConfigPlugin.isEnabled("*.instant_bow")) {
+		if(MixinConfigPlugin.isEnabled("*.instant_bow") && MixinConfigPredicates.shouldRun("*.instant_bow", user)) {
 			ItemStack itemStack = user.getStackInHand(hand);
 			Object self = this;
 			if (user.getAbilities().creativeMode || !user.getArrowType(itemStack).isEmpty()) {
