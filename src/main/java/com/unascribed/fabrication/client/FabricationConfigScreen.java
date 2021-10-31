@@ -7,6 +7,8 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
+import com.unascribed.fabrication.support.OptionalFScriptScreen;
+import net.minecraft.client.MinecraftClient;
 import org.apache.commons.lang3.ArrayUtils;
 import org.lwjgl.opengl.GL11;
 
@@ -82,7 +84,7 @@ public class FabricationConfigScreen extends Screen {
 			.put(Profile.BURNT, 0xFF12181B)
 			.put(Profile.ASH, 0xFFAAAAAA)
 			.build();
-	
+
 	private static final Identifier BG = new Identifier("fabrication", "bg.png");
 	private static final Identifier BG_DARK = new Identifier("fabrication", "bg-dark.png");
 	private static final Identifier BG_GRAD = new Identifier("fabrication", "bg-grad.png");
@@ -268,8 +270,10 @@ public class FabricationConfigScreen extends Screen {
 			client.setScreen(parent);
 		}
 	}
-
 	private void drawBackground(MatrixStack matrices, int mouseX, int mouseY, float delta, int cutoffX, int cutoffY) {
+		drawBackground(height, width, client, prideFlag, selectedSection == null ? 10-selectTime : prevSelectedSection == null ? selectTime : 0, matrices, mouseX, mouseY, delta, cutoffX, cutoffY);
+	}
+	public static void drawBackground(int height, int width, MinecraftClient client, PrideFlag prideFlag, float time, MatrixStack matrices, int mouseX, int mouseY, float delta, int cutoffX, int cutoffY) {
 		float cutoffV = cutoffY/(float)height;
 		Identifier bg = MixinConfigPlugin.isEnabled("general.dark_mode") ? BG_DARK : BG;
 		Identifier bgGrad = MixinConfigPlugin.isEnabled("general.dark_mode") ? BG_GRAD_DARK : BG_GRAD;
@@ -278,8 +282,6 @@ public class FabricationConfigScreen extends Screen {
 		
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
-		float time = selectedSection == null ? 10-selectTime : prevSelectedSection == null ? selectTime : 0;
-		
 		RenderSystem.disableCull();
 
 		RenderSystem.setShaderColor(1, 1, 1, 1);
@@ -975,6 +977,12 @@ public class FabricationConfigScreen extends Screen {
 				drawTexture(matrices, 134+38, 1, 30, 0, 15, 9, 60, 9);
 			} else {
 				drawTexture(matrices, 134, 1, 0, 0, 60, 9, 60, 9);
+			}
+		}
+		//TODO
+		if (FeaturesFile.get(key).fscript != null && Agnos.isModLoaded("fscript")){
+			if (drawButton(matrices, width-60, 2, 60, 15, "PLACEHOLDEr", mouseX, (mouseY >= y+1 && mouseY <= y+10)? 2 : 0)){
+				client.setScreen(new OptionalFScriptScreen(this, prideFlag, title, key));
 			}
 		}
 		RenderSystem.disableTexture();

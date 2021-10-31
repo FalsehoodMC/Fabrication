@@ -4,6 +4,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.features.FeatureFabricationCommand;
+import com.unascribed.fabrication.loaders.LoaderFScript;
 import net.minecraft.command.CommandSource;
 import net.minecraft.text.LiteralText;
 import tf.ssf.sfort.script.Default;
@@ -31,6 +32,7 @@ public class OptionalFScript {
         configKey = MixinConfigPlugin.remap(configKey);
         if (ConfigPredicates.predicateDefaults.containsKey(configKey)) ConfigPredicates.predicates.put(configKey, ConfigPredicates.predicateDefaults.get(configKey));
         else ConfigPredicates.predicates.remove(configKey);
+        LoaderFScript.put(configKey, null);
     }
     private static<T> void setScript(String configKey, String script, Consumer<Exception> exceptionConsumer){
         configKey = MixinConfigPlugin.remap(configKey);
@@ -46,6 +48,7 @@ public class OptionalFScript {
                 return;
             }
             ConfigPredicates.predicates.put(configKey, predicate);
+            LoaderFScript.put(configKey, script);
         }catch (Exception e){
             exceptionConsumer.accept(e);
         }

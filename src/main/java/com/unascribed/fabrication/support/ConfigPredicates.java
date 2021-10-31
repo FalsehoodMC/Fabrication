@@ -7,6 +7,7 @@ import net.minecraft.entity.LivingEntity;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class ConfigPredicates {
 
@@ -33,6 +34,6 @@ public class ConfigPredicates {
         predicateDefaults.put("tweaks.feather_falling_no_trample",
                 (Predicate<LivingEntity>) livingEntity -> EnchantmentHelper.getEquipmentLevel(Enchantments.FEATHER_FALLING, livingEntity)>=1
         );
-        predicates = predicateDefaults;
+        predicates = predicateDefaults.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }

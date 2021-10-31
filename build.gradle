@@ -43,7 +43,7 @@ dependencies {
 	modImplementation("com.terraformersmc:modmenu:2.0.3") {
 		transitive = false
 	}
-	modImplementation("tf.ssf.sfort:fscript:1.1.2") {
+	modImplementation("tf.ssf.sfort:fscript:1.1.4") {
 		transitive = false
 	}
 	modRuntime fabricApi.module("fabric-screen-api-v1", "${project.fabric_version}")
