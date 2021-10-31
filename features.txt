@@ -786,6 +786,7 @@ tweaks.feather_falling_no_trample
 	name: Feather Falling No Trample
 	since: 1.3.0
 	sides: server_only
+	fscript: living_entity
 	media: https://unascribed.com/fabrication/feather_falling_no_trample.mp4
 	desc:
 		Farmland will not get trampled when wearing feather falling.
@@ -1328,6 +1329,7 @@ balance.food_always_edible
 	name: Food Always Edible
 	since: 1.3.0
 	sides: server_only
+	fscript: player_entity
 	default: burnt
 	desc:
 		Allows players to eat unconditionally.
@@ -1397,6 +1399,7 @@ balance.disable_mending
 	name: Disable Mending
 	since: 1.4.0
 	sides: server_only
+	fscript: player_entity
 	media: https://unascribed.com/fabrication/disable_mending.mp4
 	default: burnt
 	desc:
@@ -1415,6 +1418,7 @@ balance.disable_elytra_boost
 	name: Disable Elytra Boost
 	since: 1.4.0
 	sides: server_only
+	fscript: player_entity
 	desc:
 		Prevent Elytra boosting using firework rockets.
 
@@ -1540,6 +1544,7 @@ weird_tweaks.instant_pickup
 	name: Instant Pickup
 	since: 1.3.2
 	sides: server_only
+	fscript: player_entity
 	media: https://unascribed.com/fabrication/instant_pickup.mp4
 	desc:
 		Drops from blocks and entities are instantly placed in your inventory if there's room. This
@@ -1738,6 +1743,7 @@ woina.no_sprint
 	name: No Sprint
 	since: 1.4.0
 	sides: server_only
+	fscript: living_entity
 	default: ash
 	desc:
 		Disable sprinting.

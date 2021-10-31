@@ -2,6 +2,7 @@ package com.unascribed.fabrication.support;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.unascribed.fabrication.FabLog;
+import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.features.FeatureFabricationCommand;
 import net.minecraft.command.CommandSource;
 import net.minecraft.text.LiteralText;
@@ -9,20 +10,15 @@ import tf.ssf.sfort.script.Default;
 import tf.ssf.sfort.script.PredicateProvider;
 import tf.ssf.sfort.script.ScriptParser;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class OptionalFScript {
-    public static Map<String, Object> predicateProviders = new HashMap<>();
+    public static Map<String, PredicateProvider<?>> predicateProviders;
     static {
-        predicateProviders.put("tweaks.feather_falling_no_trample", Default.LIVING_ENTITY);
-        predicateProviders.put("balance.food_always_edible", Default.PLAYER_ENTITY);
-        predicateProviders.put("balance.disable_mending", Default.PLAYER_ENTITY);
-        predicateProviders.put("balance.disable_elytra_boost", Default.PLAYER_ENTITY);
-        predicateProviders.put("woina.instant_bow", Default.PLAYER_ENTITY);
-        predicateProviders.put("woina.no_sprint", Default.LIVING_ENTITY);
+        predicateProviders = FeaturesFile.getAll().entrySet().stream().filter(f -> f.getValue().fscript != null).collect(Collectors.toMap(Map.Entry::getKey, v -> Default.getDefaultMap().get(v.getValue().fscript)));
     }
 
     public static<T> void setScript(CommandContext<? extends CommandSource> c, String configKey, String script){
