@@ -31,6 +31,11 @@ public class OptionalFScript {
     public static<T> void setScript(String configKey, String script){
         setScript(configKey, script, e -> FabLog.error("Failed to set script for "+configKey, e));
     }
+    public static void restoreDefault(String configKey){
+        configKey = MixinConfigPlugin.remap(configKey);
+        if (ConfigPredicates.predicateDefaults.containsKey(configKey)) ConfigPredicates.predicates.put(configKey, ConfigPredicates.predicateDefaults.get(configKey));
+        else ConfigPredicates.predicates.remove(configKey);
+    }
     private static<T> void setScript(String configKey, String script, Consumer<Exception> exceptionConsumer){
         configKey = MixinConfigPlugin.remap(configKey);
         try {
@@ -44,7 +49,7 @@ public class OptionalFScript {
                 exceptionConsumer.accept(new Exception("FScript returned null, likely because an invalid script was given"));
                 return;
             }
-            MixinConfigPredicates.predicates.put(configKey, predicate);
+            ConfigPredicates.predicates.put(configKey, predicate);
         }catch (Exception e){
             exceptionConsumer.accept(e);
         }

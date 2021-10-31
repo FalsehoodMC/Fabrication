@@ -3,7 +3,7 @@ package com.unascribed.fabrication.mixin.c_tweaks.feather_falling_no_trample;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 
-import com.unascribed.fabrication.support.MixinConfigPredicates;
+import com.unascribed.fabrication.support.ConfigPredicates;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FarmlandBlock;
@@ -30,7 +30,7 @@ public abstract class MixinFarmBlock extends Block {
 			at=@At("HEAD"), cancellable=true)
 	public void onLandedUpon(World world, BlockState state, BlockPos pos, Entity entity, float fallDistance, CallbackInfo ci) {
 		if (MixinConfigPlugin.isEnabled("*.feather_falling_no_trample") && entity instanceof LivingEntity
-				&& (EnchantmentHelper.getEquipmentLevel(Enchantments.FEATHER_FALLING, (LivingEntity)entity) >= 1 || MixinConfigPredicates.shouldRun("*.feather_falling_no_trample", (LivingEntity)entity, false))) {
+				&& ConfigPredicates.shouldRun("*.feather_falling_no_trample", (LivingEntity)entity, false)) {
 			super.onLandedUpon(world, state, pos, entity, fallDistance);
 			ci.cancel();
 		}

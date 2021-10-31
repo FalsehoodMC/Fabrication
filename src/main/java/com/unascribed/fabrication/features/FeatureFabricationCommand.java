@@ -25,6 +25,7 @@ import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.FeaturesFile.Sides;
 import com.unascribed.fabrication.interfaces.TaggablePlayer;
 import com.unascribed.fabrication.logic.PlayerTag;
+import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.MixinConfigPlugin.Profile;
@@ -415,6 +416,20 @@ public class FeatureFabricationCommand implements Feature {
 					set.then(LiteralArgumentBuilder.<T>literal("*"+s.substring(s.indexOf('.'))).then(value));
 			}
 			script.then(set);
+
+			LiteralArgumentBuilder<T> unset = LiteralArgumentBuilder.<T>literal("unset");
+			for (String s : OptionalFScript.predicateProviders.keySet()) {
+				if (dediServer && FeaturesFile.get(s).sides == FeaturesFile.Sides.CLIENT_ONLY) continue;
+				LiteralArgumentBuilder<T> key = LiteralArgumentBuilder.<T>literal(s).executes((c) -> {
+					OptionalFScript.restoreDefault(s);
+					sendFeedback(c, new LiteralText("Restored default behaviour for "+s), true);
+					return 1;
+				});
+				unset.then(key);
+				if (s.contains("."))
+					unset.then(LiteralArgumentBuilder.<T>literal("*"+s.substring(s.indexOf('.'))).executes(key.getCommand()));
+			}
+			script.then(unset);
 		}
 		root.then(script);
 	}
