@@ -13,7 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicReference;
 
 @EligibleIf(envMatches=Env.CLIENT)
 public class LoaderFScript implements ConfigLoader {
@@ -24,12 +24,31 @@ public class LoaderFScript implements ConfigLoader {
 		if (scripts.containsKey(key)) return scripts.get(key);
 		return FeaturesFile.get(key).fscriptDefault;
 	}
-	//TODO save to file properly
+
 	public static void put(String key, String script) {
 		if(script == null) scripts.remove(key);
 		else scripts.put(key, script);
+
+		save();
+	}
+	public static void save(){
 		StringBuilder builder = new StringBuilder();
-		scripts.forEach((key1, value) -> builder.append(key1).append('=').append(value).append('\n'));
+		AtomicReference<String> catagory = new AtomicReference<>();
+		scripts.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach((entry) -> {
+			String key1 = entry.getKey();
+			int i = 0;
+			if(key1.contains(".")){
+				i = key1.indexOf('.');
+				String cat = key1.substring(0, i);
+				if (!cat.equals(catagory.get())){
+					builder.append('[').append(key1, 0, i).append(']').append('\n');
+					catagory.set(cat);
+				}
+				i++;
+			}
+			builder.append(key1, i, key1.length()).append('=').append(entry.getValue()).append('\n');
+		});
+
 		try {
 			if (lastPath != null) Files.writeString(lastPath, builder);
 		}catch (Exception e){
