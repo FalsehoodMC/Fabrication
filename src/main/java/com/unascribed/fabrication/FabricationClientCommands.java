@@ -1,9 +1,5 @@
 package com.unascribed.fabrication;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.concurrent.CompletableFuture;
-
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
@@ -17,8 +13,9 @@ import com.unascribed.fabrication.client.AtlasTracking;
 import com.unascribed.fabrication.client.AtlasViewerScreen;
 import com.unascribed.fabrication.features.FeatureFabricationCommand;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
-
-import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
+import com.unascribed.fabrication.support.OptionalFScript;
+import com.unascribed.fabrication.support.OptionalFScriptScreen;
+import io.github.queerbric.pride.PrideFlags;
 import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.SpriteAtlasTexture;
@@ -27,6 +24,10 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.concurrent.CompletableFuture;
 
 public class FabricationClientCommands {
 
@@ -57,6 +58,7 @@ public class FabricationClientCommands {
 	
 	public static void registerCommands(CommandDispatcher<FabricClientCommandSource> dispatcher) {
 		LiteralArgumentBuilder<FabricClientCommandSource> root = LiteralArgumentBuilder.<FabricClientCommandSource>literal("fabrication:client");
+		if (Agnos.isModLoaded("fscript")) addFScript(root);
 		FeatureFabricationCommand.addConfig(root, false);
 		if (!MixinConfigPlugin.isFailed("atlas_viewer")) {
 			root.then(LiteralArgumentBuilder.<FabricClientCommandSource>literal("atlas")
@@ -71,7 +73,25 @@ public class FabricationClientCommands {
 		}
 		dispatcher.register(root);
 	}
-
+	public static <T extends FabricClientCommandSource> void addFScript(LiteralArgumentBuilder<T> root) {
+		LiteralArgumentBuilder<T> script = LiteralArgumentBuilder.<T>literal("fscript");
+		{
+			LiteralArgumentBuilder<T> ui = LiteralArgumentBuilder.<T>literal("ui");
+			for (String s : OptionalFScript.predicateProviders.keySet()) {
+				LiteralArgumentBuilder<T> key = LiteralArgumentBuilder.<T>literal(s).executes((c) -> {
+					MinecraftClient.getInstance().send(() -> {
+						MinecraftClient.getInstance().setScreen(new OptionalFScriptScreen(null, PrideFlags.getRandomFlag(), FeaturesFile.get(s).name, s));
+					});
+					return 1;
+				});
+				ui.then(key);
+				if (s.contains("."))
+					ui.then(LiteralArgumentBuilder.<T>literal("*"+s.substring(s.indexOf('.'))).executes(key.getCommand()));
+			}
+			script.then(ui);
+		}
+		root.then(script);
+	}
 	public static void sendFeedback(CommandContext<? extends CommandSource> c, LiteralText text) {
 		((FabricClientCommandSource)c.getSource()).sendFeedback(new LiteralText("§b[CLIENT]§r ").append(text));
 	}
