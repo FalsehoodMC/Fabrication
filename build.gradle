@@ -24,7 +24,7 @@ repositories {
 		url = "https://maven.terraformersmc.com/releases"
 	}
 	maven {
-		url = 'https://sfort.github.io/fscript-mvn/'
+		url = 'https://maven.ssf.tf/'
 	}
 }
 
