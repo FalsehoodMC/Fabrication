@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @EligibleIf(envMatches=Env.CLIENT)
 public class LoaderFScript implements ConfigLoader {
@@ -23,10 +24,17 @@ public class LoaderFScript implements ConfigLoader {
 		if (scripts.containsKey(key)) return scripts.get(key);
 		return FeaturesFile.get(key).fscriptDefault;
 	}
-	//TODO save to file
+	//TODO save to file properly
 	public static void put(String key, String script) {
 		if(script == null) scripts.remove(key);
 		else scripts.put(key, script);
+		StringBuilder builder = new StringBuilder();
+		scripts.forEach((key1, value) -> builder.append(key1).append('=').append(value).append('\n'));
+		try {
+			if (lastPath != null) Files.writeString(lastPath, builder);
+		}catch (Exception e){
+			FabLog.error("Failed to write fscript.ini", e);
+		}
 	}
 
 	@Override

@@ -80,7 +80,7 @@ public class FabricationClientCommands {
 			for (String s : OptionalFScript.predicateProviders.keySet()) {
 				LiteralArgumentBuilder<T> key = LiteralArgumentBuilder.<T>literal(s).executes((c) -> {
 					MinecraftClient.getInstance().send(() -> {
-						MinecraftClient.getInstance().setScreen(new OptionalFScriptScreen(null, PrideFlags.getRandomFlag(), FeaturesFile.get(s).name, s));
+						MinecraftClient.getInstance().setScreen(new OptionalFScriptScreen(null, PrideFlags.isPrideMonth() ? PrideFlags.getRandomFlag() : null, FeaturesFile.get(s).name, s));
 					});
 					return 1;
 				});
