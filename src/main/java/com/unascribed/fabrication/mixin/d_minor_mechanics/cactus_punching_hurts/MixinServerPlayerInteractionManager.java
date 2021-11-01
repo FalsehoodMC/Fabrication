@@ -23,7 +23,7 @@ public class MixinServerPlayerInteractionManager {
 
 	@Inject(at=@At("HEAD"), method="continueMining(Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;I)F")
 	private void cactusHurt(BlockState state, BlockPos pos, int i, CallbackInfoReturnable<Float> cir) {
-		if (MixinConfigPlugin.isEnabled("*.cactus_punching_hurts") && 	state.isOf(Blocks.CACTUS) && player.getActiveItem().isEmpty()) player.damage(DamageSource.CACTUS, 1.0F);
+		if (MixinConfigPlugin.isEnabled("*.cactus_punching_hurts") && 	state.isOf(Blocks.CACTUS) && player.getMainHandStack().isEmpty()) player.damage(DamageSource.CACTUS, 1.0F);
 	}
 	
 }
