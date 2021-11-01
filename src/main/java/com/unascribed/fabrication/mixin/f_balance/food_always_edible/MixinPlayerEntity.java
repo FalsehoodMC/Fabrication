@@ -17,7 +17,7 @@ public class MixinPlayerEntity {
 	@Inject(method="canConsume(Z)Z", at=@At("HEAD"), cancellable=true)
 	public void canConsume(boolean ignoreHunger, CallbackInfoReturnable<Boolean> cir) {
 		if (!MixinConfigPlugin.isEnabled("*.food_always_edible")) return;
-		if (!ConfigPredicates.shouldRun("", (PlayerEntity)(Object)this)) return;
+		if (!ConfigPredicates.shouldRun("*.food_always_edible", (PlayerEntity)(Object)this)) return;
 		cir.setReturnValue(true);
 	}
 	

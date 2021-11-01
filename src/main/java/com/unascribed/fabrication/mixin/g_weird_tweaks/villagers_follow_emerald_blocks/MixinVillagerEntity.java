@@ -3,7 +3,6 @@ package com.unascribed.fabrication.mixin.g_weird_tweaks.villagers_follow_emerald
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.passive.MerchantEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
