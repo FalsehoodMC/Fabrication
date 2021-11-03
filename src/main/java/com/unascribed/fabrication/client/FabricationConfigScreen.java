@@ -151,6 +151,7 @@ public class FabricationConfigScreen extends Screen {
 	private TextFieldWidget searchField;
 	private Pattern queryPattern = Pattern.compile("");
 	private boolean emptyQuery = true;
+	private boolean searchingScriptable = false;
 	
 	public FabricationConfigScreen(Screen parent) {
 		super(new LiteralText("Fabrication configuration"));
@@ -203,6 +204,8 @@ public class FabricationConfigScreen extends Screen {
 			}
 		}
 		searchField = new TextFieldWidget(textRenderer, 131, 1, width-252, 14, searchField, new LiteralText("Search"));
+		if (Agnos.isModLoaded("fscript")) searchField.setWidth(searchField.getWidth()-16);
+
 		searchField.setChangedListener((s) -> {
 			s = s.trim();
 			emptyQuery = s.isEmpty();
@@ -548,7 +551,6 @@ public class FabricationConfigScreen extends Screen {
 			searchField.render(matrices, mouseX, mouseY, delta);
 		}
 		searchField.setTextFieldFocused(searchSelected);
-		
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		
 		matrices.push();
@@ -592,7 +594,17 @@ public class FabricationConfigScreen extends Screen {
 			RenderSystem.setShaderColor(0, 0, 0, 1);
 			drawTexture(matrices, width-49, 3, 0, 0, 0, 8, 8, 8, 8);
 		}
-		
+		if (searchSelected && Agnos.isModLoaded("fscript")) {
+			if(didClick && mouseX >= width-136 && mouseX < width-120 && mouseY <= 16) {
+				client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1f));
+				searchingScriptable = !searchingScriptable;
+			}
+			Identifier id = new Identifier("fabrication", "fscript.png");
+			client.getTextureManager().bindTexture(id);
+			RenderSystem.setShaderTexture(0, id);
+			fill(matrices, width-136, 0, width-120, 16, searchingScriptable? 0xFF0AA000 : 0x55000000);
+			drawTexture(matrices, width-136, 0, 0, 0, 0, 16, 16, 16, 16);
+		}
 		drawBackground(matrices, mouseX, mouseY, delta, 130, height-20);
 		
 		List<String> notes = Lists.newArrayList();
@@ -799,9 +811,9 @@ public class FabricationConfigScreen extends Screen {
 				y = drawConfigValues(matrices, y, mouseX, mouseY, (en) -> en.key.startsWith("general."));
 			} else if ("search".equals(section)) {
 				y += 4;
-				y = drawConfigValues(matrices, y, mouseX, mouseY, (en) -> {
-					return emptyQuery || (queryPattern.matcher(en.name).find() || queryPattern.matcher(en.shortName).find() || queryPattern.matcher(en.desc).find());
-				}, SHOW_SOURCE_SECTION, emptyQuery ? null : HIGHLIGHT_QUERY_MATCH);
+				Predicate<FeatureEntry> pen= (en) -> emptyQuery || (queryPattern.matcher(en.name).find() || queryPattern.matcher(en.shortName).find() || queryPattern.matcher(en.desc).find());
+				if (Agnos.isModLoaded("fscript") && searchingScriptable) pen = ((Predicate<FeatureEntry>) en -> en.fscript != null).and(pen);
+				y = drawConfigValues(matrices, y, mouseX, mouseY, pen, SHOW_SOURCE_SECTION, emptyQuery ? null : HIGHLIGHT_QUERY_MATCH);
 			} else {
 				y = drawConfigValues(matrices, y, mouseX, mouseY, (en) -> en.key.startsWith(section+"."));
 			}
@@ -979,12 +991,7 @@ public class FabricationConfigScreen extends Screen {
 				drawTexture(matrices, 134, 1, 0, 0, 60, 9, 60, 9);
 			}
 		}
-		//TODO
-		if (FeaturesFile.get(key).fscript != null && Agnos.isModLoaded("fscript")){
-			if (drawButton(matrices, width-60, 2, 60, 15, "PLACEHOLDEr", mouseX, (mouseY >= y+1 && mouseY <= y+10)? 2 : 0)){
-				client.setScreen(new OptionalFScriptScreen(this, prideFlag, title, key));
-			}
-		}
+
 		RenderSystem.disableTexture();
 		if (didClick) {
 			if (mouseX >= 134 && mouseX <= 134+trackSize && mouseY >= y+1 && mouseY <= y+10) {
@@ -1055,6 +1062,13 @@ public class FabricationConfigScreen extends Screen {
 		y += drawWrappedText(matrices, startX, 2, drawTitle, width-startX-6, 0xFFFFFF | textAlpha, false)*scale;
 		int endX = startY == y-8 ? width - 6 : startX+textRenderer.getWidth(title);
 //		int endX = textRenderer.draw(matrices, title, startX, 2, 0xFFFFFF | textAlpha);
+		if (mouseX >= 134+trackSize && mouseX <= endX && mouseY >= startY+1 && mouseY <= startY+10 && FeaturesFile.get(key).fscript != null && Agnos.isModLoaded("fscript")){
+			if (didClick){
+				client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1f));
+				client.setScreen(new OptionalFScriptScreen(this, prideFlag, title, key));
+			}
+			fill(matrices, startX-2, 9, endX, 10, -1);
+		}
 		matrices.pop();
 		if ((("search".equals(selectedSection) ? false : mouseX <= width-120) || mouseY >= 16) && mouseY < height-20) {
 			if (section != null && mouseX >= startStartX && mouseX <= startX && mouseY >= startY && mouseY <= y) {
