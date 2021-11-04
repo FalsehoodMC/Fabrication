@@ -1758,7 +1758,6 @@ woina.no_sprint
 	name: No Sprint
 	since: 1.4.0
 	sides: server_only
-	fscript: living_entity
 	default: ash
 	desc:
 		Disable sprinting.
