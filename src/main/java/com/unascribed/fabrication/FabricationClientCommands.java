@@ -14,7 +14,7 @@ import com.unascribed.fabrication.client.AtlasViewerScreen;
 import com.unascribed.fabrication.features.FeatureFabricationCommand;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.OptionalFScript;
-import com.unascribed.fabrication.support.OptionalFScriptScreen;
+import com.unascribed.fabrication.client.OptionalFScriptScreen;
 import io.github.queerbric.pride.PrideFlags;
 import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
 import net.minecraft.client.MinecraftClient;

@@ -24,8 +24,8 @@ import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.FeaturesFile.Sides;
 import com.unascribed.fabrication.interfaces.TaggablePlayer;
+import com.unascribed.fabrication.loaders.LoaderFScript;
 import com.unascribed.fabrication.logic.PlayerTag;
-import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.MixinConfigPlugin.Profile;
@@ -400,6 +400,18 @@ public class FeatureFabricationCommand implements Feature {
 		LiteralArgumentBuilder<T> script = LiteralArgumentBuilder.<T>literal("fscript");
 		script.requires(s -> s.hasPermissionLevel(2));
 		{
+			LiteralArgumentBuilder<T> get = LiteralArgumentBuilder.<T>literal("get");
+			for (String s : OptionalFScript.predicateProviders.keySet()) {
+				if (dediServer && FeaturesFile.get(s).sides == FeaturesFile.Sides.CLIENT_ONLY) continue;
+				LiteralArgumentBuilder<T> key = LiteralArgumentBuilder.<T>literal(s).executes((c) -> {
+					sendFeedback(c, new LiteralText(s+ ": "+ LoaderFScript.get(s)), false);
+					return 1;
+				});
+				get.then(key);
+				if (s.contains("."))
+					get.then(LiteralArgumentBuilder.<T>literal("*"+s.substring(s.indexOf('.'))).executes(key.getCommand()));
+			}
+			script.then(get);
 			LiteralArgumentBuilder<T> set = LiteralArgumentBuilder.<T>literal("set");
 			for (String s : OptionalFScript.predicateProviders.keySet()) {
 				if (dediServer && FeaturesFile.get(s).sides == FeaturesFile.Sides.CLIENT_ONLY) continue;
@@ -407,7 +419,7 @@ public class FeatureFabricationCommand implements Feature {
 				RequiredArgumentBuilder<T, String> value =
 						RequiredArgumentBuilder.<T, String>argument("script", StringArgumentType.string())
 								.executes((c) -> {
-									OptionalFScript.setScript(c, s, c.getArgument("script", String.class));
+									OptionalFScript.set(c, s, c.getArgument("script", String.class));
 									return 1;
 								});
 				key.then(value);
@@ -430,6 +442,14 @@ public class FeatureFabricationCommand implements Feature {
 					unset.then(LiteralArgumentBuilder.<T>literal("*"+s.substring(s.indexOf('.'))).executes(key.getCommand()));
 			}
 			script.then(unset);
+			script.then(LiteralArgumentBuilder.<T>literal("reload")
+					.executes((c) -> {
+						LoaderFScript.reload();
+						OptionalFScript.reload();
+						sendFeedback(c, new LiteralText("Fabrication fscript reloaded"), true);
+						return 1;
+					})
+			);
 		}
 		root.then(script);
 	}

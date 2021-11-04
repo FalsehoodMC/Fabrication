@@ -24,14 +24,16 @@ public class LoaderFScript implements ConfigLoader {
 		if (scripts.containsKey(key)) return scripts.get(key);
 		return FeaturesFile.get(key).fscriptDefault;
 	}
-
+	public static Map<String, String> getMap() {
+		return scripts;
+	}
 	public static void put(String key, String script) {
 		if(script == null) scripts.remove(key);
 		else scripts.put(key, script);
 
 		save();
 	}
-	public static void save(){
+	public static void save() {
 		StringBuilder builder = new StringBuilder();
 		AtomicReference<String> catagory = new AtomicReference<>();
 		scripts.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach((entry) -> {
@@ -55,19 +57,35 @@ public class LoaderFScript implements ConfigLoader {
 			FabLog.error("Failed to write fscript.ini", e);
 		}
 	}
-
-	@Override
-	public void load(Path configDir, QDIni config, boolean loadError) {
-		lastPath = configDir.resolve(getConfigName()+".ini");
+	public static void reload(){
+		if(lastPath == null) return;
 		scripts.clear();
 		try {
-			config = QDIni.loadAndTransform(lastPath.toString(), new InputStreamReader(Files.newInputStream(lastPath), StandardCharsets.UTF_8), null, null, false);
-			for (String k : config.keySet()) {
-				config.get(k).ifPresent(s -> scripts.put(k, s));
-			}
+			QDIni.loadAndTransform(lastPath.toString(), new InputStreamReader(Files.newInputStream(lastPath), StandardCharsets.UTF_8), new QDIni.IniTransformer() {
+				@Override
+				public String transformLine(String path, String line) {
+					return line;
+				}
+
+				@Override
+				public String transformValueComment(String key, String value, String comment) {
+					return comment;
+				}
+
+				@Override
+				public String transformValue(String key, String value) {
+					scripts.put(key, value);
+					return value;
+				}
+			}, null, false);
 		}catch (Exception e){
 			FabLog.error("Failed to load fscript.ini", e);
 		}
+	}
+	@Override
+	public void load(Path configDir, QDIni config, boolean loadError) {
+		lastPath = configDir.resolve(getConfigName()+".ini");
+		reload();
 	}
 
 	@Override
