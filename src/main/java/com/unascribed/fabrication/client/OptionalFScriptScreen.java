@@ -8,10 +8,12 @@ import com.unascribed.fabrication.support.OptionalFScript;
 import io.github.queerbric.pride.PrideFlag;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.command.CommandSource;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
 import tf.ssf.sfort.script.ScriptingScreen;
@@ -40,13 +42,19 @@ public class OptionalFScriptScreen extends ScriptingScreen {
 
     @Override
     protected void drawOptionButtons(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        if (drawButton(matrices, width-83, 1, 35, 10, writeLocal? "Client":"Server", "Toggle where scripts are saved/loaded", mouseX, mouseY)){
-            if (this.client !=null && client.player != null) {
-                CommandNode<CommandSource> cmd = client.player.networkHandler.getCommandDispatcher().getRoot().getChild("fabrication");
-                if (!(cmd == null || cmd.getChild("fscript") == null || cmd.getChild("fscript").getChild("set") == null))
-                    writeLocal = !writeLocal;
-                else writeLocal = true;
-            }else writeLocal = true;
+        if (drawButton(matrices, width - 83, 1, 35, 10, writeLocal ? "Client" : "Server", "Toggle where scripts are saved/loaded", mouseX, mouseY)) {
+            if (this.client == null || client.player == null) {
+                super.drawOptionButtons(matrices, mouseX, mouseY, delta);
+                return;
+            }
+            CommandNode<CommandSource> cmd = client.player.networkHandler.getCommandDispatcher().getRoot().getChild("fabrication");
+            if (!(cmd == null || cmd.getChild("fscript") == null || cmd.getChild("fscript").getChild("set") == null)) {
+                writeLocal = !writeLocal;
+            } else {
+                writeLocal = true;
+                client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO, 0.8f, 1));
+                client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO, 0.7f, 1));
+            }
         }
         super.drawOptionButtons(matrices, mouseX, mouseY, delta);
     }

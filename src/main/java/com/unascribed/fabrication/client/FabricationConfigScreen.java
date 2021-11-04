@@ -599,6 +599,7 @@ public class FabricationConfigScreen extends Screen {
 				searchingScriptable = !searchingScriptable;
 			}
 			RenderSystem.setShaderTexture(0, new Identifier("fabrication", "fscript.png"));
+			RenderSystem.setShaderColor(1, 1, 1, 1);
 			fill(matrices, width-136, 0, width-120, 16, searchingScriptable? 0xFF0AA000 : 0x55000000);
 			drawTexture(matrices, width-136, 0, 0, 0, 0, 16, 16, 16, 16);
 		}
