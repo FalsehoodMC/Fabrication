@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.c_tweaks.bush_walk_doesnt_hurt_with_armor;
 
+import com.unascribed.fabrication.support.ConfigPredicates;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -23,8 +24,7 @@ public class MixinSweetBerryBushBlock {
 			method="onEntityCollision(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/Entity;)V", cancellable=true)
 	public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity, CallbackInfo ci) {
 		if (MixinConfigPlugin.isEnabled("*.bush_walk_doesnt_hurt_with_armor") && entity instanceof LivingEntity
-				&& !((LivingEntity)entity).getEquippedStack(EquipmentSlot.LEGS).isEmpty()
-				&& !((LivingEntity)entity).getEquippedStack(EquipmentSlot.FEET).isEmpty()) {
+				&& ConfigPredicates.shouldRun("*.bush_walk_doesnt_hurt_with_armor", (LivingEntity)entity)) {
 			ci.cancel();
 		}
 	}

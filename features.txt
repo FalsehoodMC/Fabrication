@@ -639,6 +639,8 @@ tweaks.cactus_walk_doesnt_hurt_with_boots
 	name: Cactus Walk Doesn't Hurt With Boots
 	since: 1.0
 	sides: server_only
+	fscript: living_entity
+	fscript_default: !boots:empty
 	media: https://unascribed.com/fabrication/cactus_walk_doesnt_hurt_with_boots.mp4
 	short_desc: Walking on top of a cactus with boots on doesn't hurt
 	desc:
@@ -649,6 +651,8 @@ tweaks.cactus_brush_doesnt_hurt_with_chest
 	name: Cactus Brush Doesn't Hurt With Chest
 	since: 1.1
 	sides: server_only
+	fscript: living_entity
+	fscript_default: !legs:empty
 	media: https://unascribed.com/fabrication/cactus_brush_doesnt_hurt_with_chest.mp4
 	short_desc: Touching the side of a cactus with a chestplate on doesn't hurt
 	desc:
@@ -659,6 +663,8 @@ tweaks.bush_walk_doesnt_hurt_with_armor
 	name: Bush Walk Doesn't Hurt With Armor
 	since: 1.1
 	sides: server_only
+	fscript: living_entity
+	fscript_default: !(boots:empty;legs:empty)
 	media: https://unascribed.com/fabrication/bush_walk_doesnt_hurt_with_armor.mp4
 	short_desc: Walking through berry bushes with both legging and boots equipped doesn't hurt
 	desc:
@@ -786,6 +792,8 @@ tweaks.feather_falling_no_trample
 	name: Feather Falling No Trample
 	since: 1.3.0
 	sides: server_only
+	fscript: living_entity
+	fscript_default: ~boots:~enchant~minecraft;feather_falling:enchant_level:1
 	media: https://unascribed.com/fabrication/feather_falling_no_trample.mp4
 	desc:
 		Farmland will not get trampled when wearing feather falling.
@@ -794,6 +802,7 @@ tweaks.no_sneak_bypass
 	name: No Sneak Bypass
 	since: 1.3.0
 	sides: server_only
+	fscript: entity
 	media: https://unascribed.com/fabrication/no_sneak_bypass.mp4
 	desc:
 		Blocks which would normally not affect players when sneaking will.
@@ -884,6 +893,8 @@ minor_mechanics.feather_falling_five
 	name: Feather Falling V
 	since: 1.0
 	sides: server_only_with_client_helper
+	fscript: living_entity
+	fscript_default: ~boots:~enchant~minecraft;feather_falling:enchant_level:5
 	media: https://unascribed.com/fabrication/feather_falling_five.mp4
 	desc:
 		Makes Feather Falling V a valid enchant that completely negates fall damage. Optionally does
@@ -895,6 +906,7 @@ minor_mechanics.feather_falling_five_damages_boots
 	name: Feather Falling V Damages Boots
 	since: 1.0
 	sides: server_only
+	fscript: living_entity
 	parent: minor_mechanics.feather_falling_five
 	desc:
 		Makes absorbing fall damage with Feather Falling V cause damage to the boots.
@@ -1073,6 +1085,8 @@ minor_mechanics.cactus_punching_hurts
 	name: Cactus Punching Hurts
 	since: 1.4.0
 	sides: server_only
+	fscript: server_player_entity
+	fscript_default: hand:empty
 	desc:
 		Breaking cactus with your hand will damage you the same as hugging it.
 
@@ -1328,6 +1342,7 @@ balance.food_always_edible
 	name: Food Always Edible
 	since: 1.3.0
 	sides: server_only
+	fscript: player_entity
 	default: burnt
 	desc:
 		Allows players to eat unconditionally.
@@ -1397,6 +1412,7 @@ balance.disable_mending
 	name: Disable Mending
 	since: 1.4.0
 	sides: server_only
+	fscript: player_entity
 	media: https://unascribed.com/fabrication/disable_mending.mp4
 	default: burnt
 	desc:
@@ -1415,6 +1431,7 @@ balance.disable_elytra_boost
 	name: Disable Elytra Boost
 	since: 1.4.0
 	sides: server_only
+	fscript: player_entity
 	desc:
 		Prevent Elytra boosting using firework rockets.
 
@@ -1437,6 +1454,8 @@ weird_tweaks.creepers_explode_when_on_fire
 	name: Creepers Explode When On Fire
 	since: 1.0
 	sides: server_only
+	fscript: living_entity
+	fscript_default: on_fire
 	default: never
 	media: https://unascribed.com/fabrication/creepers_explode_when_on_fire.mp4
 	desc:
@@ -1594,6 +1613,7 @@ weird_tweaks.disable_night_skip
 	name: Disable Night Skip
 	since: 1.4.0
 	sides: server_only
+	fscript: server_player_entity
 	media: https://unascribed.com/fabrication/disable_night_skip.mp4
 	desc:
 		Prevents beds from skipping the night.
@@ -1772,6 +1792,7 @@ woina.instant_bow
 	name: Instant Bow
 	since: 1.4.0
 	sides: server_only
+	fscript: player_entity
 	media: https://unascribed.com/fabrication/instant_bow.mp4
 	default: ash
 	desc:
@@ -1835,6 +1856,7 @@ situational.all_damage_is_fatal
 	name: All Damage Is Fatal
 	since: 1.0.1
 	sides: server_only
+	fscript: living_entity
 	default: never
 	media: https://unascribed.com/fabrication/all_damage_is_fatal.mp4
 	desc:
@@ -1866,6 +1888,7 @@ situational.disable_elytra
 	name: Disable Elytra
 	since: 1.3.3
 	sides: server_only
+	fscript: item_stack
 	media: https://unascribed.com/fabrication/disable_elytra.mp4
 	desc:
 		Prevents using Elytra.

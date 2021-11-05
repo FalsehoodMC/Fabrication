@@ -12,7 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import com.mojang.brigadier.Command;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.CommandNode;
 import com.unascribed.fabrication.Agnos;
@@ -22,10 +24,12 @@ import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.FeaturesFile.Sides;
 import com.unascribed.fabrication.interfaces.TaggablePlayer;
+import com.unascribed.fabrication.loaders.LoaderFScript;
 import com.unascribed.fabrication.logic.PlayerTag;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.MixinConfigPlugin.Profile;
+import com.unascribed.fabrication.support.OptionalFScript;
 import com.unascribed.fabrication.util.Cardinal;
 
 import com.google.common.base.Charsets;
@@ -68,6 +72,7 @@ public class FeatureFabricationCommand implements Feature {
 			try {
 				LiteralArgumentBuilder<ServerCommandSource> root = LiteralArgumentBuilder.<ServerCommandSource>literal("fabrication");
 				addConfig(root, dedi);
+				if (Agnos.isModLoaded("fscript")) addFScript(root, dedi);
 				
 				LiteralArgumentBuilder<ServerCommandSource> tag = LiteralArgumentBuilder.<ServerCommandSource>literal("tag");
 				tag.requires(scs -> MixinConfigPlugin.isEnabled("*.taggable_players") && scs.hasPermissionLevel(2));
@@ -391,7 +396,65 @@ public class FeatureFabricationCommand implements Feature {
 		root.then(config);
 	}
 
-	private static void sendFeedback(CommandContext<? extends CommandSource> c, LiteralText text, boolean broadcast) {
+	public static <T extends CommandSource> void addFScript(LiteralArgumentBuilder<T> root, boolean dediServer) {
+		LiteralArgumentBuilder<T> script = LiteralArgumentBuilder.<T>literal("fscript");
+		script.requires(s -> s.hasPermissionLevel(2));
+		{
+			LiteralArgumentBuilder<T> get = LiteralArgumentBuilder.<T>literal("get");
+			for (String s : OptionalFScript.predicateProviders.keySet()) {
+				if (dediServer && FeaturesFile.get(s).sides == FeaturesFile.Sides.CLIENT_ONLY) continue;
+				LiteralArgumentBuilder<T> key = LiteralArgumentBuilder.<T>literal(s).executes((c) -> {
+					sendFeedback(c, new LiteralText(s+ ": "+ LoaderFScript.get(s)), false);
+					return 1;
+				});
+				get.then(key);
+				if (s.contains("."))
+					get.then(LiteralArgumentBuilder.<T>literal("*"+s.substring(s.indexOf('.'))).executes(key.getCommand()));
+			}
+			script.then(get);
+			LiteralArgumentBuilder<T> set = LiteralArgumentBuilder.<T>literal("set");
+			for (String s : OptionalFScript.predicateProviders.keySet()) {
+				if (dediServer && FeaturesFile.get(s).sides == FeaturesFile.Sides.CLIENT_ONLY) continue;
+				LiteralArgumentBuilder<T> key = LiteralArgumentBuilder.<T>literal(s);
+				RequiredArgumentBuilder<T, String> value =
+						RequiredArgumentBuilder.<T, String>argument("script", StringArgumentType.string())
+								.executes((c) -> {
+									OptionalFScript.set(c, s, c.getArgument("script", String.class));
+									return 1;
+								});
+				key.then(value);
+				set.then(key);
+				if (s.contains("."))
+					set.then(LiteralArgumentBuilder.<T>literal("*"+s.substring(s.indexOf('.'))).then(value));
+			}
+			script.then(set);
+
+			LiteralArgumentBuilder<T> unset = LiteralArgumentBuilder.<T>literal("unset");
+			for (String s : OptionalFScript.predicateProviders.keySet()) {
+				if (dediServer && FeaturesFile.get(s).sides == FeaturesFile.Sides.CLIENT_ONLY) continue;
+				LiteralArgumentBuilder<T> key = LiteralArgumentBuilder.<T>literal(s).executes((c) -> {
+					OptionalFScript.restoreDefault(s);
+					sendFeedback(c, new LiteralText("Restored default behaviour for "+s), true);
+					return 1;
+				});
+				unset.then(key);
+				if (s.contains("."))
+					unset.then(LiteralArgumentBuilder.<T>literal("*"+s.substring(s.indexOf('.'))).executes(key.getCommand()));
+			}
+			script.then(unset);
+			script.then(LiteralArgumentBuilder.<T>literal("reload")
+					.executes((c) -> {
+						LoaderFScript.reload();
+						OptionalFScript.reload();
+						sendFeedback(c, new LiteralText("Fabrication fscript reloaded"), true);
+						return 1;
+					})
+			);
+		}
+		root.then(script);
+	}
+
+	public static void sendFeedback(CommandContext<? extends CommandSource> c, LiteralText text, boolean broadcast) {
 		if (c.getSource() instanceof ServerCommandSource) {
 			((ServerCommandSource)c.getSource()).sendFeedback(text, broadcast);
 		} else {

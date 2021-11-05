@@ -426,8 +426,10 @@ public class QDIni {
 	public static QDIni loadAndTransform(String fileName, InputStream in, IniTransformer transformer, Writer w) throws IOException {
 		return loadAndTransform(fileName, new InputStreamReader(in, StandardCharsets.UTF_8), transformer, w);
 	}
-	
 	public static QDIni loadAndTransform(String fileName, Reader r, IniTransformer transformer, Writer w) throws IOException, SyntaxErrorException {
+		return loadAndTransform(fileName, r, transformer, w, true);
+	}
+	public static QDIni loadAndTransform(String fileName, Reader r, IniTransformer transformer, Writer w, boolean inValComments) throws IOException, SyntaxErrorException {
 		BufferedReader br = r instanceof BufferedReader ? (BufferedReader)r : new BufferedReader(r);
 		Map<String, List<BlameString>> data = new LinkedHashMap<>();
 		int lineNum = 1;
@@ -463,7 +465,7 @@ public class QDIni {
 				continue;
 			}
 			if (line.startsWith("[")) {
-				if (line.contains(";")) {
+				if (line.contains(";") && inValComments) {
 					trunc = line.substring(0, line.indexOf(';'));
 				}
 				trunc = trunc.trim();
@@ -480,7 +482,7 @@ public class QDIni {
 				}
 			} else if (line.contains("=")) {
 				String comment = null;
-				if (trunc.contains(";")) {
+				if (trunc.contains(";") && inValComments) {
 					comment = trunc.substring(trunc.indexOf(';')+1);
 					trunc = trunc.substring(0, trunc.indexOf(';'));
 				}
