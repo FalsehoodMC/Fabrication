@@ -1,7 +1,6 @@
 package com.unascribed.fabrication.mixin.g_weird_tweaks.leaves_grow_grass;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Fertilizable;
@@ -20,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(BoneMealItem.class)
-@EligibleIf(configAvailable="*.leaves_grow_grass", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.leaves_grow_grass")
 public abstract class MixinBoneMealItem {
 
 	@Inject(at=@At("HEAD"), method="useOnBlock(Lnet/minecraft/item/ItemUsageContext;)Lnet/minecraft/util/ActionResult;", cancellable=true)
