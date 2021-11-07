@@ -881,11 +881,11 @@ tweaks.recipe_book_auto_craft
 		Recipe book crafts items instead of moving them to the crafting area.
 
 tweaks.no_heavy_minecarts
-    name: No Heavy Minecarts
-    since: 2.1.0
-    sides: server_only
-    desc:
-        Chest and hopper minecarts will not be slowed down proportionally to the number of items in them.
+	name: No Heavy Minecarts
+	since: 2.1.0
+	sides: server_only
+	desc:
+		Chest and hopper minecarts will not be slowed down proportionally to the number of items in them.
 
 
 minor_mechanics
