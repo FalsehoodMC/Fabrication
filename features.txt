@@ -393,7 +393,7 @@ utility.taggable_players
 		* permanent_conduit_power - The player always has Conduit Power.  
 		* scares_creepers - (Since 1.1) The player scares creepers.  
 		* no_phantoms - (Since 1.1) The player cannot have phantoms spawn on them.
-
+		* no_wandering_trader - (Since 2.0.0) The player cannot have wandering traders spawn on them.
 		
 utility.legacy_command_syntax
 	name: Legacy Command Syntax
