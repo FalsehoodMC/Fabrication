@@ -11,6 +11,7 @@ public enum PlayerTag {
 	PERMANENT_CONDUIT_POWER,
 	SCARES_CREEPERS,
 	NO_PHANTOMS,
+	NO_WANDERING_TRADER,
 	;
 	
 	public String lowerName() {
