@@ -1,7 +1,6 @@
 package com.unascribed.fabrication.mixin.g_weird_tweaks.leaves_grow_grass;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -15,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PlantBlock.class)
-@EligibleIf(configAvailable="*.leaves_grow_grass", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.leaves_grow_grass")
 public abstract class MixinPlantBlock {
 
 	@Inject(at=@At("HEAD"), method="canPlantOnTop(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)Z", cancellable=true)
