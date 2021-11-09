@@ -1825,6 +1825,7 @@ woina.full_enchanting_cost
 	name: Full Enchanting Cost
 	since: 1.4.0
 	sides: server_only
+	default: never
 	desc:
 		Enchanting consumes all of the xp required for an enchant.
 		For example a 30 level enchant will consume 30 levels instead of 3.
