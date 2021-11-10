@@ -11,6 +11,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
+
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -346,8 +348,7 @@ public class FeatureFabricationCommand implements Feature {
 					return 1;
 				});
 				get.then(key);
-				if (s.contains("."))
-					get.then(LiteralArgumentBuilder.<T>literal("*"+s.substring(s.indexOf('.'))).executes(key.getCommand()));
+				setAltKeys(s, alt -> get.then(LiteralArgumentBuilder.<T>literal(alt).executes(key.getCommand())));
 			}
 			config.then(get);
 			LiteralArgumentBuilder<T> set = LiteralArgumentBuilder.<T>literal("set");
@@ -373,12 +374,12 @@ public class FeatureFabricationCommand implements Feature {
 					key.then(value);
 				}
 				set.then(key);
-				if (s.contains(".")) {
-					LiteralArgumentBuilder<T> short_key = LiteralArgumentBuilder.<T>literal("*" + s.substring(s.indexOf('.')));
+				setAltKeys(s, alt -> {
+					LiteralArgumentBuilder<T> short_key = LiteralArgumentBuilder.<T>literal(alt);
 					for (CommandNode<T> arg : key.getArguments())
 						short_key.then(arg);
 					set.then(short_key);
-				}
+				});
 			}
 			config.then(set);
 			config.then(LiteralArgumentBuilder.<T>literal("reload")
@@ -408,8 +409,7 @@ public class FeatureFabricationCommand implements Feature {
 					return 1;
 				});
 				get.then(key);
-				if (s.contains("."))
-					get.then(LiteralArgumentBuilder.<T>literal("*"+s.substring(s.indexOf('.'))).executes(key.getCommand()));
+				setAltKeys(s, alt -> get.then(LiteralArgumentBuilder.<T>literal(alt).executes(key.getCommand())));
 			}
 			script.then(get);
 			LiteralArgumentBuilder<T> set = LiteralArgumentBuilder.<T>literal("set");
@@ -424,8 +424,7 @@ public class FeatureFabricationCommand implements Feature {
 								});
 				key.then(value);
 				set.then(key);
-				if (s.contains("."))
-					set.then(LiteralArgumentBuilder.<T>literal("*"+s.substring(s.indexOf('.'))).then(value));
+				setAltKeys(s, alt -> set.then(LiteralArgumentBuilder.<T>literal(alt).then(value)));
 			}
 			script.then(set);
 
@@ -438,8 +437,7 @@ public class FeatureFabricationCommand implements Feature {
 					return 1;
 				});
 				unset.then(key);
-				if (s.contains("."))
-					unset.then(LiteralArgumentBuilder.<T>literal("*"+s.substring(s.indexOf('.'))).executes(key.getCommand()));
+				setAltKeys(s, alt -> unset.then(LiteralArgumentBuilder.<T>literal(alt).executes(key.getCommand())));
 			}
 			script.then(unset);
 			script.then(LiteralArgumentBuilder.<T>literal("reload")
@@ -520,6 +518,14 @@ public class FeatureFabricationCommand implements Feature {
 				}
 			}
 		}
+	}
+
+	public static void setAltKeys(String key, Consumer<String> set){
+		if(!key.contains(".")) return;
+		for (int i = key.indexOf('.'); i != -1; i = key.indexOf('.', i+1))
+			set.accept("*"+key.substring(i));
+		if (key.lastIndexOf('.') != key.indexOf('.'))
+			set.accept(key.substring(0,key.indexOf('.'))+key.substring(key.lastIndexOf('.')));
 	}
 
 	@Override
