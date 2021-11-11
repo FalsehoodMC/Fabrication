@@ -1634,6 +1634,13 @@ weird_tweaks.leaves_grow_grass
 
 		Using Bone Meal on leaves makes them grow grass.
 
+weird_tweaks.chaining_creepers
+	name: Chaining Creepers
+	since: 1.4.0
+	sides: server_only
+	desc:
+		Creepers explode after taking explosion damage.
+
 woina
 	name: What's Old Is New Again
 	section: true
