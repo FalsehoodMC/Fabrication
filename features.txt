@@ -1634,6 +1634,15 @@ weird_tweaks.leaves_grow_grass
 
 		Using Bone Meal on leaves makes them grow grass.
 
+weird_tweaks.villager_trades_reset
+	name: Villager Trades Reset
+	since: 1.4.0
+	sides: server_only
+	default: never
+	desc:
+		Instead of restocking villagers will completely reset their trades.
+		this also soft-limits the trades to 2.
+
 woina
 	name: What's Old Is New Again
 	section: true
