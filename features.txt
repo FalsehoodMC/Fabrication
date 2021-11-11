@@ -1834,6 +1834,7 @@ woina.no_player_death_animation
 	name: No Player Death Animation
 	since: 1.4.0
 	sides: client_only
+	default: never
 	desc:
 		Players stay upright when killed.
 
