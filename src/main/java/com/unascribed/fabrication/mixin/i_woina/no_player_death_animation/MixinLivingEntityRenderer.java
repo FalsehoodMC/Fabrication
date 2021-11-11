@@ -11,12 +11,12 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(LivingEntityRenderer.class)
 @EligibleIf(configAvailable="*.no_player_death_animation")
-abstract public class MixinLivingEntityRenderer {
+public abstract class MixinLivingEntityRenderer {
 
-    @Redirect(method="setupTransforms(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/client/util/math/MatrixStack;FFF)V", at=@At(value="FIELD", target="Lnet/minecraft/entity/LivingEntity;deathTime:I"))
-    public int oldDeath(LivingEntity instance){
-        if (MixinConfigPlugin.isEnabled("*.no_player_death_animation") && instance instanceof PlayerEntity) return 0;
-        return instance.deathTime;
-    }
+	@Redirect(method="setupTransforms(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/client/util/math/MatrixStack;FFF)V", at=@At(value="FIELD", target="Lnet/minecraft/entity/LivingEntity;deathTime:I"))
+	public int oldDeath(LivingEntity instance){
+		if (MixinConfigPlugin.isEnabled("*.no_player_death_animation") && instance instanceof PlayerEntity) return 0;
+		return instance.deathTime;
+	}
 
 }
