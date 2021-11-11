@@ -1641,7 +1641,7 @@ weird_tweaks.villager_trades_reset
 	default: never
 	desc:
 		Instead of restocking villagers will completely reset their trades.
-		this also soft-limits the trades to the villagers level (one trade of each level).
+		This also soft-limits the trades to the villager's level (one trade of each level).
 
 woina
 	name: What's Old Is New Again
