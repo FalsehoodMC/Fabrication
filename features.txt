@@ -1830,6 +1830,13 @@ woina.full_enchanting_cost
 		Enchanting consumes all of the xp required for an enchant.
 		For example a 30 level enchant will consume 30 levels instead of 3.
 
+woina.no_player_death_animation
+	name: No Player Death Animation
+	since: 1.4.0
+	sides: client_only
+	desc:
+		Players stay upright when killed.
+
 pedantry
 	name: Pedantry
 	section: true
