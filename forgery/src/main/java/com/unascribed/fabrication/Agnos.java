@@ -91,14 +91,6 @@ public final class Agnos {
 		return soundEvent;
 	}
 	
-	public static ITag<Block> registerBlockTag(ResourceLocation id) {
-		return ForgeTagHandler.createOptionalTag(ForgeRegistries.BLOCKS, id);
-	}
-
-	public static ITag<Item> registerItemTag(ResourceLocation id) {
-		return ForgeTagHandler.createOptionalTag(ForgeRegistries.ITEMS, id);
-	}
-	
 	@OnlyIn(Dist.CLIENT)
 	public static KeyBinding registerKeyBinding(KeyBinding kb) {
 		ClientRegistry.registerKeyBinding(kb);
