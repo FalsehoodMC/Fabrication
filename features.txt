@@ -1641,6 +1641,15 @@ weird_tweaks.chaining_creepers
 	desc:
 		Creepers explode after taking explosion damage.
 
+weird_tweaks.villager_trades_reset
+	name: Villager Trades Reset
+	since: 1.4.0
+	sides: server_only
+	default: never
+	desc:
+		Instead of restocking villagers will completely reset their trades.
+		This also soft-limits the trades to the villager's level (one trade of each level).
+
 woina
 	name: What's Old Is New Again
 	section: true
@@ -1836,6 +1845,14 @@ woina.full_enchanting_cost
 	desc:
 		Enchanting consumes all of the xp required for an enchant.
 		For example a 30 level enchant will consume 30 levels instead of 3.
+
+woina.no_player_death_animation
+	name: No Player Death Animation
+	since: 1.4.0
+	sides: client_only
+	default: never
+	desc:
+		Players stay upright when killed.
 
 pedantry
 	name: Pedantry
