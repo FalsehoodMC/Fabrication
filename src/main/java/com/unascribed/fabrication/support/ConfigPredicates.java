@@ -7,6 +7,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.server.network.ServerPlayerEntity;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -14,61 +15,105 @@ import java.util.stream.Collectors;
 
 public class ConfigPredicates {
 
-    public static Map<String, Object> predicates;
-    public static final Map<String, Object> predicateDefaults = new HashMap<>();
+    private static Map<String, Object> active;
+    private static Map<String, Feature> idle = new HashMap<>();
+    private static final Map<String, Object> defaults = new HashMap<>();
 
     public static<T> boolean shouldRun(String configKey, T test) {
         return shouldRun(configKey, test, true);
     }
 
-    public static<T> boolean shouldRun(String configKey, T test, boolean ifMissingReturn) {
+    public static<T> boolean shouldRun(String configKey, T test, boolean defaultValue) {
         configKey = MixinConfigPlugin.remap(configKey);
         Predicate<T> predicate;
         try{
-             predicate= (Predicate<T>) predicates.get(configKey);
-            if (predicate == null) return ifMissingReturn;
+            predicate = (Predicate<T>) active.get(configKey);
+            if (predicate == null) return defaultValue;
         }catch (Exception e){
-            return ifMissingReturn;
+            return defaultValue;
         }
         return predicate.test(test);
     }
 
+    public static void put(String configKey, Predicate<?> predicate){
+        put(configKey, predicate, 0);
+    }
+
+    public static void put(String configKey, Predicate<?> predicate, int level){
+        if (!idle.containsKey(configKey)) {
+            idle.put(configKey, new Feature());
+        }
+        if(idle.get(configKey).add(predicate, level)) {
+            active.put(configKey, predicate);
+        }
+    }
+    public static void remove(String configKey){
+        remove(configKey, 0);
+    }
+    public static void remove(String configKey, int level){
+        if (idle.containsKey(configKey)){
+            Object rtrn = idle.get(configKey).remove(level, active);
+            active.put(configKey, rtrn == null ? defaults.get(configKey) : rtrn);
+        }
+    }
+
     static{
-        predicateDefaults.put("tweaks.bush_walk_doesnt_hurt_with_armor",
+        defaults.put("tweaks.bush_walk_doesnt_hurt_with_armor",
                 (Predicate<LivingEntity>) livingEntity -> !(
                         livingEntity.getEquippedStack(EquipmentSlot.LEGS).isEmpty()
                         || livingEntity.getEquippedStack(EquipmentSlot.FEET).isEmpty()
                 )
         );
-        predicateDefaults.put("tweaks.feather_falling_no_trample",
-                (Predicate<LivingEntity>) livingEntity ->
-                        EnchantmentHelper.getEquipmentLevel(Enchantments.FEATHER_FALLING, livingEntity)>=1
-        );
-        predicateDefaults.put("tweaks.cactus_walk_doesnt_hurt_with_boots",
+        defaults.put("tweaks.cactus_walk_doesnt_hurt_with_boots",
                 (Predicate<LivingEntity>) livingEntity ->
                         !livingEntity.getEquippedStack(EquipmentSlot.FEET).isEmpty()
         );
-        predicateDefaults.put("tweaks.cactus_brush_doesnt_hurt_with_chest",
+        defaults.put("tweaks.cactus_brush_doesnt_hurt_with_chest",
                 (Predicate<LivingEntity>) livingEntity ->
                         !livingEntity.getEquippedStack(EquipmentSlot.CHEST).isEmpty()
         );
-        predicateDefaults.put("tweaks.creepers_explode_when_on_fire",
+        defaults.put("tweaks.creepers_explode_when_on_fire",
                 (Predicate<LivingEntity>) livingEntity ->
                         livingEntity.getFireTicks() > 0 && !livingEntity.hasStatusEffect(StatusEffects.FIRE_RESISTANCE)
         );
-        predicateDefaults.put("minor_mechanics.cactus_punching_hurts",
+        defaults.put("minor_mechanics.cactus_punching_hurts",
                 (Predicate<ServerPlayerEntity>) serverPlayerEntity ->
                         serverPlayerEntity.getMainHandStack().isEmpty()
         );
-        predicateDefaults.put("minor_mechanics.feather_falling_five",
+        defaults.put("minor_mechanics.feather_falling_five",
                 (Predicate<LivingEntity>) livingEntity ->
                         EnchantmentHelper.getLevel(Enchantments.FEATHER_FALLING, livingEntity.getEquippedStack(EquipmentSlot.FEET)) >= 5
         );
-        predicateDefaults.put("minor_mechanics.feather_falling_five_damages_boots",
+        defaults.put("minor_mechanics.feather_falling_five_damages_boots",
                 (Predicate<LivingEntity>) livingEntity ->
                         EnchantmentHelper.getLevel(Enchantments.FEATHER_FALLING, livingEntity.getEquippedStack(EquipmentSlot.FEET)) >= 5
         );
 
-        predicates = predicateDefaults.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        active = defaults.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    private static class Feature {
+        Integer i = Integer.MIN_VALUE;
+        Map<Integer, Object> map = new HashMap<>();
+
+        public boolean add(Predicate<?> predicate, int level){
+            map.put(level, predicate);
+            if (i<=level) {
+                i = level;
+                return true;
+            }
+            return false;
+        }
+        public Object remove(int level, Object defaultVal){
+            map.remove(level);
+            if (map.isEmpty()) {
+                i = Integer.MIN_VALUE;
+                return null;
+            } else if (i<=level) {
+                i = map.keySet().stream().max(Comparator.comparingInt(i -> i)).get();
+                return map.get(i);
+            }
+            return defaultVal;
+        }
     }
 }

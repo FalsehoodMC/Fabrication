@@ -38,8 +38,7 @@ public class OptionalFScript {
     }
     public static void restoreDefault(String configKey){
         configKey = MixinConfigPlugin.remap(configKey);
-        if (ConfigPredicates.predicateDefaults.containsKey(configKey)) ConfigPredicates.predicates.put(configKey, ConfigPredicates.predicateDefaults.get(configKey));
-        else ConfigPredicates.predicates.remove(configKey);
+        ConfigPredicates.remove(configKey, 2);
         LoaderFScript.put(configKey, null);
     }
     public static void reload(){
@@ -54,7 +53,7 @@ public class OptionalFScript {
             if (predicateProvider == null) return Optional.of(new Exception("No predicate provider exists for specified key"));
             Predicate<?> predicate = new ScriptParser<>(predicateProvider).parse(script);
             if (predicate == null ) return Optional.of(new Exception("FScript returned null, likely because an invalid script was given"));
-            ConfigPredicates.predicates.put(configKey, predicate);
+            ConfigPredicates.put(configKey, predicate, 2);
             LoaderFScript.put(configKey, script);
         }catch (Exception e){
             return Optional.of(e);

@@ -792,7 +792,6 @@ tweaks.feather_falling_no_trample
 	name: Feather Falling No Trample
 	since: 1.3.0
 	sides: server_only
-	fscript: living_entity
 	fscript_default: ~boots:~enchant~minecraft;feather_falling:enchant_level:1
 	media: https://unascribed.com/fabrication/feather_falling_no_trample.mp4
 	desc:
@@ -887,6 +886,13 @@ tweaks.no_heavy_minecarts
 	desc:
 		Chest and hopper minecarts will not be slowed down proportionally to the number of items in them.
 
+tweaks.no_trample
+	name: No Trample
+	since: 2.0.0
+	sides: server_only
+	fscript: living_entity
+	desc:
+		Farmland will not get trampled when wearing feather falling.
 
 minor_mechanics
 	name: Minor Mechanics
