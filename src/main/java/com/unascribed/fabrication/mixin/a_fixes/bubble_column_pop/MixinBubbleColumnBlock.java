@@ -22,7 +22,7 @@ import java.util.Random;
 
 @Mixin(BubbleColumnBlock.class)
 @EligibleIf(configAvailable="*.bubble_column_pop", envMatches=Env.CLIENT)
-public class MixinTextureManager {
+public class MixinBubbleColumnBlock {
 
 	@Shadow @Final public static BooleanProperty DRAG;
 
