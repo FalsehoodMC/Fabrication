@@ -353,6 +353,14 @@ fixes.fix_charm_amethyst_dupe
 		you have another mod that can make item frames invisible, such as Fabrication's own
 		Invisibility Splash On Inanimates.
 
+fixes.bubble_column_pop
+	name: Bubble Column Pop
+	since: 2.0.0
+	sides: client_only
+	default: never
+	desc:
+		Re-adds bubble columns having a bubble pop particle and sound at the top.
+
 utility
 	name: Utility
 	section: true
@@ -892,7 +900,7 @@ tweaks.no_trample
 	sides: server_only
 	fscript: living_entity
 	desc:
-		Farmland will not get trampled when wearing feather falling.
+		Farmland will not get trampled.
 
 minor_mechanics
 	name: Minor Mechanics
