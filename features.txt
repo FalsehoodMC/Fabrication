@@ -1664,6 +1664,14 @@ weird_tweaks.villager_trades_reset
 		Instead of restocking villagers will completely reset their trades.
 		This also soft-limits the trades to the villager's level (one trade of each level).
 
+weird_tweaks.no_dolphin_theft
+	name: No Dolphin Theft
+	since: 2.0.0
+	sides: server_only
+	default: never
+	desc:
+		Prevents dolphins from picking up items.
+
 woina
 	name: What's Old Is New Again
 	section: true
