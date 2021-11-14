@@ -1660,6 +1660,7 @@ weird_tweaks.no_dolphin_theft
 	name: No Dolphin Theft
 	since: 2.0.0
 	sides: server_only
+	default: never
 	desc:
 		Prevents dolphins from picking up items.
 
