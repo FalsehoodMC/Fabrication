@@ -357,6 +357,7 @@ fixes.bubble_column_pop
 	name: Bubble Column Pop
 	since: 2.1.0
 	sides: client_only
+	default: vienna
 	desc:
 		Re-adds bubble columns having a bubble pop particle and sound at the top.
 
