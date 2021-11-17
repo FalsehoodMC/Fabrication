@@ -11,9 +11,9 @@ import net.minecraft.item.ItemStack;
 public class Hooks {
 
 	// Dummy.
-	
+
 	public static void fireRenderEntityItem(ItemRenderer renderer, ItemStack stack, ModelTransformation.Mode transformType, boolean leftHanded, MatrixStack matrixStack, VertexConsumerProvider renderTypeBuffer, int light, int overlay, BakedModel model, ItemEntity entity, float partialTicks) {
-		
+
 	}
-	
+
 }

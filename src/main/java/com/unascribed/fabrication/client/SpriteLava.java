@@ -25,7 +25,7 @@ public class SpriteLava extends Sprite
 	@Override
 	public void tickAnimation() {
 		// I cannot be bothered to deobfuscate this the rest of the way.
-		
+
 		int var2;
 		float var3;
 		int var5;

@@ -11,6 +11,7 @@ import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.entity.Entity;
@@ -22,10 +23,10 @@ import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 @Mixin(ClientPlayNetworkHandler.class)
 @EligibleIf(configEnabled="*.alt_absorption_sound", envMatches=Env.CLIENT)
 public class MixinClientPlayNetworkHandler {
-	
+
 	@Shadow @Final
 	private ClientConnection connection;
-	
+
 	@Inject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/s2c/play/CustomPayloadS2CPacket;)V", cancellable=true)
 	public void onCustomPayload(CustomPayloadS2CPacket packet, CallbackInfo ci) {
 		if (packet.getChannel().getNamespace().equals("fabrication") && packet.getChannel().getPath().equals("play_absorp_sound")) {
@@ -44,5 +45,5 @@ public class MixinClientPlayNetworkHandler {
 			ci.cancel();
 		}
 	}
-	
+
 }

@@ -10,6 +10,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import com.unascribed.fabrication.FabricationMod;
 
 import com.google.common.collect.Maps;
+
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
@@ -19,18 +20,18 @@ import net.minecraft.world.PersistentState;
 public class PingPrivacyPersistentState extends PersistentState {
 
 	private static final String name = FabricationMod.MOD_NAME_LOWER+"_ping_privacy";
-	
+
 	private final Map<InetAddress, Long> knownIps = Maps.newHashMap();
 	private final ReadWriteLock rwl = new ReentrantReadWriteLock();
-	
+
 	public PingPrivacyPersistentState() {
 		super(name);
 	}
-	
+
 	public static PingPrivacyPersistentState get(ServerWorld world) {
 		return world.getPersistentStateManager().getOrCreate(PingPrivacyPersistentState::new, name);
 	}
-	
+
 	public void addKnownIp(InetAddress addr) {
 		try {
 			rwl.writeLock().lock();
@@ -49,7 +50,7 @@ public class PingPrivacyPersistentState extends PersistentState {
 			rwl.readLock().unlock();
 		}
 	}
-	
+
 	private boolean isRecent(long time) {
 		return System.currentTimeMillis()-time < TimeUnit.DAYS.toMillis(7);
 	}

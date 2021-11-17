@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.unascribed.fabrication.interfaces.MarkWet;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.particle.ParticleTypes;
@@ -27,24 +28,24 @@ public abstract class MixinEntity implements MarkWet {
 
 	private int fabrication$wetTimer;
 	private boolean fabrication$checkingOriginalWetness;
-	
+
 	@Shadow
 	public World world;
 	@Shadow
 	private Vec3d pos;
-	
+
 	@Shadow
 	public abstract boolean isWet();
 	@Shadow
 	public abstract boolean isInLava();
-	
+
 	@Shadow
 	public abstract SoundCategory getSoundCategory();
 	@Shadow
 	public abstract Box getBoundingBox();
 	@Shadow
 	public abstract void playSound(SoundEvent se, float volume, float pitch);
-	
+
 	@Inject(at=@At("TAIL"), method="baseTick()V")
 	public void baseTick(CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.enhanced_moistness") || world.isClient) return;
@@ -73,7 +74,7 @@ public abstract class MixinEntity implements MarkWet {
 			}
 		}
 	}
-	
+
 	@Inject(at=@At("HEAD"), method="isWet()Z", cancellable=true)
 	public void isWet(CallbackInfoReturnable<Boolean> ci) {
 		if (MixinConfigPlugin.isEnabled("*.enhanced_moistness")) {
@@ -82,10 +83,10 @@ public abstract class MixinEntity implements MarkWet {
 			}
 		}
 	}
-	
+
 	@Override
 	public void fabrication$markWet() {
 		fabrication$wetTimer = 100;
 	}
-	
+
 }

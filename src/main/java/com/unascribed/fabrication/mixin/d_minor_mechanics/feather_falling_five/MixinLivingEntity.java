@@ -1,15 +1,14 @@
 package com.unascribed.fabrication.mixin.d_minor_mechanics.feather_falling_five;
 
-import com.unascribed.fabrication.support.ConfigPredicates;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import com.unascribed.fabrication.support.MixinConfigPlugin;
+import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.support.EligibleIf;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
+import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -33,5 +32,5 @@ public class MixinLivingEntity {
 			cir.setReturnValue(false);
 		}
 	}
-	
+
 }

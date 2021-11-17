@@ -14,21 +14,21 @@ public class ParsedTime {
 	private static final int SECOND_IN_TICKS = 20;
 	private static final int MINUTE_IN_TICKS = SECOND_IN_TICKS*60;
 	private static final int HOUR_IN_TICKS = MINUTE_IN_TICKS*60;
-	
+
 	public static final ParsedTime UNSET = new ParsedTime(6000, false);
 	public static final ParsedTime FOREVER = new ParsedTime(Integer.MAX_VALUE, false);
 	public static final ParsedTime INVINCIBLE = new ParsedTime(Integer.MAX_VALUE, false);
 	public static final ParsedTime INSTANTLY = new ParsedTime(0, false);
-	
+
 	public final int timeInTicks;
 	public final boolean priority;
-	
+
 	private ParsedTime(int timeInTicks, boolean priority) {
 		super();
 		this.timeInTicks = timeInTicks;
 		this.priority = priority;
 	}
-	
+
 	public boolean overshadows(ParsedTime that) {
 		if (this == that) return false;
 		if (this == UNSET) return false;
@@ -37,7 +37,7 @@ public class ParsedTime {
 		if (this.priority && !that.priority) return true;
 		return this.timeInTicks > that.timeInTicks;
 	}
-	
+
 	@Override
 	public String toString() {
 		String s;
@@ -60,7 +60,7 @@ public class ParsedTime {
 		}
 		return s+(priority ? "!" : "");
 	}
-	
+
 	public static ParsedTime getFrom(QDIni cfg, String k) {
 		String v = cfg.get(k).orElse("");
 		try {
@@ -70,7 +70,7 @@ public class ParsedTime {
 			return UNSET;
 		}
 	}
-	
+
 	public static ParsedTime parse(String time) {
 		Preconditions.checkNotNull(time);
 		if (time.isEmpty()) {
@@ -106,5 +106,5 @@ public class ParsedTime {
 		}
 		return new ParsedTime(new BigDecimal(timeNumPart).multiply(new BigDecimal(multiplier)).intValueExact(), priority);
 	}
-	
+
 }

@@ -15,14 +15,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @EligibleIf(envMatches=Env.CLIENT, configEnabled="*.dirt_screen")
 public class MixinTitleScreen extends Screen {
 
-    protected MixinTitleScreen(Text title) {
-        super(title);
-    }
+	protected MixinTitleScreen(Text title) {
+		super(title);
+	}
 
-    @Inject(method = "render", at = @At(value="INVOKE", target="Lnet/minecraft/client/gui/RotatingCubeMapRenderer;render(FF)V", shift = At.Shift.AFTER))
-    public void drawDirt(CallbackInfo ci) {
-        if (MixinConfigPlugin.isEnabled("*.dirt_screen")) {
-            renderBackgroundTexture(0);
-        }
-    }
+	@Inject(method = "render", at = @At(value="INVOKE", target="Lnet/minecraft/client/gui/RotatingCubeMapRenderer;render(FF)V", shift = At.Shift.AFTER))
+	public void drawDirt(CallbackInfo ci) {
+		if (MixinConfigPlugin.isEnabled("*.dirt_screen")) {
+			renderBackgroundTexture(0);
+		}
+	}
 }

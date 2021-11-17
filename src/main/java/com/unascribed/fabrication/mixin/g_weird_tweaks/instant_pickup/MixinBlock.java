@@ -29,6 +29,6 @@ public class MixinBlock {
 			InstantPickup.slurp(world, new Box(pos).expand(0.25), (PlayerEntity)breaker);
 		}
 	}
-	
-	
+
+
 }

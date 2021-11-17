@@ -17,6 +17,7 @@ import com.unascribed.fabrication.interfaces.TaggablePlayer;
 import com.unascribed.fabrication.logic.PlayerTag;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import com.google.common.base.Enums;
 import com.google.common.collect.ImmutableSet;
 
@@ -41,7 +42,7 @@ public abstract class MixinServerPlayerEntity extends PlayerEntity implements Ta
 	}
 
 	private final EnumSet<PlayerTag> fabrication$tags = EnumSet.noneOf(PlayerTag.class);
-	
+
 	@Override
 	public Set<PlayerTag> fabrication$getTags() {
 		return ImmutableSet.copyOf(fabrication$tags);
@@ -71,7 +72,7 @@ public abstract class MixinServerPlayerEntity extends PlayerEntity implements Ta
 	public boolean fabrication$hasTag(PlayerTag tag) {
 		return fabrication$tags.contains(tag);
 	}
-	
+
 	@Inject(at=@At("TAIL"), method="tick()V")
 	public void tick(CallbackInfo ci) {
 		if (MixinConfigPlugin.isEnabled("*.taggable_players")) {
@@ -102,7 +103,7 @@ public abstract class MixinServerPlayerEntity extends PlayerEntity implements Ta
 		fabrication$tags.clear();
 		fabrication$tags.addAll(((TaggablePlayer)oldPlayer).fabrication$getTags());
 	}
-	
+
 	@Inject(at=@At("TAIL"), method="writeCustomDataToNbt(Lnet/minecraft/nbt/NbtCompound;)V")
 	public void writeCustomDataToTag(NbtCompound tag, CallbackInfo ci) {
 		NbtList li = new NbtList();
@@ -113,7 +114,7 @@ public abstract class MixinServerPlayerEntity extends PlayerEntity implements Ta
 			tag.put("fabrication:Tags", li);
 		}
 	}
-	
+
 	@Inject(at=@At("TAIL"), method="readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V")
 	public void readCustomDataFromTag(NbtCompound tag, CallbackInfo ci) {
 		fabrication$tags.clear();
@@ -127,5 +128,5 @@ public abstract class MixinServerPlayerEntity extends PlayerEntity implements Ta
 			}
 		}
 	}
-	
+
 }

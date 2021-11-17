@@ -1,8 +1,15 @@
 package com.unascribed.fabrication.mixin.c_tweaks.recipe_book_auto_craft;
 
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.entity.player.PlayerInventory;
@@ -10,11 +17,6 @@ import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(InventoryScreen.class)
 @EligibleIf(configEnabled="*.recipe_book_auto_craft", envMatches=Env.CLIENT)
@@ -24,6 +26,7 @@ public abstract class MixinInventoryScreen extends AbstractInventoryScreen<Playe
 		super(screenHandler, playerInventory, text);
 	}
 
+	@Override
 	@Shadow protected abstract void onMouseClick(Slot slot, int slotId, int button, SlotActionType actionType);
 
 	@Inject(method="mouseClicked(DDI)Z", at=@At(value="INVOKE", target="Lnet/minecraft/client/gui/screen/ingame/InventoryScreen;setFocused(Lnet/minecraft/client/gui/Element;)V"))

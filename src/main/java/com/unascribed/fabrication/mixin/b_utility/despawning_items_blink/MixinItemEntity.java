@@ -23,16 +23,16 @@ import net.minecraft.world.World;
 @Mixin(ItemEntity.class)
 @EligibleIf(configEnabled="*.despawning_items_blink")
 public abstract class MixinItemEntity extends Entity implements RenderingAgeAccess {
-	
+
 	public MixinItemEntity(EntityType<?> type, World world) {
 		super(type, world);
 	}
-	
+
 	private static final Identifier FABRICATION$ITEM_DESPAWN = new Identifier("fabrication", "item_despawn");
-	
+
 	@Shadow
 	private int itemAge;
-	
+
 	private int fabrication$renderingAge = -1000000;
 
 	@Inject(at=@At("TAIL"), method="tick()V")
@@ -48,15 +48,15 @@ public abstract class MixinItemEntity extends Entity implements RenderingAgeAcce
 		}
 		fabrication$renderingAge++;
 	}
-	
+
 	@Override
 	public int fabrication$getRenderingAge() {
 		return fabrication$renderingAge;
 	}
-	
+
 	@Override
 	public void fabrication$setRenderingAge(int age) {
 		fabrication$renderingAge = age;
 	}
-	
+
 }

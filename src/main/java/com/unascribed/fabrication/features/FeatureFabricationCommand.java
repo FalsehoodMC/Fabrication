@@ -67,7 +67,7 @@ import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.ChunkStatus;
 
 public class FeatureFabricationCommand implements Feature {
-	
+
 	@Override
 	public void apply() {
 		Agnos.runForCommandRegistration((dispatcher, dedi) -> {
@@ -84,7 +84,7 @@ public class FeatureFabricationCommand implements Feature {
 					LiteralArgumentBuilder<ServerCommandSource> remove = LiteralArgumentBuilder.<ServerCommandSource>literal("remove");
 					LiteralArgumentBuilder<ServerCommandSource> get = LiteralArgumentBuilder.<ServerCommandSource>literal("get");
 					LiteralArgumentBuilder<ServerCommandSource> clear = LiteralArgumentBuilder.<ServerCommandSource>literal("clear");
-					
+
 					for (PlayerTag pt : PlayerTag.values()) {
 						add.then(CommandManager.literal(pt.lowerName())
 							.executes(c -> {
@@ -96,7 +96,7 @@ public class FeatureFabricationCommand implements Feature {
 								})
 							)
 						);
-						
+
 						remove.then(CommandManager.literal(pt.lowerName())
 							.executes(c -> {
 								return removeTag(c, Collections.singleton(c.getSource().getPlayer()), pt);
@@ -108,7 +108,7 @@ public class FeatureFabricationCommand implements Feature {
 							)
 						);
 					}
-					
+
 					get.executes(c -> {
 						return getTags(c, c.getSource().getPlayer());
 					}).then(CommandManager.argument("player", EntityArgumentType.player())
@@ -116,7 +116,7 @@ public class FeatureFabricationCommand implements Feature {
 							return getTags(c, EntityArgumentType.getPlayer(c, "player"));
 						})
 					);
-					
+
 					clear.executes(c -> {
 						return clearTags(c, Collections.singleton(c.getSource().getPlayer()));
 					}).then(CommandManager.argument("players", EntityArgumentType.players())
@@ -124,21 +124,21 @@ public class FeatureFabricationCommand implements Feature {
 							return clearTags(c, EntityArgumentType.getPlayers(c, "players"));
 						})
 					);
-				
+
 					tag.then(add);
 					tag.then(remove);
 					tag.then(get);
 					tag.then(clear);
-					
+
 				}
 				root.then(tag);
-				
+
 				LiteralArgumentBuilder<ServerCommandSource> analyze = LiteralArgumentBuilder.<ServerCommandSource>literal("analyze");
 				analyze.requires(scs -> scs.hasPermissionLevel(4));
 				{
 					LiteralArgumentBuilder<ServerCommandSource> biome = CommandManager.literal("biome");
-					
-					
+
+
 					for (Map.Entry<RegistryKey<Biome>, Biome> en : BuiltinRegistries.BIOME.getEntries()) {
 						Identifier id = en.getKey().getValue();
 						Identifier b = en.getKey().getValue();
@@ -160,7 +160,7 @@ public class FeatureFabricationCommand implements Feature {
 						biome.then(CommandManager.literal(id.toString())
 								.executes(exec));
 					}
-					
+
 					analyze.then(CommandManager.literal("block_distribution")
 									.executes(c -> analyzeBlockDistribution(c, c.getSource().getEntityOrThrow().world, null))
 									.then(biome)
@@ -170,7 +170,7 @@ public class FeatureFabricationCommand implements Feature {
 												.executes(c -> analyzeBlockDistribution(c, DimensionArgumentType.getDimensionArgument(c, "dimension"), null)))));
 				}
 				root.then(analyze);
-				
+
 				dispatcher.register(root);
 			} catch (Throwable t) {
 				FabricationMod.featureError(this, t);
@@ -200,17 +200,17 @@ public class FeatureFabricationCommand implements Feature {
 			int legLength = 0;
 			int i = 0;
 			int j = 0;
-			
+
 			int scannedChunks = 0;
 
 			long scanned = 0;
 			long skipped = 0;
 			long goal = (biomes == null ? 8000 : 1000)*16*16*world.getHeight();
-			
+
 			class MutableLong { long value = 1; }
-			
+
 			Map<BlockState, MutableLong> counts = Maps.newHashMap();
-			
+
 			// scan in a counterclockwise outward spiral from 0, 0
 			out: while (true) {
 				Chunk chunk = world.getChunk(x, z, ChunkStatus.FULL, false);
@@ -283,7 +283,7 @@ public class FeatureFabricationCommand implements Feature {
 				BigDecimal scannedBD = new BigDecimal(scanned);
 				BigDecimal hundred = new BigDecimal(100);
 				for (Map.Entry<BlockState, MutableLong> en : sorted) {
-					osw.write(Registry.BLOCK.getId(en.getKey().getBlock()).toString().replace("\t", "    "));
+					osw.write(Registry.BLOCK.getId(en.getKey().getBlock()).toString().replace("\t", "	"));
 					if (!en.getKey().getEntries().isEmpty()) {
 						osw.write("[");
 						boolean first = true;
@@ -293,9 +293,9 @@ public class FeatureFabricationCommand implements Feature {
 							} else {
 								osw.write(",");
 							}
-							osw.write(stateEn.getKey().getName().replace("\t", "    "));
+							osw.write(stateEn.getKey().getName().replace("\t", "	"));
 							osw.write("=");
-							osw.write(((Property)stateEn.getKey()).name(stateEn.getValue()).replace("\t", "    "));
+							osw.write(((Property)stateEn.getKey()).name(stateEn.getValue()).replace("\t", "	"));
 						}
 						osw.write("]");
 					}
@@ -316,7 +316,7 @@ public class FeatureFabricationCommand implements Feature {
 		config.requires(s -> {
 			// always allow a client to reconfigure itself
 			if (!(s instanceof ServerCommandSource)) return true;
-			
+
 			ServerCommandSource scs = (ServerCommandSource)s;
 			if (scs.hasPermissionLevel(2)) return true;
 			if (scs.getMinecraftServer().isSinglePlayer() && scs.getEntity() != null) {
@@ -490,7 +490,7 @@ public class FeatureFabricationCommand implements Feature {
 		}
 		return 1;
 	}
-	
+
 	private int removeTag(CommandContext<ServerCommandSource> c, Collection<ServerPlayerEntity> players, PlayerTag pt) {
 		for (ServerPlayerEntity spe : players) {
 			((TaggablePlayer)spe).fabrication$setTag(pt, false);

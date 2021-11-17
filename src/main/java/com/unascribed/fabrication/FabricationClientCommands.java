@@ -18,8 +18,8 @@ import com.unascribed.fabrication.client.AtlasViewerScreen;
 import com.unascribed.fabrication.client.OptionalFScriptScreen;
 import com.unascribed.fabrication.features.FeatureFabricationCommand;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
-
 import com.unascribed.fabrication.support.OptionalFScript;
+
 import io.github.queerbric.pride.PrideFlags;
 import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
 import net.minecraft.client.MinecraftClient;
@@ -42,7 +42,7 @@ public class FabricationClientCommands {
 			}
 			throw new CommandException(new LiteralText("There is no atlas with ID "+id));
 		}
-		
+
 		@Override
 		public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
 			for (SpriteAtlasTexture sat : AtlasTracking.allAtlases) {
@@ -50,13 +50,13 @@ public class FabricationClientCommands {
 			}
 			return builder.buildFuture();
 		}
-		
+
 		@Override
 		public Collection<String> getExamples() {
 			return Collections.singleton(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE.toString());
 		}
 	}
-	
+
 	public static void registerCommands(CommandDispatcher<FabricClientCommandSource> dispatcher) {
 		LiteralArgumentBuilder<FabricClientCommandSource> root = LiteralArgumentBuilder.<FabricClientCommandSource>literal("fabrication:client");
 		if (Agnos.isModLoaded("fscript")) addFScript(root);

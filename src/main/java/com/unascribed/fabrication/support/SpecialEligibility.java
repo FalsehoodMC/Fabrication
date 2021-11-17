@@ -12,7 +12,7 @@ public enum SpecialEligibility {
 		this.displayName = displayName;
 		this.ignorableWithRuntimeChecks = ignorableWithRuntimeChecks;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "\""+displayName+"\"";

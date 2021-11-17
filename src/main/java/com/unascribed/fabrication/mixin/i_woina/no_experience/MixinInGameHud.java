@@ -23,7 +23,7 @@ public class MixinInGameHud {
 			ci.cancel();
 		}
 	}
-	
+
 	@Inject(at=@At("HEAD"), method="renderStatusBars(Lnet/minecraft/client/util/math/MatrixStack;)V")
 	private void renderStatusBarsHead(MatrixStack matrices, CallbackInfo ci) {
 		if (MixinConfigPlugin.isEnabled("*.no_experience")) {
@@ -31,12 +31,12 @@ public class MixinInGameHud {
 			GlStateManager.translatef(0, 7, 0);
 		}
 	}
-	
+
 	@Inject(at=@At("RETURN"), method="renderStatusBars(Lnet/minecraft/client/util/math/MatrixStack;)V")
 	private void renderStatusBarsRet(MatrixStack matrices, CallbackInfo ci) {
 		if (MixinConfigPlugin.isEnabled("*.no_experience")) {
 			GlStateManager.popMatrix();
 		}
 	}
-	
+
 }

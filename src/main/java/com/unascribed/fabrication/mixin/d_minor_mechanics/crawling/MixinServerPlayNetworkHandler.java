@@ -19,10 +19,10 @@ import net.minecraft.util.Identifier;
 @Mixin(ServerPlayNetworkHandler.class)
 @EligibleIf(configEnabled="*.crawling")
 public class MixinServerPlayNetworkHandler {
-	
+
 	@Shadow
 	public ServerPlayerEntity player;
-	
+
 	@Inject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/c2s/play/CustomPayloadC2SPacket;)V", cancellable=true)
 	public void onCustomPayload(CustomPayloadC2SPacket packet, CallbackInfo ci) {
 		Identifier channel = FabRefl.getChannel(packet);
@@ -35,5 +35,5 @@ public class MixinServerPlayNetworkHandler {
 			ci.cancel();
 		}
 	}
-	
+
 }

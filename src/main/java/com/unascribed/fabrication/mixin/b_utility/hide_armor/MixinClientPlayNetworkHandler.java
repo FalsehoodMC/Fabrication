@@ -23,10 +23,10 @@ import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 @Mixin(ClientPlayNetworkHandler.class)
 @EligibleIf(configEnabled="*.hide_armor", envMatches=Env.CLIENT)
 public class MixinClientPlayNetworkHandler {
-	
+
 	@Shadow @Final
 	private ClientConnection connection;
-	
+
 	@Inject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/s2c/play/CustomPayloadS2CPacket;)V", cancellable=true)
 	public void onCustomPayload(CustomPayloadS2CPacket packet, CallbackInfo ci) {
 		if (packet.getChannel().getNamespace().equals("fabrication") && packet.getChannel().getPath().equals("hide_armor")) {
@@ -46,5 +46,5 @@ public class MixinClientPlayNetworkHandler {
 			ci.cancel();
 		}
 	}
-	
+
 }

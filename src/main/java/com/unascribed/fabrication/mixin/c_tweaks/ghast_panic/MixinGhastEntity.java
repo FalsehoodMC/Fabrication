@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.FlyingEntity;
 import net.minecraft.entity.mob.GhastEntity;
@@ -29,5 +30,5 @@ public abstract class MixinGhastEntity extends FlyingEntity {
 			ci.setReturnValue(SoundEvents.ENTITY_GHAST_SCREAM);
 		}
 	}
-	
+
 }

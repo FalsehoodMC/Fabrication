@@ -14,16 +14,16 @@ import net.minecraft.entity.player.PlayerEntity;
 @Mixin(PlayerEntity.class)
 @EligibleIf(configEnabled="*.crawling")
 public class MixinPlayerEntity implements SetCrawling {
-	
+
 	private boolean fabrication$crawling;
-	
+
 	@Inject(at=@At("HEAD"), method="jump()V", cancellable=true)
 	public void jump(CallbackInfo ci) {
 		if (MixinConfigPlugin.isEnabled("*.crawling") && fabrication$crawling) {
 			ci.cancel();
 		}
 	}
-	
+
 	@Inject(at=@At("HEAD"), method="updateSwimming()V", cancellable=true)
 	public void updateSwimming(CallbackInfo ci) {
 		if (MixinConfigPlugin.isEnabled("*.crawling") && fabrication$crawling) {
@@ -36,10 +36,10 @@ public class MixinPlayerEntity implements SetCrawling {
 	public void fabrication$setCrawling(boolean b) {
 		fabrication$crawling = b;
 	}
-	
+
 	@Override
 	public boolean fabrication$isCrawling() {
 		return fabrication$crawling;
 	}
-	
+
 }

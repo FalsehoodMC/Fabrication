@@ -9,6 +9,7 @@ import com.unascribed.fabrication.features.FeatureToggleStance;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.client.input.KeyboardInput;
 
 @Mixin(KeyboardInput.class)
@@ -21,5 +22,5 @@ public class MixinKeyboardInput {
 			((KeyboardInput)(Object)this).sneaking = true;
 		}
 	}
-	
+
 }

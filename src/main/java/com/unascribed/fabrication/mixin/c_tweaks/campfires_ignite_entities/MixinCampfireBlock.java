@@ -1,16 +1,18 @@
 package com.unascribed.fabrication.mixin.c_tweaks.campfires_ignite_entities;
 
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CampfireBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(CampfireBlock.class)
 @EligibleIf(configEnabled="*.campfires_ignite_entities")
@@ -23,5 +25,5 @@ public class MixinCampfireBlock {
 		entity.setFireTicks(entity.getFireTicks() + 1);
 		if (entity.getFireTicks() == 0) entity.setOnFireFor(8);
 	}
-	
+
 }

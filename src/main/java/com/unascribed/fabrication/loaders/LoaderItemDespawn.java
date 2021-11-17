@@ -21,21 +21,21 @@ public class LoaderItemDespawn implements ConfigLoader {
 	public static final Map<Resolvable<Enchantment>, ParsedTime> enchDespawns = Maps.newHashMap();
 	public static final Map<Identifier, ParsedTime> tagDespawns = Maps.newHashMap();
 	public static final Map<String, ParsedTime> nbtBools = Maps.newHashMap();
-	
+
 	public static ParsedTime curseDespawn = ParsedTime.UNSET;
 	public static ParsedTime normalEnchDespawn = ParsedTime.UNSET;
 	public static ParsedTime treasureDespawn = ParsedTime.UNSET;
-	
+
 	public static ParsedTime defaultDespawn = ParsedTime.UNSET;
 	public static ParsedTime dropsDespawn = ParsedTime.UNSET;
 	public static ParsedTime renamedDespawn = ParsedTime.UNSET;
 	public static ParsedTime playerDeathDespawn = ParsedTime.UNSET;
-	
+
 	@Override
 	public String getConfigName() {
 		return "item_despawn";
 	}
-	
+
 	@Override
 	public void load(Path configDir, QDIni config, boolean loadError) {
 		itemDespawns.clear();
@@ -68,5 +68,5 @@ public class LoaderItemDespawn implements ConfigLoader {
 			}
 		}
 	}
-	
+
 }

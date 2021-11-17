@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.enchantment.DamageEnchantment;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentTarget;
@@ -22,7 +23,7 @@ import net.minecraft.item.Items;
 public class MixinDamageEnchantment extends Enchantment {
 
 	// enchantment is implemented in MixinTridentEntity in z_combined.trident_enchantments
-	
+
 	protected MixinDamageEnchantment(Rarity weight, EnchantmentTarget type, EquipmentSlot[] slotTypes) {
 		super(weight, type, slotTypes);
 	}
@@ -34,12 +35,12 @@ public class MixinDamageEnchantment extends Enchantment {
 			ci.setReturnValue(false);
 		}
 	}
-	
+
 	@Inject(at=@At("HEAD"), method="isAcceptableItem(Lnet/minecraft/item/ItemStack;)Z", cancellable=true)
 	public void isAcceptableItem(ItemStack stack, CallbackInfoReturnable<Boolean> ci) {
 		if (MixinConfigPlugin.isEnabled("*.tridents_accept_sharpness") && this == Enchantments.SHARPNESS && stack.getItem() == Items.TRIDENT) {
 			ci.setReturnValue(true);
 		}
 	}
-	
+
 }

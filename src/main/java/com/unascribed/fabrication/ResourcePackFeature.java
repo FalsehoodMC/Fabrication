@@ -14,10 +14,10 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.resource.ResourcePack;
 import net.minecraft.resource.ResourcePackProfile;
-import net.minecraft.resource.ResourcePackProvider;
-import net.minecraft.resource.ResourcePackSource;
 import net.minecraft.resource.ResourcePackProfile.Factory;
 import net.minecraft.resource.ResourcePackProfile.InsertionPosition;
+import net.minecraft.resource.ResourcePackProvider;
+import net.minecraft.resource.ResourcePackSource;
 import net.minecraft.resource.metadata.PackResourceMetadata;
 import net.minecraft.text.LiteralText;
 
@@ -25,12 +25,12 @@ public abstract class ResourcePackFeature implements Feature, ResourcePackProvid
 
 	private final String configKey;
 	private final String path;
-	
+
 	private boolean active = false;
-	
+
 	@Environment(EnvType.CLIENT)
 	private ResourcePack pack;
-	
+
 	public ResourcePackFeature(String path) {
 		this.configKey = "*."+path;
 		this.path = path;
@@ -38,7 +38,7 @@ public abstract class ResourcePackFeature implements Feature, ResourcePackProvid
 			initClient();
 		}
 	}
-	
+
 	@Environment(EnvType.CLIENT)
 	private void initClient() {
 		Set<ResourcePackProvider> providers = FabRefl.getProviders(MinecraftClient.getInstance().getResourcePackManager());
@@ -60,7 +60,7 @@ public abstract class ResourcePackFeature implements Feature, ResourcePackProvid
 					InsertionPosition.TOP, ResourcePackSource.PACK_SOURCE_BUILTIN));
 		}
 	}
-	
+
 	@Override
 	public void apply() {
 		active = true;
@@ -68,14 +68,14 @@ public abstract class ResourcePackFeature implements Feature, ResourcePackProvid
 			reloadClient();
 		}
 	}
-	
+
 	@Environment(EnvType.CLIENT)
 	private void reloadClient() {
 		if (MinecraftClient.getInstance().getResourceManager() != null) {
 			MinecraftClient.getInstance().reloadResources();
 		}
 	}
-	
+
 	@Override
 	public boolean undo() {
 		active = false;
@@ -84,10 +84,10 @@ public abstract class ResourcePackFeature implements Feature, ResourcePackProvid
 		}
 		return true;
 	}
-	
+
 	@Override
 	public String getConfigKey() {
 		return configKey;
 	}
-	
+
 }

@@ -9,12 +9,13 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity.PickupPermission;
+import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -33,7 +34,7 @@ public class MixinCrossbowItem {
 		}
 		return creative;
 	}
-	
+
 	@Inject(at=@At(value="INVOKE", target="net/minecraft/item/ItemStack.damage(ILnet/minecraft/entity/LivingEntity;Ljava/util/function/Consumer;)V"),
 			method="shoot(Lnet/minecraft/world/World;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemStack;FZFFF)V",
 			locals=LocalCapture.CAPTURE_FAILHARD)
@@ -45,5 +46,5 @@ public class MixinCrossbowItem {
 			((PersistentProjectileEntity)proj).pickupType = PickupPermission.CREATIVE_ONLY;
 		}
 	}
-	
+
 }

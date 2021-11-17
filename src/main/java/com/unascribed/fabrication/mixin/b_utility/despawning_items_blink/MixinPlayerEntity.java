@@ -4,12 +4,13 @@ import org.spongepowered.asm.mixin.Mixin;
 
 import com.unascribed.fabrication.interfaces.SetItemDespawnAware;
 import com.unascribed.fabrication.support.EligibleIf;
+
 import net.minecraft.entity.player.PlayerEntity;
 
 @Mixin(PlayerEntity.class)
 @EligibleIf(configEnabled="*.despawning_items_blink")
 public class MixinPlayerEntity implements SetItemDespawnAware {
-	
+
 	private boolean fabrication$itemDespawnAware;
 
 	@Override
@@ -21,5 +22,5 @@ public class MixinPlayerEntity implements SetItemDespawnAware {
 	public boolean fabrication$isItemDespawnAware() {
 		return fabrication$itemDespawnAware;
 	}
-	
+
 }

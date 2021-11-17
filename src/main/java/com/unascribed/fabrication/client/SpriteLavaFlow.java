@@ -22,12 +22,12 @@ public class SpriteLavaFlow extends Sprite
 	protected float[] field_76875_i = new float[256];
 	protected float[] field_76872_j = new float[256];
 	int field_76873_k = 0;
-	
+
 
 	@Override
 	public void tickAnimation() {
 		// I cannot be bothered to deobfuscate this the rest of the way.
-		
+
 		++this.field_76873_k;
 		int var2;
 		float var3;

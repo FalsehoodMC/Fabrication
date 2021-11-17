@@ -24,4 +24,4 @@ public abstract class MixinLivingEntity {
 		((CreeperEntity)self).ignite();
 		cir.setReturnValue(false);
 	}
-} 
+}

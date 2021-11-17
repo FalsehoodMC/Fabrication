@@ -10,6 +10,7 @@ import com.unascribed.fabrication.loaders.LoaderDimensionalTools.NameSubstitutio
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Feature;
+
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
@@ -32,10 +33,10 @@ public class FeatureDimensionalTools implements Feature {
 		format.setGroupingUsed(false);
 		format.setMaximumFractionDigits(2);
 	}
-	
+
 	private boolean applied = false;
 	private boolean active = false;
-	
+
 	@Override
 	public void apply() {
 		active = true;

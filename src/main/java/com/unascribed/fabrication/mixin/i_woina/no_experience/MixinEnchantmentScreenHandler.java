@@ -23,5 +23,5 @@ public class MixinEnchantmentScreenHandler {
 		if (MixinConfigPlugin.isEnabled("*.no_experience")) return 65535;
 		return subject.experienceLevel;
 	}
-	
+
 }

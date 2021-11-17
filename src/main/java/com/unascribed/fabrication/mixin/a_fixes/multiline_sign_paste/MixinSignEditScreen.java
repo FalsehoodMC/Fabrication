@@ -68,7 +68,7 @@ public abstract class MixinSignEditScreen extends Screen {
 					return client.textRenderer.getWidth(pasted) <= 90;
 				});
 	}
-	
+
 	@Inject(at=@At("HEAD"), method="keyPressed(III)Z", cancellable=true)
 	public void keyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> ci) {
 		if (keyCode == GLFW.GLFW_KEY_C && hasControlDown() && hasShiftDown() && !hasAltDown()) {

@@ -27,5 +27,5 @@ public abstract class MixinZombieVillagerEntity extends ZombieEntity {
 			remove();
 		}
 	}
-	
+
 }

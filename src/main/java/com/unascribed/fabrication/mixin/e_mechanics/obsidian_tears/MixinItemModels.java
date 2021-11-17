@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.client.render.item.ItemModels;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedModelManager;
@@ -22,13 +23,13 @@ import net.minecraft.util.Identifier;
 @Mixin(ItemModels.class)
 @EligibleIf(configEnabled="*.obsidian_tears", envMatches=Env.CLIENT)
 public abstract class MixinItemModels {
-	
+
 	@Unique
 	private BakedModel fabrication$obsidianTearsModel = null;
 
 	@Shadow
 	public abstract BakedModelManager getModelManager();
-	
+
 	@Inject(at=@At("HEAD"), method="getModel(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/client/render/model/BakedModel;",
 			cancellable=true, require=0)
 	public void getModel(ItemStack stack, CallbackInfoReturnable<BakedModel> ci) {
@@ -37,10 +38,10 @@ public abstract class MixinItemModels {
 			ci.setReturnValue(fabrication$obsidianTearsModel);
 		}
 	}
-	
+
 	@Inject(at=@At("TAIL"), method="reloadModels()V", require=0)
 	public void reloadModels(CallbackInfo ci) {
 		fabrication$obsidianTearsModel = getModelManager().getModel(new ModelIdentifier(new Identifier("fabrication", "obsidian_tears"), "inventory"));
 	}
-	
+
 }

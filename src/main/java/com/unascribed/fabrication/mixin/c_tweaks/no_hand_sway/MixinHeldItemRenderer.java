@@ -1,12 +1,14 @@
 package com.unascribed.fabrication.mixin.c_tweaks.no_hand_sway;
 
-import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
-import net.minecraft.client.render.item.HeldItemRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+
+import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.Env;
+import com.unascribed.fabrication.support.MixinConfigPlugin;
+
+import net.minecraft.client.render.item.HeldItemRenderer;
 
 @Mixin(HeldItemRenderer.class)
 @EligibleIf(configEnabled="*.no_hand_sway", envMatches=Env.CLIENT)
@@ -22,5 +24,5 @@ public abstract class MixinHeldItemRenderer {
 	private float setI(float i) {
 		return MixinConfigPlugin.isEnabled("*.no_hand_sway") ? 1 : i;
 	}
-	
+
 }

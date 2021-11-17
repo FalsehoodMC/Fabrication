@@ -6,9 +6,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
 import com.unascribed.fabrication.interfaces.WasShoved;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.vehicle.AbstractMinecartEntity;
 import net.minecraft.entity.vehicle.FurnaceMinecartEntity;
@@ -24,7 +26,7 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 
 	@Shadow
 	public int fuel;
-	
+
 	@Inject(at=@At("HEAD"), method="tick()V")
 	public void tick(CallbackInfo ci) {
 		if (MixinConfigPlugin.isEnabled("*.hyperspeed_furnace_minecart") && !(this instanceof WasShoved && ((WasShoved)this).fabrication$wasShoved())) {
@@ -32,12 +34,12 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 			fuel = Math.max(0, fuel - 3);
 		}
 	}
-	
+
 	@Inject(at=@At("RETURN"), method="getMaxOffRailSpeed()D", cancellable=true)
 	public void getMaxOffRailSpeed(CallbackInfoReturnable<Double> ci) {
 		if (MixinConfigPlugin.isEnabled("*.hyperspeed_furnace_minecart")) {
 			ci.setReturnValue(Math.max(ci.getReturnValueD(), 0.6));
 		}
 	}
-	
+
 }

@@ -5,6 +5,7 @@ import org.spongepowered.asm.mixin.Shadow;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -25,10 +26,10 @@ public abstract class MixinNoteBlock extends Block {
 	public MixinNoteBlock(Settings settings) {
 		super(settings);
 	}
-	
+
 	@Shadow
 	private void playNote(World world, BlockPos pos) {}
-	
+
 	@Override
 	public void onLandedUpon(World world, BlockPos pos, Entity entity, float distance) {
 		super.onLandedUpon(world, pos, entity, distance);

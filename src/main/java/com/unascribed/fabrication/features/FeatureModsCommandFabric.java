@@ -2,11 +2,12 @@ package com.unascribed.fabrication.features;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.unascribed.fabrication.FabricationMod;
+import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.SpecialEligibility;
-import com.unascribed.fabrication.FabricationMod;
-import com.unascribed.fabrication.support.EligibleIf;
+
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
@@ -22,9 +23,9 @@ import net.minecraft.util.Formatting;
 
 @EligibleIf(configEnabled="*.mods_command", specialConditions=SpecialEligibility.NOT_FORGE)
 public class FeatureModsCommandFabric implements Feature {
-	
+
 	private boolean applied = false;
-	
+
 	@Override
 	public void apply() {
 		if (applied) return;
@@ -57,7 +58,7 @@ public class FeatureModsCommandFabric implements Feature {
 			}
 		});
 	}
-	
+
 	@Override
 	public boolean undo() {
 		return true;

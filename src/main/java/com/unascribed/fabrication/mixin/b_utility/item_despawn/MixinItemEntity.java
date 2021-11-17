@@ -55,15 +55,15 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 	private int fabrication$extraTime;
 	private boolean fabrication$invincible;
 	private boolean fabrication$fromPlayerDeath;
-	
+
 	@Shadow
 	private int itemAge;
 	@Shadow
 	private UUID thrower;
-	
+
 	@Shadow
 	public abstract ItemStack getStack();
-	
+
 	@Inject(at=@At("HEAD"), method="tick()V")
 	public void tickHead(CallbackInfo ci) {
 		if (fabrication$extraTime > 0) {
@@ -82,31 +82,31 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 			}
 		}
 	}
-	
+
 	@Inject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", cancellable=true)
 	public void damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> ci) {
 		if (fabrication$invincible || (MixinConfigPlugin.isEnabled("*.item_despawn") && world.isClient)) {
 			ci.setReturnValue(false);
 		}
 	}
-	
+
 	@Inject(at=@At("TAIL"), method="setStack(Lnet/minecraft/item/ItemStack;)V")
 	public void setStack(ItemStack stack, CallbackInfo ci) {
 		calculateDespawn();
 	}
-	
+
 	@Inject(at=@At("TAIL"), method="setThrower(Ljava/util/UUID;)V")
 	public void setThrower(UUID id, CallbackInfo ci) {
 		calculateDespawn();
 	}
-	
+
 	@ModifyConstant(constant=@Constant(intValue=-32768), method="canMerge()Z")
 	public int modifyIllegalAge(int orig) {
 		// age-1 will never be equal to age; short-circuits the "age != -32768" check and allows
 		// items set to "invincible" to stack together
 		return fabrication$invincible ? itemAge -1 : orig;
 	}
-	
+
 	@Override
 	public void fabrication$setFromPlayerDeath(boolean b) {
 		fabrication$fromPlayerDeath = b;
@@ -217,7 +217,7 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 			}
 		}
 	}
-	
+
 	@Inject(at=@At("TAIL"), method="writeCustomDataToNbt(Lnet/minecraft/nbt/NbtCompound;)V")
 	public void writeCustomDataToTag(NbtCompound tag, CallbackInfo ci) {
 		if (fabrication$extraTime > 0) tag.putInt("fabrication:ExtraTime", fabrication$extraTime);
@@ -225,7 +225,7 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 		if (fabrication$fromPlayerDeath) tag.putBoolean("fabrication:FromPlayerDeath", true);
 		if (fabrication$invincible) tag.putBoolean("fabrication:Invincible", true);
 	}
-	
+
 	@Inject(at=@At("TAIL"), method="readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V")
 	public void readCustomDataFromTag(NbtCompound tag, CallbackInfo ci) {
 		fabrication$extraTime = tag.getInt("fabrication:ExtraTime");
@@ -233,5 +233,5 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 		fabrication$fromPlayerDeath = tag.getBoolean("fabrication:FromPlayerDeath");
 		fabrication$invincible = tag.getBoolean("fabrication:Invincible");
 	}
-	
+
 }

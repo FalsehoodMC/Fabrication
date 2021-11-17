@@ -1,15 +1,14 @@
 package com.unascribed.fabrication.features;
 
+import com.unascribed.fabrication.FabRefl;
+import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Feature;
 
 import com.google.common.collect.ImmutableList;
 
-import com.unascribed.fabrication.FabRefl;
-import com.unascribed.fabrication.support.EligibleIf;
-
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.Block;
 
 @EligibleIf(configEnabled="*.faster_obsidian")
 public class FeatureFasterObsidian implements Feature {
@@ -19,12 +18,12 @@ public class FeatureFasterObsidian implements Feature {
 			Blocks.CRYING_OBSIDIAN,
 			Blocks.ENDER_CHEST
 		);
-	
+
 	@Override
 	public void apply() {
 		amendHardness(1/3f);
 	}
-	
+
 	@Override
 	public boolean undo() {
 		amendHardness(3);

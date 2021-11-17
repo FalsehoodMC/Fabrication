@@ -12,6 +12,7 @@ import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.argument.EnchantmentArgumentType;
@@ -37,7 +38,7 @@ public class FeatureIMore implements Feature {
 
 	private boolean applied = false;
 	private boolean registered = false;
-	
+
 	@Override
 	public void apply() {
 		applied = true;
@@ -79,7 +80,7 @@ public class FeatureIMore implements Feature {
 			});
 		}
 	}
-	
+
 	public int fenchant(ServerCommandSource source, Collection<? extends Entity> targets, Enchantment enchantment, int level) throws CommandSyntaxException {
 		int amt = 0;
 		for (Entity e : targets) {
@@ -118,7 +119,7 @@ public class FeatureIMore implements Feature {
 
 		return amt;
 	}
-	
+
 	public int more(CommandContext<ServerCommandSource> ctx, EquipmentSlot slot) throws CommandSyntaxException {
 		ServerPlayerEntity player = ctx.getSource().getPlayer();
 		ItemStack held = player.getEquippedStack(slot);
@@ -145,7 +146,7 @@ public class FeatureIMore implements Feature {
 		player.equipStack(slot, held);
 		return 1;
 	}
-	
+
 	public int item(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
 		int count;
 		try {

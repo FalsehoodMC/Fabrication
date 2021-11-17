@@ -1,5 +1,11 @@
 package com.unascribed.fabrication;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+
+import com.unascribed.fabrication.logic.WoinaDrops;
+import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
 import net.minecraft.client.MinecraftClient;
@@ -8,12 +14,6 @@ import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceReloader;
 import net.minecraft.util.Unit;
 import net.minecraft.util.profiler.Profiler;
-
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
-
-import com.unascribed.fabrication.logic.WoinaDrops;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 public class FabricationModClient implements ClientModInitializer {
 	@Override

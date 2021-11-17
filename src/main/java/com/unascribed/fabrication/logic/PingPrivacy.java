@@ -14,7 +14,7 @@ public class PingPrivacy {
 	private static final String consonants = "bcdfghjklmprstvwy ";
 	private static final String rareConsonants = "xqz";
 	private static final String numbers = "0123456789";
-	
+
 	public static void generateBelievableUsername(Random r, StringBuilder sb) {
 		int len = r.nextInt(13)+3;
 		boolean spammingNumbers = false;
@@ -47,11 +47,11 @@ public class PingPrivacy {
 			}
 		}
 	}
-	
+
 	private static char pick(Random r, String s) {
 		return s.charAt(r.nextInt(s.length()));
 	}
-	
+
 	private static final Set<InetAddress> EVIL_ADDRESSES = ImmutableSet.of(
 			// NameMC - they constantly ping servers without permission and collect data on players with no opt-out
 			constantAddress("51.222.110.150")
@@ -64,9 +64,9 @@ public class PingPrivacy {
 			throw new AssertionError(e);
 		}
 	}
-	
+
 	public static boolean isEvil(InetAddress addr) {
 		return EVIL_ADDRESSES.contains(addr);
 	}
-	
+
 }

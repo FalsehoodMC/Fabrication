@@ -25,10 +25,10 @@ import net.minecraft.util.profiler.Profiler;
 @Mixin(RecipeManager.class)
 @EligibleIf(configEnabled="*.yeet_recipes")
 public class MixinRecipeManager {
-	
+
 	@Shadow
 	private Map<RecipeType<?>, Map<Identifier, Recipe<?>>> recipes;
-	
+
 	@Inject(at=@At("TAIL"), method="apply(Ljava/util/Map;Lnet/minecraft/resource/ResourceManager;Lnet/minecraft/util/profiler/Profiler;)V")
 	public void apply(Map<Identifier, JsonElement> map, ResourceManager rm, Profiler profiler, CallbackInfo ci) {
 		recipes = Maps.transformValues(recipes, m -> Maps.filterKeys(m, k -> !MixinConfigPlugin.isEnabled("*.yeet_recipes") || !LoaderYeetRecipes.recipesToYeet.contains(k)));

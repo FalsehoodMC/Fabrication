@@ -36,5 +36,5 @@ public abstract class MixinCreeperEntity extends HostileEntity {
 		withinRangePredicate.ignoreEntityTargetRules();
 		goalSelector.add(3, goal);
 	}
-	
+
 }

@@ -30,17 +30,17 @@ import net.minecraft.world.World;
 @Mixin(LivingEntity.class)
 @EligibleIf(configEnabled="*.alt_absorption_sound")
 public abstract class MixinLivingEntity extends Entity implements DidJustAbsorp {
-	
+
 	public MixinLivingEntity(EntityType<?> type, World world) {
 		super(type, world);
 	}
 
 	@Unique
 	private float fabrication$absorptionAmountBeforeDamage;
-	
+
 	@Shadow
 	protected float lastDamageTaken;
-	
+
 	@Shadow
 	public abstract float getAbsorptionAmount();
 	@Shadow
@@ -49,17 +49,17 @@ public abstract class MixinLivingEntity extends Entity implements DidJustAbsorp 
 	protected abstract float getSoundVolume();
 	@Shadow
 	protected abstract float getSoundPitch();
-	
+
 	@Inject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z")
 	public void damage(DamageSource ds, float amount, CallbackInfoReturnable<Boolean> cir) {
 		fabrication$absorptionAmountBeforeDamage = getAbsorptionAmount();
 	}
-	
+
 	@Override
 	public boolean fabrication$didJustAbsorp() {
 		return getAbsorptionAmount() < fabrication$absorptionAmountBeforeDamage && fabrication$absorptionAmountBeforeDamage >= lastDamageTaken;
 	}
-	
+
 	@Inject(at=@At("HEAD"), method="playHurtSound(Lnet/minecraft/entity/damage/DamageSource;)V",
 			cancellable=true)
 	public void playHurtSound(DamageSource src, CallbackInfo ci) {
@@ -89,5 +89,5 @@ public abstract class MixinLivingEntity extends Entity implements DidJustAbsorp 
 			ci.cancel();
 		}
 	}
-	
+
 }

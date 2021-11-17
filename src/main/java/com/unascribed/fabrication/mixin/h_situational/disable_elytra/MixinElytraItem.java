@@ -1,11 +1,11 @@
 package com.unascribed.fabrication.mixin.h_situational.disable_elytra;
 
-import com.unascribed.fabrication.support.ConfigPredicates;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 
@@ -22,5 +22,5 @@ public class MixinElytraItem {
 			ci.setReturnValue(false);
 		}
 	}
-	
+
 }

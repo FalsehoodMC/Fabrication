@@ -11,6 +11,7 @@ import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.SignBlockEntityRenderer;
@@ -24,20 +25,20 @@ public class MixinSignBlockEntityRenderer {
 
 	@Unique
 	private static final String RENDER = "render(Lnet/minecraft/block/entity/SignBlockEntity;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;II)V";
-	
+
 	@Unique
 	private SignBlockEntity fabrication$currentEntity;
-	
+
 	@Inject(at=@At("HEAD"), method=RENDER)
 	public void renderHead(SignBlockEntity sbe, float f, MatrixStack matrices, VertexConsumerProvider vcp, int i, int j, CallbackInfo ci) {
 		fabrication$currentEntity = sbe;
 	}
-	
+
 	@Inject(at=@At("TAIL"), method=RENDER)
 	public void renderTail(SignBlockEntity sbe, float f, MatrixStack matrices, VertexConsumerProvider vcp, int i, int j, CallbackInfo ci) {
 		fabrication$currentEntity = null;
 	}
-	
+
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/client/texture/NativeImage.getAbgrColor(IIII)I"),
 			method=RENDER)
 	public int modifySignTextColor(int a, int r, int g, int b) {
@@ -50,5 +51,5 @@ public class MixinSignBlockEntityRenderer {
 			default: return FabRefl.getColor(dc);
 		}
 	}
-	
+
 }

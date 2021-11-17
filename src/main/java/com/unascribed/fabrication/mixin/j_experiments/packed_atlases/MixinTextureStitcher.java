@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.client.texture.TextureStitcher;
 import net.minecraft.util.math.MathHelper;
 
@@ -20,5 +21,5 @@ public class MixinTextureStitcher {
 		if (MixinConfigPlugin.isEnabled("*.packed_atlases")) return in;
 		return MathHelper.smallestEncompassingPowerOfTwo(in);
 	}
-	
+
 }

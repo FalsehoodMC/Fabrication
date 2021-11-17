@@ -8,7 +8,7 @@ import net.minecraft.text.Text;
 public class ColorButtonWidget extends ButtonWidget {
 
 	private int bg;
-	
+
 	public ColorButtonWidget(int x, int y, int width, int height, int bg, Text message, PressAction onPress, TooltipSupplier tooltipSupplier) {
 		super(x, y, width, height, message, onPress, tooltipSupplier);
 		this.bg = bg;
@@ -22,7 +22,7 @@ public class ColorButtonWidget extends ButtonWidget {
 	@Override
 	public void drawTexture(MatrixStack matrices, int x, int y, int u, int v, int width, int height) {
 	}
-	
+
 	@Override
 	protected void renderBackground(MatrixStack matrices, MinecraftClient client, int mouseX, int mouseY) {
 		fill(matrices, x, y, x+width, y+height, bg);
@@ -33,5 +33,5 @@ public class ColorButtonWidget extends ButtonWidget {
 			fill(matrices, x, y+height-1, x+width, y+height, -1);
 		}
 	}
-	
+
 }

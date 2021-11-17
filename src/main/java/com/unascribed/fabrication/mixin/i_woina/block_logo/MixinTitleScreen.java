@@ -1,6 +1,10 @@
 package com.unascribed.fabrication.mixin.i_woina.block_logo;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
+import static org.lwjgl.opengl.GL11.GL_ONE;
+import static org.lwjgl.opengl.GL11.GL_PROJECTION;
+import static org.lwjgl.opengl.GL11.GL_SRC_COLOR;
 
 import java.util.function.BiConsumer;
 
@@ -21,6 +25,7 @@ import com.unascribed.fabrication.logic.LogoBlock;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -32,8 +37,8 @@ import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.VertexConsumerProvider.Immediate;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.Sprite;
@@ -52,25 +57,25 @@ import net.minecraft.util.math.Vec3f;
 public class MixinTitleScreen extends Screen {
 
 	private static final Identifier FABRICATION$EMPTY = new Identifier("fabrication", "empty.png");
-	
+
 	@Shadow @Final
 	private static Identifier EDITION_TITLE_TEXTURE;
-	
-	
+
+
 	protected MixinTitleScreen(Text title) {
 		super(title);
 	}
-	
+
 	private LogoBlock[][] fabrication$blocks = null;
 	@Shadow
 	private String splashText;
 	private String fabrication$splashText;
-	
+
 	@Shadow
 	private boolean doBackgroundFade;
 	@Shadow
 	private long backgroundFadeStart;
-	
+
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/client/gui/screen/TitleScreen.method_29343(IILjava/util/function/BiConsumer;)V"),
 			method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V", expect=2)
 	public void drawLogo(TitleScreen subject, int x, int y, BiConsumer<Integer, Integer> callback) {
@@ -80,7 +85,7 @@ public class MixinTitleScreen extends Screen {
 		}
 		drawLogo(MinecraftClient.getInstance().getTickDelta());
 	}
-	
+
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/client/texture/TextureManager.bindTexture(Lnet/minecraft/util/Identifier;)V"),
 			method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
 	public void bindTexture(TextureManager subject, Identifier id) {
@@ -89,21 +94,21 @@ public class MixinTitleScreen extends Screen {
 		}
 		subject.bindTexture(id);
 	}
-	
+
 	@Inject(at=@At("HEAD"), method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
 	public void renderHead(MatrixStack matrices, int mouseX, int mouseY, float tickDelta, CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.block_logo")) return;
 		fabrication$splashText = splashText;
 		splashText = null;
 	}
-	
+
 	@Inject(at=@At("RETURN"), method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
 	public void renderReturn(MatrixStack matrices, int mouseX, int mouseY, float tickDelta, CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.block_logo")) return;
 		splashText = fabrication$splashText;
 		fabrication$splashText = null;
 	}
-	
+
 	@Inject(at=@At("TAIL"), method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
 	public void renderTail(MatrixStack matrices, int mouseX, int mouseY, float tickDelta, CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.block_logo")) return;
@@ -120,8 +125,8 @@ public class MixinTitleScreen extends Screen {
 			RenderSystem.popMatrix();
 		}
 	}
-	
-	
+
+
 	@Inject(at=@At("TAIL"), method="tick()V")
 	public void tick(CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.block_logo")) return;
@@ -136,7 +141,7 @@ public class MixinTitleScreen extends Screen {
 			}
 		}
 	}
-	
+
 	@Unique
 	private void drawLogo(float partialTicks) {
 		MinecraftClient mc = MinecraftClient.getInstance();
@@ -149,10 +154,10 @@ public class MixinTitleScreen extends Screen {
 			fabrication$blocks = new LogoBlock[logoDataWidth][logoDataHeight];
 			if (LoaderBlockLogo.unrecoverableLoadError) {
 				String[] error = {
-						"### ### ### ### ###    ### ### ###   #   ### ###",
-						"#   # # # # # # # #    #   #   #     #   # # #  ",
-						"##  ##  ##  # # ##     ### ##  ##    #   # # # #",
-						"#   # # # # # # # #      # #   #     #   # # # #",
+						"### ### ### ### ###	### ### ###   #   ### ###",
+						"#   # # # # # # # #	#   #   #	 #   # # #  ",
+						"##  ##  ##  # # ##	 ### ##  ##	#   # # # #",
+						"#   # # # # # # # #	  # #   #	 #   # # # #",
 						"### # # # # ### # # #  ### ### ###   ### ### ###"
 				};
 				for (int x = 0; x < error[0].length(); x++) {
@@ -176,10 +181,10 @@ public class MixinTitleScreen extends Screen {
 				}
 			}
 		}
-	
+
 		// ported from beta 1.2_01. hell yeah
 		// getting MCP for that version to work was actually pretty easy
-		
+
 		GlStateManager.matrixMode(GL_PROJECTION);
 		GlStateManager.pushMatrix();
 		GlStateManager.loadIdentity();
@@ -228,7 +233,7 @@ public class MixinTitleScreen extends Screen {
 				GlStateManager.enableTexture();
 				GlStateManager.color4f(1, 1, 1, 1);
 			}
-			
+
 			for (int y = 0; y < logoDataHeight; y++) {
 				for (int x = 0; x < logoDataWidth; x++) {
 					LogoBlock blk = fabrication$blocks[x][y];
@@ -252,37 +257,37 @@ public class MixinTitleScreen extends Screen {
 							BufferBuilder bb = Tessellator.getInstance().getBuffer();
 							bb.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE_COLOR_NORMAL);
 							Sprite missing = mc.getSpriteAtlas(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE).apply(new Identifier("missingno", "missingno"));
-							
+
 							float minU = missing.getMinU();
 							float minV = missing.getMinV();
 							float maxU = missing.getMaxU();
 							float maxV = missing.getMaxV();
-							
+
 							bb.vertex(0, 0, 0).texture(minU, minV).color(255, 255, 255, 255).normal(0, -1, 0).next();
 							bb.vertex(1, 0, 0).texture(maxU, minV).color(255, 255, 255, 255).normal(0, -1, 0).next();
 							bb.vertex(1, 0, 1).texture(maxU, maxV).color(255, 255, 255, 255).normal(0, -1, 0).next();
 							bb.vertex(0, 0, 1).texture(minU, maxV).color(255, 255, 255, 255).normal(0, -1, 0).next();
-							
+
 							bb.vertex(0, 1, 0).texture(minU, minV).color(255, 255, 255, 255).normal(0,  1, 0).next();
 							bb.vertex(1, 1, 0).texture(maxU, minV).color(255, 255, 255, 255).normal(0,  1, 0).next();
 							bb.vertex(1, 1, 1).texture(maxU, maxV).color(255, 255, 255, 255).normal(0,  1, 0).next();
 							bb.vertex(0, 1, 1).texture(minU, maxV).color(255, 255, 255, 255).normal(0,  1, 0).next();
-							
+
 							bb.vertex(0, 0, 0).texture(minU, minV).color(255, 255, 255, 255).normal(0, 0, -1).next();
 							bb.vertex(1, 0, 0).texture(maxU, minV).color(255, 255, 255, 255).normal(0, 0, -1).next();
 							bb.vertex(1, 1, 0).texture(maxU, maxV).color(255, 255, 255, 255).normal(0, 0, -1).next();
 							bb.vertex(0, 1, 0).texture(minU, maxV).color(255, 255, 255, 255).normal(0, 0, -1).next();
-							
+
 							bb.vertex(0, 0, 1).texture(minU, minV).color(255, 255, 255, 255).normal(0, 0,  1).next();
 							bb.vertex(1, 0, 1).texture(maxU, minV).color(255, 255, 255, 255).normal(0, 0,  1).next();
 							bb.vertex(1, 1, 1).texture(maxU, maxV).color(255, 255, 255, 255).normal(0, 0,  1).next();
 							bb.vertex(0, 1, 1).texture(minU, maxV).color(255, 255, 255, 255).normal(0, 0,  1).next();
-							
+
 							bb.vertex(0, 0, 0).texture(minU, minV).color(255, 255, 255, 255).normal(-1, 0, 0).next();
 							bb.vertex(0, 1, 0).texture(maxU, minV).color(255, 255, 255, 255).normal(-1, 0, 0).next();
 							bb.vertex(0, 1, 1).texture(maxU, maxV).color(255, 255, 255, 255).normal(-1, 0, 0).next();
 							bb.vertex(0, 0, 1).texture(minU, maxV).color(255, 255, 255, 255).normal(-1, 0, 0).next();
-							
+
 							bb.vertex(1, 0, 0).texture(minU, minV).color(255, 255, 255, 255).normal( 1, 0, 0).next();
 							bb.vertex(1, 1, 0).texture(maxU, minV).color(255, 255, 255, 255).normal( 1, 0, 0).next();
 							bb.vertex(1, 1, 1).texture(maxU, maxV).color(255, 255, 255, 255).normal( 1, 0, 0).next();
@@ -305,27 +310,27 @@ public class MixinTitleScreen extends Screen {
 						bb.vertex(1, 0, 0).next();
 						bb.vertex(1, 0, 1).next();
 						bb.vertex(0, 0, 1).next();
-						
+
 						bb.vertex(0, 1, 0).next();
 						bb.vertex(1, 1, 0).next();
 						bb.vertex(1, 1, 1).next();
 						bb.vertex(0, 1, 1).next();
-						
+
 						bb.vertex(0, 0, 0).next();
 						bb.vertex(1, 0, 0).next();
 						bb.vertex(1, 1, 0).next();
 						bb.vertex(0, 1, 0).next();
-						
+
 						bb.vertex(0, 0, 1).next();
 						bb.vertex(1, 0, 1).next();
 						bb.vertex(1, 1, 1).next();
 						bb.vertex(0, 1, 1).next();
-						
+
 						bb.vertex(0, 0, 0).next();
 						bb.vertex(0, 1, 0).next();
 						bb.vertex(0, 1, 1).next();
 						bb.vertex(0, 0, 1).next();
-						
+
 						bb.vertex(1, 0, 0).next();
 						bb.vertex(1, 1, 0).next();
 						bb.vertex(1, 1, 1).next();
@@ -349,5 +354,5 @@ public class MixinTitleScreen extends Screen {
 		GlStateManager.popMatrix();
 		GlStateManager.enableCull();
 	}
-	
+
 }

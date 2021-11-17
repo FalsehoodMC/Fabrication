@@ -27,5 +27,5 @@ public abstract class MixinVillagerEntity extends MerchantEntity {
 			remove();
 		}
 	}
-	
+
 }

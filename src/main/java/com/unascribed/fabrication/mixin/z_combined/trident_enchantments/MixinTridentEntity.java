@@ -3,6 +3,7 @@ package com.unascribed.fabrication.mixin.z_combined.trident_enchantments;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 
@@ -39,6 +40,6 @@ public class MixinTridentEntity {
 		}
 		return base - 8;
 	}
-	
-	
+
+
 }

@@ -8,9 +8,11 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import com.google.common.collect.Lists;
 
 import net.minecraft.client.font.TextRenderer;
@@ -36,7 +38,7 @@ public class MixinItemRenderer {
 
 	@Shadow
 	private float zOffset;
-	
+
 	@Inject(at=@At("TAIL"), method="renderGuiItemOverlay(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V")
 	public void renderGuiItemOverlay(TextRenderer renderer, ItemStack stack, int x, int y, String countLabel, CallbackInfo ci) {
 		if (stack == null) return;
@@ -103,5 +105,5 @@ public class MixinItemRenderer {
 			}
 		}
 	}
-	
+
 }

@@ -1,15 +1,17 @@
 package com.unascribed.fabrication.mixin.i_woina.oof;
 
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
+
 import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(value = ClientPlayNetworkHandler.class, priority = 1049)
 @EligibleIf(configEnabled="*.oof", envMatches= Env.CLIENT)
@@ -24,5 +26,5 @@ public class MixinClientPlayNetworkHandler {
 		}
 		return event;
 	}
-	
+
 }

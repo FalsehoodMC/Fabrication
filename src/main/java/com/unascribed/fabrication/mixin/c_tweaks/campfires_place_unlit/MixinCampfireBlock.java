@@ -5,10 +5,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.block.BlockState;
-
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
+import net.minecraft.block.BlockState;
 import net.minecraft.block.CampfireBlock;
 import net.minecraft.item.ItemPlacementContext;
 
@@ -22,5 +22,5 @@ public class MixinCampfireBlock {
 			ci.setReturnValue(ci.getReturnValue().with(CampfireBlock.LIT, false));
 		}
 	}
-	
+
 }

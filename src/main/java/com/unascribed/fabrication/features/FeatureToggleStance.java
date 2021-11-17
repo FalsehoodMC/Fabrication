@@ -11,6 +11,7 @@ import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.option.KeyBinding;
@@ -41,12 +42,12 @@ public class FeatureToggleStance implements Feature {
 			}
 		}
 	}
-	
+
 	public static KeyBinding keybind;
 	public static Stance currentStance = Stance.STANDING;
 	public static int toggleTime = 1000;
 	public static int lastAge = 0;
-	
+
 	@Override
 	public void apply() {
 		keybind = new KeyBinding("["+FabricationMod.MOD_NAME+"] Toggle Stance", InputUtil.UNKNOWN_KEY.getCode(), "key.categories.movement") {
@@ -101,5 +102,5 @@ public class FeatureToggleStance implements Feature {
 	public String getConfigKey() {
 		return "*.toggle_stance";
 	}
-	
+
 }

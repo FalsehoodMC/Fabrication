@@ -19,6 +19,7 @@ import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import com.google.common.collect.Iterables;
 import com.google.common.primitives.Ints;
 
@@ -58,7 +59,7 @@ public class FeatureLegacyCommandSyntax implements Feature {
 					}
 				}
 				dispatcher.register(gmCmd);
-				
+
 				LiteralArgumentBuilder<ServerCommandSource> diffCmd = CommandManager.literal("difficulty")
 						.requires(scs -> MixinConfigPlugin.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2));
 				for (Difficulty difficulty : Difficulty.values()) {
@@ -108,7 +109,7 @@ public class FeatureLegacyCommandSyntax implements Feature {
 			}
 		});
 	}
-	
+
 	private static int addExperience(ServerCommandSource source, Collection<? extends ServerPlayerEntity> targets, int amount, boolean areLevels) {
 		Iterator<? extends ServerPlayerEntity> iter = targets.iterator();
 		while (iter.hasNext()) {
@@ -137,10 +138,10 @@ public class FeatureLegacyCommandSyntax implements Feature {
 		}
 		throw new SimpleCommandExceptionType(new LiteralText("Invalid XP amount")).create();
 	}
-	
+
 	private final MethodHandle gmExecute = unreflect(GameModeCommand.class, "method_13387", "func_198484_a", "execute", CommandContext.class, Collection.class, GameMode.class);
 	private final MethodHandle worldProperties = unreflectField(ServerWorld.class, "field_24456", "field_241103_E_", "worldProperties");
-	
+
 	private static Object invoke(MethodHandle execute, Object... args) {
 		try {
 			return execute.invokeWithArguments(args);
@@ -148,7 +149,7 @@ public class FeatureLegacyCommandSyntax implements Feature {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	private static MethodHandle unreflect(Class<?> clazz, String intermediateName, String srgName, String yarnName, Class<?>... args) {
 		try {
 			Method m;
@@ -167,7 +168,7 @@ public class FeatureLegacyCommandSyntax implements Feature {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	private static MethodHandle unreflectField(Class<?> clazz, String intermediateName, String srgName, String yarnName) {
 		try {
 			Field f;

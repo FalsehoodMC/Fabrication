@@ -1,13 +1,12 @@
 package com.unascribed.fabrication.mixin.b_utility.taggable_players;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import com.unascribed.fabrication.interfaces.TaggablePlayer;
 import com.unascribed.fabrication.logic.PlayerTag;
 import com.unascribed.fabrication.support.EligibleIf;
-
-import org.spongepowered.asm.mixin.injection.At;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.gen.PhantomSpawner;
@@ -24,5 +23,5 @@ public class MixinPhantomSpawner {
 		}
 		return subject.isSpectator();
 	}
-	
+
 }

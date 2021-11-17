@@ -14,7 +14,7 @@ public class FeatureFlammableCobwebs implements Feature {
 	public void apply() {
 		FabRefl.FireBlock_registerFlammableBlock((FireBlock)Blocks.FIRE, Blocks.COBWEB, 60, 100);
 	}
-	
+
 	@Override
 	public boolean undo() {
 		FabRefl.getBurnChances((FireBlock)Blocks.FIRE).remove(Blocks.COBWEB);

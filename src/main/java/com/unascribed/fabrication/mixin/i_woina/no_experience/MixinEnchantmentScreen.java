@@ -39,7 +39,7 @@ public abstract class MixinEnchantmentScreen extends HandledScreen<EnchantmentSc
 		if (MixinConfigPlugin.isEnabled("*.no_experience")) return 65535;
 		return subject.experienceLevel;
 	}
-	
+
 	@Redirect(at=@At(value="INVOKE", target="java/util/List.add(Ljava/lang/Object;)Z"),
 			method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
 	public boolean add(List subject, Object obj) {
@@ -51,7 +51,7 @@ public abstract class MixinEnchantmentScreen extends HandledScreen<EnchantmentSc
 		}
 		return subject.add(obj);
 	}
-	
+
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/client/gui/screen/ingame/EnchantmentScreen.drawTexture(Lnet/minecraft/client/util/math/MatrixStack;IIIIII)V"),
 			method="drawBackground(Lnet/minecraft/client/util/math/MatrixStack;FII)V")
 	public void drawTexture(EnchantmentScreen subject, MatrixStack matrices, int x, int y, int u, int v, int width, int height) {
@@ -63,19 +63,19 @@ public abstract class MixinEnchantmentScreen extends HandledScreen<EnchantmentSc
 		}
 		subject.drawTexture(matrices, x, y, u, v, width, height);
 	}
-	
+
 	@ModifyVariable(at=@At(value="INVOKE", target="net/minecraft/client/font/TextRenderer.getWidth(Ljava/lang/String;)I", ordinal=0),
 			method="drawBackground(Lnet/minecraft/client/util/math/MatrixStack;FII)V", ordinal=0)
 	public String modifyLevelText(String orig) {
 		if (MixinConfigPlugin.isEnabled("*.no_experience")) return "";
 		return orig;
 	}
-	
+
 	@ModifyConstant(constant=@Constant(intValue=20, ordinal=0),
 			method="drawBackground(Lnet/minecraft/client/util/math/MatrixStack;FII)V", require=0)
 	public int modifyPhraseOffset(int orig) {
 		if (MixinConfigPlugin.isEnabled("*.no_experience")) return 3;
 		return orig;
 	}
-	
+
 }

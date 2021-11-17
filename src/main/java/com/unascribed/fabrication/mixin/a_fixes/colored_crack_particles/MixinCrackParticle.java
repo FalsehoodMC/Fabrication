@@ -9,6 +9,7 @@ import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.particle.CrackParticle;
 import net.minecraft.client.particle.SpriteBillboardParticle;
@@ -29,5 +30,5 @@ public abstract class MixinCrackParticle extends SpriteBillboardParticle {
 		int c = FabRefl.Client.getItemColors(MinecraftClient.getInstance()).getColorMultiplier(stack, 0);
 		setColor(((c>>16)&0xFF)/255f, ((c>>8)&0xFF)/255f, (c&0xFF)/255f);
 	}
-	
+
 }

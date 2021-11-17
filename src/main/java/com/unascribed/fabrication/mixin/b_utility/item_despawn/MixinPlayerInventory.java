@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 import com.unascribed.fabrication.interfaces.SetFromPlayerDeath;
 import com.unascribed.fabrication.support.EligibleIf;
+
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -24,6 +25,6 @@ public abstract class MixinPlayerInventory {
 		}
 		return e;
 	}
-	
-	
+
+
 }

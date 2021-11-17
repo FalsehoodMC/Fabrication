@@ -28,9 +28,9 @@ import net.minecraft.util.Identifier;
 public class FabricationResourcePack implements ResourcePack {
 
 	private final String path;
-	
+
 	private final JsonObject meta;
-	
+
 	public FabricationResourcePack(String path) {
 		this.path = path;
 		JsonObject meta;
@@ -42,7 +42,7 @@ public class FabricationResourcePack implements ResourcePack {
 		}
 		this.meta = meta;
 	}
-	
+
 	@Override
 	@Environment(EnvType.CLIENT)
 	public InputStream openRoot(String fileName) throws IOException {
@@ -60,11 +60,11 @@ public class FabricationResourcePack implements ResourcePack {
 	private URL url(ResourceType type, Identifier id) {
 		return url(type.getDirectory()+"/"+id.getNamespace()+"/"+id.getPath());
 	}
-	
+
 	private URL url(String path) {
 		return getClass().getClassLoader().getResource("packs/"+this.path+"/"+path);
 	}
-	
+
 	@Override
 	public InputStream open(ResourceType type, Identifier id) throws IOException {
 		URL u = url(type, id);
@@ -101,7 +101,7 @@ public class FabricationResourcePack implements ResourcePack {
 
 	@Override
 	public void close() {
-		
+
 	}
 
 }

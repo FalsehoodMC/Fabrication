@@ -19,7 +19,7 @@ import com.google.common.collect.Sets;
 import com.google.common.io.Resources;
 
 public final class FeaturesFile {
-	
+
 	public enum Sides {
 		IRRELEVANT,
 		EITHER,
@@ -28,7 +28,7 @@ public final class FeaturesFile {
 		SERVER_ONLY_WITH_CLIENT_HELPER,
 		SERVER_AND_CLIENT,
 	}
-	
+
 	public static final class FeatureEntry {
 		public final String key;
 		public final String name;
@@ -50,7 +50,7 @@ public final class FeaturesFile {
 		public final String desc;
 		public final String fscript;
 		public final String fscriptDefault;
-		
+
 		public FeatureEntry(String key, JsonObject obj) {
 			this.key = key;
 			name = get(obj, "name", JsonElement::getAsString, null);
@@ -73,7 +73,7 @@ public final class FeaturesFile {
 			fscript = get(obj, "fscript", s -> s.getAsString().toUpperCase(Locale.ROOT), null);
 			fscriptDefault = get(obj, "fscript_default", JsonElement::getAsString, null);
 		}
-		
+
 		private static <T> T get(JsonObject obj, String key, Function<JsonElement, T> func, T def) {
 			JsonElement ele = obj.get(key);
 			if (ele == null || ele.isJsonNull()) return def;
@@ -95,9 +95,9 @@ public final class FeaturesFile {
 					+ linkText + ", desc=" + desc + "]"+ ", fscript=" + fscript
 					+ ", fscriptDefault=" + fscriptDefault + "]";
 		}
-		
+
 	}
-	
+
 	private static final ImmutableMap<String, FeatureEntry> data;
 	static {
 		ImmutableMap.Builder<String, FeatureEntry> bldr = ImmutableMap.builder();
@@ -111,16 +111,16 @@ public final class FeaturesFile {
 		}
 		data = bldr.build();
 	}
-	
+
 	private static final FeatureEntry defaultEntry = new FeatureEntry("", new JsonObject());
-	
+
 	public static FeatureEntry get(String key) {
 		return data.getOrDefault(key, defaultEntry);
 	}
-	
+
 	public static ImmutableMap<String, FeatureEntry> getAll() {
 		return data;
 	}
-	
-	
+
+
 }

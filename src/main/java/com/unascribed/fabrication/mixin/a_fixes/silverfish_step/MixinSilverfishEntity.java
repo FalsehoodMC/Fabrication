@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.entity.mob.SilverfishEntity;
 
 @Mixin(SilverfishEntity.class)
@@ -18,5 +19,5 @@ public class MixinSilverfishEntity {
 	public void canClimb(CallbackInfoReturnable<Boolean> ci) {
 		if (MixinConfigPlugin.isEnabled("*.silverfish_step")) ci.setReturnValue(true);
 	}
-	
+
 }

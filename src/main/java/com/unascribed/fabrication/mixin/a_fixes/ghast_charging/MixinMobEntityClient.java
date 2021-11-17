@@ -10,6 +10,7 @@ import com.unascribed.fabrication.interfaces.GhastAttackTime;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.entity.mob.GhastEntity;
 import net.minecraft.entity.mob.MobEntity;
 
@@ -20,7 +21,7 @@ public class MixinMobEntityClient implements GhastAttackTime {
 
 	@Unique
 	private int fabrication$ghastAttackTime;
-	
+
 	@Inject(at=@At("TAIL"), method="tick()V")
 	public void tick(CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.ghast_charging")) return;
@@ -41,5 +42,5 @@ public class MixinMobEntityClient implements GhastAttackTime {
 	public int getAttackTime() {
 		return fabrication$ghastAttackTime;
 	}
-	
+
 }

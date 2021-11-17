@@ -11,10 +11,11 @@ import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
+
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
 
 @Mixin(value=PlayerEntity.class, priority=1050)
 @EligibleIf(configEnabled="*.oof", envMatches=Env.CLIENT)
@@ -22,7 +23,7 @@ public abstract class MixinPlayerEntity {
 
 	@Shadow
 	public abstract GameProfile getGameProfile();
-	
+
 	@Inject(at=@At("HEAD"), method="getHurtSound(Lnet/minecraft/entity/damage/DamageSource;)Lnet/minecraft/sound/SoundEvent;",
 			cancellable=true)
 	public void getHurtSound(DamageSource src, CallbackInfoReturnable<SoundEvent> ci) {
@@ -33,5 +34,5 @@ public abstract class MixinPlayerEntity {
 			ci.setReturnValue(FabricationMod.OOF);
 		}
 	}
-	
+
 }

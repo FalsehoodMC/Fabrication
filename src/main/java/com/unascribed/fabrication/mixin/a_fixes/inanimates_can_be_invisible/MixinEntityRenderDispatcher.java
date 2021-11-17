@@ -30,10 +30,10 @@ import net.minecraft.entity.LivingEntity;
 public abstract class MixinEntityRenderDispatcher {
 
 	private final Map<Class<?>, Boolean> fabrication$renderersUseInvisibility = new HashMap<>();
-	
+
 	@Shadow
 	public abstract <T extends Entity> EntityRenderer<? super T> getRenderer(T entity);
-	
+
 	@Inject(at=@At("HEAD"), method="shouldRender(Lnet/minecraft/entity/Entity;Lnet/minecraft/client/render/Frustum;DDD)Z", cancellable=true)
 	public void shouldRender(Entity e, Frustum f, double x, double y, double z, CallbackInfoReturnable<Boolean> ci) {
 		if (!(e instanceof LivingEntity) && e.isInvisible()) {
@@ -81,5 +81,5 @@ public abstract class MixinEntityRenderDispatcher {
 			}
 		}
 	}
-	
+
 }

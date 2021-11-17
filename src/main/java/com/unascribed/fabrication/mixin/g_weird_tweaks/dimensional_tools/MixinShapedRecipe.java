@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.unascribed.fabrication.features.FeatureDimensionalTools;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.ShapedRecipe;
@@ -21,5 +22,5 @@ public class MixinShapedRecipe {
 		if (!MixinConfigPlugin.isEnabled("*.dimensional_tools")) return;
 		FeatureDimensionalTools.handleCraft(inv, ci.getReturnValue());
 	}
-	
+
 }

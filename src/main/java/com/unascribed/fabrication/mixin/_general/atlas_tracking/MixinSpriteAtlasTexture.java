@@ -20,5 +20,5 @@ public class MixinSpriteAtlasTexture {
 	public void construct(Identifier id, CallbackInfo ci) {
 		AtlasTracking.allAtlases.add((SpriteAtlasTexture)(Object)this);
 	}
-	
+
 }

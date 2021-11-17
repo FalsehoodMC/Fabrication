@@ -12,10 +12,11 @@ import com.unascribed.fabrication.support.ConfigLoader;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+import com.unascribed.fabrication.support.OptionalFScript;
 import com.unascribed.fabrication.support.ResolvedTrilean;
 import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.Trilean;
-import com.unascribed.fabrication.support.OptionalFScript;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -43,21 +44,21 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 public class FabricationMod implements ModInitializer {
-	
+
 	public static final String MOD_NAME = MixinConfigPlugin.isMet(SpecialEligibility.FORGE) ? "Forgery" : "Fabrication";
 	// NOT the modid. We keep the mod id as "fabrication" even on Forge to keep things from getting too nutty.
 	public static final String MOD_NAME_LOWER = MixinConfigPlugin.isMet(SpecialEligibility.FORGE) ? "forgery" : "fabrication";
-	
+
 	private static final Map<String, Feature> features = Maps.newHashMap();
 	private static final List<Feature> unconfigurableFeatures = Lists.newArrayList();
 	private static final Set<String> enabledFeatures = Sets.newHashSet();
-	
+
 	public static final long LAUNCH_ID = ThreadLocalRandom.current().nextLong();
-	
+
 	public static SoundEvent LEVELUP_LONG;
 	public static SoundEvent OOF;
 	public static SoundEvent ABSORPTION_HURT;
-	
+
 	@Override
 	public void onInitialize() {
 		for (String str : MixinConfigPlugin.discoverClassesInPackage("com.unascribed.fabrication.loaders", false)) {
@@ -109,7 +110,7 @@ public class FabricationMod implements ModInitializer {
 			initPrideLib();
 		}
 	}
-	
+
 	@Environment(EnvType.CLIENT)
 	private void initPrideLib() {
 		new PrideClient().onInitializeClient();
@@ -118,7 +119,7 @@ public class FabricationMod implements ModInitializer {
 	public static void featureError(Feature f, Throwable t) {
 		featureError(f.getClass(), f.getConfigKey(), t);
 	}
-	
+
 	public static void featureError(Class<?> clazz, String configKey, Throwable t) {
 		if (configKey == null) {
 			FabLog.warn("Feature "+clazz.getName()+" failed to apply!");
@@ -138,7 +139,7 @@ public class FabricationMod implements ModInitializer {
 	public static boolean isAvailableFeature(String configKey) {
 		return features.containsKey(MixinConfigPlugin.remap(configKey));
 	}
-	
+
 	public static boolean updateFeature(String configKey) {
 		configKey = MixinConfigPlugin.remap(configKey);
 		boolean enabled = MixinConfigPlugin.isEnabled(configKey);
@@ -155,7 +156,7 @@ public class FabricationMod implements ModInitializer {
 			return b;
 		}
 	}
-	
+
 	public static Set<ServerPlayerEntity> getTrackers(Entity entity) {
 		ServerChunkManager cm = ((ServerWorld)entity.world).getChunkManager();
 		ThreadedAnvilChunkStorage tacs = cm.threadedAnvilChunkStorage;
@@ -164,7 +165,7 @@ public class FabricationMod implements ModInitializer {
 		if (tracker == null) return Collections.emptySet();
 		return FabRefl.getPlayersTracking(tracker);
 	}
-	
+
 	public static void sendToTrackersMatching(Entity entity, CustomPayloadS2CPacket pkt, Predicate<ServerPlayerEntity> predicate) {
 		if (entity.world.isClient) return;
 		Set<ServerPlayerEntity> playersTracking = getTrackers(entity);
@@ -188,7 +189,7 @@ public class FabricationMod implements ModInitializer {
 			}
 		}
 	}
-	
+
 	private static final Identifier CONFIG = new Identifier("fabrication", "config");
 
 	public static void sendConfigUpdate(MinecraftServer server, String key, ServerPlayerEntity spe) {
@@ -232,7 +233,7 @@ public class FabricationMod implements ModInitializer {
 		CustomPayloadS2CPacket pkt = new CustomPayloadS2CPacket(CONFIG, data);
 		spe.networkHandler.sendPacket(pkt);
 	}
-	
+
 	private static final BlockPos.Mutable scratchpos1 = new BlockPos.Mutable();
 	private static final BlockPos.Mutable scratchpos2 = new BlockPos.Mutable();
 	private static final BlockPos.Mutable scratchpos3 = new BlockPos.Mutable();
@@ -241,20 +242,20 @@ public class FabricationMod implements ModInitializer {
 	public interface BlockScanCallback {
 		boolean invoke(World w, BlockPos.Mutable bp, BlockPos.Mutable scratch, Direction dir);
 	}
-	
+
 	public static void forAllAdjacentBlocks(Entity entity, BlockScanCallback callback) {
 		World w = entity.world;
 		Box box = entity.getBoundingBox();
 		if (!scanBlocks(w, box.minX, box.minY, box.minZ, box.maxX, box.minY, box.maxZ, Direction.DOWN, callback)) return;
 		if (!scanBlocks(w, box.minX, box.maxY, box.minZ, box.maxX, box.maxY, box.maxZ, Direction.UP, callback)) return;
-		
+
 		if (!scanBlocks(w, box.minX, box.minY, box.minZ, box.minX, box.maxY, box.maxZ, Direction.WEST, callback)) return;
 		if (!scanBlocks(w, box.maxX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, Direction.EAST, callback)) return;
-		
+
 		if (!scanBlocks(w, box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.minZ, Direction.NORTH, callback)) return;
 		if (!scanBlocks(w, box.minX, box.minY, box.maxZ, box.maxX, box.maxY, box.maxZ, Direction.SOUTH, callback)) return;
 	}
-	
+
 	private static boolean scanBlocks(World w, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, Direction dir,
 			BlockScanCallback callback) {
 		BlockPos min = scratchpos1.set(minX+dir.getOffsetX(), minY+dir.getOffsetY(), minZ+dir.getOffsetZ());
@@ -275,5 +276,5 @@ public class FabricationMod implements ModInitializer {
 		}
 		return true;
 	}
-	
+
 }

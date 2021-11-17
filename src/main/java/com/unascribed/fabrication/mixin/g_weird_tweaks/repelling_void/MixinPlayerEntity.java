@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import com.google.common.collect.Lists;
 
 import net.minecraft.block.SideShapeType;
@@ -40,7 +41,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 	private Vec3d fabrication$lastGroundPos;
 	private final List<Vec3d> fabrication$voidFallTrail = Lists.newArrayList();
 	private boolean fabrication$debted;
-	
+
 	@Inject(at=@At("TAIL"), method="tick()V")
 	public void tick(CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.repelling_void")) return;
@@ -55,8 +56,8 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 			damage(DamageSource.OUT_OF_WORLD, 12);
 		}
 	}
-	
-	
+
+
 	@Inject(at=@At("HEAD"), method= "damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", cancellable=true)
 	public void damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
 		Vec3d pos = fabrication$lastGroundPos;
@@ -100,7 +101,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 			cir.setReturnValue(false);
 		}
 	}
-	
+
 	@Inject(at = @At("TAIL"), method = "writeCustomDataToNbt(Lnet/minecraft/nbt/NbtCompound;)V")
 	public void writeCustomDataToTag(NbtCompound tag, CallbackInfo ci) {
 		if (fabrication$lastGroundPos != null) {
@@ -113,7 +114,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 			tag.putBoolean("fabrication:Debted", fabrication$debted);
 		}
 	}
-	
+
 	@Inject(at = @At("TAIL"), method = "readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V")
 	public void readCustomDataFromTag(NbtCompound tag, CallbackInfo ci) {
 		if (tag.contains("fabrication:LastGroundPosX")) {
@@ -125,5 +126,5 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 		}
 		fabrication$debted = tag.getBoolean("fabrication:Debted");
 	}
-	
+
 }

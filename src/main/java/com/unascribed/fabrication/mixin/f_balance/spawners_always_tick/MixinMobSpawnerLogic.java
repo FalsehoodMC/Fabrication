@@ -17,7 +17,7 @@ public class MixinMobSpawnerLogic {
 
 	@Shadow
 	private int spawnDelay;
-	
+
 	@Inject(method="isPlayerInRange()Z", at=@At("RETURN"))
 	public void isPlayerInRange(CallbackInfoReturnable<Boolean> cir) {
 		// this is called in the mob spawner's update routine only once, so it makes a convenient
@@ -26,5 +26,5 @@ public class MixinMobSpawnerLogic {
 			spawnDelay--;
 		}
 	}
-	
+
 }

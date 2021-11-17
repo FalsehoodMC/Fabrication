@@ -12,7 +12,7 @@ public enum PlayerTag {
 	SCARES_CREEPERS,
 	NO_PHANTOMS,
 	;
-	
+
 	public String lowerName() {
 		return name().toLowerCase(Locale.ROOT);
 	}

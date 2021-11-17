@@ -27,5 +27,5 @@ public class MixinNoteParticleFactory {
 			((SetVelocity)p).fabrication$setVelocity(dir.getOffsetX()*0.2, dir.getOffsetY()*0.2, dir.getOffsetZ()*0.2);
 		}
 	}
-	
+
 }

@@ -3,7 +3,6 @@ package com.unascribed.fabrication.client;
 import com.mojang.brigadier.tree.CommandNode;
 import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.loaders.LoaderFScript;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.OptionalFScript;
 
 import io.github.queerbric.pride.PrideFlag;

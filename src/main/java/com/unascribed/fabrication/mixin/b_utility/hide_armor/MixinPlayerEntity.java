@@ -12,7 +12,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.interfaces.GetSuppressedSlots;
 import com.unascribed.fabrication.support.EligibleIf;
+
 import com.google.common.base.Enums;
+
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
@@ -25,12 +27,12 @@ import net.minecraft.nbt.NbtString;
 public abstract class MixinPlayerEntity implements GetSuppressedSlots {
 
 	private final EnumSet<EquipmentSlot> fabrication$suppressedSlots = EnumSet.noneOf(EquipmentSlot.class);
-	
+
 	@Override
 	public Set<EquipmentSlot> fabrication$getSuppressedSlots() {
 		return fabrication$suppressedSlots;
 	}
-	
+
 	@Inject(at=@At("TAIL"), method="writeCustomDataToNbt(Lnet/minecraft/nbt/NbtCompound;)V")
 	public void writeCustomDataToTag(NbtCompound tag, CallbackInfo ci) {
 		NbtList li = new NbtList();
@@ -41,7 +43,7 @@ public abstract class MixinPlayerEntity implements GetSuppressedSlots {
 			tag.put("fabrication:SuppressedSlots", li);
 		}
 	}
-	
+
 	@Inject(at=@At("TAIL"), method="readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V")
 	public void readCustomDataFromTag(NbtCompound tag, CallbackInfo ci) {
 		fabrication$suppressedSlots.clear();
@@ -55,5 +57,5 @@ public abstract class MixinPlayerEntity implements GetSuppressedSlots {
 			}
 		}
 	}
-	
+
 }

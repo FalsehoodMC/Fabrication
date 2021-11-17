@@ -2,12 +2,13 @@ package com.unascribed.fabrication.mixin.c_tweaks.normal_fog_with_night_vision;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.At.Shift;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.client.render.BackgroundRenderer;
 
 @Mixin(BackgroundRenderer.class)
@@ -23,5 +24,5 @@ public class MixinBackgroundRenderer {
 		}
 		return orig;
 	}
-	
+
 }

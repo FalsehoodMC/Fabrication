@@ -16,6 +16,7 @@ import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Trilean;
 
 import com.google.common.collect.Lists;
+
 import net.minecraft.block.Block;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -25,7 +26,7 @@ public class LoaderClassicBlockDrops implements ConfigLoader {
 
 	public static final List<Function<Identifier, Trilean>> rules = Lists.newArrayList();
 	private static final Map<Block, Boolean> cache = new WeakHashMap<>();
-	
+
 	public static boolean isSafe(Block b) {
 		if (cache.containsKey(b)) return cache.get(b);
 		Identifier id = Registry.BLOCK.getId(b);
@@ -41,7 +42,7 @@ public class LoaderClassicBlockDrops implements ConfigLoader {
 		cache.put(b, false);
 		return false;
 	}
-	
+
 	@Override
 	public void load(Path configDir, QDIni config, boolean loadError) {
 		rules.clear();

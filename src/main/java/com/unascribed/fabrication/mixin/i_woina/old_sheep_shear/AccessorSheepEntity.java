@@ -14,5 +14,5 @@ public interface AccessorSheepEntity {
 
 	@Accessor("DROPS")
 	Map<DyeColor, ItemConvertible> fabrication$getDrops();
-	
+
 }

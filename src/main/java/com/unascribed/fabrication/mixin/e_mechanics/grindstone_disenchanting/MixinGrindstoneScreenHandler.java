@@ -23,10 +23,10 @@ public abstract class MixinGrindstoneScreenHandler extends ScreenHandler {
 	protected MixinGrindstoneScreenHandler(ScreenHandlerType<?> type, int syncId) {
 		super(type, syncId);
 	}
-	
+
 	@Shadow
 	private ItemStack grind(ItemStack item, int damage, int amount) { return null; }
-	
+
 	@Inject(at=@At("TAIL"), method="<init>(ILnet/minecraft/entity/player/PlayerInventory;Lnet/minecraft/screen/ScreenHandlerContext;)V")
 	private void construct(CallbackInfo ci) {
 		for (Slot s : slots) {
@@ -44,5 +44,5 @@ public abstract class MixinGrindstoneScreenHandler extends ScreenHandler {
 			ci.cancel();
 		}
 	}
-	
+
 }

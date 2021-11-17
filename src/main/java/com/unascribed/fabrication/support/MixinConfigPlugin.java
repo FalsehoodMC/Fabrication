@@ -76,8 +76,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			"minor_mechanics.feather_falling_five_damages_boots",
 			"minor_mechanics.observers_see_entities_living_only"
 	);
-	
-	
+
+
 	public enum Profile {
 		GREEN,
 		BLONDE,
@@ -101,15 +101,15 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			return out;
 		}
 	}
-	
+
 	private static final ImmutableTable<Profile, String, Boolean> defaultsByProfile;
 	private static final ImmutableSet<String> validSections;
 	private static final ImmutableSet<String> validKeys;
 	private static final ImmutableMap<String, String> starMap;
 	private static ImmutableMap<String, Boolean> defaults;
-	
+
 	private static final Set<SpecialEligibility> metSpecialEligibility = EnumSet.noneOf(SpecialEligibility.class);
-	
+
 	public static void setMet(SpecialEligibility se, boolean met) {
 		if (met) {
 			metSpecialEligibility.add(se);
@@ -117,13 +117,13 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			metSpecialEligibility.remove(se);
 		}
 	}
-	
+
 	public static boolean isMet(SpecialEligibility se) {
 		return metSpecialEligibility.contains(se);
 	}
-	
+
 	private static final List<ConfigLoader> loaders = Lists.newArrayList();
-	
+
 	static {
 		try {
 			// net.fabricmc.loader.api.FabricLoader
@@ -181,7 +181,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		validSections = ImmutableSet.copyOf(sections);
 		defaultsByProfile = ImmutableTable.copyOf(profilesBldr);
 	}
-	
+
 	private static Profile profile;
 	private static QDIni rawConfig;
 	private static Map<String, Trilean> config;
@@ -189,20 +189,20 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	private static final Set<String> failuresReadOnly = Collections.unmodifiableSet(failures);
 	private static final SetMultimap<String, String> configKeysForDiscoveredClasses = HashMultimap.create();
 	private static boolean analyticsSafe = false;
-	
+
 	public static void submitConfigAnalytics() {
 		Analytics.submitConfig();
 		analyticsSafe = true;
 	}
-	
+
 	public static String remap(String configKey) {
 		return starMap.getOrDefault(configKey, configKey);
 	}
-	
+
 	public static Set<String> getConfigKeysForDiscoveredClass(String clazz) {
 		return Collections.unmodifiableSet(configKeysForDiscoveredClasses.get(clazz.replace('/', '.')));
 	}
-	
+
 	private static RuntimeException devError(String msg) {
 		try {
 			UIManager.setLookAndFeel(new MetalLookAndFeel());
@@ -230,58 +230,58 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			return defaults != null && defaults.get(configKey);
 		return config.get(configKey).resolve(defaults == null ? false : defaults.get(configKey));
 	}
-	
+
 	public static boolean isFailed(String configKey) {
 		return failures.contains(remap(configKey));
 	}
-	
+
 	public static Trilean getValue(String configKey) {
 		if (isFailed(configKey)) return Trilean.FALSE;
 		return config.getOrDefault(remap(configKey), Trilean.UNSET);
 	}
-	
+
 	public static ResolvedTrilean getResolvedValue(String configKey) {
 		if (isFailed(configKey)) return ResolvedTrilean.FALSE;
 		return config.getOrDefault(remap(configKey), Trilean.UNSET).resolveSemantically(defaults != null && defaults.getOrDefault(configKey, false));
 	}
-	
+
 	public static boolean isTrilean(String s) {
 		return !NON_TRILEANS.contains(s);
 	}
-	
+
 	public static boolean isRuntimeConfigurable(String s) {
 		return RUNTIME_CONFIGURABLE.contains(s);
 	}
-	
+
 	public static String getRawValue(String configKey) {
 		configKey = remap(remap(configKey));
 		return rawConfig.get(configKey).orElse(configKey.equals("general.profile") ? "light" : "");
 	}
-	
+
 	public static boolean isValid(String configKey) {
 		return validKeys.contains(remap(configKey));
 	}
-	
+
 	public static boolean getDefault(String configKey) {
 		return defaults != null && defaults.get(remap(configKey));
 	}
-	
+
 	public static ImmutableSet<String> getAllKeys() {
 		return validKeys;
 	}
-	
+
 	public static ImmutableSet<String> getAllSections() {
 		return validSections;
 	}
-	
+
 	public static Set<String> getAllFailures() {
 		return failuresReadOnly;
 	}
-	
+
 	public static void addFailure(String configKey) {
 		failures.add(remap(configKey));
 	}
-	
+
 	public static void set(String configKey, String newValue) {
 		if (isTrilean(configKey)) {
 			switch (newValue) {
@@ -315,10 +315,10 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		StringWriter sw = new StringWriter();
 		try {
 			 QDIni.loadAndTransform(configFile, new IniTransformer() {
-				 
+
 				boolean found = false;
 				boolean foundEmptySection = false;
-				
+
 				@Override
 				public String transformLine(String path, String line) {
 					if (line != null && line.startsWith("[]")) {
@@ -334,12 +334,12 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 					}
 					return line;
 				}
-				
+
 				@Override
 				public String transformValueComment(String key, String value, String comment) {
 					return comment;
 				}
-				
+
 				@Override
 				public String transformValue(String key, String value) {
 					if (configKey.equals(key)) {
@@ -348,7 +348,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 					}
 					return value;
 				}
-				
+
 			}, sw);
 			Files.write(configFile, sw.toString().getBytes(Charsets.UTF_8));
 			FabLog.info("Update of features.ini done in "+watch);
@@ -356,12 +356,12 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			FabLog.warn("Failed to update configuration file", e);
 		}
 	}
-	
+
 	public static void introduce(ConfigLoader ldr) {
 		load(ldr);
 		loaders.add(ldr);
 	}
-	
+
 	public static void reload() {
 		FabLog.info("Reloading configs...");
 		String name = isMet(SpecialEligibility.FORGE) ? "forgery" : "fabrication";
@@ -389,14 +389,14 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			StringWriter sw = new StringWriter();
 			try {
 				rawConfig = QDIni.loadAndTransform(configFile, new IniTransformer() {
-	
+
 					final String NOTICES_HEADER = "; Notices: (Do not edit anything past this line; it will be overwritten)";
-					
+
 					Set<String> encounteredKeys = Sets.newHashSet();
-					
+
 					List<String> notices = Lists.newArrayList();
 					boolean encounteredNotices = false;
-					
+
 					@Override
 					public String transformLine(String path, String line) {
 						if ((!encounteredNotices && line == null) || (line != null && line.trim().equals(NOTICES_HEADER))) {
@@ -424,18 +424,18 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 						}
 						return encounteredNotices ? null : line;
 					}
-	
+
 					@Override
 					public String transformValueComment(String key, String value, String comment) {
 						return comment;
 					}
-					
+
 					@Override
 					public String transformValue(String key, String value) {
 						encounteredKeys.add(key);
 						return value;
 					}
-					
+
 				}, sw);
 				profile = rawConfig.getEnum("general.profile", Profile.class).orElse(Profile.LIGHT);
 				defaults = defaultsByProfile.row(profile);
@@ -470,7 +470,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			load(ldr);
 		}
 	}
-	
+
 	private static void load(ConfigLoader ldr) {
 		String name = ldr.getConfigName();
 		String modName = isMet(SpecialEligibility.FORGE) ? "forgery" : "fabrication";
@@ -518,22 +518,22 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 					try (InputStream is = MixinConfigPlugin.class.getClassLoader().getResourceAsStream(defaultName);
 							OutputStreamWriter osw = new OutputStreamWriter(Files.newOutputStream(configFile), Charsets.UTF_8)) {
 						QDIni.loadAndTransform(defaultName, new InputStreamReader(is, Charsets.UTF_8), new IniTransformer() {
-	
+
 							@Override
 							public String transformLine(String path, String line) {
 								return line;
 							}
-	
+
 							@Override
 							public String transformValueComment(String key, String value, String comment) {
 								return comment;
 							}
-							
+
 							@Override
 							public String transformValue(String key, String value) {
 								return currentValues.get(key).orElse(value);
 							}
-							
+
 						}, osw);
 					}
 					Files.delete(configFileOld);
@@ -578,7 +578,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 
 	@Override
 	public void acceptTargets(Set<String> myTargets, Set<String> otherTargets) {
-		
+
 	}
 
 	@Override
@@ -816,5 +816,5 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	}
 
 	public static boolean RUNTIME_CHECKS_WAS_ENABLED;
-	
+
 }

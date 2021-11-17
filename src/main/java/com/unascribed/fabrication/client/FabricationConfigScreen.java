@@ -1,5 +1,10 @@
 package com.unascribed.fabrication.client;
 
+import static com.unascribed.fabrication.client.FabricationConfigScreen.TrileanFlag.CLIENT_ONLY;
+import static com.unascribed.fabrication.client.FabricationConfigScreen.TrileanFlag.HIGHLIGHT_QUERY_MATCH;
+import static com.unascribed.fabrication.client.FabricationConfigScreen.TrileanFlag.REQUIRES_FABRIC_API;
+import static com.unascribed.fabrication.client.FabricationConfigScreen.TrileanFlag.SHOW_SOURCE_SECTION;
+
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -8,7 +13,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-import net.minecraft.client.MinecraftClient;
 import org.apache.commons.lang3.ArrayUtils;
 import org.lwjgl.opengl.GL11;
 
@@ -40,6 +44,7 @@ import com.google.common.collect.Sets;
 import io.github.queerbric.pride.PrideFlag;
 import io.github.queerbric.pride.PrideFlags;
 import io.netty.buffer.Unpooled;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
@@ -60,8 +65,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Matrix4f;
 
-import static com.unascribed.fabrication.client.FabricationConfigScreen.TrileanFlag.*;
-
 public class FabricationConfigScreen extends Screen {
 
 	public enum TrileanFlag {
@@ -70,7 +73,7 @@ public class FabricationConfigScreen extends Screen {
 
 	private final Map<String, String> SECTION_DESCRIPTIONS = Maps.newHashMap();
 	private final Map<Profile, String> PROFILE_DESCRIPTIONS = Maps.newHashMap();
-	
+
 	private static final ImmutableMap<Profile, Integer> PROFILE_COLORS = ImmutableMap.<Profile, Integer>builder()
 			.put(Profile.GREEN, 0xFF8BC34A)
 			.put(Profile.BLONDE, 0xFFFFCC80)
@@ -81,29 +84,29 @@ public class FabricationConfigScreen extends Screen {
 			.put(Profile.BURNT, 0xFF12181B)
 			.put(Profile.ASH, 0xFFAAAAAA)
 			.build();
-	
+
 	private static final Identifier BG = new Identifier("fabrication", "bg.png");
-	
+
 	private static long serverLaunchId = -1;
-	
+
 	private static final Set<String> newlyFalseKeysClient = Sets.newHashSet();
 	private static final Set<String> newlyFalseKeysServer = Sets.newHashSet();
-	
+
 	private static final Set<String> newlyNotFalseKeysClient = Sets.newHashSet();
 	private static final Set<String> newlyNotFalseKeysServer = Sets.newHashSet();
-	
+
 	private static final Map<String, String> changedKeysWithoutRuntimeChecksClient = Maps.newHashMap();
 	private static final Map<String, String> changedKeysWithoutRuntimeChecksServer = Maps.newHashMap();
-	
+
 	private static boolean runtimeChecksToggledClient;
 	private static boolean runtimeChecksToggledServer;
-	
+
 	private final int random = ThreadLocalRandom.current().nextInt();
-	
+
 	private final Screen parent;
-	
+
 	private final PrideFlag prideFlag;
-	
+
 	private float timeExisted;
 	private boolean leaving = false;
 	private float timeLeaving;
@@ -111,7 +114,7 @@ public class FabricationConfigScreen extends Screen {
 	private float sidebarScroll;
 	private float lastSidebarScroll;
 	private float sidebarHeight;
-	
+
 	private boolean didClick;
 	private float selectTime;
 	private String selectedSection;
@@ -124,9 +127,9 @@ public class FabricationConfigScreen extends Screen {
 	private float lastPrevSelectedSectionScroll;
 	private float selectedSectionScrollTarget;
 	private float prevSelectedSectionScrollTarget;
-	
+
 	private int tooltipBlinkTicks = 0;
-	
+
 	private boolean configuringServer;
 	private boolean hasClonked = true;
 	private boolean isSingleplayer;
@@ -134,22 +137,22 @@ public class FabricationConfigScreen extends Screen {
 	private String whyCantConfigureServer = null;
 	private Set<String> serverKnownConfigKeys = Sets.newHashSet();
 	private boolean serverReadOnly;
-	
+
 	private final List<String> tabs = Lists.newArrayList();
 	private final Multimap<String, String> options = Multimaps.newMultimap(Maps.newLinkedHashMap(), Lists::newArrayList);
-	
+
 	private final Map<String, Trilean> optionPreviousValues = Maps.newHashMap();
 	private final Map<String, Float> optionAnimationTime = Maps.newHashMap();
 	private final Map<String, Float> disabledAnimationTime = Maps.newHashMap();
 	private final Map<String, Float> disappearAnimationTime = Maps.newHashMap();
 	private final Set<String> knownDisabled = Sets.newHashSet();
 	private final Set<String> disappeared = Sets.newHashSet();
-	
+
 	private boolean bufferTooltips = false;
 	private final List<Runnable> bufferedTooltips = Lists.newArrayList();
-	
+
 	private int noteIndex = 0;
-	
+
 	private TextFieldWidget searchField;
 	private Pattern queryPattern = Pattern.compile("");
 	private boolean emptyQuery = true;
@@ -174,7 +177,7 @@ public class FabricationConfigScreen extends Screen {
 		tabs.add("search");
 		tabs.addAll(options.keySet());
 	}
-	
+
 	@Override
 	protected void init() {
 		super.init();
@@ -267,7 +270,7 @@ public class FabricationConfigScreen extends Screen {
 			client.openScreen(parent);
 		}
 	}
-	
+
 	private void drawBackground(MatrixStack matrices, int mouseX, int mouseY, float delta, int cutoffX, int cutoffY) {
 		fillGradient(matrices, cutoffX == 0 ? -width : cutoffX, cutoffY, width*2, height, lerpColor(0xFF2196F3, 0xFF009688, cutoffY/(float)height), 0xFF009688);
 		float time = selectedSection == null ? 10-selectTime : prevSelectedSection == null ? selectTime : 0;
@@ -281,19 +284,19 @@ public class FabricationConfigScreen extends Screen {
 	public static void drawBackground(int height, int width, MinecraftClient client, PrideFlag prideFlag, float time, MatrixStack matrices, int mouseX, int mouseY, float delta, int cutoffX, int cutoffY) {
 		float cutoffV = cutoffY/(float)height;
 		float ratio = 502/1080f;
-		
+
 		float w = height*ratio;
 		float brk = Math.min(width-w, (width*2/3f)-(w/3));
 		float brk2 = brk+w;
 		float border = (float)(20/(client.getWindow().getScaleFactor()));
 		if (brk < cutoffX) brk = cutoffX;
-		
+
 		Matrix4f mat = matrices.peek().getModel();
-		
+
 		GlStateManager.enableBlend();
 		RenderSystem.defaultBlendFunc();
 		GlStateManager.color4f(1, 1, 1, 1);
-		
+
 		GlStateManager.disableCull();
 		BufferBuilder bb = Tessellator.getInstance().getBuffer();
 
@@ -325,7 +328,7 @@ public class FabricationConfigScreen extends Screen {
 				GlStateManager.shadeModel(GL11.GL_FLAT);
 			}
 		}
-		
+
 		client.getTextureManager().bindTexture(BG);
 		GlStateManager.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 		GlStateManager.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
@@ -334,17 +337,17 @@ public class FabricationConfigScreen extends Screen {
 		bb.vertex(mat, brk, cutoffY, 0).texture(0, cutoffV).next();
 		bb.vertex(mat, brk, height, 0).texture(0, 1).next();
 		bb.vertex(mat, Math.max(cutoffX, border), height, 0).texture(0, 1).next();
-		
+
 		bb.vertex(mat, brk, cutoffY, 0).texture(0, cutoffV).next();
 		bb.vertex(mat, brk2, cutoffY, 0).texture(1, cutoffV).next();
 		bb.vertex(mat, brk2, height, 0).texture(1, 1).next();
 		bb.vertex(mat, brk, height, 0).texture(0, 1).next();
-		
+
 		bb.vertex(mat, brk2, cutoffY, 0).texture(1, cutoffV).next();
 		bb.vertex(mat, width-border, cutoffY, 0).texture(1, cutoffV).next();
 		bb.vertex(mat, width-border, height, 0).texture(1, 1).next();
 		bb.vertex(mat, brk2, height, 0).texture(1, 1).next();
-		
+
 		bb.end();
 		BufferRenderer.draw(bb);
 	}
@@ -383,7 +386,7 @@ public class FabricationConfigScreen extends Screen {
 		if (configuringServer) {
 			a = 1-a;
 		}
-		
+
 		fill(matrices, -width, -height, 130, height, 0x44000000);
 		float scroll = sidebarHeight < height ? 0 : lastSidebarScroll+((sidebarScroll-lastSidebarScroll)*client.getTickDelta());
 		scroll = (float) (Math.floor((scroll*client.getWindow().getScaleFactor()))/client.getWindow().getScaleFactor());
@@ -456,17 +459,17 @@ public class FabricationConfigScreen extends Screen {
 					}
 					prevSelectedSection = selectedSection;
 					selectedSection = deselect ? null : s;
-					
+
 					prevSelectedSectionScroll = selectedSectionScroll;
 					lastPrevSelectedSectionScroll = lastSelectedSectionScroll;
 					prevSelectedSectionHeight = selectedSectionHeight;
 					prevSelectedSectionScrollTarget = selectedSectionScrollTarget;
-					
+
 					selectedSectionScroll = 0;
 					lastSelectedSectionScroll = 0;
 					selectedSectionHeight = 0;
 					selectedSectionScrollTarget = 0;
-					
+
 					selectTime = 10-selectTime;
 				}
 			}
@@ -496,7 +499,7 @@ public class FabricationConfigScreen extends Screen {
 			float knobY = (scroll/(sidebarHeight-height))*(height-knobHeight);
 			fill(matrices, 128, (int)knobY, 130, (int)(knobY+knobHeight), 0xAAFFFFFF);
 		}
-		
+
 		bufferTooltips = true;
 		float selectedA = sCurve5((10-selectTime)/10f);
 		float prevSelectedA = sCurve5(selectTime/10f);
@@ -504,13 +507,13 @@ public class FabricationConfigScreen extends Screen {
 		if (!MixinConfigPlugin.isEnabled("general.reduced_motion") && !Objects.equal(selectedSection, prevSelectedSection)) {
 			drawSection(matrices, prevSelectedSection, -200, -200, prevSelectedChoiceY, prevSelectedA, false);
 		}
-		
+
 		boolean searchSelected = "search".equals(selectedSection);
 		if (searchSelected) {
 			searchField.render(matrices, mouseX, mouseY, delta);
 		}
 		searchField.setTextFieldFocused(searchSelected);
-		
+
 		GlStateManager.pushMatrix();
 		GlStateManager.disableDepthTest();
 		fill(matrices, width-120, 0, width*2, 16, 0x33000000);
@@ -542,7 +545,7 @@ public class FabricationConfigScreen extends Screen {
 			GlStateManager.popMatrix();
 			fill(matrices, -2, -2, 2, 2, 0xFF000000);
 		GlStateManager.popMatrix();
-		
+
 		textRenderer.draw(matrices, "CLIENT", width-115, 4, 0xFF000000);
 		textRenderer.draw(matrices, "SERVER", width-40, 4, whyCantConfigureServer == null || isSingleplayer ? 0xFF000000 : 0x44000000);
 		if (serverReadOnly && whyCantConfigureServer == null) {
@@ -561,17 +564,17 @@ public class FabricationConfigScreen extends Screen {
 			drawTexture(matrices, width-136, 0, 0, 0, 0, 16, 16, 16, 16);
 		}
 		drawBackground(matrices, mouseX, mouseY, delta, 130, height-20);
-		
+
 		List<String> notes = Lists.newArrayList();
-		
+
 		Set<String> newlyFalseKeys;
 		Set<String> newlyNotFalseKeys;
 		Map<String, String> changedKeysWithoutRuntimeChecks;
-		
+
 		boolean runtimeChecksToggled;
 		boolean hasYellowNote = false;
 		boolean hasRedNote = false;
-		
+
 		if (configuringServer) {
 			checkServerData();
 			newlyFalseKeys = newlyFalseKeysServer;
@@ -625,20 +628,20 @@ public class FabricationConfigScreen extends Screen {
 				}
 			}
 		}
-		
+
 		if (drawButton(matrices, width-100, height-20, 100, 20, "Done", mouseX, mouseY)) {
 			onClose();
 		}
 		if (didClick) didClick = false;
-		
+
 		super.render(matrices, mouseX, mouseY, delta);
-		
+
 		bufferTooltips = false;
 		for (Runnable r : bufferedTooltips) {
 			r.run();
 		}
 		bufferedTooltips.clear();
-		
+
 		if (mouseX > width-120 && mouseY < 16) {
 			String msg;
 			if (whyCantConfigureServer != null) {
@@ -670,7 +673,7 @@ public class FabricationConfigScreen extends Screen {
 		}
 		GlStateManager.popMatrix();
 	}
-	
+
 	private void checkServerData() {
 		ClientPlayNetworkHandler cpnh = client.getNetworkHandler();
 		if (cpnh != null && cpnh instanceof GetServerConfig) {
@@ -1081,11 +1084,11 @@ public class FabricationConfigScreen extends Screen {
 		}
 		return result.toString().trim();
 	}
-	
+
 	private void color(int packed) {
 		color(packed, ((packed>>24)&0xFF)/255f);
 	}
-	
+
 	private void color(int packed, float alpha) {
 		GlStateManager.color4f(((packed>>16)&0xFF)/255f, ((packed>>8)&0xFF)/255f, ((packed>>0)&0xFF)/255f, alpha);
 	}
@@ -1107,7 +1110,7 @@ public class FabricationConfigScreen extends Screen {
 			}
 		} catch (Throwable t) {}
 	}
-	
+
 	@Override
 	public void tick() {
 		super.tick();
@@ -1137,7 +1140,7 @@ public class FabricationConfigScreen extends Screen {
 		}
 		searchField.tick();
 	}
-	
+
 	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
 		if (mouseX <= 120) {
@@ -1147,7 +1150,7 @@ public class FabricationConfigScreen extends Screen {
 		}
 		return super.mouseScrolled(mouseX, mouseY, amount);
 	}
-	
+
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		if (button == 0) {
@@ -1179,7 +1182,7 @@ public class FabricationConfigScreen extends Screen {
 		}
 		return super.mouseClicked(mouseX, mouseY, button);
 	}
-	
+
 	@Override
 	public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
 		if ("search".equals(selectedSection)) {
@@ -1187,7 +1190,7 @@ public class FabricationConfigScreen extends Screen {
 		}
 		return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
 	}
-	
+
 	@Override
 	public void mouseMoved(double mouseX, double mouseY) {
 		if ("search".equals(selectedSection)) {
@@ -1195,7 +1198,7 @@ public class FabricationConfigScreen extends Screen {
 		}
 		super.mouseMoved(mouseX, mouseY);
 	}
-	
+
 	@Override
 	public boolean mouseReleased(double mouseX, double mouseY, int button) {
 		if ("search".equals(selectedSection)) {
@@ -1203,7 +1206,7 @@ public class FabricationConfigScreen extends Screen {
 		}
 		return super.mouseReleased(mouseX, mouseY, button);
 	}
-	
+
 	@Override
 	public boolean charTyped(char chr, int modifiers) {
 		if ("search".equals(selectedSection)) {
@@ -1211,7 +1214,7 @@ public class FabricationConfigScreen extends Screen {
 		}
 		return super.charTyped(chr, modifiers);
 	}
-	
+
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		if ("search".equals(selectedSection)) {
@@ -1219,7 +1222,7 @@ public class FabricationConfigScreen extends Screen {
 		}
 		return super.keyPressed(keyCode, scanCode, modifiers);
 	}
-	
+
 	@Override
 	public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
 		if ("search".equals(selectedSection)) {
@@ -1227,7 +1230,7 @@ public class FabricationConfigScreen extends Screen {
 		}
 		return super.keyReleased(keyCode, scanCode, modifiers);
 	}
-	
+
 	private String getVersion() {
 		if (configuringServer) {
 			return ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerVersion();
@@ -1235,7 +1238,7 @@ public class FabricationConfigScreen extends Screen {
 			return Agnos.getModVersion();
 		}
 	}
-	
+
 	private boolean isFailed(String key) {
 		if (configuringServer) {
 			return ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerFailedConfig().contains(key);
@@ -1243,7 +1246,7 @@ public class FabricationConfigScreen extends Screen {
 			return MixinConfigPlugin.isFailed(key);
 		}
 	}
-	
+
 	private boolean isValid(String key) {
 		if (configuringServer) {
 			return ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerTrileanConfig().containsKey(key) ||
@@ -1252,7 +1255,7 @@ public class FabricationConfigScreen extends Screen {
 			return MixinConfigPlugin.isValid(key);
 		}
 	}
-	
+
 	private boolean isTrilean(String key) {
 		if (configuringServer) {
 			return ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerTrileanConfig().containsKey(key);
@@ -1260,7 +1263,7 @@ public class FabricationConfigScreen extends Screen {
 			return MixinConfigPlugin.isTrilean(key);
 		}
 	}
-	
+
 	private ResolvedTrilean getResolvedValue(String key) {
 		if (configuringServer) {
 			return ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerTrileanConfig().getOrDefault(key, ResolvedTrilean.DEFAULT_FALSE);
@@ -1268,15 +1271,15 @@ public class FabricationConfigScreen extends Screen {
 			return MixinConfigPlugin.getResolvedValue(key);
 		}
 	}
-	
+
 	private Trilean getValue(String key) {
 		return getResolvedValue(key).trilean;
 	}
-	
+
 	private boolean isEnabled(String key) {
 		return getResolvedValue(key).value;
 	}
-	
+
 	private String getRawValue(String key) {
 		if (configuringServer) {
 			if (isTrilean(key)) {
@@ -1288,14 +1291,14 @@ public class FabricationConfigScreen extends Screen {
 			return MixinConfigPlugin.getRawValue(key);
 		}
 	}
-	
+
 	private void setValue(String key, String value) {
 		Set<String> newlyFalseKeys;
 		Set<String> newlyNotFalseKeys;
 		Map<String, String> changedKeysWithoutRuntimeChecks;
-		
+
 		boolean runtimeChecksToggled;
-		
+
 		if (configuringServer) {
 			checkServerData();
 			newlyFalseKeys = newlyFalseKeysServer;
@@ -1350,14 +1353,14 @@ public class FabricationConfigScreen extends Screen {
 			}
 		}
 	}
-	
+
 	public static float sCurve5(float a) {
 		float a3 = a * a * a;
 		float a4 = a3 * a;
 		float a5 = a4 * a;
 		return (6 * a5) - (15 * a4) + (10 * a3);
 	}
-	
+
 	@Override
 	public void renderOrderedTooltip(MatrixStack matrices, List<? extends OrderedText> lines, int x, int y) {
 		if (!lines.isEmpty()) {
@@ -1414,5 +1417,5 @@ public class FabricationConfigScreen extends Screen {
 		}
 	}
 
-	
+
 }

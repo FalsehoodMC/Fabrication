@@ -4,8 +4,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.entity.LivingEntity;
 
 @Mixin(LivingEntity.class)
@@ -17,5 +19,5 @@ public class MixinLivingEntity {
 		if (!MixinConfigPlugin.isEnabled("*.soul_speed_doesnt_damage_boots")) return;
 		ci.cancel();
 	}
-	
+
 }

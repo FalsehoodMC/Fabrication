@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.SpecialEligibility;
+
 import net.minecraft.screen.AnvilScreenHandler;
 
 @Mixin(AnvilScreenHandler.class)
@@ -18,5 +19,5 @@ public class MixinAnvilScreenHandler {
 	private static float modifyDamageChance(float chance) {
 		return MixinConfigPlugin.isEnabled("*.anvil_damage_only_on_fall") ? 0 : chance;
 	}
-	
+
 }

@@ -2,8 +2,10 @@ package com.unascribed.fabrication.mixin.c_tweaks.less_restrictive_note_blocks;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
+
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.NoteBlock;
@@ -21,7 +23,7 @@ public abstract class MixinNoteBlock extends Block {
 	public MixinNoteBlock(Settings settings) {
 		super(settings);
 	}
-	
+
 	@Overwrite
 	private void playNote(World world, BlockPos pos) {
 		boolean topCovered = world.getBlockState(pos.up()).isAir();
@@ -68,5 +70,5 @@ public abstract class MixinNoteBlock extends Block {
 			}
 		}
 	}
-	
+
 }

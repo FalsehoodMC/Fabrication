@@ -40,7 +40,7 @@ public class MixinServerQueryNetworkHandler {
 	private ClientConnection connection;
 	@Shadow
 	private boolean responseSent;
-	
+
 	@Inject(at=@At("HEAD"), method="onRequest(Lnet/minecraft/network/packet/c2s/query/QueryRequestC2SPacket;)V", cancellable=true)
 	public void onRequest(QueryRequestC2SPacket p, CallbackInfo ci) {
 		if (MixinConfigPlugin.isEnabled("*.ping_privacy") && !responseSent) {
