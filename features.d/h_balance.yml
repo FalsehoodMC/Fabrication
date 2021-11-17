@@ -1,3 +1,6 @@
+# This is not actually a YAML file; it's only .yml for syntax highlighting.
+# Tab indentation *must* be used.
+
 balance:
 	name: Balance
 	section: true
@@ -245,3 +248,6 @@ balance.pickup_skeleton_arrows:
 	sides: server_only
 	desc:
 		Arrows shot by skeletons can be picked up.
+# kate: space-indent off
+# vim: noai:noet
+

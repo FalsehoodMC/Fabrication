@@ -1,3 +1,6 @@
+# This is not actually a YAML file; it's only .yml for syntax highlighting.
+# Tab indentation *must* be used.
+
 tweaks:
 	name: Tweaks
 	section: true
@@ -298,3 +301,6 @@ tweaks.no_trample:
 	fscript: living_entity
 	desc:
 		Farmland will not get trampled.
+# kate: space-indent off
+# vim: noai:noet
+

@@ -1,3 +1,6 @@
+# This is not actually a YAML file; it's only .yml for syntax highlighting.
+# Tab indentation *must* be used.
+
 config_screen:
 	name: Config Screen
 	meta: true
@@ -50,3 +53,6 @@ search:
 	since: 1.4.0
 	meta: true
 	desc:
+# kate: space-indent off
+# vim: noai:noet
+

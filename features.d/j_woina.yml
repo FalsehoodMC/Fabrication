@@ -1,3 +1,6 @@
+# This is not actually a YAML file; it's only .yml for syntax highlighting.
+# Tab indentation *must* be used.
+
 woina:
 	name: What's Old Is New Again
 	section: true
@@ -208,4 +211,7 @@ woina.yellow_button_hover:
 	sides: client_only
 	desc:
 		Hovered buttons will have yellow text.
+
+# kate: space-indent off
+# vim: noai:noet
 

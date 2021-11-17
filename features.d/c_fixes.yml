@@ -1,3 +1,6 @@
+# This is not actually a YAML file; it's only .yml for syntax highlighting.
+# Tab indentation *must* be used.
+
 fixes:
 	name: Fixes
 	section: true
@@ -203,4 +206,7 @@ fixes.bubble_column_pop:
 	default: vienna
 	desc:
 		Re-adds bubble columns having a bubble pop particle and sound at the top.
+
+# kate: space-indent off
+# vim: noai:noet
 

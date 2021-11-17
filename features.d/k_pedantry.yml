@@ -1,3 +1,6 @@
+# This is not actually a YAML file; it's only .yml for syntax highlighting.
+# Tab indentation *must* be used.
+
 pedantry:
 	name: Pedantry
 	section: true
@@ -27,4 +30,7 @@ pedantry.oak_is_apple:
 	media: https://unascribed.com/fabrication/oak_is_apple.png
 	desc:
 		Oak trees become apple trees. Because oak trees do not grow apples.
+
+# kate: space-indent off
+# vim: noai:noet
 

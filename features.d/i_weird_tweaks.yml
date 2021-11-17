@@ -1,3 +1,6 @@
+# This is not actually a YAML file; it's only .yml for syntax highlighting.
+# Tab indentation *must* be used.
+
 weird_tweaks:
 	name: Weird Tweaks
 	section: true
@@ -232,4 +235,7 @@ weird_tweaks.no_dolphin_theft:
 	default: never
 	desc:
 		Prevents dolphins from picking up items.
+
+# kate: space-indent off
+# vim: noai:noet
 

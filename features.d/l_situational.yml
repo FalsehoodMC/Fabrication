@@ -1,3 +1,6 @@
+# This is not actually a YAML file; it's only .yml for syntax highlighting.
+# Tab indentation *must* be used.
+
 situational:
 	name: Situational
 	section: true
@@ -87,4 +90,7 @@ situational.static_dragon_egg:
 	default: burnt
 	desc:
 		Prevents dragon egg from teleporting.
+
+# kate: space-indent off
+# vim: noai:noet
 

@@ -5,3 +5,6 @@
 
 # All of the actual content here has been factored out into individual files for less mess...
 @include features.d
+
+# kate: space-indent off
+# vim: noai:noet

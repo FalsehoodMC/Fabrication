@@ -1,3 +1,6 @@
+# This is not actually a YAML file; it's only .yml for syntax highlighting.
+# Tab indentation *must* be used.
+
 general:
 	name: General
 	section: true
@@ -98,3 +101,6 @@ general.profile.ash:
 	parent: general.profile
 	desc:
 		Really enable everything. (Except Experiments.)
+# kate: space-indent off
+# vim: noai:noet
+

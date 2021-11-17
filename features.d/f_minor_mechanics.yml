@@ -1,3 +1,6 @@
+# This is not actually a YAML file; it's only .yml for syntax highlighting.
+# Tab indentation *must* be used.
+
 minor_mechanics:
 	name: Minor Mechanics
 	section: true
@@ -213,4 +216,7 @@ minor_mechanics.tridents_activate_levers:
 	sides: server_only
 	desc:
 		When a trident hits a lever it will toggle it.
+
+# kate: space-indent off
+# vim: noai:noet
 
