@@ -138,6 +138,7 @@ public class MixinTitleScreen extends Screen {
 
 	@Inject(at=@At("TAIL"), method="tick()V")
 	public void tick(CallbackInfo ci) {
+		if (!MixinConfigPlugin.isEnabled("*.block_logo")) return;
 		if (fabrication$blocks != null) {
 			for (LogoBlock[] fabrication$block : fabrication$blocks) {
 				for (LogoBlock blk : fabrication$block) {
