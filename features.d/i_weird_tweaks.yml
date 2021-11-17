@@ -120,15 +120,6 @@ weird_tweaks.disable_nether_fog:
 	desc:
 		Removes thick nether fog.
 
-weird_tweaks.disable_night_skip:
-	name: Disable Night Skip
-	since: 1.4.0
-	sides: server_only
-	fscript: server_player_entity
-	media: https://unascribed.com/fabrication/disable_night_skip.mp4
-	desc:
-		Prevents beds from skipping the night.
-
 weird_tweaks.leaves_grow_grass:
 	name: Leaves Grow Grass
 	since: 1.4.0

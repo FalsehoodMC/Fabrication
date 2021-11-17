@@ -50,6 +50,16 @@ weird_tweaks.extra.villagers_follow_emerald_blocks:
 	desc:
 		Villagers will follow players holding emerald blocks.
 
+weird_tweaks.extra.disable_night_skip:
+	name: Disable Night Skip
+	since: 1.4.0
+	sides: server_only
+	default: burnt
+	fscript: server_player_entity
+	media: https://unascribed.com/fabrication/disable_night_skip.mp4
+	desc:
+		Prevents beds from skipping the night.
+
 weird_tweaks.extra.foliage_creepers:
 	name: Foliage Creepers
 	since: 2.1.0
