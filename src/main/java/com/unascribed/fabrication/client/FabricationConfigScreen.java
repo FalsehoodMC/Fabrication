@@ -227,47 +227,47 @@ public class FabricationConfigScreen extends Screen {
 		if (parent != null && (leaving || timeExisted < 10) && !MixinConfigPlugin.isEnabled("*.reduced_motion")) {
 			float a = sCurve5((leaving ? Math.max(0, 10-timeLeaving) : timeExisted)/10);
 			matrices.push();
-			matrices.translate(width/2f, height, 0);
-			matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(a*(leaving ? -180 : 180)));
-			matrices.translate(-width/2, -height, 0);
-			matrices.push();
-			matrices.translate(0, height, 0);
-			matrices.translate(width/2f, height/2f, 0);
-			matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(180));
-			matrices.translate(-width/2f, -height/2f, 0);
-			fill(matrices, -width, -height, width*2, 0, MixinConfigPlugin.isEnabled("general.dark_mode") ? 0xFF212020 : 0xFF2196F3);
-			matrices.push();
-			drawBackground(matrices, -200, -200, delta, 0, 0);
-			drawForeground(matrices, -200, -200, delta);
+				matrices.translate(width/2f, height, 0);
+				matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(a*(leaving ? -180 : 180)));
+				matrices.translate(-width/2, -height, 0);
+				matrices.push();
+					matrices.translate(0, height, 0);
+					matrices.translate(width/2f, height/2f, 0);
+					matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(180));
+					matrices.translate(-width/2f, -height/2f, 0);
+					fill(matrices, -width, -height, width*2, 0, MixinConfigPlugin.isEnabled("general.dark_mode") ? 0xFF212020 : 0xFF2196F3);
+					matrices.push();
+						drawBackground(matrices, -200, -200, delta, 0, 0);
+						drawForeground(matrices, -200, -200, delta);
+					matrices.pop();
+				matrices.pop();
 			matrices.pop();
-			matrices.pop();
-			matrices.pop();
-
+	
 			// background rendering ignores the matrixstack, so we have to Make A Mess in the projection matrix instead
 			MatrixStack projection = new MatrixStack();
 			projection.method_34425(RenderSystem.getProjectionMatrix());
 			projection.push();
-			projection.translate(width/2f, height, 0);
-			projection.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(a*(leaving ? -180 : 180)));
-			projection.translate(-width/2, -height, 0);
-			for (int x = -1; x <= 1; x++) {
-				for (int y = -1; y <= 0; y++) {
-					if (x == 0 && y == 0) continue;
-					projection.push();
-					projection.translate(width*x, height*y, 0);
-					RenderSystem.setProjectionMatrix(projection.peek().getModel());
-					parent.renderBackgroundTexture(0);
-					projection.pop();
+				projection.translate(width/2f, height, 0);
+				projection.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(a*(leaving ? -180 : 180)));
+				projection.translate(-width/2, -height, 0);
+				for (int x = -1; x <= 1; x++) {
+					for (int y = -1; y <= 0; y++) {
+						if (x == 0 && y == 0) continue;
+						projection.push();
+						projection.translate(width*x, height*y, 0);
+						RenderSystem.setProjectionMatrix(projection.peek().getModel());
+						parent.renderBackgroundTexture(0);
+						projection.pop();
+					}
 				}
-			}
-			RenderSystem.setProjectionMatrix(projection.peek().getModel());
-			parent.render(matrices, -200, -200, delta);
+				RenderSystem.setProjectionMatrix(projection.peek().getModel());
+				parent.render(matrices, -200, -200, delta);
 			projection.pop();
 			RenderSystem.setProjectionMatrix(projection.peek().getModel());
 		} else {
 			matrices.push();
-			drawBackground(matrices, mouseX, mouseY, delta, 0, 0);
-			drawForeground(matrices, mouseX, mouseY, delta);
+				drawBackground(matrices, mouseX, mouseY, delta, 0, 0);
+				drawForeground(matrices, mouseX, mouseY, delta);
 			matrices.pop();
 		}
 		if (leaving && timeLeaving > 10) {
