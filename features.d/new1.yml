@@ -1,0 +1,6 @@
+weird_tweaks.extra.source_dependant_iframes:
+	name: Source Dependant Invulnerability Frames
+	since: 2.1.0
+	sides: server_only
+	desc:
+		Allows entities to take damage multiple times if it's from multiple sources.
