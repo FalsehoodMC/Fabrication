@@ -34,6 +34,7 @@ public class MixinGhastEntityRenderer {
 			// amount of scaling that occurs in the first 10 ticks is basically unnoticeable. so
 			// add the 10 ticks we missed to the counter
 			float a = ((((GhastAttackTime)ghast).getAttackTime()+tickDelta)+10) / 20F;
+			if (a > 1) a = 1;
 			if (a < 0) a = 0;
 			a = 1 / (a * a * a * a * a * 2 + 1);
 			hScale = (8 + 1 / a) / 2;
