@@ -746,7 +746,7 @@ public class FabricationConfigScreen extends Screen {
 			String blurb = "§lFabrication v"+v+" §rby unascribed and SFort\nRunning under Minecraft "+SharedConstants.getGameVersion().getName()+"\n"+(configuringServer ? "(Local version: v"+Agnos.getModVersion()+")" : "")
 					+ "\nClick a category on the left to change settings.";
 			int height = drawWrappedText(matrices, 140, 20, blurb, width-130, -1, false);
-			if (drawButton(matrices, 140, 20+height+32, 120, 20, "Reload files", mouseX, mouseY)) {
+			if (!configuringServer && drawButton(matrices, 140, 20+height+32, 120, 20, "Reload files", mouseX, mouseY)) {
 				MixinConfigPlugin.reload();
 			}
 			y += height;
