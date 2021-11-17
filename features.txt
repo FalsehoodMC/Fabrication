@@ -353,6 +353,14 @@ fixes.fix_charm_amethyst_dupe
 		you have another mod that can make item frames invisible, such as Fabrication's own
 		Invisibility Splash On Inanimates.
 
+fixes.bubble_column_pop
+	name: Bubble Column Pop
+	since: 2.1.0
+	sides: client_only
+	default: vienna
+	desc:
+		Re-adds bubble columns having a bubble pop particle and sound at the top.
+
 utility
 	name: Utility
 	section: true
@@ -393,7 +401,7 @@ utility.taggable_players
 		* permanent_conduit_power - The player always has Conduit Power.  
 		* scares_creepers - (Since 1.1) The player scares creepers.  
 		* no_phantoms - (Since 1.1) The player cannot have phantoms spawn on them.
-		* no_wandering_trader - (Since 2.0.0) The player cannot have wandering traders spawn on them.
+		* no_wandering_trader - (Since 2.1.0) The player cannot have wandering traders spawn on them.
 		
 utility.legacy_command_syntax
 	name: Legacy Command Syntax
@@ -892,7 +900,7 @@ tweaks.no_trample
 	sides: server_only
 	fscript: living_entity
 	desc:
-		Farmland will not get trampled when wearing feather falling.
+		Farmland will not get trampled.
 
 minor_mechanics
 	name: Minor Mechanics
@@ -1642,14 +1650,22 @@ weird_tweaks.leaves_grow_grass
 
 weird_tweaks.chaining_creepers
 	name: Chaining Creepers
-	since: 1.4.0
+	since: 2.1.0
 	sides: server_only
 	desc:
 		Creepers explode after taking explosion damage.
 
+weird_tweaks.foliage_creepers
+	name: Foliage Creepers
+	since: 2.1.0
+	sides: client_only
+	default: never
+	desc:
+		Creepers will take on the foliage color of the biome their in.
+
 weird_tweaks.villager_trades_reset
 	name: Villager Trades Reset
-	since: 1.4.0
+	since: 2.1.0
 	sides: server_only
 	default: never
 	desc:
@@ -1673,6 +1689,13 @@ weird_tweaks.disable_moved_too_quickly
 	desc:
 		Server will not check if the client is cheating, when traveling faster then expected.
 		Helpful with rubber banding when you trust the players.
+
+weird_tweaks.no_dolphin_theft
+	name: No Dolphin Theft
+	since: 2.1.0
+	sides: server_only
+	default: never
+		Prevents dolphins from picking up items.
 
 woina
 	name: What's Old Is New Again
@@ -1863,7 +1886,7 @@ woina.dropped_items_dont_stack
 
 woina.full_enchanting_cost
 	name: Full Enchanting Cost
-	since: 1.4.0
+	since: 2.1.0
 	sides: server_only
 	default: never
 	desc:
@@ -1872,11 +1895,18 @@ woina.full_enchanting_cost
 
 woina.no_player_death_animation
 	name: No Player Death Animation
-	since: 1.4.0
+	since: 2.1.0
 	sides: client_only
 	default: never
 	desc:
 		Players stay upright when killed.
+
+woina.yellow_button_hover
+	name: Yellow Button Hover
+	since: 2.1.0
+	sides: client_only
+	desc:
+		Hovered buttons will have yellow text.
 
 pedantry
 	name: Pedantry
