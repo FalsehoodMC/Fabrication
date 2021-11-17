@@ -1672,6 +1672,24 @@ weird_tweaks.villager_trades_reset
 		Instead of restocking villagers will completely reset their trades.
 		This also soft-limits the trades to the villager's level (one trade of each level).
 
+weird_tweaks.disable_breaking_speed_check
+	name: Disable Breaking Check
+	since: 2.1.0
+	sides: server_only
+	default: never
+	desc:
+		Server will not check if the client is cheating, when breaking blocks faster then expected.
+		Helpful with block breaking lag when you trust the players.
+
+weird_tweaks.disable_moved_too_quickly
+	name: Disable Moved Too Quickly
+	since: 2.1.0
+	sides: server_only
+	default: never
+	desc:
+		Server will not check if the client is cheating, when traveling faster then expected.
+		Helpful with rubber banding when you trust the players.
+
 weird_tweaks.no_dolphin_theft
 	name: No Dolphin Theft
 	since: 2.1.0
