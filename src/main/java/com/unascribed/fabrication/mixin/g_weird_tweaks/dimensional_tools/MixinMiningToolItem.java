@@ -20,7 +20,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.MiningToolItem;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -72,7 +72,7 @@ public class MixinMiningToolItem {
 				}
 			}
 			if (factor < 0) {
-				if (!stack.hasTag()) stack.setTag(new CompoundTag());
+				if (!stack.hasTag()) stack.setTag(new NbtCompound());
 				int legacyPartialDamage = stack.getTag().getInt("PartialDamage");
 				if (legacyPartialDamage != 0) {
 					stack.getTag().putDouble("fabrication:PartialDamage", legacyPartialDamage/50D);

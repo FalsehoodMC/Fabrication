@@ -336,6 +336,14 @@ fixes.fix_superflat_bad_structures
 		
 		This will not affect mods that properly patch the superflat structures map.
 
+fixes.bubble_column_pop
+	name: Bubble Column Pop
+	since: 2.1.0
+	sides: client_only
+	default: vienna
+	desc:
+		Re-adds bubble columns having a bubble pop particle and sound at the top.
+
 utility
 	name: Utility
 	section: true
@@ -622,6 +630,8 @@ tweaks.cactus_walk_doesnt_hurt_with_boots
 	name: Cactus Walk Doesn't Hurt With Boots
 	since: 1.0
 	sides: server_only
+	fscript: living_entity
+	fscript_default: !boots:empty
 	media: https://unascribed.com/fabrication/cactus_walk_doesnt_hurt_with_boots.mp4
 	short_desc: Walking on top of a cactus with boots on doesn't hurt
 	desc:
@@ -632,6 +642,8 @@ tweaks.cactus_brush_doesnt_hurt_with_chest
 	name: Cactus Brush Doesn't Hurt With Chest
 	since: 1.1
 	sides: server_only
+	fscript: living_entity
+	fscript_default: !legs:empty
 	media: https://unascribed.com/fabrication/cactus_brush_doesnt_hurt_with_chest.mp4
 	short_desc: Touching the side of a cactus with a chestplate on doesn't hurt
 	desc:
@@ -642,6 +654,8 @@ tweaks.bush_walk_doesnt_hurt_with_armor
 	name: Bush Walk Doesn't Hurt With Armor
 	since: 1.1
 	sides: server_only
+	fscript: living_entity
+	fscript_default: !(boots:empty;legs:empty)
 	media: https://unascribed.com/fabrication/bush_walk_doesnt_hurt_with_armor.mp4
 	short_desc: Walking through berry bushes with both legging and boots equipped doesn't hurt
 	desc:
@@ -777,6 +791,7 @@ tweaks.no_sneak_bypass
 	name: No Sneak Bypass
 	since: 1.3.0
 	sides: server_only
+	fscript: entity
 	media: https://unascribed.com/fabrication/no_sneak_bypass.mp4
 	desc:
 		Blocks which would normally not affect players when sneaking will.
@@ -854,6 +869,20 @@ tweaks.recipe_book_auto_craft
 	desc:
 		Recipe book crafts items instead of moving them to the crafting area.
 
+tweaks.no_trample
+	name: No Trample
+	since: 1.4.0
+	sides: server_only
+	fscript: living_entity
+	desc:
+		Farmland will not get trampled
+
+tweaks.no_heavy_minecarts
+	name: No Heavy Minecarts
+	since: 1.4.0
+	sides: server_only
+	desc:
+		Chest and hopper minecarts will not be slowed down proportionally to the number of items in them.
 
 minor_mechanics
 	name: Minor Mechanics
@@ -867,6 +896,8 @@ minor_mechanics.feather_falling_five
 	name: Feather Falling V
 	since: 1.0
 	sides: server_only_with_client_helper
+	fscript: living_entity
+	fscript_default: ~boots:~enchant~minecraft;feather_falling:enchant_level:5
 	media: https://unascribed.com/fabrication/feather_falling_five.mp4
 	desc:
 		Makes Feather Falling V a valid enchant that completely negates fall damage. Optionally does
@@ -878,6 +909,7 @@ minor_mechanics.feather_falling_five_damages_boots
 	name: Feather Falling V Damages Boots
 	since: 1.0
 	sides: server_only
+	fscript: living_entity
 	parent: minor_mechanics.feather_falling_five
 	desc:
 		Makes absorbing fall damage with Feather Falling V cause damage to the boots.
@@ -1056,6 +1088,8 @@ minor_mechanics.cactus_punching_hurts
 	name: Cactus Punching Hurts
 	since: 1.4.0
 	sides: server_only
+	fscript: server_player_entity
+	fscript_default: hand:empty
 	desc:
 		Breaking cactus with your hand will damage you the same as hugging it.
 
@@ -1311,6 +1345,7 @@ balance.food_always_edible
 	name: Food Always Edible
 	since: 1.3.0
 	sides: server_only
+	fscript: player_entity
 	default: burnt
 	desc:
 		Allows players to eat unconditionally.
@@ -1398,6 +1433,7 @@ balance.disable_elytra_boost
 	name: Disable Elytra Boost
 	since: 1.4.0
 	sides: server_only
+	fscript: player_entity
 	desc:
 		Prevent Elytra boosting using firework rockets.
 
@@ -1421,6 +1457,8 @@ weird_tweaks.creepers_explode_when_on_fire
 	since: 1.0
 	sides: server_only
 	default: never
+	fscript: living_entity
+	fscript_default: on_fire
 	media: https://unascribed.com/fabrication/creepers_explode_when_on_fire.mp4
 	desc:
 		Causes creepers to light their fuses when lit on fire. Just because.
@@ -1577,6 +1615,7 @@ weird_tweaks.disable_night_skip
 	name: Disable Night Skip
 	since: 1.4.0
 	sides: server_only
+	fscript: server_player_entity
 	media: https://unascribed.com/fabrication/disable_night_skip.mp4
 	desc:
 		Prevents beds from skipping the night.
@@ -1589,6 +1628,21 @@ weird_tweaks.leaves_grow_grass
 		Grass and tall grass can be placed on leaves.
 
 		Using Bone Meal on leaves makes them grow grass.
+
+weird_tweaks.chaining_creepers
+	name: Chaining Creepers
+	since: 1.4.0
+	sides: server_only
+	desc:
+		Creepers explode after taking explosion damage.
+
+weird_tweaks.foliage_creepers
+	name: Foliage Creepers
+	since: 2.1.0
+	sides: client_only
+	default: never
+	desc:
+		Creepers will take on the foliage color of the biome their in.
 
 woina
 	name: What's Old Is New Again
@@ -1755,6 +1809,7 @@ woina.instant_bow
 	name: Instant Bow
 	since: 1.4.0
 	sides: server_only
+	fscript: player_entity
 	media: https://unascribed.com/fabrication/instant_bow.mp4
 	default: ash
 	desc:
@@ -1819,6 +1874,7 @@ situational.all_damage_is_fatal
 	since: 1.0.1
 	sides: server_only
 	default: never
+	fscript: living_entity
 	media: https://unascribed.com/fabrication/all_damage_is_fatal.mp4
 	desc:
 		Any amount of damage done to an entity is unconditionally fatal.
@@ -1849,6 +1905,7 @@ situational.disable_elytra
 	name: Disable Elytra
 	since: 1.3.3
 	sides: server_only
+	fscript: item_stack
 	media: https://unascribed.com/fabrication/disable_elytra.mp4
 	desc:
 		Prevents using Elytra.

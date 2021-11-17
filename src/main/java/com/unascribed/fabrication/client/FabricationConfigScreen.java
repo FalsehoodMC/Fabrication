@@ -8,6 +8,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
+import net.minecraft.client.MinecraftClient;
 import org.apache.commons.lang3.ArrayUtils;
 import org.lwjgl.opengl.GL11;
 
@@ -152,7 +153,8 @@ public class FabricationConfigScreen extends Screen {
 	private TextFieldWidget searchField;
 	private Pattern queryPattern = Pattern.compile("");
 	private boolean emptyQuery = true;
-	
+	private boolean searchingScriptable = false;
+
 	public FabricationConfigScreen(Screen parent) {
 		super(new LiteralText(FabricationMod.MOD_NAME+" configuration"));
 		this.parent = parent;
@@ -204,6 +206,8 @@ public class FabricationConfigScreen extends Screen {
 			}
 		}
 		searchField = new TextFieldWidget(textRenderer, 131, 1, width-252, 14, searchField, new LiteralText("Search"));
+		if (Agnos.isModLoaded("fscript")) searchField.setWidth(searchField.getWidth()-16);
+
 		searchField.setChangedListener((s) -> {
 			s = s.trim();
 			emptyQuery = s.isEmpty();
@@ -265,9 +269,17 @@ public class FabricationConfigScreen extends Screen {
 	}
 	
 	private void drawBackground(MatrixStack matrices, int mouseX, int mouseY, float delta, int cutoffX, int cutoffY) {
+		fillGradient(matrices, cutoffX == 0 ? -width : cutoffX, cutoffY, width*2, height, lerpColor(0xFF2196F3, 0xFF009688, cutoffY/(float)height), 0xFF009688);
+		float time = selectedSection == null ? 10-selectTime : prevSelectedSection == null ? selectTime : 0;
+		drawBackground(height, width, client, prideFlag, time, matrices, mouseX, mouseY, delta, cutoffX, cutoffY);
+		float a = 1-(0.3f+(sCurve5(time/10f)*0.7f));
+		if (a > 0) {
+			int ai = ((int)(a*255))<<24;
+			fillGradient(matrices, cutoffX == 0 ? -width : cutoffX, cutoffY, width*2, height, lerpColor(0x2196F3, 0x009688, cutoffY/(float)height)|ai, 0x009688|ai);
+		}
+	}
+	public static void drawBackground(int height, int width, MinecraftClient client, PrideFlag prideFlag, float time, MatrixStack matrices, int mouseX, int mouseY, float delta, int cutoffX, int cutoffY) {
 		float cutoffV = cutoffY/(float)height;
-		
-		fillGradient(matrices, cutoffX == 0 ? -width : cutoffX, cutoffY, width*2, height, lerpColor(0xFF2196F3, 0xFF009688, cutoffV), 0xFF009688);
 		float ratio = 502/1080f;
 		
 		float w = height*ratio;
@@ -280,7 +292,6 @@ public class FabricationConfigScreen extends Screen {
 		
 		GlStateManager.enableBlend();
 		RenderSystem.defaultBlendFunc();
-		float time = selectedSection == null ? 10-selectTime : prevSelectedSection == null ? selectTime : 0;
 		GlStateManager.color4f(1, 1, 1, 1);
 		
 		GlStateManager.disableCull();
@@ -336,15 +347,9 @@ public class FabricationConfigScreen extends Screen {
 		
 		bb.end();
 		BufferRenderer.draw(bb);
-		
-		float a = 1-(0.3f+(sCurve5(time/10f)*0.7f));
-		if (a > 0) {
-			int ai = ((int)(a*255))<<24;
-			fillGradient(matrices, cutoffX == 0 ? -width : cutoffX, cutoffY, width*2, height, lerpColor(0x2196F3, 0x009688, cutoffV)|ai, 0x009688|ai);
-		}
 	}
 
-	private int lerpColor(int from, int to, float delta) {
+	public static int lerpColor(int from, int to, float delta) {
 		float a = MathHelper.lerp(delta, ((from>>24)&0xFF)/255f, ((to>>24)&0xFF)/255f);
 		float r = MathHelper.lerp(delta, ((from>>16)&0xFF)/255f, ((to>>16)&0xFF)/255f);
 		float g = MathHelper.lerp(delta, ((from>>8 )&0xFF)/255f, ((to>>8 )&0xFF)/255f);
@@ -504,7 +509,7 @@ public class FabricationConfigScreen extends Screen {
 		if (searchSelected) {
 			searchField.render(matrices, mouseX, mouseY, delta);
 		}
-		searchField.setSelected(searchSelected);
+		searchField.setTextFieldFocused(searchSelected);
 		
 		GlStateManager.pushMatrix();
 		GlStateManager.disableDepthTest();
@@ -545,7 +550,16 @@ public class FabricationConfigScreen extends Screen {
 			GlStateManager.color4f(0, 0, 0, 1);
 			drawTexture(matrices, width-49, 3, 0, 0, 0, 8, 8, 8, 8);
 		}
-		
+		if (searchSelected && Agnos.isModLoaded("fscript")) {
+			if(didClick && mouseX >= width-136 && mouseX < width-120 && mouseY <= 16) {
+				client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1f));
+				searchingScriptable = !searchingScriptable;
+			}
+			client.getTextureManager().bindTexture(new Identifier("fabrication", "fscript.png"));
+			GlStateManager.color4f(1, 1, 1, 1);
+			fill(matrices, width-136, 0, width-120, 16, searchingScriptable? 0xFF0AA000 : 0x55000000);
+			drawTexture(matrices, width-136, 0, 0, 0, 0, 16, 16, 16, 16);
+		}
 		drawBackground(matrices, mouseX, mouseY, delta, 130, height-20);
 		
 		List<String> notes = Lists.newArrayList();
@@ -773,9 +787,9 @@ public class FabricationConfigScreen extends Screen {
 				y = drawTrileans(matrices, y, mouseX, mouseY, (en) -> en.key.startsWith("general."));
 			} else if ("search".equals(section)) {
 				y += 4;
-				y = drawTrileans(matrices, y, mouseX, mouseY, (en) -> {
-					return emptyQuery || (queryPattern.matcher(en.name).find() || queryPattern.matcher(en.shortName).find() || queryPattern.matcher(en.desc).find());
-				}, SHOW_SOURCE_SECTION, emptyQuery ? null : HIGHLIGHT_QUERY_MATCH);
+				Predicate<FeatureEntry> pen= (en) -> emptyQuery || (queryPattern.matcher(en.name).find() || queryPattern.matcher(en.shortName).find() || queryPattern.matcher(en.desc).find());
+				if (Agnos.isModLoaded("fscript") && searchingScriptable) pen = ((Predicate<FeatureEntry>) en -> en.fscript != null).and(pen);
+				y = drawTrileans(matrices, y, mouseX, mouseY, pen, SHOW_SOURCE_SECTION, emptyQuery ? null : HIGHLIGHT_QUERY_MATCH);
 			} else {
 				y = drawTrileans(matrices, y, mouseX, mouseY, (en) -> en.key.startsWith(section+"."));
 			}
@@ -985,6 +999,13 @@ public class FabricationConfigScreen extends Screen {
 		y += drawWrappedText(matrices, startX, 2, drawTitle, width-startX-6, 0xFFFFFF | textAlpha, false)*scale;
 		int endX = startY == y-8 ? width - 6 : startX+textRenderer.getWidth(title);
 //		int endX = textRenderer.draw(matrices, title, startX, 2, 0xFFFFFF | textAlpha);
+		if (mouseX >= 134+(noUnset?45:60) && mouseX <= endX && mouseY >= startY+1 && mouseY <= startY+10 && FeaturesFile.get(key).fscript != null && Agnos.isModLoaded("fscript")) {
+			if (didClick) {
+				client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1f));
+				client.openScreen(OptionalFScriptScreen.construct(this, prideFlag, title, key));
+			}
+			fill(matrices, startX-2, 9, endX, 10, -1);
+		}
 		GlStateManager.popMatrix();
 		if ((("search".equals(selectedSection) ? false : mouseX <= width-120) || mouseY >= 16) && mouseY < height-20) {
 			if (section != null && mouseX >= startStartX && mouseX <= startX && mouseY >= startY && mouseY <= y) {

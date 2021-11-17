@@ -12,8 +12,8 @@ import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.hit.HitResult.Type;
@@ -22,8 +22,8 @@ import net.minecraft.util.hit.HitResult.Type;
 @EligibleIf(configEnabled="*.canhit")
 public class MixinProjectileEntity implements SetCanHitList {
 
-	private ListTag fabrication$canHitList;
-	private ListTag fabrication$canHitList2;
+	private NbtList fabrication$canHitList;
+	private NbtList fabrication$canHitList2;
 	
 	@Inject(at=@At("HEAD"), method="onCollision(Lnet/minecraft/util/hit/HitResult;)V", cancellable=true)
 	public void onCollision(HitResult result, CallbackInfo ci) {
@@ -36,8 +36,8 @@ public class MixinProjectileEntity implements SetCanHitList {
 		}
 	}
 	
-	@Inject(at=@At("TAIL"), method="writeCustomDataToTag(Lnet/minecraft/nbt/CompoundTag;)V")
-	public void writeCustomDataToTag(CompoundTag tag, CallbackInfo ci) {
+	@Inject(at=@At("TAIL"), method="writeCustomDataToNbt(Lnet/minecraft/nbt/NbtCompound;)V")
+	public void writeCustomDataToTag(NbtCompound tag, CallbackInfo ci) {
 		if (fabrication$canHitList != null) {
 			tag.put("fabrication:CanHitList", fabrication$canHitList);
 		}
@@ -46,8 +46,8 @@ public class MixinProjectileEntity implements SetCanHitList {
 		}
 	}
 	
-	@Inject(at=@At("TAIL"), method="readCustomDataFromTag(Lnet/minecraft/nbt/CompoundTag;)V")
-	public void readCustomDataFromTag(CompoundTag tag, CallbackInfo ci) {
+	@Inject(at=@At("TAIL"), method= "readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V")
+	public void readCustomDataFromTag(NbtCompound tag, CallbackInfo ci) {
 		if (tag.contains("fabrication:CanHitList")) {
 			fabrication$canHitList = tag.getList("fabrication:CanHitList", NbtType.STRING);
 		} else {
@@ -61,18 +61,18 @@ public class MixinProjectileEntity implements SetCanHitList {
 	}
 	
 	@Override
-	public void fabrication$setCanHitLists(ListTag list, ListTag list2) {
+	public void fabrication$setCanHitLists(NbtList list, NbtList list2) {
 		fabrication$canHitList = list;
 		fabrication$canHitList2 = list2;
 	}
 	
 	@Override
-	public ListTag fabrication$getCanHitList() {
+	public NbtList fabrication$getCanHitList() {
 		return fabrication$canHitList;
 	}
 	
 	@Override
-	public ListTag fabrication$getCanHitList2() {
+	public NbtList fabrication$getCanHitList2() {
 		return fabrication$canHitList2;
 	}
 

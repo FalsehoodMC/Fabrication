@@ -11,8 +11,8 @@ import com.unascribed.fabrication.FabricationMod;
 
 import com.google.common.collect.Maps;
 import net.fabricmc.fabric.api.util.NbtType;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.PersistentState;
 
@@ -55,11 +55,11 @@ public class PingPrivacyPersistentState extends PersistentState {
 	}
 
 	@Override
-	public void fromTag(CompoundTag tag) {
+	public void fromTag(NbtCompound tag) {
 		knownIps.clear();
-		ListTag li = tag.getList("KnownIPs", NbtType.COMPOUND);
+		NbtList li = tag.getList("KnownIPs", NbtType.COMPOUND);
 		for (int i = 0; i < li.size(); i++) {
-			CompoundTag c = li.getCompound(i);
+			NbtCompound c = li.getCompound(i);
 			long time = c.getLong("Time");
 			if (!isRecent(time)) {
 				// don't load it, it'll get dropped on next save
@@ -77,10 +77,10 @@ public class PingPrivacyPersistentState extends PersistentState {
 	}
 
 	@Override
-	public CompoundTag toTag(CompoundTag tag) {
-		ListTag li = new ListTag();
+	public NbtCompound writeNbt(NbtCompound tag) {
+		NbtList li = new NbtList();
 		for (Map.Entry<InetAddress, Long> en : knownIps.entrySet()) {
-			CompoundTag c = new CompoundTag();
+			NbtCompound c = new NbtCompound();
 			c.putByteArray("IP", en.getKey().getAddress());
 			c.putLong("Time", en.getValue());
 			li.add(c);

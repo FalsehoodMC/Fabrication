@@ -15,7 +15,7 @@ import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.StructureWorldAccess;
-import net.minecraft.world.gen.tree.BeehiveTreeDecorator;
+import net.minecraft.world.gen.treedecorator.BeehiveTreeDecorator;
 
 @Mixin(BeehiveTreeDecorator.class)
 @EligibleIf(configEnabled="*.disable_bees")

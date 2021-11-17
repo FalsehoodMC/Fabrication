@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.d_minor_mechanics.cactus_punching_hurts;
 
+import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.block.BlockState;
@@ -23,7 +24,7 @@ public class MixinServerPlayerInteractionManager {
 
 	@Inject(at=@At("HEAD"), method="continueMining(Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;I)F")
 	private void cactusHurt(BlockState state, BlockPos pos, int i, CallbackInfoReturnable<Float> cir) {
-		if (MixinConfigPlugin.isEnabled("*.cactus_punching_hurts") && 	state.isOf(Blocks.CACTUS) && player.getActiveItem().isEmpty()) player.damage(DamageSource.CACTUS, 1.0F);
+		if (MixinConfigPlugin.isEnabled("*.cactus_punching_hurts") && 	state.isOf(Blocks.CACTUS) && ConfigPredicates.shouldRun("*.cactus_punching_hurts", player)) player.damage(DamageSource.CACTUS, 1.0F);
 	}
 	
 }

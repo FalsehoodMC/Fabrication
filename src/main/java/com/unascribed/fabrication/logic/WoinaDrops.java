@@ -40,8 +40,6 @@ import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.texture.TextureUtil;
 import net.minecraft.client.texture.NativeImage.Format;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Vector3f;
-import net.minecraft.client.util.math.Vector4f;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resource.ResourceManager;
@@ -49,7 +47,9 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Matrix4f;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.Vector4f;
 
 public class WoinaDrops {
 
@@ -163,7 +163,7 @@ public class WoinaDrops {
 		MatrixStack.Entry ent = matrices.peek();
 		int[] data = quad.getVertexData();
 		Vec3i faceVec = quad.getFace().getVector();
-		Vector3f normal = new Vector3f(faceVec.getX(), faceVec.getY(), faceVec.getZ());
+		Vec3f normal = new Vec3f(faceVec.getX(), faceVec.getY(), faceVec.getZ());
 		Vector4f pos = new Vector4f(0, 0, 0, 1);
 		Matrix4f mat = ent.getModel();
 		normal.transform(ent.getNormal());

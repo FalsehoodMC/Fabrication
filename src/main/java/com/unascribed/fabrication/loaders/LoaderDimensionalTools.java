@@ -33,7 +33,7 @@ import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.tag.ItemTags;
 import net.minecraft.tag.Tag;
@@ -190,7 +190,7 @@ public class LoaderDimensionalTools implements ConfigLoader {
 			}
 			if (stack.getTag().contains("fabrication:HonoraryDimensions", NbtType.LIST)) {
 				dims = Sets.newHashSet(dims);
-				ListTag li = stack.getTag().getList("fabrication:HonoraryDimensions", NbtType.STRING);
+				NbtList li = stack.getTag().getList("fabrication:HonoraryDimensions", NbtType.STRING);
 				for (int i = 0; i < li.size(); i++) {
 					try {
 						dims.add(MohsIdentifier.parse(li.getString(i)));

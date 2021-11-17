@@ -16,7 +16,7 @@ import com.google.common.base.CharMatcher;
 
 import net.minecraft.command.argument.ItemStringReader;
 import net.minecraft.item.Item;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.DefaultedRegistry;
 
@@ -25,9 +25,9 @@ import net.minecraft.util.registry.DefaultedRegistry;
 public class MixinItemStringReader {
 
 	@Shadow
-	private CompoundTag tag;
+	private NbtCompound tag;
 	
-	private CompoundTag fabrication$legacyDamageNbt = null;
+	private NbtCompound fabrication$legacyDamageNbt = null;
 	
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/util/registry/DefaultedRegistry.getOrEmpty(Lnet/minecraft/util/Identifier;)Ljava/util/Optional;"),
 			method="readItem()V")
@@ -66,7 +66,7 @@ public class MixinItemStringReader {
 					}
 				}
 				if (i.isDamageable() && metaAsDamage) {
-					fabrication$legacyDamageNbt = new CompoundTag();
+					fabrication$legacyDamageNbt = new NbtCompound();
 					fabrication$legacyDamageNbt.putInt("Damage", metaI);
 				}
 				return Optional.of(i);
