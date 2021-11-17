@@ -1,8 +1,11 @@
 package com.unascribed.fabrication.util;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.*;
+import net.minecraft.client.texture.NativeImage;
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class Grayscale extends InputStream {
     final InputStream stream;
@@ -12,17 +15,15 @@ public class Grayscale extends InputStream {
         IOException er = null;
         BufferedInputStream in = new BufferedInputStream(original);
         try {
-            BufferedImage image = ImageIO.read(in);
+            NativeImage image = NativeImage.read(in);
             for(int h = 0; h < image.getHeight() ; h++) {
                 for(int w = 0; w < image.getWidth() ; w++) {
-                    int color = image.getRGB(w, h);
+                    int color = image.getPixelColor(w, h);
                     int gray = ((color>>16 & 255) + (color>>8 & 255) + (color & 255))/3;
-                    image.setRGB(w, h,(color & 0xff000000) | gray << 16 | gray << 8 | gray);
+                    image.setPixelColor(w, h,(color & 0xff000000) | gray << 16 | gray << 8 | gray);
                 }
             }
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            ImageIO.write(image, "png", os);
-            rtrn = new ByteArrayInputStream(os.toByteArray());
+            rtrn = new ByteArrayInputStream(image.getBytes());
         } catch (IOException e) {
             er = e;
         }
