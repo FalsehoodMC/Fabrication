@@ -1,5 +1,5 @@
 package com.unascribed.fabrication.interfaces;
 
 public interface TickSourceIFrames {
-    void fabrication$tickSourceDependentIFrames();
+	void fabrication$tickSourceDependentIFrames();
 }
