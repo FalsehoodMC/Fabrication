@@ -16,7 +16,7 @@ import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -34,7 +34,7 @@ public class MixinItemStackClient {
 		if (self.hasTag() && self.getTag().contains("CanHit", NbtType.LIST) && !self.getTag().getBoolean("HideCanHit")) {
 			list.add(LiteralText.EMPTY);
 			list.add(new LiteralText("Can hit:").formatted(Formatting.GRAY));
-			ListTag canhit = self.getTag().getList("CanHit", NbtType.STRING);
+			NbtList canhit = self.getTag().getList("CanHit", NbtType.STRING);
 			if (canhit.isEmpty()) {
 				list.add(new LiteralText("Nothing").formatted(Formatting.GRAY));
 			}

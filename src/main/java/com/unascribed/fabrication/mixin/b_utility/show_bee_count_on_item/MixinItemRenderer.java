@@ -11,8 +11,8 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -29,13 +29,13 @@ public class MixinItemRenderer {
 	@Inject(at=@At("TAIL"), method="renderGuiItemOverlay(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V")
 	public void renderGuiItemOverlay(TextRenderer renderer, ItemStack stack, int x, int y, String countLabel, CallbackInfo ci) {
 		if (!(MixinConfigPlugin.isEnabled("*.show_bee_count_on_item") && stack.hasTag())) return;
-		CompoundTag tag = stack.getTag().getCompound("BlockEntityTag");
+		NbtCompound tag = stack.getTag().getCompound("BlockEntityTag");
 		if (tag == null || !tag.contains("Bees", NbtType.LIST)) return;
 
 		MatrixStack matrixStack = new MatrixStack();
 		matrixStack.translate(0, 0, zOffset + 200);
 		VertexConsumerProvider.Immediate vc = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
-		String count = String.valueOf(((ListTag)tag.get("Bees")).size());
+		String count = String.valueOf(((NbtList)tag.get("Bees")).size());
 		renderer.draw(count, x + 19 - 2 - renderer.getWidth(count), (y), 16777045, true, matrixStack.peek().getModel(), vc, false, 0, 15728880);
 		vc.draw();
 	}

@@ -15,6 +15,9 @@ repositories {
 		name = "JitPack"
 		url = "https://jitpack.io"
 	}
+	maven {
+		url = "https://maven.ssf.tf"
+	}
 }
 
 dependencies {
@@ -39,6 +42,9 @@ dependencies {
 		transitive = false
 	}
 	modRuntime fabricApi.module("fabric-screen-api-v1", "${project.fabric_version}")
+	modImplementation("tf.ssf.sfort:fscript:1.1.5-1.16"){
+		transitive = false
+	}
 }
 
 minecraft {

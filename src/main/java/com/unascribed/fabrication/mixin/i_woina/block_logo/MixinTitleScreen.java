@@ -39,13 +39,13 @@ import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Matrix4f;
+import net.minecraft.util.math.Vec3f;
 
 @Mixin(TitleScreen.class)
 @EligibleIf(configEnabled="*.block_logo", envMatches=Env.CLIENT)
@@ -116,7 +116,7 @@ public class MixinTitleScreen extends Screen {
 			float s = 1.8f - MathHelper.abs(MathHelper.sin(Util.getMeasuringTimeMs() % 1000 / 1000f * 6.28f) * 0.1f);
 			s = s * 100f / (textRenderer.getWidth(splashText) + 32);
 			RenderSystem.scalef(s, s, s);
-			drawCenteredString(matrices, textRenderer, splashText, 0, -8, 0xFFFF00 | l);
+			drawCenteredText(matrices, textRenderer, splashText, 0, -8, 0xFFFF00 | l);
 			RenderSystem.popMatrix();
 		}
 	}
@@ -193,8 +193,8 @@ public class MixinTitleScreen extends Screen {
 		GlStateManager.pushMatrix();
 		DiffuseLighting.enable();
 		RenderSystem.setupGui3DDiffuseLighting(
-				Util.make(new Vector3f(0f, -1.0f, -0.7f), Vector3f::normalize),
-				Util.make(new Vector3f(0f, -1.0f, -0.7f), Vector3f::normalize));
+				Util.make(new Vec3f(0f, -1.0f, -0.7f), Vec3f::normalize),
+				Util.make(new Vec3f(0f, -1.0f, -0.7f), Vec3f::normalize));
 		GlStateManager.popMatrix();
 		BlockRenderManager brm = mc.getBlockRenderManager();
 		MatrixStack matrices = new MatrixStack();

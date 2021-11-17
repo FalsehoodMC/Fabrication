@@ -17,7 +17,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -101,8 +101,8 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 		}
 	}
 	
-	@Inject(at = @At("TAIL"), method = "writeCustomDataToTag(Lnet/minecraft/nbt/CompoundTag;)V")
-	public void writeCustomDataToTag(CompoundTag tag, CallbackInfo ci) {
+	@Inject(at = @At("TAIL"), method = "writeCustomDataToNbt(Lnet/minecraft/nbt/NbtCompound;)V")
+	public void writeCustomDataToTag(NbtCompound tag, CallbackInfo ci) {
 		if (fabrication$lastGroundPos != null) {
 			Vec3d pos = fabrication$lastGroundPos;
 			tag.putDouble("fabrication:LastGroundPosX", pos.x);
@@ -114,8 +114,8 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 		}
 	}
 	
-	@Inject(at = @At("TAIL"), method = "readCustomDataFromTag(Lnet/minecraft/nbt/CompoundTag;)V")
-	public void readCustomDataFromTag(CompoundTag tag, CallbackInfo ci) {
+	@Inject(at = @At("TAIL"), method = "readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V")
+	public void readCustomDataFromTag(NbtCompound tag, CallbackInfo ci) {
 		if (tag.contains("fabrication:LastGroundPosX")) {
 			fabrication$lastGroundPos = new Vec3d(
 					tag.getDouble("fabrication:LastGroundPosX"),

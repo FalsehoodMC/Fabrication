@@ -11,8 +11,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
+
 import com.mojang.brigadier.Command;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.CommandNode;
 import com.unascribed.fabrication.Agnos;
@@ -22,10 +26,12 @@ import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.FeaturesFile.Sides;
 import com.unascribed.fabrication.interfaces.TaggablePlayer;
+import com.unascribed.fabrication.loaders.LoaderFScript;
 import com.unascribed.fabrication.logic.PlayerTag;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.MixinConfigPlugin.Profile;
+import com.unascribed.fabrication.support.OptionalFScript;
 import com.unascribed.fabrication.util.Cardinal;
 
 import com.google.common.base.Charsets;
@@ -68,7 +74,9 @@ public class FeatureFabricationCommand implements Feature {
 			try {
 				LiteralArgumentBuilder<ServerCommandSource> root = LiteralArgumentBuilder.<ServerCommandSource>literal(FabricationMod.MOD_NAME_LOWER);
 				addConfig(root, dedi);
-				
+
+				if (Agnos.isModLoaded("fscript")) addFScript(root, dedi);
+
 				LiteralArgumentBuilder<ServerCommandSource> tag = LiteralArgumentBuilder.<ServerCommandSource>literal("tag");
 				tag.requires(scs -> MixinConfigPlugin.isEnabled("*.taggable_players") && scs.hasPermissionLevel(2));
 				{
@@ -341,8 +349,7 @@ public class FeatureFabricationCommand implements Feature {
 					return 1;
 				});
 				get.then(key);
-				if (s.contains("."))
-					get.then(LiteralArgumentBuilder.<T>literal("*"+s.substring(s.indexOf('.'))).executes(key.getCommand()));
+				setAltKeys(s, alt -> get.then(LiteralArgumentBuilder.<T>literal(alt).executes(key.getCommand())));
 			}
 			config.then(get);
 			LiteralArgumentBuilder<T> set = LiteralArgumentBuilder.<T>literal("set");
@@ -368,12 +375,12 @@ public class FeatureFabricationCommand implements Feature {
 					key.then(value);
 				}
 				set.then(key);
-				if (s.contains(".")) {
-					LiteralArgumentBuilder<T> short_key = LiteralArgumentBuilder.<T>literal("*" + s.substring(s.indexOf('.')));
+				setAltKeys(s, alt -> {
+					LiteralArgumentBuilder<T> short_key = LiteralArgumentBuilder.<T>literal(alt);
 					for (CommandNode<T> arg : key.getArguments())
 						short_key.then(arg);
 					set.then(short_key);
-				}
+				});
 			}
 			config.then(set);
 			config.then(LiteralArgumentBuilder.<T>literal("reload")
@@ -391,14 +398,67 @@ public class FeatureFabricationCommand implements Feature {
 		root.then(config);
 	}
 
-	private static void sendFeedback(CommandContext<? extends CommandSource> c, LiteralText text, boolean broadcast) {
+	public static void sendFeedback(CommandContext<? extends CommandSource> c, LiteralText text, boolean broadcast) {
 		if (c.getSource() instanceof ServerCommandSource) {
 			((ServerCommandSource)c.getSource()).sendFeedback(text, broadcast);
 		} else {
 			sendFeedbackClient(c, text);
 		}
 	}
+	public static <T extends CommandSource> void addFScript(LiteralArgumentBuilder<T> root, boolean dediServer) {
+		LiteralArgumentBuilder<T> script = LiteralArgumentBuilder.<T>literal("fscript");
+		script.requires(s -> s.hasPermissionLevel(2));
+		{
+			LiteralArgumentBuilder<T> get = LiteralArgumentBuilder.<T>literal("get");
+			for (String s : OptionalFScript.predicateProviders.keySet()) {
+				if (dediServer && FeaturesFile.get(s).sides == FeaturesFile.Sides.CLIENT_ONLY) continue;
+				LiteralArgumentBuilder<T> key = LiteralArgumentBuilder.<T>literal(s).executes((c) -> {
+					sendFeedback(c, new LiteralText(s+ ": "+ LoaderFScript.get(s)), false);
+					return 1;
+				});
+				get.then(key);
+				setAltKeys(s, alt -> get.then(LiteralArgumentBuilder.<T>literal(alt).executes(key.getCommand())));
+			}
+			script.then(get);
+			LiteralArgumentBuilder<T> set = LiteralArgumentBuilder.<T>literal("set");
+			for (String s : OptionalFScript.predicateProviders.keySet()) {
+				if (dediServer && FeaturesFile.get(s).sides == FeaturesFile.Sides.CLIENT_ONLY) continue;
+				LiteralArgumentBuilder<T> key = LiteralArgumentBuilder.<T>literal(s);
+				RequiredArgumentBuilder<T, String> value =
+						RequiredArgumentBuilder.<T, String>argument("script", StringArgumentType.string())
+								.executes((c) -> {
+									OptionalFScript.set(c, s, c.getArgument("script", String.class));
+									return 1;
+								});
+				key.then(value);
+				set.then(key);
+				setAltKeys(s, alt -> set.then(LiteralArgumentBuilder.<T>literal(alt).then(value)));
+			}
+			script.then(set);
 
+			LiteralArgumentBuilder<T> unset = LiteralArgumentBuilder.<T>literal("unset");
+			for (String s : OptionalFScript.predicateProviders.keySet()) {
+				if (dediServer && FeaturesFile.get(s).sides == FeaturesFile.Sides.CLIENT_ONLY) continue;
+				LiteralArgumentBuilder<T> key = LiteralArgumentBuilder.<T>literal(s).executes((c) -> {
+					OptionalFScript.restoreDefault(s);
+					sendFeedback(c, new LiteralText("Restored default behaviour for "+s), true);
+					return 1;
+				});
+				unset.then(key);
+				setAltKeys(s, alt -> unset.then(LiteralArgumentBuilder.<T>literal(alt).executes(key.getCommand())));
+			}
+			script.then(unset);
+			script.then(LiteralArgumentBuilder.<T>literal("reload")
+					.executes((c) -> {
+						LoaderFScript.reload();
+						OptionalFScript.reload();
+						sendFeedback(c, new LiteralText("Fabrication fscript reloaded"), true);
+						return 1;
+					})
+			);
+		}
+		root.then(script);
+	}
 	private static void sendFeedbackClient(CommandContext<? extends CommandSource> c, LiteralText text) {
 		FabricationClientCommands.sendFeedback(c, text);
 	}
@@ -463,7 +523,13 @@ public class FeatureFabricationCommand implements Feature {
 			}
 		}
 	}
-
+	public static void setAltKeys(String key, Consumer<String> set){
+		if(!key.contains(".")) return;
+		for (int i = key.indexOf('.'); i != -1; i = key.indexOf('.', i+1))
+			set.accept("*"+key.substring(i));
+		if (key.lastIndexOf('.') != key.indexOf('.'))
+			set.accept(key.substring(0,key.indexOf('.'))+key.substring(key.lastIndexOf('.')));
+	}
 	@Override
 	public boolean undo() {
 		return false;

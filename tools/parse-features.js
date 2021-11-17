@@ -68,6 +68,8 @@ let defaults = (curKey, cur) => ({
 	short_desc: cur && cur.desc ? cur.desc.search(/\.( |\n|$)/) !== -1 ? cur.desc.substring(0, cur.desc.search(/\.( |\n|$)/)) : cur.desc : null,
 	desc: null,
 	brand_new: cur && cur.since && cur.since === currentVersion,
+	fscript: null,
+    fscript_default: null,
 	new: (cur ? cur.since_code ? cur.since_code : versionNamesToCodes[cur.since] : 9999) >= currentVersionCode-1
 });
 let lineNum = 0;

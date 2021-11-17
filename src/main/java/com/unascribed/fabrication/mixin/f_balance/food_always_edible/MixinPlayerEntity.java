@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.f_balance.food_always_edible;
 
+import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 
@@ -16,6 +17,7 @@ public class MixinPlayerEntity {
 	@Inject(method="canConsume(Z)Z", at=@At("HEAD"), cancellable=true)
 	public void canConsume(boolean ignoreHunger, CallbackInfoReturnable<Boolean> cir) {
 		if (!MixinConfigPlugin.isEnabled("*.food_always_edible")) return;
+		if (!ConfigPredicates.shouldRun("*.food_always_edible", (PlayerEntity)(Object)this)) return;
 		cir.setReturnValue(true);
 	}
 	

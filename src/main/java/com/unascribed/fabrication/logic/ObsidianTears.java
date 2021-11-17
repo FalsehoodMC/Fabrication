@@ -7,8 +7,8 @@ import net.minecraft.block.DispenserBlock;
 import net.minecraft.block.dispenser.ItemDispenserBehavior;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.item.ItemStack.TooltipSection;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
@@ -44,7 +44,7 @@ public class ObsidianTears {
 	
 	public static void setSpawnPoint(ServerPlayerEntity p, ItemStack stack) {
 		World world = p.world;
-		RegistryKey<World> key = RegistryKey.of(Registry.DIMENSION, new Identifier(stack.getTag().getString("fabrication:ObsidianTearsOriginDim")));
+		RegistryKey<World> key = RegistryKey.of(Registry.WORLD_KEY, new Identifier(stack.getTag().getString("fabrication:ObsidianTearsOriginDim")));
 		BlockPos pos = BlockPos.fromLong(stack.getTag().getLong("fabrication:ObsidianTearsOrigin"));
 		if (world instanceof ServerWorld) {
 			((ServerWorld)world).spawnParticles(ParticleTypes.FALLING_OBSIDIAN_TEAR, p.getPos().x, p.getPos().y+p.getBoundingBox().getYLength()/2, p.getPos().z, 16,
@@ -57,7 +57,7 @@ public class ObsidianTears {
 	public static ItemStack createStack(World world, BlockPos blockPos) {
 		ItemStack stack = PotionUtil.setPotion(new ItemStack(Items.POTION), Potions.THICK);
 		stack.setCustomName(new LiteralText("§fObsidian Tears"));
-		CompoundTag tag = stack.getOrCreateTag();
+		NbtCompound tag = stack.getOrCreateTag();
 		tag.putBoolean("fabrication:ObsidianTears", true);
 		tag.putLong("fabrication:ObsidianTearsOrigin", blockPos.asLong());
 		tag.putString("fabrication:ObsidianTearsOriginDim", world.getRegistryKey().getValue().toString());

@@ -14,8 +14,8 @@ import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.command.CommandException;
+import net.minecraft.command.argument.EnchantmentArgumentType;
 import net.minecraft.command.argument.EntityArgumentType;
-import net.minecraft.command.argument.ItemEnchantmentArgumentType;
 import net.minecraft.command.argument.ItemStackArgument;
 import net.minecraft.command.argument.ItemStackArgumentType;
 import net.minecraft.enchantment.Enchantment;
@@ -23,8 +23,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -72,10 +72,10 @@ public class FeatureIMore implements Feature {
 				dispatcher.register(CommandManager.literal("fenchant")
 						.requires(requirement)
 						.then(CommandManager.argument("targets", EntityArgumentType.entities())
-						.then(CommandManager.argument("enchantment", ItemEnchantmentArgumentType.itemEnchantment())
-							.executes((ctx) -> fenchant(ctx.getSource(), EntityArgumentType.getEntities(ctx, "targets"), ItemEnchantmentArgumentType.getEnchantment(ctx, "enchantment"), 1))
+						.then(CommandManager.argument("enchantment", EnchantmentArgumentType.enchantment())
+							.executes((ctx) -> fenchant(ctx.getSource(), EntityArgumentType.getEntities(ctx, "targets"), EnchantmentArgumentType.getEnchantment(ctx, "enchantment"), 1))
 							.then(CommandManager.argument("level", IntegerArgumentType.integer(0))
-								.executes((ctx) -> fenchant(ctx.getSource(), EntityArgumentType.getEntities(ctx, "targets"), ItemEnchantmentArgumentType.getEnchantment(ctx, "enchantment"), IntegerArgumentType.getInteger(ctx, "level")))))));
+								.executes((ctx) -> fenchant(ctx.getSource(), EntityArgumentType.getEntities(ctx, "targets"), EnchantmentArgumentType.getEnchantment(ctx, "enchantment"), IntegerArgumentType.getInteger(ctx, "level")))))));
 			});
 		}
 	}
@@ -87,13 +87,13 @@ public class FeatureIMore implements Feature {
 				LivingEntity le = (LivingEntity)e;
 				ItemStack stack = le.getMainHandStack();
 				if (!stack.isEmpty()) {
-					CompoundTag tag = stack.getOrCreateTag();
+					NbtCompound tag = stack.getOrCreateTag();
 					if (!tag.contains("Enchantments", 9)) {
-						tag.put("Enchantments", new ListTag());
+						tag.put("Enchantments", new NbtList());
 					}
 
-					ListTag ench = tag.getList("Enchantments", NbtType.COMPOUND);
-					CompoundTag c = new CompoundTag();
+					NbtList ench = tag.getList("Enchantments", NbtType.COMPOUND);
+					NbtCompound c = new NbtCompound();
 					c.putString("id", String.valueOf(Registry.ENCHANTMENT.getId(enchantment)));
 					c.putInt("lvl", level);
 					ench.add(c);

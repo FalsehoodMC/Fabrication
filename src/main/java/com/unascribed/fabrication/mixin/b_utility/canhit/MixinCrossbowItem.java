@@ -17,7 +17,7 @@ import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity.PickupPermission;
 import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 
@@ -31,8 +31,8 @@ public class MixinCrossbowItem {
 	private static void shoot(World world, LivingEntity shooter, Hand hand, ItemStack crossbow, ItemStack projectile, float soundPitch, boolean creative, float speed, float divergence, float simulated,
 			CallbackInfo ci, boolean firework, ProjectileEntity proj) {
 		if (!MixinConfigPlugin.isEnabled("*.canhit") || CanHitUtil.isExempt(shooter)) return;
-		ListTag canHitList = crossbow.hasTag() && crossbow.getTag().contains("CanHit") ? crossbow.getTag().getList("CanHit", NbtType.STRING) : null;
-		ListTag canHitList2 = projectile.hasTag() && projectile.getTag().contains("CanHit") ? projectile.getTag().getList("CanHit", NbtType.STRING) : null;
+		NbtList canHitList = crossbow.hasTag() && crossbow.getTag().contains("CanHit") ? crossbow.getTag().getList("CanHit", NbtType.STRING) : null;
+		NbtList canHitList2 = projectile.hasTag() && projectile.getTag().contains("CanHit") ? projectile.getTag().getList("CanHit", NbtType.STRING) : null;
 		if (proj instanceof SetCanHitList) {
 			((SetCanHitList)proj).fabrication$setCanHitLists(canHitList, canHitList2);
 			if (canHitList2 != null && proj instanceof PersistentProjectileEntity && ((PersistentProjectileEntity)proj).pickupType == PickupPermission.ALLOWED) {

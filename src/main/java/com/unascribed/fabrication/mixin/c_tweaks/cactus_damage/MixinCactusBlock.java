@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.c_tweaks.cactus_damage;
 
+import com.unascribed.fabrication.support.ConfigPredicates;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -26,13 +27,13 @@ public class MixinCactusBlock {
 		boolean touchedTop = (int)(entity.getPos().y+0.075) > pos.getY();
 		if (touchedTop) {
 			if (MixinConfigPlugin.isEnabled("*.cactus_walk_doesnt_hurt_with_boots")) {
-				if (!le.getEquippedStack(EquipmentSlot.FEET).isEmpty()) {
+				if (ConfigPredicates.shouldRun("*.cactus_walk_doesnt_hurt_with_boots", le)) {
 					ci.cancel();
 				}
 			}
 		} else {
 			if (MixinConfigPlugin.isEnabled("*.cactus_brush_doesnt_hurt_with_chest")) {
-				if (!le.getEquippedStack(EquipmentSlot.CHEST).isEmpty()) {
+				if (ConfigPredicates.shouldRun("*.cactus_brush_doesnt_hurt_with_chest", le)) {
 					ci.cancel();
 				}
 			}

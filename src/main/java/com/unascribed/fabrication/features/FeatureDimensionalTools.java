@@ -18,8 +18,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtString;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Language;
@@ -107,9 +107,9 @@ public class FeatureDimensionalTools implements Feature {
 						}
 					}
 					stack.setCustomName(new LiteralText("§f"+s));
-					ListTag li = new ListTag();
+					NbtList li = new NbtList();
 					for (MohsIdentifier dim : finalDimensions) {
-						li.add(StringTag.of(dim.toString()));
+						li.add(NbtString.of(dim.toString()));
 					}
 					stack.getTag().put("fabrication:HonoraryDimensions", li);
 				}

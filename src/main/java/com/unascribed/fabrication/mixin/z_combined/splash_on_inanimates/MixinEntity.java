@@ -11,7 +11,7 @@ import com.unascribed.fabrication.interfaces.SetInvisNoGravReversible;
 import com.unascribed.fabrication.support.EligibleIf;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.world.World;
 
 @Mixin(Entity.class)
@@ -70,8 +70,8 @@ public abstract class MixinEntity implements SetInvisNoGravReversible {
 		fabrication$noGravityReversible = reversible;
 	}
 	
-	@Inject(at=@At("TAIL"), method="toTag(Lnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/nbt/CompoundTag;")
-	public void toTag(CompoundTag tag, CallbackInfoReturnable<CompoundTag> ci) {
+	@Inject(at=@At("TAIL"), method= "writeNbt(Lnet/minecraft/nbt/NbtCompound;)Lnet/minecraft/nbt/NbtCompound;")
+	public void toTag(NbtCompound tag, CallbackInfoReturnable<NbtCompound> ci) {
 		if (fabrication$invisibilityReversible) {
 			tag.putBoolean("fabrication:InvisibilityReversible", fabrication$invisibilityReversible);
 		}
@@ -80,8 +80,8 @@ public abstract class MixinEntity implements SetInvisNoGravReversible {
 		}
 	}
 	
-	@Inject(at=@At("TAIL"), method="fromTag(Lnet/minecraft/nbt/CompoundTag;)V")
-	public void fromTag(CompoundTag tag, CallbackInfo ci) {
+	@Inject(at=@At("TAIL"), method="readNbt(Lnet/minecraft/nbt/NbtCompound;)V")
+	public void fromTag(NbtCompound tag, CallbackInfo ci) {
 		fabrication$invisibilityReversible = tag.getBoolean("fabrication:InvisibilityReversible");
 		fabrication$noGravityReversible = tag.getBoolean("fabrication:NoGravityReversible");
 	}

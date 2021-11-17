@@ -24,7 +24,7 @@ public class ColorButtonWidget extends ButtonWidget {
 	}
 	
 	@Override
-	protected void renderBg(MatrixStack matrices, MinecraftClient client, int mouseX, int mouseY) {
+	protected void renderBackground(MatrixStack matrices, MinecraftClient client, int mouseX, int mouseY) {
 		fill(matrices, x, y, x+width, y+height, bg);
 		if (isHovered() || isFocused()) {
 			fill(matrices, x, y, x+width, y+1, -1);

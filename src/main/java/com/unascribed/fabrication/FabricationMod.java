@@ -15,7 +15,7 @@ import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.ResolvedTrilean;
 import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.Trilean;
-
+import com.unascribed.fabrication.support.OptionalFScript;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -67,6 +67,7 @@ public class FabricationMod implements ModInitializer {
 				throw new RuntimeException(e);
 			}
 		}
+		if (Agnos.isModLoaded("fscript")) OptionalFScript.reload();
 		for (String s : MixinConfigPlugin.discoverClassesInPackage("com.unascribed.fabrication.features", false)) {
 			try {
 				Feature r = (Feature)Class.forName(s).newInstance();

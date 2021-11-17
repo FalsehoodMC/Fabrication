@@ -18,7 +18,7 @@ import net.minecraft.entity.projectile.PersistentProjectileEntity.PickupPermissi
 import net.minecraft.item.ArrowItem;
 import net.minecraft.item.BowItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.world.World;
 
 @Mixin(BowItem.class)
@@ -31,8 +31,8 @@ public class MixinBowItem {
 	public void onStoppedUsing(ItemStack bowStack, World world, LivingEntity user, int remaining, CallbackInfo ci,
 			PlayerEntity entity, boolean infinity, ItemStack arrowStack, int i, float f, boolean b2, ArrowItem ai, PersistentProjectileEntity arrow) {
 		if (!MixinConfigPlugin.isEnabled("*.canhit") || CanHitUtil.isExempt(entity)) return;
-		ListTag canHitList = bowStack.hasTag() && bowStack.getTag().contains("CanHit") ? bowStack.getTag().getList("CanHit", NbtType.STRING) : null;
-		ListTag canHitList2 = arrowStack.hasTag() && arrowStack.getTag().contains("CanHit") ? arrowStack.getTag().getList("CanHit", NbtType.STRING) : null;
+		NbtList canHitList = bowStack.hasTag() && bowStack.getTag().contains("CanHit") ? bowStack.getTag().getList("CanHit", NbtType.STRING) : null;
+		NbtList canHitList2 = arrowStack.hasTag() && arrowStack.getTag().contains("CanHit") ? arrowStack.getTag().getList("CanHit", NbtType.STRING) : null;
 		if (arrow instanceof SetCanHitList) {
 			((SetCanHitList)arrow).fabrication$setCanHitLists(canHitList, canHitList2);
 			if (canHitList2 != null && arrow.pickupType == PickupPermission.ALLOWED) {

@@ -9,7 +9,7 @@ import com.unascribed.fabrication.support.EligibleIf;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.entity.projectile.TridentEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtList;
 
 @Mixin(TridentEntity.class)
 @EligibleIf(configEnabled="*.canhit")
@@ -19,7 +19,7 @@ public abstract class MixinTridentEntity implements SetCanHitList {
 	private ItemStack tridentStack;
 	
 	@Override
-	public ListTag fabrication$getCanHitList() {
+	public NbtList fabrication$getCanHitList() {
 		return tridentStack.hasTag() && tridentStack.getTag().contains("CanHit") && !CanHitUtil.isExempt(((TridentEntity)(Object)this).getOwner()) ?
 				tridentStack.getTag().getList("CanHit", NbtType.STRING) : null;
 	}
