@@ -154,10 +154,10 @@ public class MixinTitleScreen extends Screen {
 			fabrication$blocks = new LogoBlock[logoDataWidth][logoDataHeight];
 			if (LoaderBlockLogo.unrecoverableLoadError) {
 				String[] error = {
-						"### ### ### ### ###	### ### ###   #   ### ###",
-						"#   # # # # # # # #	#   #   #	 #   # # #  ",
-						"##  ##  ##  # # ##	 ### ##  ##	#   # # # #",
-						"#   # # # # # # # #	  # #   #	 #   # # # #",
+						"### ### ### ### ###    ### ### ###   #   ### ###",
+						"#   # # # # # # # #    #   #   #     #   # # #  ",
+						"##  ##  ##  # # ##     ### ##  ##    #   # # # #",
+						"#   # # # # # # # #      # #   #     #   # # # #",
 						"### # # # # ### # # #  ### ### ###   ### ### ###"
 				};
 				for (int x = 0; x < error[0].length(); x++) {
