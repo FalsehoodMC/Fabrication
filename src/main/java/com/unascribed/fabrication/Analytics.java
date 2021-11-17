@@ -41,7 +41,7 @@ import net.minecraft.client.util.Window;
 
 public class Analytics {
 
-	private static final Executor exec = Executors.newSingleThreadExecutor();
+	private static final Executor exec = Executors.newSingleThreadExecutor(r -> new Thread(r, "Fabrication analytics submission thread") {{setDaemon(true);}});
 	
 	private static String userId = null;
 	private static long last = -1;
