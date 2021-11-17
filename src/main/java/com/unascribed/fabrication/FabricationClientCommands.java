@@ -15,6 +15,7 @@ import com.unascribed.fabrication.features.FeatureFabricationCommand;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.OptionalFScript;
 import com.unascribed.fabrication.client.OptionalFScriptScreen;
+
 import io.github.queerbric.pride.PrideFlags;
 import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
 import net.minecraft.client.MinecraftClient;
@@ -80,7 +81,7 @@ public class FabricationClientCommands {
 			for (String s : OptionalFScript.predicateProviders.keySet()) {
 				LiteralArgumentBuilder<T> key = LiteralArgumentBuilder.<T>literal(s).executes((c) -> {
 					MinecraftClient.getInstance().send(() -> {
-						MinecraftClient.getInstance().setScreen(new OptionalFScriptScreen(null, PrideFlags.isPrideMonth() ? PrideFlags.getRandomFlag() : null, FeaturesFile.get(s).name, s));
+						MinecraftClient.getInstance().setScreen(OptionalFScriptScreen.construct(null, PrideFlags.isPrideMonth() ? PrideFlags.getRandomFlag() : null, FeaturesFile.get(s).name, s));
 					});
 					return 1;
 				});

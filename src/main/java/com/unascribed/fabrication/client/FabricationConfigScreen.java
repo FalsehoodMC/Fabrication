@@ -1063,7 +1063,7 @@ public class FabricationConfigScreen extends Screen {
 		if (mouseX >= 134+trackSize && mouseX <= endX && mouseY >= startY+1 && mouseY <= startY+10 && FeaturesFile.get(key).fscript != null && Agnos.isModLoaded("fscript")){
 			if (didClick){
 				client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1f));
-				client.setScreen(new OptionalFScriptScreen(this, prideFlag, title, key));
+				client.setScreen(OptionalFScriptScreen.construct(this, prideFlag, title, key));
 			}
 			fill(matrices, startX-2, 9, endX, 10, -1);
 		}

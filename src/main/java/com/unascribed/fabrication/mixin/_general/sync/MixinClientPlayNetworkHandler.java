@@ -3,7 +3,7 @@ package com.unascribed.fabrication.mixin._general.sync;
 import java.util.Map;
 import java.util.Set;
 
-import com.unascribed.fabrication.client.OptionalFScriptScreen;
+import com.unascribed.fabrication.client.FScriptScreen;
 import net.minecraft.client.MinecraftClient;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -105,8 +105,8 @@ public class MixinClientPlayNetworkHandler implements GetServerConfig {
 					PacketByteBuf buf = packet.getData();
 					int code = buf.readVarInt();
 					if (code == 0){
-						if (client.currentScreen instanceof OptionalFScriptScreen){
-							((OptionalFScriptScreen) client.currentScreen).fabrication$setScript(buf.readString());
+						if (client.currentScreen instanceof FScriptScreen){
+							((FScriptScreen) client.currentScreen).fabrication$setScript(buf.readString());
 						}
 					}
 					ci.cancel();
