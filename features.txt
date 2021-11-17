@@ -1884,6 +1884,13 @@ woina.no_player_death_animation
 	desc:
 		Players stay upright when killed.
 
+woina.yellow_button_hover
+	name: Yellow Button Hover
+	since: 2.1.0
+	sides: client_only
+	desc:
+		Hovered buttons will have yellow text.
+
 pedantry
 	name: Pedantry
 	section: true
