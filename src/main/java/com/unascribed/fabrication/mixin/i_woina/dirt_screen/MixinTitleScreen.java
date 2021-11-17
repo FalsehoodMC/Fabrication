@@ -14,7 +14,7 @@ import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.text.Text;
 
 @Mixin(TitleScreen.class)
-@EligibleIf(envMatches=Env.CLIENT)
+@EligibleIf(envMatches=Env.CLIENT, configAvailable="*.dirt_screen")
 public class MixinTitleScreen extends Screen {
 
 	protected MixinTitleScreen(Text title) {
