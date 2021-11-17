@@ -27,6 +27,6 @@ experiments.no_set_window_pos:
 		Prevents the game from manually modifying the window position. So if you have custom configs
 		or something that memorizes window positions, they will be honored instead of the window
 		always being centered.
+
 # kate: space-indent off
 # vim: noai:noet
-

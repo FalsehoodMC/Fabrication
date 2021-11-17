@@ -248,6 +248,6 @@ balance.pickup_skeleton_arrows:
 	sides: server_only
 	desc:
 		Arrows shot by skeletons can be picked up.
+
 # kate: space-indent off
 # vim: noai:noet
-
