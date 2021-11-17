@@ -439,7 +439,7 @@ public class FabricationConfigScreen extends Screen {
 			float startY = y;
 			if (y >= -24 && y < height) {
 				int icoY = 0;
-				int size = 24;
+				int size = 28;
 				if ("search".equals(s)) {
 					size = 12;
 					icoY = -4;
@@ -450,11 +450,12 @@ public class FabricationConfigScreen extends Screen {
 				client.getTextureManager().bindTexture(id);
 				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-				RenderSystem.setShaderColor(1, 1, 1, 0.4f);
+				RenderSystem.setShaderColor(1, 1, 1, 0.3f);
 				RenderSystem.setShaderTexture(0, id);
 				matrices.push();
-				matrices.translate(0, y, 0);
-				drawTexture(matrices, (130-4-size), icoY, 0, 0, 0, size, Math.min(size, (int)Math.ceil(height-y)), size, size);
+				matrices.translate((130-4-size), icoY+y, 0);
+				matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(5));
+				drawTexture(matrices, 0, 0, 0, 0, 0, size, Math.min(size, (int)Math.ceil(height-y)), size, size);
 				matrices.pop();
 			}
 			if (y >= -12 && y < height) {
@@ -763,6 +764,9 @@ public class FabricationConfigScreen extends Screen {
 			drawTexture(matrices, -80, -80, 0, 0, 0, 160, 160, 160, 160);
 			matrices.pop();
 			if ("general".equals(section)) {
+				if (y > 0) {
+					textRenderer.draw(matrices, "§lGeneral", 135, y-12, -1);
+				}
 				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
 				RenderSystem.setShaderTexture(0, new Identifier("fabrication", "coffee_bean.png"));
@@ -772,10 +776,10 @@ public class FabricationConfigScreen extends Screen {
 				Profile hovered = null;
 				for (Profile p : Profile.values()) {
 					boolean profSel = getRawValue("general.profile").toUpperCase(Locale.ROOT).equals(p.name());
-					if (mouseX >= 134+x && mouseX <= 134+x+16 && mouseY >= 18 && mouseY <= 18+16) {
+					if (mouseX >= 134+x && mouseX <= 134+x+16 && mouseY >= 28 && mouseY <= 28+16) {
 						hovered = p;
 					}
-					if (didClick && mouseX >= 134+x && mouseX <= 134+x+16 && mouseY >= 18 && mouseY <= 18+16) {
+					if (didClick && mouseX >= 134+x && mouseX <= 134+x+16 && mouseY >= 28 && mouseY <= 28+16) {
 						if (p == Profile.BURNT) {
 							client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_CHIME, 1.8f, 1f));
 							client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.ITEM_FLINTANDSTEEL_USE, 1f));
@@ -788,11 +792,11 @@ public class FabricationConfigScreen extends Screen {
 						setValue("general.profile", p.name().toLowerCase(Locale.ROOT));
 					}
 					color(PROFILE_COLORS.get(p), profSel ? 1f : (hovered == p ? 0.6f : 0.3f) * (MixinConfigPlugin.isEnabled("general.dark_mode") ? 0.5f : 1));
-					drawTexture(matrices, 134+x, 18, 0, 0, 0, 16, 16, 16, 16);
+					drawTexture(matrices, 134+x, 28, 0, 0, 0, 16, 16, 16, 16);
 					x += 18;
 				}
 				FeatureEntry profile = FeaturesFile.get("general.profile");
-				int textRight = textRenderer.draw(matrices, profile.name, 136, 6, -1);
+				int textRight = textRenderer.draw(matrices, profile.name, 135, 16, -1);
 				if (mouseX >= 136 && mouseX <= textRight && mouseY >= 6 && mouseY <= 18) {
 					renderWrappedTooltip(matrices, profile.desc, mouseX, mouseY);
 				}
@@ -800,7 +804,7 @@ public class FabricationConfigScreen extends Screen {
 					FeatureEntry hoveredEntry = FeaturesFile.get("general.profile."+hovered.name().toLowerCase(Locale.ROOT));
 					renderWrappedTooltip(matrices, "§l"+hoveredEntry.name+"\n§f"+hoveredEntry.desc, mouseX, mouseY);
 				}
-				y = 40;
+				y = 50;
 				y = drawConfigValues(matrices, y, mouseX, mouseY, (en) -> en.key.startsWith("general."));
 			} else if ("search".equals(section)) {
 				y += 4;
@@ -808,12 +812,16 @@ public class FabricationConfigScreen extends Screen {
 				if (Agnos.isModLoaded("fscript") && searchingScriptable) pen = ((Predicate<FeatureEntry>) en -> en.fscript != null).and(pen);
 				y = drawConfigValues(matrices, y, mouseX, mouseY, pen, SHOW_SOURCE_SECTION, emptyQuery ? null : HIGHLIGHT_QUERY_MATCH);
 			} else {
+				String name = FeaturesFile.get(section).name;
+				if (y > 0) {
+					textRenderer.draw(matrices, "§l"+name, 135, y-12, -1);
+				}
 				y = drawConfigValues(matrices, y, mouseX, mouseY, (en) -> en.key.startsWith(section+".") && !en.extra);
 				int titleY = y;
-				y += 25;
+				y += 22;
 				int endY = drawConfigValues(matrices, y, mouseX, mouseY, (en) -> en.key.startsWith(section+".") && en.extra);
 				if (endY != y && y < height-8) {
-					textRenderer.draw(matrices, "§lExtra", 135, titleY+10, -1);
+					textRenderer.draw(matrices, "§l"+name+" §oExtra", 135, titleY+10, -1);
 				}
 				y = endY;
 			}

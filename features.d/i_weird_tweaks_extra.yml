@@ -1,6 +1,17 @@
 # This is not actually a YAML file; it's only .yml for syntax highlighting.
 # Tab indentation *must* be used.
 
+weird_tweaks.extra.creepers_explode_when_on_fire:
+	name: Creepers Explode When On Fire
+	since: 1.0
+	sides: server_only
+	fscript: living_entity
+	fscript_default: on_fire
+	default: burnt
+	media: https://unascribed.com/fabrication/creepers_explode_when_on_fire.mp4
+	desc:
+		Causes creepers to light their fuses when lit on fire. Just because.
+
 weird_tweaks.extra.photoallergic_creepers:
 	name: Photoallergic Creepers
 	since: 1.2.4

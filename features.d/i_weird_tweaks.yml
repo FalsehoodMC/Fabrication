@@ -9,17 +9,6 @@ weird_tweaks:
 	desc:
 		Opinionated changes.
 
-weird_tweaks.creepers_explode_when_on_fire:
-	name: Creepers Explode When On Fire
-	since: 1.0
-	sides: server_only
-	fscript: living_entity
-	fscript_default: on_fire
-	default: never
-	media: https://unascribed.com/fabrication/creepers_explode_when_on_fire.mp4
-	desc:
-		Causes creepers to light their fuses when lit on fire. Just because.
-
 weird_tweaks.endermen_dont_squeal:
 	name: Endermen Don't Squeal
 	since: 1.0
