@@ -32,7 +32,8 @@ public class MixinGhastEntityRenderer {
 			// not worth needing this tweak on the server-side and sending our own packets; the
 			// amount of scaling that occurs in the first 10 ticks is basically unnoticeable. so
 			// add the 10 ticks we missed to the counter
-			float a = ((((GhastAttackTime)ghast).getAttackTime()+tickDelta)+10) / 20F;
+			float a = ((((GhastAttackTime)ghast).getAttackTime()+(ghast.isAlive() ? tickDelta : 0))+10) / 20F;
+			if (a > 1) a = 1;
 			if (a < 0) a = 0;
 			a = 1 / (a * a * a * a * a * 2 + 1);
 			hScale = (8 + 1 / a) / 2;

@@ -587,6 +587,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		return discoverClassesInPackage("com.unascribed.fabrication.mixin", true);
 	}
 
+	@SuppressWarnings("unchecked")
 	public static List<String> discoverClassesInPackage(String pkg, boolean truncate) {
 		FabLog.debug("Starting discovery pass...");
 		try {

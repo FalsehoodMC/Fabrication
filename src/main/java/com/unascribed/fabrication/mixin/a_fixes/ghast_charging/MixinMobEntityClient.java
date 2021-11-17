@@ -28,7 +28,9 @@ public class MixinMobEntityClient implements GhastAttackTime {
 		if (self instanceof GhastEntity) {
 			GhastEntity g = (GhastEntity)self;
 			if (g.isShooting()) {
-				fabrication$ghastAttackTime++;
+				if (g.isAlive()) {
+					fabrication$ghastAttackTime++;
+				}
 			} else {
 				fabrication$ghastAttackTime = 0;
 			}

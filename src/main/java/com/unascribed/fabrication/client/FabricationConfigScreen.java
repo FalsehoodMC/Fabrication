@@ -719,7 +719,7 @@ public class FabricationConfigScreen extends Screen {
 			String blurb = "§l"+FabricationMod.MOD_NAME+" v"+v+" §rby unascribed\n"+(configuringServer ? "(Local version: v"+Agnos.getModVersion()+")" : "")
 					+ "\nClick a category on the left to change settings.";
 			int height = drawWrappedText(matrices, 140, 20, blurb, width-130, -1, false);
-			if (drawButton(matrices, 140, 20+height+32, 120, 20, "Reload files", mouseX, mouseY)) {
+			if (!configuringServer && drawButton(matrices, 140, 20+height+32, 120, 20, "Reload files", mouseX, mouseY)) {
 				MixinConfigPlugin.reload();
 			}
 			y += height;
