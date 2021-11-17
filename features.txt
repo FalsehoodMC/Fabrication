@@ -1656,6 +1656,7 @@ weird_tweaks.villager_trades_reset
 		Instead of restocking villagers will completely reset their trades.
 		This also soft-limits the trades to the villager's level (one trade of each level).
 
+
 woina
 	name: What's Old Is New Again
 	section: true
@@ -1859,6 +1860,13 @@ woina.no_player_death_animation
 	default: never
 	desc:
 		Players stay upright when killed.
+
+woina.yellow_button_hover
+	name: Yellow Button Hover
+	since: 2.1.0
+	sides: client_only
+	desc:
+		Hovered buttons will have yellow text.
 
 pedantry
 	name: Pedantry
