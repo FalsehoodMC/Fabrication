@@ -503,7 +503,6 @@ public class FabricationConfigScreen extends Screen {
 					selectTime = 10-selectTime;
 				}
 			}
-			thisHeight += 8;
 			if (selectA > 0) {
 				RenderSystem.disableCull();
 				RenderSystem.enableBlend();
