@@ -16,26 +16,26 @@ import net.minecraft.nbt.NbtCompound;
 @Mixin(Entity.class)
 @EligibleIf(configAvailable="*.killmessage")
 public abstract class MixinEntity implements GetKillMessage {
-	
+
 	private String fabrication$killmessage = null;
-	
+
 	@Override
 	public String fabrication$getKillMessage() {
 		return fabrication$killmessage;
 	}
-	
+
 	@Inject(at=@At("TAIL"), method="writeNbt(Lnet/minecraft/nbt/NbtCompound;)Lnet/minecraft/nbt/NbtCompound;")
 	public void toTag(NbtCompound tag, CallbackInfoReturnable<NbtCompound> ci) {
 		if (fabrication$killmessage != null) {
 			tag.putString("KillMessage", fabrication$killmessage);
 		}
 	}
-	
+
 	@Inject(at=@At("TAIL"), method="readNbt(Lnet/minecraft/nbt/NbtCompound;)V")
 	public void fromTag(NbtCompound tag, CallbackInfo ci) {
 		if (tag.contains("KillMessage", NbtType.STRING) ) {
 			fabrication$killmessage = tag.getString("KillMessage");
 		}
 	}
-	
+
 }

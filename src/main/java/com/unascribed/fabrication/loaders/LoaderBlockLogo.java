@@ -41,7 +41,7 @@ public class LoaderBlockLogo implements ConfigLoader {
 	public static float shadowGreen = 0.f;
 	public static float shadowBlue = 0.f;
 	public static float shadowAlpha = 0.f;
-	
+
 	public enum Reverse {
 		FALSE(() -> false),
 		TRUE(() -> true),
@@ -52,7 +52,7 @@ public class LoaderBlockLogo implements ConfigLoader {
 			this.sup = sup;
 		}
 	}
-	
+
 	@Override
 	public void load(Path configDir, QDIni config, boolean loadError) {
 		colorToState.clear();
@@ -62,14 +62,14 @@ public class LoaderBlockLogo implements ConfigLoader {
 			image.close();
 			image = null;
 		}
-		
+
 		getReverse = config.getEnum("general.reverse", Reverse.class).orElse(Reverse.FALSE).sup;
 		sound = config.getBoolean("general.sound").orElse(false);
 		shadowRed = config.getInt("shadow.red").orElse(0) / 255.f;
 		shadowGreen = config.getInt("shadow.green").orElse(0) / 255.f;
 		shadowBlue = config.getInt("shadow.blue").orElse(0) / 255.f;
 		shadowAlpha = config.getInt("shadow.alpha").orElse(225) / 255.f;
-		
+
 		if (loadError) {
 			unrecoverableLoadError = true;
 			return;
@@ -103,7 +103,7 @@ public class LoaderBlockLogo implements ConfigLoader {
 				}
 			}
 		});
-		
+
 		for (String key : config.keySet()) {
 			if (key.startsWith("pixels.")) {
 				String color = key.substring(7);
@@ -114,23 +114,23 @@ public class LoaderBlockLogo implements ConfigLoader {
 				int colorInt = Integer.parseInt(color, 16);
 				int swapped = colorInt&0x0000FF00;
 				swapped |= (colorInt&0x00FF0000) >> 16;
-				swapped |= (colorInt&0x000000FF) << 16;
-				String[] blocks = config.get(key).orElse("").split(" ");
-				colorToState.put(swapped, () -> {
-					// Since this Loader (like all loaders) is called on the mod's initialization,
-					// the block registry might not have been populated by other mods yet.
-					// Therefore late BlockState resolution is performed here; colorToState suppliers
-					// are called by MixinTitleScreen, which runs after game init is done.
-					String block = blocks[ThreadLocalRandom.current().nextInt(blocks.length)];
-					try {
-						BlockArgumentParser parser = new BlockArgumentParser(new StringReader(block), false);
-						parser.parse(false);
-						return parser.getBlockState();
-					} catch (CommandSyntaxException e) {
-						FabLog.warn(block+" is not a valid identifier at "+config.getBlame(key));
-						return Blocks.AIR.getDefaultState();
-					}
-				});
+					swapped |= (colorInt&0x000000FF) << 16;
+					String[] blocks = config.get(key).orElse("").split(" ");
+					colorToState.put(swapped, () -> {
+						// Since this Loader (like all loaders) is called on the mod's initialization,
+						// the block registry might not have been populated by other mods yet.
+						// Therefore late BlockState resolution is performed here; colorToState suppliers
+						// are called by MixinTitleScreen, which runs after game init is done.
+						String block = blocks[ThreadLocalRandom.current().nextInt(blocks.length)];
+						try {
+							BlockArgumentParser parser = new BlockArgumentParser(new StringReader(block), false);
+							parser.parse(false);
+							return parser.getBlockState();
+						} catch (CommandSyntaxException e) {
+							FabLog.warn(block+" is not a valid identifier at "+config.getBlame(key));
+							return Blocks.AIR.getDefaultState();
+						}
+					});
 			}
 		}
 		for (int x = 0; x < image.getWidth(); x++) {

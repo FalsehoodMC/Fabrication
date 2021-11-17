@@ -120,19 +120,6 @@ minor_mechanics.spiders_cant_climb_glazed_terracotta:
 		Logic: Slime blocks can't stick to glazed terracotta. Are spiders really stickier than solid
 		slime?
 
-minor_mechanics.spiders_cant_climb_while_wet:
-	name: Spiders Can't Climb While Wet
-	since: 1.2.3
-	sides: server_only
-	default: burnt
-	media: https://unascribed.com/fabrication/spiders_cant_climb_while_wet.mp4
-	desc:
-		Makes spiders unable to climb while wet. Basically a more overpowered version of Spiders
-		Can't Climb Glazed Terracotta. May break vanilla spider farms.
-		
-		Interacts with Enhanced Moistness, and the demo video uses it for the water splash to work
-		like it does.
-
 minor_mechanics.water_fills_on_break:
 	name: Water Fills On Break
 	since: 1.1.1

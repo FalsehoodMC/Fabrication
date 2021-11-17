@@ -54,7 +54,7 @@ public class CanHitUtil {
 		} catch (CommandSyntaxException e) {}
 		return false;
 	}
-	
+
 	public static boolean canHit(ItemStack stack, Entity entity) {
 		if (stack.hasNbt() && stack.getNbt().contains("CanHit", NbtType.LIST)) {
 			NbtList canhit = stack.getNbt().getList("CanHit", NbtType.STRING);

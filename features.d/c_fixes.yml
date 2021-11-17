@@ -206,6 +206,8 @@ fixes.bubble_column_pop:
 	default: vienna
 	desc:
 		Re-adds bubble columns having a bubble pop particle and sound at the top.
+		
+		Was present in 18w07a, got removed before 1.13 release.
 
 # kate: space-indent off
 # vim: noai:noet

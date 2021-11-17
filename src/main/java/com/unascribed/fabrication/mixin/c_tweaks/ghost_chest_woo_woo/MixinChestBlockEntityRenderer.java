@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.ChestBlock;
@@ -32,7 +33,7 @@ public class MixinChestBlockEntityRenderer {
 
 	@Shadow
 	private boolean christmas;
-	
+
 	@Inject(at=@At("HEAD"), method="render(Lnet/minecraft/block/entity/BlockEntity;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;II)V")
 	public void renderHead(BlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.ghost_chest_woo_woo")) return;
@@ -52,7 +53,7 @@ public class MixinChestBlockEntityRenderer {
 			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		}
 	}
-	
+
 	@Unique
 	private RenderLayer getRenderLayer(BlockEntity entity) {
 		World world = entity.getWorld();

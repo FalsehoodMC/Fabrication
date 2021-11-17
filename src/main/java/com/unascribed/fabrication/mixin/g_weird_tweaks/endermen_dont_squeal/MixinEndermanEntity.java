@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
@@ -21,11 +22,11 @@ public class MixinEndermanEntity {
 		if (!MixinConfigPlugin.isEnabled("*.endermen_dont_squeal")) return;
 		ci.cancel();
 	}
-	
+
 	@Inject(at=@At("HEAD"), method="getAmbientSound()Lnet/minecraft/sound/SoundEvent;", cancellable=true)
 	public void getAmbientSound(CallbackInfoReturnable<SoundEvent> cir) {
 		if (!MixinConfigPlugin.isEnabled("*.endermen_dont_squeal")) return;
 		cir.setReturnValue(SoundEvents.ENTITY_ENDERMAN_AMBIENT);
 	}
-	
+
 }

@@ -1,8 +1,18 @@
 package com.unascribed.fabrication.mixin.a_fixes.bubble_column_pop;
 
+import java.util.Random;
+
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BubbleColumnBlock;
 import net.minecraft.particle.ParticleTypes;
@@ -11,14 +21,6 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.Random;
 
 @Mixin(BubbleColumnBlock.class)
 @EligibleIf(configAvailable="*.bubble_column_pop", envMatches=Env.CLIENT)
@@ -34,5 +36,5 @@ public class MixinBubbleColumnBlock {
 			world.playSound(pos.getX(), pos.getY()+0.5, pos.getZ(), SoundEvents.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, SoundCategory.BLOCKS, 0.2F + random.nextFloat() * 0.2F, 0.9F + random.nextFloat() * 0.15F, false);
 		}
 	}
-	
+
 }

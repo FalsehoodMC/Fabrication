@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -48,35 +47,35 @@ public class LoaderDimensionalTools implements ConfigLoader {
 	public static final class MohsIdentifier {
 		private final boolean hard;
 		private final Identifier id;
-		
+
 		public MohsIdentifier(boolean hard, Identifier id) {
 			this.hard = hard;
 			this.id = id;
 		}
-		
+
 		public static MohsIdentifier createHard(Identifier id) {
 			return new MohsIdentifier(true, id);
 		}
-		
+
 		public static MohsIdentifier createSoft(Identifier id) {
 			return new MohsIdentifier(false, id);
 		}
-		
+
 		public static MohsIdentifier parse(String s) {
 			boolean hard = s.endsWith("!");
 			if (hard) s = s.substring(0, s.length()-1);
 			return new MohsIdentifier(hard, new Identifier(s));
 		}
-		
+
 		public MohsIdentifier asSoft() {
 			if (!hard) return this;
 			return new MohsIdentifier(false, id);
 		}
-		
+
 		public boolean isHard() {
 			return hard;
 		}
-		
+
 		public Identifier getId() {
 			return id;
 		}
@@ -88,12 +87,12 @@ public class LoaderDimensionalTools implements ConfigLoader {
 		public String getNamespace() {
 			return id.getNamespace();
 		}
-		
+
 		@Override
 		public String toString() {
 			return id.toString()+(hard ? "!" : "");
 		}
-		
+
 		@Override
 		public int hashCode() {
 			return Objects.hash(id, hard);
@@ -109,14 +108,14 @@ public class LoaderDimensionalTools implements ConfigLoader {
 			if (!Objects.equals(this.id, that.id)) return false;
 			return true;
 		}
-		
+
 	}
-	
+
 	public static final class NameSubstitution {
 		public final Identifier dimId;
 		public final String find;
 		public final String replace;
-		
+
 		private NameSubstitution(Identifier dimId, String find, String replace) {
 			this.dimId = dimId;
 			this.find = find;
@@ -134,21 +133,21 @@ public class LoaderDimensionalTools implements ConfigLoader {
 	private @interface ItemTagId {}
 	@Retention(RetentionPolicy.SOURCE) @Documented @Target(ElementType.TYPE_USE)
 	private @interface DimensionId {}
-	
+
 	public static final SetMultimap<@BlockId Identifier, @DimensionId MohsIdentifier> blockAssociations = HashMultimap.create();
 	public static final SetMultimap<@BlockTagId Identifier, @DimensionId MohsIdentifier> blockTagAssociations = HashMultimap.create();
-	
+
 	public static final SetMultimap<@ItemId Identifier, @DimensionId MohsIdentifier> toolAssociations = HashMultimap.create();
 	public static final SetMultimap<@ItemTagId Identifier, @DimensionId MohsIdentifier> toolTagAssociations = HashMultimap.create();
-	
+
 	public static final SetMultimap<@ItemId Identifier, @Nullable MohsIdentifier> ingredientAssociations = HashMultimap.create();
 	public static final SetMultimap<@ItemTagId Identifier, @Nullable MohsIdentifier> ingredientTagAssociations = HashMultimap.create();
-	
+
 	public static final Set<@ItemId Identifier> substitutableItems = Sets.newHashSet();
 	public static final Set<@ItemTagId Identifier> substitutableItemTags = Sets.newHashSet();
-	
+
 	public static final List<NameSubstitution> nameSubstitutions = Lists.newArrayList();
-	
+
 	// A>B
 	public static final Table<@DimensionId MohsIdentifier, @DimensionId Identifier, Integer> oneToOneDamageFactors = HashBasedTable.create();
 	// *>A
@@ -157,7 +156,7 @@ public class LoaderDimensionalTools implements ConfigLoader {
 	public static final Map<@DimensionId Identifier, Integer> foreignHardOnNativeDamageFactors = Maps.newHashMap();
 	// A>*
 	public static final Map<@DimensionId MohsIdentifier, Integer> nativeOnForeignDamageFactors = Maps.newHashMap();
-	
+
 	public static int getDamageFactor(@DimensionId @Nullable MohsIdentifier tool, @DimensionId @Nullable Identifier block) {
 		if (tool != null) {
 			if (oneToOneDamageFactors.contains(tool, block))
@@ -180,7 +179,7 @@ public class LoaderDimensionalTools implements ConfigLoader {
 		}
 		return 1;
 	}
-	
+
 	public static Set<MohsIdentifier> getAssociatedDimensionsForTool(ItemStack stack) {
 		Set<MohsIdentifier> dims = processTags(toolAssociations.get(Registry.ITEM.getId(stack.getItem())), toolTagAssociations, ItemTags.getTagGroup(), stack.getItem());
 		if (stack.hasNbt()) {
@@ -202,11 +201,11 @@ public class LoaderDimensionalTools implements ConfigLoader {
 		}
 		return dims;
 	}
-	
+
 	public static Set<MohsIdentifier> getAssociatedDimensionsForIngredient(ItemStack stack) {
 		return processTags(ingredientAssociations.get(Registry.ITEM.getId(stack.getItem())), ingredientTagAssociations, ItemTags.getTagGroup(), stack.getItem());
 	}
-	
+
 	public static Set<MohsIdentifier> getAssociatedDimensions(Block block) {
 		return processTags(blockAssociations.get(Registry.BLOCK.getId(block)), blockTagAssociations, BlockTags.getTagGroup(), block);
 	}
@@ -234,7 +233,7 @@ public class LoaderDimensionalTools implements ConfigLoader {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public void load(Path configDir, QDIni config, boolean loadError) {
 		blockAssociations.clear();

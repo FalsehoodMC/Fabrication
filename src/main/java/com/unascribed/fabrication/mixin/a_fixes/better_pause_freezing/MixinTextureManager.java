@@ -9,6 +9,7 @@ import com.unascribed.fabrication.client.AtlasViewerScreen;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.TextureManager;
 
@@ -22,5 +23,5 @@ public class MixinTextureManager {
 			ci.cancel();
 		}
 	}
-	
+
 }

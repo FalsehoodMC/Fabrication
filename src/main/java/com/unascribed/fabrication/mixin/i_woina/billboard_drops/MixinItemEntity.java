@@ -10,6 +10,7 @@ import com.unascribed.fabrication.client.FlatItems;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
@@ -17,10 +18,10 @@ import net.minecraft.item.ItemStack;
 @Mixin(ItemEntity.class)
 @EligibleIf(configAvailable="*.billboard_drops", envMatches=Env.CLIENT)
 public abstract class MixinItemEntity {
-	
+
 	@Shadow
 	public ItemStack getStack() { return null; }
-	
+
 	@Inject(at=@At("HEAD"), method="getRotation(F)F", cancellable=true)
 	public void getRotation(float partialTicks, CallbackInfoReturnable<Float> ci) {
 		if (MixinConfigPlugin.isEnabled("*.billboard_drops")) {
@@ -32,5 +33,5 @@ public abstract class MixinItemEntity {
 			}
 		}
 	}
-	
+
 }

@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 
 @Mixin(AbstractInventoryScreen.class)
@@ -18,5 +19,5 @@ public class MixinAbstractInventoryScreen {
 		if (MixinConfigPlugin.isEnabled("*.boundless_levels")) return 32767;
 		return orig;
 	}
-	
+
 }

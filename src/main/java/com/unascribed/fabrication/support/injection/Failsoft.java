@@ -4,8 +4,8 @@ import java.lang.reflect.Field;
 
 import org.objectweb.asm.tree.MethodNode;
 import org.spongepowered.asm.mixin.MixinEnvironment.Option;
-import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 import org.spongepowered.asm.mixin.extensibility.IMixinErrorHandler.ErrorAction;
+import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 import org.spongepowered.asm.mixin.injection.struct.InjectionInfo;
 import org.spongepowered.asm.mixin.injection.throwables.InvalidInjectionException;
 import org.spongepowered.asm.mixin.transformer.MixinTargetContext;
@@ -58,7 +58,7 @@ public class Failsoft {
 		} catch (Throwable ignore) {}
 		return t;
 	}
-	
+
 	private static boolean doctorStack(StackTraceElement[] stackTrace, StackTraceElement[] newStackTrace) {
 		boolean needClone = false;
 		for (int i = 0; i < stackTrace.length; i++) {
@@ -80,14 +80,14 @@ public class Failsoft {
 		int injectedCallbackCount = pluck(InjectionInfo.class, ii, "injectedCallbackCount");
 		int requiredCallbackCount = pluck(InjectionInfo.class, ii, "requiredCallbackCount");
 		int maxCallbackCount = pluck(InjectionInfo.class, ii, "maxCallbackCount");
-		
+
 		for (MethodNode method : (Iterable<MethodNode>)pluck(InjectionInfo.class, ii, "injectedMethods")) {
 			ii.getClassNode().methods.add(method);
 		}
 
-//		String description = ii.getDescription();
+		//		String description = ii.getDescription();
 		String refMapStatus = mixin.getReferenceMapper().getStatus();
-//		String extraInfo = ii.getDynamicInfo() + ii.getMessages();
+		//		String extraInfo = ii.getDynamicInfo() + ii.getMessages();
 		if ((mixin.getOption(Option.DEBUG_INJECTORS) && ii.getInjectedCallbackCount() < expectedCallbackCount)) {
 			handleApplyErrorProactively(mixin.getTargetClassInfo().getClassName(), new InvalidInjectionException(ii.getContext(),
 					String.format("Injection validation failed: %s %s%s in %s expected %d invocation(s) but %d succeeded. Scanned %d target(s). %s%s",

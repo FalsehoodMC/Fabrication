@@ -5,6 +5,7 @@ import com.unascribed.fabrication.interfaces.SetCrawling;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Feature;
+
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
@@ -18,7 +19,7 @@ public class FeatureCrawling implements Feature {
 
 	public static KeyBinding keybind;
 	public static boolean forced = false;
-	
+
 	@Override
 	public void apply() {
 		keybind = new KeyBinding("[Fabrication] Crawl", InputUtil.UNKNOWN_KEY.getCode(), "key.categories.movement") {
@@ -59,5 +60,5 @@ public class FeatureCrawling implements Feature {
 	public String getConfigKey() {
 		return "*.crawling";
 	}
-	
+
 }

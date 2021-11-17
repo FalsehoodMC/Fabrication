@@ -2,15 +2,15 @@ package com.unascribed.fabrication.mixin.i_woina.block_logo;
 
 import java.util.function.BiConsumer;
 
-import net.minecraft.util.math.Quaternion;
-import net.minecraft.util.math.Vec3f;
-
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -19,6 +19,7 @@ import com.unascribed.fabrication.logic.LogoBlock;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -33,8 +34,8 @@ import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.VertexConsumerProvider.Immediate;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.VertexFormat.DrawMode;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.Sprite;
@@ -45,26 +46,28 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Matrix4f;
+import net.minecraft.util.math.Quaternion;
+import net.minecraft.util.math.Vec3f;
 
 @Mixin(TitleScreen.class)
 @EligibleIf(configAvailable="*.block_logo", envMatches=Env.CLIENT)
 public class MixinTitleScreen extends Screen {
 
 	private static final Identifier FABRICATION$EMPTY = new Identifier("fabrication", "empty.png");
-	
+
 	@Shadow @Final
 	private static Identifier EDITION_TITLE_TEXTURE;
-	
-	
+
+
 	protected MixinTitleScreen(Text title) {
 		super(title);
 	}
-	
+
 	private LogoBlock[][] fabrication$blocks = null;
 	@Shadow
 	private String splashText;
 	private String fabrication$splashText;
-	
+
 	@Shadow
 	private boolean doBackgroundFade;
 	@Shadow
@@ -81,7 +84,7 @@ public class MixinTitleScreen extends Screen {
 	}
 
 	// the mixture of deobf and obf classes here confuses MixinGradle, so we have to spell it out
-	
+
 	@ModifyArg(at=@At(value="INVOKE", target="com/mojang/blaze3d/systems/RenderSystem.setShaderTexture(ILnet/minecraft/util/Identifier;)V", ordinal=2),
 			method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V", require=0)
 	public Identifier setShaderTextureDev(Identifier id) {
@@ -90,7 +93,7 @@ public class MixinTitleScreen extends Screen {
 		}
 		return id;
 	}
-	
+
 	@ModifyArg(at=@At(value="INVOKE", target="com/mojang/blaze3d/systems/RenderSystem.setShaderTexture(ILnet/minecraft/class_2960;)V", ordinal=2),
 			method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V", require=0)
 	public Identifier setShaderTextureObf(Identifier id) {
@@ -99,21 +102,21 @@ public class MixinTitleScreen extends Screen {
 		}
 		return id;
 	}
-	
+
 	@Inject(at=@At("HEAD"), method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
 	public void renderHead(MatrixStack matrices, int mouseX, int mouseY, float tickDelta, CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.block_logo")) return;
 		fabrication$splashText = splashText;
 		splashText = null;
 	}
-	
+
 	@Inject(at=@At("RETURN"), method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
 	public void renderReturn(MatrixStack matrices, int mouseX, int mouseY, float tickDelta, CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.block_logo")) return;
 		splashText = fabrication$splashText;
 		fabrication$splashText = null;
 	}
-	
+
 	@Inject(at=@At("TAIL"), method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
 	public void renderTail(MatrixStack matrices, int mouseX, int mouseY, float tickDelta, CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.block_logo")) return;
@@ -131,8 +134,8 @@ public class MixinTitleScreen extends Screen {
 		}
 
 	}
-	
-	
+
+
 	@Inject(at=@At("TAIL"), method="tick()V")
 	public void tick(CallbackInfo ci) {
 		if (fabrication$blocks != null) {
@@ -145,7 +148,7 @@ public class MixinTitleScreen extends Screen {
 			}
 		}
 	}
-	
+
 	@Unique
 	private void drawLogo(float partialTicks) {
 		MinecraftClient mc = MinecraftClient.getInstance();
@@ -185,7 +188,7 @@ public class MixinTitleScreen extends Screen {
 				}
 			}
 		}
-	
+
 		// ported from beta 1.2_01. hell yeah
 		// getting MCP for that version to work was actually pretty easy
 		MatrixStack matrices = new MatrixStack();
@@ -225,19 +228,19 @@ public class MixinTitleScreen extends Screen {
 			matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(15));
 			matrices.scale(0.89f, 1, 0.4f);
 			matrices.translate(-logoDataWidth * 0.5f, -logoDataHeight * 0.5f, 0);
-			
-//			RenderSystem.setShader(GameRenderer::getRenderTypeLinesShader);
-//			RenderSystem.setShaderColor(1, 1, 1, 1);
-//			RenderSystem.lineWidth(8);
-//			bb.begin(DrawMode.LINES, VertexFormats.LINES);
-//			bb.vertex(matrices.peek().getModel(), -400, 0, 0).color(1, 0, 0, 1f).normal(1, 0, 0).next();
-//			bb.vertex(matrices.peek().getModel(), 400, 0, 0).color(1, 0, 0, 1f).normal(1, 0, 0).next();
-//			bb.vertex(matrices.peek().getModel(), 0, -400, 0).color(0, 1, 0, 1f).normal(0, 1, 0).next();
-//			bb.vertex(matrices.peek().getModel(), 0, 400, 0).color(0, 1, 0, 1f).normal(0, 1, 0).next();
-//			bb.vertex(matrices.peek().getModel(), 0, 0, -400).color(0, 0, 1, 1f).normal(0, 0, 1).next();
-//			bb.vertex(matrices.peek().getModel(), 0, 0, 400).color(0, 0, 1, 1f).normal(0, 0, 1).next();
-//			Tessellator.getInstance().draw();
-			
+
+			//			RenderSystem.setShader(GameRenderer::getRenderTypeLinesShader);
+			//			RenderSystem.setShaderColor(1, 1, 1, 1);
+			//			RenderSystem.lineWidth(8);
+			//			bb.begin(DrawMode.LINES, VertexFormats.LINES);
+			//			bb.vertex(matrices.peek().getModel(), -400, 0, 0).color(1, 0, 0, 1f).normal(1, 0, 0).next();
+			//			bb.vertex(matrices.peek().getModel(), 400, 0, 0).color(1, 0, 0, 1f).normal(1, 0, 0).next();
+			//			bb.vertex(matrices.peek().getModel(), 0, -400, 0).color(0, 1, 0, 1f).normal(0, 1, 0).next();
+			//			bb.vertex(matrices.peek().getModel(), 0, 400, 0).color(0, 1, 0, 1f).normal(0, 1, 0).next();
+			//			bb.vertex(matrices.peek().getModel(), 0, 0, -400).color(0, 0, 1, 1f).normal(0, 0, 1).next();
+			//			bb.vertex(matrices.peek().getModel(), 0, 0, 400).color(0, 0, 1, 1f).normal(0, 0, 1).next();
+			//			Tessellator.getInstance().draw();
+
 			if (pass == 0) {
 				RenderSystem.disableTexture();
 				RenderSystem.setShaderColor(1, 1, 1, 1);
@@ -245,7 +248,7 @@ public class MixinTitleScreen extends Screen {
 				RenderSystem.enableTexture();
 				RenderSystem.setShaderColor(1, 1, 1, 1);
 			}
-			
+
 			for (int y = 0; y < logoDataHeight; y++) {
 				for (int x = 0; x < logoDataWidth; x++) {
 					LogoBlock blk = fabrication$blocks[x][y];
@@ -272,38 +275,38 @@ public class MixinTitleScreen extends Screen {
 						if (state == null) {
 							bb.begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR_NORMAL);
 							Sprite missing = mc.getSpriteAtlas(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE).apply(new Identifier("missingno", "missingno"));
-							
+
 							float minU = missing.getMinU();
 							float minV = missing.getMinV();
 							float maxU = missing.getMaxU();
 							float maxV = missing.getMaxV();
-							
+
 							Matrix4f mat = matrices.peek().getModel();
 							bb.vertex(mat, 0, 0, 0).texture(minU, minV).color(255, 255, 255, 255).normal(0, -1, 0).next();
 							bb.vertex(mat, 1, 0, 0).texture(maxU, minV).color(255, 255, 255, 255).normal(0, -1, 0).next();
 							bb.vertex(mat, 1, 0, 1).texture(maxU, maxV).color(255, 255, 255, 255).normal(0, -1, 0).next();
 							bb.vertex(mat, 0, 0, 1).texture(minU, maxV).color(255, 255, 255, 255).normal(0, -1, 0).next();
-							
+
 							bb.vertex(mat, 0, 1, 0).texture(minU, minV).color(255, 255, 255, 255).normal(0,  1, 0).next();
 							bb.vertex(mat, 1, 1, 0).texture(maxU, minV).color(255, 255, 255, 255).normal(0,  1, 0).next();
 							bb.vertex(mat, 1, 1, 1).texture(maxU, maxV).color(255, 255, 255, 255).normal(0,  1, 0).next();
 							bb.vertex(mat, 0, 1, 1).texture(minU, maxV).color(255, 255, 255, 255).normal(0,  1, 0).next();
-							
+
 							bb.vertex(mat, 0, 0, 0).texture(minU, minV).color(255, 255, 255, 255).normal(0, 0, -1).next();
 							bb.vertex(mat, 1, 0, 0).texture(maxU, minV).color(255, 255, 255, 255).normal(0, 0, -1).next();
 							bb.vertex(mat, 1, 1, 0).texture(maxU, maxV).color(255, 255, 255, 255).normal(0, 0, -1).next();
 							bb.vertex(mat, 0, 1, 0).texture(minU, maxV).color(255, 255, 255, 255).normal(0, 0, -1).next();
-							
+
 							bb.vertex(mat, 0, 0, 1).texture(minU, minV).color(255, 255, 255, 255).normal(0, 0,  1).next();
 							bb.vertex(mat, 1, 0, 1).texture(maxU, minV).color(255, 255, 255, 255).normal(0, 0,  1).next();
 							bb.vertex(mat, 1, 1, 1).texture(maxU, maxV).color(255, 255, 255, 255).normal(0, 0,  1).next();
 							bb.vertex(mat, 0, 1, 1).texture(minU, maxV).color(255, 255, 255, 255).normal(0, 0,  1).next();
-							
+
 							bb.vertex(mat, 0, 0, 0).texture(minU, minV).color(255, 255, 255, 255).normal(-1, 0, 0).next();
 							bb.vertex(mat, 0, 1, 0).texture(maxU, minV).color(255, 255, 255, 255).normal(-1, 0, 0).next();
 							bb.vertex(mat, 0, 1, 1).texture(maxU, maxV).color(255, 255, 255, 255).normal(-1, 0, 0).next();
 							bb.vertex(mat, 0, 0, 1).texture(minU, maxV).color(255, 255, 255, 255).normal(-1, 0, 0).next();
-							
+
 							bb.vertex(mat, 1, 0, 0).texture(minU, minV).color(255, 255, 255, 255).normal( 1, 0, 0).next();
 							bb.vertex(mat, 1, 1, 0).texture(maxU, minV).color(255, 255, 255, 255).normal( 1, 0, 0).next();
 							bb.vertex(mat, 1, 1, 1).texture(maxU, maxV).color(255, 255, 255, 255).normal( 1, 0, 0).next();
@@ -327,27 +330,27 @@ public class MixinTitleScreen extends Screen {
 						bb.vertex(mat, 1, 0, 0).next();
 						bb.vertex(mat, 1, 0, 1).next();
 						bb.vertex(mat, 0, 0, 1).next();
-						
+
 						bb.vertex(mat, 0, 1, 0).next();
 						bb.vertex(mat, 1, 1, 0).next();
 						bb.vertex(mat, 1, 1, 1).next();
 						bb.vertex(mat, 0, 1, 1).next();
-						
+
 						bb.vertex(mat, 0, 0, 0).next();
 						bb.vertex(mat, 1, 0, 0).next();
 						bb.vertex(mat, 1, 1, 0).next();
 						bb.vertex(mat, 0, 1, 0).next();
-						
+
 						bb.vertex(mat, 0, 0, 1).next();
 						bb.vertex(mat, 1, 0, 1).next();
 						bb.vertex(mat, 1, 1, 1).next();
 						bb.vertex(mat, 0, 1, 1).next();
-						
+
 						bb.vertex(mat, 0, 0, 0).next();
 						bb.vertex(mat, 0, 1, 0).next();
 						bb.vertex(mat, 0, 1, 1).next();
 						bb.vertex(mat, 0, 0, 1).next();
-						
+
 						bb.vertex(mat, 1, 0, 0).next();
 						bb.vertex(mat, 1, 1, 0).next();
 						bb.vertex(mat, 1, 1, 1).next();
@@ -370,5 +373,5 @@ public class MixinTitleScreen extends Screen {
 		matrices.pop();
 		RenderSystem.enableCull();
 	}
-	
+
 }

@@ -16,7 +16,7 @@ public class MixinErrorHandler_THIS_ERROR_HANDLER_IS_FOR_SOFT_FAILURE_IN_FABRICA
 
 	public static final MixinErrorHandler_THIS_ERROR_HANDLER_IS_FOR_SOFT_FAILURE_IN_FABRICATION_ITSELF_AND_DOES_NOT_IMPLY_FABRICATION_IS_RESPONSIBLE_FOR_THE_BELOW_ERROR INST = new MixinErrorHandler_THIS_ERROR_HANDLER_IS_FOR_SOFT_FAILURE_IN_FABRICATION_ITSELF_AND_DOES_NOT_IMPLY_FABRICATION_IS_RESPONSIBLE_FOR_THE_BELOW_ERROR();
 	public static boolean actuallyItWasUs = false;
-	
+
 	@Override
 	public ErrorAction onPrepareError(IMixinConfig config, Throwable th, IMixinInfo mixin, ErrorAction action) {
 		return onError(th, mixin, action, "prepare");
@@ -26,7 +26,7 @@ public class MixinErrorHandler_THIS_ERROR_HANDLER_IS_FOR_SOFT_FAILURE_IN_FABRICA
 	public ErrorAction onApplyError(String targetClassName, Throwable th, IMixinInfo mixin, ErrorAction action) {
 		return onError(th, mixin, action, "apply");
 	}
-		
+
 	public ErrorAction onError(Throwable th, IMixinInfo mixin, ErrorAction action, String verb) {
 		if (mixin.getClassName().startsWith("com.unascribed.fabrication.")) {
 			String msg = th.getMessage();
@@ -39,7 +39,7 @@ public class MixinErrorHandler_THIS_ERROR_HANDLER_IS_FOR_SOFT_FAILURE_IN_FABRICA
 					"Message2", msg2,
 					"Message3", msg3,
 					"Mixin", mixin.getClassName()
-				));
+					));
 			if (action == ErrorAction.ERROR) {
 				Set<String> keys = MixinConfigPlugin.getConfigKeysForDiscoveredClass(mixin.getClassName());
 				if (!keys.isEmpty()) {

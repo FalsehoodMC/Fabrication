@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.enchantment.ProtectionEnchantment;
 
@@ -21,5 +22,5 @@ public class MixinProtectionEnchantment {
 			cir.setReturnValue(5);
 		}
 	}
-	
+
 }

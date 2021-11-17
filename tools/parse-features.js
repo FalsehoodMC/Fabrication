@@ -52,6 +52,7 @@ let defaults = (curKey, cur) => ({
 	meta: false,
 	section: false,
 	hidden: false,
+	extra: false,
 	since: null,
 	since_code: cur && cur.since ? versionNamesToCodes[cur.since] : null,
 	sides: "irrelevant",
@@ -95,6 +96,9 @@ function parseFile(file) {
 		commitMultiline();
 		cur = Object.assign(defaults(curKey, cur), cur);
 		cur.key = curKey;
+		if (curKey.indexOf(".extra.") > -1) {
+			cur.extra = true;
+		}
 		data.push(cur);
 		curKey = null;
 		cur = {};
@@ -196,7 +200,7 @@ function parseFile(file) {
 
 parseFile(process.argv[2] || 'features.yml');
 
-let sections = ["general", "fixes", "utility", "tweaks", "minor_mechanics", "mechanics", "balance", "weird_tweaks", "woina", "pedantry", "situational", "experiments"];
+let sections = ["general", "fixes", "utility", "tweaks", "minor_mechanics", "mechanics", "balance", "weird_tweaks", "woina", "unsafe", "pedantry", "experiments"];
 data.sort((a, b) => {
 	let sectionA = a.key.indexOf('.') === -1 ? a.key : a.key.substring(0, a.key.indexOf('.'));
 	let sectionB = b.key.indexOf('.') === -1 ? b.key : b.key.substring(0, b.key.indexOf('.'));

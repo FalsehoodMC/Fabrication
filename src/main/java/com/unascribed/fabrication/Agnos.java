@@ -38,39 +38,39 @@ public final class Agnos {
 	public interface CommandRegistrationCallback {
 		void register(CommandDispatcher<ServerCommandSource> dispatcher, boolean dedicated);
 	}
-	
+
 	public interface TooltipRenderCallback {
 		void render(ItemStack stack, List<Text> lines);
 	}
-	
+
 	public interface HudRenderCallback {
 		void render(MatrixStack matrixStack, float tickDelta);
 	}
-	
+
 	public static void runForCommandRegistration(CommandRegistrationCallback r) {
 		net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback.EVENT.register(r::register);
 	}
-	
+
 	@Environment(EnvType.CLIENT)
 	public static void runForTooltipRender(TooltipRenderCallback r) {
 		ItemTooltipCallback.EVENT.register((stack, ctx, lines) -> r.render(stack, lines));
 	}
-	
+
 	@Environment(EnvType.CLIENT)
 	public static void runForHudRender(HudRenderCallback r) {
 		net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback.EVENT.register((ms, d) -> r.render(ms, d));
 	}
-	
+
 	public static SoundEvent registerSoundEvent(Identifier id, SoundEvent soundEvent) {
 		return Registry.register(Registry.SOUND_EVENT, id, soundEvent);
 	}
-	
+
 	@Environment(EnvType.CLIENT)
 	public static KeyBinding registerKeyBinding(KeyBinding kb) {
 		KeyBindingHelper.registerKeyBinding(kb);
 		return kb;
 	}
-	
+
 	public static boolean eventsAvailable() {
 		return true;
 	}
@@ -88,12 +88,12 @@ public final class Agnos {
 		if (modid.startsWith("fabric:")) modid = modid.substring(7);
 		return FabricLoader.getInstance().isModLoaded(modid);
 	}
-	
+
 	public static String getModVersion() {
 		if (FabRefl.DEV) return "DEV";
 		return FabricLoader.getInstance().getModContainer("fabrication").get().getMetadata().getVersion().getFriendlyString();
 	}
-	
+
 	public static byte[] getClassBytes(Class<?> clazz) {
 		try {
 			byte[] bys = FabricLauncherBase.getLauncher().getClassByteArray(clazz.getName(), true);
@@ -108,5 +108,5 @@ public final class Agnos {
 	public static String getLoaderVersion() {
 		return FabricLoader.getInstance().getModContainer("fabricloader").get().getMetadata().getVersion().getFriendlyString();
 	}
-	
+
 }

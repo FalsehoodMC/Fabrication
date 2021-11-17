@@ -13,7 +13,7 @@ import io.netty.channel.Channel;
 @Mixin(targets="net.minecraft.server.ServerNetworkIo$1")
 @EligibleIf(configAvailable="*.ping_privacy")
 public class MixinServerChannelHandler {
-	
+
 	@Inject(at=@At(value="INVOKE", target="net/minecraft/server/MinecraftServer.getRateLimit()I"),
 			method="net/minecraft/server/ServerNetworkIo$1.initChannel(Lio/netty/channel/Channel;)V")
 	private void onInitChannel(Channel channel, CallbackInfo ci) {
@@ -21,5 +21,5 @@ public class MixinServerChannelHandler {
 			channel.pipeline().remove("legacy_query");
 		}
 	}
-	
+
 }

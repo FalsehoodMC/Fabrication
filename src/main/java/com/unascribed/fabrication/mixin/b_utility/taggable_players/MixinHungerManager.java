@@ -11,6 +11,7 @@ import com.unascribed.fabrication.interfaces.TaggablePlayer;
 import com.unascribed.fabrication.logic.PlayerTag;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.entity.player.HungerManager;
 import net.minecraft.entity.player.PlayerEntity;
 
@@ -20,7 +21,7 @@ public abstract class MixinHungerManager implements SetSaturation {
 
 	@Shadow
 	private float foodSaturationLevel;
-	
+
 	@Inject(at=@At("HEAD"), method="update(Lnet/minecraft/entity/player/PlayerEntity;)V", cancellable=true)
 	public void update(PlayerEntity pe, CallbackInfo ci) {
 		if (MixinConfigPlugin.isEnabled("*.taggable_players") && pe instanceof TaggablePlayer) {
@@ -29,10 +30,10 @@ public abstract class MixinHungerManager implements SetSaturation {
 			}
 		}
 	}
-	
+
 	@Override
 	public void fabrication$setSaturation(float sat) {
 		foodSaturationLevel = sat;
 	}
-	
+
 }

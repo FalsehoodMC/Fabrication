@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import com.unascribed.fabrication.interfaces.WasShoved;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.entity.vehicle.FurnaceMinecartEntity;
 
 @Mixin(FurnaceMinecartEntity.class)
@@ -30,5 +31,5 @@ public abstract class MixinFurnaceMinecartEntity {
 			args.set(2, ((double)args.get(2))*speed);
 		}
 	}
-	
+
 }

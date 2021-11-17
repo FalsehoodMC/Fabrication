@@ -13,7 +13,9 @@ import com.unascribed.fabrication.interfaces.SetFabricationConfigAware;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import com.google.common.collect.Lists;
+
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
@@ -32,10 +34,10 @@ import net.minecraft.util.Identifier;
 public class FeatureHideArmor implements Feature {
 
 	private static final EquipmentSlot[] ALL_ARMOR = {EquipmentSlot.FEET, EquipmentSlot.LEGS, EquipmentSlot.CHEST, EquipmentSlot.HEAD};
-	
+
 	private boolean applied = false;
 	private boolean registered = false;
-	
+
 	@Override
 	public void apply() {
 		applied = true;
@@ -121,7 +123,7 @@ public class FeatureHideArmor implements Feature {
 		}
 		return equipmentList;
 	}
-	
+
 	public static void sendSuppressedSlotsForSelf(ServerPlayerEntity ent) {
 		// we need client support for self-hiding of armor to prevent the inventory from
 		// glitching out, as we're lying to the client about what armor is equipped
@@ -136,5 +138,5 @@ public class FeatureHideArmor implements Feature {
 			ent.networkHandler.sendPacket(pkt);
 		}
 	}
-	
+
 }

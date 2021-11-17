@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.features;
 
 import java.util.Set;
+
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Feature;
 
@@ -13,7 +14,7 @@ import net.minecraft.world.gen.feature.ConfiguredFeatures.Configs;
 public class FeatureNoDinnerlava implements Feature {
 
 	private Set<Block> originalValidBlocks;
-	
+
 	@Override
 	public void apply() {
 		originalValidBlocks = Configs.ENCLOSED_NETHER_SPRING_CONFIG.validBlocks;
@@ -33,5 +34,5 @@ public class FeatureNoDinnerlava implements Feature {
 	public String getConfigKey() {
 		return "*.no_dinnerlava";
 	}
-	
+
 }

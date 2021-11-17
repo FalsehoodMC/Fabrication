@@ -8,9 +8,11 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import com.google.common.collect.Lists;
 
 import net.minecraft.client.font.TextRenderer;
@@ -36,7 +38,7 @@ public class MixinItemRenderer {
 
 	@Shadow
 	private float zOffset;
-	
+
 	@Inject(at=@At("TAIL"), method="renderGuiItemOverlay(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V")
 	public void renderGuiItemOverlay(TextRenderer renderer, ItemStack stack, int x, int y, String countLabel, CallbackInfo ci) {
 		if (stack == null) return;
@@ -63,23 +65,23 @@ public class MixinItemRenderer {
 			if (display.isCursed()) {
 				String curseOfBinding = I18n.translate(Enchantments.BINDING_CURSE.getTranslationKey());
 				String curseOfVanishing = I18n.translate(Enchantments.VANISHING_CURSE.getTranslationKey());
-//				boolean suffix = false;
+				//				boolean suffix = false;
 				String curseOf = StringUtils.getCommonPrefix(curseOfBinding, curseOfVanishing);
-//				if (curseOf.isEmpty()) {
-//					// try suffix instead
-//					curseOf = reverse(StringUtils.getCommonPrefix(reverse(curseOfBinding), reverse(curseOfVanishing)));
-//					suffix = true;
-//				}
+				//				if (curseOf.isEmpty()) {
+				//					// try suffix instead
+				//					curseOf = reverse(StringUtils.getCommonPrefix(reverse(curseOfBinding), reverse(curseOfVanishing)));
+				//					suffix = true;
+				//				}
 				if (!curseOf.isEmpty()) {
-//					if (suffix) {
-//						if (translated.endsWith(curseOf)) {
-//							translated = translated.substring(0, translated.length()-curseOf.length());
-//						}
-//					} else {
-						if (translated.startsWith(curseOf)) {
-							translated = translated.substring(curseOf.length());
-						}
-//					}
+					//					if (suffix) {
+					//						if (translated.endsWith(curseOf)) {
+					//							translated = translated.substring(0, translated.length()-curseOf.length());
+					//						}
+					//					} else {
+					if (translated.startsWith(curseOf)) {
+						translated = translated.substring(curseOf.length());
+					}
+					//					}
 				}
 			}
 			String firstCodepoint = new String(Character.toChars(translated.codePoints().findFirst().getAsInt()));
@@ -103,5 +105,5 @@ public class MixinItemRenderer {
 			}
 		}
 	}
-	
+
 }

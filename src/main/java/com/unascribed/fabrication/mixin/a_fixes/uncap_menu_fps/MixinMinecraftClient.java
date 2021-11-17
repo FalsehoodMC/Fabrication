@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.client.MinecraftClient;
 
 @Mixin(MinecraftClient.class)
@@ -20,5 +21,5 @@ public class MixinMinecraftClient {
 			ci.setReturnValue(((MinecraftClient)(Object)this).getWindow().getFramerateLimit());
 		}
 	}
-	
+
 }

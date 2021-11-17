@@ -5,9 +5,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
-import com.unascribed.fabrication.support.EligibleIf;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.InGameOverlayRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -28,11 +29,11 @@ public class MixinInGameOverlayRenderer {
 			stack.translate(0, -0.2, 0);
 		}
 	}
-	
+
 	@Inject(at=@At("TAIL"), method="renderFireOverlay(Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/util/math/MatrixStack;)V", cancellable=true)
 	private static void renderFireOverlayTail(MinecraftClient client, MatrixStack stack, CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.less_annoying_fire")) return;
 		stack.pop();
 	}
-	
+
 }

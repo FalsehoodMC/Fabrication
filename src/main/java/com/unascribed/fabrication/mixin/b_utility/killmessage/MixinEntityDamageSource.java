@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.unascribed.fabrication.interfaces.GetKillMessage;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -28,7 +29,7 @@ public abstract class MixinEntityDamageSource {
 
 	@Unique
 	private static final Pattern fabrication$placeholderPattern = Pattern.compile("(?<!%)%(?:([123])\\$)?s");
-	
+
 	@Inject(at=@At("HEAD"), method="getDeathMessage(Lnet/minecraft/entity/LivingEntity;)Lnet/minecraft/text/Text;", cancellable=true)
 	public void getDeathMessage(LivingEntity victim, CallbackInfoReturnable<Text> rtrn) {
 		if (!MixinConfigPlugin.isEnabled("*.killmessage")) return;
@@ -86,5 +87,5 @@ public abstract class MixinEntityDamageSource {
 			}
 		}
 	}
-	
+
 }

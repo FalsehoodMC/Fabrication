@@ -22,7 +22,7 @@ public class MixinFlatChunkGeneratorConfig {
 
 	@Shadow @Final
 	private Registry<Biome> biomeRegistry;
-	
+
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/world/biome/GenerationSettings$Builder.structureFeature(Lnet/minecraft/world/gen/feature/ConfiguredStructureFeature;)Lnet/minecraft/world/biome/GenerationSettings$Builder;"),
 			method="createBiome()Lnet/minecraft/world/biome/Biome;")
 	public GenerationSettings.Builder createBiomeAddStructureFeature(GenerationSettings.Builder subject, ConfiguredStructureFeature<?, ?> feature) {
@@ -33,5 +33,5 @@ public class MixinFlatChunkGeneratorConfig {
 		}
 		return subject;
 	}
-	
+
 }

@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.mixin.c_tweaks.less_restrictive_note_blocks;
 
 import org.spongepowered.asm.mixin.Mixin;
+
 import com.unascribed.fabrication.interfaces.SetVelocity;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
@@ -23,5 +24,5 @@ public abstract class MixinNoteParticle extends Particle implements SetVelocity 
 		this.velocityY = vY;
 		this.velocityZ = vZ;
 	}
-	
+
 }

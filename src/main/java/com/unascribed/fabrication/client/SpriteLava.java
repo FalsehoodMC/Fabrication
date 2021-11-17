@@ -28,7 +28,7 @@ public class SpriteLava extends Sprite implements TextureTickListener {
 		FeatureOldLava.mip(images);
 		upload();
 	}
-	
+
 	public void tickAnimation() {
 		// I cannot be bothered to deobfuscate this the rest of the way.
 

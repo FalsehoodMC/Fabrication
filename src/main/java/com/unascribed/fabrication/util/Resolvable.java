@@ -13,14 +13,14 @@ import net.minecraft.util.registry.Registry;
 public class Resolvable<T> {
 
 	private static final ThreadLocal<Resolvable> MAP_KEY = ThreadLocal.withInitial(() -> new Resolvable<>(null, null, null));
-	
+
 	private Identifier id;
 	private Registry<T> registry;
-	
+
 	private Optional<T> resolved;
-	
+
 	private final boolean resolvedImmediately;
-	
+
 	private Resolvable(Identifier id, Registry<T> registry, Optional<T> resolved) {
 		this.id = id;
 		this.registry = registry;
@@ -31,7 +31,7 @@ public class Resolvable<T> {
 	public Identifier getId() {
 		return id;
 	}
-	
+
 	public Optional<T> get() {
 		if (resolved == null) throw new IllegalStateException("Cannot resolve a mapKey resolvable");
 		if (!resolved.isPresent()) {
@@ -39,16 +39,16 @@ public class Resolvable<T> {
 		}
 		return resolved;
 	}
-	
+
 	public T getOrNull() {
 		return get().orElse(null);
 	}
-	
+
 	public boolean isResolved() {
 		if (resolved == null) throw new IllegalStateException("Cannot resolve a mapKey resolvable");
 		return resolved.isPresent();
 	}
-	
+
 	public boolean wasResolvedImmediately() {
 		if (resolved == null) throw new IllegalStateException("Cannot resolve a mapKey resolvable");
 		return resolvedImmediately;
@@ -61,14 +61,14 @@ public class Resolvable<T> {
 	public static <T> Resolvable<T> mapKey(T obj, Registry<T> registry) {
 		return mapKey(registry.getId(obj), registry);
 	}
-	
+
 	public static <T> Resolvable<T> mapKey(Identifier id, Registry<T> registry) {
 		Resolvable<T> r = MAP_KEY.get();
 		r.id = id;
 		r.registry = registry;
 		return r;
 	}
-	
+
 	@Override
 	public String toString() {
 		if (resolved == null) return "Resolvable(MapKey){id="+id+"}";
@@ -94,5 +94,5 @@ public class Resolvable<T> {
 		if (registry != other.registry) return false;
 		return true;
 	}
-	
+
 }

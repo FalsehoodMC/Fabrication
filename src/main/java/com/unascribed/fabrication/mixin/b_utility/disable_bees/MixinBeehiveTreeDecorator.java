@@ -1,19 +1,21 @@
-package com.unascribed.fabrication.mixin.h_situational.disable_bees;
+package com.unascribed.fabrication.mixin.b_utility.disable_bees;
 
-import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.TestableWorld;
-import net.minecraft.world.gen.treedecorator.BeehiveTreeDecorator;
+import java.util.List;
+import java.util.Random;
+import java.util.function.BiConsumer;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.List;
-import java.util.Random;
-import java.util.function.BiConsumer;
+import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.MixinConfigPlugin;
+
+import net.minecraft.block.BlockState;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.TestableWorld;
+import net.minecraft.world.gen.treedecorator.BeehiveTreeDecorator;
 
 @Mixin(BeehiveTreeDecorator.class)
 @EligibleIf(configAvailable="*.disable_bees")
@@ -26,5 +28,5 @@ public class MixinBeehiveTreeDecorator {
 			ci.cancel();
 		}
 	}
-	
+
 }

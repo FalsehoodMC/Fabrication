@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.block.entity.FurnaceBlockEntity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -33,12 +34,12 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 	private static Ingredient ACCEPTABLE_FUEL;
 	@Shadow
 	private int fuel;
-	
+
 	@Shadow
 	public double pushX;
 	@Shadow
 	public double pushZ;
-	
+
 	@Inject(at=@At("HEAD"), method="interact(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;")
 	public void interact(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> ci) {
 		if (!MixinConfigPlugin.isEnabled("*.furnace_minecart_any_fuel")) return;
@@ -53,12 +54,12 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 			}
 		}
 	}
-	
+
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/recipe/Ingredient.test(Lnet/minecraft/item/ItemStack;)Z"),
 			method="interact(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;")
 	public boolean testFuel(Ingredient subject, ItemStack stack) {
 		if (!MixinConfigPlugin.isEnabled("*.furnace_minecart_any_fuel")) return subject.test(stack);
 		return false;
 	}
-	
+
 }

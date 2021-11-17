@@ -31,19 +31,19 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 public class LoaderGearComponents implements ConfigLoader {
-	
+
 	public static final class MaterialData {
 		public final int nuggetsPerIngot;
 		public final Supplier<Item> nuggetGetter;
 		public final Supplier<Item> ingotGetter;
-		
+
 		public MaterialData(int nuggetsPerIngot, Supplier<Item> nuggetGetter, Supplier<Item> ingotGetter) {
 			this.nuggetsPerIngot = nuggetsPerIngot;
 			this.nuggetGetter = nuggetGetter;
 			this.ingotGetter = ingotGetter;
 		}
 	}
-	
+
 	public static final class ItemMaterialValue {
 		public final double valueInIngots;
 		public final String materialName;
@@ -57,21 +57,21 @@ public class LoaderGearComponents implements ConfigLoader {
 			this.enchant = enchant;
 		}
 	}
-	
+
 	public static DoubleSupplier dropRate = () -> 0.75;
-	
+
 	public static int guaranteedIngots = 1;
 	public static boolean ignoreVanishing = true;
 	public static int cheat = 1;
 
 	public static final Map<String, MaterialData> materials = Maps.newHashMap();
 	public static final Multimap<Resolvable<Item>, ItemMaterialValue> items = ArrayListMultimap.create();
-	
+
 	private static final Random rand = new Random();
-	
+
 	private static final Splitter SPACE_SPLITTER = Splitter.on(' ');
 	private static final Pattern MATERIAL_VALUE_PATTERN = Pattern.compile("^([0-9]+(?:\\.[0-9]+)?)(.*)$");
-	
+
 	@Override
 	public void load(Path configDir, QDIni config, boolean loadError) {
 		dropRate = () -> 0.75;
@@ -81,7 +81,7 @@ public class LoaderGearComponents implements ConfigLoader {
 		double dropRateMid = config.getDouble("@options.drop_rate_mid").orElse(75D)/100;
 		double dropRateMax = config.getDouble("@options.drop_rate_max").orElse(75D)/100;
 		boolean dropRateUniform = config.getBoolean("@options.drop_rate_uniform").orElse(false);
-		
+
 		if (dropRateMin == dropRateMid && dropRateMid == dropRateMax) {
 			final double rate = dropRateMid;
 			dropRate = () -> rate;
@@ -103,7 +103,7 @@ public class LoaderGearComponents implements ConfigLoader {
 				return 0;
 			};
 		}
-		
+
 		Optional<String> guaranteedIngotsStr = config.get("@options.guaranteed_ingots");
 		if (guaranteedIngotsStr.isPresent()) {
 			if ("*".equals(guaranteedIngotsStr.get())) {

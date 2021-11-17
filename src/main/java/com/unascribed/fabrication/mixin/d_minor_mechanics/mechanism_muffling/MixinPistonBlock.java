@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import com.unascribed.fabrication.logic.MechanismMuffling;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.block.PistonBlock;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.sound.SoundCategory;
@@ -24,5 +25,5 @@ public class MixinPistonBlock {
 		if (MixinConfigPlugin.isEnabled("*.mechanism_muffling") && MechanismMuffling.isMuffled(subject, pos)) return;
 		subject.playSound(player, pos, sound, category, volume, pitch);
 	}
-	
+
 }

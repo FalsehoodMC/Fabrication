@@ -5,7 +5,7 @@ import com.unascribed.fabrication.support.Feature;
 public class DelegateFeature implements Feature {
 
 	private final Feature delegate;
-	
+
 	public DelegateFeature(String className) {
 		try {
 			delegate = (Feature)Class.forName(className).getConstructor().newInstance();
@@ -13,7 +13,7 @@ public class DelegateFeature implements Feature {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	@Override
 	public void apply() {
 		delegate.apply();

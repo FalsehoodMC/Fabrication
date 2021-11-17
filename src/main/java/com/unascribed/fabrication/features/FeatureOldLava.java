@@ -21,9 +21,9 @@ public class FeatureOldLava implements Feature {
 
 	private static Sprite originalLava;
 	private static Sprite originalLavaFlow;
-	
+
 	private static boolean applied = false;
-	
+
 	public static void onLoaded(SpriteAtlasTexture atlas, SpriteAtlasTexture.Data data) {
 		try {
 			if (applied && atlas.getId().toString().equals("minecraft:textures/atlas/blocks.png")) {
@@ -63,7 +63,7 @@ public class FeatureOldLava implements Feature {
 			FabricationMod.featureError(FeatureOldLava.class, "*.old_lava", t);
 		}
 	}
-	
+
 	@Override
 	public void apply() {
 		applied = true;

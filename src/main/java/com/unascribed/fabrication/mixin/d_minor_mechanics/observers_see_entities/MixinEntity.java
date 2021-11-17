@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.ObserverBlock;
@@ -29,12 +30,12 @@ public abstract class MixinEntity {
 	public Vec3d pos;
 	@Shadow
 	public World world;
-	
+
 	@Shadow
 	public abstract BlockPos getBlockPos();
 	@Shadow
 	public abstract Box getBoundingBox();
-	
+
 	@Inject(at=@At("TAIL"), method="move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V")
 	public void move(MovementType type, Vec3d movement, CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.observers_see_entities")) return;
@@ -55,5 +56,5 @@ public abstract class MixinEntity {
 			world.getProfiler().pop();
 		}
 	}
-	
+
 }

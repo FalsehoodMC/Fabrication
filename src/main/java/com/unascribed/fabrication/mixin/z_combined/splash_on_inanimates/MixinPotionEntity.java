@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import com.unascribed.fabrication.interfaces.SetInvisNoGravReversible;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -58,5 +59,5 @@ public abstract class MixinPotionEntity extends ThrownItemEntity {
 			}
 		}
 	}
-	
+
 }

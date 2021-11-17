@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.math.IntMath;
@@ -35,11 +36,11 @@ import net.minecraft.world.World;
 @Mixin(NoteBlock.class)
 @EligibleIf(anyConfigAvailable={"*.exact_note_block_tuning", "*.note_block_notes", "*.reverse_note_block_tuning"})
 public class MixinNoteBlock {
-	
+
 	private static final String FABRICATION$NOTE_COLORS = "aa66cccccdd559999bbbaaaaa";
 	private static final ImmutableList<String> FABRICATION$NOTES = ImmutableList.of(
 			"F#", "G", "G#", "A", "A#", "B", "C", "C#", "D", "D#", "E", "F"
-	);
+			);
 	private static final ImmutableMap<Instrument, String> FABRICATION$INSTRUMENT_NAMES = ImmutableMap.<Instrument, String>builder()
 			.put(Instrument.BASS, "String Bass")
 			.put(Instrument.SNARE, "Snare Drum")
@@ -64,7 +65,7 @@ public class MixinNoteBlock {
 			.put(Instrument.HAT, 5)
 			// bass drum's frequency range is utter nonsense and slides over time :(
 			.put(Instrument.BASEDRUM, -1)
-			
+
 			// source: Minecraft Wiki; a few verified via showcqt as a sanity check
 			.put(Instrument.BASS, 1)
 			.put(Instrument.BELL, 5)
@@ -85,10 +86,10 @@ public class MixinNoteBlock {
 			.put(Instrument.SNARE, -2) // starts at E rather than F#
 			.put(Instrument.HAT, -9) // starts at A rather than F#
 			.build();
-	
+
 	@Shadow
 	private void playNote(World world, BlockPos pos) {}
-	
+
 	@Inject(at=@At("HEAD"), method= "onUse(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;", cancellable=true)
 	public void onUseHead(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, CallbackInfoReturnable<ActionResult> ci) {
 		if (!world.isClient) {
@@ -127,12 +128,12 @@ public class MixinNoteBlock {
 			}
 		}
 	}
-	
+
 	@Inject(at=@At("RETURN"), method="onUse(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;", cancellable=true)
 	public void onUseReturn(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, CallbackInfoReturnable<ActionResult> ci) {
 		fabrication$informNote(player, world.getBlockState(pos));
 	}
-	
+
 	@Inject(at=@At("HEAD"), method="onBlockBreakStart(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/player/PlayerEntity;)V")
 	public void onBlockBreakStart(BlockState state, World world, BlockPos pos, PlayerEntity player, CallbackInfo ci) {
 		fabrication$informNote(player, state);
@@ -165,7 +166,7 @@ public class MixinNoteBlock {
 					+" ("+state.get(NoteBlock.NOTE)+")"), true);
 		}
 	}
-	
+
 	@Unique
 	private static <S extends BlockState, T extends Comparable<T>> S cycleBackward(S s, Property<T> property) {
 		return (S)s.with(property, getPrev(property.getValues(), s.get(property)));

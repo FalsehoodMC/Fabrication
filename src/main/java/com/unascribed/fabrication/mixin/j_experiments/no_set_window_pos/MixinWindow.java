@@ -18,12 +18,12 @@ public class MixinWindow {
 
 	@Shadow
 	private boolean fullscreen;
-	
+
 	@Inject(at=@At("HEAD"), method="updateWindowRegion()V", cancellable=true)
 	public void updateWindowRegion(CallbackInfo ci) {
 		if (MixinConfigPlugin.isEnabled("*.no_set_window_pos") && !fullscreen) {
 			ci.cancel();
 		}
 	}
-	
+
 }

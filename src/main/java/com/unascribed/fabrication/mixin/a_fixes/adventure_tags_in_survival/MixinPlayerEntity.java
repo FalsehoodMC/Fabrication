@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.block.pattern.CachedBlockPosition;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -27,7 +28,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 	protected MixinPlayerEntity(EntityType<? extends LivingEntity> entityType, World world) {
 		super(entityType, world);
 	}
-	
+
 	@Shadow @Final
 	public PlayerAbilities abilities;
 
@@ -42,7 +43,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 			}
 		}
 	}
-	
+
 	@Inject(at=@At("HEAD"), method="canPlaceOn(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;Lnet/minecraft/item/ItemStack;)Z",
 			cancellable=true)
 	public void canPlaceOn(BlockPos pos, Direction dir, ItemStack stack, CallbackInfoReturnable<Boolean> ci) {
@@ -55,5 +56,5 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 			}
 		}
 	}
-	
+
 }

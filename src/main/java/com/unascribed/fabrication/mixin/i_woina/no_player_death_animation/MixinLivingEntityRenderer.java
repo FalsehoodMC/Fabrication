@@ -1,13 +1,15 @@
 package com.unascribed.fabrication.mixin.i_woina.no_player_death_animation;
 
-import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
-import net.minecraft.client.render.entity.LivingEntityRenderer;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+
+import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.MixinConfigPlugin;
+
+import net.minecraft.client.render.entity.LivingEntityRenderer;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 
 @Mixin(LivingEntityRenderer.class)
 @EligibleIf(configAvailable="*.no_player_death_animation")

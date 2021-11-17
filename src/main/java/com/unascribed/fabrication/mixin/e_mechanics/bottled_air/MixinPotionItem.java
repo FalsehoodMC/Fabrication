@@ -28,7 +28,7 @@ public class MixinPotionItem {
 			ci.setReturnValue(PotionUtil.setPotion(new ItemStack(Items.POTION), Potions.WATER));
 		}
 	}
-	
+
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/entity/player/PlayerInventory.insertStack(Lnet/minecraft/item/ItemStack;)Z"),
 			method="finishUsing(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/LivingEntity;)Lnet/minecraft/item/ItemStack;")
 	public boolean insertStack(PlayerInventory subject, ItemStack stack, ItemStack junk, World junk2, LivingEntity user) {
@@ -37,5 +37,5 @@ public class MixinPotionItem {
 		}
 		return subject.insertStack(stack);
 	}
-	
+
 }

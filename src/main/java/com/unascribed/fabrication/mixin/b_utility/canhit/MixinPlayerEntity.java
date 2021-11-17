@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import com.unascribed.fabrication.logic.CanHitUtil;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -31,6 +32,6 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 		ItemStack stack = getStackInHand(Hand.MAIN_HAND);
 		return CanHitUtil.canHit(stack, entity);
 	}
-	
-	
+
+
 }

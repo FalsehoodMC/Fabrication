@@ -84,36 +84,6 @@ weird_tweaks.dimensional_tools:
 		
 		Inspired by a joke video.
 
-weird_tweaks.photoallergic_creepers:
-	name: Photoallergic Creepers
-	since: 1.2.4
-	sides: server_only
-	default: burnt
-	media: https://unascribed.com/fabrication/photoallergic_creepers.mp4
-	desc:
-		Creepers burn in sunlight. Very dangerous in combination with Creepers Explode When On Fire.
-		
-		Takes precedence over Photoresistant Mobs if that is also enabled, allowing you to make only
-		creepers burn in sunlight.
-
-weird_tweaks.photoresistant_mobs:
-	name: Photoresistant Mobs
-	since: 1.2.4
-	sides: server_only
-	default: burnt
-	media: https://unascribed.com/fabrication/photoresistant_mobs.mp4
-	desc:
-		Mobs don't burn in sunlight.
-
-weird_tweaks.underwater_explosions:
-	name: Underwater Explosions
-	since: 1.3.2
-	sides: server_only
-	default: burnt
-	media: https://unascribed.com/fabrication/underwater_explosions.mp4
-	desc:
-		TNT and other explosives do block damage even underwater.
-
 weird_tweaks.instant_pickup:
 	name: Instant Pickup
 	since: 1.3.2
@@ -153,13 +123,6 @@ weird_tweaks.use_items_while_riding:
 	desc:
 		Allows players to use items and attack while riding entities like boats.
 
-weird_tweaks.villagers_follow_emerald_blocks:
-	name: Villagers Follow Emerald Blocks
-	since: 1.4.0
-	sides: server_only
-	desc:
-		Villagers will follow players holding emerald blocks.
-
 weird_tweaks.disable_nether_fog:
 	name: Disable Nether Fog
 	since: 1.4.0
@@ -192,49 +155,6 @@ weird_tweaks.chaining_creepers:
 	sides: server_only
 	desc:
 		Creepers explode after taking explosion damage.
-
-weird_tweaks.foliage_creepers:
-	name: Foliage Creepers
-	since: 2.1.0
-	sides: client_only
-	default: never
-	desc:
-		Creepers will take on the foliage color of the biome their in.
-
-weird_tweaks.villager_trades_reset:
-	name: Villager Trades Reset
-	since: 2.1.0
-	sides: server_only
-	default: never
-	desc:
-		Instead of restocking villagers will completely reset their trades.
-		This also soft-limits the trades to the villager's level (one trade of each level).
-
-weird_tweaks.disable_breaking_speed_check:
-	name: Disable Breaking Check
-	since: 2.1.0
-	sides: server_only
-	default: never
-	desc:
-		Server will not check if the client is cheating, when breaking blocks faster then expected.
-		Helpful with block breaking lag when you trust the players.
-
-weird_tweaks.disable_moved_too_quickly:
-	name: Disable Moved Too Quickly
-	since: 2.1.0
-	sides: server_only
-	default: never
-	desc:
-		Server will not check if the client is cheating, when traveling faster then expected.
-		Helpful with rubber banding when you trust the players.
-
-weird_tweaks.no_dolphin_theft:
-	name: No Dolphin Theft
-	since: 2.1.0
-	sides: server_only
-	default: never
-	desc:
-		Prevents dolphins from picking up items.
 
 # kate: space-indent off
 # vim: noai:noet

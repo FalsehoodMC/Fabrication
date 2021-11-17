@@ -1,18 +1,20 @@
 package com.unascribed.fabrication.mixin.g_weird_tweaks.foliage_creepers;
 
-import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.LivingEntityRenderer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.mob.CreeperEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
+
+import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.MixinConfigPlugin;
+
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.LivingEntityRenderer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.mob.CreeperEntity;
 
 @Mixin(LivingEntityRenderer.class)
 @EligibleIf(configAvailable="*.foliage_creepers")
@@ -33,5 +35,5 @@ public abstract class MixinLivingEntityRenderer {
 		args.set(5, (i >> 8 & 255) / 255.0F);
 		args.set(6, (i & 255) / 255.0F);
 	}
-	
+
 }

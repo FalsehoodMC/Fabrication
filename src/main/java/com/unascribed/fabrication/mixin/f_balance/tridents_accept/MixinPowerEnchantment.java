@@ -4,6 +4,7 @@ import org.spongepowered.asm.mixin.Mixin;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.enchantment.DamageEnchantment;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentTarget;
@@ -18,7 +19,7 @@ import net.minecraft.item.Items;
 public class MixinPowerEnchantment extends Enchantment {
 
 	// enchantment is implemented in MixinTridentEntity in z_combined.trident_enchantments
-	
+
 	protected MixinPowerEnchantment(Rarity weight, EnchantmentTarget type, EquipmentSlot[] slotTypes) {
 		super(weight, type, slotTypes);
 	}
@@ -27,10 +28,10 @@ public class MixinPowerEnchantment extends Enchantment {
 	public boolean canAccept(Enchantment other) {
 		return !(other instanceof DamageEnchantment || other instanceof ImpalingEnchantment) && super.canAccept(other);
 	}
-	
+
 	@Override
 	public boolean isAcceptableItem(ItemStack stack) {
 		return (MixinConfigPlugin.isEnabled("*.tridents_accept_power") && stack.getItem() == Items.TRIDENT) || super.isAcceptableItem(stack);
 	}
-	
+
 }

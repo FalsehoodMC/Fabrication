@@ -26,7 +26,7 @@ import net.minecraft.world.World;
 public class MixinServerPlayerInteractionManager {
 
 	@Inject(at=@At("RETURN"), method="interactBlock(Lnet/minecraft/server/network/ServerPlayerEntity;Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;",
-		cancellable=true)
+			cancellable=true)
 	public void interactBlock(ServerPlayerEntity player, World world, ItemStack stack, Hand hand, BlockHitResult hitResult, CallbackInfoReturnable<ActionResult> ci) {
 		if (MixinConfigPlugin.isEnabled("*.fire_aspect_is_flint_and_steel") && ci.getReturnValue() == ActionResult.PASS) {
 			if (EnchantmentHelper.getLevel(Enchantments.FIRE_ASPECT, stack) > 0) {
@@ -49,6 +49,6 @@ public class MixinServerPlayerInteractionManager {
 			}
 		}
 	}
-	
-	
+
+
 }

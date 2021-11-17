@@ -19,21 +19,21 @@ public enum Cardinal {
 
 	public Cardinal cw() {
 		switch(this) {
-		case NORTH: return EAST;
-		case EAST: return SOUTH;
-		case SOUTH: return WEST;
-		default:
-		case WEST: return NORTH;
+			case NORTH: return EAST;
+			case EAST: return SOUTH;
+			case SOUTH: return WEST;
+			default:
+			case WEST: return NORTH;
 		}
 	}
 
 	public Cardinal ccw() {
 		switch(this) {
-		case NORTH: return WEST;
-		case EAST: return NORTH;
-		case SOUTH: return EAST;
-		default:
-		case WEST: return SOUTH;
+			case NORTH: return WEST;
+			case EAST: return NORTH;
+			case SOUTH: return EAST;
+			default:
+			case WEST: return SOUTH;
 		}
 	}
 }

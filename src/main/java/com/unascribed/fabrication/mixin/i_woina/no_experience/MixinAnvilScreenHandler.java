@@ -21,12 +21,12 @@ public class MixinAnvilScreenHandler {
 		if (!MixinConfigPlugin.isEnabled("*.no_experience")) return lvl;
 		return lvl >= 1 ? 1 : lvl;
 	}
-	
+
 	@Inject(at=@At("HEAD"), method="canTakeOutput(Lnet/minecraft/entity/player/PlayerEntity;Z)Z", cancellable=true)
 	public void canTakeOutput(PlayerEntity player, boolean present, CallbackInfoReturnable<Boolean> ci) {
 		if (MixinConfigPlugin.isEnabled("*.no_experience")) {
 			ci.setReturnValue(true);
 		}
 	}
-	
+
 }

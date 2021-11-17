@@ -10,5 +10,5 @@ public class FeatureOakIsApple extends ResourcePackFeature {
 	public FeatureOakIsApple() {
 		super("oak_is_apple");
 	}
-	
+
 }

@@ -10,5 +10,5 @@ public interface TaggablePlayer {
 	void fabrication$clearTags();
 	void fabrication$setTag(PlayerTag tag, boolean enabled);
 	boolean fabrication$hasTag(PlayerTag tag);
-	
+
 }

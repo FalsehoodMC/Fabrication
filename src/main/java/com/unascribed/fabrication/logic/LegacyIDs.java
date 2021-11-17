@@ -18,7 +18,7 @@ import net.minecraft.util.registry.Registry;
 public class LegacyIDs {
 
 	private static final Int2ObjectOpenHashMap<Item> data = new Int2ObjectOpenHashMap<>();
-	
+
 	static {
 		try {
 			JsonObject obj = new Gson().fromJson(Resources.toString(LegacyIDs.class.getClassLoader().getResource("legacy_ids.json"), Charsets.UTF_8), JsonObject.class);
@@ -34,9 +34,9 @@ public class LegacyIDs {
 			FabLog.warn("Failed to load legacy IDs", t);
 		}
 	}
-	
+
 	public static Item lookup(int id, int meta) {
 		return data.get(id << 16 | meta);
 	}
-	
+
 }

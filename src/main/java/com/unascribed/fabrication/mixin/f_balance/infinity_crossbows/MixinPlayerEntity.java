@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerAbilities;
@@ -25,5 +26,5 @@ public class MixinPlayerEntity {
 		}
 		return subject.creativeMode;
 	}
-	
+
 }

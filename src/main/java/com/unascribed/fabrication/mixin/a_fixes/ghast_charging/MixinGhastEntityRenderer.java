@@ -9,6 +9,7 @@ import com.unascribed.fabrication.interfaces.GhastAttackTime;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.client.render.entity.GhastEntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.mob.GhastEntity;

@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.mob.CreeperEntity;
@@ -17,7 +18,7 @@ import net.minecraft.world.World;
 @Mixin(CreeperEntity.class)
 @EligibleIf(configAvailable="*.photoallergic_creepers")
 public abstract class MixinCreeperEntity extends HostileEntity {
-	
+
 	protected MixinCreeperEntity(EntityType<? extends HostileEntity> entityType, World world) {
 		super(entityType, world);
 	}

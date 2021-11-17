@@ -18,10 +18,10 @@ public class MixinEnchantmentScreenHandler {
 			method={
 					"onButtonClick(Lnet/minecraft/entity/player/PlayerEntity;I)Z",
 					"onContentChanged(Lnet/minecraft/inventory/Inventory;)V"
-			})
+	})
 	public int amendExperienceLevel(PlayerEntity subject) {
 		if (MixinConfigPlugin.isEnabled("*.no_experience")) return 65535;
 		return subject.experienceLevel;
 	}
-	
+
 }

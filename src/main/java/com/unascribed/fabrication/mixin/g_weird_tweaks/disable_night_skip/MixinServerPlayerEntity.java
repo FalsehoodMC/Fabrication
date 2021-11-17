@@ -1,17 +1,19 @@
 package com.unascribed.fabrication.mixin.g_weird_tweaks.disable_night_skip;
 
-import com.mojang.datafixers.util.Either;
-import com.unascribed.fabrication.support.ConfigPredicates;
-import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Unit;
-import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import com.mojang.datafixers.util.Either;
+import com.unascribed.fabrication.support.ConfigPredicates;
+import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.MixinConfigPlugin;
+
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Unit;
+import net.minecraft.util.math.BlockPos;
 
 @Mixin(ServerPlayerEntity.class)
 @EligibleIf(configAvailable="*.disable_night_skip")

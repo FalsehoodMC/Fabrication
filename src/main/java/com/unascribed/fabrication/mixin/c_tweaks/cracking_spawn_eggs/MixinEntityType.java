@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
@@ -36,5 +37,5 @@ public class MixinEntityType {
 			e.playSound(SoundEvents.ENTITY_TURTLE_EGG_CRACK, 1.0f, 1.0f);
 		}
 	}
-	
+
 }

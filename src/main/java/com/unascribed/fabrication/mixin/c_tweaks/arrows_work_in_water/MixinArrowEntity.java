@@ -4,6 +4,7 @@ import org.spongepowered.asm.mixin.Mixin;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
@@ -22,5 +23,5 @@ public abstract class MixinArrowEntity extends PersistentProjectileEntity {
 	protected float getDragInWater() {
 		return MixinConfigPlugin.isEnabled("*.arrows_work_in_water") ? 0.85f : super.getDragInWater();
 	}
-	
+
 }

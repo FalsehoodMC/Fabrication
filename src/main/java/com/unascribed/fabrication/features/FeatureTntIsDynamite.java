@@ -10,5 +10,5 @@ public class FeatureTntIsDynamite extends ResourcePackFeature {
 	public FeatureTntIsDynamite() {
 		super("tnt_is_dynamite");
 	}
-	
+
 }

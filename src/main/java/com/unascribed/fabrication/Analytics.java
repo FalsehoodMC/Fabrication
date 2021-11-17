@@ -19,10 +19,10 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.sun.jna.Platform;
+import com.unascribed.fabrication.support.ConfigValue;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.ResolvedConfigValue;
-import com.unascribed.fabrication.support.ConfigValue;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Charsets;
@@ -42,11 +42,11 @@ import net.minecraft.client.util.Window;
 public class Analytics {
 
 	private static final Executor exec = Executors.newSingleThreadExecutor();
-	
+
 	private static String userId = null;
 	private static long last = -1;
 	private static long first = -1;
-	
+
 	public static void deleteId() {
 		userId = null;
 		last = -1;
@@ -55,11 +55,11 @@ public class Analytics {
 		userIdFile().delete();
 		FabLog.info("Analytics user ID deleted due to opt-out");
 	}
-	
+
 	public static void submit(String action) {
 		submit(action, Collections.emptyMap());
 	}
-	
+
 	public static void submit(String action, Map<String, String> extraScoped) {
 		if (!MixinConfigPlugin.isEnabled("*.data_upload")) return;
 		exec.execute(() -> {
@@ -115,7 +115,7 @@ public class Analytics {
 			touch();
 		});
 	}
-	
+
 	public static void submitConfig() {
 		if (!MixinConfigPlugin.isEnabled("*.data_upload")) return;
 		exec.execute(() -> {
@@ -149,25 +149,25 @@ public class Analytics {
 			touch();
 		});
 	}
-	
+
 	private static File userHome() {
 		return new File(System.getProperty("user.home"));
 	}
-	
+
 	private static File timerFile() {
 		return new File(userHome(), ".fabrication-timer");
 	}
-	
+
 	private static File userIdFile() {
 		return new File(userHome(), ".fabrication-user-id");
 	}
-	
+
 	private static void touch() {
 		File timerFile = timerFile();
 		last = System.currentTimeMillis()/1000L;
 		timerFile.setLastModified(System.currentTimeMillis());
 	}
-	
+
 	private static void ensureUserIdPresent() {
 		File timerFile = timerFile();
 		if (userId == null) {

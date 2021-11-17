@@ -7,10 +7,10 @@ public enum ResolvedConfigValue {
 	DEFAULT_FALSE(false, ConfigValue.UNSET),
 	BANNED(false, ConfigValue.BANNED),
 	;
-	
+
 	public final boolean value;
 	public final ConfigValue trilean;
-	
+
 	ResolvedConfigValue(boolean value, ConfigValue trilean) {
 		this.value = value;
 		this.trilean = trilean;

@@ -6,9 +6,6 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.Random;
 
-import com.mojang.blaze3d.platform.TextureUtil;
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.util.math.*;
 import org.lwjgl.opengl.ARBCopyImage;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
@@ -16,6 +13,8 @@ import org.lwjgl.opengl.GL12;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
+import com.mojang.blaze3d.platform.TextureUtil;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.loaders.LoaderClassicBlockDrops;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
@@ -38,20 +37,26 @@ import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.client.texture.AbstractTexture;
 import net.minecraft.client.texture.MipmapHelper;
 import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.texture.NativeImage.Format;
+import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Matrix4f;
+import net.minecraft.util.math.Vec3f;
+import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.Vector4f;
 
 public class WoinaDrops {
 
 	public static float curTimer;
-	
+
 	private static AbstractTexture mippedBlocks;
-	
+
 	public static boolean mippedBlocksInvalid = true;
 
 	public static int modifyOverlay(ItemStack stack, int overlay) {
@@ -60,7 +65,7 @@ public class WoinaDrops {
 		}
 		return overlay;
 	}
-	
+
 	public static void interceptRender(ItemRenderer subject, ItemStack stack, ModelTransformation.Mode renderMode, boolean leftHanded, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, BakedModel model) {
 		if (MixinConfigPlugin.isEnabled("*.classic_block_drops")) {
 			if (stack.getItem() instanceof BlockItem && model instanceof BasicBakedModel && model.hasDepth()) {
@@ -83,7 +88,7 @@ public class WoinaDrops {
 					if (mippedBlocks == null || mippedBlocksInvalid) {
 						mippedBlocksInvalid = false;
 						mippedBlocks = new AbstractTexture() {
-							
+
 							@Override
 							public void load(ResourceManager manager) throws IOException {
 								clearGlId();
@@ -129,7 +134,7 @@ public class WoinaDrops {
 					RenderLayer defLayer = RenderLayers.getItemLayer(stack, true);
 					RenderLayer layer = defLayer == TexturedRenderLayers.getEntityCutout() ?
 							RenderLayer.getEntityCutout(new Identifier("fabrication", "textures/atlas/blocks-mip.png")) :
-							RenderLayer.getEntityTranslucent(new Identifier("fabrication", "textures/atlas/blocks-mip.png"));
+								RenderLayer.getEntityTranslucent(new Identifier("fabrication", "textures/atlas/blocks-mip.png"));
 					VertexConsumer vertices = vertexConsumers.getBuffer(layer);
 					FabRefl.Client.ItemRenderer_renderBakedItemModel(subject, model, stack, light, overlay, matrices, vertices);
 				}
@@ -139,10 +144,10 @@ public class WoinaDrops {
 		}
 		subject.renderItem(stack, renderMode, leftHanded, matrices, vertexConsumers, light, overlay, model);
 	}
-	
+
 	private static void drawExaggeratedQuad(ItemStack is, MatrixStack matrices, VertexConsumer vertices, BakedQuad quad, int light, int overlay) {
 		boolean isProbablyGrass = false;
-		
+
 		int packedColor = -1;
 		if (quad.hasColor()) {
 			packedColor = FabRefl.Client.getItemColors(MinecraftClient.getInstance()).getColorMultiplier(is, quad.getColorIndex());
@@ -154,7 +159,7 @@ public class WoinaDrops {
 		float tintR = (packedColor >> 16 & 0xFF) / 255.0f;
 		float tintG = (packedColor >> 8 & 0xFF) / 255.0f;
 		float tintB = (packedColor & 0xFF) / 255.0f;
-		
+
 		MatrixStack.Entry ent = matrices.peek();
 		int[] data = quad.getVertexData();
 		Vec3i faceVec = quad.getFace().getVector();
@@ -178,7 +183,7 @@ public class WoinaDrops {
 					iBuf.put(data, i * 8, 8);
 					float u = buf.getFloat(16);
 					float v = buf.getFloat(20);
-					
+
 					if (pass == 0) {
 						minU = Math.min(minU, u);
 						maxU = Math.max(maxU, u);
@@ -188,14 +193,14 @@ public class WoinaDrops {
 						float x = buf.getFloat(0);
 						float y = buf.getFloat(4);
 						float z = buf.getFloat(8);
-						
+
 						float r = ((buf.get(12) & 0xFF) / 255.0f) * tintR;
 						float g = ((buf.get(13) & 0xFF) / 255.0f) * tintG;
 						float b = ((buf.get(14) & 0xFF) / 255.0f) * tintB;
-						
+
 						pos.set(x, y, z, 1);
 						pos.transform(mat);
-						
+
 						float uSize = maxU-minU;
 						float vSize = maxV-minV;
 
@@ -209,7 +214,7 @@ public class WoinaDrops {
 						} else if (v == maxV) {
 							v = minV + (vSize*((isProbablyGrass ? 9 : 12)/16f));
 						}
-						
+
 						vertices.vertex(pos.getX(), pos.getY(), pos.getZ(),
 								r, g, b, 1,
 								u, v,

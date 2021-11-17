@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.interfaces.SetInvisibleByCharm;
 import com.unascribed.fabrication.support.EligibleIf;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NbtCompound;
 
@@ -16,27 +17,27 @@ import net.minecraft.nbt.NbtCompound;
 public abstract class MixinEntity implements SetInvisibleByCharm {
 
 	private boolean fabrication$invisibleByCharm;
-	
+
 	@Override
 	public boolean fabrication$isInvisibleByCharm() {
 		return fabrication$invisibleByCharm;
 	}
-	
+
 	@Override
 	public void fabrication$setInvisibleByCharm(boolean b) {
 		fabrication$invisibleByCharm = b;
 	}
-	
+
 	@Inject(at=@At("TAIL"), method="writeNbt(Lnet/minecraft/nbt/NbtCompound;)Lnet/minecraft/nbt/NbtCompound;")
 	public void toTag(NbtCompound tag, CallbackInfoReturnable<NbtCompound> ci) {
 		if (fabrication$invisibleByCharm) {
 			tag.putBoolean("fabrication:InvisibleByCharm", fabrication$invisibleByCharm);
 		}
 	}
-	
+
 	@Inject(at=@At("TAIL"), method="readNbt(Lnet/minecraft/nbt/NbtCompound;)V")
 	public void fromTag(NbtCompound tag, CallbackInfo ci) {
 		fabrication$invisibleByCharm = tag.getBoolean("fabrication:InvisibleByCharm");
 	}
-	
+
 }

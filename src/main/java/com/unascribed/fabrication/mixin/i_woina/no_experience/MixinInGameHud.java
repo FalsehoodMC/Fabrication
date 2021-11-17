@@ -5,7 +5,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
@@ -23,7 +22,7 @@ public class MixinInGameHud {
 			ci.cancel();
 		}
 	}
-	
+
 	@Inject(at=@At("HEAD"), method="renderStatusBars(Lnet/minecraft/client/util/math/MatrixStack;)V")
 	private void renderStatusBarsHead(MatrixStack matrices, CallbackInfo ci) {
 		if (MixinConfigPlugin.isEnabled("*.no_experience")) {
@@ -31,12 +30,12 @@ public class MixinInGameHud {
 			matrices.translate(0, 7, 0);
 		}
 	}
-	
+
 	@Inject(at=@At("RETURN"), method="renderStatusBars(Lnet/minecraft/client/util/math/MatrixStack;)V")
 	private void renderStatusBarsRet(MatrixStack matrices, CallbackInfo ci) {
 		if (MixinConfigPlugin.isEnabled("*.no_experience")) {
 			matrices.pop();
 		}
 	}
-	
+
 }

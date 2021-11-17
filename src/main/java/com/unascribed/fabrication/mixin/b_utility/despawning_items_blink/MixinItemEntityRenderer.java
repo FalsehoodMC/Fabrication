@@ -9,6 +9,7 @@ import com.unascribed.fabrication.interfaces.RenderingAgeAccess;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.ItemEntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -48,5 +49,5 @@ public class MixinItemEntityRenderer {
 			}
 		}
 	}
-	
+
 }

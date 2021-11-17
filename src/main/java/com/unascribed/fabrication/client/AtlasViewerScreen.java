@@ -1,5 +1,25 @@
 package com.unascribed.fabrication.client;
 
+import static org.lwjgl.opengl.GL11C.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11C.GL_TEXTURE_BINDING_2D;
+import static org.lwjgl.opengl.GL11C.GL_TEXTURE_HEIGHT;
+import static org.lwjgl.opengl.GL11C.GL_TEXTURE_WIDTH;
+import static org.lwjgl.opengl.GL11C.glBindTexture;
+import static org.lwjgl.opengl.GL11C.glGetInteger;
+import static org.lwjgl.opengl.GL11C.glGetTexLevelParameteri;
+import static org.lwjgl.opengl.GL11C.glGetTexParameteri;
+import static org.lwjgl.opengl.GL11C.glTexParameteri;
+import static org.lwjgl.opengl.GL12C.GL_TEXTURE_BASE_LEVEL;
+import static org.lwjgl.opengl.GL12C.GL_TEXTURE_MAX_LEVEL;
+
+import java.util.List;
+
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.unascribed.fabrication.FabRefl;
+
+import com.google.common.collect.Lists;
+
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
@@ -16,24 +36,15 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Matrix4f;
 
-import static org.lwjgl.opengl.GL30C.*;
-
-import java.util.List;
-
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.unascribed.fabrication.FabRefl;
-
-import com.google.common.collect.Lists;
-
 public class AtlasViewerScreen extends Screen {
 
 	private static final Identifier CHECKER = new Identifier("fabrication", "textures/checker.png");
-	
+
 	private final Identifier atlas;
 	private float panX = 100;
 	private float panY = 100;
 	private int level = 0;
-	
+
 	public AtlasViewerScreen(Identifier atlas) {
 		super(new LiteralText("Atlas viewer"));
 		this.atlas = atlas;
@@ -43,12 +54,12 @@ public class AtlasViewerScreen extends Screen {
 	protected void init() {
 		client.skipGameRender = true;
 	}
-	
+
 	@Override
 	public void removed() {
 		client.skipGameRender = false;
 	}
-	
+
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		matrices.push();
@@ -67,21 +78,21 @@ public class AtlasViewerScreen extends Screen {
 		BufferBuilder bb = Tessellator.getInstance().getBuffer();
 		Matrix4f mat = matrices.peek().getModel();
 		bb.begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
-			bb.vertex(mat, 0, 0, 0).texture(0, 0).next();
-			bb.vertex(mat, width, 0, 0).texture(width/8, 0).next();
-			bb.vertex(mat, width, height, 0).texture(width/8, height/8).next();
-			bb.vertex(mat, 0, height, 0).texture(0, height/8).next();
+		bb.vertex(mat, 0, 0, 0).texture(0, 0).next();
+		bb.vertex(mat, width, 0, 0).texture(width/8, 0).next();
+		bb.vertex(mat, width, height, 0).texture(width/8, height/8).next();
+		bb.vertex(mat, 0, height, 0).texture(0, height/8).next();
 		bb.end();
 		BufferRenderer.draw(bb);
-		
+
 		client.getTextureManager().bindTexture(atlas);
-		
+
 		matrices.translate(panX, panY, 0);
-		
+
 		int atlasWidth = glGetTexLevelParameteri(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH);
 		int atlasHeight = glGetTexLevelParameteri(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT);
 		int atlasMaxLevel = glGetTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL);
-		
+
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		RenderSystem.disableTexture();
 		RenderSystem.enableBlend();
@@ -89,40 +100,40 @@ public class AtlasViewerScreen extends Screen {
 		RenderSystem.setShaderColor(1f, 1f, 1f, 0.15f);
 		mat = matrices.peek().getModel();
 		bb.begin(DrawMode.QUADS, VertexFormats.POSITION);
-			bb.vertex(mat, 0, 0, 0).next();
-			bb.vertex(mat, atlasWidth, 0, 0).next();
-			bb.vertex(mat, atlasWidth, atlasHeight, 0).next();
-			bb.vertex(mat, 0, atlasHeight, 0).next();
+		bb.vertex(mat, 0, 0, 0).next();
+		bb.vertex(mat, atlasWidth, 0, 0).next();
+		bb.vertex(mat, atlasWidth, atlasHeight, 0).next();
+		bb.vertex(mat, 0, atlasHeight, 0).next();
 		bb.end();
 		BufferRenderer.draw(bb);
-		
+
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, level);
-		
+
 		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		RenderSystem.enableTexture();
 		RenderSystem.setShaderTexture(0, atlas);
 		RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 		mat = matrices.peek().getModel();
 		bb.begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
-			bb.vertex(mat, 0, 0, 0).texture(0, 0).next();
-			bb.vertex(mat, atlasWidth, 0, 0).texture(1, 0).next();
-			bb.vertex(mat, atlasWidth, atlasHeight, 0).texture(1, 1).next();
-			bb.vertex(mat, 0, atlasHeight, 0).texture(0, 1).next();
+		bb.vertex(mat, 0, 0, 0).texture(0, 0).next();
+		bb.vertex(mat, atlasWidth, 0, 0).texture(1, 0).next();
+		bb.vertex(mat, atlasWidth, atlasHeight, 0).texture(1, 1).next();
+		bb.vertex(mat, 0, atlasHeight, 0).texture(0, 1).next();
 		bb.end();
 		BufferRenderer.draw(bb);
-		
+
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 		matrices.pop();
-		
+
 		mouseX -= panX;
 		mouseY -= panY;
-		
-		
+
+
 		SpriteAtlasTexture sat = getAtlas();
 		renderTooltip(matrices, Lists.<Text>newArrayList(
 				new LiteralText(atlas.toString()),
 				new LiteralText("§7"+atlasWidth+"×"+atlasHeight+"×"+(atlasMaxLevel+1)+" @"+(level+1)+" §f|§7 "+FabRefl.Client.getSprites(sat).size()+" sprites")
-			), -9, 15);
+				), -9, 15);
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 		List<Sprite> sprites = Lists.newArrayList();
@@ -146,10 +157,10 @@ public class AtlasViewerScreen extends Screen {
 			RenderSystem.setShaderColor(1, 0, 0, 0.2f);
 			mat = matrices.peek().getModel();
 			bb.begin(DrawMode.QUADS, VertexFormats.POSITION);
-				bb.vertex(mat, panX+x, panY+y, 0).next();
-				bb.vertex(mat, panX+x+w, panY+y, 0).next();
-				bb.vertex(mat, panX+x+w, panY+y+h, 0).next();
-				bb.vertex(mat, panX+x, panY+y+h, 0).next();
+			bb.vertex(mat, panX+x, panY+y, 0).next();
+			bb.vertex(mat, panX+x+w, panY+y, 0).next();
+			bb.vertex(mat, panX+x+w, panY+y+h, 0).next();
+			bb.vertex(mat, panX+x, panY+y+h, 0).next();
 			bb.end();
 			BufferRenderer.draw(bb);
 		}
@@ -161,7 +172,7 @@ public class AtlasViewerScreen extends Screen {
 						new LiteralText("<nothing>"),
 						new LiteralText("§7"+mouseX+", "+mouseY),
 						new LiteralText("If there is something here, it's either garbage from your graphics driver or an unregistered sprite")
-					), (int)(mouseX+panX), (int)(mouseY+panY));
+						), (int)(mouseX+panX), (int)(mouseY+panY));
 			}
 		} else if (sprites.size() == 1) {
 			Sprite s = sprites.get(0);
@@ -187,14 +198,14 @@ public class AtlasViewerScreen extends Screen {
 				anim = " @"+FabRefl.Client.getFrameIndex(sa)+"."+FabRefl.Client.getFrameTicks(sa);
 			}
 			renderTooltip(matrices, Lists.<Text>newArrayList(
-				new LiteralText(s.getId().toString()),
-				new LiteralText("§7At "+x+","+y+" "+w+"×"+h+"×"+FabRefl.Client.getFrameCount(s)+anim),
-				new LiteralText("§7From §f"+src)
-			), (int)(mouseX+panX), (int)(mouseY+panY));
+					new LiteralText(s.getId().toString()),
+					new LiteralText("§7At "+x+","+y+" "+w+"×"+h+"×"+FabRefl.Client.getFrameCount(s)+anim),
+					new LiteralText("§7From §f"+src)
+					), (int)(mouseX+panX), (int)(mouseY+panY));
 		} else {
 			List<Text> li = Lists.newArrayList(
-				new LiteralText("§c\u26A0 MULTIPLE SPRITES \u26A0")
-			);
+					new LiteralText("§c\u26A0 MULTIPLE SPRITES \u26A0")
+					);
 			for (Sprite s : sprites) {
 				int x = FabRefl.Client.getX(s);
 				int y = FabRefl.Client.getY(s);
@@ -211,7 +222,7 @@ public class AtlasViewerScreen extends Screen {
 			renderTooltip(matrices, li, (int)(mouseX+panX), (int)(mouseY+panY));
 		}
 	}
-	
+
 	@Override
 	public void renderTooltip(MatrixStack matrices, List<Text> lines, int x, int y) {
 		List<OrderedText> ordered = Lists.newArrayList();
@@ -220,7 +231,7 @@ public class AtlasViewerScreen extends Screen {
 		}
 		renderOrderedTooltip(matrices, ordered, x, y);
 	}
-	
+
 	private SpriteAtlasTexture getAtlas() {
 		for (SpriteAtlasTexture cand : AtlasTracking.allAtlases) {
 			if (cand.getId().equals(this.atlas)) return cand;
@@ -232,7 +243,7 @@ public class AtlasViewerScreen extends Screen {
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		return super.keyPressed(keyCode, scanCode, modifiers);
 	}
-	
+
 	@Override
 	public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
 		if (button == 0) {
@@ -241,7 +252,7 @@ public class AtlasViewerScreen extends Screen {
 		}
 		return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
 	}
-	
+
 	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
 		int oldBind = glGetInteger(GL_TEXTURE_BINDING_2D);

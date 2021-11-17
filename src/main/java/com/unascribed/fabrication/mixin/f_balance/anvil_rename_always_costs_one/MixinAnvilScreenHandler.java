@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.AnvilScreenHandler;
 import net.minecraft.screen.ForgingScreenHandler;
@@ -26,7 +27,7 @@ public abstract class MixinAnvilScreenHandler extends ForgingScreenHandler {
 
 	@Shadow @Final
 	private Property levelCost;
-	
+
 	@Inject(at=@At("TAIL"), method="updateResult()V")
 	public void updateResult(CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.anvil_rename_always_costs_one")) return;
@@ -34,5 +35,5 @@ public abstract class MixinAnvilScreenHandler extends ForgingScreenHandler {
 			levelCost.set(1);
 		}
 	}
-	
+
 }

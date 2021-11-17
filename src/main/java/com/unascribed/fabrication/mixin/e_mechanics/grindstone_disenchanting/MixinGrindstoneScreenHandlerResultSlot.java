@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.unascribed.fabrication.interfaces.SetOwner;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.EnchantmentLevelEntry;
@@ -30,7 +31,7 @@ public class MixinGrindstoneScreenHandlerResultSlot implements SetOwner<Grindsto
 	private ItemStack fabrication$storedResultBook;
 	@Unique
 	private GrindstoneScreenHandler fabrication$owner;
-	
+
 	@Override
 	public void fabrication$setOwner(GrindstoneScreenHandler owner) {
 		fabrication$owner = owner;
@@ -50,7 +51,7 @@ public class MixinGrindstoneScreenHandlerResultSlot implements SetOwner<Grindsto
 			}
 		}
 	}
-	
+
 	@Inject(at=@At("TAIL"), method="onTakeItem(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/item/ItemStack;)V")
 	public void onTakeItemPost(PlayerEntity player, ItemStack stack, CallbackInfo ci) {
 		if (fabrication$storedResultBook != null) {
@@ -58,10 +59,10 @@ public class MixinGrindstoneScreenHandlerResultSlot implements SetOwner<Grindsto
 			fabrication$storedResultBook = null;
 		}
 	}
-	
+
 	@Inject(at=@At("HEAD"), method="getExperience(Lnet/minecraft/world/World;)I", cancellable=true)
 	private void getExperience(World world, CallbackInfoReturnable<Integer> ci) {
 		if (fabrication$storedResultBook != null) ci.setReturnValue(0);
 	}
-	
+
 }

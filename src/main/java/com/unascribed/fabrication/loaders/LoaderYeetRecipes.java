@@ -14,7 +14,7 @@ import net.minecraft.util.Identifier;
 public class LoaderYeetRecipes implements ConfigLoader {
 
 	public static Set<Identifier> recipesToYeet = Sets.newHashSet();
-	
+
 	@Override
 	public void load(Path configDir, QDIni config, boolean loadError) {
 		Set<Identifier> recipesToYeetTmp = Sets.newHashSet();

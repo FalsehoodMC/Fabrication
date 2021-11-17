@@ -19,7 +19,7 @@ import com.google.common.collect.Sets;
 import com.google.common.io.Resources;
 
 public final class FeaturesFile {
-	
+
 	public enum Sides {
 		IRRELEVANT,
 		EITHER,
@@ -28,13 +28,14 @@ public final class FeaturesFile {
 		SERVER_ONLY_WITH_CLIENT_HELPER,
 		SERVER_AND_CLIENT,
 	}
-	
+
 	public static final class FeatureEntry {
 		public final String key;
 		public final String name;
 		public final String shortName;
 		public final boolean meta;
 		public final boolean section;
+		public final boolean extra;
 		public final String since;
 		public final int sinceCode;
 		public final Sides sides;
@@ -50,13 +51,14 @@ public final class FeaturesFile {
 		public final String desc;
 		public final String fscript;
 		public final String fscriptDefault;
-		
+
 		public FeatureEntry(String key, JsonObject obj) {
 			this.key = key;
 			name = get(obj, "name", JsonElement::getAsString, null);
 			shortName = get(obj, "short_name", JsonElement::getAsString, null);
 			meta = get(obj, "meta", JsonElement::getAsBoolean, false);
 			section = get(obj, "section", JsonElement::getAsBoolean, false);
+			extra = get(obj, "extra", JsonElement::getAsBoolean, false);
 			since = get(obj, "since", JsonElement::getAsString, null);
 			sinceCode = get(obj, "since_code", JsonElement::getAsInt, -1);
 			sides = Sides.valueOf(get(obj, "sides", JsonElement::getAsString, "irrelevant").toUpperCase(Locale.ROOT));
@@ -73,7 +75,7 @@ public final class FeaturesFile {
 			fscript = get(obj, "fscript", s -> s.getAsString().toUpperCase(Locale.ROOT), null);
 			fscriptDefault = get(obj, "fscript_default", JsonElement::getAsString, null);
 		}
-		
+
 		private static <T> T get(JsonObject obj, String key, Function<JsonElement, T> func, T def) {
 			JsonElement ele = obj.get(key);
 			if (ele == null || ele.isJsonNull()) return def;
@@ -85,19 +87,20 @@ public final class FeaturesFile {
 
 		@Override
 		public String toString() {
-			return "FeatureEntry [name=" + name + ", shortName=" + shortName
-					+ ", meta=" + meta + ", section=" + section + ", since="
+			return "FeatureEntry [key=" + key + ", name=" + name
+					+ ", shortName=" + shortName + ", meta=" + meta
+					+ ", section=" + section + ", extra=" + extra + ", since="
 					+ since + ", sinceCode=" + sinceCode + ", sides=" + sides
-					+ ", needs=" + needs + ", default=" + def + ", parent=" + parent
+					+ ", needs=" + needs + ", def=" + def + ", parent=" + parent
 					+ ", media=" + media + ", mediaText=" + mediaText
 					+ ", extraMedia=" + extraMedia + ", extraMediaText="
 					+ extraMediaText + ", linkUrl=" + linkUrl + ", linkText="
 					+ linkText + ", desc=" + desc + ", fscript=" + fscript
 					+ ", fscriptDefault=" + fscriptDefault + "]";
 		}
-		
+
 	}
-	
+
 	private static final ImmutableMap<String, FeatureEntry> data;
 	static {
 		ImmutableMap.Builder<String, FeatureEntry> bldr = ImmutableMap.builder();
@@ -111,16 +114,16 @@ public final class FeaturesFile {
 		}
 		data = bldr.build();
 	}
-	
+
 	private static final FeatureEntry defaultEntry = new FeatureEntry("", new JsonObject());
-	
+
 	public static FeatureEntry get(String key) {
 		return data.getOrDefault(key, defaultEntry);
 	}
-	
+
 	public static ImmutableMap<String, FeatureEntry> getAll() {
 		return data;
 	}
-	
-	
+
+
 }

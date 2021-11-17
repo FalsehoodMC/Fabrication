@@ -227,19 +227,11 @@ utility.ping_privacy:
 		other things.
 
 utility.show_bee_count_tooltip:
-	name: Show Bee Count
+	name: Show Bee Count in Tooltip
 	since: 1.4.0
 	sides: client_only
 	desc:
 		Makes bee hive tooltips show amount of contained bees.
-
-utility.show_bee_count_on_item:
-	name: Show Bee Count
-	since: 1.4.0
-	sides: client_only
-	default: never
-	desc:
-		Makes bee hive items show amount of contained bees.
-
+		
 # kate: space-indent off
 # vim: noai:noet

@@ -6,8 +6,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.block.dispenser.ItemDispenserBehavior;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.item.ItemStack.TooltipSection;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.potion.PotionUtil;
@@ -41,7 +41,7 @@ public class ObsidianTears {
 		}
 
 	};
-	
+
 	public static void setSpawnPoint(ServerPlayerEntity p, ItemStack stack) {
 		World world = p.world;
 		RegistryKey<World> key = RegistryKey.of(Registry.WORLD_KEY, new Identifier(stack.getNbt().getString("fabrication:ObsidianTearsOriginDim")));
@@ -53,7 +53,7 @@ public class ObsidianTears {
 		}
 		p.setSpawnPoint(key, pos, p.getYaw(), false, true);
 	}
-	
+
 	public static ItemStack createStack(World world, BlockPos blockPos) {
 		ItemStack stack = PotionUtil.setPotion(new ItemStack(Items.POTION), Potions.THICK);
 		stack.setCustomName(new LiteralText("§fObsidian Tears"));

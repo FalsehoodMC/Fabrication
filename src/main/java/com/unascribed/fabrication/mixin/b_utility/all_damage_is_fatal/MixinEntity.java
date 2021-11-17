@@ -1,12 +1,13 @@
-package com.unascribed.fabrication.mixin.h_situational.all_damage_is_fatal;
+package com.unascribed.fabrication.mixin.b_utility.all_damage_is_fatal;
 
-import com.unascribed.fabrication.support.ConfigPredicates;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
+import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -26,5 +27,5 @@ public abstract class MixinEntity extends Entity {
 		LivingEntity le = ((LivingEntity)(Object)this);
 		return MixinConfigPlugin.isEnabled("*.all_damage_is_fatal") && ConfigPredicates.shouldRun("*.all_damage_is_fatal", le) ? le.getHealth()*20 : amount;
 	}
-	
+
 }

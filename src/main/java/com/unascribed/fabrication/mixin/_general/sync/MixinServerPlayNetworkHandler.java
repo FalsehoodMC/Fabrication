@@ -1,25 +1,25 @@
 package com.unascribed.fabrication.mixin._general.sync;
 
-import com.unascribed.fabrication.Agnos;
-import com.unascribed.fabrication.FeaturesFile;
-import com.unascribed.fabrication.loaders.LoaderFScript;
-import com.unascribed.fabrication.support.OptionalFScript;
-import io.netty.buffer.Unpooled;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.FabricationMod;
+import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.features.FeatureHideArmor;
 import com.unascribed.fabrication.interfaces.SetFabricationConfigAware;
+import com.unascribed.fabrication.loaders.LoaderFScript;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+import com.unascribed.fabrication.support.OptionalFScript;
 
+import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
+import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
@@ -32,7 +32,7 @@ import net.minecraft.world.GameRules;
 
 @Mixin(ServerPlayNetworkHandler.class)
 public class MixinServerPlayNetworkHandler {
-	
+
 	@Shadow
 	public ServerPlayerEntity player;
 
@@ -65,7 +65,7 @@ public class MixinServerPlayNetworkHandler {
 							FabricationMod.sendConfigUpdate(player.server, key);
 							fabrication$sendCommandFeedback(
 									new TranslatableText("chat.type.admin", player.getDisplayName(), new LiteralText(key + " is now set to " + value))
-											.formatted(Formatting.GRAY, Formatting.ITALIC));
+									.formatted(Formatting.GRAY, Formatting.ITALIC));
 						}
 					}
 				}
@@ -90,7 +90,7 @@ public class MixinServerPlayNetworkHandler {
 							if (Agnos.isModLoaded("fscript") && OptionalFScript.set(key, value, player)) {
 								fabrication$sendCommandFeedback(
 										new TranslatableText("chat.type.admin", player.getDisplayName(), new LiteralText(key + " script is now set to " + value))
-												.formatted(Formatting.GRAY, Formatting.ITALIC));
+										.formatted(Formatting.GRAY, Formatting.ITALIC));
 							}
 						}
 					}
@@ -102,7 +102,7 @@ public class MixinServerPlayNetworkHandler {
 							OptionalFScript.restoreDefault(key);
 							fabrication$sendCommandFeedback(
 									new TranslatableText("chat.type.admin", player.getDisplayName(), new LiteralText(key + " script has been unset"))
-											.formatted(Formatting.GRAY, Formatting.ITALIC));
+									.formatted(Formatting.GRAY, Formatting.ITALIC));
 						}
 					}
 				}else if (id == 3) {
@@ -113,7 +113,7 @@ public class MixinServerPlayNetworkHandler {
 						if (Agnos.isModLoaded("fscript")) OptionalFScript.reload();
 						fabrication$sendCommandFeedback(
 								new TranslatableText("chat.type.admin", player.getDisplayName(), new LiteralText(" scripts have been reloaded"))
-										.formatted(Formatting.GRAY, Formatting.ITALIC));
+								.formatted(Formatting.GRAY, Formatting.ITALIC));
 					}
 				}
 			}
@@ -132,5 +132,5 @@ public class MixinServerPlayNetworkHandler {
 			player.server.sendSystemMessage(text, Util.NIL_UUID);
 		}
 	}
-	
+
 }

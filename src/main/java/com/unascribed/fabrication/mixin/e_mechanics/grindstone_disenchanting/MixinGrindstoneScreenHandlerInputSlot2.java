@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -26,5 +27,5 @@ public class MixinGrindstoneScreenHandlerInputSlot2 extends Slot {
 			ci.setReturnValue(true);
 		}
 	}
-	
+
 }

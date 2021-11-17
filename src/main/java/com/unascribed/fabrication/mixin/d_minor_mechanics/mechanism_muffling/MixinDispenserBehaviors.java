@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.unascribed.fabrication.logic.MechanismMuffling;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.block.dispenser.BoatDispenserBehavior;
 import net.minecraft.block.dispenser.FallibleItemDispenserBehavior;
 import net.minecraft.block.dispenser.ItemDispenserBehavior;
@@ -24,5 +25,5 @@ public class MixinDispenserBehaviors {
 			ci.cancel();
 		}
 	}
-	
+
 }

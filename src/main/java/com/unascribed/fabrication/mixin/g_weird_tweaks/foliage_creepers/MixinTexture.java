@@ -1,10 +1,7 @@
 package com.unascribed.fabrication.mixin.g_weird_tweaks.foliage_creepers;
 
-import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
-import com.unascribed.fabrication.util.Grayscale;
-import net.minecraft.resource.ResourceImpl;
-import net.minecraft.util.Identifier;
+import java.io.InputStream;
+
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -13,7 +10,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.io.InputStream;
+import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.MixinConfigPlugin;
+import com.unascribed.fabrication.util.Grayscale;
+
+import net.minecraft.resource.ResourceImpl;
+import net.minecraft.util.Identifier;
 
 @Mixin(ResourceImpl.class)
 @EligibleIf(configAvailable="*.foliage_creepers")

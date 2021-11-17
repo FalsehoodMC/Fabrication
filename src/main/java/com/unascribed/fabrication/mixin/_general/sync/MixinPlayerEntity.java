@@ -3,11 +3,12 @@ package com.unascribed.fabrication.mixin._general.sync;
 import org.spongepowered.asm.mixin.Mixin;
 
 import com.unascribed.fabrication.interfaces.SetFabricationConfigAware;
+
 import net.minecraft.entity.player.PlayerEntity;
 
 @Mixin(PlayerEntity.class)
 public class MixinPlayerEntity implements SetFabricationConfigAware {
-	
+
 	private boolean fabrication$configAware;
 
 	@Override
@@ -19,5 +20,5 @@ public class MixinPlayerEntity implements SetFabricationConfigAware {
 	public boolean fabrication$isConfigAware() {
 		return fabrication$configAware;
 	}
-	
+
 }

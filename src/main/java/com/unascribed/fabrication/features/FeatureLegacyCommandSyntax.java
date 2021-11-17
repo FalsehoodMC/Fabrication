@@ -19,6 +19,7 @@ import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import com.google.common.collect.Iterables;
 import com.google.common.primitives.Ints;
 
@@ -49,14 +50,14 @@ public class FeatureLegacyCommandSyntax implements Feature {
 				LiteralArgumentBuilder<ServerCommandSource> gmCmd = CommandManager.literal("gamemode")
 						.requires(scs -> MixinConfigPlugin.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2));
 				for (GameMode mode : GameMode.values()) {
-						gmCmd.then(CommandManager.literal(Integer.toString(mode.getId()))
+					gmCmd.then(CommandManager.literal(Integer.toString(mode.getId()))
 							.executes(c -> (int)invoke(gmExecute, c, Collections.singleton(c.getSource().getPlayer()), mode))
 							.then(CommandManager.argument("target", EntityArgumentType.players())
-								.executes(c -> (int)invoke(gmExecute, c, EntityArgumentType.getPlayers(c, "target"), mode)))
+									.executes(c -> (int)invoke(gmExecute, c, EntityArgumentType.getPlayers(c, "target"), mode)))
 							);
 				}
 				dispatcher.register(gmCmd);
-				
+
 				LiteralArgumentBuilder<ServerCommandSource> diffCmd = CommandManager.literal("difficulty")
 						.requires(scs -> MixinConfigPlugin.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2));
 				for (Difficulty difficulty : Difficulty.values()) {
@@ -68,25 +69,25 @@ public class FeatureLegacyCommandSyntax implements Feature {
 				dispatcher.register(CommandManager.literal("experience")
 						.requires(scs -> MixinConfigPlugin.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2))
 						.then(CommandManager.argument("amount", IntegerArgumentType.integer())
-							.executes(c -> {
-								return addExperience(c.getSource(), Collections.singleton(c.getSource().getPlayer()), IntegerArgumentType.getInteger(c,"amount"), false);
-							})
-							.then(CommandManager.argument("targets", EntityArgumentType.players())
 								.executes(c -> {
-									return addExperience(c.getSource(), EntityArgumentType.getPlayers(c, "targets"), IntegerArgumentType.getInteger(c, "amount"), false);
+									return addExperience(c.getSource(), Collections.singleton(c.getSource().getPlayer()), IntegerArgumentType.getInteger(c,"amount"), false);
 								})
-							)
-						)
+								.then(CommandManager.argument("targets", EntityArgumentType.players())
+										.executes(c -> {
+											return addExperience(c.getSource(), EntityArgumentType.getPlayers(c, "targets"), IntegerArgumentType.getInteger(c, "amount"), false);
+										})
+										)
+								)
 						.then(CommandManager.argument("lvlAmount", StringArgumentType.word())
-							.executes((c) -> {
-								return addExperience(c.getSource(), Collections.singleton(c.getSource().getPlayer()), StringArgumentType.getString(c, "lvlAmount"));
-							})
-							.then(CommandManager.argument("targets", EntityArgumentType.players())
-								.executes(c ->{
-									return addExperience(c.getSource(), EntityArgumentType.getPlayers(c, "targets"), StringArgumentType.getString(c, "lvlAmount"));
+								.executes((c) -> {
+									return addExperience(c.getSource(), Collections.singleton(c.getSource().getPlayer()), StringArgumentType.getString(c, "lvlAmount"));
 								})
-							)
-						));
+								.then(CommandManager.argument("targets", EntityArgumentType.players())
+										.executes(c ->{
+											return addExperience(c.getSource(), EntityArgumentType.getPlayers(c, "targets"), StringArgumentType.getString(c, "lvlAmount"));
+										})
+										)
+								));
 
 				dispatcher.register(CommandManager.literal("toggledownfall")
 						.requires(scs -> MixinConfigPlugin.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2))
@@ -106,7 +107,7 @@ public class FeatureLegacyCommandSyntax implements Feature {
 			}
 		});
 	}
-	
+
 	private static int addExperience(ServerCommandSource source, Collection<? extends ServerPlayerEntity> targets, int amount, boolean areLevels) {
 		Iterator<? extends ServerPlayerEntity> iter = targets.iterator();
 		while (iter.hasNext()) {
@@ -135,10 +136,10 @@ public class FeatureLegacyCommandSyntax implements Feature {
 		}
 		throw new SimpleCommandExceptionType(new LiteralText("Invalid XP amount")).create();
 	}
-	
+
 	private final MethodHandle gmExecute = unreflect(GameModeCommand.class, "method_13387", "func_198484_a", "execute", CommandContext.class, Collection.class, GameMode.class);
 	private final MethodHandle worldProperties = unreflectField(ServerWorld.class, "field_24456", "field_241103_E_", "worldProperties");
-	
+
 	private static Object invoke(MethodHandle execute, Object... args) {
 		try {
 			return execute.invokeWithArguments(args);
@@ -146,7 +147,7 @@ public class FeatureLegacyCommandSyntax implements Feature {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	private static MethodHandle unreflect(Class<?> clazz, String intermediateName, String srgName, String yarnName, Class<?>... args) {
 		try {
 			Method m;
@@ -165,7 +166,7 @@ public class FeatureLegacyCommandSyntax implements Feature {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	private static MethodHandle unreflectField(Class<?> clazz, String intermediateName, String srgName, String yarnName) {
 		try {
 			Field f;

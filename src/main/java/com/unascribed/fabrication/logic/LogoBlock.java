@@ -3,6 +3,7 @@ package com.unascribed.fabrication.logic;
 import java.util.concurrent.ThreadLocalRandom;
 
 import com.unascribed.fabrication.loaders.LoaderBlockLogo;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.sound.PositionedSoundInstance;

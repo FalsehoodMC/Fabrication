@@ -20,6 +20,7 @@ import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.util.Resolvable;
 
 import com.google.common.collect.Lists;
+
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
@@ -48,7 +49,7 @@ public abstract class MixinLivingEntity extends Entity {
 	public void sendEquipmentBreakStatus(EquipmentSlot slot, CallbackInfo ci) {
 		shatter(slot, ((LivingEntity)(Object)this).getEquippedStack(slot));
 	}
-	
+
 	@Inject(at=@At("HEAD"), method="sendToolBreakStatus(Lnet/minecraft/util/Hand;)V")
 	public void sendToolBreakStatus(Hand hand, CallbackInfo ci) {
 		shatter(hand == Hand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND, ((LivingEntity)(Object)this).getStackInHand(hand));
@@ -159,5 +160,5 @@ public abstract class MixinLivingEntity extends Entity {
 			dropStack(is);
 		}
 	}
-	
+
 }

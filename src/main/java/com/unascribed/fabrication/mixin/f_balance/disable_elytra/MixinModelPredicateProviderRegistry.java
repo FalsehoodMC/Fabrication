@@ -1,4 +1,4 @@
-package com.unascribed.fabrication.mixin.h_situational.disable_elytra;
+package com.unascribed.fabrication.mixin.f_balance.disable_elytra;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,7 +17,7 @@ import net.minecraft.item.ItemStack;
 @Mixin(ModelPredicateProviderRegistry.class)
 @EligibleIf(configAvailable="*.disable_elytra", envMatches=Env.CLIENT)
 public class MixinModelPredicateProviderRegistry {
-	
+
 	// "broken" predicate lambda
 	// this calls the isUsable method used by the other mixin, making elytra always look broken
 	// so we make this method use the original isUsable implementation to avoid that
@@ -27,5 +27,5 @@ public class MixinModelPredicateProviderRegistry {
 			ci.setReturnValue(item.getDamage() < item.getMaxDamage()-1 ? 0.0f : 1.0f);
 		}
 	}
-	
+
 }

@@ -86,21 +86,14 @@ general.profile.vienna:
 	meta: true
 	parent: general.profile
 	desc:
-		Dark + balance tweaks, weird mechanic additions, and some revivals of old features. Author's choice.
+		Everything but "extra" features. Author's choice.
 
 general.profile.burnt:
 	name: Burnt
 	meta: true
 	parent: general.profile
 	desc:
-		Just enable everything, except the "Situational" and "Experiments" sections and most of WOINA. Vienna without the opinions.
-		
-general.profile.ash:
-	name: Ash
-	meta: true
-	parent: general.profile
-	desc:
-		Really enable everything. (Except Experiments.)
+		Vienna + all "extra" features.
 
 # kate: space-indent off
 # vim: noai:noet

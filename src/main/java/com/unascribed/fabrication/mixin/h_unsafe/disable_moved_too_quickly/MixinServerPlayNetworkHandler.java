@@ -1,11 +1,13 @@
-package com.unascribed.fabrication.mixin.g_weird_tweaks.disable_moved_too_quickly;
+package com.unascribed.fabrication.mixin.h_unsafe.disable_moved_too_quickly;
 
-import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
+
+import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.MixinConfigPlugin;
+
+import net.minecraft.server.network.ServerPlayNetworkHandler;
 
 @Mixin(ServerPlayNetworkHandler.class)
 @EligibleIf(configAvailable="*.disable_moved_too_quickly")
@@ -22,5 +24,5 @@ public abstract class MixinServerPlayNetworkHandler {
 		if (!MixinConfigPlugin.isEnabled("*.disable_moved_too_quickly")) return old;
 		return Double.MAX_VALUE;
 	}
-	
+
 }

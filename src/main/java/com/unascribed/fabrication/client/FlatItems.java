@@ -12,5 +12,5 @@ public class FlatItems {
 		BakedModel bm = mc.getItemRenderer().getHeldItemModel(item, mc.world, null, 1);
 		return !bm.hasDepth() || item.isOf(Items.TRIDENT) || item.isOf(Items.SPYGLASS);
 	}
-	
+
 }

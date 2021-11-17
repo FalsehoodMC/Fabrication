@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.unascribed.fabrication.interfaces.WasShoved;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.block.entity.FurnaceBlockEntity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -33,10 +34,10 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 	private static Ingredient ACCEPTABLE_FUEL;
 	@Shadow
 	private int fuel;
-	
+
 	private boolean fabrication$wasShoved;
 	private boolean fabrication$wasJustShoved;
-	
+
 	@Inject(at=@At("HEAD"), method="interact(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;")
 	public void interactHead(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> ci) {
 		if (!MixinConfigPlugin.isEnabled("*.furnace_minecart_pushing")) return;
@@ -47,7 +48,7 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 			fabrication$wasJustShoved = true;
 		}
 	}
-	
+
 	@Inject(at=@At("RETURN"), method="interact(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;")
 	public void interactReturn(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> ci) {
 		if (!MixinConfigPlugin.isEnabled("*.furnace_minecart_pushing")) return;
@@ -55,10 +56,10 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 			fabrication$wasShoved = fabrication$wasJustShoved;
 		}
 	}
-	
+
 	@Override
 	public boolean fabrication$wasShoved() {
 		return fabrication$wasShoved;
 	}
-	
+
 }

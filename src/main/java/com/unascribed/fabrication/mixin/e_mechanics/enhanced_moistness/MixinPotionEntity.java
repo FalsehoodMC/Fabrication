@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import com.unascribed.fabrication.interfaces.MarkWet;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.EndermanEntity;
@@ -24,8 +25,8 @@ public abstract class MixinPotionEntity extends ThrownItemEntity {
 	public MixinPotionEntity(EntityType<? extends ThrownItemEntity> entityType, double d, double e, double f, World world) {
 		super(entityType, d, e, f, world);
 	}
-	
-	
+
+
 	@Inject(at=@At("TAIL"), method="damageEntitiesHurtByWater()V", locals=LocalCapture.CAPTURE_FAILHARD)
 	public void damageEntitiesHurtByWater(CallbackInfo ci, Box box) {
 		if (!MixinConfigPlugin.isEnabled("*.enhanced_moistness") || world.isClient) return;
@@ -38,5 +39,5 @@ public abstract class MixinPotionEntity extends ThrownItemEntity {
 			}
 		}
 	}
-	
+
 }

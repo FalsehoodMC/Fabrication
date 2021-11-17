@@ -10,5 +10,5 @@ public class ModMenuInitializer implements ModMenuApi {
 	public ConfigScreenFactory<?> getModConfigScreenFactory() {
 		return FabricationConfigScreen::new;
 	}
-	
+
 }

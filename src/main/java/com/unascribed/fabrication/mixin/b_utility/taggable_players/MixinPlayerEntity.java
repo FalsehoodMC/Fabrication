@@ -9,6 +9,7 @@ import com.unascribed.fabrication.interfaces.TaggablePlayer;
 import com.unascribed.fabrication.logic.PlayerTag;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -50,7 +51,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 			}
 		}
 	}
-	
+
 	@Inject(at=@At("HEAD"), method="isInvulnerableTo(Lnet/minecraft/entity/damage/DamageSource;)Z", cancellable=true)
 	public void isInvulnerableTo(DamageSource ds, CallbackInfoReturnable<Boolean> ci) {
 		if (MixinConfigPlugin.isEnabled("*.taggable_players") && this instanceof TaggablePlayer) {
@@ -59,5 +60,5 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 			}
 		}
 	}
-	
+
 }

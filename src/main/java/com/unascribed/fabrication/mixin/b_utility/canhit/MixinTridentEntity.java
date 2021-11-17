@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import com.unascribed.fabrication.interfaces.SetCanHitList;
 import com.unascribed.fabrication.logic.CanHitUtil;
 import com.unascribed.fabrication.support.EligibleIf;
+
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.entity.projectile.TridentEntity;
 import net.minecraft.item.ItemStack;
@@ -17,11 +18,11 @@ public abstract class MixinTridentEntity implements SetCanHitList {
 
 	@Shadow
 	private ItemStack tridentStack;
-	
+
 	@Override
 	public NbtList fabrication$getCanHitList() {
 		return tridentStack.hasNbt() && tridentStack.getNbt().contains("CanHit") && !CanHitUtil.isExempt(((TridentEntity)(Object)this).getOwner()) ?
 				tridentStack.getNbt().getList("CanHit", NbtType.STRING) : null;
 	}
-	
+
 }

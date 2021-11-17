@@ -1,0 +1,18 @@
+# This is not actually a YAML file; it's only .yml for syntax highlighting.
+# Tab indentation *must* be used.
+
+minor_mechanics.extra.spiders_cant_climb_while_wet:
+	name: Spiders Can't Climb While Wet
+	since: 1.2.3
+	sides: server_only
+	default: burnt
+	media: https://unascribed.com/fabrication/spiders_cant_climb_while_wet.mp4
+	desc:
+		Makes spiders unable to climb while wet. Basically a more overpowered version of Spiders
+		Can't Climb Glazed Terracotta. May break vanilla spider farms.
+		
+		Interacts with Enhanced Moistness, and the demo video uses it for the water splash to work
+		like it does.
+
+# kate: space-indent off
+# vim: noai:noet

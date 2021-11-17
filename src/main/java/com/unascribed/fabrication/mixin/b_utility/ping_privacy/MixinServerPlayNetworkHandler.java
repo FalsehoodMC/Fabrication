@@ -29,7 +29,7 @@ public class MixinServerPlayNetworkHandler {
 	private MinecraftServer server;
 	@Shadow @Final
 	public ClientConnection connection;
-	
+
 	@Inject(at=@At("HEAD"), method="sendPacket(Lnet/minecraft/network/Packet;Lio/netty/util/concurrent/GenericFutureListener;)V")
 	public void sendPacket(Packet<?> p, GenericFutureListener<?> l, CallbackInfo ci) {
 		if (MixinConfigPlugin.isEnabled("*.ping_privacy") && p instanceof GameJoinS2CPacket) {
@@ -39,5 +39,5 @@ public class MixinServerPlayNetworkHandler {
 			}
 		}
 	}
-	
+
 }

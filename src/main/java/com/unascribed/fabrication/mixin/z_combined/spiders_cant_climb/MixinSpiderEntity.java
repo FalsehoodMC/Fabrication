@@ -27,10 +27,10 @@ public abstract class MixinSpiderEntity extends HostileEntity {
 
 	@Shadow
 	public abstract void setClimbingWall(boolean b);
-	
+
 	@Shadow
 	public abstract boolean isClimbingWall();
-	
+
 	@Inject(at=@At("TAIL"), method="tick()V")
 	public void tickTail(CallbackInfo ci) {
 		if (!world.isClient) {
@@ -53,5 +53,5 @@ public abstract class MixinSpiderEntity extends HostileEntity {
 			}
 		}
 	}
-	
+
 }

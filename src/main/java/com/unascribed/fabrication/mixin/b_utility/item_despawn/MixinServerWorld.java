@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -21,6 +22,6 @@ public abstract class MixinServerWorld {
 			ci.setReturnValue(false);
 		}
 	}
-	
-	
+
+
 }

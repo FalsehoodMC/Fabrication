@@ -62,11 +62,11 @@ public class QDIni {
 		public final String value;
 		public final String file;
 		public final int line;
-		
+
 		private BlameString(String value) {
 			this(value, null, -1);
 		}
-		
+
 		private BlameString(String value, String file, int line) {
 			this.value = value;
 			this.file = file;
@@ -76,17 +76,17 @@ public class QDIni {
 			return line == -1 ? "<unknown>" : "line "+line+" in "+file;
 		}
 	}
-	
+
 	private final String prelude;
 	private final Map<String, List<BlameString>> data;
-	
+
 	private Consumer<String> yapLog;
-	
+
 	private QDIni(String prelude, Map<String, List<BlameString>> data) {
 		this.prelude = prelude;
 		this.data = data;
 	}
-	
+
 	/**
 	 * Enables "yap" mode for parse failures in this config, where rather than throwing a
 	 * BadValueException a warning string will be sent to this Consumer and an empty Optional
@@ -97,17 +97,17 @@ public class QDIni {
 	public void setYapLog(Consumer<String> yapLog) {
 		this.yapLog = yapLog;
 	}
-	
+
 	public boolean containsKey(String key) {
 		return data.containsKey(key) && !data.get(key).isEmpty();
 	}
-	
+
 	public void put(String key, String value) {
 		List<BlameString> li = new ArrayList<>();
 		li.add(new BlameString(value));
 		data.put(key, li);
 	}
-	
+
 	public void put(String key, String... values) {
 		List<BlameString> li = new ArrayList<>();
 		for (String v : values) {
@@ -115,7 +115,7 @@ public class QDIni {
 		}
 		data.put(key, li);
 	}
-	
+
 	public void put(String key, Iterable<String> values) {
 		List<BlameString> li = new ArrayList<>();
 		for (String v : values) {
@@ -123,29 +123,29 @@ public class QDIni {
 		}
 		data.put(key, li);
 	}
-	
+
 	/**
 	 * Return all defined values for the given key, or an empty list if it's not defined.
 	 */
 	public List<String> getAll(String key) {
 		return unwrap(data.get(key));
 	}
-	
+
 	private List<BlameString> getAllBlamed(String key) {
 		return data.containsKey(key) ? data.get(key) : Collections.emptyList();
 	}
-	
+
 	public String getBlame(String key) {
 		return getBlamed(key).map(BlameString::blame).orElse("<unknown>");
 	}
-	
+
 	public String getBlame(String key, int index) {
 		if (containsKey(key)) {
 			return getAllBlamed(key).get(index).blame();
 		}
 		return "<unknown>";
 	}
-	
+
 	private List<String> unwrap(List<BlameString> list) {
 		if (list == null) return Collections.emptyList();
 		return new AbstractList<String>() {
@@ -159,10 +159,10 @@ public class QDIni {
 			public int size() {
 				return list.size();
 			}
-			
+
 		};
 	}
-	
+
 	private String unwrap(BlameString bs) {
 		if (bs == null) return null;
 		return bs.value;
@@ -174,23 +174,23 @@ public class QDIni {
 	public Optional<String> get(String key) {
 		return Optional.ofNullable(getLast(getAll(key)));
 	}
-	
+
 	private Optional<BlameString> getBlamed(String key) {
 		return Optional.ofNullable(getLast(getAllBlamed(key)));
 	}
-	
+
 	public Optional<Integer> getInt(String key) throws BadValueException {
 		return getParsed(key, Integer::parseInt, () -> "a whole number");
 	}
-	
+
 	public Optional<Double> getDouble(String key) throws BadValueException {
 		return getParsed(key, Double::parseDouble, () -> "a number");
 	}
-	
+
 	public Optional<Boolean> getBoolean(String key) throws BadValueException {
 		return getParsed(key, this::strictParseBoolean, () -> "true or false");
 	}
-	
+
 	private boolean strictParseBoolean(String s) {
 		switch (s.toLowerCase(Locale.ROOT)) {
 			case "true": return true;
@@ -198,7 +198,7 @@ public class QDIni {
 			default: throw new IllegalArgumentException();
 		}
 	}
-	
+
 	public <E extends Enum<E>> Optional<E> getEnum(String key, Class<E> clazz) throws BadValueException {
 		return getParsed(key, s -> Enum.valueOf(clazz, s.toUpperCase(Locale.ROOT)), () -> {
 			StringBuilder sb = new StringBuilder("one of ");
@@ -214,7 +214,7 @@ public class QDIni {
 			return sb.toString();
 		});
 	}
-	
+
 	private <T> Optional<T> getParsed(String key, Function<String, ? extends T> parser, Supplier<String> error) throws BadValueException {
 		Optional<String> s = get(key);
 		if (!s.isPresent()) return Optional.empty();
@@ -238,7 +238,7 @@ public class QDIni {
 	public Set<String> keySet() {
 		return data.keySet();
 	}
-	
+
 	public Set<Map.Entry<String, List<String>>> entrySet() {
 		return new AbstractSet<Map.Entry<String, List<String>>>() {
 
@@ -264,10 +264,10 @@ public class QDIni {
 			public int size() {
 				return size();
 			}
-			
+
 		};
 	}
-	
+
 	public int size() {
 		return data.size();
 	}
@@ -293,7 +293,7 @@ public class QDIni {
 		}
 		return sb.toString();
 	}
-	
+
 	/**
 	 * Merge the given QDIni's data with this QDIni's data, returning a new QDIni object. Keys
 	 * defined in the given QDIni will have their values appended to this one's. For usages of
@@ -314,7 +314,7 @@ public class QDIni {
 		}
 		return new QDIni(prelude+", merged with "+that.prelude, Collections.unmodifiableMap(newData));
 	}
-	
+
 	/**
 	 * Return a view of this QDIni's data, dropping multivalues and collapsing to a basic key-value
 	 * mapping that returns the last defined value for any given key.
@@ -326,22 +326,22 @@ public class QDIni {
 			public String get(Object key) {
 				return QDIni.this.get((String)key).orElse(null);
 			}
-			
+
 			@Override
 			public boolean containsKey(Object key) {
 				return QDIni.this.containsKey((String)key);
 			}
-			
+
 			@Override
 			public Set<String> keySet() {
 				return QDIni.this.keySet();
 			}
-			
+
 			@Override
 			public int size() {
 				return QDIni.this.size();
 			}
-			
+
 			@Override
 			public Set<Entry<String, String>> entrySet() {
 				return new AbstractSet<Map.Entry<String,String>>() {
@@ -368,13 +368,13 @@ public class QDIni {
 					public int size() {
 						return size();
 					}
-					
+
 				};
 			}
-			
+
 		};
 	}
-	
+
 	public static QDIni load(String fileName, String s) {
 		try {
 			return load(fileName, new StringReader(s));
@@ -382,27 +382,27 @@ public class QDIni {
 			throw new AssertionError(e);
 		}
 	}
-	
+
 	public static QDIni load(File f) throws IOException {
 		try (InputStream in = new FileInputStream(f)) {
 			return load(f.getName(), in);
 		}
 	}
-	
+
 	public static QDIni load(Path p) throws IOException {
 		try (InputStream in = Files.newInputStream(p)) {
 			return load(p.getFileName().toString(), in);
 		}
 	}
-	
+
 	public static QDIni load(String fileName, InputStream in) throws IOException {
 		return load(fileName, new InputStreamReader(in, StandardCharsets.UTF_8));
 	}
-	
+
 	public static QDIni load(String fileName, Reader r) throws IOException {
 		return loadAndTransform(fileName, r, null, null);
 	}
-	
+
 	public static QDIni loadAndTransform(String fileName, String s, IniTransformer transformer, Writer w) {
 		try {
 			return loadAndTransform(fileName, new StringReader(s), transformer, w);
@@ -410,19 +410,19 @@ public class QDIni {
 			throw new AssertionError(e);
 		}
 	}
-	
+
 	public static QDIni loadAndTransform(File f, IniTransformer transformer, Writer w) throws IOException {
 		try (InputStream in = new FileInputStream(f)) {
 			return loadAndTransform(f.getName(), in, transformer, w);
 		}
 	}
-	
+
 	public static QDIni loadAndTransform(Path p, IniTransformer transformer, Writer w) throws IOException {
 		try (InputStream in = Files.newInputStream(p)) {
 			return loadAndTransform(p.getFileName().toString(), in, transformer, w);
 		}
 	}
-	
+
 	public static QDIni loadAndTransform(String fileName, InputStream in, IniTransformer transformer, Writer w) throws IOException {
 		return loadAndTransform(fileName, new InputStreamReader(in, StandardCharsets.UTF_8), transformer, w);
 	}

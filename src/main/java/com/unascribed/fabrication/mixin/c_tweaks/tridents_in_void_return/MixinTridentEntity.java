@@ -5,6 +5,7 @@ import org.spongepowered.asm.mixin.Shadow;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.data.TrackedData;
@@ -19,13 +20,13 @@ public abstract class MixinTridentEntity extends Entity {
 	public MixinTridentEntity(EntityType<? extends ProjectileEntity> entityType, World world) {
 		super(entityType, world);
 	}
-	
+
 	@Shadow
 	private static TrackedData<Byte> LOYALTY;
 	@Shadow
 	private boolean dealtDamage;
-	
-	
+
+
 	@Override
 	protected void tickInVoid() {
 		TridentEntity self = (TridentEntity)(Object)this;
@@ -38,5 +39,5 @@ public abstract class MixinTridentEntity extends Entity {
 		}
 		super.tickInVoid();
 	}
-	
+
 }

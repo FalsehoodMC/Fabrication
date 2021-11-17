@@ -13,7 +13,7 @@ public enum PlayerTag {
 	NO_PHANTOMS,
 	NO_WANDERING_TRADER,
 	;
-	
+
 	public String lowerName() {
 		return name().toLowerCase(Locale.ROOT);
 	}

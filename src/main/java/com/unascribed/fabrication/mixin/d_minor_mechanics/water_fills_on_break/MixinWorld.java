@@ -2,13 +2,13 @@ package com.unascribed.fabrication.mixin.d_minor_mechanics.water_fills_on_break;
 
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.logic.WaterFillsOnBreak;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
-import org.spongepowered.asm.mixin.injection.At;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.fluid.Fluids;
@@ -38,6 +38,6 @@ public class MixinWorld {
 			}
 		}
 	}
-	
-	
+
+
 }

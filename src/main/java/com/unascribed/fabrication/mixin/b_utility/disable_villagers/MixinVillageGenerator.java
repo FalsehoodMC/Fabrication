@@ -1,4 +1,4 @@
-package com.unascribed.fabrication.mixin.h_situational.disable_villagers;
+package com.unascribed.fabrication.mixin.b_utility.disable_villagers;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,5 +20,5 @@ public class MixinVillageGenerator {
 			ci.cancel();
 		}
 	}
-	
+
 }

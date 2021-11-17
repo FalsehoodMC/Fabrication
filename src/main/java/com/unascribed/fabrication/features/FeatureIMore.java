@@ -12,10 +12,11 @@ import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.command.CommandException;
-import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.EnchantmentArgumentType;
+import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.ItemStackArgument;
 import net.minecraft.command.argument.ItemStackArgumentType;
 import net.minecraft.enchantment.Enchantment;
@@ -37,7 +38,7 @@ public class FeatureIMore implements Feature {
 
 	private boolean applied = false;
 	private boolean registered = false;
-	
+
 	@Override
 	public void apply() {
 		applied = true;
@@ -51,35 +52,35 @@ public class FeatureIMore implements Feature {
 					dispatcher.register(CommandManager.literal(name)
 							.requires(requirement)
 							.then(CommandManager.argument("item", ItemStackArgumentType.itemStack())
-								.then(CommandManager.argument("count", IntegerArgumentType.integer(1))
-									.executes(this::item))
-								.executes(this::item)));
+									.then(CommandManager.argument("count", IntegerArgumentType.integer(1))
+											.executes(this::item))
+									.executes(this::item)));
 				}
 				dispatcher.register(CommandManager.literal("more")
 						.requires(requirement)
 						.then(CommandManager.argument("count", IntegerArgumentType.integer(1))
 								.executes((c) -> more(c, EquipmentSlot.MAINHAND)))
 						.then(CommandManager.literal("main")
-							.then(CommandManager.argument("count", IntegerArgumentType.integer(1))
-								.executes((c) -> more(c, EquipmentSlot.MAINHAND))))
+								.then(CommandManager.argument("count", IntegerArgumentType.integer(1))
+										.executes((c) -> more(c, EquipmentSlot.MAINHAND))))
 						.then(CommandManager.literal("off")
 								.then(CommandManager.argument("count", IntegerArgumentType.integer(1))
-									.executes((c) -> more(c, EquipmentSlot.OFFHAND))))
+										.executes((c) -> more(c, EquipmentSlot.OFFHAND))))
 						.then(CommandManager.literal("both")
 								.then(CommandManager.argument("count", IntegerArgumentType.integer(1))
-									.executes((c) -> { more(c, EquipmentSlot.OFFHAND); return more(c, EquipmentSlot.MAINHAND); })))
+										.executes((c) -> { more(c, EquipmentSlot.OFFHAND); return more(c, EquipmentSlot.MAINHAND); })))
 						.executes((c) -> more(c, EquipmentSlot.MAINHAND)));
 				dispatcher.register(CommandManager.literal("fenchant")
 						.requires(requirement)
 						.then(CommandManager.argument("targets", EntityArgumentType.entities())
-						.then(CommandManager.argument("enchantment", EnchantmentArgumentType.enchantment())
-							.executes((ctx) -> fenchant(ctx.getSource(), EntityArgumentType.getEntities(ctx, "targets"), EnchantmentArgumentType.getEnchantment(ctx, "enchantment"), 1))
-							.then(CommandManager.argument("level", IntegerArgumentType.integer(0))
-								.executes((ctx) -> fenchant(ctx.getSource(), EntityArgumentType.getEntities(ctx, "targets"), EnchantmentArgumentType.getEnchantment(ctx, "enchantment"), IntegerArgumentType.getInteger(ctx, "level")))))));
+								.then(CommandManager.argument("enchantment", EnchantmentArgumentType.enchantment())
+										.executes((ctx) -> fenchant(ctx.getSource(), EntityArgumentType.getEntities(ctx, "targets"), EnchantmentArgumentType.getEnchantment(ctx, "enchantment"), 1))
+										.then(CommandManager.argument("level", IntegerArgumentType.integer(0))
+												.executes((ctx) -> fenchant(ctx.getSource(), EntityArgumentType.getEntities(ctx, "targets"), EnchantmentArgumentType.getEnchantment(ctx, "enchantment"), IntegerArgumentType.getInteger(ctx, "level")))))));
 			});
 		}
 	}
-	
+
 	public int fenchant(ServerCommandSource source, Collection<? extends Entity> targets, Enchantment enchantment, int level) throws CommandSyntaxException {
 		int amt = 0;
 		for (Entity e : targets) {
@@ -118,7 +119,7 @@ public class FeatureIMore implements Feature {
 
 		return amt;
 	}
-	
+
 	public int more(CommandContext<ServerCommandSource> ctx, EquipmentSlot slot) throws CommandSyntaxException {
 		ServerPlayerEntity player = ctx.getSource().getPlayer();
 		ItemStack held = player.getEquippedStack(slot);
@@ -145,7 +146,7 @@ public class FeatureIMore implements Feature {
 		player.equipStack(slot, held);
 		return 1;
 	}
-	
+
 	public int item(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
 		int count;
 		try {

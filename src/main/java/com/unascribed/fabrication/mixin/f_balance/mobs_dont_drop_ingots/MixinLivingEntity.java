@@ -1,19 +1,20 @@
 package com.unascribed.fabrication.mixin.f_balance.mobs_dont_drop_ingots;
 
+import java.util.function.Consumer;
+
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
+
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.registry.Registry;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
-
-import java.util.Map;
-import java.util.function.Consumer;
 
 @Mixin(LivingEntity.class)
 @EligibleIf(configAvailable="*.mobs_dont_drop_ingots")
@@ -37,6 +38,6 @@ public class MixinLivingEntity {
 
 				lootConsumer.accept(stack);
 			};
-		return lootConsumer;
+			return lootConsumer;
 	}
 }

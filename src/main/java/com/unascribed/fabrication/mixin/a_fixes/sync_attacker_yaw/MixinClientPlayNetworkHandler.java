@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
@@ -25,10 +26,10 @@ import net.minecraft.util.Identifier;
 @Mixin(ClientPlayNetworkHandler.class)
 @EligibleIf(configAvailable="*.sync_attacker_yaw", envMatches=Env.CLIENT)
 public class MixinClientPlayNetworkHandler {
-	
+
 	@Shadow @Final
 	private ClientConnection connection;
-	
+
 	@Inject(at=@At("TAIL"), method="onGameJoin(Lnet/minecraft/network/packet/s2c/play/GameJoinS2CPacket;)V")
 	public void onGameJoin(GameJoinS2CPacket packet, CallbackInfo ci) {
 		// this *should* use minecraft:register but it is unclear what format that packet is
@@ -39,7 +40,7 @@ public class MixinClientPlayNetworkHandler {
 		// i don't think anyone has used the REGISTER channel for years, honestly
 		connection.send(new CustomPayloadC2SPacket(new Identifier("fabrication", "attacker_yaw"), new PacketByteBuf(Unpooled.buffer())));
 	}
-	
+
 	@Inject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/s2c/play/CustomPayloadS2CPacket;)V", cancellable=true)
 	public void onCustomPayload(CustomPayloadS2CPacket packet, CallbackInfo ci) {
 		if (packet.getChannel().getNamespace().equals("fabrication") && packet.getChannel().getPath().equals("attacker_yaw")) {
@@ -55,5 +56,5 @@ public class MixinClientPlayNetworkHandler {
 			ci.cancel();
 		}
 	}
-	
+
 }

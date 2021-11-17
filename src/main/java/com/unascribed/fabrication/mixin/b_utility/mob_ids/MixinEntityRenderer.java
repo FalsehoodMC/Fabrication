@@ -25,10 +25,10 @@ public abstract class MixinEntityRenderer {
 
 	@Unique
 	private boolean fabrication$mobIdsShiftTextDown;
-	
+
 	@Shadow
 	protected abstract void renderLabelIfPresent(Entity entity, Text text, MatrixStack matrices, VertexConsumerProvider vcp, int light);
-	
+
 	@Inject(at=@At("TAIL"), method="render(Lnet/minecraft/entity/Entity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")
 	public void render(Entity e, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vcp, int light, CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.mob_ids")) return;
@@ -46,7 +46,7 @@ public abstract class MixinEntityRenderer {
 			matrices.pop();
 		}
 	}
-	
+
 	@Inject(at=@At(value="INVOKE", target="net/minecraft/client/util/math/MatrixStack.scale(FFF)V", shift=At.Shift.AFTER),
 			method="renderLabelIfPresent(Lnet/minecraft/entity/Entity;Lnet/minecraft/text/Text;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")
 	public void renderLabelIfPresentAdjustPosition(Entity e, Text text, MatrixStack matrices, VertexConsumerProvider vcp, int light, CallbackInfo ci) {
@@ -54,5 +54,5 @@ public abstract class MixinEntityRenderer {
 			matrices.translate(0, 19, 0);
 		}
 	}
-	
+
 }

@@ -14,7 +14,7 @@ import net.minecraft.predicate.entity.EntityPredicates;
 public class FeatureTaggablePlayers implements Feature {
 
 	private Predicate<Entity> originalUntargetablePredicate;
-	
+
 	@Override
 	public void apply() {
 		originalUntargetablePredicate = EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR;
@@ -41,7 +41,6 @@ public class FeatureTaggablePlayers implements Feature {
 		return "*.taggable_players";
 	}
 
-	
-	
+
+
 }
-;

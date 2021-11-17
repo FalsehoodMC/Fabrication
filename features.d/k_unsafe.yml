@@ -1,0 +1,31 @@
+# This is not actually a YAML file; it's only .yml for syntax highlighting.
+# Tab indentation *must* be used.
+
+unsafe:
+	name: Unsafe
+	section: true
+	since: 2.1.0
+	default: never
+	desc:
+		QoL changes that make cheating easier.
+
+unsafe.disable_breaking_speed_check:
+	name: Disable Breaking Check
+	since: 2.1.0
+	sides: server_only
+	desc:
+		Server will not check if the client is cheating, when breaking blocks faster then expected.
+		
+		Helpful with block breaking lag when you trust the players.
+
+unsafe.disable_moved_too_quickly:
+	name: Disable Moved Too Quickly
+	since: 2.1.0
+	sides: server_only
+	desc:
+		Server will not check if the client is cheating, when traveling faster then expected.
+		
+		Helpful with rubber banding when you trust the players.
+		
+# kate: space-indent off
+# vim: noai:noet

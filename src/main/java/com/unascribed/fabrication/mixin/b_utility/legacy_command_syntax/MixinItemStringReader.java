@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.unascribed.fabrication.logic.LegacyIDs;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import com.google.common.base.CharMatcher;
 
 import net.minecraft.command.argument.ItemStringReader;
@@ -26,9 +27,9 @@ public class MixinItemStringReader {
 
 	@Shadow
 	private NbtCompound nbt;
-	
+
 	private NbtCompound fabrication$legacyDamageNbt = null;
-	
+
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/util/registry/DefaultedRegistry.getOrEmpty(Lnet/minecraft/util/Identifier;)Ljava/util/Optional;"),
 			method="readItem()V")
 	public Optional<Item> getOrEmpty(DefaultedRegistry<Item> subject, Identifier id) {
@@ -74,7 +75,7 @@ public class MixinItemStringReader {
 		}
 		return subject.getOrEmpty(id);
 	}
-	
+
 	@Inject(at=@At("RETURN"), method="consume()Lnet/minecraft/command/argument/ItemStringReader;")
 	public void consume(CallbackInfoReturnable<ItemStringReader> ci) {
 		if (fabrication$legacyDamageNbt != null) {
@@ -85,5 +86,5 @@ public class MixinItemStringReader {
 			}
 		}
 	}
-	
+
 }

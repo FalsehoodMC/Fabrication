@@ -21,5 +21,5 @@ public class MixinAnvilScreenHandlerClient {
 			ci.setReturnValue(0);
 		}
 	}
-	
+
 }

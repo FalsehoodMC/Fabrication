@@ -15,7 +15,7 @@ import net.minecraft.entity.EntityPose;
 @Mixin(Entity.class)
 @EligibleIf(configAvailable="*.crawling")
 public class MixinEntity {
-	
+
 	@Inject(at=@At("HEAD"), method="wouldPoseNotCollide(Lnet/minecraft/entity/EntityPose;)Z", cancellable=true)
 	public void wouldPoseNotCollide(EntityPose pose, CallbackInfoReturnable<Boolean> ci) {
 		if (MixinConfigPlugin.isEnabled("*.crawling") && this instanceof SetCrawling) {
@@ -26,5 +26,5 @@ public class MixinEntity {
 			}
 		}
 	}
-	
+
 }

@@ -21,7 +21,7 @@ public abstract class MixinServerPlayerEntity extends PlayerEntity {
 	public MixinServerPlayerEntity(World world, BlockPos pos, float yaw, GameProfile profile) {
 		super(world, pos, yaw, profile);
 	}
-	
+
 	@Inject(at=@At("HEAD"), method="copyFrom(Lnet/minecraft/server/network/ServerPlayerEntity;Z)V", cancellable=true)
 	public void copyFrom(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
 		if (this instanceof SetAttackerYawAware) {
@@ -32,5 +32,5 @@ public abstract class MixinServerPlayerEntity extends PlayerEntity {
 			}
 		}
 	}
-	
+
 }

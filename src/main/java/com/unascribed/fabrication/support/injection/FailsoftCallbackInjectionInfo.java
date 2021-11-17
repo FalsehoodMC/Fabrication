@@ -13,7 +13,7 @@ public class FailsoftCallbackInjectionInfo extends CallbackInjectionInfo {
 	public FailsoftCallbackInjectionInfo(MixinTargetContext mixin, MethodNode method, AnnotationNode annotation) {
 		super(mixin, method, annotation);
 	}
-	
+
 	@Override
 	public void postInject() {
 		if (Failsoft.postInject(this, mixin, getDescription(), getDynamicInfo() + getMessages())) {

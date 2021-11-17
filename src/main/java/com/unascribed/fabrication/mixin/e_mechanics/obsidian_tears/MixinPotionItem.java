@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.unascribed.fabrication.logic.ObsidianTears;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.PotionItem;
@@ -25,5 +26,5 @@ public class MixinPotionItem {
 			ObsidianTears.setSpawnPoint((ServerPlayerEntity)quaffer, stack);
 		}
 	}
-	
+
 }
