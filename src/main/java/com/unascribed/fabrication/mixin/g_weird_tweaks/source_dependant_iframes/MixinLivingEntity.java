@@ -32,7 +32,7 @@ public abstract class MixinLivingEntity extends Entity implements TickSourceIFra
 	@Inject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z")
 	private void checkDependentIFrames(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
 		if (!MixinConfigPlugin.isEnabled("*.source_dependant_iframes")) return;
-		if (fabrication$iframeTracker.add(source.getName())) {
+		if (fabrication$iframeTracker.add(source.getName() + (source.getAttacker() == null || source.getAttacker().getUuid() == null ? ":direct" :  source.getAttacker().getUuid().toString()))) {
 			this.timeUntilRegen = 0;
 		}else {
 			this.timeUntilRegen = 20;
