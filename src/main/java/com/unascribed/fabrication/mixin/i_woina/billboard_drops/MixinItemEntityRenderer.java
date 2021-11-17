@@ -18,7 +18,6 @@ import net.minecraft.client.render.entity.ItemEntityRenderer;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.ItemEntity;
-import net.minecraft.util.math.Matrix4f;
 
 @Mixin(ItemEntityRenderer.class)
 @EligibleIf(configAvailable="*.billboard_drops", envMatches=Env.CLIENT)
@@ -31,8 +30,7 @@ public class MixinItemEntityRenderer {
 			method="render(Lnet/minecraft/entity/ItemEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")
 	public void render(ItemEntity entity, float f, float g, MatrixStack matrices, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci) {
 		if (MixinConfigPlugin.isEnabled("*.billboard_drops") && FlatItems.hasGeneratedModel(entity.getStack())) {
-			// multiply the model matrix directly to avoid corrupting normals
-			matrices.peek().getModel().multiply(Matrix4f.scale(1, 1, 0));
+			matrices.scale(1, 1, 0.01f);
 		}
 	}
 
