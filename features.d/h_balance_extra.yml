@@ -1,6 +1,24 @@
 # This is not actually a YAML file; it's only .yml for syntax highlighting.
 # Tab indentation *must* be used.
 
+balance.extra.infinity_mending:
+	name: Infinity & Mending
+	since: 1.0
+	sides: server_only
+	default: burnt
+	media: https://unascribed.com/fabrication/infinity_mending.mp4
+	desc:
+		Makes Mending and Infinity compatible enchantments.
+
+balance.extra.anvil_damage_only_on_fall:
+	name: Anvils Take Damage Only When Falling
+	since: 1.1
+	sides: server_only
+	default: burnt
+	media: https://unascribed.com/fabrication/anvil_damage_only_on_fall.mp4
+	desc:
+		Anvils only take damage when falling from a height rather than randomly after being used.
+
 balance.extra.player_free_spawners:
 	name: Player Free Spawners
 	since: 1.3.0

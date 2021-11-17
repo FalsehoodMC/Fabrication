@@ -41,15 +41,6 @@ balance.soul_speed_doesnt_damage_boots:
 	desc:
 		Makes running on soul blocks with Soul Speed not deal damage to your boots.
 
-balance.infinity_mending:
-	name: Infinity & Mending
-	since: 1.0
-	sides: server_only
-	default: burnt
-	media: https://unascribed.com/fabrication/infinity_mending.mp4
-	desc:
-		Makes Mending and Infinity compatible enchantments.
-
 balance.hyperspeed_furnace_minecart:
 	name: Hyperspeed Furnace Minecart
 	since: 1.0
@@ -109,15 +100,6 @@ balance.environmentally_friendly_creepers:
 	media: https://unascribed.com/fabrication/environmentally_friendly_creepers.mp4
 	desc:
 		Creeper explosions deal entity damage, but not block damage, even if mobGriefing is true.
-
-balance.anvil_damage_only_on_fall:
-	name: Anvils Take Damage Only When Falling
-	since: 1.1
-	sides: server_only
-	default: burnt
-	media: https://unascribed.com/fabrication/anvil_damage_only_on_fall.mp4
-	desc:
-		Anvils only take damage when falling from a height rather than randomly after being used.
 
 balance.drop_more_exp_on_death:
 	name: Drop More Experience On Death
