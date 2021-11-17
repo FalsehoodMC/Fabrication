@@ -512,8 +512,8 @@ public class FabricationConfigScreen extends Screen {
 				BufferBuilder bb = Tessellator.getInstance().getBuffer();
 				Matrix4f mat = matrices.peek().getModel();
 				bb.begin(DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-				bb.vertex(mat, 0, y-thisHeight, 0).color(1, 1, 1, 0.2f).next();
-				bb.vertex(mat, 130*selectA, y-thisHeight, 0).color(1, 1, 1, 0.2f+((1-selectA)*0.8f)).next();
+				bb.vertex(mat, 0, y-thisHeight-8, 0).color(1, 1, 1, 0.2f).next();
+				bb.vertex(mat, 130*selectA, y-thisHeight-8, 0).color(1, 1, 1, 0.2f+((1-selectA)*0.8f)).next();
 				bb.vertex(mat, 130*selectA, y, 0).color(1, 1, 1, 0.2f+((1-selectA)*0.8f)).next();
 				bb.vertex(mat, 0, y, 0).color(1, 1, 1, 0.2f).next();
 				bb.end();
