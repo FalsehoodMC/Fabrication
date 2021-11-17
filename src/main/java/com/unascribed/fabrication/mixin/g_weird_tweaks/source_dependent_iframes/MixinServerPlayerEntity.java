@@ -1,4 +1,4 @@
-package com.unascribed.fabrication.mixin.g_weird_tweaks.source_dependant_iframes;
+package com.unascribed.fabrication.mixin.g_weird_tweaks.source_dependent_iframes;
 
 import com.unascribed.fabrication.interfaces.TickSourceIFrames;
 import com.unascribed.fabrication.support.EligibleIf;
@@ -10,12 +10,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerPlayerEntity.class)
-@EligibleIf(configAvailable="*.source_dependant_iframes")
+@EligibleIf(configAvailable="*.source_dependent_iframes")
 public abstract class MixinServerPlayerEntity {
 
 	@Inject(at=@At("HEAD"), method= "tick()V")
 	private void tickSourceDependentIFrames(CallbackInfo ci) {
-		if (!MixinConfigPlugin.isEnabled("*.source_dependant_iframes")) return;
+		if (!MixinConfigPlugin.isEnabled("*.source_dependent_iframes")) return;
 		((TickSourceIFrames)this).fabrication$tickSourceDependentIFrames();
 	}
 	

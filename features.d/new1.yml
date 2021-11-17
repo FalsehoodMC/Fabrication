@@ -1,5 +1,5 @@
-weird_tweaks.extra.source_dependant_iframes:
-	name: Source Dependant Invulnerability Frames
+weird_tweaks.extra.source_dependent_iframes:
+	name: Source Dependent Invulnerability Frames
 	since: 2.1.0
 	sides: server_only
 	desc:
