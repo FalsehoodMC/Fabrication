@@ -1655,6 +1655,14 @@ weird_tweaks.chaining_creepers
 	desc:
 		Creepers explode after taking explosion damage.
 
+weird_tweaks.foliage_creepers
+	name: Foliage Creepers
+	since: 2.1.0
+	sides: client_only
+	default: never
+	desc:
+		Creepers will take on the foliage color of the biome their in.
+
 weird_tweaks.villager_trades_reset
 	name: Villager Trades Reset
 	since: 2.1.0
