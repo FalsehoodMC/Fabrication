@@ -1,0 +1,239 @@
+utility:
+	name: Utility
+	section: true
+	since: 1.0
+	default: blonde
+	desc:
+		Useful tidbits that don't modify gameplay.
+
+utility.mods_command:
+	name: /mods Command
+	since: 1.0
+	sides: server_only
+	needs: events
+	media: https://unascribed.com/fabrication/mods_command.mp4
+	short_desc: Adds a /mods command in the same vein as Bukkit's /plugins
+	desc:
+		Adds a /mods command listing all mods on the server. Hovering over the mods shows their
+		descriptions, clicking on them takes you to their homepage if they have one.
+		
+		If Bukkit is not present, also adds a /plugins command suggesting people use /mods instead.
+
+utility.taggable_players:
+	name: Taggable Players
+	since: 1.0
+	sides: server_only
+	media: https://unascribed.com/fabrication/taggable_players.mp4
+	needs: events
+	short_desc: Allows assigning various "tags" to players, such as no_hunger or invisible_to_mobs
+	desc:
+		Allows you to assign or unassign various "tags" from players via /fabrication tag.
+		
+		Valid tags:  
+		* invisible_to_mobs - The player cannot be targeted by mobs at all. Sorta like Apathetic Mobs.  
+		* no_hunger - The player never loses food, and when they eat food it instead heals them directly. Sorta like Hunger Strike.  
+		* fireproof - The player cannot take fire damage.  
+		* can_breathe_water - The player does not lose air while underwater.  
+		* permanent_dolphins_grace - The player always has Dolphin's Grace.  
+		* permanent_conduit_power - The player always has Conduit Power.  
+		* scares_creepers - (Since 1.1) The player scares creepers.  
+		* no_phantoms - (Since 1.1) The player cannot have phantoms spawn on them.
+		* no_wandering_trader - (Since 2.1.0) The player cannot have wandering traders spawn on them.
+		
+utility.legacy_command_syntax:
+	name: Legacy Command Syntax
+	since: 1.0
+	sides: server_only
+	needs: events
+	media: https://unascribed.com/fabrication/legacy_command_syntax.mp4
+	short_desc: Brings back various kinds of old command syntax; old habits die hard
+	desc:
+		Allows numeric arguments to /gamemode and /difficulty, re-adds /toggledownfall, allows
+		TitleCase arguments to /summon, allows numeric arguments to commands that accept items
+		like /give, and re-adds shorthand to /xp.
+		
+		Old habits die hard.
+
+utility.books_show_enchants:
+	name: Books Show Enchants
+	since: 1.0
+	sides: client_only
+	media: https://unascribed.com/fabrication/books_show_enchants.mp4
+	short_desc: Enchanted books show the first letter of their enchant
+	desc:
+		Makes enchanted books show the first letter of their enchants in the bottom left, cycling
+		through enchants every second if they have multiple.
+
+utility.tools_show_important_enchant:
+	name: Tools Show Important Enchant
+	since: 1.0
+	sides: client_only
+	media: https://unascribed.com/fabrication/tools_show_important_enchant.mp4
+	short_desc: Tools show the first letter of their "important" enchant
+	desc:
+		Makes tools enchanted with Silk Touch, Fortune, or Riptide show the first letter of that
+		enchant in the top left.
+		
+		Never break an Ender Chest with the wrong tool again.
+
+utility.despawning_items_blink:
+	name: Despawning Items Blink
+	since: 1.1
+	sides: server_and_client
+	media: https://unascribed.com/fabrication/despawning_items_blink.mp4
+	desc:
+		Makes items that are about to despawn blink. The despawn timer is synced from the server, so
+		this only works if the server also has it installed, but it means that the blinking only
+		happens when it should.
+
+utility.canhit:
+	name: CanHit
+	since: 1.2.1
+	sides: server_only_with_client_helper
+	media: https://unascribed.com/fabrication/canhit.mp4
+	short_desc: A CanHit tag for weapons in the same vein as CanDestroy/CanPlaceOn
+	desc:
+		Adds a new CanHit tag that affects melee attacks, bows, crossbows, and tridents. Also works
+		on arrows and fireworks, in which case the restrictions will be AND'd with the restrictions
+		of the bow or crossbow doing the firing.
+		
+		The tag must be a list of strings, which may contain UUIDs that match a specific entity or
+		an entity type ID optionally prefixed with a ! to invert the match.
+		
+		If installed on the client, adds hit information to the tooltip. You can hide this
+		information by creating an NBT byte set to 1 called "HideCanHit".
+		
+		For example, a sword that can only hit spiders: /give @p diamond_sword{CanHit:["spider"]}
+		
+		A sword that can hit anything but creepers: /give @p diamond_sword{CanHit:["!creeper"]}
+
+utility.item_despawn:
+	name: Item Despawn Control
+	since: 1.1
+	sides: server_only
+	link_url: https://github.com/unascribed/Fabrication/blob/trunk/src/main/resources/default_item_despawn_config.ini
+	link_text: See the default config for more info
+	short_desc: Allows fine-grained control over item despawn times
+	desc:
+		Allows fine-grained control over item despawn times and making items invulnerable to
+		all forms of damage including the void. You can filter by the item ID, whether the item was
+		dropped by a player, if the item was dropped by a player dying, what enchantments are on the
+		item, if the item is cursed, arbitrary NBT booleans, and block or item tags.
+		
+		Configured in config/fabrication/item_despawn.ini.
+
+utility.i_and_more:
+	name: /i And More
+	since: 1.2.5
+	sides: server_only
+	needs: events
+	media: https://unascribed.com/fabrication/i_and_more.mp4
+	desc:
+		Adds /i, /item, /more, and /fenchant commands.
+		
+		/i and /item are shorthand for /give to yourself, and /more increases the size of your held
+		item's stack. /fenchant is like /enchant but it ignores all restrictions.
+
+utility.killmessage:
+	name: KillMessage
+	since: 1.2.11
+	sides: server_only
+	short_desc: Allows customizing kill messages for summoned entities and spawned items
+	desc:
+		Adds a KillMessage NBT tag to entities and items, allowing them to show a custom death
+		message when they kill a player. You can use placeholders to show the name of the killed
+		entity, the name of the killing entity, or the name of the killing entity's held item, in
+		that order.
+		
+		For example, "%s found a %s" would show e.g. "unascribed found a Skeleton". You could also
+		write this as "%1$s found a %2$s" for the same result, or, say "A %2$s found %1$s" to show
+		them in the opposite order, e.g. "A Skeleton found unascribed". The third %s or a %3$s will
+		show the item name; if there isn't one, [Air] will be shown.
+
+utility.toggle_stance:
+	name: Toggle Stance
+	since: 1.3.0
+	sides: client_only
+	needs: events
+	media: https://unascribed.com/fabrication/toggle_stance.mp4
+	desc:
+		Adds a "Toggle Stance" keybind to switch between standing and sneaking. Vanilla has an
+		accessibility option to make the existing Sneak key work as a toggle, but it can be useful
+		to have a hold-to-sneak and toggle-sneak button at the same time.
+		
+		Interacts with Minor Mechanics > Crawling; if they are both enabled, the Toggle Stance key
+		will cycle between standing, sneaking, and crawling.
+
+utility.hide_armor:
+	name: Hide Armor
+	since: 1.3.0
+	sides: server_only_with_client_helper
+	needs: events
+	media: https://unascribed.com/fabrication/hide_armor.mp4
+	desc:
+		Adds /hidearmor and /showarmor commands to hide and show your armor. Works with vanilla
+		clients for hiding armor from others; for hiding armor from yourself to work, must be
+		present on client.
+
+utility.yeet_recipes:
+	name: Yeet Recipes
+	since: 1.3.2
+	sides: server_only
+	desc:
+		Adds a yeet_recipes.ini that can be used to completely remove any recipe.
+
+utility.mob_ids:
+	name: Mob IDs
+	since: 1.3.2
+	sides: client_only
+	media: https://unascribed.com/fabrication/mob_ids.mp4
+	desc:
+		Makes entities show their entity ID as a nametag in Creative when F3 is up. Originally a
+		vanilla feature; was removed in Beta 1.8 as nametags are visible through walls and it was
+		a bit cheaty in Survival.
+
+utility.toggle_sprint:
+	name: Toggle Sprint
+	since: 1.4.0
+	sides: client_only
+	needs: events
+	desc:
+		Adds a "Toggle/Hold Sprint" keybind.
+		Vanilla has an accessibility option to make the Sneak key work as a toggle,
+		since it can be useful to have a hold and toggle button at the same time
+		this keybind will take the other mode of the accessibility setting.
+
+utility.show_map_id:
+	name: Show Map ID
+	since: 1.4.0
+	sides: client_only
+	desc:
+		Makes filled maps show their ID.
+
+utility.ping_privacy:
+	name: Ping Privacy
+	since: 1.4.0
+	sides: server_only
+	media: https://unascribed.com/fabrication/ping_privacy.png
+	desc:
+		Sends no ping data to IPs that have not successfully logged in in the last 7 days.
+		
+		Prevents scraping. There exist services that constantly ping servers they know about and
+		track their uptime and who's connected, which will then turn around and store the name
+		history of discovered users permanently and make their cape publicly searchable, among
+		other things.
+
+utility.show_bee_count_tooltip:
+	name: Show Bee Count
+	since: 1.4.0
+	sides: client_only
+	desc:
+		Makes bee hive tooltips show amount of contained bees.
+
+utility.show_bee_count_on_item:
+	name: Show Bee Count
+	since: 1.4.0
+	sides: client_only
+	default: never
+	desc:
+		Makes bee hive items show amount of contained bees.

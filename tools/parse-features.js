@@ -46,9 +46,6 @@ let currentVersion = /version\s+=\s+(.*?)\s+/.exec(fs.readFileSync('gradle.prope
 let currentVersionCode = versionNamesToCodes[currentVersion];
 
 let data = [];
-let lines = fs.readFileSync(process.argv[2] || 'features.txt').toString('utf8').split(/\r?\n/g);
-let curKey = null;
-let cur = {};
 let defaults = (curKey, cur) => ({
 	name: curKey,
 	short_name: cur && cur.name || null,
@@ -74,96 +71,131 @@ let defaults = (curKey, cur) => ({
 	fscript_default: null,
 	new: (cur ? cur.since_code ? cur.since_code : versionNamesToCodes[cur.since] : 9999) >= currentVersionCode-1
 });
-let lineNum = 0;
-let multilineKey = null
-let multilineBuf = "";
 
-function commitMultiline() {
-	if (multilineKey !== null) {
-		cur[multilineKey] = multilineBuf.trim().replace(/ +\n/g, '\n');
-	}
-	multilineKey = null;
-	multilineBuf = "";
-}
-
-function commit() {
-	commitMultiline();
-	cur = Object.assign(defaults(curKey, cur), cur);
-	cur.key = curKey;
-	data.push(cur);
-	curKey = null;
-	cur = {};
-}
-
-lines.forEach((line) => {
-	lineNum++;
-	let trim = line.trim();
-	if (trim.indexOf('#') == 0) return;
-	let leadingTabs = 0;
-	for (let i = 0; i < line.length; i++) {
-		if (line.charAt(i) == '\t') {
-			leadingTabs++;
-		} else {
-			break;
-		}
-	}
-	if (leadingTabs == 0) {
-		if (trim.length > 0) {
-			if (curKey != null) {
-				commit();
-			}
-			curKey = trim;
-		} else {
-			if (multilineKey !== null) {
-				multilineBuf += "\n";
-			}
-		}
-	} else if (curKey == null) {
-		console.error("At line "+lineNum+": Got an indented line before a key definition. Ignoring");
+function parseFile(file) {
+	let stat = fs.statSync(file, {throwIfNoEntry: false});
+	if (!stat) {
+		console.error(file+" was not found");
 		return;
-	} else {
-		if (leadingTabs == 1) {
-			if (multilineKey !== null) {
-				commitMultiline();
+	}
+	if (stat.isDirectory()) {
+		fs.readdirSync(file).forEach(e => parseFile(file+"/"+e));
+		return;
+	}
+	
+	function commitMultiline() {
+		if (multilineKey !== null) {
+			cur[multilineKey] = multilineBuf.trim().replace(/ +\n/g, '\n');
+		}
+		multilineKey = null;
+		multilineBuf = "";
+	}
+
+	function commit() {
+		commitMultiline();
+		cur = Object.assign(defaults(curKey, cur), cur);
+		cur.key = curKey;
+		data.push(cur);
+		curKey = null;
+		cur = {};
+	}
+	
+
+	let lines = fs.readFileSync(file).toString('utf8').split(/\r?\n/g);
+	let curKey = null;
+	let cur = {};
+	let lineNum = 0;
+	let multilineKey = null
+	let multilineBuf = "";
+
+	lines.forEach((line) => {
+		lineNum++;
+		if (line.indexOf('@') == 0) {
+			let split = line.split(" ");
+			switch (split[0]) {
+				case "@include":
+					parseFile(split[1]);
+					break;
+				default:
+					console.error("At line "+lineNum+" in "+file+": Unknown at-directive "+split[0]+". Ignoring");
 			}
-			let colonIdx = trim.indexOf(':');
-			if (colonIdx == -1) {
-				console.error("At line "+lineNum+": Got a single-indented line with no colon. Ignoring");
-				return;
-			}
-			let k = trim.substring(0, colonIdx).trim();
-			if (typeof defaults(curKey, null)[k] === 'undefined') {
-				console.error("At line "+lineNum+": Got an unknown key "+k+". Ignoring");
-				return;
-			}
-			let v = trim.substring(colonIdx+1).trim();
-			if (v === '') {
-				multilineKey = k;
+			return;
+		}
+		let trim = line.trim();
+		if (trim.indexOf('#') == 0) return;
+		let leadingTabs = 0;
+		for (let i = 0; i < line.length; i++) {
+			if (line.charAt(i) == '\t') {
+				leadingTabs++;
 			} else {
-				switch (k) {
-					case 'needs':
-						v = v.split(' ');
-						break;
-					case 'endorsed': case 'hidden': case 'section': case 'meta':
-						v = (v === 'false' ? false : v === 'true' ? true : v);
-						break;
-				}
-				cur[k] = v;
+				break;
 			}
-		} else if (leadingTabs >= 2) {
-			if (multilineKey !== null) {
-				if (trim.length === 0) {
-					// paragraph separator
-					multilineBuf += "\n\n";
+		}
+		if (leadingTabs == 0) {
+			if (trim.length > 0) {
+				if (curKey != null) {
+					commit();
+				}
+				if (trim.lastIndexOf(":") == trim.length-1) {
+					// yaml syntax compatibility
+					trim = trim.slice(0, -1);
+				}
+				curKey = trim;
+			} else {
+				if (multilineKey !== null) {
+					multilineBuf += "\n";
+				}
+			}
+		} else if (curKey == null) {
+			console.error("At line "+lineNum+" in "+file+": Got an indented line before a key definition. Ignoring");
+			return;
+		} else {
+			if (leadingTabs == 1) {
+				if (multilineKey !== null) {
+					commitMultiline();
+				}
+				let colonIdx = trim.indexOf(':');
+				if (colonIdx == -1) {
+					console.error("At line "+lineNum+" in "+file+": Got a single-indented line with no colon. Ignoring");
+					return;
+				}
+				let k = trim.substring(0, colonIdx).trim();
+				if (typeof defaults(curKey, null)[k] === 'undefined') {
+					console.error("At line "+lineNum+" in "+file+": Got an unknown key "+k+". Ignoring");
+					return;
+				}
+				let v = trim.substring(colonIdx+1).trim();
+				if (v === '') {
+					multilineKey = k;
 				} else {
-					multilineBuf += line.substring(2)+" ";
-					if (/  $/.exec(line)) multilineBuf += "\n";
+					switch (k) {
+						case 'needs':
+							v = v.split(' ');
+							break;
+						case 'endorsed': case 'hidden': case 'section': case 'meta':
+							v = (v === 'false' ? false : v === 'true' ? true : v);
+							break;
+					}
+					cur[k] = v;
+				}
+			} else if (leadingTabs >= 2) {
+				if (multilineKey !== null) {
+					if (trim.length === 0) {
+						// paragraph separator
+						multilineBuf += "\n\n";
+					} else {
+						multilineBuf += line.substring(2)+" ";
+						if (/  $/.exec(line)) multilineBuf += "\n";
+					}
 				}
 			}
 		}
-	}
-});
-if (curKey !== null) commit();
+	});
+	if (curKey !== null) commit();
+}
+
+parseFile(process.argv[2] || 'features.yml');
+
 let sections = ["general", "fixes", "utility", "tweaks", "minor_mechanics", "mechanics", "balance", "weird_tweaks", "woina", "pedantry", "situational", "experiments"];
 data.sort((a, b) => {
 	let sectionA = a.key.indexOf('.') === -1 ? a.key : a.key.substring(0, a.key.indexOf('.'));

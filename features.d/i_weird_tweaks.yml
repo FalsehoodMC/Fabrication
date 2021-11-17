@@ -1,0 +1,235 @@
+weird_tweaks:
+	name: Weird Tweaks
+	section: true
+	since: 1.0
+	default: vienna
+	desc:
+		Opinionated changes.
+
+weird_tweaks.creepers_explode_when_on_fire:
+	name: Creepers Explode When On Fire
+	since: 1.0
+	sides: server_only
+	fscript: living_entity
+	fscript_default: on_fire
+	default: never
+	media: https://unascribed.com/fabrication/creepers_explode_when_on_fire.mp4
+	desc:
+		Causes creepers to light their fuses when lit on fire. Just because.
+
+weird_tweaks.endermen_dont_squeal:
+	name: Endermen Don't Squeal
+	since: 1.0
+	sides: either
+	desc:
+		Makes Endermen not make their growling or screeching sounds when angry.
+		
+		On client, mutes the sounds for just you. This means angry endermen don't make ambient
+		sounds.
+		
+		On server, replaces the angry ambient sound with the normal ambient sound for everyone. The
+		stare sound is client-sided, unfortunately.
+
+weird_tweaks.disable_equip_sound:
+	name: Disable Equip Sound
+	since: 1.0
+	sides: either
+	desc:
+		Disables the unnecessary "Gear equips" sound that plays when your hands change, and is often
+		glitchily played every tick. Armor equip sounds and other custom equip sounds remain
+		unchanged. You won't even notice it's gone.
+		
+		On client, mutes it just for you.
+		
+		On server, prevents the sound from playing at all for everyone.
+
+weird_tweaks.repelling_void:
+	name: Déjà Void
+	since: 1.0
+	sides: server_only
+	media: https://unascribed.com/fabrication/repelling_void.mp4
+	desc:
+		Players falling into the void teleports them back to the last place they were on the ground
+		and deals 6 hearts of unblockable void damage.
+
+weird_tweaks.drop_exp_with_keep_inventory:
+	name: Drop Experience With keepInventory
+	since: 1.2.1
+	sides: server_only
+	media: https://unascribed.com/fabrication/drop_exp_with_keepinventory.mp4
+	desc:
+		If keepInventory is enabled, players still drop their experience when dying, but do so
+		losslessly. Incents returning to where you died even when keepInventory is enabled.
+
+weird_tweaks.dimensional_tools:
+	name: Dimensional Tools
+	since: 1.2.10
+	sides: server_only_with_client_helper
+	media: https://unascribed.com/fabrication/gold_tools_useful_in_nether.mp4
+	link_url: https://github.com/unascribed/Fabrication/blob/trunk/src/main/resources/default_dimensional_tools_config.ini
+	link_text: See the default config for more info
+	short_desc: Completely configurable dimensional tool bonuses/penalties
+	desc:
+		By default, makes breaking nether blocks deal 50x damage to non-golden and non-netherite
+		tools, and makes golden tools take 1/50th the damage when breaking the same blocks, bringing
+		their durability just above diamond. Also makes wooden tools crafted with nether planks into
+		"Fungal" tools, and stone tools crafted with blackstone into "Blackstone" tools, which also
+		get the 1/50th damage bonus. Completely configurable; see
+		config/fabrication/dimensional_tools.ini.
+		
+		On client, adjusts tooltips to show fractional damage.
+		
+		Inspired by a joke video.
+
+weird_tweaks.photoallergic_creepers:
+	name: Photoallergic Creepers
+	since: 1.2.4
+	sides: server_only
+	default: burnt
+	media: https://unascribed.com/fabrication/photoallergic_creepers.mp4
+	desc:
+		Creepers burn in sunlight. Very dangerous in combination with Creepers Explode When On Fire.
+		
+		Takes precedence over Photoresistant Mobs if that is also enabled, allowing you to make only
+		creepers burn in sunlight.
+
+weird_tweaks.photoresistant_mobs:
+	name: Photoresistant Mobs
+	since: 1.2.4
+	sides: server_only
+	default: burnt
+	media: https://unascribed.com/fabrication/photoresistant_mobs.mp4
+	desc:
+		Mobs don't burn in sunlight.
+
+weird_tweaks.underwater_explosions:
+	name: Underwater Explosions
+	since: 1.3.2
+	sides: server_only
+	default: burnt
+	media: https://unascribed.com/fabrication/underwater_explosions.mp4
+	desc:
+		TNT and other explosives do block damage even underwater.
+
+weird_tweaks.instant_pickup:
+	name: Instant Pickup
+	since: 1.3.2
+	sides: server_only
+	media: https://unascribed.com/fabrication/instant_pickup.mp4
+	desc:
+		Drops from blocks and entities are instantly placed in your inventory if there's room. This
+		is animated and everything.
+
+weird_tweaks.endermen_dont_grief:
+	name: Endermen Don't Grief
+	since: 1.3.4
+	sides: server_only
+	desc:
+		Endermen no longer place or pickup blocks.
+
+weird_tweaks.item_safe_cactus:
+	name: Item Safe Cactus
+	since: 1.4.0
+	sides: server_only
+	media: https://unascribed.com/fabrication/item_safe_cactus.mp4
+	desc:
+		Items don't get destroyed by cactus blocks.
+
+weird_tweaks.blaze_fertilizer:
+	name: Blaze Powder Grows Nether Wart
+	since: 1.4.0
+	sides: server_only
+	media: https://unascribed.com/fabrication/blaze_fertilizer.mp4
+	desc:
+		Blaze powder behaves as bone meal for nether wart.
+
+weird_tweaks.use_items_while_riding:
+	name: Use Items While Riding
+	since: 1.4.0
+	sides: client_only
+	desc:
+		Allows players to use items and attack while riding entities like boats.
+
+weird_tweaks.villagers_follow_emerald_blocks:
+	name: Villagers Follow Emerald Blocks
+	since: 1.4.0
+	sides: server_only
+	desc:
+		Villagers will follow players holding emerald blocks.
+
+weird_tweaks.disable_nether_fog:
+	name: Disable Nether Fog
+	since: 1.4.0
+	sides: client_only
+	media: https://unascribed.com/fabrication/disable_nether_fog.mp4
+	desc:
+		Removes thick nether fog.
+
+weird_tweaks.disable_night_skip:
+	name: Disable Night Skip
+	since: 1.4.0
+	sides: server_only
+	fscript: server_player_entity
+	media: https://unascribed.com/fabrication/disable_night_skip.mp4
+	desc:
+		Prevents beds from skipping the night.
+
+weird_tweaks.leaves_grow_grass:
+	name: Leaves Grow Grass
+	since: 1.4.0
+	sides: server_only
+	desc:
+		Grass and tall grass can be placed on leaves.
+
+		Using Bone Meal on leaves makes them grow grass.
+
+weird_tweaks.chaining_creepers:
+	name: Chaining Creepers
+	since: 2.1.0
+	sides: server_only
+	desc:
+		Creepers explode after taking explosion damage.
+
+weird_tweaks.foliage_creepers:
+	name: Foliage Creepers
+	since: 2.1.0
+	sides: client_only
+	default: never
+	desc:
+		Creepers will take on the foliage color of the biome their in.
+
+weird_tweaks.villager_trades_reset:
+	name: Villager Trades Reset
+	since: 2.1.0
+	sides: server_only
+	default: never
+	desc:
+		Instead of restocking villagers will completely reset their trades.
+		This also soft-limits the trades to the villager's level (one trade of each level).
+
+weird_tweaks.disable_breaking_speed_check:
+	name: Disable Breaking Check
+	since: 2.1.0
+	sides: server_only
+	default: never
+	desc:
+		Server will not check if the client is cheating, when breaking blocks faster then expected.
+		Helpful with block breaking lag when you trust the players.
+
+weird_tweaks.disable_moved_too_quickly:
+	name: Disable Moved Too Quickly
+	since: 2.1.0
+	sides: server_only
+	default: never
+	desc:
+		Server will not check if the client is cheating, when traveling faster then expected.
+		Helpful with rubber banding when you trust the players.
+
+weird_tweaks.no_dolphin_theft:
+	name: No Dolphin Theft
+	since: 2.1.0
+	sides: server_only
+	default: never
+	desc:
+		Prevents dolphins from picking up items.
+

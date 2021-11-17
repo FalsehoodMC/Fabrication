@@ -1,0 +1,52 @@
+config_screen:
+	name: Config Screen
+	meta: true
+	media: https://unascribed.com/fabrication/config_screen.mp4
+	desc:
+		Fabrication has a nice ingame configuration GUI accessed via Mod Menu on Fabric or the
+		built-in Mods screen on Forge. It can be used to change profiles and toggle all features.
+		
+		The GUI is client/server aware (note Fabrication does not currently have config syncing
+		outside of the GUI) and can be used to view the server's config, or even change it if you're
+		an op.
+
+config_command:
+	name: Config Command
+	meta: true
+	desc:
+		The /fabrication command has a "config" subcommand that can be used to reload config files,
+		set config keys, and get config keys. This is useful from command blocks (used extensively
+		in the demo videos), from non-Fabrication clients, or from Forge clients (no ingame Mods
+		button in 1.16)
+
+block_distribution_analysis:
+	name: Block Distribution Analysis
+	meta: true
+	media: https://unascribed.com/fabrication/block_distribution_analysis.png
+	desc:
+		The /fabrication command has an "analyze" subcommand that can be used to perform block
+		distribution analysis on the world. By default it will scan the dimension you're in, but
+		you can specify an alternate dimension if you want. A biome filter can also be specified.
+		
+		This will generate and/or load a ton of chunks. Use with caution. Progress reports go to
+		the console; once complete, a TSV (tab-separated value) file will be written to the game
+		directory.
+
+atlas_viewer:
+	name: Atlas Viewer
+	meta: true
+	media: https://unascribed.com/fabrication/atlas_viewer.png
+	desc:
+		The /fabrication:client command (available under Fabric if you have Cotton Client Commands
+		installed - Forge does not support client commands) has an "atlas" subcommand that can be
+		used to view any of the loaded texture atlases. Information on sprites will be shown when
+		hovered.
+		
+		This is an invaluable debugging tool for various kinds of atlas disasters, and was added to
+		debug a sprite overwrite issue with Old Lava.
+
+search:
+	name: Search
+	since: 1.4.0
+	meta: true
+	desc:

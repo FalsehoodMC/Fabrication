@@ -1,0 +1,300 @@
+tweaks:
+	name: Tweaks
+	section: true
+	since: 1.0
+	default: light
+	desc:
+		Minor changes that fit with vanilla.
+
+tweaks.tridents_in_void_return:
+	name: Tridents In Void Return
+	since: 1.0
+	sides: server_only
+	media: https://unascribed.com/fabrication/tridents_in_void_return.mp4
+	short_desc: Loyalty tridents return when falling into the Void
+	desc:
+		Makes Loyalty tridents immune to void damage, and causes them to start their return timer
+		upon falling into the void.
+
+tweaks.less_annoying_fire:
+	name: Less Annoying Fire
+	since: 1.0
+	sides: client_only
+	media: https://unascribed.com/fabrication/less_annoying_fire.mp4
+	short_desc: Shortens the fire overlay and hides it when you have Fire Resistance
+	desc:
+		Makes the "on fire" overlay half as tall, and removes it completely if you have Fire
+		Resistance.
+		
+		Especially nice with resource packs like Faithful that have tall fire textures.
+
+tweaks.less_restrictive_note_blocks:
+	name: Less Restrictive Note Blocks
+	since: 1.0
+	sides: server_only_with_client_helper
+	media: https://unascribed.com/fabrication/less_restrictive_note_blocks.mp4
+	short_desc: Makes note blocks work with blocks above them
+	desc:
+		Allows note blocks to play if any block next to them has a nonsolid face, instead of only if
+		the block above is air.
+		
+		On the client, just adjusts the note particle to fly the right direction.
+
+tweaks.cactus_walk_doesnt_hurt_with_boots:
+	name: Cactus Walk Doesn't Hurt With Boots
+	since: 1.0
+	sides: server_only
+	fscript: living_entity
+	fscript_default: !boots:empty
+	media: https://unascribed.com/fabrication/cactus_walk_doesnt_hurt_with_boots.mp4
+	short_desc: Walking on top of a cactus with boots on doesn't hurt
+	desc:
+		Makes walking on top of a cactus (not touching the side of one) with boots equipped not deal
+		damage.
+
+tweaks.cactus_brush_doesnt_hurt_with_chest:
+	name: Cactus Brush Doesn't Hurt With Chest
+	since: 1.1
+	sides: server_only
+	fscript: living_entity
+	fscript_default: !legs:empty
+	media: https://unascribed.com/fabrication/cactus_brush_doesnt_hurt_with_chest.mp4
+	short_desc: Touching the side of a cactus with a chestplate on doesn't hurt
+	desc:
+		Makes touching the side of a cactus (not walking on top of one) with a chestplate equipped
+		not deal damage.
+
+tweaks.bush_walk_doesnt_hurt_with_armor:
+	name: Bush Walk Doesn't Hurt With Armor
+	since: 1.1
+	sides: server_only
+	fscript: living_entity
+	fscript_default: !(boots:empty;legs:empty)
+	media: https://unascribed.com/fabrication/bush_walk_doesnt_hurt_with_armor.mp4
+	short_desc: Walking through berry bushes with both legging and boots equipped doesn't hurt
+	desc:
+		Makes walking through berry bushes with both leggings and boots equipped not deal damage.
+
+tweaks.shulker_bullets_despawn_on_death:
+	name: Shulker Bullets Despawn On Death
+	since: 1.0
+	sides: server_only
+	media: https://unascribed.com/fabrication/shulker_bullets_despawn_on_death.mp4
+	desc:
+		Makes shulker bullets despawn when the shulker that shot them is killed.
+
+tweaks.arrows_work_in_water:
+	name: Arrows Work In Water
+	since: 1.0
+	sides: server_only
+	media: https://unascribed.com/fabrication/arrows_work_in_water.mp4
+	desc:
+		Reduces arrow drag in water by a fair bit to make bows useful underwater. Not nearly as
+		good as a trident, but usable.
+
+tweaks.reverse_note_block_tuning:
+	name: Reverse Note Block Tuning
+	since: 1.0
+	sides: server_only
+	media: https://unascribed.com/fabrication/reverse_note_block_tuning.mp4
+	desc:
+		Sneaking while tuning a note block reduces its pitch rather than increases.
+
+tweaks.campfires_place_unlit:
+	name: Campfires Place Unlit
+	since: 1.1.1
+	sides: server_only
+	media: https://unascribed.com/fabrication/campfires_place_unlit.mp4
+	desc:
+		Campfires are unlit when placed and must be lit with a Flint and Steel.
+
+tweaks.rainbow_experience:
+	name: Rainbow Experience
+	since: 1.2.1
+	sides: client_only
+	media: https://unascribed.com/fabrication/rainbow_experience.mp4
+	desc:
+		Makes experience random colors instead of just lime green.
+
+tweaks.long_levelup_sound_at_30:
+	name: Long Level Up Sound At 30
+	since: 1.2.1
+	sides: client_only
+	needs: events
+	media: https://unascribed.com/fabrication/long_levelup_sound_at_30.mp4
+	desc:
+		Plays the old longer level up sound when you reach level 30.
+
+tweaks.flammable_cobwebs:
+	name: Flammable Cobwebs
+	since: 1.2.8
+	sides: server_only
+	media: https://unascribed.com/fabrication/flammable_cobwebs.mp4
+	desc:
+		Cobwebs can burn.
+
+tweaks.normal_fog_with_night_vision:
+	name: Normal Fog With Night Vision
+	since: 1.2.9
+	sides: client_only
+	media: https://unascribed.com/fabrication/normal_fog_with_night_vision.mp4
+	desc:
+		Disables the fog brightening effect with Night Vision.
+
+tweaks.play_note_blocks_in_creative:
+	name: Play Note Blocks In Creative
+	since: 1.2.9
+	sides: server_only_with_client_helper
+	media: https://unascribed.com/fabrication/play_note_blocks_in_creative.mp4
+	desc:
+		Allows sneaking when punching note blocks to play them in Creative mode.
+		
+		On the client, prevents the break effect from occurring as usually happens with server-side
+		break prevention.
+
+tweaks.legible_signs:
+	name: Legible Signs
+	since: 1.2.10
+	sides: client_only
+	media: https://unascribed.com/fabrication/legible_signs.mp4
+	desc:
+		Adjusts sign text colors to be less garbage.
+
+tweaks.fullres_banner_shields:
+	name: Fullres Banner Shields
+	since: 1.2.10
+	sides: client_only
+	media: https://unascribed.com/fabrication/fullres_banner_shields.mp4
+	desc:
+		Makes shields use the full-res banner patterns instead of weird smaller versions. Compatible
+		with custom patterns and resource packs.
+
+tweaks.ghast_panic:
+	name: Ghast Panic
+	since: 1.2.10
+	sides: server_only
+	desc:
+		Makes ghasts randomly play the unused "scream" sound when outside of the Nether.
+
+tweaks.cracking_spawn_eggs:
+	name: Cracking Spawn Eggs
+	since: 1.2.10
+	sides: server_only
+	media: https://unascribed.com/fabrication/cracking_spawn_eggs.mp4
+	desc:
+		Spawn eggs spawn cracking particles and play a sound when used.
+
+tweaks.ghost_chest_woo_woo:
+	name: Ghost Chest Woo Woo
+	hidden: true
+	default: never
+	since: 1.0
+	sides: client_only
+	desc:
+		?
+
+tweaks.feather_falling_no_trample:
+	name: Feather Falling No Trample
+	since: 1.3.0
+	sides: server_only
+	fscript_default: ~boots:~enchant~minecraft;feather_falling:enchant_level:1
+	media: https://unascribed.com/fabrication/feather_falling_no_trample.mp4
+	desc:
+		Farmland will not get trampled when wearing feather falling.
+
+tweaks.no_sneak_bypass:
+	name: No Sneak Bypass
+	since: 1.3.0
+	sides: server_only
+	fscript: entity
+	media: https://unascribed.com/fabrication/no_sneak_bypass.mp4
+	desc:
+		Blocks which would normally not affect players when sneaking will.
+
+tweaks.nether_cauldron:
+	name: Nether Cauldron
+	since: 1.3.0
+	sides: server_only
+	media: https://unascribed.com/fabrication/nether_cauldron.mp4
+	desc:
+		Water evaporates when being placed inside a cauldron in the nether.
+
+tweaks.no_dinnerlava:
+	name: No Dinnerlava
+	since: 1.3.2
+	sides: server_only
+	desc:
+		Disables the generation of 1 block hidden lava pockets in the Nether. They were initially
+		added to discourage stripmining in the Nether for quartz, but now that Netherite exists,
+		which can only be reasonably obtained via stripmining, it's just frustrating for no real
+		reason.
+		
+		"Dinnerlava" refers to the fact this was part of a series of changes all made by Dinnerbone
+		in a short span of time in the 1.5 era mostly on provocation from Vechs of Super Hostile
+		fame.
+
+tweaks.silent_minecarts:
+	name: Silent Minecarts
+	since: 1.3.3
+	sides: client_only
+	desc:
+		Makes minecarts not make noise.
+
+tweaks.alt_absorption_sound:
+	name: Alt Absorption Sound
+	since: 1.3.4
+	sides: server_and_client
+	desc:
+		Taking damage that is completely absorbed by Absorption plays a different (custom) sound.
+		
+		Required on both sides, but doesn't break vanilla clients.
+
+tweaks.silent_minecarts:
+	name: Silent Minecarts
+	since: 1.4.0
+	sides: client_only
+	desc:
+		Makes minecarts silent.
+
+tweaks.see_items_while_riding:
+	name: See Held Items While Riding
+	since: 1.4.0
+	sides: client_only
+	desc:
+		Allows players to see held items while riding entities like boats.
+
+tweaks.campfires_cook_entities:
+	name: Campfires Cook Entities
+	since: 1.4.0
+	sides: server_only
+	desc:
+		Campfires will cook entities without setting them on fire.
+
+tweaks.campfires_ignite_entities:
+	name: Campfires Ignite Entities
+	since: 1.4.0
+	sides: server_only
+	desc:
+		Campfires will set fire to mobs standing on them, therefore also cooking them.
+
+tweaks.recipe_book_auto_craft:
+	name: Recipe Book Auto Craft
+	since: 1.4.0
+	sides: client_only
+	desc:
+		Recipe book crafts items instead of moving them to the crafting area.
+
+tweaks.no_heavy_minecarts:
+	name: No Heavy Minecarts
+	since: 2.1.0
+	sides: server_only
+	desc:
+		Chest and hopper minecarts will not be slowed down proportionally to the number of items in them.
+
+tweaks.no_trample:
+	name: No Trample
+	since: 2.0.0
+	sides: server_only
+	fscript: living_entity
+	desc:
+		Farmland will not get trampled.

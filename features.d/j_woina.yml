@@ -1,0 +1,211 @@
+woina:
+	name: What's Old Is New Again
+	section: true
+	short_name: W.O.I.N.A.
+	since: 1.2.4
+	default: vienna
+	desc:
+		Forward ports of forgotten tidbits.
+
+woina.block_logo:
+	name: Block Logo
+	since: 1.2.4
+	sides: client_only
+	media: https://unascribed.com/fabrication/block_logo.mp4
+	desc:
+		Resurrects the Beta 1.2-era animated falling block logo. Because it looked sweet and it is
+		shameful they removed it.
+		
+		The block logo is completely customizable in config/fabrication/block_logo.png and
+		config/fabrication/block_logo.ini. The default is identical to how it was in Beta 1.2.
+
+woina.old_lava:
+	name: Old Lava
+	since: 1.2.4
+	sides: client_only
+	media: https://unascribed.com/fabrication/old_lava.mp4
+	desc:
+		Resurrects the old procedural lava texture from 1.4. Replace your molten cheese with pasta
+		sauce today! HAYO!
+
+woina.classic_block_drops:
+	name: Classic Block Drops
+	since: 1.2.4
+	sides: client_only
+	media: https://unascribed.com/fabrication/classic_block_drops.mp4
+	extra_media: https://unascribed.com/fabrication/survival_test.mp4
+	extra_media_text: Survival Test video, for reference
+	short_desc: Draws block drops with a mipmapped or small portion of the texture
+	desc:
+		Back in Survival Test, likely in the interest of keeping a consistent pixel density in the
+		world, block drops were drawn with an 8x8 portion of the block texture. This didn't always
+		work well back then, and rather than fix things up and design textures with it in mind, it
+		was simply removed.
+
+		This option uses a whitelist in config/fabrication/classic_block_drops.ini to emulate the
+		old behavior, and for anything not whitelisted, uses mipmapped textures.
+		
+		This looks pretty neat.
+
+woina.blinking_drops:
+	name: Blinking Drops
+	since: 1.2.4
+	sides: client_only
+	media: https://unascribed.com/fabrication/blinking_drops.mp4
+	extra_media: https://unascribed.com/fabrication/survival_test.mp4
+	extra_media_text: Survival Test video, for reference
+	short_desc: Drops blink white like they did in Survival Test
+	desc:
+		Back in Survival Test, drops blinked white to make them stand out more. This is an
+		implementation of that.
+		
+		If Utility > Despawning Items Blink is enabled, that tweak's disappear-flashing will be
+		disabled, and instead this tweak's white flashing will get faster and faster as despawn
+		approaches.
+
+woina.janky_arm:
+	name: Janky Arm
+	since: 1.2.8
+	sides: client_only
+	default: ash
+	media: https://unascribed.com/fabrication/janky_arm.png
+	extra_media: https://unascribed.com/fabrication/survival_test.mp4
+	extra_media_text: Survival Test video, for reference
+	desc:
+		Brings back Survival Test arm rotation.
+		
+		"Why?" Why not.
+
+woina.flat_items:
+	name: Flat Items
+	since: 1.2.8
+	sides: client_only
+	default: ash
+	media: https://unascribed.com/fabrication/flat_items.png
+	desc:
+		Brings back Indev flat first-person item models.
+		
+		"Why?" Why not.
+
+woina.billboard_drops:
+	name: Billboard Drops
+	since: 1.2.8
+	sides: client_only
+	default: ash
+	media: https://unascribed.com/fabrication/billboard_drops.mp4
+	desc:
+		Brings back billboarded flat item drops like on Fast graphics prior to 1.8 or like always
+		prior to 1.4.
+
+woina.oof:
+	name: Oof
+	since: 1.2.8
+	sides: client_only
+	default: ash
+	media: https://unascribed.com/fabrication/oof.mp4
+	desc:
+		Brings back the old "Oof" hurt sound. Unlike the resource pack approach, this is
+		player-specific rather than replacing the generic fleshy damage sound, so it won't result
+		in random things Oof-ing.
+
+woina.no_experience:
+	name: No Experience
+	since: 1.3.3
+	sides: server_only_with_client_helper
+	default: ash
+	desc:
+		Removes experience. Anvils become free and enchanting only costs lapis.
+
+woina.old_sheep_shear:
+	name: Old Sheep Shear
+	since: 1.3.4
+	sides: server_only
+	media: https://unascribed.com/fabrication/old_sheep_shear.mp4
+	default: ash
+	desc:
+		Sheep drop wool when punched.
+
+woina.no_sprint:
+	name: No Sprint
+	since: 1.4.0
+	sides: server_only
+	default: ash
+	desc:
+		Disable sprinting.
+
+woina.instant_eat:
+	name: Instant Eat
+	since: 1.4.0
+	sides: server_only
+	media: https://unascribed.com/fabrication/instant_eat.mp4
+	default: ash
+	desc:
+		Eating food is instant.
+
+woina.dirt_screen:
+	name: Dirt Screen
+	since: 1.4.0
+	sides: client_only
+	default: ash
+	desc:
+		Replaces the panorama background of the title screen with the old dirt one.
+
+woina.old_tooltip:
+	name: Old Tooltip
+	since: 1.4.0
+	sides: client_only
+	media: https://unascribed.com/fabrication/old_tooltip.mp4
+	default: ash
+	desc:
+		Ressurects the old inventory tooltip from the beta days.
+
+woina.instant_bow:
+	name: Instant Bow
+	since: 1.4.0
+	sides: server_only
+	fscript: player_entity
+	media: https://unascribed.com/fabrication/instant_bow.mp4
+	default: ash
+	desc:
+		Bow fires arrows instantly upon clicking.
+
+woina.no_hand_sway:
+	name: No Hand Sway
+	since: 1.4.0
+	sides: client_only
+	media: https://unascribed.com/fabrication/no_hand_sway.mp4
+	default: ash
+	desc:
+		Prevents first-person hands from gradually transitioning from the last camera position.
+
+woina.dropped_items_dont_stack:
+	name: Dropped Items Don't Stack
+	since: 1.4.0
+	sides: server_only
+	desc:
+		When dropping items of the same type they don't merge into a bigger stack.
+
+woina.full_enchanting_cost:
+	name: Full Enchanting Cost
+	since: 2.1.0
+	sides: server_only
+	default: never
+	desc:
+		Enchanting consumes all of the xp required for an enchant.
+		For example a 30 level enchant will consume 30 levels instead of 3.
+
+woina.no_player_death_animation:
+	name: No Player Death Animation
+	since: 2.1.0
+	sides: client_only
+	default: never
+	desc:
+		Players stay upright when killed.
+
+woina.yellow_button_hover:
+	name: Yellow Button Hover
+	since: 2.1.0
+	sides: client_only
+	desc:
+		Hovered buttons will have yellow text.
+

@@ -1,0 +1,206 @@
+fixes:
+	name: Fixes
+	section: true
+	since: 1.0
+	default: blonde
+	desc:
+		Fixes for bugs and weird behavior.
+
+fixes.sync_attacker_yaw:
+	name: Sync Attacker Yaw
+	since: 1.0
+	sides: server_and_client
+	media: https://unascribed.com/fabrication/sync_attacker_yaw.mp4
+	short_desc: Correctly sync the last attacker yaw for damage tilt; fixes MC-26678
+	desc:
+		Makes the last attacker yaw field sync properly when the player is damaged, instead of
+		always being zero. Causes the camera shake animation when being hurt to tilt away from the
+		source of damage instead of always tilting right.
+		
+		Fixes MC-26678, which is closed as Won't Fix.
+		
+		Needed on both client and server, but doesn't break vanilla clients.
+
+fixes.furnace_minecart_pushing:
+	name: Furnace Minecart Pushing
+	since: 1.0
+	sides: server_only
+	media: https://unascribed.com/fabrication/furnace_minecart_pushing.mp4
+	short_desc: Right-clicking a furnace minecart pushes it; silently removed around 17w46a
+	desc:
+		Right-clicking a furnace minecart with a non-fuel while it's out of fuel gives it a little
+		bit of fuel, allowing you to "push" it.
+		
+		Removed some time after 17w46a (1.13 pre releases); nobody seems to have noticed, and it
+		wasn't announced.
+
+fixes.use_player_list_name_in_tag:
+	name: Use Player List Name In Tag
+	since: 1.0
+	sides: client_only
+	media: https://unascribed.com/fabrication/use_player_list_name_in_tag.png
+	desc:
+		Changes player name tags to match names in the player list. Good in combination with
+		nickname mods like Drogtor.
+
+fixes.better_pause_freezing:
+	name: Better Pause Freezing
+	since: 1.0.1
+	sides: client_only
+	media: https://unascribed.com/fabrication/better_pause_freezing.mp4
+	short_desc: Makes textures not tick while the game is paused
+	desc:
+		Makes textures not tick while the game is paused, meaning animated blocks and such properly
+		freeze instead of continuing to animate.
+
+fixes.inanimates_can_be_invisible:
+	name: Inanimates Can Be Invisible
+	since: 1.1.1
+	sides: client_only
+	desc:
+		Makes inanimate entities honor the "invisible" tag sent by the server. Does nothing on its
+		own; the server must have something that marks inanimate entities as invisible, such as
+		Fabrication's own Invisibility Splash On Inanimates.
+
+fixes.omniscent_player:
+	name: Omniscent Player
+	since: 1.1.1
+	sides: client_only
+	media: https://unascribed.com/fabrication/omniscent_player.mp4
+	short_desc: The player render in the inventory always follows your cursor
+	desc:
+		The player render in the inventory follows your cursor, even if it's not inside the game
+		window.
+
+fixes.uncap_menu_fps:
+	name: Uncap Menu FPS
+	since: 1.2
+	sides: client_only
+	short_desc: Removes the hardcoded 60 FPS cap in menu screens
+	desc:
+		Removes the hardcoded 60 FPS cap in menu screens, instead using whatever you have the
+		framerate cap set to.
+		
+		Primarily added because in prior versions the cap was 30 FPS and I thought it still was.
+		Maybe this is nice if you have a 144Hz display?
+
+fixes.adventure_tags_in_survival:
+	name: Adventure Tags In Survival
+	since: 1.2.1
+	sides: server_only_with_client_helper
+	media: https://unascribed.com/fabrication/adventure_tags_in_survival.mp4
+	short_desc: Makes CanDestroy/CanPlaceOn work in Survival
+	desc:
+		Makes the CanDestroy and CanPlaceOn tags be honored in survival mode instead of just adventure mode.
+		
+		Only needed on server, but the experience is more seamless if it's also on the client.
+
+fixes.stable_cacti:
+	name: Stable Cacti
+	since: 1.2.3
+	sides: server_only
+	media: https://unascribed.com/fabrication/stable_cacti.mp4
+	short_desc: Makes cacti less afraid
+	desc:
+		Fixes cactuses being made of Explodium due to long-since-fixed engine limitations. In
+		English: Makes cacti not break themselves if a block is placed next to them. They will still
+		break if they *grow* into such a space, so cactus randomizers and cactus farms still work.
+
+fixes.boundless_levels:
+	name: Boundless Levels
+	since: 1.2.5
+	sides: client_only
+	media: https://unascribed.com/fabrication/boundless_levels.mp4
+	short_desc: Fixes enchantment.level.27
+	desc:
+		Replaces translation strings for potion and enchantment levels with a dynamic algorithm that
+		supports arbitrarily large numbers.
+
+fixes.ghast_charging:
+	name: Ghast Charging
+	since: 1.2.8
+	sides: client_only
+	media: https://unascribed.com/fabrication/ghast_charging.mp4
+	short_desc: Brings back the ghast "charging" animation that broke in 1.3
+	desc:
+		Brings back the ghast "charging" animation when they're about to fire a fireball that got
+		broken in 1.3 and removed in 1.8, and never worked in multiplayer.
+
+fixes.no_night_vision_flash:
+	name: No Night Vision Flashing
+	since: 1.2.9
+	sides: client_only
+	media: https://unascribed.com/fabrication/no_night_vision_flash.mp4
+	desc:
+		Disables the flashing effect when Night Vision is about to run out. This effect ranges from
+		"annoying" to "actively dangerous". With this enabled, it just slowly fades out instead.
+
+fixes.multiline_sign_paste:
+	name: Multiline Sign Paste
+	since: 1.2.10
+	sides: client_only
+	media: https://unascribed.com/fabrication/multiline_sign_paste.mp4
+	desc:
+		Allows pasting multiple lines of text into a sign. You can also copy all the lines of a sign
+		by holding Shift while copying.
+
+fixes.colored_crack_particles:
+	name: Colored Crack Particles
+	since: 1.2.10
+	sides: client_only
+	media: https://unascribed.com/fabrication/colored_crack_particles.mp4
+	desc:
+		Makes "crack" particles honor item coloration, such as leather armor dye.
+
+fixes.silverfish_step:
+	name: Silverfish Step
+	since: 1.2.10
+	sides: server_only
+	media: https://unascribed.com/fabrication/silverfish_step.mp4
+	desc:
+		Fixes an oversight that prevents silverfish from playing their step sound. It's also
+		possible it's not an oversight and that Mojang simply deemed the silverfish step sound too
+		horrible and dummied it out.
+
+fixes.open_inventories_in_nether_portal:
+	name: Open Inventories in Nether Portals
+	since: 1.4.0
+	sides: client_only
+	media: https://unascribed.com/fabrication/open_inventories_in_nether_portal.mp4
+	desc:
+		Allows players to open inventories while in a nether portal.
+		
+		Vanilla originally made this change to fix a dupe exploit in Beta. The underlying cause of
+		this dupe was fixed a very long time ago.
+
+fixes.fix_superflat_bad_structures:
+	name: Fix Superflat Bad Structures
+	since: 1.4.0
+	sides: either
+	desc:
+		Fixes a bug that some biome-adding mods have that causes their structure features to be
+		added to a superflat world, which have a hardcoded list of supported structure features.
+		
+		This bug shows up as a "safe mode" error screen with an exception in the log showing a
+		NullPointerException in method_30979.
+		
+		This will not affect mods that properly patch the superflat structures map.
+
+fixes.fix_charm_amethyst_dupe:
+	name: Fix Charm Amethyst Dupe
+	since: 2.0.0
+	sides: server_only
+	short_desc: Fixes a bug in Charm caused by bad assumptions that allows generating amethyst shards.
+	desc:
+		Fixes a bug in Charm caused by bad assumptions that allows generating amethyst shards if
+		you have another mod that can make item frames invisible, such as Fabrication's own
+		Invisibility Splash On Inanimates.
+
+fixes.bubble_column_pop:
+	name: Bubble Column Pop
+	since: 2.1.0
+	sides: client_only
+	default: vienna
+	desc:
+		Re-adds bubble columns having a bubble pop particle and sound at the top.
+

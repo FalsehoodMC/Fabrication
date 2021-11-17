@@ -1,0 +1,26 @@
+experiments:
+	name: Experiments
+	section: true
+	since: 1.2.8
+	default: never
+	desc:
+		Bad ideas given form.
+
+experiments.packed_atlases:
+	name: Packed Atlases
+	since: 1.2.8
+	sides: client_only
+	desc:
+		Disables rounding of atlases to the next power-of-two. GPU drivers have supported "NPOT"
+		textures since forever.
+		
+		Possibly reduces VRAM usage. May reduce performance. Might cause incompatibilites.
+
+experiments.no_set_window_pos:
+	name: No Set Window Pos
+	since: 1.3.2
+	sides: client_only
+	desc:
+		Prevents the game from manually modifying the window position. So if you have custom configs
+		or something that memorizes window positions, they will be honored instead of the window
+		always being centered.

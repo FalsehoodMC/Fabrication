@@ -1,0 +1,7 @@
+# This file is used to generate the default config comments, config GUI, wiki, CurseForge pages,
+# et al.
+
+# It's not actually YAML, we just call it that for syntax highlighting. Indentation *must* be tabs.
+
+# All of the actual content here has been factored out into individual files for less mess...
+@include features.d
