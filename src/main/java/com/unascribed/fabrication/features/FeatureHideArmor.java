@@ -7,10 +7,14 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.datafixers.util.Pair;
+import com.unascribed.ears.api.EarsStateType;
+import com.unascribed.ears.api.OverrideResult;
+import com.unascribed.ears.api.registry.EarsStateOverriderRegistry;
 import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.interfaces.GetSuppressedSlots;
 import com.unascribed.fabrication.interfaces.SetFabricationConfigAware;
 import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 
@@ -46,6 +50,34 @@ public class FeatureHideArmor implements Feature {
 			Agnos.runForCommandRegistration((dispatcher, dedi) -> {
 				dispatcher.register(buildCommand("hidearmor", true));
 				dispatcher.register(buildCommand("showarmor", false));
+			});
+			if (Agnos.getCurrentEnv() == Env.CLIENT && Agnos.isModLoaded("ears")) {
+				try {
+					EarsCompat.init();
+				} catch (Throwable t) {}
+			}
+		}
+	}
+	
+	private static final class EarsCompat {
+		public static void init() {
+			EarsStateOverriderRegistry.register("fabrication", (state, peer) -> {
+				if (!MixinConfigPlugin.isEnabled("*.hide_armor")) return OverrideResult.DEFAULT;
+				if (!(peer instanceof GetSuppressedSlots)) return OverrideResult.DEFAULT;
+				GetSuppressedSlots gsg = (GetSuppressedSlots)peer;
+				if (state == EarsStateType.WEARING_HELMET && gsg.fabrication$getSuppressedSlots().contains(EquipmentSlot.HEAD)) {
+					return OverrideResult.FALSE;
+				}
+				if (state == EarsStateType.WEARING_CHESTPLATE && gsg.fabrication$getSuppressedSlots().contains(EquipmentSlot.CHEST)) {
+					return OverrideResult.FALSE;
+				}
+				if (state == EarsStateType.WEARING_LEGGINGS && gsg.fabrication$getSuppressedSlots().contains(EquipmentSlot.LEGS)) {
+					return OverrideResult.FALSE;
+				}
+				if (state == EarsStateType.WEARING_BOOTS && gsg.fabrication$getSuppressedSlots().contains(EquipmentSlot.FEET)) {
+					return OverrideResult.FALSE;
+				}
+				return OverrideResult.DEFAULT;
 			});
 		}
 	}

@@ -12,8 +12,7 @@ group = project.maven_group
 
 repositories {
 	maven {
-		name = 'CottonMC'
-		url = 'https://server.bbkr.space/artifactory/libs-release'
+		url = "https://repo.unascribed.com"
 	}
 	maven {
 		name = "JitPack"
@@ -25,6 +24,9 @@ repositories {
 	}
 	maven {
 		url = 'https://maven.ssf.tf/'
+		content {
+			includeGroup "tf.ssf.sfort"
+		}
 	}
 }
 
@@ -46,6 +48,7 @@ dependencies {
 	modImplementation("com.terraformersmc:modmenu:2.0.3") {
 		transitive = false
 	}
+	modImplementation "com.unascribed:ears-api:1.4.1"
 	modImplementation("tf.ssf.sfort:fscript:1.1.5") {
 		transitive = false
 	}
