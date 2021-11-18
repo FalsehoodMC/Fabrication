@@ -6,7 +6,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.FeaturesFile;
@@ -14,6 +16,8 @@ import com.unascribed.fabrication.QDIni;
 import com.unascribed.fabrication.support.ConfigLoader;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
+import com.unascribed.fabrication.support.MixinConfigPlugin;
+import net.minecraft.client.option.StickyKeyBinding;
 
 @EligibleIf(envMatches=Env.CLIENT)
 public class LoaderFScript implements ConfigLoader {
@@ -24,6 +28,7 @@ public class LoaderFScript implements ConfigLoader {
 		if (scripts.containsKey(key)) return scripts.get(key);
 		return FeaturesFile.get(key).fscriptDefault;
 	}
+
 	public static Map<String, String> getMap() {
 		return scripts;
 	}

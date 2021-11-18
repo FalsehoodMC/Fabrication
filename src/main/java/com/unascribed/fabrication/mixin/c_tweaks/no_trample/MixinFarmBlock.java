@@ -25,10 +25,10 @@ public abstract class MixinFarmBlock extends Block {
 		super(settings);
 	}
 
-	@Inject(method= "onLandedUpon(Lnet/minecraft/world/World;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/Entity;F)V",
+	@Inject(method="onLandedUpon(Lnet/minecraft/world/World;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/Entity;F)V",
 			at=@At("HEAD"), cancellable=true)
 	public void onLandedUpon(World world, BlockState state, BlockPos pos, Entity entity, float fallDistance, CallbackInfo ci) {
-		if (!(MixinConfigPlugin.isEnabled("*.no_trample") || MixinConfigPlugin.isEnabled("*.feather_falling_no_trample"))) return;
+		if (!MixinConfigPlugin.isAnyEnabled("*.no_trample")) return;
 		if (entity instanceof LivingEntity && ConfigPredicates.shouldRun("*.no_trample", (LivingEntity)entity)) {
 			super.onLandedUpon(world, state, pos, entity, fallDistance);
 			ci.cancel();

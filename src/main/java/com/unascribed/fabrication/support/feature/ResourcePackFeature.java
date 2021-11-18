@@ -1,9 +1,13 @@
-package com.unascribed.fabrication;
+package com.unascribed.fabrication.support.feature;
 
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import com.unascribed.fabrication.Agnos;
+import com.unascribed.fabrication.FabLog;
+import com.unascribed.fabrication.FabRefl;
+import com.unascribed.fabrication.FabricationResourcePack;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Feature;
 

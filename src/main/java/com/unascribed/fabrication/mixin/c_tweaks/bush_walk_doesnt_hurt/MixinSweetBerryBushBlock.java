@@ -1,4 +1,4 @@
-package com.unascribed.fabrication.mixin.c_tweaks.bush_walk_doesnt_hurt_with_armor;
+package com.unascribed.fabrication.mixin.c_tweaks.bush_walk_doesnt_hurt;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,14 +17,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 @Mixin(SweetBerryBushBlock.class)
-@EligibleIf(configAvailable="*.bush_walk_doesnt_hurt_with_armor")
+@EligibleIf(anyConfigAvailable={"*.bush_walk_doesnt_hurt", "*.bush_walk_doesnt_hurt_with_armor", "*.bush_walk_doesnt_hurt_when_sneaking"})
 public class MixinSweetBerryBushBlock {
 
 	@Inject(at=@At(value="INVOKE", target="net/minecraft/entity/Entity.damage(Lnet/minecraft/entity/damage/DamageSource;F)Z"),
 			method="onEntityCollision(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/Entity;)V", cancellable=true)
 	public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity, CallbackInfo ci) {
-		if (MixinConfigPlugin.isEnabled("*.bush_walk_doesnt_hurt_with_armor") && entity instanceof LivingEntity
-				&& ConfigPredicates.shouldRun("*.bush_walk_doesnt_hurt_with_armor", (LivingEntity)entity)) {
+		if (MixinConfigPlugin.isAnyEnabled("*.bush_walk_doesnt_hurt") && entity instanceof LivingEntity
+				&& ConfigPredicates.shouldRun("*.bush_walk_doesnt_hurt", (LivingEntity)entity)) {
 			ci.cancel();
 		}
 	}

@@ -1,32 +1,24 @@
 package com.unascribed.fabrication.features;
 
-import java.util.function.Predicate;
-
-import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.Feature;
-
+import com.unascribed.fabrication.support.feature.SimplePredicateFeature;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
 
-@EligibleIf(configAvailable="*.feather_falling_no_trample")
-public class FeatureFeatherFallingNoTrample implements Feature {
-	@Override
-	public void apply() {
-		ConfigPredicates.put("tweaks.no_trample",
-				(Predicate<LivingEntity>) livingEntity -> EnchantmentHelper.getEquipmentLevel(Enchantments.FEATHER_FALLING, livingEntity)>=1
-				);
-	}
+import java.util.function.Predicate;
 
-	@Override
-	public boolean undo() {
-		ConfigPredicates.remove("tweaks.no_trample");
-		return true;
-	}
+@EligibleIf(configAvailable="*.feather_falling_no_trample")
+public class FeatureFeatherFallingNoTrample extends SimplePredicateFeature {
 
 	@Override
 	public String getConfigKey() {
 		return "*.feather_falling_no_trample";
+	}
+
+	public FeatureFeatherFallingNoTrample() {
+		super("*.no_trample",
+				(Predicate<LivingEntity>) livingEntity -> EnchantmentHelper.getEquipmentLevel(Enchantments.FEATHER_FALLING, livingEntity)>=1
+		);
 	}
 }

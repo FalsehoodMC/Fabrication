@@ -28,7 +28,7 @@ tweaks.less_annoying_fire:
 	desc:
 		Makes the "on fire" overlay half as tall, and removes it completely if you have Fire
 		Resistance.
-		
+
 		Especially nice with resource packs like Faithful that have tall fire textures.
 
 tweaks.less_restrictive_note_blocks:
@@ -40,7 +40,7 @@ tweaks.less_restrictive_note_blocks:
 	desc:
 		Allows note blocks to play if any block next to them has a nonsolid face, instead of only if
 		the block above is air.
-		
+
 		On the client, just adjusts the note particle to fly the right direction.
 
 tweaks.cactus_walk_doesnt_hurt_with_boots:
@@ -71,7 +71,7 @@ tweaks.bush_walk_doesnt_hurt_with_armor:
 	name: Bush Walk Doesn't Hurt With Armor
 	since: 1.1
 	sides: server_only
-	fscript: living_entity
+	extend: *.bush_walk_doesnt_hurt
 	fscript_default: !(boots:empty;legs:empty)
 	media: https://unascribed.com/fabrication/bush_walk_doesnt_hurt_with_armor.mp4
 	short_desc: Walking through berry bushes with both legging and boots equipped doesn't hurt
@@ -151,7 +151,7 @@ tweaks.play_note_blocks_in_creative:
 	media: https://unascribed.com/fabrication/play_note_blocks_in_creative.mp4
 	desc:
 		Allows sneaking when punching note blocks to play them in Creative mode.
-		
+
 		On the client, prevents the break effect from occurring as usually happens with server-side
 		break prevention.
 
@@ -200,6 +200,7 @@ tweaks.feather_falling_no_trample:
 	name: Feather Falling No Trample
 	since: 1.3.0
 	sides: server_only
+	extend: *.no_trample
 	fscript_default: ~boots:~enchant~minecraft;feather_falling:enchant_level:1
 	media: https://unascribed.com/fabrication/feather_falling_no_trample.mp4
 	desc:
@@ -231,7 +232,7 @@ tweaks.no_dinnerlava:
 		added to discourage stripmining in the Nether for quartz, but now that Netherite exists,
 		which can only be reasonably obtained via stripmining, it's just frustrating for no real
 		reason.
-		
+
 		"Dinnerlava" refers to the fact this was part of a series of changes all made by Dinnerbone
 		in a short span of time in the 1.5 era mostly on provocation from Vechs of Super Hostile
 		fame.
@@ -249,7 +250,7 @@ tweaks.alt_absorption_sound:
 	sides: server_and_client
 	desc:
 		Taking damage that is completely absorbed by Absorption plays a different (custom) sound.
-		
+
 		Required on both sides, but doesn't break vanilla clients.
 
 tweaks.silent_minecarts:

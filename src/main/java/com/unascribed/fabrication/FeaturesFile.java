@@ -51,6 +51,7 @@ public final class FeaturesFile {
 		public final String desc;
 		public final String fscript;
 		public final String fscriptDefault;
+		public final String extend;
 
 		public FeatureEntry(String key, JsonObject obj) {
 			this.key = key;
@@ -74,6 +75,7 @@ public final class FeaturesFile {
 			desc = get(obj, "desc", JsonElement::getAsString, "No description");
 			fscript = get(obj, "fscript", s -> s.getAsString().toUpperCase(Locale.ROOT), null);
 			fscriptDefault = get(obj, "fscript_default", JsonElement::getAsString, null);
+			extend = get(obj, "extend", JsonElement::getAsString, null);
 		}
 
 		private static <T> T get(JsonObject obj, String key, Function<JsonElement, T> func, T def) {
@@ -96,7 +98,8 @@ public final class FeaturesFile {
 					+ ", extraMedia=" + extraMedia + ", extraMediaText="
 					+ extraMediaText + ", linkUrl=" + linkUrl + ", linkText="
 					+ linkText + ", desc=" + desc + ", fscript=" + fscript
-					+ ", fscriptDefault=" + fscriptDefault + "]";
+					+ ", fscriptDefault=" + fscriptDefault + ", extend="
+					+ extend + "]";
 		}
 
 	}
