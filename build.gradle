@@ -12,11 +12,17 @@ group = project.maven_group
 
 repositories {
 	maven {
+		url = "https://repo.unascribed.com"
+	}
+	maven {
 		name = "JitPack"
 		url = "https://jitpack.io"
 	}
 	maven {
 		url = "https://maven.ssf.tf"
+		content {
+			includeGroup "tf.ssf.sfort"
+		}
 	}
 }
 
@@ -37,6 +43,8 @@ dependencies {
 	modImplementation("io.github.prospector:modmenu:1.16.6") {
 		transitive = false
 	}
+	
+	modImplementation "com.unascribed:ears-api:1.4.1"
 	
 	modRuntime("com.github.SuperCoder7979:databreaker:715b589") {
 		transitive = false

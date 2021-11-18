@@ -22,7 +22,7 @@ public abstract class MixinItemEntity {
 	public abstract ItemStack getStack();
 
 	@Shadow
-	private int age;
+	private int itemAge;
 
 	@Inject(at=@At("HEAD"), method="isFireImmune()Z", cancellable=true)
 	public void isFireImmune(CallbackInfoReturnable<Boolean> cir) {
