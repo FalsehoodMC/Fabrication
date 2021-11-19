@@ -1,6 +1,6 @@
 package com.unascribed.fabrication.features;
 
-import com.unascribed.fabrication.ResourcePackFeature;
+import com.unascribed.fabrication.support.feature.ResourcePackFeature;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 

@@ -70,6 +70,7 @@ let defaults = (curKey, cur) => ({
 	brand_new: cur && cur.since && cur.since === currentVersion,
 	fscript: null,
 	fscript_default: null,
+	extend: null,
 	new: (cur ? cur.since_code ? cur.since_code : versionNamesToCodes[cur.since] : 9999) >= currentVersionCode-1
 });
 
@@ -83,7 +84,7 @@ function parseFile(file) {
 		fs.readdirSync(file).forEach(e => parseFile(file+"/"+e));
 		return;
 	}
-	
+
 	function commitMultiline() {
 		if (multilineKey !== null) {
 			cur[multilineKey] = multilineBuf.trim().replace(/ +\n/g, '\n');
@@ -103,7 +104,7 @@ function parseFile(file) {
 		curKey = null;
 		cur = {};
 	}
-	
+
 
 	let lines = fs.readFileSync(file).toString('utf8').split(/\r?\n/g);
 	let curKey = null;

@@ -14,10 +14,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -113,6 +115,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	private static final ImmutableSet<String> validSections;
 	private static final ImmutableSet<String> validKeys;
 	private static final ImmutableMap<String, String> starMap;
+	private static final ImmutableMap<String, Set<String>> equivalanceMap;
 	private static ImmutableMap<String, Boolean> defaults;
 
 	private static final Set<SpecialEligibility> metSpecialEligibility = EnumSet.noneOf(SpecialEligibility.class);
@@ -149,6 +152,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			throw devError("You must run build-features.sh before running the game.");
 		}
 		Map<String, String> starMapBldr = Maps.newLinkedHashMap();
+		Map<String, Set<String>> equivalanceMapBldr = Maps.newLinkedHashMap();
 		Table<Profile, String, Boolean> profilesBldr = Tables.newCustomTable(Maps.newLinkedHashMap(), Maps::newLinkedHashMap);
 		Set<String> keys = Sets.newLinkedHashSet();
 		Set<String> sections = Sets.newLinkedHashSet();
@@ -161,6 +165,11 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 				continue;
 			}
 			String key = en.getKey();
+			String extend = en.getValue().extend;
+			if (extend != null){
+				if (!equivalanceMapBldr.containsKey(extend)) equivalanceMapBldr.put(extend, new HashSet<>());
+				equivalanceMapBldr.get(extend).add(key);
+			}
 			keys.add(key);
 			int dot = key.indexOf('.');
 			String parent = null;
@@ -188,6 +197,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			}
 		}
 		starMap = ImmutableMap.copyOf(starMapBldr);
+		equivalanceMap = ImmutableMap.copyOf(equivalanceMapBldr.entrySet().stream().map(e-> Map.entry(remap(e.getKey()), e.getValue())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
 		validKeys = ImmutableSet.copyOf(keys);
 		validSections = ImmutableSet.copyOf(sections);
 		defaultsByProfile = ImmutableTable.copyOf(profilesBldr);
@@ -211,6 +221,10 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		return starMap.getOrDefault(configKey, configKey);
 	}
 
+	public static Set<String> getEquivalent(String configKey) {
+		return equivalanceMap.getOrDefault(remap(configKey), new HashSet<>());
+	}
+
 	public static Set<String> getConfigKeysForDiscoveredClass(String clazz) {
 		return Collections.unmodifiableSet(configKeysForDiscoveredClasses.get(clazz.replace('/', '.')));
 	}
@@ -230,7 +244,10 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		} catch (Throwable t) {}
 		return new RuntimeException(msg);
 	}
-
+	public static boolean isAnyEnabled(String configKey) {
+		if (isEnabled(configKey)) return true;
+		return getEquivalent(configKey).stream().anyMatch(MixinConfigPlugin::isEnabled);
+	}
 	public static boolean isEnabled(String configKey) {
 		if (isFailed(configKey) || isBanned(configKey)) return false;
 		configKey = remap(configKey);

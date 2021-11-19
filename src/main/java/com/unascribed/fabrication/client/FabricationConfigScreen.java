@@ -242,7 +242,7 @@ public class FabricationConfigScreen extends Screen {
 					matrices.pop();
 				matrices.pop();
 			matrices.pop();
-	
+
 			// background rendering ignores the matrixstack, so we have to Make A Mess in the projection matrix instead
 			MatrixStack projection = new MatrixStack();
 			projection.method_34425(RenderSystem.getProjectionMatrix());
@@ -1070,10 +1070,11 @@ public class FabricationConfigScreen extends Screen {
 		y += drawWrappedText(matrices, startX, 2, drawTitle, width-startX-6, 0xFFFFFF | textAlpha, false)*scale;
 		int endX = startY == y-8 ? width - 6 : startX+textRenderer.getWidth(title);
 		//		int endX = textRenderer.draw(matrices, title, startX, 2, 0xFFFFFF | textAlpha);
-		if (mouseX >= 134+trackSize && mouseX <= endX && mouseY >= startY+1 && mouseY <= startY+10 && FeaturesFile.get(key).fscript != null && Agnos.isModLoaded("fscript")){
+		FeatureEntry feature = FeaturesFile.get(key);
+		if (mouseX >= 134+trackSize && mouseX <= endX && mouseY >= startY+1 && mouseY <= startY+10 && (feature.fscript != null || feature.extend !=null && FeaturesFile.get(MixinConfigPlugin.remap(feature.extend)).fscript != null) && Agnos.isModLoaded("fscript")){
 			if (didClick){
 				client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1f));
-				client.setScreen(OptionalFScriptScreen.construct(this, prideFlag, title, key));
+				client.setScreen(OptionalFScriptScreen.construct(this, prideFlag, feature.fscript != null ? title : FeaturesFile.get(MixinConfigPlugin.remap(feature.extend)).name, feature.fscript != null ? key : MixinConfigPlugin.remap(feature.extend)));
 			}
 			fill(matrices, startX-2, 9, endX, 10, -1);
 		}
