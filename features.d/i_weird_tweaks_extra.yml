@@ -20,7 +20,7 @@ weird_tweaks.extra.photoallergic_creepers:
 	media: https://unascribed.com/fabrication/photoallergic_creepers.mp4
 	desc:
 		Creepers burn in sunlight. Very dangerous in combination with Creepers Explode When On Fire.
-		
+
 		Takes precedence over Photoresistant Mobs if that is also enabled, allowing you to make only
 		creepers burn in sunlight.
 
@@ -84,6 +84,22 @@ weird_tweaks.extra.no_dolphin_theft:
 	default: burnt
 	desc:
 		Prevents dolphins from picking up items.
+
+weird_tweaks.extra.thrown_buckets_empty_lava_cauldrons:
+	name: Thrown Buckets Empty Lava Cauldrons
+	since: 2.1.0
+	sides: server_only
+	default: never
+	desc:
+		Throwing an bucket at a lava cauldron will pickup the lava.
+
+weird_tweaks.extra.source_dependent_iframes:
+	name: Source Dependent Invulnerability Frames
+	since: 2.1.0
+	sides: server_only
+	default: never
+	desc:
+		Allows entities to take damage multiple times if it's from multiple sources.
 
 # kate: space-indent off
 # vim: noai:noet
