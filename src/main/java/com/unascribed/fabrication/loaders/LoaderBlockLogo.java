@@ -94,11 +94,11 @@ public class LoaderBlockLogo implements ConfigLoader {
 			}
 			for (int x = 0; x < image.getWidth(); x++) {
 				for (int y = 0; y < image.getHeight(); y++) {
-					int color = image.getPixelColor(x, y);
+					int color = image.getColor(x, y);
 					int alpha = (color>>24)&0xFF;
 					if (alpha > 0 && alpha < 255) {
 						FabLog.warn("At "+x+", "+y+" in block_logo.png: Found a pixel that is not fully transparent or fully opaque; ignoring it");
-						image.setPixelColor(x, y, 0);
+						image.setColor(x, y, 0);
 					}
 				}
 			}
@@ -135,12 +135,12 @@ public class LoaderBlockLogo implements ConfigLoader {
 		}
 		for (int x = 0; x < image.getWidth(); x++) {
 			for (int y = 0; y < image.getHeight(); y++) {
-				int color = image.getPixelColor(x, y);
+				int color = image.getColor(x, y);
 				int alpha = (color>>24)&0xFF;
 				color &= 0x00FFFFFF;
 				if (alpha == 255 && !colorToState.containsKey(color)) {
 					FabLog.warn("At "+x+", "+y+" in block_logo.png: Found a pixel with a color that isn't in the config: "+Integer.toHexString(color|0xFF000000).substring(2).toUpperCase(Locale.ROOT)+"; ignoring it");
-					image.setPixelColor(x, y, 0);
+					image.setColor(x, y, 0);
 				}
 			}
 		}

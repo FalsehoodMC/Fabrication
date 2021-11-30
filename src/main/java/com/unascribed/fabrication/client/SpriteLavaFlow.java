@@ -102,7 +102,7 @@ public class SpriteLavaFlow extends Sprite implements TextureTickListener {
 
 			for (int xo = 0; xo <= 1; xo++) {
 				for (int yo = 0; yo <= 1; yo++) {
-					images[0].setPixelColor((xo*16)+(var2%16), (yo*16)+(var2/16), (var5) | (var6 << 8) | (var7 << 16) | 0xFF000000);
+					images[0].setColor((xo*16)+(var2%16), (yo*16)+(var2/16), (var5) | (var6 << 8) | (var7 << 16) | 0xFF000000);
 				}
 			}
 		}

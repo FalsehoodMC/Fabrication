@@ -245,7 +245,7 @@ public class FabricationConfigScreen extends Screen {
 
 			// background rendering ignores the matrixstack, so we have to Make A Mess in the projection matrix instead
 			MatrixStack projection = new MatrixStack();
-			projection.method_34425(RenderSystem.getProjectionMatrix());
+			projection.multiplyPositionMatrix(RenderSystem.getProjectionMatrix());
 			projection.push();
 				projection.translate(width/2f, height, 0);
 				projection.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(a*(leaving ? -180 : 180)));
@@ -255,15 +255,15 @@ public class FabricationConfigScreen extends Screen {
 						if (x == 0 && y == 0) continue;
 						projection.push();
 						projection.translate(width*x, height*y, 0);
-						RenderSystem.setProjectionMatrix(projection.peek().getModel());
+						RenderSystem.setProjectionMatrix(projection.peek().getPositionMatrix());
 						parent.renderBackgroundTexture(0);
 						projection.pop();
 					}
 				}
-				RenderSystem.setProjectionMatrix(projection.peek().getModel());
+				RenderSystem.setProjectionMatrix(projection.peek().getPositionMatrix());
 				parent.render(matrices, -200, -200, delta);
 			projection.pop();
-			RenderSystem.setProjectionMatrix(projection.peek().getModel());
+			RenderSystem.setProjectionMatrix(projection.peek().getPositionMatrix());
 		} else {
 			matrices.push();
 				drawBackground(matrices, mouseX, mouseY, delta, 0, 0);
@@ -282,7 +282,7 @@ public class FabricationConfigScreen extends Screen {
 		Identifier bg = MixinConfigPlugin.isEnabled("general.dark_mode") ? BG_DARK : BG;
 		Identifier bgGrad = MixinConfigPlugin.isEnabled("general.dark_mode") ? BG_GRAD_DARK : BG_GRAD;
 		BufferBuilder bb = Tessellator.getInstance().getBuffer();
-		Matrix4f mat = matrices.peek().getModel();
+		Matrix4f mat = matrices.peek().getPositionMatrix();
 
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
@@ -511,7 +511,7 @@ public class FabricationConfigScreen extends Screen {
 				RenderSystem.disableTexture();
 				RenderSystem.setShader(GameRenderer::getPositionColorShader);
 				BufferBuilder bb = Tessellator.getInstance().getBuffer();
-				Matrix4f mat = matrices.peek().getModel();
+				Matrix4f mat = matrices.peek().getPositionMatrix();
 				bb.begin(DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 				bb.vertex(mat, 0, y-thisHeight-8, 0).color(1, 1, 1, 0.2f).next();
 				bb.vertex(mat, 130*selectA, y-thisHeight-8, 0).color(1, 1, 1, 0.2f+((1-selectA)*0.8f)).next();
@@ -1471,7 +1471,7 @@ public class FabricationConfigScreen extends Screen {
 			for (int i = 0; i < lines.size(); ++i) {
 				OrderedText line = lines.get(i);
 				if (line != null) {
-					textRenderer.draw(line, innerX, innerY, -1, false, matrices.peek().getModel(), vcp, false, 0, 0xF000F0);
+					textRenderer.draw(line, innerX, innerY, -1, false, matrices.peek().getPositionMatrix(), vcp, false, 0, 0xF000F0);
 				}
 				//				if (i == 0) {
 				//					innerY += 2;

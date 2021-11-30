@@ -18,9 +18,9 @@ public class Grayscale extends InputStream {
 			NativeImage image = NativeImage.read(in);
 			for(int h = 0; h < image.getHeight() ; h++) {
 				for(int w = 0; w < image.getWidth() ; w++) {
-					int color = image.getPixelColor(w, h);
+					int color = image.getColor(w, h);
 					int gray = ((color>>16 & 255) + (color>>8 & 255) + (color & 255))/3;
-					image.setPixelColor(w, h,(color & 0xff000000) | gray << 16 | gray << 8 | gray);
+					image.setColor(w, h,(color & 0xff000000) | gray << 16 | gray << 8 | gray);
 				}
 			}
 			rtrn = new ByteArrayInputStream(image.getBytes());

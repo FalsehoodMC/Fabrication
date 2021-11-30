@@ -100,12 +100,12 @@ public class WoinaDrops {
 									int h = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_HEIGHT);
 									ByteBuffer dest = MemoryUtil.memAlloc(w*h*4);
 									try {
-										GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, Format.ABGR.getPixelDataFormat(), GL11.GL_UNSIGNED_BYTE, MemoryUtil.memAddress(dest));
+										GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, Format.RGBA.toGl(), GL11.GL_UNSIGNED_BYTE, MemoryUtil.memAddress(dest));
 									} catch (Error | RuntimeException e) {
 										MemoryUtil.memFree(dest);
 										throw e;
 									}
-									NativeImage img = FabRefl.Client.NativeImage_new(Format.ABGR, w, h, false, MemoryUtil.memAddress(dest));
+									NativeImage img = FabRefl.Client.NativeImage_new(Format.RGBA, w, h, false, MemoryUtil.memAddress(dest));
 									try {
 										NativeImage mipped = MipmapHelper.getMipmapLevelsImages(img, 1)[1];
 										try {
@@ -150,7 +150,7 @@ public class WoinaDrops {
 
 		int packedColor = -1;
 		if (quad.hasColor()) {
-			packedColor = FabRefl.Client.getItemColors(MinecraftClient.getInstance()).getColorMultiplier(is, quad.getColorIndex());
+			packedColor = FabRefl.Client.getItemColors(MinecraftClient.getInstance()).getColor(is, quad.getColorIndex());
 			Block b = ((BlockItem)is.getItem()).getBlock();
 			if (b.getDefaultState().getMaterial() == Material.SOIL || b.getDefaultState().getMaterial() == Material.SOLID_ORGANIC) {
 				isProbablyGrass = true;
@@ -165,8 +165,8 @@ public class WoinaDrops {
 		Vec3i faceVec = quad.getFace().getVector();
 		Vec3f normal = new Vec3f(faceVec.getX(), faceVec.getY(), faceVec.getZ());
 		Vector4f pos = new Vector4f(0, 0, 0, 1);
-		Matrix4f mat = ent.getModel();
-		normal.transform(ent.getNormal());
+		Matrix4f mat = ent.getPositionMatrix();
+		normal.transform(ent.getNormalMatrix());
 		int j = data.length / 8;
 		try (MemoryStack stack = MemoryStack.stackPush()) {
 			ByteBuffer buf = stack.malloc(VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL.getVertexSize());

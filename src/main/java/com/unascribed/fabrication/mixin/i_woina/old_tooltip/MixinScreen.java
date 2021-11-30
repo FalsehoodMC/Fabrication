@@ -65,7 +65,7 @@ public abstract class MixinScreen extends AbstractParentElement implements Drawa
 				}
 				matrices.push();
 				matrices.translate(0.0D, 0.0D, 400.0D);
-				Matrix4f matrix4f = matrices.peek().getModel();
+				Matrix4f matrix4f = matrices.peek().getPositionMatrix();
 				VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
 				this.fillGradient(matrices, k - 3, l - 3, k + i + 3, l + (11 * components.size()), -1073741824, -1073741824);
 				for (int s = 0; s < components.size(); ++s) {

@@ -65,6 +65,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.ChunkStatus;
+import net.minecraft.world.gen.chunk.ChunkGenerator;
 
 public class FeatureFabricationCommand implements Feature {
 
@@ -228,7 +229,8 @@ public class FeatureFabricationCommand implements Feature {
 							for (int cX = 0; cX < 16; cX++) {
 								for (int cZ = 0; cZ < 16; cZ++) {
 									if (biomes != null) {
-										Biome b = ((ServerWorld)world).getChunkManager().getChunkGenerator().getBiomeSource().getBiomeForNoiseGen(cX+chunk.getPos().getStartX(), cY, cZ+chunk.getPos().getStartZ());
+										ChunkGenerator generator = ((ServerWorld)world).getChunkManager().getChunkGenerator();
+										Biome b = generator.getBiomeSource().getBiome(cX+chunk.getPos().getStartX(), cY, cZ+chunk.getPos().getStartZ(), generator.getMultiNoiseSampler());
 										if (!biomes.contains(b)) {
 											skipped++;
 											if (skipped > goal && scanned == 0) {
@@ -318,10 +320,10 @@ public class FeatureFabricationCommand implements Feature {
 
 			ServerCommandSource scs = (ServerCommandSource)s;
 			if (scs.hasPermissionLevel(2)) return true;
-			if (scs.getServer().isSinglePlayer() && scs.getEntity() != null) {
+			if (scs.getServer().isSingleplayer() && scs.getEntity() != null) {
 				Entity e = scs.getEntity();
 				if (e instanceof PlayerEntity) {
-					if (scs.getServer().getUserName().equals(((PlayerEntity)e).getGameProfile().getName())) {
+					if (scs.getServer().getSinglePlayerName().equals(((PlayerEntity)e).getGameProfile().getName())) {
 						// always allow in singleplayer, even if cheats are off
 						return true;
 					}

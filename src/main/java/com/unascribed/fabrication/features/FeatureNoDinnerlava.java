@@ -8,7 +8,7 @@ import com.unascribed.fabrication.support.Feature;
 import com.google.common.collect.ImmutableSet;
 
 import net.minecraft.block.Block;
-import net.minecraft.world.gen.feature.ConfiguredFeatures.Configs;
+import net.minecraft.world.gen.feature.NetherConfiguredFeatures;
 
 @EligibleIf(configAvailable="*.no_dinnerlava")
 public class FeatureNoDinnerlava implements Feature {
@@ -17,14 +17,14 @@ public class FeatureNoDinnerlava implements Feature {
 
 	@Override
 	public void apply() {
-		originalValidBlocks = Configs.ENCLOSED_NETHER_SPRING_CONFIG.validBlocks;
-		Configs.ENCLOSED_NETHER_SPRING_CONFIG.validBlocks = ImmutableSet.of();
+		originalValidBlocks = NetherConfiguredFeatures.SPRING_NETHER_CLOSED.config.validBlocks;
+		NetherConfiguredFeatures.SPRING_NETHER_CLOSED.config.validBlocks = ImmutableSet.of();
 	}
 
 	@Override
 	public boolean undo() {
 		if (originalValidBlocks != null) {
-			Configs.ENCLOSED_NETHER_SPRING_CONFIG.validBlocks = originalValidBlocks;
+			NetherConfiguredFeatures.SPRING_NETHER_CLOSED.config.validBlocks = originalValidBlocks;
 			originalValidBlocks = null;
 		}
 		return true;

@@ -25,9 +25,9 @@ public class MixinExperienceOrbEntityRenderer {
 	private final Random fabrication$colorDecider = new Random();
 
 	@Shadow
-	private static void method_23171(VertexConsumer vertexConsumer, Matrix4f matrix4f, Matrix3f matrix3f, float f, float g, int i, int j, int k, float h, float l, int m) {}
+	private static void vertex(VertexConsumer vertexConsumer, Matrix4f matrix4f, Matrix3f matrix3f, float f, float g, int i, int j, int k, float h, float l, int m) {}
 
-	@Redirect(at=@At(value="INVOKE", target="net/minecraft/client/render/entity/ExperienceOrbEntityRenderer.method_23171(Lnet/minecraft/client/render/VertexConsumer;Lnet/minecraft/util/math/Matrix4f;Lnet/minecraft/util/math/Matrix3f;FFIIIFFI)V"),
+	@Redirect(at=@At(value="INVOKE", target="net/minecraft/client/render/entity/ExperienceOrbEntityRenderer.vertex(Lnet/minecraft/client/render/VertexConsumer;Lnet/minecraft/util/math/Matrix4f;Lnet/minecraft/util/math/Matrix3f;FFIIIFFI)V"),
 			method="render(Lnet/minecraft/entity/ExperienceOrbEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")
 	public void addVertex(VertexConsumer arg1, Matrix4f arg2, Matrix3f arg3, float arg4, float arg5, int r, int g, int b, float arg9, float arg10, int arg11, ExperienceOrbEntity entity) {
 		if (MixinConfigPlugin.isEnabled("*.rainbow_experience")) {
@@ -46,7 +46,7 @@ public class MixinExperienceOrbEntityRenderer {
 			g = (int)((g1+((g2-g1)*a))*255);
 			b = (int)((b1+((b2-b1)*a))*255);
 		}
-		method_23171(arg1, arg2, arg3, arg4, arg5, r, g, b, arg9, arg10, arg11);
+		vertex(arg1, arg2, arg3, arg4, arg5, r, g, b, arg9, arg10, arg11);
 	}
 
 }

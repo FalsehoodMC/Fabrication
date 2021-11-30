@@ -23,7 +23,7 @@ import net.minecraft.util.math.BlockPos;
 public class MixinGlassBottleDispenserBehavior extends FallibleItemDispenserBehavior {
 
 	@Shadow
-	private ItemStack method_22141(BlockPointer blockPointer, ItemStack emptyBottleStack, ItemStack filledBottleStack) { return null; }
+	private ItemStack tryPutFilledBottle(BlockPointer blockPointer, ItemStack emptyBottleStack, ItemStack filledBottleStack) { return null; }
 
 	@Inject(at=@At("HEAD"), method="dispenseSilently(Lnet/minecraft/util/math/BlockPointer;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;",
 			cancellable=true)
@@ -33,7 +33,7 @@ public class MixinGlassBottleDispenserBehavior extends FallibleItemDispenserBeha
 		BlockState state = w.getBlockState(pos);
 		if (state.getBlock() == Blocks.CRYING_OBSIDIAN) {
 			setSuccess(true);
-			ci.setReturnValue(method_22141(pointer, stack, ObsidianTears.createStack(pointer.getWorld(), pos)));
+			ci.setReturnValue(tryPutFilledBottle(pointer, stack, ObsidianTears.createStack(pointer.getWorld(), pos)));
 		}
 	}
 

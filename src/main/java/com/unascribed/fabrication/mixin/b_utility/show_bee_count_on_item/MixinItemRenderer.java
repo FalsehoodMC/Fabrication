@@ -37,7 +37,7 @@ public class MixinItemRenderer {
 		matrixStack.translate(0, 0, zOffset + 200);
 		VertexConsumerProvider.Immediate vc = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
 		String count = String.valueOf(((NbtList)tag.get("Bees")).size());
-		renderer.draw(count, (float)(x + 19 - 2 - renderer.getWidth(count)), (float)(y), 16777045, true, matrixStack.peek().getModel(), vc, false, 0, 15728880);
+		renderer.draw(count, (float)(x + 19 - 2 - renderer.getWidth(count)), (float)(y), 16777045, true, matrixStack.peek().getPositionMatrix(), vc, false, 0, 15728880);
 		vc.draw();
 	}
 }

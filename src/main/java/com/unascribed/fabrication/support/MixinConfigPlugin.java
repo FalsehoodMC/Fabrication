@@ -1,12 +1,7 @@
 package com.unascribed.fabrication.support;
 
 import java.awt.Toolkit;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -807,7 +802,12 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 				return rtrn;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			// silences "java.lang.NoSuchMethodException: com.google.common.reflect.ClassPath$ClassInfo.<init>(java.lang.String,java.lang.ClassLoader)"
+			// attempting to fix ClassInfo to have correct args causes no mixins to load
+			// doing this just to prevent people opening issues about it
+			if (!(e instanceof NoSuchMethodException)) {
+				e.printStackTrace();
+			}
 		}
 		try {
 			return ClassPath.from(MixinConfigPlugin.class.getClassLoader()).getTopLevelClassesRecursive(pkg);

@@ -97,7 +97,7 @@ public class SpriteLava extends Sprite implements TextureTickListener {
 			var6 = (int)(var3 * var3 * 255.0F);
 			var7 = (int)(var3 * var3 * var3 * var3 * 128.0F);
 
-			images[0].setPixelColor(var2%16, var2/16, (var5) | (var6 << 8) | (var7 << 16) | 0xFF000000);
+			images[0].setColor(var2%16, var2/16, (var5) | (var6 << 8) | (var7 << 16) | 0xFF000000);
 		}
 	}
 }

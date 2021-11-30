@@ -46,8 +46,8 @@ public class MixinBannerBlockEntityRenderer {
 			((Immediate)vertexConsumers).draw();
 			RenderSystem.enablePolygonOffset();
 			RenderSystem.polygonOffset(-3, -3);
-			Matrix4f mdl = matrices.peek().getModel();
-			Matrix3f nrm = matrices.peek().getNormal();
+			Matrix4f mdl = matrices.peek().getPositionMatrix();
+			Matrix3f nrm = matrices.peek().getNormalMatrix();
 			for (Pair<BannerPattern, DyeColor> pattern : patterns) {
 				float[] col = pattern.getSecond().getColorComponents();
 				SpriteIdentifier si = new SpriteIdentifier(TexturedRenderLayers.BANNER_PATTERNS_ATLAS_TEXTURE, pattern.getFirst().getSpriteId(true));
