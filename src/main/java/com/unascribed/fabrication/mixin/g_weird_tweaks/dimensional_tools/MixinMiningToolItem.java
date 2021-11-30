@@ -18,7 +18,10 @@ import com.google.common.collect.Sets;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.MiningToolItem;
 import net.minecraft.nbt.NbtCompound;
@@ -106,6 +109,10 @@ public class MixinMiningToolItem {
 				});
 				world.playSound(null, miner.getPos().x, miner.getPos().y, miner.getPos().z, SoundEvents.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, miner.getSoundCategory(), factor/125f, 2.0f);
 				world.sendEntityStatus(miner, (byte)47);
+				miner.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 40, 3, false, false, false));
+				if (miner instanceof PlayerEntity) {
+					((PlayerEntity)miner).getItemCooldownManager().set((Item)(Object)this, 40);
+				}
 			} else if (factor == 0) {
 				ci.setReturnValue(true);
 			}
