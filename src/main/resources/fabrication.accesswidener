@@ -5,11 +5,5 @@ mutable field net/minecraft/resource/ResourcePackManager providers Ljava/util/Se
 mutable field net/minecraft/predicate/entity/EntityPredicates EXCEPT_CREATIVE_OR_SPECTATOR Ljava/util/function/Predicate;
 mutable field net/minecraft/world/gen/feature/SpringFeatureConfig validBlocks Ljava/util/Set;
 
-# for some reason these aren't being remapped... ref #273
-mutable field net/minecraft/resource/ResourcePackManager field_14227 Ljava/util/Set;
-
-mutable field net/minecraft/predicate/entity/EntityPredicates field_6156 Ljava/util/function/Predicate;
-mutable field net/minecraft/world/gen/feature/SpringFeatureConfig field_21287 Ljava/util/Set;
-
 accessible class net/minecraft/server/world/ThreadedAnvilChunkStorage$EntityTracker
 accessible class net/minecraft/client/texture/Sprite$Animation

@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '0.8-SNAPSHOT'
+	id 'fabric-loom' version '0.10-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -12,20 +12,27 @@ group = project.maven_group
 
 repositories {
 	maven {
-		url = "https://repo.unascribed.com"
+		url 'https://repo.unascribed.com'
+		content {
+			includeGroup "com.unascribed"
+		}
 	}
 	maven {
-		name = "JitPack"
-		url = "https://jitpack.io"
+		url 'https://maven.terraformersmc.com/releases'
+		content {
+			includeGroup "com.terraformersmc"
+		}
 	}
 	maven {
-		name = "TerraformersMC"
-		url = "https://maven.terraformersmc.com/releases"
-	}
-	maven {
-		url = 'https://maven.ssf.tf/'
+		url 'https://maven.ssf.tf/'
 		content {
 			includeGroup "tf.ssf.sfort"
+		}
+	}
+	maven {
+		url 'https://maven.gegy.dev/releases'
+		content {
+			includeGroup "io.github.queerbric"
 		}
 	}
 }
@@ -42,7 +49,7 @@ dependencies {
 	modImplementation include(fabricApi.module("fabric-key-binding-api-v1", "${project.fabric_version}"))
 	modImplementation include(fabricApi.module("fabric-rendering-v1", "${project.fabric_version}"))
 	
-	modImplementation(include("com.github.Queerbric:pridelib:d8ead31410")) {
+	modImplementation(include("io.github.queerbric:pridelib:1.1.0+1.17")) {
 		transitive = false
 	}
 	modImplementation("com.terraformersmc:modmenu:2.0.3") {
@@ -52,12 +59,10 @@ dependencies {
 	modImplementation("tf.ssf.sfort:fscript:1.1.5") {
 		transitive = false
 	}
-	modRuntime fabricApi.module("fabric-screen-api-v1", "${project.fabric_version}")
+	modRuntimeOnly fabricApi.module("fabric-screen-api-v1", "${project.fabric_version}")
 }
 
-minecraft {
-	accessWidener "src/main/resources/fabrication.accesswidener"
-}
+loom.accessWidenerPath = file("src/main/resources/fabrication.accesswidener")
 
 processResources {
 	inputs.property "version", project.version
