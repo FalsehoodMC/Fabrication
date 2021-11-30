@@ -1,0 +1,7 @@
+weird_tweaks.extra.thrown_buckets_empty_lava_cauldrons:
+	name: Thrown Buckets Empty Lava Cauldrons
+	since: 2.1.0
+	sides: server_only
+	default: never
+	desc:
+		Throwing an bucket at a lava cauldron will pickup the lava.
