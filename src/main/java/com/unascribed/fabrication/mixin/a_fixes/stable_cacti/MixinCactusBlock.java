@@ -58,7 +58,7 @@ public class MixinCactusBlock extends Block {
 				}
 			}
 			if (shouldBreak) {
-				world.getBlockTickScheduler().schedule(posFrom, this, 1);
+				world.createAndScheduleBlockTick(posFrom, this, 1);
 			}
 		}
 	}

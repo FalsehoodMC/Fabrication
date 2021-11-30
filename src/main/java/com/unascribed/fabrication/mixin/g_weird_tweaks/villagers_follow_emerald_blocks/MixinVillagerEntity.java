@@ -26,7 +26,7 @@ public abstract class MixinVillagerEntity extends MerchantEntity  {
 			if (world.getTime()%40 == 0)
 				fabrication$player = world.getClosestPlayer(getX(), getY(), getZ(), 10, (player) -> player instanceof PlayerEntity && !player.isSpectator() && ((PlayerEntity)player).isHolding(Items.EMERALD_BLOCK));
 			if (fabrication$player != null) {
-				getLookControl().lookAt(fabrication$player, getBodyYawSpeed(), getLookPitchSpeed());
+				getLookControl().lookAt(fabrication$player, getMaxHeadRotation(), getMaxLookPitchChange());
 				if (squaredDistanceTo(fabrication$player) < 6.25D)
 					getNavigation().stop();
 				else

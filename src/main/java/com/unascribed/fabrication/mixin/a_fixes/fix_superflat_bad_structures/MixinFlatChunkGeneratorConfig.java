@@ -1,5 +1,7 @@
 package com.unascribed.fabrication.mixin.a_fixes.fix_superflat_bad_structures;
 
+import net.minecraft.world.gen.GenerationStep;
+import net.minecraft.world.gen.feature.PlacedFeature;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -23,13 +25,13 @@ public class MixinFlatChunkGeneratorConfig {
 	@Shadow @Final
 	private Registry<Biome> biomeRegistry;
 
-	@Redirect(at=@At(value="INVOKE", target="net/minecraft/world/biome/GenerationSettings$Builder.structureFeature(Lnet/minecraft/world/gen/feature/ConfiguredStructureFeature;)Lnet/minecraft/world/biome/GenerationSettings$Builder;"),
+	@Redirect(at=@At(value="INVOKE", target="net/minecraft/world/biome/GenerationSettings$Builder.feature (Lnet/minecraft/world/gen/GenerationStep$Feature;Lnet/minecraft/world/gen/feature/PlacedFeature;)Lnet/minecraft/world/biome/GenerationSettings$Builder;"),
 			method="createBiome()Lnet/minecraft/world/biome/Biome;")
-	public GenerationSettings.Builder createBiomeAddStructureFeature(GenerationSettings.Builder subject, ConfiguredStructureFeature<?, ?> feature) {
+	public GenerationSettings.Builder createBiomeAddStructureFeature(GenerationSettings.Builder subject, GenerationStep.Feature featureStep, PlacedFeature feature) {
 		if (MixinConfigPlugin.isEnabled("*.fix_superflat_bad_structures") && feature == null) {
 			FabLog.debug("Preventing a bad structure from being added to a flat world generator.");
 		} else {
-			subject.structureFeature(feature);
+			subject.feature(featureStep, feature);
 		}
 		return subject;
 	}

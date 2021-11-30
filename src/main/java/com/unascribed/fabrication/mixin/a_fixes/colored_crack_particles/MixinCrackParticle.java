@@ -27,7 +27,7 @@ public abstract class MixinCrackParticle extends SpriteBillboardParticle {
 	@Inject(at=@At("TAIL"), method="<init>(Lnet/minecraft/client/world/ClientWorld;DDDLnet/minecraft/item/ItemStack;)V")
 	public void construct(ClientWorld world, double x, double y, double z, ItemStack stack, CallbackInfo ci) {
 		if (!MixinConfigPlugin.isEnabled("*.colored_crack_particles")) return;
-		int c = FabRefl.Client.getItemColors(MinecraftClient.getInstance()).getColorMultiplier(stack, 0);
+		int c = FabRefl.Client.getItemColors(MinecraftClient.getInstance()).getColor(stack, 0);
 		setColor(((c>>16)&0xFF)/255f, ((c>>8)&0xFF)/255f, (c&0xFF)/255f);
 	}
 

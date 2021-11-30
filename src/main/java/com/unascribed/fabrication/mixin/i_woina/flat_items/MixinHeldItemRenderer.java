@@ -35,7 +35,7 @@ public class MixinHeldItemRenderer {
 				if (orig == Mode.FIRST_PERSON_LEFT_HAND || orig == Mode.FIRST_PERSON_RIGHT_HAND) {
 					matrices.translate(leftHanded ? -0.1 : 0.1, -0.16, -0.15);
 					// multiply the model matrix directly to avoid corrupting normals
-					matrices.peek().getModel().multiply(Matrix4f.scale(1, 1, 0));
+					matrices.peek().getPositionMatrix().multiply(Matrix4f.scale(1, 1, 0));
 					if (leftHanded) {
 						matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180));
 					}

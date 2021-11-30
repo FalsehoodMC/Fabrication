@@ -8,9 +8,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 
-import net.minecraft.client.render.SkyProperties;
+import net.minecraft.client.render.DimensionEffects;
 
-@Mixin(SkyProperties.Nether.class)
+@Mixin(DimensionEffects.Nether.class)
 @EligibleIf(configAvailable="*.disable_nether_fog")
 public class MixinEntity {
 

@@ -85,7 +85,7 @@ public class MixinItemRenderer {
 				}
 			}
 			String firstCodepoint = new String(Character.toChars(translated.codePoints().findFirst().getAsInt()));
-			renderer.draw(firstCodepoint, x, y + 6 + 3, display.isCursed() ? 0xFFFF5555 : display.isTreasure() ? 0xFF55FFFF : 0xFFFFFFFF, true, matrixStack.peek().getModel(), vc, false, 0, 0xF000F0);
+			renderer.draw(firstCodepoint, x, y + 6 + 3, display.isCursed() ? 0xFFFF5555 : display.isTreasure() ? 0xFF55FFFF : 0xFFFFFFFF, true, matrixStack.peek().getPositionMatrix(), vc, false, 0, 0xF000F0);
 			vc.draw();
 		}
 		if (MixinConfigPlugin.isEnabled("*.tools_show_important_enchant")) {
@@ -100,7 +100,7 @@ public class MixinItemRenderer {
 			if (display != null) {
 				String translated = I18n.translate(display.getTranslationKey());
 				String firstCodepoint = new String(Character.toChars(translated.codePoints().findFirst().getAsInt()));
-				renderer.draw(firstCodepoint, x, y, 0xFFFF55FF, true, matrixStack.peek().getModel(), vc, false, 0, 0xF000F0);
+				renderer.draw(firstCodepoint, x, y, 0xFFFF55FF, true, matrixStack.peek().getPositionMatrix(), vc, false, 0, 0xF000F0);
 				vc.draw();
 			}
 		}
