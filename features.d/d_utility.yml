@@ -232,6 +232,14 @@ utility.show_bee_count_tooltip:
 	sides: client_only
 	desc:
 		Makes bee hive tooltips show amount of contained bees.
+
+utility.extract_furnace_xp:
+	name: Extract Furnace Experience
+	since: 2.1.0
+	sides: server_only
+	desc:
+		Allows clicking on the empty output slot of a furnace to extract the experience, instead of
+		needing to break it.
 		
 # kate: space-indent off
 # vim: noai:noet
