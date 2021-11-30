@@ -303,5 +303,22 @@ tweaks.no_trample:
 	desc:
 		Farmland will not get trampled.
 
+tweaks.bush_walk_doesnt_hurt:
+	name: Bush Walk Doesn't Hurt
+	since: 2.1.0
+	sides: server_only
+	fscript: living_entity
+	desc:
+		Makes walking through berry bushes not deal damage.
+
+tweaks.bush_walk_doesnt_hurt_when_sneaking:
+	name: Bush Walk Doesn't Hurt When Sneaking
+	since: 2.1.0
+	sides: server_only
+	extend: *.bush_walk_doesnt_hurt
+	fscript_default: sneaky
+	desc:
+		Makes walking through berry bushes when sneaking not deal damage.
+
 # kate: space-indent off
 # vim: noai:noet
