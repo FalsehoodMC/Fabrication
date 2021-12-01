@@ -62,27 +62,27 @@ public class ConfigPredicates {
 	}
 
 	static{
-		defaults.put("*.cactus_walk_doesnt_hurt_with_boots",
+		defaults.put(remap("*.cactus_walk_doesnt_hurt_with_boots"),
 				(Predicate<LivingEntity>) livingEntity ->
 		!livingEntity.getEquippedStack(EquipmentSlot.FEET).isEmpty()
 				);
-		defaults.put("*.cactus_brush_doesnt_hurt_with_chest",
+		defaults.put(remap("*.cactus_brush_doesnt_hurt_with_chest"),
 				(Predicate<LivingEntity>) livingEntity ->
 		!livingEntity.getEquippedStack(EquipmentSlot.CHEST).isEmpty()
 				);
-		defaults.put("*.creepers_explode_when_on_fire",
+		defaults.put(remap("*.creepers_explode_when_on_fire"),
 				(Predicate<LivingEntity>) livingEntity ->
 		livingEntity.getFireTicks() > 0 && !livingEntity.hasStatusEffect(StatusEffects.FIRE_RESISTANCE)
 				);
-		defaults.put("*.cactus_punching_hurts",
+		defaults.put(remap("*.cactus_punching_hurts"),
 				(Predicate<ServerPlayerEntity>) serverPlayerEntity ->
 		serverPlayerEntity.getMainHandStack().isEmpty()
 				);
-		defaults.put("*.feather_falling_five",
+		defaults.put(remap("*.feather_falling_five"),
 				(Predicate<LivingEntity>) livingEntity ->
 		EnchantmentHelper.getLevel(Enchantments.FEATHER_FALLING, livingEntity.getEquippedStack(EquipmentSlot.FEET)) >= 5
 				);
-		defaults.put("*.feather_falling_five_damages_boots",
+		defaults.put(remap("*.feather_falling_five_damages_boots"),
 				(Predicate<LivingEntity>) livingEntity ->
 		EnchantmentHelper.getLevel(Enchantments.FEATHER_FALLING, livingEntity.getEquippedStack(EquipmentSlot.FEET)) >= 5
 				);
