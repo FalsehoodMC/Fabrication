@@ -89,17 +89,17 @@ public class Failsoft {
 		String refMapStatus = mixin.getReferenceMapper().getStatus();
 		//		String extraInfo = ii.getDynamicInfo() + ii.getMessages();
 		if ((mixin.getOption(Option.DEBUG_INJECTORS) && ii.getInjectedCallbackCount() < expectedCallbackCount)) {
-			handleApplyErrorProactively(mixin.getTargetClassInfo().getClassName(), new InvalidInjectionException(ii.getContext(),
+			handleApplyErrorProactively(mixin.getTargetClassInfo().getClassName(), new InvalidInjectionException(ii.getMixin(),
 					String.format("Injection validation failed: %s %s%s in %s expected %d invocation(s) but %d succeeded. Scanned %d target(s). %s%s",
 							description, ii.getMethodName(), ii.getMethod().desc, mixin, expectedCallbackCount, ii.getInjectedCallbackCount(),
 							targetCount, refMapStatus, extraInfo)), mixin.getMixin(), ErrorAction.ERROR);
 		} else if (injectedCallbackCount < requiredCallbackCount) {
-			handleApplyErrorProactively(mixin.getTargetClassInfo().getClassName(),  new InvalidInjectionException(ii.getContext(),
+			handleApplyErrorProactively(mixin.getTargetClassInfo().getClassName(),  new InvalidInjectionException(ii.getMixin(),
 					String.format("Critical injection failure: %s %s%s in %s failed injection check, (%d/%d) succeeded. Scanned %d target(s). %s%s",
 							description, ii.getMethodName(), ii.getMethod().desc, mixin, ii.getInjectedCallbackCount(), requiredCallbackCount,
 							targetCount, refMapStatus, extraInfo)), mixin.getMixin(), ErrorAction.ERROR);
 		} else if (injectedCallbackCount > maxCallbackCount) {
-			handleApplyErrorProactively(mixin.getTargetClassInfo().getClassName(),  new InvalidInjectionException(ii.getContext(),
+			handleApplyErrorProactively(mixin.getTargetClassInfo().getClassName(),  new InvalidInjectionException(ii.getMixin(),
 					String.format("Critical injection failure: %s %s%s in %s failed injection check, %d succeeded of %d allowed.%s",
 							description, ii.getMethodName(), ii.getMethod().desc, mixin, ii.getInjectedCallbackCount(), maxCallbackCount, extraInfo)), mixin.getMixin(), ErrorAction.ERROR);
 		}
