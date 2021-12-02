@@ -2,7 +2,6 @@ package com.unascribed.fabrication.mixin.g_weird_tweaks.foliage_creepers;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.util.Grayscale;
 import com.unascribed.fabrication.util.GrayscaleIdentifier;
 import net.minecraft.resource.ResourceImpl;
@@ -27,8 +26,8 @@ public abstract class MixinResourceImpl {
 
 	@Inject(at=@At("TAIL"), method= "<init>(Ljava/lang/String;Lnet/minecraft/util/Identifier;Ljava/io/InputStream;Ljava/io/InputStream;)V")
 	public void convertToGrayscale(String packName, Identifier id, InputStream inputStream, InputStream metaInputStream, CallbackInfo ci){
-		if (!(MixinConfigPlugin.isEnabled("*.foliage_creepers") && this.id instanceof GrayscaleIdentifier)) return;
-		this.inputStream = new Grayscale(this.inputStream);
+		if (this.id instanceof GrayscaleIdentifier)
+			this.inputStream = new Grayscale(this.inputStream);
 	}
 
 }
