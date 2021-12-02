@@ -47,8 +47,11 @@ public abstract class MixinPoweredRailBlock extends AbstractRailBlock {
 	
 	@Override
 	public int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
-		if (!MixinConfigPlugin.isEnabled("*.detecting_powered_rails") || !world.getBlockState(pos.offset(direction)).isOf(Blocks.REPEATER)) return 0;
+		if (!MixinConfigPlugin.isEnabled("*.detecting_powered_rails")) return 0;
 		if (!(world instanceof World)) return 0;
+		BlockState who = world.getBlockState(pos.offset(direction.getOpposite()));
+		if (!who.isOf(Blocks.REPEATER)) return 0;
+		if (who.get(RepeaterBlock.FACING) != direction) return 0;
 		return ((AccessorDetectorRailBlock)Blocks.DETECTOR_RAIL).fabrication$getCarts((World)world, pos, AbstractMinecartEntity.class, e -> true).isEmpty() ? 0 : 15;
 	}
 	
