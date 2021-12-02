@@ -44,7 +44,7 @@ public abstract class MixinPoweredRailBlock extends AbstractRailBlock {
 		if (!MixinConfigPlugin.isEnabled("*.detecting_powered_rails")) return 0;
 		return Blocks.DETECTOR_RAIL.getComparatorOutput(Blocks.DETECTOR_RAIL.getDefaultState().with(DetectorRailBlock.POWERED, true), world, pos);
 	}
-	
+
 	@Override
 	public int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
 		if (!MixinConfigPlugin.isEnabled("*.detecting_powered_rails")) return 0;
@@ -54,7 +54,7 @@ public abstract class MixinPoweredRailBlock extends AbstractRailBlock {
 		if (who.get(RepeaterBlock.FACING) != direction) return 0;
 		return ((AccessorDetectorRailBlock)Blocks.DETECTOR_RAIL).fabrication$getCarts((World)world, pos, AbstractMinecartEntity.class, e -> true).isEmpty() ? 0 : 15;
 	}
-	
+
 	@Override
 	public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
 		if (!MixinConfigPlugin.isEnabled("*.detecting_powered_rails")) return;
@@ -82,10 +82,10 @@ public abstract class MixinPoweredRailBlock extends AbstractRailBlock {
 					}
 				}
 			}
-			world.getBlockTickScheduler().schedule(pos, this, 20);
+			world.createAndScheduleBlockTick(pos, this, 20);
 			world.updateComparators(pos, this);
 		}
 	}
 
-	
+
 }
