@@ -44,7 +44,7 @@ mechanics.broken_tools_drop_components:
 		config/fabrication/gear_components.ini.
 		
 		Also works with nonplayer entities, where it is affected by their drop chance table.
-		
+
 mechanics.obsidian_tears:
 	name: Obsidian Tears
 	since: 1.2.8
@@ -79,7 +79,7 @@ mechanics.anvil_repair:
 	sides: server_only
 	media: https://unascribed.com/fabrication/anvil_repair.mp4
 	desc:
-		Allows right-clicking on an anvil with a Block of Iron to repair it one stage. 
+		Allows right-clicking on an anvil with a Block of Iron to repair it one stage.
 
 mechanics.pursurvers:
 	name: Pursurvers
@@ -97,6 +97,33 @@ mechanics.bottled_air:
 	media: https://unascribed.com/fabrication/bottled_air.mp4
 	desc:
 		Filling a glass bottle underwater refills 1 air bubble.
+
+mechanics.detecting_powered_rails:
+	name: Detecting Powered Rails
+	since: 2.2.0
+	sides: server_only
+	desc:
+		Allows using a comparator on a powered rail just like a detector rail. Makes minecart
+		logistics a lot easier. Also allows using a repeater to do normal detection.
+
+mechanics.directional_powered_rails:
+	name: Directional Powered Rails
+	since: 2.2.0
+	sides: server_only
+	desc:
+		Placing magenta glazed terracotta under a powered rail makes it push minecarts in the
+		direction of the arrow, even from a stop. They also work as hard stops for carts going the
+		wrong direction.
+		
+		Works similar to a Railcraft Boarding Track.
+
+mechanics.directional_detector_rails:
+	name: Directional Detector Rails
+	since: 2.2.0
+	sides: server_only
+	desc:
+		Placing magenta glazed terracotta under a detector rail makes it only detect minecarts
+		moving in the direction of the arrow.
 
 # kate: space-indent off
 # vim: noai:noet
