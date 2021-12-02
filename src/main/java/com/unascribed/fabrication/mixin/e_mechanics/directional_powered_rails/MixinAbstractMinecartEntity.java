@@ -37,19 +37,23 @@ public abstract class MixinAbstractMinecartEntity extends Entity {
 			BlockState downState = world.getBlockState(down);
 			if (downState.isOf(Blocks.MAGENTA_GLAZED_TERRACOTTA)) {
 				Direction dir = downState.get(GlazedTerracottaBlock.FACING).getOpposite();
-				double addition = state.get(PoweredRailBlock.POWERED) ? 0.1 : 0;
 				Vec3d vel = getVelocity();
-				if (dir.getAxis() == Axis.X) {
-					if (dir.getDirection().offset() != Math.signum(vel.getX())) {
-						vel = vel.multiply(0, 1, 1);
+				if (state.get(PoweredRailBlock.POWERED)) {
+					double addition = 0.1;
+					if (dir.getAxis() == Axis.X) {
+						if (dir.getDirection().offset() != Math.signum(vel.getX())) {
+							vel = vel.multiply(0, 1, 1);
+						}
 					}
-				}
-				if (dir.getAxis() == Axis.Z) {
-					if (dir.getDirection().offset() != Math.signum(vel.getZ())) {
-						vel = vel.multiply(1, 1, 0);
+					if (dir.getAxis() == Axis.Z) {
+						if (dir.getDirection().offset() != Math.signum(vel.getZ())) {
+							vel = vel.multiply(1, 1, 0);
+						}
 					}
+					vel = vel.add(dir.getOffsetX()*addition, dir.getOffsetY()*addition, dir.getOffsetZ()*addition);
+				} else {
+					vel = vel.multiply(0.025);
 				}
-				vel = vel.add(dir.getOffsetX()*addition, dir.getOffsetY()*addition, dir.getOffsetZ()*addition);
 				setVelocity(vel);
 			}
 		}
