@@ -18,7 +18,7 @@ import net.minecraft.world.World;
 @EligibleIf(configAvailable="*.detecting_powered_rails")
 public interface AccessorDetectorRailBlock {
 
-	@Invoker("getCarts(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Ljava/lang/Class;Ljava/util/function/Predicate;)Ljava/util/List;")
+	@Invoker("getCarts")
 	<T extends AbstractMinecartEntity> List<T> fabrication$getCarts(World world, BlockPos pos, Class<T> entityClass, Predicate<Entity> entityPredicate);
 	
 }
