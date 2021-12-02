@@ -31,7 +31,7 @@ public abstract class MixinAnimalEntity extends PassiveEntity {
 		Object self = this;
 		if (self instanceof SheepEntity && MixinConfigPlugin.isEnabled("*.old_sheep_shear") && ((SheepEntity)self).isShearable() && source.getAttacker() instanceof PlayerEntity) {
 			((SheepEntity)self).setSheared(true);
-			ItemStack wool = new ItemStack(((AccessorSheepEntity)this).fabrication$getDrops().get(((SheepEntity)self).getColor()), 1 + this.random.nextInt(3));
+			ItemStack wool = new ItemStack(AccessorSheepEntity.fabrication$getDrops().get(((SheepEntity)self).getColor()), 1 + this.random.nextInt(3));
 			ItemEntity itemEntity = this.dropStack(wool, 1);
 			if (itemEntity != null) {
 				itemEntity.setVelocity(itemEntity.getVelocity().add((this.random.nextFloat() - this.random.nextFloat()) * 0.1F, this.random.nextFloat() * 0.05F, (this.random.nextFloat() - this.random.nextFloat()) * 0.1F));

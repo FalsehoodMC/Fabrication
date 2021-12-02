@@ -160,6 +160,30 @@
 		let keys = [
 			"intro", "faq", {{#sections_incl_meta}}"{{{key}}}", {{#features_incl_meta}}"{{{key}}}", {{/features_incl_meta}}{{/sections_incl_meta}}
 		];
+		function setTarget(target){
+			var index = window.location.href.lastIndexOf('#');
+			window.history.pushState("", "",index == -1 ?window.location.href:window.location.href.slice(0,index)+'#'+target);
+		}
+		document.addEventListener('keydown',press=>{
+			let index = window.location.href.lastIndexOf('#');
+			if (index !== -1) {
+				for(let i = 0; i<keys.length-1; i++){
+					if (keys[i] === window.location.href.slice(index+1, window.location.href.length)){
+						if(press.keyCode === 40 || (press.keyCode === 38 && i !== 0)){
+							let j = press.keyCode === 40 ? 1 : -1;
+						let ele = document.getElementById(keys[i+j]+"-outer");
+							ele.scrollIntoView();
+							setTarget(keys[i+j]);
+							press.preventDefault();
+						}
+						break;
+					}
+				}
+			}else{
+				window.history.pushState("", "",window.location.href+'#');
+				press.preventDefault();
+			}
+		 });
 		document.addEventListener('scroll', () => {
 			if (banner.getBoundingClientRect().bottom+8 < 0) {
 				toc.classList.add("fixed");
@@ -170,8 +194,9 @@
 				let ele = document.getElementById(k+"-outer");
 				let tocent = document.getElementById(k+"-tocent");
 				let rect = ele.getBoundingClientRect();
-				if ((k === 'intro' || rect.top <= 0) && rect.bottom > 0) {
+				if ((k === 'intro' || rect.top <= 100) && rect.bottom > 100) {
 					tocent.classList.add("active");
+					setTarget(k);
 					if (tocent.nodeName === "SUMMARY" && !tocent.parentElement.open) {
 						tocent.parentElement.dataset.openDueToScroll = true;
 						tocent.parentElement.open = true;
