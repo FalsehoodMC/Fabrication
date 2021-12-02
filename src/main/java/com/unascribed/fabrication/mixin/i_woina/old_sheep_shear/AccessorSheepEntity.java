@@ -13,6 +13,8 @@ import net.minecraft.util.DyeColor;
 public interface AccessorSheepEntity {
 
 	@Accessor("DROPS")
-	Map<DyeColor, ItemConvertible> fabrication$getDrops();
+	static Map<DyeColor, ItemConvertible> fabrication$getDrops() {
+		return null;
+	}
 
 }
