@@ -14,5 +14,26 @@ minor_mechanics.extra.spiders_cant_climb_while_wet:
 		Interacts with Enhanced Moistness, and the demo video uses it for the water splash to work
 		like it does.
 
+minor_mechanics.extra.observers_see_entities:
+	name: Observers See Entities
+	since: 1.0
+	sides: server_only
+	media: https://unascribed.com/fabrication/observers_see_entities.mp4
+	default: never
+	desc:
+		Observers detect when entities move in front of them if they have no block in front of them.
+
+minor_mechanics.extra.observers_see_entities_living_only:
+	name: Observers See Entities - Living Only
+	since: 1.0
+	sides: server_only
+	parent: minor_mechanics.observers_see_entities
+	short_desc: Observers only detect living entities, and not e.g. item entities
+	default: never
+	desc:
+		Observers only detect living entities, and not e.g. item entities.
+		
+		Safety option to prevent breaking a variety of vanilla contraptions.
+
 # kate: space-indent off
 # vim: noai:noet

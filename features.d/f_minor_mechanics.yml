@@ -67,26 +67,6 @@ minor_mechanics.fire_protection_on_any_item:
 		Fire Protection can be applied to any enchantable item, and makes the item immune to fire
 		and lava damage.
 
-minor_mechanics.observers_see_entities:
-	name: Observers See Entities
-	since: 1.0
-	sides: server_only
-	media: https://unascribed.com/fabrication/observers_see_entities.mp4
-	desc:
-		Observers detect when entities move in front of them if they have no block in front of them.
-		Not as laggy as it sounds.
-
-minor_mechanics.observers_see_entities_living_only:
-	name: Observers See Entities - Living Only
-	since: 1.0
-	sides: server_only
-	parent: minor_mechanics.observers_see_entities
-	short_desc: Observers only detect living entities, and not e.g. item entities
-	desc:
-		Observers only detect living entities, and not e.g. item entities.
-		
-		Safety option to prevent breaking a variety of vanilla contraptions.
-
 minor_mechanics.exact_note_block_tuning:
 	name: Exact Note Block Tuning
 	since: 1.0
