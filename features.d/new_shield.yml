@@ -1,6 +1,6 @@
 balance.extra.brittle_shields:
 	name: Brittle Shields
-	since: 2.2.0
+	since: 2.3.0
 	default: burnt
 	sides: server_only
 	desc:
