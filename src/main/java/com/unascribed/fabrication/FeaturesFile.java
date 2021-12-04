@@ -27,6 +27,7 @@ public final class FeaturesFile {
 		SERVER_ONLY,
 		SERVER_ONLY_WITH_CLIENT_HELPER,
 		SERVER_AND_CLIENT,
+		X
 	}
 
 	public static final class FeatureEntry {

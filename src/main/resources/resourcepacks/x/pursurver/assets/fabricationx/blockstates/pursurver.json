@@ -1,0 +1,50 @@
+{
+  "variants": {
+    "facing=down,powered=false": {
+      "model": "fabricationx:block/pursurver",
+      "x": 90
+    },
+    "facing=down,powered=true": {
+      "model": "fabricationx:block/pursurver_on",
+      "x": 90
+    },
+    "facing=east,powered=false": {
+      "model": "fabricationx:block/pursurver",
+      "y": 90
+    },
+    "facing=east,powered=true": {
+      "model": "fabricationx:block/pursurver_on",
+      "y": 90
+    },
+    "facing=north,powered=false": {
+      "model": "fabricationx:block/pursurver"
+    },
+    "facing=north,powered=true": {
+      "model": "fabricationx:block/pursurver_on"
+    },
+    "facing=south,powered=false": {
+      "model": "fabricationx:block/pursurver",
+      "y": 180
+    },
+    "facing=south,powered=true": {
+      "model": "fabricationx:block/pursurver_on",
+      "y": 180
+    },
+    "facing=up,powered=false": {
+      "model": "fabricationx:block/pursurver",
+      "x": 270
+    },
+    "facing=up,powered=true": {
+      "model": "fabricationx:block/pursurver_on",
+      "x": 270
+    },
+    "facing=west,powered=false": {
+      "model": "fabricationx:block/pursurver",
+      "y": 270
+    },
+    "facing=west,powered=true": {
+      "model": "fabricationx:block/pursurver_on",
+      "y": 270
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+    "parent": "fabricationx:block/pursurver",
+    "textures": {
+        "bottom": "fabricationx:block/pursurver_back_on"
+    }
+}

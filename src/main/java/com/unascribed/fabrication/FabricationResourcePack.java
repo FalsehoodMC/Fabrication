@@ -62,7 +62,7 @@ public class FabricationResourcePack implements ResourcePack {
 	}
 
 	private URL url(String path) {
-		return getClass().getClassLoader().getResource("packs/"+this.path+"/"+path);
+		return getClass().getClassLoader().getResource("resourcepacks/"+this.path+"/"+path);
 	}
 
 	@Override

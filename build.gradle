@@ -36,6 +36,10 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
+	// all of FAPI, for Fabrication X
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+	// individual modules wanted by normal Fabrication
 	modImplementation include(fabricApi.module("fabric-resource-loader-v0", "${project.fabric_version}"))
 	modImplementation include(fabricApi.module("fabric-command-api-v1", "${project.fabric_version}"))
 	modImplementation include(fabricApi.module("fabric-item-api-v1", "${project.fabric_version}"))

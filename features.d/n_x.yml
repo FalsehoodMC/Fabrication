@@ -1,0 +1,23 @@
+# This is not actually a YAML file; it's only .yml for syntax highlighting.
+# Tab indentation *must* be used.
+
+x:
+	name: X
+	section: true
+	since: 2.3.0
+	# default to light since these features need you to explicitly install the Fabrication X dummy jar
+	default: light
+	desc:
+		Non-vanilla-compatible functionality. Must match client/server.
+
+x.pursurver_block:
+	name: Pursurvers
+	since: 2.3.0
+	sides: x
+	desc:
+		Adds a new "Purserver" block crafted with an Observer and a Purpur block. This replaces the
+		functionality of mechanics.pursurvers with a variant that feels less out of place in a more
+		heavily modded environment.
+
+# kate: space-indent off
+# vim: noai:noet

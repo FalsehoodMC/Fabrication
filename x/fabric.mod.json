@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "fabricationx",
+  "version": "1",
+
+  "name": "Fabrication X",
+  "description": "Additional functionality for Fabrication that breaks vanilla clients.",
+  "authors": [
+    "unascribed",
+    "SFort"
+  ],
+  "contact": {
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/fabrication",
+    "source": "https://github.com/unascribed/Fabrication",
+    "issues": "https://github.com/unascribed/Fabrication/issues"
+  },
+
+  "license": "MIT",
+
+  "environment": "*",
+  "entrypoints": {},
+  "icon": "fabrication-x.png",
+
+  "depends": {
+    "fabric": "*",
+    "fabrication": ">=2.3.0"
+  },
+  "custom": {
+    "modmenu": {
+      "parent": "fabrication"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "minecraft:observer"
+    },
+    {
+      "item": "minecraft:purpur_block"
+    }
+  ],
+  "result": {
+    "item": "fabricationx:pursurver"
+  }
+}
