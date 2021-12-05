@@ -21,16 +21,24 @@ public class MixinSignBlockEntityRenderer {
 	private static void modifySignTextColor(SignBlockEntity sign, CallbackInfoReturnable<Integer> cir) {
 		if (MixinConfigPlugin.isEnabled("*.legible_signs") && !sign.isGlowingText()){
 			DyeColor dc = sign.getTextColor();
-
-			cir.setReturnValue(switch (dc) {
-				case BLACK -> 0x000000;
-				case GRAY -> 0x333333;
-				case BROWN -> dc.getSignColor();
-				default -> {
+			
+			int res;
+			switch (dc) {
+				case BLACK:
+					res = 0x000000;
+					break;
+				case GRAY:
+					res = 0x333333;
+					break;
+				case BROWN:
+					res = dc.getSignColor();
+					break;
+				default: {
 					float[] bgr = dc.getColorComponents();
-					yield  Math.round(bgr[0]*255.0F) << 16 | Math.round(bgr[1]*255.0F) << 8 | Math.round(bgr[2]*255);
+					res = Math.round(bgr[0]*255.0F) << 16 | Math.round(bgr[1]*255.0F) << 8 | Math.round(bgr[2]*255);
 				}
-			});
+			}
+			cir.setReturnValue(res);
 		}
 	}
 }
