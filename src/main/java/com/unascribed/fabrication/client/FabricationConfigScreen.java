@@ -808,7 +808,12 @@ public class FabricationConfigScreen extends Screen {
 				y = drawConfigValues(matrices, y, mouseX, mouseY, (en) -> en.key.startsWith("general."));
 			} else if ("search".equals(section)) {
 				y += 4;
-				Predicate<FeatureEntry> pen= (en) -> emptyQuery || (queryPattern.matcher(en.name).find() || queryPattern.matcher(en.shortName).find() || queryPattern.matcher(en.desc).find());
+				Predicate<FeatureEntry> pen;
+				if ("#failed".equals(searchField.getText())) {
+					pen = fe -> MixinConfigPlugin.isFailed(fe.key);
+				} else {
+					pen = (en) -> emptyQuery || (queryPattern.matcher(en.name).find() || queryPattern.matcher(en.shortName).find() || queryPattern.matcher(en.desc).find());
+				}
 				if (Agnos.isModLoaded("fscript") && searchingScriptable) pen = ((Predicate<FeatureEntry>) en -> en.fscript != null).and(pen);
 				y = drawConfigValues(matrices, y, mouseX, mouseY, pen, SHOW_SOURCE_SECTION, emptyQuery ? null : HIGHLIGHT_QUERY_MATCH);
 			} else {
