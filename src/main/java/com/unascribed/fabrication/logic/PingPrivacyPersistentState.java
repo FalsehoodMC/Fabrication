@@ -22,8 +22,12 @@ public class PingPrivacyPersistentState extends PersistentState {
 	private final Map<InetAddress, Long> knownIps = Maps.newHashMap();
 	private final ReadWriteLock rwl = new ReentrantReadWriteLock();
 
+	public PingPrivacyPersistentState() {
+		super(name);
+	}
+
 	public static PingPrivacyPersistentState get(ServerWorld world) {
-		return world.getPersistentStateManager().getOrCreate(PingPrivacyPersistentState::fromNbt, PingPrivacyPersistentState::new, name);
+		return world.getPersistentStateManager().getOrCreate(PingPrivacyPersistentState::new, name);
 	}
 
 	public void addKnownIp(InetAddress addr) {
@@ -45,12 +49,13 @@ public class PingPrivacyPersistentState extends PersistentState {
 		}
 	}
 
-	private static boolean isRecent(long time) {
+	private boolean isRecent(long time) {
 		return System.currentTimeMillis()-time < TimeUnit.DAYS.toMillis(7);
 	}
 
-	public static PingPrivacyPersistentState fromNbt(NbtCompound tag) {
-		PingPrivacyPersistentState rtrn = new PingPrivacyPersistentState();
+	@Override
+	public void fromTag(NbtCompound tag) {
+		knownIps.clear();
 		NbtList li = tag.getList("KnownIPs", NbtType.COMPOUND);
 		for (int i = 0; i < li.size(); i++) {
 			NbtCompound c = li.getCompound(i);
@@ -66,9 +71,8 @@ public class PingPrivacyPersistentState extends PersistentState {
 				// ????????
 				continue;
 			}
-			rtrn.knownIps.put(addr, time);
+			knownIps.put(addr, time);
 		}
-		return rtrn;
 	}
 
 	@Override

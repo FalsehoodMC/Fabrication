@@ -182,19 +182,19 @@ public class LoaderDimensionalTools implements ConfigLoader {
 
 	public static Set<MohsIdentifier> getAssociatedDimensionsForTool(ItemStack stack) {
 		Set<MohsIdentifier> dims = processTags(toolAssociations.get(Registry.ITEM.getId(stack.getItem())), toolTagAssociations, ItemTags.getTagGroup(), stack.getItem());
-		if (stack.hasNbt()) {
-			if (stack.getNbt().getBoolean("fabrication:ActLikeGold")) {
+		if (stack.hasTag()) {
+			if (stack.getTag().getBoolean("fabrication:ActLikeGold")) {
 				dims = Sets.newHashSet(dims);
 				dims.add(new MohsIdentifier(true, DimensionType.THE_NETHER_ID));
 			}
-			if (stack.getNbt().contains("fabrication:HonoraryDimensions", NbtType.LIST)) {
+			if (stack.getTag().contains("fabrication:HonoraryDimensions", NbtType.LIST)) {
 				dims = Sets.newHashSet(dims);
-				NbtList li = stack.getNbt().getList("fabrication:HonoraryDimensions", NbtType.STRING);
+				NbtList li = stack.getTag().getList("fabrication:HonoraryDimensions", NbtType.STRING);
 				for (int i = 0; i < li.size(); i++) {
 					try {
 						dims.add(MohsIdentifier.parse(li.getString(i)));
 					} catch (InvalidIdentifierException e) {
-						FabLog.warn("Bad honorary dimension "+li.getString(i)+" in stack "+Registry.ITEM.getId(stack.getItem())+stack.getNbt());
+						FabLog.warn("Bad honorary dimension "+li.getString(i)+" in stack "+Registry.ITEM.getId(stack.getItem())+stack.getTag());
 					}
 				}
 			}

@@ -13,10 +13,11 @@ import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 @Mixin(TextureManager.class)
 @EligibleIf(configAvailable="*.foliage_creepers", envMatches= Env.CLIENT)
-public abstract class MixinResourceTexture {
+public abstract class MixinTextureManager {
 
-	@ModifyArgs(at=@At(value="INVOKE", target="Lnet/minecraft/client/texture/ResourceTexture;<init>(Lnet/minecraft/util/Identifier;)V"), method= "getTexture(Lnet/minecraft/util/Identifier;)Lnet/minecraft/client/texture/AbstractTexture;")
-	public void convertToGrayscale(Args args){
+	@ModifyArgs(at=@At(value="INVOKE", target="net/minecraft/client/texture/ResourceTexture.<init>(Lnet/minecraft/util/Identifier;)V"),
+			method="bindTextureInner(Lnet/minecraft/util/Identifier;)V")
+	public void convertToGrayscale(Args args) {
 		Identifier id = args.get(0);
 		if (!(MixinConfigPlugin.isEnabled("*.foliage_creepers") && "fabrication_grayscale".equals(id.getNamespace()))) return;
 		args.set(0, new GrayscaleIdentifier(id.getPath()));

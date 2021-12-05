@@ -51,12 +51,12 @@ public class FeatureOldLava implements Feature {
 				}
 				// simulate the automata for 100 ticks to prevent a "fade-in" effect
 				for (int i = 0; i < 100; i++) {
-					newLava.tickAnimation();
-					newLavaFlow.tickAnimation();
+					newLava.tickAutomata();
+					newLavaFlow.tickAutomata();
 				}
 				// now tick it for real so it mips and uploads
-				newLavaFlow.tick();
-				newLava.tick();
+				newLava.tickAnimation();
+				newLavaFlow.tickAnimation();
 			}
 		} catch (Throwable t) {
 			applied = false;

@@ -11,13 +11,13 @@ import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.FireworkRocketItem;
+import net.minecraft.item.FireworkItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 
-@Mixin(FireworkRocketItem.class)
+@Mixin(FireworkItem.class)
 @EligibleIf(configAvailable="*.disable_elytra_boost")
 public abstract class MixinFireworkRocketItem {
 

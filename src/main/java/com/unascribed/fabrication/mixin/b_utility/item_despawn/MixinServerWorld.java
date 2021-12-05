@@ -17,7 +17,7 @@ public abstract class MixinServerWorld {
 
 	@Inject(at=@At("HEAD"), method="addEntity(Lnet/minecraft/entity/Entity;)Z", cancellable=true)
 	public void addEntity(Entity e, CallbackInfoReturnable<Boolean> ci) {
-		if (e instanceof ItemEntity && e.isRemoved()) {
+		if (e instanceof ItemEntity && !e.isAlive()) {
 			// don't squawk about items set to despawn instantly
 			ci.setReturnValue(false);
 		}

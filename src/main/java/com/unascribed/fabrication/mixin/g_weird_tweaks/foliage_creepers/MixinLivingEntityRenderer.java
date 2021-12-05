@@ -42,7 +42,7 @@ public abstract class MixinLivingEntityRenderer {
 
 	@ModifyVariable(at=@At("STORE"), method="getRenderLayer(Lnet/minecraft/entity/LivingEntity;ZZZ)Lnet/minecraft/client/render/RenderLayer;")
 	public Identifier transformCreeperIdentifier(Identifier id){
-		if (!(MixinConfigPlugin.isEnabled("*.foliage_creepers") && ((Object)this) instanceof CreeperEntityRenderer && Identifier.DEFAULT_NAMESPACE.equals(id.getNamespace()))) return id;
+		if (!(MixinConfigPlugin.isEnabled("*.foliage_creepers") && ((Object)this) instanceof CreeperEntityRenderer && "minecraft".equals(id.getNamespace()))) return id;
 		return new Identifier("fabrication_grayscale", id.getPath());
 	}
 

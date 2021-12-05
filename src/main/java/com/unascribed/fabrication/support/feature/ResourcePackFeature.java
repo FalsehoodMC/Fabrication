@@ -59,8 +59,8 @@ public abstract class ResourcePackFeature implements Feature, ResourcePackProvid
 	public void register(Consumer<ResourcePackProfile> consumer, Factory factory) {
 		if (active) {
 			Supplier<ResourcePack> f = () -> new FabricationResourcePack(path);
-			consumer.accept(factory.create("Fabrication "+path, new LiteralText("Internal Fabrication resources"),true, f,
-					new PackResourceMetadata(new LiteralText("Internal Fabrication resources"), 7),
+			consumer.accept(factory.create("Fabrication "+path, true, f, f.get(),
+					new PackResourceMetadata(new LiteralText("Internal Fabrication resources"), 6),
 					InsertionPosition.TOP, ResourcePackSource.PACK_SOURCE_BUILTIN));
 		}
 	}

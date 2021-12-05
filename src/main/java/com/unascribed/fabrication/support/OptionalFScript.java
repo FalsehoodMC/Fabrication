@@ -28,10 +28,10 @@ public class OptionalFScript {
 	public static void set(CommandContext<? extends CommandSource> c, String configKey, String script){
 		setScript(configKey, script).ifPresent(e -> FeatureFabricationCommand.sendFeedback(c, new LiteralText("Failed to set script for "+configKey+"\n"+e.getLocalizedMessage()), true));
 	}
-	public static boolean set(String configKey, String script, ServerPlayerEntity spe){
+	public static boolean set(String configKey, String script, ServerPlayerEntity spe) {
 		Optional<Exception> err = setScript(configKey, script);
 		err.ifPresent(e -> spe.sendSystemMessage(new LiteralText("Failed to set script for "+configKey+"\n"+e.getLocalizedMessage()), Util.NIL_UUID));
-		return err.isEmpty();
+		return !err.isPresent();
 	}
 	public static void set(String configKey, String script){
 		setScript(configKey, script).ifPresent(e -> FabLog.error("Failed to set script for "+configKey, e));

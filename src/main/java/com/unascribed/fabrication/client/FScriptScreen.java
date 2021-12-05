@@ -99,7 +99,7 @@ public class FScriptScreen extends ScriptingScreen {
 					this.loadScript(script);
 				} else {
 					Set<FeaturesFile.FeatureEntry> eq = MixinConfigPlugin.getEquivalent(configKey).stream().map(FeaturesFile::get).filter(f->f.fscriptDefault!=null).collect(Collectors.toSet());
-					if (!eq.isEmpty()) this.client.setScreen(new SelectScreen(this, eq, this::loadScript));
+					if (!eq.isEmpty()) this.client.openScreen(new SelectScreen(this, eq, this::loadScript));
 				}
 			}else{
 				PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
@@ -190,7 +190,7 @@ public class FScriptScreen extends ScriptingScreen {
 		}
 		@Override
 		public void onClose() {
-			client.setScreen(parent);
+			client.openScreen(parent);
 		}
 		@Override
 		public boolean mouseClicked(double mouseX, double mouseY, int button) {

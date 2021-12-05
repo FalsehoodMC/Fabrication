@@ -56,8 +56,8 @@ public class CanHitUtil {
 	}
 
 	public static boolean canHit(ItemStack stack, Entity entity) {
-		if (stack.hasNbt() && stack.getNbt().contains("CanHit", NbtType.LIST)) {
-			NbtList canhit = stack.getNbt().getList("CanHit", NbtType.STRING);
+		if (stack.hasTag() && stack.getTag().contains("CanHit", NbtType.LIST)) {
+			NbtList canhit = stack.getTag().getList("CanHit", NbtType.STRING);
 			return canHit(canhit, entity);
 		}
 		return true;
@@ -66,7 +66,7 @@ public class CanHitUtil {
 	public static boolean isExempt(Entity shooter) {
 		if (shooter instanceof PlayerEntity) {
 			PlayerEntity p = (PlayerEntity)shooter;
-			return p.getAbilities().creativeMode || (!MixinConfigPlugin.isEnabled("*.adventure_tags_in_survival") && p.canModifyBlocks());
+			return p.abilities.creativeMode || (!MixinConfigPlugin.isEnabled("*.adventure_tags_in_survival") && p.canModifyBlocks());
 		}
 		return false;
 	}

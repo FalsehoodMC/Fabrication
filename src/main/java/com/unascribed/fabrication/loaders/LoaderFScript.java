@@ -6,18 +6,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
-
 import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.QDIni;
 import com.unascribed.fabrication.support.ConfigLoader;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
-import net.minecraft.client.option.StickyKeyBinding;
+import com.google.common.base.Charsets;
+import com.google.common.io.MoreFiles;
 
 @EligibleIf(envMatches=Env.CLIENT)
 public class LoaderFScript implements ConfigLoader {
@@ -57,7 +54,7 @@ public class LoaderFScript implements ConfigLoader {
 		});
 
 		try {
-			if (lastPath != null) Files.writeString(lastPath, builder);
+			if (lastPath != null) MoreFiles.asCharSink(lastPath, Charsets.UTF_8).write(builder);
 		}catch (Exception e){
 			FabLog.error("Failed to write fscript.ini", e);
 		}

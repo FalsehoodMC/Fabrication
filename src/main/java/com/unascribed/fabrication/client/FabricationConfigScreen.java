@@ -4,6 +4,7 @@ import static com.unascribed.fabrication.client.FabricationConfigScreen.ConfigVa
 import static com.unascribed.fabrication.client.FabricationConfigScreen.ConfigValueFlag.HIGHLIGHT_QUERY_MATCH;
 import static com.unascribed.fabrication.client.FabricationConfigScreen.ConfigValueFlag.REQUIRES_FABRIC_API;
 import static com.unascribed.fabrication.client.FabricationConfigScreen.ConfigValueFlag.SHOW_SOURCE_SECTION;
+import static org.lwjgl.opengl.GL11.*;
 
 import java.util.List;
 import java.util.Locale;
@@ -49,10 +50,8 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.VertexFormat.DrawMode;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
@@ -243,27 +242,21 @@ public class FabricationConfigScreen extends Screen {
 				matrices.pop();
 			matrices.pop();
 
-			// background rendering ignores the matrixstack, so we have to Make A Mess in the projection matrix instead
-			MatrixStack projection = new MatrixStack();
-			projection.method_34425(RenderSystem.getProjectionMatrix());
-			projection.push();
-				projection.translate(width/2f, height, 0);
-				projection.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(a*(leaving ? -180 : 180)));
-				projection.translate(-width/2, -height, 0);
+			RenderSystem.pushMatrix();
+				RenderSystem.translatef(width/2f, height, 0);
+				RenderSystem.rotatef(a*(leaving ? -180 : 180), 0, 0, 1);
+				RenderSystem.translatef(-width/2, -height, 0);
 				for (int x = -1; x <= 1; x++) {
 					for (int y = -1; y <= 0; y++) {
 						if (x == 0 && y == 0) continue;
-						projection.push();
-						projection.translate(width*x, height*y, 0);
-						RenderSystem.setProjectionMatrix(projection.peek().getModel());
-						parent.renderBackgroundTexture(0);
-						projection.pop();
+						RenderSystem.pushMatrix();
+							RenderSystem.translatef(width*x, height*y, 0);
+							parent.renderBackgroundTexture(0);
+						RenderSystem.popMatrix();
 					}
 				}
-				RenderSystem.setProjectionMatrix(projection.peek().getModel());
 				parent.render(matrices, -200, -200, delta);
-			projection.pop();
-			RenderSystem.setProjectionMatrix(projection.peek().getModel());
+			RenderSystem.popMatrix();
 		} else {
 			matrices.push();
 				drawBackground(matrices, mouseX, mouseY, delta, 0, 0);
@@ -271,7 +264,7 @@ public class FabricationConfigScreen extends Screen {
 			matrices.pop();
 		}
 		if (leaving && timeLeaving > 10) {
-			client.setScreen(parent);
+			client.openScreen(parent);
 		}
 	}
 	private void drawBackground(MatrixStack matrices, int mouseX, int mouseY, float delta, int cutoffX, int cutoffY) {
@@ -288,16 +281,14 @@ public class FabricationConfigScreen extends Screen {
 		RenderSystem.defaultBlendFunc();
 		RenderSystem.disableCull();
 
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		RenderSystem.setShaderTexture(0, bgGrad);
+		RenderSystem.color4f(1, 1, 1, 1);
 		client.getTextureManager().bindTexture(bgGrad);
 		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 
 		int startX = cutoffX == 0 ? -width : cutoffX;
 
-		bb.begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+		bb.begin(GL_QUADS, VertexFormats.POSITION_TEXTURE);
 		bb.vertex(mat, startX, cutoffY, 0).texture(0, cutoffV).next();
 		bb.vertex(mat, width*2, cutoffY, 0).texture(1, cutoffV).next();
 		bb.vertex(mat, width*2, height, 0).texture(1, 1).next();
@@ -322,12 +313,12 @@ public class FabricationConfigScreen extends Screen {
 				top = cutoffY;
 				flagCutoffV = 1-((bottom-top)/h);
 			}
-			RenderSystem.setShader(GameRenderer::getPositionColorShader);
 			if (prideFlag != null) {
 				prideFlag.render(matrices, brk, top, w, bottom-top);
 			} else {
+				RenderSystem.shadeModel(GL_SMOOTH);
 				RenderSystem.disableTexture();
-				bb.begin(DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+				bb.begin(GL_QUADS, VertexFormats.POSITION_COLOR);
 				float r = MathHelper.lerp(flagCutoffV, 0.298f, 0.475f);
 				float g = MathHelper.lerp(flagCutoffV, 0.686f, 0.333f);
 				float b = MathHelper.lerp(flagCutoffV, 0.314f, 0.282f);
@@ -338,15 +329,14 @@ public class FabricationConfigScreen extends Screen {
 				bb.end();
 				BufferRenderer.draw(bb);
 				RenderSystem.enableTexture();
+				RenderSystem.shadeModel(GL_FLAT);
 			}
 		}
 
-		RenderSystem.setShaderTexture(0, bg);
 		client.getTextureManager().bindTexture(bg);
 		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-		RenderSystem.setShader(GameRenderer::getPositionTexShader);
-		bb.begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+		bb.begin(GL_QUADS, VertexFormats.POSITION_TEXTURE);
 		bb.vertex(mat, Math.max(cutoffX, border), cutoffY, 0).texture(0, cutoffV).next();
 		bb.vertex(mat, brk, cutoffY, 0).texture(0, cutoffV).next();
 		bb.vertex(mat, brk, height, 0).texture(0, 1).next();
@@ -367,9 +357,9 @@ public class FabricationConfigScreen extends Screen {
 
 		float a = 1-(0.3f+(sCurve5(time/10f)*0.7f));
 		if (a > 0) {
-			RenderSystem.setShaderColor(1, 1, 1, a);
-			RenderSystem.setShaderTexture(0, bgGrad);
-			bb.begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+			RenderSystem.color4f(1, 1, 1, a);
+			client.getTextureManager().bindTexture(bgGrad);
+			bb.begin(GL_QUADS, VertexFormats.POSITION_TEXTURE);
 			bb.vertex(mat, startX, cutoffY, 0).texture(0, cutoffV).next();
 			bb.vertex(mat, width*2, cutoffY, 0).texture(1, cutoffV).next();
 			bb.vertex(mat, width*2, height, 0).texture(1, 1).next();
@@ -378,7 +368,7 @@ public class FabricationConfigScreen extends Screen {
 			BufferRenderer.draw(bb);
 		}
 
-		RenderSystem.setShaderColor(1, 1, 1, 1);
+		RenderSystem.color4f(1, 1, 1, 1);
 	}
 
 	private int lerpColor(int from, int to, float delta) {
@@ -450,8 +440,7 @@ public class FabricationConfigScreen extends Screen {
 				client.getTextureManager().bindTexture(id);
 				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-				RenderSystem.setShaderColor(1, 1, 1, 0.3f);
-				RenderSystem.setShaderTexture(0, id);
+				RenderSystem.color4f(1, 1, 1, 0.3f);
 				matrices.push();
 				matrices.translate((130-4-size), icoY+y, 0);
 				matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(5));
@@ -509,10 +498,9 @@ public class FabricationConfigScreen extends Screen {
 				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
 				RenderSystem.disableTexture();
-				RenderSystem.setShader(GameRenderer::getPositionColorShader);
 				BufferBuilder bb = Tessellator.getInstance().getBuffer();
 				Matrix4f mat = matrices.peek().getModel();
-				bb.begin(DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+				bb.begin(GL_QUADS, VertexFormats.POSITION_COLOR);
 				bb.vertex(mat, 0, y-thisHeight-8, 0).color(1, 1, 1, 0.2f).next();
 				bb.vertex(mat, 130*selectA, y-thisHeight-8, 0).color(1, 1, 1, 0.2f+((1-selectA)*0.8f)).next();
 				bb.vertex(mat, 130*selectA, y, 0).color(1, 1, 1, 0.2f+((1-selectA)*0.8f)).next();
@@ -543,16 +531,16 @@ public class FabricationConfigScreen extends Screen {
 		boolean searchSelected = "search".equals(selectedSection);
 		boolean searchWasSelected = "search".equals(prevSelectedSection);
 		if (searchSelected) {
-			RenderSystem.setShaderColor(1, 1, 1, selectedA);
+			RenderSystem.color4f(1, 1, 1, selectedA);
 			searchField.setAlpha(selectedA);
 			searchField.render(matrices, mouseX, mouseY, delta);
 		} else if (searchWasSelected && prevSelectedA > 0) {
-			RenderSystem.setShaderColor(1, 1, 1, prevSelectedA);
+			RenderSystem.color4f(1, 1, 1, prevSelectedA);
 			searchField.setAlpha(prevSelectedA);
 			searchField.render(matrices, mouseX, mouseY, delta);
 		}
 		searchField.setTextFieldFocused(searchSelected);
-		RenderSystem.setShaderColor(1, 1, 1, 1);
+		RenderSystem.color4f(1, 1, 1, 1);
 
 		matrices.push();
 		RenderSystem.disableDepthTest();
@@ -591,8 +579,8 @@ public class FabricationConfigScreen extends Screen {
 		textRenderer.draw(matrices, "CLIENT", width-115, 4, 0xFF000000);
 		textRenderer.draw(matrices, "SERVER", width-40, 4, whyCantConfigureServer == null || isSingleplayer ? 0xFF000000 : darkMode ? 0x44FFFFFF : 0x44000000);
 		if (serverReadOnly && whyCantConfigureServer == null) {
-			RenderSystem.setShaderTexture(0, new Identifier("fabrication", "lock.png"));
-			RenderSystem.setShaderColor(0, 0, 0, 1);
+			client.getTextureManager().bindTexture(new Identifier("fabrication", "lock.png"));
+			RenderSystem.color4f(0, 0, 0, 1);
 			drawTexture(matrices, width-49, 3, 0, 0, 0, 8, 8, 8, 8);
 		}
 		if (searchSelected && Agnos.isModLoaded("fscript")) {
@@ -600,8 +588,8 @@ public class FabricationConfigScreen extends Screen {
 				client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1f));
 				searchingScriptable = !searchingScriptable;
 			}
-			RenderSystem.setShaderTexture(0, new Identifier("fabrication", "fscript.png"));
-			RenderSystem.setShaderColor(1, 1, 1, 1);
+			client.getTextureManager().bindTexture(new Identifier("fabrication", "fscript.png"));
+			RenderSystem.color4f(1, 1, 1, 1);
 			fill(matrices, width-136, 0, width-120, 16, searchingScriptable? 0xFF0AA000 : 0x55000000);
 			drawTexture(matrices, width-136, 0, 0, 0, 0, 16, 16, 16, 16);
 		}
@@ -755,10 +743,10 @@ public class FabricationConfigScreen extends Screen {
 		} else {
 			RenderSystem.enableBlend();
 			RenderSystem.defaultBlendFunc();
-			RenderSystem.setShaderTexture(0, new Identifier("fabrication", "category/"+section+".png"));
+			client.getTextureManager().bindTexture(new Identifier("fabrication", "category/"+section+".png"));
 			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-			RenderSystem.setShaderColor(1, 1, 1, 0.1f);
+			RenderSystem.color4f(1, 1, 1, 0.1f);
 			matrices.push();
 			matrices.translate(130+((width-130)/2f), height/2f, 0);
 			drawTexture(matrices, -80, -80, 0, 0, 0, 160, 160, 160, 160);
@@ -769,7 +757,7 @@ public class FabricationConfigScreen extends Screen {
 				}
 				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
-				RenderSystem.setShaderTexture(0, new Identifier("fabrication", "coffee_bean.png"));
+				client.getTextureManager().bindTexture(new Identifier("fabrication", "coffee_bean.png"));
 				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 				int x = 0;
@@ -808,7 +796,12 @@ public class FabricationConfigScreen extends Screen {
 				y = drawConfigValues(matrices, y, mouseX, mouseY, (en) -> en.key.startsWith("general."));
 			} else if ("search".equals(section)) {
 				y += 4;
-				Predicate<FeatureEntry> pen= (en) -> emptyQuery || (queryPattern.matcher(en.name).find() || queryPattern.matcher(en.shortName).find() || queryPattern.matcher(en.desc).find());
+				Predicate<FeatureEntry> pen;
+				if ("#failed".equals(searchField.getText())) {
+					pen = fe -> MixinConfigPlugin.isFailed(fe.key);
+				} else {
+					pen = (en) -> emptyQuery || (queryPattern.matcher(en.name).find() || queryPattern.matcher(en.shortName).find() || queryPattern.matcher(en.desc).find());
+				}
 				if (Agnos.isModLoaded("fscript") && searchingScriptable) pen = ((Predicate<FeatureEntry>) en -> en.fscript != null).and(pen);
 				y = drawConfigValues(matrices, y, mouseX, mouseY, pen, SHOW_SOURCE_SECTION, emptyQuery ? null : HIGHLIGHT_QUERY_MATCH);
 			} else {
@@ -845,7 +838,7 @@ public class FabricationConfigScreen extends Screen {
 	}
 
 	private int drawConfigValues(MatrixStack matrices, int y, float mouseX, float mouseY, Predicate<FeatureEntry> pred, ConfigValueFlag... defaultFlags) {
-		RenderSystem.setShaderColor(1, 1, 1, 1);
+		RenderSystem.color4f(1, 1, 1, 1);
 		for (Map.Entry<String, FeatureEntry> en : FeaturesFile.getAll().entrySet()) {
 			if ("general.profile".equals(en.getKey())) continue;
 			FeatureEntry fe = en.getValue();
@@ -985,8 +978,8 @@ public class FabricationConfigScreen extends Screen {
 		matrices.pop();
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
-		RenderSystem.setShaderTexture(0, new Identifier("fabrication", "configvalue.png"));
-		RenderSystem.setShaderColor(1, 1, 1, 0.5f+((1-da)*0.5f));
+		client.getTextureManager().bindTexture(new Identifier("fabrication", "configvalue.png"));
+		RenderSystem.color4f(1, 1, 1, 0.5f+((1-da)*0.5f));
 		RenderSystem.enableTexture();
 		if (noUnset) {
 			drawTexture(matrices, 134+3, 1, 15, 0, 15, 9, 60, 9);
@@ -1056,8 +1049,9 @@ public class FabricationConfigScreen extends Screen {
 		if (showSourceSection && key.contains(".")) {
 			section = key.substring(0, key.indexOf('.'));
 			Identifier id = new Identifier("fabrication", "category/"+section+".png");
-			RenderSystem.setShaderTexture(0, id);
-			RenderSystem.setShaderColor(1, 1, 1, 1);
+			client.getTextureManager().bindTexture(id);
+			RenderSystem.color4f(1, 1, 1, 1);
+			RenderSystem.enableTexture();
 			drawTexture(matrices, startX-2, 0, 0, 0, 12, 12, 12, 12);
 			startX += 14;
 		}
@@ -1074,7 +1068,7 @@ public class FabricationConfigScreen extends Screen {
 		if (mouseX >= 134+trackSize && mouseX <= endX && mouseY >= startY+1 && mouseY <= startY+10 && (feature.fscript != null || feature.extend !=null && FeaturesFile.get(MixinConfigPlugin.remap(feature.extend)).fscript != null) && Agnos.isModLoaded("fscript")){
 			if (didClick){
 				client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1f));
-				client.setScreen(OptionalFScriptScreen.construct(this, prideFlag, feature.fscript != null ? title : FeaturesFile.get(MixinConfigPlugin.remap(feature.extend)).name, feature.fscript != null ? key : MixinConfigPlugin.remap(feature.extend)));
+				client.openScreen(OptionalFScriptScreen.construct(this, prideFlag, feature.fscript != null ? title : FeaturesFile.get(MixinConfigPlugin.remap(feature.extend)).name, feature.fscript != null ? key : MixinConfigPlugin.remap(feature.extend)));
 			}
 			fill(matrices, startX-2, 9, endX, 10, -1);
 		}
@@ -1184,7 +1178,7 @@ public class FabricationConfigScreen extends Screen {
 	}
 
 	private void color(int packed, float alpha) {
-		RenderSystem.setShaderColor(((packed>>16)&0xFF)/255f, ((packed>>8)&0xFF)/255f, ((packed>>0)&0xFF)/255f, alpha);
+		RenderSystem.color4f(((packed>>16)&0xFF)/255f, ((packed>>8)&0xFF)/255f, ((packed>>0)&0xFF)/255f, alpha);
 	}
 
 	@Override
@@ -1194,7 +1188,7 @@ public class FabricationConfigScreen extends Screen {
 			client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_BARREL_CLOSE, 0.7f));
 			client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_SHROOMLIGHT_PLACE, 2f, 1f));
 		} else {
-			client.setScreen(parent);
+			client.openScreen(parent);
 		}
 	}
 

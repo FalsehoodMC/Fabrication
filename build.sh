@@ -1,15 +1,8 @@
 #!/bin/bash -e
-#if [ -f ~/ForgeryTools.jar ]; then
-#	canforgery=1
-#else
-#	echo "Forgery tools not found. As of the time of writing, the Forgery tooling is not public."
-	echo "Forgery does not yet support 1.17."
-	echo "Performing a Fabric build only."
-	echo
-	canforgery=0
-#fi
-if [ -n "$JAVA16_HOME" ]; then
-	export JAVA_HOME=$JAVA16_HOME
+if [ -f ~/ForgeryTools.jar ]; then
+	canforgery=1
+else
+	echo "Forgery tools not found. As of the time of writing, the Forgery tooling is not public."
 fi
 ./build-features.sh
 rm -rf build/libs
@@ -38,7 +31,7 @@ if [ "$canforgery" == "1" ]; then
 	./gradlew clean build
 	cd ..
 	echo Running Forgery...
-	java -jar ~/ForgeryTools.jar "$forgeryIn" "$forgery" ~/.gradle/caches/fabric-loom/mappings/intermediary-1.16.4-v2.tiny ~/.gradle/caches/forge_gradle/minecraft_repo/versions/1.16.4/mcp_mappings.tsrg ./forgery/build/libs/forgery.jar ~/.gradle/caches/fabric-loom/minecraft-1.16.4-intermediary-net.fabricmc.yarn-1.16.4+build.6-v2.jar com.unascribed.fabrication
+	java -jar ~/ForgeryTools.jar "$forgeryIn" "$forgery" ~/.gradle/caches/fabric-loom/mappings/intermediary-1.16.5-v2.tiny ~/.gradle/caches/forge_gradle/minecraft_repo/versions/1.16.5/mcp_mappings.tsrg ./forgery/build/libs/forgery.jar ~/.gradle/caches/fabric-loom/minecraft-1.16.5-intermediary-net.fabricmc.yarn-1.16.5+build.10-v2.jar com.unascribed.fabrication
 	rm -rf $tmp
 fi
 echo Done

@@ -39,7 +39,7 @@ public class MixinMiningToolItem {
 	public void postMine(ItemStack stack, World world, BlockState state, BlockPos pos, LivingEntity miner, CallbackInfoReturnable<Boolean> ci) {
 		if (!MixinConfigPlugin.isEnabled("*.dimensional_tools")) return;
 		if (world.isClient) return;
-		if ((!(miner instanceof PlayerEntity) || !((PlayerEntity)miner).getAbilities().creativeMode)) {
+		if ((!(miner instanceof PlayerEntity) || !((PlayerEntity)miner).abilities.creativeMode)) {
 			if (!stack.isDamageable()) return;
 			if (stack.getMiningSpeedMultiplier(state) <= 1) {
 				// tool is not effective against this block, don't penalize or reward
@@ -76,13 +76,13 @@ public class MixinMiningToolItem {
 				}
 			}
 			if (factor < 0) {
-				if (!stack.hasNbt()) stack.setNbt(new NbtCompound());
-				int legacyPartialDamage = stack.getNbt().getInt("PartialDamage");
+				if (!stack.hasTag()) stack.setTag(new NbtCompound());
+				int legacyPartialDamage = stack.getTag().getInt("PartialDamage");
 				if (legacyPartialDamage != 0) {
-					stack.getNbt().putDouble("fabrication:PartialDamage", legacyPartialDamage/50D);
-					stack.getNbt().remove("PartialDamage");
+					stack.getTag().putDouble("fabrication:PartialDamage", legacyPartialDamage/50D);
+					stack.getTag().remove("PartialDamage");
 				}
-				double partialDamage = stack.getNbt().getDouble("fabrication:PartialDamage");
+				double partialDamage = stack.getTag().getDouble("fabrication:PartialDamage");
 				if (stack.getDamage() == 0) {
 					// must have been repaired. reset for less jankiness
 					partialDamage = 0;
@@ -97,7 +97,7 @@ public class MixinMiningToolItem {
 				} else {
 					partialDamage = 0;
 				}
-				stack.getNbt().putDouble("fabrication:PartialDamage", partialDamage);
+				stack.getTag().putDouble("fabrication:PartialDamage", partialDamage);
 				ci.setReturnValue(true);
 			} else if (factor > 1) {
 				// BRING OUT THE WHEEL OF PUNISHMENT

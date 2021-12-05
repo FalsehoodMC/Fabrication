@@ -14,7 +14,7 @@ import net.minecraft.world.MobSpawnerLogic;
 @EligibleIf(configAvailable="*.player_free_spawners")
 public class MixinMobSpawnerLogic {
 
-	@Inject(method="isPlayerInRange(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)Z", at=@At("HEAD"), cancellable=true)
+	@Inject(method="isPlayerInRange()Z", at=@At("HEAD"), cancellable=true)
 	public void isPlayerInRange(CallbackInfoReturnable<Boolean> cir) {
 		if (MixinConfigPlugin.isEnabled("*.player_free_spawners")) {
 			cir.setReturnValue(true);

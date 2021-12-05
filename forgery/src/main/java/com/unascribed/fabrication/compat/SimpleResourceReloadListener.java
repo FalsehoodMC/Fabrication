@@ -14,7 +14,7 @@ public interface SimpleResourceReloadListener<T> extends IResourceManagerReloadL
 			IResourceManager resourceManager, IProfiler preparationsProfiler,
 			IProfiler reloadProfiler, Executor backgroundExecutor,
 			Executor gameExecutor) {
-		return load(resourceManager, preparationsProfiler, backgroundExecutor).thenCompose(stage::markCompleteAwaitingOthers).thenCompose(
+		return load(resourceManager, preparationsProfiler, backgroundExecutor).thenCompose(stage::wait).thenCompose(
 				(o) -> apply(o, resourceManager, reloadProfiler, gameExecutor)
 			);
 	}

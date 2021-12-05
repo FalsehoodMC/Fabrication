@@ -21,8 +21,8 @@ public abstract class MixinTridentEntity implements SetCanHitList {
 
 	@Override
 	public NbtList fabrication$getCanHitList() {
-		return tridentStack.hasNbt() && tridentStack.getNbt().contains("CanHit") && !CanHitUtil.isExempt(((TridentEntity)(Object)this).getOwner()) ?
-				tridentStack.getNbt().getList("CanHit", NbtType.STRING) : null;
+		return tridentStack.hasTag() && tridentStack.getTag().contains("CanHit") && !CanHitUtil.isExempt(((TridentEntity)(Object)this).getOwner()) ?
+				tridentStack.getTag().getList("CanHit", NbtType.STRING) : null;
 	}
 
 }

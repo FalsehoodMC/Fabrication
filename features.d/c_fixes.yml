@@ -189,15 +189,15 @@ fixes.fix_superflat_bad_structures:
 		
 		This will not affect mods that properly patch the superflat structures map.
 
-fixes.fix_charm_amethyst_dupe:
-	name: Fix Charm Amethyst Dupe
-	since: 2.0.0
-	sides: server_only
-	short_desc: Fixes a bug in Charm caused by bad assumptions that allows generating amethyst shards.
-	desc:
-		Fixes a bug in Charm caused by bad assumptions that allows generating amethyst shards if
-		you have another mod that can make item frames invisible, such as Fabrication's own
-		Invisibility Splash On Inanimates.
+#fixes.fix_charm_amethyst_dupe:
+#	name: Fix Charm Amethyst Dupe
+#	since: 2.0.0
+#	sides: server_only
+#	short_desc: Fixes a bug in Charm caused by bad assumptions that allows generating amethyst shards.
+#	desc:
+#		Fixes a bug in Charm caused by bad assumptions that allows generating amethyst shards if
+#		you have another mod that can make item frames invisible, such as Fabrication's own
+#		Invisibility Splash On Inanimates.
 
 fixes.bubble_column_pop:
 	name: Bubble Column Pop

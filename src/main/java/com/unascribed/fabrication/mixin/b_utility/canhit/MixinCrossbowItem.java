@@ -32,8 +32,8 @@ public class MixinCrossbowItem {
 	private static void shoot(World world, LivingEntity shooter, Hand hand, ItemStack crossbow, ItemStack projectile, float soundPitch, boolean creative, float speed, float divergence, float simulated,
 			CallbackInfo ci, boolean firework, ProjectileEntity proj) {
 		if (!MixinConfigPlugin.isEnabled("*.canhit") || CanHitUtil.isExempt(shooter)) return;
-		NbtList canHitList = crossbow.hasNbt() && crossbow.getNbt().contains("CanHit") ? crossbow.getNbt().getList("CanHit", NbtType.STRING) : null;
-		NbtList canHitList2 = projectile.hasNbt() && projectile.getNbt().contains("CanHit") ? projectile.getNbt().getList("CanHit", NbtType.STRING) : null;
+		NbtList canHitList = crossbow.hasTag() && crossbow.getTag().contains("CanHit") ? crossbow.getTag().getList("CanHit", NbtType.STRING) : null;
+		NbtList canHitList2 = projectile.hasTag() && projectile.getTag().contains("CanHit") ? projectile.getTag().getList("CanHit", NbtType.STRING) : null;
 		if (proj instanceof SetCanHitList) {
 			((SetCanHitList)proj).fabrication$setCanHitLists(canHitList, canHitList2);
 			if (canHitList2 != null && proj instanceof PersistentProjectileEntity && ((PersistentProjectileEntity)proj).pickupType == PickupPermission.ALLOWED) {

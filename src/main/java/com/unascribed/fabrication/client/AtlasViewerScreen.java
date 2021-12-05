@@ -1,12 +1,51 @@
 package com.unascribed.fabrication.client;
 
+import static org.lwjgl.opengl.GL11.GL_ALL_ATTRIB_BITS;
+import static org.lwjgl.opengl.GL11.GL_ALPHA_TEST;
+import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_POLYGON_STIPPLE;
+import static org.lwjgl.opengl.GL11.GL_QUADS;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_BINDING_2D;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_HEIGHT;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_WIDTH;
+import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glClearColor;
+import static org.lwjgl.opengl.GL11.glColor4f;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.glGetInteger;
+import static org.lwjgl.opengl.GL11.glGetTexLevelParameteri;
+import static org.lwjgl.opengl.GL11.glGetTexParameteri;
+import static org.lwjgl.opengl.GL11.glPopAttrib;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushAttrib;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glTexCoord2f;
+import static org.lwjgl.opengl.GL11.glTexParameteri;
+import static org.lwjgl.opengl.GL11.glTranslatef;
+import static org.lwjgl.opengl.GL11.glVertex2f;
+import static org.lwjgl.opengl.GL12.GL_TEXTURE_BASE_LEVEL;
+import static org.lwjgl.opengl.GL12.GL_TEXTURE_MAX_LEVEL;
+
+import java.util.List;
+
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.unascribed.fabrication.FabRefl;
+
+import com.google.common.collect.Lists;
+
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat.DrawMode;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
@@ -14,26 +53,16 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Matrix4f;
-
-import static org.lwjgl.opengl.GL30C.*;
-
-import java.util.List;
-
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.unascribed.fabrication.FabRefl;
-
-import com.google.common.collect.Lists;
 
 public class AtlasViewerScreen extends Screen {
 
 	private static final Identifier CHECKER = new Identifier("fabrication", "textures/checker.png");
-	
+
 	private final Identifier atlas;
 	private float panX = 100;
 	private float panY = 100;
 	private int level = 0;
-	
+
 	public AtlasViewerScreen(Identifier atlas) {
 		super(new LiteralText("Atlas viewer"));
 		this.atlas = atlas;
@@ -43,81 +72,82 @@ public class AtlasViewerScreen extends Screen {
 	protected void init() {
 		client.skipGameRender = true;
 	}
-	
+
 	@Override
 	public void removed() {
 		client.skipGameRender = false;
 	}
-	
+
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		matrices.push();
-		RenderSystem.clearColor(0.3f, 0.3f, 0.3f, 1);
-		RenderSystem.clear(GL_COLOR_BUFFER_BIT, false);
+		// GlStateManager can get fucked
+		glPushAttrib(GL_ALL_ATTRIB_BITS);
+			glPushMatrix();
+			glClearColor(0.3f, 0.3f, 0.3f, 1);
+			glClear(GL_COLOR_BUFFER_BIT);
 
-		RenderSystem.disableDepthTest();
-		RenderSystem.disableCull();
-		RenderSystem.disableBlend();
+			glDisable(GL_DEPTH_TEST);
+			glDisable(GL_CULL_FACE);
+			glDisable(GL_BLEND);
+			glDisable(GL_ALPHA_TEST);
 
-		client.getTextureManager().bindTexture(CHECKER);
-		RenderSystem.enableTexture();
-		RenderSystem.setShader(GameRenderer::getPositionTexShader);
-		RenderSystem.setShaderTexture(0, CHECKER);
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		BufferBuilder bb = Tessellator.getInstance().getBuffer();
-		Matrix4f mat = matrices.peek().getModel();
-		bb.begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
-			bb.vertex(mat, 0, 0, 0).texture(0, 0).next();
-			bb.vertex(mat, width, 0, 0).texture(width/8, 0).next();
-			bb.vertex(mat, width, height, 0).texture(width/8, height/8).next();
-			bb.vertex(mat, 0, height, 0).texture(0, height/8).next();
-		bb.end();
-		BufferRenderer.draw(bb);
-		
-		client.getTextureManager().bindTexture(atlas);
-		
-		matrices.translate(panX, panY, 0);
-		
-		int atlasWidth = glGetTexLevelParameteri(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH);
-		int atlasHeight = glGetTexLevelParameteri(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT);
-		int atlasMaxLevel = glGetTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL);
-		
-		RenderSystem.setShader(GameRenderer::getPositionShader);
-		RenderSystem.disableTexture();
-		RenderSystem.enableBlend();
-		RenderSystem.defaultBlendFunc();
-		RenderSystem.setShaderColor(1f, 1f, 1f, 0.15f);
-		mat = matrices.peek().getModel();
-		bb.begin(DrawMode.QUADS, VertexFormats.POSITION);
-			bb.vertex(mat, 0, 0, 0).next();
-			bb.vertex(mat, atlasWidth, 0, 0).next();
-			bb.vertex(mat, atlasWidth, atlasHeight, 0).next();
-			bb.vertex(mat, 0, atlasHeight, 0).next();
-		bb.end();
-		BufferRenderer.draw(bb);
-		
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, level);
-		
-		RenderSystem.setShader(GameRenderer::getPositionTexShader);
-		RenderSystem.enableTexture();
-		RenderSystem.setShaderTexture(0, atlas);
-		RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-		mat = matrices.peek().getModel();
-		bb.begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
-			bb.vertex(mat, 0, 0, 0).texture(0, 0).next();
-			bb.vertex(mat, atlasWidth, 0, 0).texture(1, 0).next();
-			bb.vertex(mat, atlasWidth, atlasHeight, 0).texture(1, 1).next();
-			bb.vertex(mat, 0, atlasHeight, 0).texture(0, 1).next();
-		bb.end();
-		BufferRenderer.draw(bb);
-		
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		matrices.pop();
-		
+			client.getTextureManager().bindTexture(CHECKER);
+			glEnable(GL_TEXTURE_2D);
+			glColor4f(1, 1, 1, 1);
+			glBegin(GL_QUADS);
+				glTexCoord2f(0, 0);
+				glVertex2f(0, 0);
+				glTexCoord2f(width/8, 0);
+				glVertex2f(width, 0);
+				glTexCoord2f(width/8, height/8);
+				glVertex2f(width, height);
+				glTexCoord2f(0, height/8);
+				glVertex2f(0, height);
+			glEnd();
+
+			client.getTextureManager().bindTexture(atlas);
+			glDisable(GL_POLYGON_STIPPLE);
+
+			glTranslatef(panX, panY, 0);
+
+			int atlasWidth = glGetTexLevelParameteri(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH);
+			int atlasHeight = glGetTexLevelParameteri(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT);
+			int atlasMaxLevel = glGetTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL);
+
+			glDisable(GL_TEXTURE_2D);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glColor4f(1f, 1f, 1f, 0.15f);
+			glBegin(GL_QUADS);
+				glVertex2f(0, 0);
+				glVertex2f(atlasWidth, 0);
+				glVertex2f(atlasWidth, atlasHeight);
+				glVertex2f(0, atlasHeight);
+			glEnd();
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, level);
+
+			glEnable(GL_TEXTURE_2D);
+			glColor4f(1, 1, 1, 1);
+			glBegin(GL_QUADS);
+				glTexCoord2f(0, 0);
+				glVertex2f(0, 0);
+				glTexCoord2f(1, 0);
+				glVertex2f(atlasWidth, 0);
+				glTexCoord2f(1, 1);
+				glVertex2f(atlasWidth, atlasHeight);
+				glTexCoord2f(0, 1);
+				glVertex2f(0, atlasHeight);
+			glEnd();
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+			glPopMatrix();
+		glPopAttrib();
+
 		mouseX -= panX;
 		mouseY -= panY;
-		
-		
+
+
 		SpriteAtlasTexture sat = getAtlas();
 		renderTooltip(matrices, Lists.<Text>newArrayList(
 				new LiteralText(atlas.toString()),
@@ -135,26 +165,22 @@ public class AtlasViewerScreen extends Screen {
 				sprites.add(s);
 			}
 		}
-		RenderSystem.disableCull();
-		RenderSystem.disableTexture();
-		RenderSystem.setShader(GameRenderer::getPositionShader);
+		GlStateManager.disableCull();
+		GlStateManager.disableTexture();
 		for (Sprite s : sprites) {
 			int x = FabRefl.Client.getX(s);
 			int y = FabRefl.Client.getY(s);
 			int w = s.getWidth();
 			int h = s.getHeight();
-			RenderSystem.setShaderColor(1, 0, 0, 0.2f);
-			mat = matrices.peek().getModel();
-			bb.begin(DrawMode.QUADS, VertexFormats.POSITION);
-				bb.vertex(mat, panX+x, panY+y, 0).next();
-				bb.vertex(mat, panX+x+w, panY+y, 0).next();
-				bb.vertex(mat, panX+x+w, panY+y+h, 0).next();
-				bb.vertex(mat, panX+x, panY+y+h, 0).next();
-			bb.end();
-			BufferRenderer.draw(bb);
+			GlStateManager.color4f(1, 0, 0, 0.2f);
+			glBegin(GL_QUADS);
+				glVertex2f(panX+x, panY+y);
+				glVertex2f(panX+x+w, panY+y);
+				glVertex2f(panX+x+w, panY+y+h);
+				glVertex2f(panX+x, panY+y+h);
+			glEnd();
 		}
-		RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-		RenderSystem.enableTexture();
+		GlStateManager.enableTexture();
 		if (sprites.isEmpty()) {
 			if (mouseX >= 0 && mouseY >= 0 && mouseX < atlasWidth && mouseY < atlasHeight) {
 				renderTooltip(matrices, Lists.<Text>newArrayList(
@@ -181,14 +207,9 @@ public class AtlasViewerScreen extends Screen {
 			} else {
 				src = "Custom Sprite subclass "+s.getClass().getName();
 			}
-			String anim = "";
-			if (s.getAnimation() != null) {
-				Sprite.Animation sa = (Sprite.Animation)s.getAnimation();
-				anim = " @"+FabRefl.Client.getFrameIndex(sa)+"."+FabRefl.Client.getFrameTicks(sa);
-			}
 			renderTooltip(matrices, Lists.<Text>newArrayList(
 				new LiteralText(s.getId().toString()),
-				new LiteralText("§7At "+x+","+y+" "+w+"×"+h+"×"+FabRefl.Client.getFrameCount(s)+anim),
+				new LiteralText("§7At "+x+","+y+" "+w+"×"+h+"×"+s.getFrameCount()+" @"+FabRefl.Client.getFrameIndex(s)+"."+FabRefl.Client.getFrameTicks(s)),
 				new LiteralText("§7From §f"+src)
 			), (int)(mouseX+panX), (int)(mouseY+panY));
 		} else {
@@ -201,17 +222,12 @@ public class AtlasViewerScreen extends Screen {
 				int w = s.getWidth();
 				int h = s.getHeight();
 				li.add(new LiteralText(s.getId().toString()));
-				String anim = "";
-				if (s.getAnimation() != null) {
-					Sprite.Animation sa = (Sprite.Animation)s.getAnimation();
-					anim = " @"+FabRefl.Client.getFrameIndex(sa)+"."+FabRefl.Client.getFrameTicks(sa);
-				}
-				li.add(new LiteralText("§7At "+x+","+y+" "+w+"×"+h+"×"+FabRefl.Client.getFrameCount(s)+anim));
+				li.add(new LiteralText("§7At "+x+","+y+" "+w+"×"+h+"×"+s.getFrameCount()+" @"+FabRefl.Client.getFrameIndex(s)+"."+FabRefl.Client.getFrameTicks(s)));
 			}
 			renderTooltip(matrices, li, (int)(mouseX+panX), (int)(mouseY+panY));
 		}
 	}
-	
+
 	@Override
 	public void renderTooltip(MatrixStack matrices, List<Text> lines, int x, int y) {
 		List<OrderedText> ordered = Lists.newArrayList();
@@ -220,7 +236,7 @@ public class AtlasViewerScreen extends Screen {
 		}
 		renderOrderedTooltip(matrices, ordered, x, y);
 	}
-	
+
 	private SpriteAtlasTexture getAtlas() {
 		for (SpriteAtlasTexture cand : AtlasTracking.allAtlases) {
 			if (cand.getId().equals(this.atlas)) return cand;
@@ -232,7 +248,7 @@ public class AtlasViewerScreen extends Screen {
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		return super.keyPressed(keyCode, scanCode, modifiers);
 	}
-	
+
 	@Override
 	public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
 		if (button == 0) {
@@ -241,7 +257,7 @@ public class AtlasViewerScreen extends Screen {
 		}
 		return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
 	}
-	
+
 	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
 		int oldBind = glGetInteger(GL_TEXTURE_BINDING_2D);

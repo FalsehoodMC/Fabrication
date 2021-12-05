@@ -33,10 +33,10 @@ public class MixinItemStackClient {
 	public void getTooltip(PlayerEntity player, TooltipContext ctx, CallbackInfoReturnable<List<Text>> ci, List<Text> list) {
 		if (!MixinConfigPlugin.isEnabled("*.canhit")) return;
 		ItemStack self = (ItemStack)(Object)this;
-		if (self.hasNbt() && self.getNbt().contains("CanHit", NbtType.LIST) && !self.getNbt().getBoolean("HideCanHit")) {
+		if (self.hasTag() && self.getTag().contains("CanHit", NbtType.LIST) && !self.getTag().getBoolean("HideCanHit")) {
 			list.add(LiteralText.EMPTY);
 			list.add(new LiteralText("Can hit:").formatted(Formatting.GRAY));
-			NbtList canhit = self.getNbt().getList("CanHit", NbtType.STRING);
+			NbtList canhit = self.getTag().getList("CanHit", NbtType.STRING);
 			if (canhit.isEmpty()) {
 				list.add(new LiteralText("Nothing").formatted(Formatting.GRAY));
 			}

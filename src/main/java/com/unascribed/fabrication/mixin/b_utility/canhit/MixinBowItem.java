@@ -32,8 +32,8 @@ public class MixinBowItem {
 	public void onStoppedUsing(ItemStack bowStack, World world, LivingEntity user, int remaining, CallbackInfo ci,
 			PlayerEntity entity, boolean infinity, ItemStack arrowStack, int i, float f, boolean b2, ArrowItem ai, PersistentProjectileEntity arrow) {
 		if (!MixinConfigPlugin.isEnabled("*.canhit") || CanHitUtil.isExempt(entity)) return;
-		NbtList canHitList = bowStack.hasNbt() && bowStack.getNbt().contains("CanHit") ? bowStack.getNbt().getList("CanHit", NbtType.STRING) : null;
-		NbtList canHitList2 = arrowStack.hasNbt() && arrowStack.getNbt().contains("CanHit") ? arrowStack.getNbt().getList("CanHit", NbtType.STRING) : null;
+		NbtList canHitList = bowStack.hasTag() && bowStack.getTag().contains("CanHit") ? bowStack.getTag().getList("CanHit", NbtType.STRING) : null;
+		NbtList canHitList2 = arrowStack.hasTag() && arrowStack.getTag().contains("CanHit") ? arrowStack.getTag().getList("CanHit", NbtType.STRING) : null;
 		if (arrow instanceof SetCanHitList) {
 			((SetCanHitList)arrow).fabrication$setCanHitLists(canHitList, canHitList2);
 			if (canHitList2 != null && arrow.pickupType == PickupPermission.ALLOWED) {

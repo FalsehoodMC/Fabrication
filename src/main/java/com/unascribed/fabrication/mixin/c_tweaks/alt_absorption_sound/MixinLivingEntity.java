@@ -23,7 +23,6 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlaySoundFromEntityS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.EntityTrackingListener;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
@@ -68,13 +67,11 @@ public abstract class MixinLivingEntity extends Entity implements DidJustAbsorp 
 		Object self = this;
 		if (fabrication$didJustAbsorp()) {
 			PacketByteBuf data = new PacketByteBuf(Unpooled.buffer(4));
-			data.writeInt(getId());
+			data.writeInt(getEntityId());
 			CustomPayloadS2CPacket fabPkt = new CustomPayloadS2CPacket(new Identifier("fabrication", "play_absorp_sound"), data);
 			SoundEvent defHurtSound = getHurtSound(src);
 			PlaySoundFromEntityS2CPacket vanPkt = defHurtSound == null ? null : new PlaySoundFromEntityS2CPacket(defHurtSound, getSoundCategory(), this, getSoundVolume(), getSoundPitch());
-			for (EntityTrackingListener etl : FabricationMod.getTrackers(this)) {
-				ServerPlayerEntity spe = etl.getPlayer();
-				//TODO access spe.entity for instanceof check
+			for (ServerPlayerEntity spe : FabricationMod.getTrackers(this)) {
 				if (spe instanceof SetFabricationConfigAware && ((SetFabricationConfigAware) spe).fabrication$isConfigAware()) {
 					spe.networkHandler.sendPacket(fabPkt);
 				} else if (vanPkt != null) {

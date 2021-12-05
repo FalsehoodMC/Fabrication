@@ -85,13 +85,13 @@ weird_tweaks.extra.no_dolphin_theft:
 	desc:
 		Prevents dolphins from picking up items.
 
-weird_tweaks.extra.thrown_buckets_empty_lava_cauldrons:
-	name: Thrown Buckets Empty Lava Cauldrons
-	since: 2.1.0
-	sides: server_only
-	default: never
-	desc:
-		Throwing an bucket at a lava cauldron will pickup the lava.
+#weird_tweaks.extra.thrown_buckets_empty_lava_cauldrons:
+#	name: Thrown Buckets Empty Lava Cauldrons
+#	since: 2.1.0
+#	sides: server_only
+#	default: never
+#	desc:
+#		Throwing an bucket at a lava cauldron will pickup the lava.
 
 weird_tweaks.extra.source_dependent_iframes:
 	name: Source Dependent Invulnerability Frames

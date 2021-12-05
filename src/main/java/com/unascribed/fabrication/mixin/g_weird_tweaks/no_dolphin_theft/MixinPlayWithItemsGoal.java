@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 
-@Mixin(targets="net.minecraft.entity.passive.DolphinEntity.PlayWithItemsGoal")
+@Mixin(targets="net.minecraft.entity.passive.DolphinEntity$PlayWithItemsGoal")
 @EligibleIf(configAvailable="*.no_dolphin_theft")
 public abstract class MixinPlayWithItemsGoal {
 

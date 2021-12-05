@@ -40,7 +40,7 @@ public abstract class MixinItemEntity extends Entity implements RenderingAgeAcce
 		if (!world.isClient) {
 			if (age % 10 == 0) {
 				PacketByteBuf data = new PacketByteBuf(Unpooled.buffer(8));
-				data.writeInt(getId());
+				data.writeInt(getEntityId());
 				data.writeInt(itemAge);
 				FabricationMod.sendToTrackersMatching(this, new CustomPayloadS2CPacket(FABRICATION$ITEM_DESPAWN, data), spe -> spe instanceof SetAttackerYawAware && ((SetAttackerYawAware) spe).fabrication$isAttackerYawAware());
 			}

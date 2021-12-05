@@ -33,7 +33,7 @@ public abstract class MixinVillagerEntity extends MerchantEntity {
 
 	@Shadow public abstract VillagerData getVillagerData();
 
-	@Inject(method={"restock()V", "restockAndUpdateDemandBonus()V"}, at=@At("TAIL"))
+	@Inject(method={"restock()V", "method_21723()V"}, at=@At("TAIL"))
 	public void resetTrades(CallbackInfo ci){
 		if(!MixinConfigPlugin.isEnabled("*.villager_trades_reset")) return;
 		TradeOfferList tradeOfferList = new TradeOfferList();

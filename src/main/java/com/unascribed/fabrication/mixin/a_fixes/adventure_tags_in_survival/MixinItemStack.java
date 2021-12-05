@@ -23,10 +23,10 @@ public class MixinItemStack {
 	public void useOnBlock(ItemUsageContext iuc, CallbackInfoReturnable<ActionResult> ci) {
 		if (!MixinConfigPlugin.isEnabled("*.adventure_tags_in_survival")) return;
 		PlayerEntity player = iuc.getPlayer();
-		if (player != null && (player.getAbilities().creativeMode || !player.getAbilities().allowModifyWorld)) return;
+		if (player != null && (player.abilities.creativeMode || !player.abilities.allowModifyWorld)) return;
 		ItemStack self = (ItemStack)(Object)this;
 		if (!self.isEmpty()) {
-			if (self.hasNbt() && self.getNbt().contains("CanPlaceOn")) {
+			if (self.hasTag() && self.getTag().contains("CanPlaceOn")) {
 				boolean able = self.canPlaceOn(iuc.getWorld().getTagManager(), new CachedBlockPosition(iuc.getWorld(), iuc.getBlockPos(), false));
 				if (!able) {
 					ci.setReturnValue(ActionResult.PASS);

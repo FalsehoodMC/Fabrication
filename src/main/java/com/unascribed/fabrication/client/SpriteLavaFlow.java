@@ -5,10 +5,10 @@ import com.unascribed.fabrication.features.FeatureOldLava;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.client.texture.TextureTickListener;
 import net.minecraft.util.math.MathHelper;
 
-public class SpriteLavaFlow extends Sprite implements TextureTickListener {
+public class SpriteLavaFlow extends Sprite
+{
 	public SpriteLavaFlow(SpriteAtlasTexture spriteAtlasTexture,
 			Info info, int maxLevel, int atlasWidth, int atlasHeight, int x,
 			int y) {
@@ -25,13 +25,14 @@ public class SpriteLavaFlow extends Sprite implements TextureTickListener {
 
 
 	@Override
-	public void tick() {
-		tickAnimation();
+	public void tickAnimation() {
+		tickAutomata();
 		FeatureOldLava.mip(images);
 		upload();
 	}
 
-	public void tickAnimation() {
+
+	public void tickAutomata() {
 		// I cannot be bothered to deobfuscate this the rest of the way.
 
 		++this.field_76873_k;

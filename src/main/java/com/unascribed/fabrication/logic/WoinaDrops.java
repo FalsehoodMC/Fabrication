@@ -13,7 +13,6 @@ import org.lwjgl.opengl.GL12;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
-import com.mojang.blaze3d.platform.TextureUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.loaders.LoaderClassicBlockDrops;
@@ -39,6 +38,7 @@ import net.minecraft.client.texture.MipmapHelper;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImage.Format;
 import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.texture.TextureUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
@@ -92,7 +92,7 @@ public class WoinaDrops {
 							@Override
 							public void load(ResourceManager manager) throws IOException {
 								clearGlId();
-								SpriteAtlasTexture atlas = MinecraftClient.getInstance().getBakedModelManager().getAtlas(new Identifier("textures/atlas/blocks.png"));
+								SpriteAtlasTexture atlas = MinecraftClient.getInstance().getBakedModelManager().method_24153(new Identifier("textures/atlas/blocks.png"));
 								RenderSystem.bindTexture(atlas.getGlId());
 								int maxLevel = GL11.glGetTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LEVEL);
 								if (maxLevel == 0 || !GL.getCapabilities().GL_ARB_copy_image) {
@@ -109,7 +109,7 @@ public class WoinaDrops {
 									try {
 										NativeImage mipped = MipmapHelper.getMipmapLevelsImages(img, 1)[1];
 										try {
-											TextureUtil.prepareImage(getGlId(), mipped.getWidth(), mipped.getHeight());
+											TextureUtil.allocate(getGlId(), mipped.getWidth(), mipped.getHeight());
 											RenderSystem.bindTexture(getGlId());
 											mipped.upload(0, 0, 0, true);
 										} finally {
@@ -121,7 +121,7 @@ public class WoinaDrops {
 								} else {
 									int w = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 1, GL11.GL_TEXTURE_WIDTH);
 									int h = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 1, GL11.GL_TEXTURE_HEIGHT);
-									TextureUtil.prepareImage(getGlId(), w, h);
+									TextureUtil.allocate(getGlId(), w, h);
 									ARBCopyImage.glCopyImageSubData(
 											atlas.getGlId(), GL11.GL_TEXTURE_2D, 1, 0, 0, 0,
 											getGlId(), GL11.GL_TEXTURE_2D, 0, 0, 0, 0,

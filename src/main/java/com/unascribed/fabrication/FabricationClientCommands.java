@@ -67,7 +67,7 @@ public class FabricationClientCommands {
 							.then(RequiredArgumentBuilder.<FabricClientCommandSource, Identifier>argument("atlas", new AtlasArgumentType())
 									.executes((c) -> {
 										MinecraftClient.getInstance().send(() -> {
-											MinecraftClient.getInstance().setScreen(new AtlasViewerScreen(c.getArgument("atlas", Identifier.class)));
+											MinecraftClient.getInstance().openScreen(new AtlasViewerScreen(c.getArgument("atlas", Identifier.class)));
 										});
 										return 1;
 									}))));
@@ -81,7 +81,7 @@ public class FabricationClientCommands {
 			for (String s : OptionalFScript.predicateProviders.keySet()) {
 				LiteralArgumentBuilder<T> key = LiteralArgumentBuilder.<T>literal(s).executes((c) -> {
 					MinecraftClient.getInstance().send(() -> {
-						MinecraftClient.getInstance().setScreen(OptionalFScriptScreen.construct(null, PrideFlags.isPrideMonth() ? PrideFlags.getRandomFlag() : null, FeaturesFile.get(s).name, s));
+						MinecraftClient.getInstance().openScreen(OptionalFScriptScreen.construct(null, PrideFlags.isPrideMonth() ? PrideFlags.getRandomFlag() : null, FeaturesFile.get(s).name, s));
 					});
 					return 1;
 				});

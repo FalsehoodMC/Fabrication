@@ -14,14 +14,15 @@ import java.util.function.Consumer;
 @EligibleIf(configAvailable="*.dropped_items_dont_stack")
 public abstract class MixinLivingEntity {
 
-	@ModifyArg(method="dropLoot(Lnet/minecraft/entity/damage/DamageSource;Z)V", at=@At(value="INVOKE", target="Lnet/minecraft/loot/LootTable;generateLoot(Lnet/minecraft/loot/context/LootContext;Ljava/util/function/Consumer;)V"))
+	@ModifyArg(method="dropLoot(Lnet/minecraft/entity/damage/DamageSource;Z)V",
+			at=@At(value="INVOKE", target="Lnet/minecraft/loot/LootTable;generateLoot(Lnet/minecraft/loot/context/LootContext;Ljava/util/function/Consumer;)V"))
 	public Consumer<ItemStack> splitLoot(Consumer<ItemStack> lootConsumer) {
 		if(!MixinConfigPlugin.isEnabled("*.dropped_items_dont_stack")) return lootConsumer;
 		return stack ->{
 			ItemStack single = stack.copy();
 			single.setCount(1);
 			for (int i=0; i<stack.getCount(); i++){
-				lootConsumer.accept(single);
+				lootConsumer.accept(single.copy());
 			}
 		};
 

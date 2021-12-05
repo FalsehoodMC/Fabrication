@@ -88,7 +88,7 @@ public class FeatureIMore implements Feature {
 				LivingEntity le = (LivingEntity)e;
 				ItemStack stack = le.getMainHandStack();
 				if (!stack.isEmpty()) {
-					NbtCompound tag = stack.getOrCreateNbt();
+					NbtCompound tag = stack.getOrCreateTag();
 					if (!tag.contains("Enchantments", 9)) {
 						tag.put("Enchantments", new NbtList());
 					}

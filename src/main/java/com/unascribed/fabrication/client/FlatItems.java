@@ -9,8 +9,8 @@ public class FlatItems {
 
 	public static boolean hasGeneratedModel(ItemStack item) {
 		MinecraftClient mc = MinecraftClient.getInstance();
-		BakedModel bm = mc.getItemRenderer().getHeldItemModel(item, mc.world, null, 1);
-		return !bm.hasDepth() || item.isOf(Items.TRIDENT) || item.isOf(Items.SPYGLASS);
+		BakedModel bm = mc.getItemRenderer().getHeldItemModel(item, mc.world, null);
+		return !bm.hasDepth() || item.getItem() == Items.TRIDENT;
 	}
 
 }

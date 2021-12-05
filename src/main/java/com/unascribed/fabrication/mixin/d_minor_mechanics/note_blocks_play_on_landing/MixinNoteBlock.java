@@ -31,8 +31,8 @@ public abstract class MixinNoteBlock extends Block {
 	private void playNote(World world, BlockPos pos) {}
 
 	@Override
-	public void onLandedUpon(World world, BlockState state, BlockPos pos, Entity entity, float distance) {
-		super.onLandedUpon(world, state, pos, entity, distance);
+	public void onLandedUpon(World world, BlockPos pos, Entity entity, float distance) {
+		super.onLandedUpon(world, pos, entity, distance);
 		if (!world.isClient && MixinConfigPlugin.isEnabled("*.note_blocks_play_on_landing")) {
 			for (int i = 0; i < Math.min(8, Math.ceil(distance/2)); i++) {
 				playNote(world, pos);

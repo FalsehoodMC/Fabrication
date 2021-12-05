@@ -18,7 +18,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 
 @Mixin(value=Hooks.class)
-@EligibleIf(anyConfigAvailable= {"*.blinking_drops", "*.classic_block_drops"}, envMatches=Env.CLIENT, modLoaded="forge:obfuscate")
+@EligibleIf(anyConfigAvailable={"*.blinking_drops", "*.classic_block_drops"}, envMatches=Env.CLIENT, modLoaded="forge:obfuscate")
 public class MixinItemEntityRendererObfuscate {
 
 	@ModifyVariable(at=@At("HEAD"), method="fireRenderEntityItem",
@@ -27,8 +27,8 @@ public class MixinItemEntityRendererObfuscate {
 		return WoinaDrops.modifyOverlay(stack, orig);
 	}
 
-	@Redirect(at=@At(value="INVOKE", target="net/minecraft/client/render/item/ItemRenderer.renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformation$Mode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/render/model/BakedModel;)V"),
-			method="fireRenderEntityItem")
+	@Redirect(at=@At(value="INVOKE", target="net/minecraft/client/render/item/ItemRenderer.renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformation$Mode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/render/model/BakedModel;)V", remap=true),
+			method="fireRenderEntityItem", remap=false)
 	private static void interceptRender(ItemRenderer subject, ItemStack stack, ModelTransformation.Mode renderMode, boolean leftHanded, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, BakedModel model) {
 		WoinaDrops.interceptRender(subject, stack, renderMode, leftHanded, matrices, vertexConsumers, light, overlay, model);
 	}

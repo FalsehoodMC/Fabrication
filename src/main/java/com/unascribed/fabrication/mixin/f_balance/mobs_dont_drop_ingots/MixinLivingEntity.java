@@ -28,7 +28,7 @@ public class MixinLivingEntity {
 			Item current = stack.getItem();
 			if (Items.IRON_INGOT.equals(current)) replacement = Items.IRON_NUGGET;
 			else if (Items.GOLD_INGOT.equals(current)) replacement = Items.GOLD_NUGGET;
-			else if (Items.COPPER_INGOT.equals(current) || Items.NETHERITE_INGOT.equals(current) || Items.GOLD_NUGGET.equals(current) || Items.IRON_NUGGET.equals(current))
+			else if (Items.NETHERITE_INGOT.equals(current) || Items.GOLD_NUGGET.equals(current) || Items.IRON_NUGGET.equals(current))
 				replacement = Items.AIR;
 			if (replacement != null) {
 				NbtCompound tag = new NbtCompound();

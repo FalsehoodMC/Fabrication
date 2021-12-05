@@ -26,7 +26,7 @@ public class MixinBowItem {
 		if(MixinConfigPlugin.isEnabled("*.instant_bow") && ConfigPredicates.shouldRun("*.instant_bow", user)) {
 			ItemStack itemStack = user.getStackInHand(hand);
 			Object self = this;
-			if (user.getAbilities().creativeMode || !user.getArrowType(itemStack).isEmpty()) {
+			if (user.abilities.creativeMode || !user.getArrowType(itemStack).isEmpty()) {
 				((BowItem) self).onStoppedUsing(itemStack, world, user, 0);
 			}
 			cir.setReturnValue(TypedActionResult.fail(itemStack));

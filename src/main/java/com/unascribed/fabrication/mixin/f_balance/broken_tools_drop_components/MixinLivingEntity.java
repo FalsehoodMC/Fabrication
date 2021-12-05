@@ -60,9 +60,9 @@ public abstract class MixinLivingEntity extends Entity {
 		if (!MixinConfigPlugin.isEnabled("*.broken_tools_drop_components")) return;
 		Item item = stack.getItem();
 		if (LoaderGearComponents.ignoreVanishing && EnchantmentHelper.hasVanishingCurse(stack)) return;
-		if (stack.hasNbt() && stack.getNbt().getBoolean("fabrication:ShatteredAlready")) return;
-		if (!stack.hasNbt()) stack.setNbt(new NbtCompound());
-		stack.getNbt().putBoolean("fabrication:ShatteredAlready", true);
+		if (stack.hasTag() && stack.getTag().getBoolean("fabrication:ShatteredAlready")) return;
+		if (!stack.hasTag()) stack.setTag(new NbtCompound());
+		stack.getTag().putBoolean("fabrication:ShatteredAlready", true);
 		List<ItemStack> enchantables = Lists.newArrayList();
 		for (ItemMaterialValue imv : LoaderGearComponents.items.get(Resolvable.mapKey(Registry.ITEM.getId(item), Registry.ITEM))) {
 			double dropChance = 1;

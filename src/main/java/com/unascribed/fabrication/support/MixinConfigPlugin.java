@@ -10,6 +10,7 @@ import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -197,7 +198,9 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			}
 		}
 		starMap = ImmutableMap.copyOf(starMapBldr);
-		equivalanceMap = ImmutableMap.copyOf(equivalanceMapBldr.entrySet().stream().map(e-> Map.entry(remap(e.getKey()), e.getValue())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+		equivalanceMap = ImmutableMap.copyOf(equivalanceMapBldr.entrySet().stream()
+				.map(e -> new AbstractMap.SimpleImmutableEntry<>(remap(e.getKey()), e.getValue()))
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
 		validKeys = ImmutableSet.copyOf(keys);
 		validSections = ImmutableSet.copyOf(sections);
 		defaultsByProfile = ImmutableTable.copyOf(profilesBldr);

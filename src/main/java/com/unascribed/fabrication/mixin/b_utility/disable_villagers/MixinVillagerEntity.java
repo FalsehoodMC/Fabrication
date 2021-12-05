@@ -24,7 +24,7 @@ public abstract class MixinVillagerEntity extends MerchantEntity {
 	@Inject(at=@At("HEAD"), method="tick()V", cancellable=true)
 	public void tick(CallbackInfo ci) {
 		if (MixinConfigPlugin.isEnabled("*.disable_villagers")) {
-			discard();
+			remove();
 		}
 	}
 

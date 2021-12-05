@@ -13,7 +13,6 @@ import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.Window;
 import net.minecraft.entity.player.PlayerEntity;
@@ -28,7 +27,7 @@ public class FeatureToggleStance implements Feature {
 		CRAWLING(false, true),
 		;
 		public final boolean sneaking, crawling;
-		private Stance(boolean sneaking, boolean crawling) {
+		Stance(boolean sneaking, boolean crawling) {
 			this.sneaking = sneaking;
 			this.crawling = crawling;
 		}
@@ -78,13 +77,12 @@ public class FeatureToggleStance implements Feature {
 				Identifier tex = new Identifier("fabrication", "textures/stance/"+currentStance.name().toLowerCase(Locale.ROOT)+".png");
 				RenderSystem.defaultBlendFunc();
 				RenderSystem.enableBlend();
-				RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
-				//GlStateManager.disableAlphaTest();
-				RenderSystem.setShaderTexture(0, tex);
-				RenderSystem.setShaderColor(1, 1, 1, a);
+				RenderSystem.disableAlphaTest();
+				MinecraftClient.getInstance().getTextureManager().bindTexture(tex);
+				RenderSystem.color4f(1, 1, 1, a);
 				DrawableHelper.drawTexture(ms, (w.getScaledWidth()/2)-48, (w.getScaledHeight()-32)/2, 0, 0, 0, 32, 32, 32, 32);
 				RenderSystem.disableBlend();
-				//GlStateManager.enableAlphaTest();
+				RenderSystem.enableAlphaTest();
 			}
 			if (p.age != lastAge) {
 				lastAge = p.age;

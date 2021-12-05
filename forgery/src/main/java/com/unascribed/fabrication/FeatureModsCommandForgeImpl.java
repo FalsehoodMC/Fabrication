@@ -45,7 +45,7 @@ public class FeatureModsCommandForgeImpl implements Feature {
 				} catch (Throwable t) {
 					dispatcher.register(LiteralArgumentBuilder.<CommandSource>literal("plugins")
 							.executes((c) -> {
-								c.getSource().sendFeedback(new StringTextComponent("§cThis ain't no Bukkit!\nTry /mods"), false);
+								c.getSource().sendSuccess(new StringTextComponent("§cThis ain't no Bukkit!\nTry /mods"), false);
 								return 1;
 							}));
 				}
@@ -66,7 +66,7 @@ public class FeatureModsCommandForgeImpl implements Feature {
 			for (ModInfo mi : ModList.get().getMods()) {
 				if (mi.getModId().equals("minecraft")) continue;
 				if (!first) {
-					mt.append(new StringTextComponent(", ").mergeStyle(Style.EMPTY.applyFormatting(TextFormatting.RESET)));
+					mt.append(new StringTextComponent(", ").withStyle(Style.EMPTY.applyFormat(TextFormatting.RESET)));
 				} else {
 					first = false;
 				}
@@ -95,16 +95,16 @@ public class FeatureModsCommandForgeImpl implements Feature {
 				desc.append("ID: ");
 				desc.append(mi.getModId());
 				StringTextComponent lt = new StringTextComponent(mi.getDisplayName());
-				Style s = Style.EMPTY.applyFormatting(TextFormatting.GREEN)
-						.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new StringTextComponent(desc.toString())));
+				Style s = Style.EMPTY.applyFormat(TextFormatting.GREEN)
+						.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new StringTextComponent(desc.toString())));
 				Optional<String> displayUrlOpt = mi.getConfigElement("displayURL");
 				if (displayUrlOpt.isPresent()) {
-					s = s.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, displayUrlOpt.get()));
+					s = s.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, displayUrlOpt.get()));
 				}
 				lt.setStyle(s);
 				mt.append(lt);
 			}
-			c.getSource().sendFeedback(mt, false);
+			c.getSource().sendSuccess(mt, false);
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}

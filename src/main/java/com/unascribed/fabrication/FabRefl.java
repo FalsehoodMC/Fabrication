@@ -59,9 +59,9 @@ import net.minecraft.resource.ResourcePackProvider;
 import net.minecraft.server.command.GiveCommand;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.EntityTrackingListener;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage.EntityTracker;
+import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
 
 public class FabRefl {
@@ -142,11 +142,11 @@ public class FabRefl {
 		}
 	}
 
-	private static final MethodHandle et_playersTracking = unreflectGetter("EntityTracker", () -> EntityTracker.class, "listeners", "field_18250", "field_219406_f")
+	private static final MethodHandle et_playersTracking = unreflectGetter("EntityTracker", () -> EntityTracker.class, "playersTracking", "field_18250", "field_219406_f")
 			.requiredBy("*.sync_attacker_yaw", "*.despawning_items_blink").get();
-	public static Set<EntityTrackingListener> getPlayersTracking(EntityTracker subject) {
+	public static Set<ServerPlayerEntity> getPlayersTracking(EntityTracker subject) {
 		try {
-			return (Set<EntityTrackingListener>)checkHandle(et_playersTracking).invokeExact(subject);
+			return (Set<ServerPlayerEntity>)checkHandle(et_playersTracking).invokeExact(subject);
 		} catch (Throwable t) {
 			throw rethrow(t);
 		}
@@ -212,6 +212,16 @@ public class FabRefl {
 		}
 	}
 
+	private static final MethodHandle dc_color = unreflectGetter("DyeColor", () -> DyeColor.class, "color", "field_7949", "field_193351_w")
+			.requiredBy("*.legible_signs").get();
+	public static int getColor(DyeColor subject) {
+		try {
+			return (int)checkHandle(dc_color).invokeExact(subject);
+		} catch (Throwable t) {
+			throw rethrow(t);
+		}
+	}
+
 	private static final MethodHandle ie_pickupDelay = unreflectGetter("ItemEntity", () -> ItemEntity.class, "pickupDelay", "field_7202", "field_145804_b")
 			.requiredBy("*.instant_pickup").get();
 	public static int getPickupDelay(ItemEntity subject) {
@@ -224,8 +234,8 @@ public class FabRefl {
 
 
 	private static final MethodHandle gc_execute = unreflectMethod("GiveCommand", () -> GiveCommand.class, "execute", "method_13401", "func_198497_a",
-			int.class,
-			ServerCommandSource.class, ItemStackArgument.class, Collection.class, int.class)
+				int.class,
+				ServerCommandSource.class, ItemStackArgument.class, Collection.class, int.class)
 			.requiredBy("*.i_and_more").get();
 	public static int GiveCommand_execute(ServerCommandSource source, ItemStackArgument item, Collection<ServerPlayerEntity> targets, int count) throws CommandSyntaxException {
 		try {
@@ -236,8 +246,8 @@ public class FabRefl {
 	}
 
 	private static final MethodHandle me_getDropChance = unreflectMethod("MobEntity", () -> MobEntity.class, "getDropChance", "method_5929", "func_205712_c",
-			float.class,
-			EquipmentSlot.class)
+				float.class,
+				EquipmentSlot.class)
 			.requiredBy("*.broken_tools_drop_components").get();
 	public static float MobEntity_getDropChance(MobEntity subject, EquipmentSlot slot) {
 		try {
@@ -248,9 +258,9 @@ public class FabRefl {
 	}
 
 	private static final MethodHandle fb_registerFlammableBlock = unreflectMethod("FireBlock", () -> FireBlock.class,
-			"registerFlammableBlock", "method_10189", "func_180686_a",
-			void.class,
-			Block.class, int.class, int.class)
+				"registerFlammableBlock", "method_10189", "func_180686_a",
+				void.class,
+				Block.class, int.class, int.class)
 			.requiredBy("*.flammable_cobwebs").get();
 	public static void FireBlock_registerFlammableBlock(FireBlock subject, Block block, int burnChance, int spreadChance) {
 		try {
@@ -313,21 +323,21 @@ public class FabRefl {
 			}
 		}
 
-		private static final MethodHandle spriteAnimation_frameIndex = unreflectGetter("Sprite.Animation", () -> Sprite.Animation.class, "frameIndex", "field_28470", "field_110973_g")
+		private static final MethodHandle sprite_frameIndex = unreflectGetter("Sprite", () -> Sprite.class, "frameIndex", "field_5273", "field_110973_g")
 				.requiredBy("atlas_viewer").get();
-		public static int getFrameIndex(Sprite.Animation subject) {
+		public static int getFrameIndex(Sprite subject) {
 			try {
-				return (int)checkHandle(spriteAnimation_frameIndex).invokeExact(subject);
+				return (int)checkHandle(sprite_frameIndex).invokeExact(subject);
 			} catch (Throwable t) {
 				throw rethrow(t);
 			}
 		}
 
-		private static final MethodHandle spriteAnimation_frameTicks = unreflectGetter("Sprite.Animation", () -> Sprite.Animation.class, "frameTicks", "field_28471", "field_110983_h")
+		private static final MethodHandle sprite_frameTicks = unreflectGetter("Sprite", () -> Sprite.class, "frameTicks", "field_5272", "field_110983_h")
 				.requiredBy("atlas_viewer").get();
-		public static int getFrameTicks(Sprite.Animation subject) {
+		public static int getFrameTicks(Sprite subject) {
 			try {
-				return (int)checkHandle(spriteAnimation_frameTicks).invokeExact(subject);
+				return (int)checkHandle(sprite_frameTicks).invokeExact(subject);
 			} catch (Throwable t) {
 				throw rethrow(t);
 			}
@@ -363,9 +373,11 @@ public class FabRefl {
 			}
 		}
 
+
+
 		private static final MethodHandle mh_blend = unreflectMethod("MipmapHelper", () -> MipmapHelper.class, "blend", "method_24101", "func_229172_a_",
-				int.class,
-				int.class, int.class, int.class, int.class, boolean.class)
+					int.class,
+					int.class, int.class, int.class, int.class, boolean.class)
 				.requiredBy("*.old_lava").get();
 		public static int MipmapHelper_blend(int one, int two, int three, int four, boolean checkAlpha) {
 			try {
@@ -376,7 +388,7 @@ public class FabRefl {
 		}
 
 		private static final MethodHandle ni_new = unreflectConstructor("NativeImage", () -> NativeImage.class,
-				Format.class, int.class, int.class, boolean.class, long.class)
+					Format.class, int.class, int.class, boolean.class, long.class)
 				.requiredBy("*.classic_block_drops").get();
 		public static NativeImage NativeImage_new(Format format, int width, int height, boolean useStb, long pointer) {
 			try {
@@ -387,23 +399,12 @@ public class FabRefl {
 		}
 
 		private static final MethodHandle ir_renderBakedItemModel = unreflectMethod("ItemRenderer", () -> ItemRenderer.class, "renderBakedItemModel", "method_23182", "func_229114_a_",
-				void.class,
-				BakedModel.class, ItemStack.class, int.class, int.class, MatrixStack.class, VertexConsumer.class)
+					void.class,
+					BakedModel.class, ItemStack.class, int.class, int.class, MatrixStack.class, VertexConsumer.class)
 				.requiredBy("*.classic_block_drops").get();
 		public static void ItemRenderer_renderBakedItemModel(ItemRenderer subject, BakedModel model, ItemStack stack, int light, int overlay, MatrixStack matrices, VertexConsumer vertices) {
 			try {
 				checkHandle(ir_renderBakedItemModel).invokeExact(subject, model, stack, light, overlay, matrices, vertices);
-			} catch (Throwable t) {
-				throw rethrow(t);
-			}
-		}
-
-		private static final MethodHandle s_getFrameCount = unreflectMethod("Sprite", () -> Sprite.class, "getFrameCount", "method_4592", "",
-				int.class)
-				.requiredBy("*.atlas_viewer").get();
-		public static int getFrameCount(Sprite subject) {
-			try {
-				return (int)checkHandle(s_getFrameCount).invokeExact(subject);
 			} catch (Throwable t) {
 				throw rethrow(t);
 			}
@@ -511,7 +512,7 @@ public class FabRefl {
 	private static RuntimeException rethrow(Throwable t) {
 		if (!MixinErrorHandler_THIS_ERROR_HANDLER_IS_FOR_SOFT_FAILURE_IN_FABRICATION_ITSELF_AND_DOES_NOT_IMPLY_FABRICATION_IS_RESPONSIBLE_FOR_THE_BELOW_ERROR.actuallyItWasUs && (t instanceof MixinError || t instanceof MixinException)) {
 			throw new RuntimeException("DO NOT REPORT THIS ERROR TO FABRICATION.\n"
-					+ "This is caused by ANOTHER MOD'S MIXIN FAILURE that was initiated by Fabrication initializing reflection.\n"
+					+ "This is caused by ANOTHER MOD'S MIXIN FAILURE that was initiated by "+(FORGE ? "Forgery" : "Fabrication")+" initializing reflection.\n"
 					+ "Errors like these show up attributed to whoever was the first person to load the class with the broken mixin.\n"
 					+ "!!!!! DO NOT REPORT THIS ERROR TO FABRICATION !!!!!");
 		}
