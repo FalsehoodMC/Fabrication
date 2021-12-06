@@ -26,8 +26,8 @@ import net.minecraft.world.World;
 @EligibleIf(configAvailable="*.colorful_redstone")
 public class MixinRedstoneWireBlock {
 
-	@Inject(at=@At("RETURN"), method="method_27841(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;Z)Lnet/minecraft/block/enums/WireConnection;", cancellable=true)
-	private void method_27841(BlockView blockView, BlockPos blockPos, Direction direction, boolean bl, CallbackInfoReturnable<WireConnection> ci) {
+	@Inject(at=@At("RETURN"), method="getRenderConnectionType(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;Z)Lnet/minecraft/block/enums/WireConnection;", cancellable=true)
+	private void getRenderConnectionType(BlockView blockView, BlockPos blockPos, Direction direction, boolean bl, CallbackInfoReturnable<WireConnection> ci) {
 		if (!MixinConfigPlugin.isEnabled("*.colorful_redstone")) return;
 		if (ci.getReturnValue() != WireConnection.NONE && !fabrication$canConnect(blockView, blockPos, direction)) {
 			ci.setReturnValue(WireConnection.NONE);
@@ -51,7 +51,7 @@ public class MixinRedstoneWireBlock {
 			BlockPos theirFloorPos = theirPos.down();
 			BlockState theirFloor = view.getBlockState(theirFloorPos);
 			if (theirFloor.isIn(BlockTags.WOOL)) {
-				if (ourFloor.getTopMaterialColor(view, ourFloorPos) != theirFloor.getTopMaterialColor(view, theirFloorPos)) {
+				if (ourFloor.getMapColor(view, ourFloorPos) != theirFloor.getMapColor(view, theirFloorPos)) {
 					return false;
 				}
 			}
