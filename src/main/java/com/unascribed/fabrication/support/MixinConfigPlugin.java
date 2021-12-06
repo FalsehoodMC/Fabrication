@@ -362,7 +362,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 				Analytics.deleteId();
 			}
 		}
-		Path configFile = Agnos.getConfigDir().resolve("fabrication").resolve("features.ini");
+		String cfgDir = isMet(SpecialEligibility.FORGE) ? "forgery" : "fabrication";
+		Path configFile = Agnos.getConfigDir().resolve(cfgDir).resolve("features.ini");
 		Stopwatch watch = Stopwatch.createStarted();
 		StringWriter sw = new StringWriter();
 		try {
