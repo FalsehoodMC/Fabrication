@@ -40,7 +40,8 @@ let versionNamesToCodes = {
 	'1.3.5': 31,
 	'2.0.0': 40,
 	'2.1.0': 41,
-	'2.2.0': 42
+	'2.2.0': 42,
+	'2.2.1': 42
 };
 
 let currentVersion = /version\s+=\s+(.*?)\s+/.exec(fs.readFileSync('gradle.properties').toString('utf8'))[1];
