@@ -1,6 +1,14 @@
 # This is not actually a YAML file; it's only .yml for syntax highlighting.
 # Tab indentation *must* be used.
 
+mechanics.extra.colorful_redstone:
+	name: Colorful Redstone
+	since: 2.3.0
+	default: burnt
+	desc:
+		Redstone on top of wool will not connect to redstone on top of a different color of wool.
+		
+		Experimental. Once sufficiently tested, will be moved out of Extra.
 
 # kate: space-indent off
 # vim: noai:noet
