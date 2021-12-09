@@ -1,7 +1,6 @@
 fixes.fix_end_portal_render:
-	name: Fix End Portal REnder
+	name: Fix End Portal Render
 	since: 2.3.0
-	default: burnt
-	sides: server_only
+	sides: client_only
 	desc:
 		End portal block will render from all sides.
