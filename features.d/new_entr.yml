@@ -3,4 +3,4 @@ utility.extra.enter_selects_highlighted_suggestion:
 	since: 2.3.0
 	sides: client_only
 	desc:
-		Pressing enter uses the selected suggestion.
+		Pressing enter selects the highlighted suggestion.

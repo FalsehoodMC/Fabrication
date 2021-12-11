@@ -16,12 +16,15 @@ public abstract class MixinSuggestionWindow {
 	@Shadow
 	public abstract void complete();
 
+	@Shadow
+	private boolean completed;
+
 	@Inject(at=@At(value="HEAD"), method="keyPressed(III)Z", cancellable=true)
 	public void onStoppedUsing(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
 		if (!MixinConfigPlugin.isEnabled("*.enter_selects_highlighted_suggestion")) return;
-		if (keyCode == 257 || keyCode == 335){
+		if ((keyCode == 257 || keyCode == 335) && !this.completed){
 			this.complete();
-			cir.setReturnValue(false);
+			cir.setReturnValue(true);
 		}
 	}
 
