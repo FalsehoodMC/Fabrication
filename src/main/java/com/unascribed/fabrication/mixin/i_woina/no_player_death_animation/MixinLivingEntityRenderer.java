@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.i_woina.no_player_death_animation;
 
+import com.unascribed.fabrication.support.Env;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -12,7 +13,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 
 @Mixin(LivingEntityRenderer.class)
-@EligibleIf(configAvailable="*.no_player_death_animation")
+@EligibleIf(configAvailable="*.no_player_death_animation", envMatches=Env.CLIENT)
 public abstract class MixinLivingEntityRenderer {
 
 	@Redirect(method="setupTransforms(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/client/util/math/MatrixStack;FFF)V", at=@At(value="FIELD", target="Lnet/minecraft/entity/LivingEntity;deathTime:I"))
