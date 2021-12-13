@@ -1,0 +1,6 @@
+mechanics.toggleable_furnace_carts:
+	name: Toggleable Furnace Carts
+	since: 2.3.0
+	sides: server_only
+	desc:
+		Powered rails stop furnace carts when appropriate and conserve their fuel.
