@@ -1,0 +1,9 @@
+minor_mechanics.protection_on_any_item:
+	name: Protection On Any Item
+	since: 2.3.0
+	sides: server_only
+	desc:
+		Protection can be applied to any enchantable item.
+
+		It will inclusively protect from:.
+		Level 1: cactus, Level 2: fire, Level 3: lava, Level 4: explosions.
