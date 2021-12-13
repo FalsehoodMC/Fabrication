@@ -1,0 +1,7 @@
+weird_tweaks.extra.encroaching_emeralds:
+	name: Encroaching Emeralds
+	since: 2.3.0
+	default: burnt
+	sides: server_only
+	desc:
+		Emeralds spawn in all biomes which have ores.
