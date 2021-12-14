@@ -6,11 +6,11 @@ public class Markdown {
 
 	public static final Pattern strike = Pattern.compile("~~(.+)~~");
 	public static final Pattern under = Pattern.compile("~(.+)~");
-	public static final Pattern bold = Pattern.compile("[_*][_*](.+)[_*][_*]");
-	public static final Pattern italic = Pattern.compile("[_*](.+)[_*]");
+	public static final Pattern bold = Pattern.compile("__(.+)__|\\*\\*(.+)\\*\\*");
+	public static final Pattern italic = Pattern.compile("_(.+)_|\\*(.+)\\*");
 	public static final Pattern dedup = Pattern.compile("(§r)+");
 
 	public static String convert(String in){
-		return dedup.matcher(italic.matcher(bold.matcher(under.matcher(strike.matcher(in).replaceAll("§m$1§r")).replaceAll("§n$1§r")).replaceAll("§l$1§r")).replaceAll("§o$1§r")).replaceAll("§r");
+		return dedup.matcher(italic.matcher(bold.matcher(under.matcher(strike.matcher(in).replaceAll("§m$1§r")).replaceAll("§n$1§r")).replaceAll("§l$1$2§r")).replaceAll("§o$1$2§r")).replaceAll("§r");
 	}
 }
