@@ -101,5 +101,22 @@ weird_tweaks.extra.source_dependent_iframes:
 	desc:
 		Allows entities to take damage multiple times if it's from multiple sources.
 
+weird_tweaks.extra.encroaching_emeralds:
+	name: Encroaching Emeralds
+	since: 2.3.0
+	default: burnt
+	sides: server_only
+	desc:
+		Emeralds spawn in all biomes which have ores.
+
+weird_tweaks.extra.disable_lightning_fire:
+	name: Disable Lightning Fire
+	since: 2.3.0
+	default: burnt
+	sides: server_only
+	desc:
+		Prevents lightning from creating fire.
+
+
 # kate: space-indent off
 # vim: noai:noet

@@ -26,8 +26,8 @@ public abstract class MixinWanderingTraderManager {
 	@Shadow @Final private Random random;
 
 	@ModifyVariable(at=@At(value="STORE", ordinal=0), method= "method_18018(Lnet/minecraft/server/world/ServerWorld;)Z")
-	protected PlayerEntity trySpawn(PlayerEntity old, ServerWorld world) {
-		if (MixinConfigPlugin.isEnabled("*.taggable_players")) return old;
+	protected PlayerEntity trySpawn(PlayerEntity old,ServerWorld world) {
+		if (!MixinConfigPlugin.isEnabled("*.taggable_players")) return old;
 		List<ServerPlayerEntity> list = world.getPlayers(pe -> pe.isAlive() && !(pe instanceof TaggablePlayer && ((TaggablePlayer)pe).fabrication$hasTag(PlayerTag.NO_WANDERING_TRADER)));
 		return list.isEmpty() ? null : list.get(this.random.nextInt(list.size()));
 	}
