@@ -6,7 +6,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.World;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -27,9 +29,12 @@ public abstract class MixinEntity {
 	@Inject(method="getLandingPos()Lnet/minecraft/util/math/BlockPos;", at=@At(value="HEAD"), cancellable=true)
 	public void getLandingPos(CallbackInfoReturnable<BlockPos> cir) {
 		if (!MixinConfigPlugin.isEnabled("*.collision_based_landing_pos")) return;
-		world.getBlockCollisions((Entity)(Object)this, this.entityBounds.offset(0, -0.20000000298023224D, 0), (state, pos) -> pos.getY() <= this.getY()).findFirst().ifPresent(
-				vs -> cir.setReturnValue(new BlockPos(vs.getBoundingBox().getCenter()))
-		);
+		for (VoxelShape shape : world.getBlockCollisions((Entity)(Object)this, this.entityBounds.offset(0, -0.20000000298023224D, 0))) {
+			if (shape.getBoundingBox().getCenter().getY() <= this.getY()) {
+				cir.setReturnValue(new BlockPos(shape.getBoundingBox().getCenter()));
+				return;
+			}
+		}
 	}
 
 }
