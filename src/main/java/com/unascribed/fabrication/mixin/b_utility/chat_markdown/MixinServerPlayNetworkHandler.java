@@ -10,9 +10,10 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(ServerPlayNetworkHandler.class)
 @EligibleIf(configAvailable="*.chat_markdown")
-public class MixinItemStringReader {
+public class MixinServerPlayNetworkHandler {
 
-	@ModifyArg(at=@At(value="INVOKE", target="Lnet/minecraft/server/network/ServerPlayNetworkHandler;filterText(Ljava/lang/String;Ljava/util/function/Consumer;)V"), method="onGameMessage(Lnet/minecraft/network/packet/c2s/play/ChatMessageC2SPacket;)V")
+	@ModifyArg(at=@At(value="INVOKE", target="Lnet/minecraft/server/network/ServerPlayNetworkHandler;filterText(Ljava/lang/String;Ljava/util/function/Consumer;)V"),
+			method="onChatMessage(Lnet/minecraft/network/packet/c2s/play/ChatMessageC2SPacket;)V")
 	public String consume(String in) {
 		if (!MixinConfigPlugin.isEnabled("*.chat_markdown")) return in;
 		return Markdown.convert(in);
