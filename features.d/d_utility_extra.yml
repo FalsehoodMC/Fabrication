@@ -65,5 +65,22 @@ utility.extra.item_frame_no_name_display:
 	desc:
 		Item frames will not display the names of the item inside them.
 
+utility.extra.enter_selects_highlighted_suggestion:
+	name: Enter Selects Highlighted Suggestion
+	since: 2.3.0
+	sides: client_only
+	default: burnt
+	desc:
+		Pressing enter selects the highlighted suggestion.
+
+utility.extra.chat_markdown:
+	name: Chat Markdown
+	since: 2.3.0
+	sides: server_only
+	default: burnt
+	desc:
+		Adds bold, strikethrough, underscore and italic markdown to chat.
+
+
 # kate: space-indent off
 # vim: noai:noet

@@ -146,5 +146,13 @@ balance.extra.static_dragon_egg:
 	desc:
 		Prevents dragon egg from teleporting.
 
+balance.extra.brittle_shields:
+	name: Brittle Shields
+	since: 2.3.0
+	default: burnt
+	sides: server_only
+	desc:
+		Causes explosions to always break shields.
+
 # kate: space-indent off
 # vim: noai:noet
