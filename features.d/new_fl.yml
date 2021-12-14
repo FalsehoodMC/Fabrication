@@ -1,0 +1,7 @@
+weird_tweaks.extra.disable_lightning_fire:
+	name: Disable Lightning Fire
+	since: 2.3.0
+	default: burnt
+	sides: server_only
+	desc:
+		Prevents lightning from creating fire.
