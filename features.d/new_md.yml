@@ -1,0 +1,6 @@
+utility.chat_markdown:
+	name: Chat Markdown
+	since: 2.3.0
+	sides: server_only
+	desc:
+		Adds bold, strikethrough, underscore and italic markdown to chat.
