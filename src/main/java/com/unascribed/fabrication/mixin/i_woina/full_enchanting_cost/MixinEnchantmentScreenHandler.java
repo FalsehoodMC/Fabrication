@@ -23,8 +23,8 @@ public class MixinEnchantmentScreenHandler {
 	@Shadow @Final private Inventory inventory;
 
 	@Shadow @Final public int[] enchantmentPower;
-	//              Intermediary    Forge/MCP               Forge/Mojmap
-	@Inject(method={"method_17410", "lambda$enchantItem$1", "lambda$clickMenuButton$1"},
+	//              Intermediary    Forge/MCP               Forge/Mojmap                SRG
+	@Inject(method={"method_17410", "lambda$enchantItem$1", "lambda$clickMenuButton$1", "func_217003_a"},
 			at=@At(value="INVOKE", target="net/minecraft/entity/player/PlayerEntity.applyEnchantmentCosts(Lnet/minecraft/item/ItemStack;I)V"))
 	private void fullExperienceCost(ItemStack itemStack, int i, PlayerEntity playerEntity, int j, ItemStack itemStack2, World world, BlockPos pos, CallbackInfo ci) {
 		if (MixinConfigPlugin.isEnabled("*.full_enchanting_cost"))
