@@ -1,4 +1,4 @@
-package com.unascribed.fabrication.mixin.g_weird_tweaks.fire_retardant_lightning;
+package com.unascribed.fabrication.mixin.g_weird_tweaks.disable_lightning_fire;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
@@ -9,12 +9,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LightningEntity.class)
-@EligibleIf(configAvailable="*.fire_retardant_lightning")
+@EligibleIf(configAvailable="*.disable_lightning_fire")
 public class MixinLightningEntity {
 
 	@Inject(at=@At("HEAD"), method="spawnFire(I)V", cancellable=true)
 	public void preventFire(int spreadAttempts, CallbackInfo ci) {
-		if (MixinConfigPlugin.isEnabled("*.fire_retardant_lightning")) ci.cancel();
+		if (MixinConfigPlugin.isEnabled("*.disable_lightning_fire")) ci.cancel();
 	}
 
 }
