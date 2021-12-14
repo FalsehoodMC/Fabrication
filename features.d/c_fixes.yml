@@ -209,5 +209,12 @@ fixes.bubble_column_pop:
 		
 		Was present in 18w07a, got removed before 1.13 release.
 
+fixes.fix_end_portal_render:
+	name: Fix End Portal Render
+	since: 2.3.0
+	sides: client_only
+	desc:
+		End portal block will render from all sides.
+
 # kate: space-indent off
 # vim: noai:noet
