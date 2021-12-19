@@ -7,15 +7,16 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.unascribed.fabrication.support.Feature;
 
-import net.minecraft.command.CommandSource;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.event.ClickEvent;
-import net.minecraft.util.text.event.HoverEvent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.moddiscovery.ModInfo;
+import net.minecraftforge.forgespi.language.IModInfo;
 
 public class FeatureModsCommandForgeImpl implements Feature {
 
@@ -28,9 +29,9 @@ public class FeatureModsCommandForgeImpl implements Feature {
 		if (!registered) {
 			registered = true;
 			Agnos.runForCommandRegistration((dispatcher, dedi) -> {
-				dispatcher.register(LiteralArgumentBuilder.<CommandSource>literal("mods")
+				dispatcher.register(LiteralArgumentBuilder.<CommandSourceStack>literal("mods")
 						.requires(s -> applied)
-						.then(LiteralArgumentBuilder.<CommandSource>literal("all")
+						.then(LiteralArgumentBuilder.<CommandSourceStack>literal("all")
 								.executes((c) -> {
 									sendMods(c, true);
 									return 1;
@@ -43,9 +44,9 @@ public class FeatureModsCommandForgeImpl implements Feature {
 					// I mean, you never know...
 					Class.forName("org.bukkit.Bukkit");
 				} catch (Throwable t) {
-					dispatcher.register(LiteralArgumentBuilder.<CommandSource>literal("plugins")
+					dispatcher.register(LiteralArgumentBuilder.<CommandSourceStack>literal("plugins")
 							.executes((c) -> {
-								c.getSource().sendFeedback(new StringTextComponent("§cThis ain't no Bukkit!\nTry /mods"), false);
+								c.getSource().sendSuccess(new TextComponent("§cThis ain't no Bukkit!\nTry /mods"), false);
 								return 1;
 							}));
 				}
@@ -59,14 +60,14 @@ public class FeatureModsCommandForgeImpl implements Feature {
 		return true;
 	}
 
-	private void sendMods(CommandContext<CommandSource> c, boolean all) {
+	private void sendMods(CommandContext<CommandSourceStack> c, boolean all) {
 		try {
-			TextComponent mt = new StringTextComponent("Mods: ");
+			MutableComponent mt = new TextComponent("Mods: ");
 			boolean first = true;
-			for (ModInfo mi : ModList.get().getMods()) {
+			for (IModInfo mi : ModList.get().getMods()) {
 				if (mi.getModId().equals("minecraft")) continue;
 				if (!first) {
-					mt.append(new StringTextComponent(", ").mergeStyle(Style.EMPTY.applyFormatting(TextFormatting.RESET)));
+					mt.append(new TextComponent(", ").withStyle(Style.EMPTY.applyFormat(ChatFormatting.RESET)));
 				} else {
 					first = false;
 				}
@@ -74,7 +75,7 @@ public class FeatureModsCommandForgeImpl implements Feature {
 				if (desc.length() > 0) {
 					desc.append("\n\n");
 				}
-				Optional<Object> authorsOpt = mi.getConfigElement("authors");
+				Optional<Object> authorsOpt = mi instanceof ModInfo ? ((ModInfo)mi).getConfigElement("authors") : Optional.empty();
 				if (authorsOpt.isPresent()) {
 					desc.append("Authors: ");
 					if (authorsOpt.get() instanceof List) {
@@ -94,17 +95,17 @@ public class FeatureModsCommandForgeImpl implements Feature {
 				}
 				desc.append("ID: ");
 				desc.append(mi.getModId());
-				StringTextComponent lt = new StringTextComponent(mi.getDisplayName());
-				Style s = Style.EMPTY.applyFormatting(TextFormatting.GREEN)
-						.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new StringTextComponent(desc.toString())));
-				Optional<String> displayUrlOpt = mi.getConfigElement("displayURL");
+				MutableComponent lt = new TextComponent(mi.getDisplayName());
+				Style s = Style.EMPTY.applyFormat(ChatFormatting.GREEN)
+						.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent(desc.toString())));
+				Optional<String> displayUrlOpt = mi instanceof ModInfo ? ((ModInfo)mi).getConfigElement("displayURL") : Optional.empty();
 				if (displayUrlOpt.isPresent()) {
-					s = s.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, displayUrlOpt.get()));
+					s = s.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, displayUrlOpt.get()));
 				}
 				lt.setStyle(s);
 				mt.append(lt);
 			}
-			c.getSource().sendFeedback(mt, false);
+			c.getSource().sendSuccess(mt, false);
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}

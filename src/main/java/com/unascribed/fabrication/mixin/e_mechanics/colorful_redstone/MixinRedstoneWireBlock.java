@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+import com.unascribed.fabrication.support.SpecialEligibility;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -23,7 +24,7 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
 @Mixin(RedstoneWireBlock.class)
-@EligibleIf(configAvailable="*.colorful_redstone")
+@EligibleIf(configAvailable="*.colorful_redstone", specialConditions=SpecialEligibility.NOT_FORGE)
 public class MixinRedstoneWireBlock {
 
 	@Inject(at=@At("RETURN"), method="getRenderConnectionType(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;Z)Lnet/minecraft/block/enums/WireConnection;", cancellable=true)

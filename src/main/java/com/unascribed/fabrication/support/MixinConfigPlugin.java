@@ -2,7 +2,6 @@ package com.unascribed.fabrication.support;
 
 import java.awt.Toolkit;
 import java.io.*;
-import java.lang.reflect.Constructor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -55,6 +54,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableTable;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
@@ -62,11 +62,10 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import com.google.common.collect.Tables;
 import com.google.common.io.BaseEncoding;
+import com.google.common.io.ByteSource;
 import com.google.common.io.MoreFiles;
 import com.google.common.io.Resources;
 import com.google.common.reflect.ClassPath;
-import com.google.common.reflect.ClassPath.ClassInfo;
-
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
@@ -354,7 +353,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 				Analytics.deleteId();
 			}
 		}
-		Path configFile = Agnos.getConfigDir().resolve("fabrication").resolve("features.ini");
+		String cfgDir = isMet(SpecialEligibility.FORGE) ? "forgery" : "fabrication";
+		Path configFile = Agnos.getConfigDir().resolve(cfgDir).resolve("features.ini");
 		Stopwatch watch = Stopwatch.createStarted();
 		StringWriter sw = new StringWriter();
 		try {
@@ -408,11 +408,24 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 
 	public static void reload() {
 		FabLog.info("Reloading configs...");
-		Path dir = Agnos.getConfigDir().resolve("fabrication");
+		String name = isMet(SpecialEligibility.FORGE) ? "forgery" : "fabrication";
+		Path dir = Agnos.getConfigDir().resolve(name);
+		if (isMet(SpecialEligibility.FORGE)) {
+			if (!Files.exists(dir)) {
+				Path fabrication = Agnos.getConfigDir().resolve("fabrication");
+				if (Files.exists(fabrication)) {
+					try {
+						Files.move(fabrication, dir);
+					} catch (IOException e) {
+						throw new RuntimeException("Failed to move fabrication config to forgery", e);
+					}
+				}
+			}
+		}
 		try {
 			Files.createDirectories(dir);
 		} catch (IOException e1) {
-			throw new RuntimeException("Failed to create fabrication config directory", e1);
+			throw new RuntimeException("Failed to create "+name+" config directory", e1);
 		}
 		Path configFile = dir.resolve("features.ini");
 		checkForAndSaveDefaultsOrUpgrade(configFile, "default_features_config.ini");
@@ -446,7 +459,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 								}
 							}
 							if (badKeys) {
-								notices.add("Consider updating this config file by renaming it to fabrication.ini.old");
+								notices.add("Consider updating this config file by renaming it to "+name+".ini.old");
 							}
 							if (notices.isEmpty()) {
 								return NOTICES_HEADER+"\r\n; - No notices. You're in the clear!";
@@ -504,7 +517,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 
 	private static void load(ConfigLoader ldr) {
 		String name = ldr.getConfigName();
-		Path dir = Agnos.getConfigDir().resolve("fabrication");
+		String modName = isMet(SpecialEligibility.FORGE) ? "forgery" : "fabrication";
+		Path dir = Agnos.getConfigDir().resolve(modName);
 		Path file = dir.resolve(name+".ini");
 		checkForAndSaveDefaultsOrUpgrade(file, "default_"+name+"_config.ini");
 		FabLog.timeAndCountWarnings("Loading of "+name+".ini", () -> {
@@ -584,8 +598,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	public void onLoad(String mixinPackage) {
 		reload();
 		Mixins.registerErrorHandlerClass("com.unascribed.fabrication.support.MixinErrorHandler_THIS_ERROR_HANDLER_IS_FOR_SOFT_FAILURE_IN_FABRICATION_ITSELF_AND_DOES_NOT_IMPLY_FABRICATION_IS_RESPONSIBLE_FOR_THE_BELOW_ERROR");
-		FabLog.warn("Fabrication is about to inject into Mixin to add support for failsoft mixins.");
-		FabLog.warn("THE FOLLOWING WARNINGS ARE NOT AN ERROR AND DO NOT IMPLY FABRICATION IS RESPONSIBLE FOR A CRASH.");
+		FabLog.warn((isMet(SpecialEligibility.FORGE) ? "Forgery" : "Fabrication")+" is about to inject into Mixin to add support for failsoft mixins.");
+		FabLog.warn("THE FOLLOWING WARNINGS ARE NOT AN ERROR AND DO NOT IMPLY "+(isMet(SpecialEligibility.FORGE) ? "FORGERY" : "FABRICATION")+" IS RESPONSIBLE FOR A CRASH.");
 		InjectionInfo.register(FailsoftCallbackInjectionInfo.class);
 		InjectionInfo.register(FailsoftModifyArgInjectionInfo.class);
 		InjectionInfo.register(FailsoftModifyArgsInjectionInfo.class);
@@ -787,8 +801,6 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	private static Iterable<ClassInfo> getClassesInPackage(String pkg) {
 		try (InputStream is = MixinConfigPlugin.class.getClassLoader().getResourceAsStream("classes.txt")) {
 			if (is != null) {
-				Constructor<ClassInfo> cons = ClassInfo.class.getDeclaredConstructor(String.class, ClassLoader.class);
-				cons.setAccessible(true);
 				List<ClassInfo> rtrn = Lists.newArrayList();
 				BufferedReader br = new BufferedReader(new InputStreamReader(is, Charsets.UTF_8));
 				String prefix = pkg.replace('.', '/')+"/";
@@ -796,21 +808,16 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 					String line = br.readLine();
 					if (line == null) break;
 					if (line.startsWith(prefix)) {
-						rtrn.add(cons.newInstance(line, MixinConfigPlugin.class.getClassLoader()));
+						rtrn.add(new BareClassInfo(line, MixinConfigPlugin.class.getClassLoader()));
 					}
 				}
 				return rtrn;
 			}
 		} catch (Exception e) {
-			// silences "java.lang.NoSuchMethodException: com.google.common.reflect.ClassPath$ClassInfo.<init>(java.lang.String,java.lang.ClassLoader)"
-			// attempting to fix ClassInfo to have correct args causes no mixins to load
-			// doing this just to prevent people opening issues about it
-			if (!(e instanceof NoSuchMethodException)) {
-				e.printStackTrace();
-			}
+			e.printStackTrace();
 		}
 		try {
-			return ClassPath.from(MixinConfigPlugin.class.getClassLoader()).getTopLevelClassesRecursive(pkg);
+			return Iterables.transform(ClassPath.from(MixinConfigPlugin.class.getClassLoader()).getTopLevelClassesRecursive(pkg), GuavaClassInfo::new);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -822,6 +829,55 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 
 	@Override
 	public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
+	}
+	
+	private interface ClassInfo {
+
+		String getName();
+		ByteSource asByteSource();
+		
+	}
+	
+	private static class BareClassInfo implements ClassInfo {
+
+		private final String name;
+		private final ClassLoader loader;
+		
+		public BareClassInfo(String name, ClassLoader loader) {
+			this.name = name;
+			this.loader = loader;
+		}
+
+		@Override
+		public String getName() {
+			return name.replace('/', '.').replace(".class", "");
+		}
+
+		@Override
+		public ByteSource asByteSource() {
+			return Resources.asByteSource(loader.getResource(name));
+		}
+		
+	}
+	
+	private static class GuavaClassInfo implements ClassInfo {
+		
+		private final ClassPath.ClassInfo delegate;
+
+		public GuavaClassInfo(ClassPath.ClassInfo delegate) {
+			this.delegate = delegate;
+		}
+
+		@Override
+		public String getName() {
+			return delegate.getName();
+		}
+
+		@Override
+		public ByteSource asByteSource() {
+			return delegate.asByteSource();
+		}
+
 	}
 
 }
