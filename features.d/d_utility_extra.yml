@@ -81,6 +81,13 @@ utility.extra.chat_markdown:
 	desc:
 		Adds bold, strikethrough, underscore and italic markdown to chat.
 
+utility.extra.no_guardian_jumpscare:
+	name: No Guardian Jumpscare
+	since: 2.3.1
+	sides: client_only
+	default: burnt
+	desc:
+		Disables the elder guardian appearance effect upon being inflicted with Mining Fatigue.
 
 # kate: space-indent off
 # vim: noai:noet
