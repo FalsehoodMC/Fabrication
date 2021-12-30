@@ -194,6 +194,5 @@ minor_mechanics.protection_on_any_item:
 		It will inclusively protect from:.
 		Level 1: cactus, Level 2: fire, Level 3: lava, Level 4: explosions.
 
-
 # kate: space-indent off
 # vim: noai:noet
