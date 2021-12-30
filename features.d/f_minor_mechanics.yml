@@ -194,6 +194,13 @@ minor_mechanics.protection_on_any_item:
 		It will inclusively protect from:.
 		Level 1: cactus, Level 2: fire, Level 3: lava, Level 4: explosions.
 
+minor_mechanics.spreadable_moss:
+	name: Spreadable Moss
+	since: 2.3.1
+	sides: server_only
+	desc:
+		Using bone meal on a stone block with a moss block nearby grows moss to that block, to make
+		it a bit easier to work with for building.
 
 # kate: space-indent off
 # vim: noai:noet
