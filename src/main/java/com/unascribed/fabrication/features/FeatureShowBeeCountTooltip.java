@@ -22,8 +22,7 @@ public class FeatureShowBeeCountTooltip implements Feature {
 		if (!applied) {
 			applied = true;
 			Agnos.runForTooltipRender((stack, lines) -> {
-				if (!(MixinConfigPlugin.isEnabled("*.show_bee_count_tooltip") && stack.hasNbt())) return;
-				if (active && !stack.isEmpty() && stack.hasNbt()) {
+				if (active && !stack.isEmpty() && stack.hasNbt() && stack.hasNbt()) {
 					NbtCompound tag = stack.getNbt().getCompound("BlockEntityTag");
 					if (tag == null || !tag.contains("Bees", NbtElement.LIST_TYPE)) return;
 
