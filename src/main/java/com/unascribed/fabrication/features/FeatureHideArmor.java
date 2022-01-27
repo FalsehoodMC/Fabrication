@@ -34,7 +34,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
 
-@EligibleIf(configAvailable="*.hide_armor")
+@EligibleIf(configAvailable="*.hide_armor", modLoaded="fabric_only:fabric-command-api-v1")
 public class FeatureHideArmor implements Feature {
 
 	private static final EquipmentSlot[] ALL_ARMOR = {EquipmentSlot.FEET, EquipmentSlot.LEGS, EquipmentSlot.CHEST, EquipmentSlot.HEAD};
@@ -58,7 +58,7 @@ public class FeatureHideArmor implements Feature {
 			}
 		}
 	}
-	
+
 	private static final class EarsCompat {
 		public static void init() {
 			EarsStateOverriderRegistry.register("fabrication", (state, peer) -> {

@@ -24,15 +24,13 @@ import net.minecraft.text.Text;
 @EligibleIf(anyConfigAvailable={"*.show_bee_count_tooltip"}, envMatches=Env.CLIENT)
 public class MixinItemStack {
 
-	@Inject(at=@At("RETURN"), method="getTooltip(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/client/item/TooltipContext;)Ljava/util/List;", cancellable=true)
+	@Inject(at=@At("RETURN"), method="getTooltip(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/client/item/TooltipContext;)Ljava/util/List;")
 	public void getTooltip(PlayerEntity player, TooltipContext context, CallbackInfoReturnable<List<Text>> cir) {
 		ItemStack stack = (ItemStack)(Object)this;
 		if (!(MixinConfigPlugin.isEnabled("*.show_bee_count_tooltip") && stack.hasNbt())) return;
 		NbtCompound tag = stack.getNbt().getCompound("BlockEntityTag");
 		if (tag == null || !tag.contains("Bees", NbtElement.LIST_TYPE)) return;
 
-		List<Text> list = cir.getReturnValue();
-		list.add(new LiteralText("Bees: " + ((NbtList) tag.get("Bees")).size()));
-		cir.setReturnValue(list);
+		cir.getReturnValue().add(new LiteralText("Bees: " + ((NbtList) tag.get("Bees")).size()));
 	}
 }

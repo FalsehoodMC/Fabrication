@@ -28,10 +28,11 @@ import com.unascribed.fabrication.FeaturesFile.Sides;
 import com.unascribed.fabrication.interfaces.TaggablePlayer;
 import com.unascribed.fabrication.loaders.LoaderFScript;
 import com.unascribed.fabrication.logic.PlayerTag;
+import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.MixinConfigPlugin.Profile;
-import com.unascribed.fabrication.support.OptionalFScript;
+import com.unascribed.fabrication.support.optional.OptionalFScript;
 import com.unascribed.fabrication.util.Cardinal;
 
 import com.google.common.base.Charsets;
@@ -66,6 +67,7 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.ChunkStatus;
 
+@EligibleIf(modLoaded="fabric_only:fabric-command-api-v1")
 public class FeatureFabricationCommand implements Feature {
 
 	@Override

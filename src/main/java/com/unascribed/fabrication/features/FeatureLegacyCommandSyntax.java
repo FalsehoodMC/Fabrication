@@ -36,7 +36,7 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.level.ServerWorldProperties;
 
-@EligibleIf(configAvailable="*.legacy_command_syntax")
+@EligibleIf(configAvailable="*.legacy_command_syntax", modLoaded="fabric_only:fabric-command-api-v1")
 public class FeatureLegacyCommandSyntax implements Feature {
 
 	private boolean applied = false;

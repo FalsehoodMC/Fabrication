@@ -19,7 +19,7 @@ import net.minecraft.client.util.Window;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 
-@EligibleIf(configAvailable="*.toggle_stance", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.toggle_stance", envMatches=Env.CLIENT, modLoaded="fabric_only:fabric-key-binding-api-v1")
 public class FeatureToggleStance implements Feature {
 
 	public enum Stance {

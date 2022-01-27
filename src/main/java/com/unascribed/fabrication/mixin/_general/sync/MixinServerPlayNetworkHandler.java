@@ -14,7 +14,7 @@ import com.unascribed.fabrication.features.FeatureHideArmor;
 import com.unascribed.fabrication.interfaces.SetFabricationConfigAware;
 import com.unascribed.fabrication.loaders.LoaderFScript;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
-import com.unascribed.fabrication.support.OptionalFScript;
+import com.unascribed.fabrication.support.optional.OptionalFScript;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;

@@ -2,13 +2,13 @@ package com.unascribed.fabrication.features;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.SpecialEligibility;
 
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
@@ -21,7 +21,7 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.util.Formatting;
 
-@EligibleIf(configAvailable="*.mods_command", specialConditions=SpecialEligibility.NOT_FORGE)
+@EligibleIf(configAvailable="*.mods_command", modLoaded="fabric:fabric-command-api-v1")
 public class FeatureModsCommandFabric implements Feature {
 
 	private boolean applied = false;
@@ -30,7 +30,7 @@ public class FeatureModsCommandFabric implements Feature {
 	public void apply() {
 		if (applied) return;
 		applied = true;
-		CommandRegistrationCallback.EVENT.register((dispatcher, dedi) -> {
+		Agnos.runForCommandRegistration((dispatcher, dedi) -> {
 			try {
 				dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("mods")
 						.requires(s -> MixinConfigPlugin.isEnabled("*.mods_command"))

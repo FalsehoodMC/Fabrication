@@ -33,7 +33,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.registry.Registry;
 
-@EligibleIf(configAvailable="*.i_and_more")
+@EligibleIf(configAvailable="*.i_and_more", modLoaded="fabric_only:fabric-command-api-v1")
 public class FeatureIMore implements Feature {
 
 	private boolean applied = false;

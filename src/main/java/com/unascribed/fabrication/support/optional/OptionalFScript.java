@@ -1,4 +1,4 @@
-package com.unascribed.fabrication.support;
+package com.unascribed.fabrication.support.optional;
 
 import java.util.Map;
 import java.util.Optional;
@@ -11,6 +11,8 @@ import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.features.FeatureFabricationCommand;
 import com.unascribed.fabrication.loaders.LoaderFScript;
 
+import com.unascribed.fabrication.support.ConfigPredicates;
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;

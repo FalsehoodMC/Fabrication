@@ -9,6 +9,7 @@ import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.resource.ReloadableResourceManager;
@@ -20,7 +21,9 @@ import net.minecraft.util.profiler.Profiler;
 public class FabricationModClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
-		FabricationClientCommands.registerCommands(ClientCommandManager.DISPATCHER);
+		if (FabricLoader.getInstance().isModLoaded("fabric-command-api-v1")){
+			FabricationClientCommands.registerCommands(ClientCommandManager.DISPATCHER);
+		}
 
 		if (!MixinConfigPlugin.isBanned("*.classic_block_drops")) {
 			MinecraftClient.getInstance().send(() -> {

@@ -13,7 +13,7 @@ import com.unascribed.fabrication.support.ConfigValue;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
-import com.unascribed.fabrication.support.OptionalFScript;
+import com.unascribed.fabrication.support.optional.OptionalFScript;
 import com.unascribed.fabrication.support.ResolvedConfigValue;
 
 import com.google.common.collect.Lists;

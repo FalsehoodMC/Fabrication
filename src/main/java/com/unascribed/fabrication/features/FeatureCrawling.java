@@ -14,7 +14,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 import net.minecraft.util.Identifier;
 
-@EligibleIf(configAvailable="*.crawling", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.crawling", envMatches=Env.CLIENT, modLoaded="fabric_only:fabric-key-binding-api-v1")
 public class FeatureCrawling implements Feature {
 
 	public static KeyBinding keybind;

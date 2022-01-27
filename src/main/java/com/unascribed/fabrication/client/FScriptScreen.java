@@ -4,7 +4,7 @@ import com.mojang.brigadier.tree.CommandNode;
 import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.loaders.LoaderFScript;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
-import com.unascribed.fabrication.support.OptionalFScript;
+import com.unascribed.fabrication.support.optional.OptionalFScript;
 import io.github.queerbric.pride.PrideFlag;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.gui.screen.Screen;

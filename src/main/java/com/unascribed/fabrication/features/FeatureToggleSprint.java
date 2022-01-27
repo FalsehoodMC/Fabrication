@@ -9,7 +9,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 
-@EligibleIf(configAvailable="*.toggle_sprint", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.toggle_sprint", envMatches=Env.CLIENT, modLoaded="fabric_only:fabric-key-binding-api-v1")
 public class FeatureToggleSprint implements Feature {
 
 	public static KeyBinding keybind;

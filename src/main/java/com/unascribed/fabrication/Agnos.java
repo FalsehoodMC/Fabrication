@@ -3,6 +3,9 @@ package com.unascribed.fabrication;
 import java.nio.file.Path;
 import java.util.List;
 
+import com.unascribed.fabrication.support.optional.OptionalFabricCommand;
+import com.unascribed.fabrication.support.optional.OptionalFabricKeybind;
+import com.unascribed.fabrication.support.optional.OptionalFabricRender;
 import org.spongepowered.asm.mixin.MixinEnvironment;
 import org.spongepowered.asm.mixin.transformer.IMixinTransformer;
 
@@ -11,8 +14,6 @@ import com.unascribed.fabrication.support.Env;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.launch.common.FabricLauncherBase;
 import net.minecraft.client.option.KeyBinding;
@@ -48,17 +49,21 @@ public final class Agnos {
 	}
 
 	public static void runForCommandRegistration(CommandRegistrationCallback r) {
-		net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback.EVENT.register(r::register);
+		if (FabricLoader.getInstance().isModLoaded("fabric-command-api-v1")) {
+			OptionalFabricCommand.runForCommandRegistration(r);
+		}
 	}
 
 	@Environment(EnvType.CLIENT)
 	public static void runForTooltipRender(TooltipRenderCallback r) {
-		ItemTooltipCallback.EVENT.register((stack, ctx, lines) -> r.render(stack, lines));
+		//Dunno if it's safe to delete
 	}
 
 	@Environment(EnvType.CLIENT)
 	public static void runForHudRender(HudRenderCallback r) {
-		net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback.EVENT.register((ms, d) -> r.render(ms, d));
+		if (FabricLoader.getInstance().isModLoaded("fabric-rendering-v1")) {
+			OptionalFabricRender.runForHudRender(r);
+		}
 	}
 
 	public static SoundEvent registerSoundEvent(Identifier id, SoundEvent soundEvent) {
@@ -67,7 +72,9 @@ public final class Agnos {
 
 	@Environment(EnvType.CLIENT)
 	public static KeyBinding registerKeyBinding(KeyBinding kb) {
-		KeyBindingHelper.registerKeyBinding(kb);
+		if (FabricLoader.getInstance().isModLoaded("fabric-key-binding-api-v1")) {
+			OptionalFabricKeybind.registerKeyBinding(kb);
+		}
 		return kb;
 	}
 
@@ -85,7 +92,9 @@ public final class Agnos {
 
 	public static boolean isModLoaded(String modid) {
 		if (modid.startsWith("forge:")) return false;
+		else if (modid.startsWith("forge_only:")) return true;
 		if (modid.startsWith("fabric:")) modid = modid.substring(7);
+		else if (modid.startsWith("fabric_only:")) modid = modid.substring(12);
 		return FabricLoader.getInstance().isModLoaded(modid);
 	}
 
