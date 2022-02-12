@@ -2,6 +2,7 @@ package com.unascribed.fabrication.mixin.g_weird_tweaks.repelling_void;
 
 import java.util.List;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.util.shape.VoxelShape;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -64,16 +65,19 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 		if (MixinConfigPlugin.isEnabled("*.repelling_void") && !fabrication$debted && source == DamageSource.OUT_OF_WORLD && fabrication$lastLandingPos != null && this.getY() < this.world.getBottomY() -10) {
 			BlockPos bp = fabrication$lastLandingPos;
 			Vec3d pos = fabrication$lastGroundPos;
-			VoxelShape shape = world.getBlockState(bp).getCollisionShape(world, bp);
-			if (shape.isEmpty() || !shape.getBoundingBox().contains(fabrication$lastGroundPos.x, fabrication$lastGroundPos.y - 0.20000000298023224D, fabrication$lastGroundPos.z)) {
+			BlockState state = world.getBlockState(bp);
+			if (!state.getCollisionShape(world, bp).isEmpty()) {
+				Box bounds = state.getCollisionShape(world, bp).getBoundingBox();
+				pos = new Vec3d(bp.getX()+bounds.minX+(bounds.maxX-bounds.minX)/2, bp.getY()+bounds.maxY+0.1, bp.getZ()+bounds.minZ+(bounds.maxZ-bounds.minZ)/2);
+			} else {
 				out: for (int d = 1; d <= 3; d++) {
 					for (int x = -d; x <= d; x++) {
 						for (int z = -d; z <= d; z++) {
 							bp = fabrication$lastLandingPos.add(x, 0, z);
-							shape = world.getBlockState(bp).getCollisionShape(world, bp);
-							if (!shape.isEmpty() &&  shape.getBoundingBox().contains(fabrication$lastGroundPos.x, fabrication$lastGroundPos.y - 0.20000000298023224D, fabrication$lastGroundPos.z)) {
-								Box bounds = shape.getBoundingBox();
-								pos = new Vec3d(bounds.minX+(bounds.maxX-bounds.minX)/2, bounds.maxY+0.1, bounds.minZ+(bounds.maxZ-bounds.minZ)/2);
+							state = world.getBlockState(bp);
+							if (!state.getCollisionShape(world, bp).isEmpty()) {
+								Box bounds = state.getCollisionShape(world, bp).getBoundingBox();
+								pos = new Vec3d(bp.getX()+bounds.minX+(bounds.maxX-bounds.minX)/2, bp.getY()+bounds.maxY+0.1, bp.getZ()+bounds.minZ+(bounds.maxZ-bounds.minZ)/2);
 								break out;
 							}
 						}
