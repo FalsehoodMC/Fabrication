@@ -47,21 +47,20 @@ public class ModifyReturnInjector {
 								char d = toInject.target.charAt(insn.owner.length());
 								if ((d == '.' || d == ';') && toInject.target.substring(insn.owner.length()+1).equals(insn.name+insn.desc)){
 									InsnList mod = new InsnList();
-									int count = Type.getMethodType(toInject.desc).getArgumentTypes().length;
-									if (count>1) {
-										count--;
+									int countTarget = Type.getMethodType(toInject.target.substring(toInject.target.indexOf('('))).getArgumentTypes().length;
+									if (insn.getOpcode() != Opcodes.INVOKESTATIC) countTarget++;
+									int countDesc = Type.getMethodType(toInject.desc).getArgumentTypes().length;
+									if (countDesc>1) {
 										int max = methodNode.maxLocals;
 										//TODO trace var origin at least till method calls
-										for (int c=0; c<count; c++){
-											methodNode.instructions.insertBefore(insn, new VarInsnNode(Opcodes.ASTORE, max));
-											max++;
+										for (int c=0; c<countTarget; c++){
+											methodNode.instructions.insertBefore(insn, new VarInsnNode(Opcodes.ASTORE, max++));
 										}
-										for (int c=methodNode.maxLocals+count-1; c>=methodNode.maxLocals; c--){
-											mod.add(new VarInsnNode(Opcodes.ALOAD, c));
-											methodNode.instructions.insertBefore(insn, new VarInsnNode(Opcodes.ALOAD, c));
+										for (int c=0; c<countTarget; c++){
+											mod.add(new VarInsnNode(Opcodes.ALOAD, --max));
+											methodNode.instructions.insertBefore(insn, new VarInsnNode(Opcodes.ALOAD, max));
 										}
-										count -= Type.getMethodType(toInject.target.substring(toInject.target.indexOf('('))).getArgumentTypes().length + 1;
-										for (int c=0; c<count; c++){
+										for (int c=0; c<countDesc-countTarget-1; c++){
 											mod.add(new VarInsnNode(Opcodes.ALOAD, c));
 										}
 									}
