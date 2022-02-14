@@ -847,8 +847,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 									earlyRet.add(new JumpInsnNode(Opcodes.IFEQ, label));
 									earlyRet.add(new InsnNode(Opcodes.RETURN));
 									earlyRet.add(label);
-									earlyRet.add(methodNode.instructions);
-									methodNode.instructions = earlyRet;
+									methodNode.instructions.insert(earlyRet);
 								}
 								break;
 							}
