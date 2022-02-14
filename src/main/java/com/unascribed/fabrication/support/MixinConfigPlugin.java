@@ -50,6 +50,7 @@ import com.unascribed.fabrication.support.injection.FailsoftModifyArgsInjectionI
 import com.unascribed.fabrication.support.injection.FailsoftModifyConstantInjectionInfo;
 import com.unascribed.fabrication.support.injection.FailsoftModifyVariableInjectionInfo;
 import com.unascribed.fabrication.support.injection.FailsoftRedirectInjectionInfo;
+import com.unascribed.fabrication.support.injection.ModifyReturnInjector;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Enums;
@@ -822,6 +823,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 
 	@Override
 	public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
+		ModifyReturnInjector.apply(targetClass);
 	}
 
 }
