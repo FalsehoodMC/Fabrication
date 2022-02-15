@@ -49,20 +49,23 @@ public class ModifyReturnInjector {
 									char d = target.charAt(insn.owner.length());
 									if ((d == '.' || d == ';') && target.substring(insn.owner.length() + 1).equals(insn.name + insn.desc)) {
 										InsnList mod = new InsnList();
-										int countTarget = Type.getMethodType(target.substring(target.indexOf('('))).getArgumentTypes().length;
-										if (insn.getOpcode() != Opcodes.INVOKESTATIC) countTarget++;
+										List<Type> argTypes = new ArrayList<>();
+										if (insn.getOpcode() != Opcodes.INVOKESTATIC)
+											argTypes.add(Type.VOID_TYPE);
+										argTypes.addAll(Arrays.asList(Type.getMethodType(target.substring(target.indexOf('('))).getArgumentTypes()));
 										int countDesc = Type.getMethodType(toInject.desc).getArgumentTypes().length;
 										if (countDesc > 1) {
 											int max = methodNode.maxLocals;
 											//TODO trace var origin at least till method calls
-											for (int c = 0; c < countTarget; c++) {
-												methodNode.instructions.insertBefore(insn, new VarInsnNode(Opcodes.ASTORE, max++));
+											for (int c = 0; c < argTypes.size(); c++) {
+												methodNode.instructions.insertBefore(insn, new VarInsnNode(getStoreOpcode(argTypes.get(argTypes.size()-1-c).getSort()), max++));
 											}
-											for (int c = 0; c < countTarget; c++) {
-												mod.add(new VarInsnNode(Opcodes.ALOAD, --max));
-												methodNode.instructions.insertBefore(insn, new VarInsnNode(Opcodes.ALOAD, max));
+											for (int c = 0; c < argTypes.size(); c++) {
+												int opcode = getLoadOpcode(argTypes.get(argTypes.size()-1-c).getSort());
+												mod.add(new VarInsnNode(opcode, --max));
+												methodNode.instructions.insertBefore(insn, new VarInsnNode(opcode, max));
 											}
-											for (int c = 0; c < countDesc - countTarget - 1; c++) {
+											for (int c = 0; c < countDesc - argTypes.size() - 1; c++) {
 												mod.add(new VarInsnNode(Opcodes.ALOAD, c));
 											}
 										}
@@ -77,5 +80,17 @@ public class ModifyReturnInjector {
 				}
 			});
 		});
+	}
+	public static int getStoreOpcode(int type){
+		return getLoadOpcode(type) + 33;
+	}
+	public static int getLoadOpcode(int type){
+		switch (type){
+			case Type.INT: return Opcodes.ILOAD;
+			case Type.LONG: return Opcodes.LLOAD;
+			case Type.FLOAT: return Opcodes.FLOAD;
+			case Type.DOUBLE: return Opcodes.DLOAD;
+			default: return Opcodes.ALOAD;
+		}
 	}
 }
