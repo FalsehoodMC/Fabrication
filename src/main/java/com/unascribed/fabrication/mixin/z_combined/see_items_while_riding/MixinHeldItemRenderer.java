@@ -10,7 +10,8 @@ import org.spongepowered.asm.mixin.Mixin;
 @Mixin(HeldItemRenderer.class)
 @EligibleIf(anyConfigAvailable={"*.see_items_while_riding", "*.use_items_while_riding"}, envMatches=Env.CLIENT)
 public class MixinHeldItemRenderer {
-	@ModifyReturn(method="updateHeldItems()V", target="Lnet/minecraft/client/network/ClientPlayerEntity;isRiding()Z")
+	@ModifyReturn(method={"updateHeldItems()V", "method_3220()V"},
+			target={"Lnet/minecraft/client/network/ClientPlayerEntity;isRiding()Z", "Lnet/minecraft/class_746;method_3144()Z"})
 	private static boolean fabrication$heldItemView(boolean original){
 		return !(MixinConfigPlugin.isEnabled("*.see_items_while_riding") || MixinConfigPlugin.isEnabled("*.use_items_while_riding")) && original;
 	}
