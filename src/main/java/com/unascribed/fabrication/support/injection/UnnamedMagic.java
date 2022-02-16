@@ -6,9 +6,10 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+// if targeting void, return bool otherwise Optional<>
 @Retention(RUNTIME)
 @Target(METHOD)
-public @interface ModifyReturn {
+public @interface UnnamedMagic {
 	String[] method();
 	String[] target();
 }
