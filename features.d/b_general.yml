@@ -32,9 +32,15 @@ general.data_upload:
 		Forge/Fabric version, Java version, approximate window aspect ratio, OpenGL version,
 		selected language, operating system name (no version), your selected profile, current
 		status of all features, and any mixin failures.
-		
+
 		Please enable this to give me insight into what features people use, what features conflict,
 		and to help inform development decisions based on version information.
+
+general.runtime_configs:
+	name: Runtime Configs
+	since: 2.3.1
+	desc:
+		Makes the game a teensy bit faster, but requires a restart to change features.
 
 general.profile:
 	name: Profile
@@ -43,7 +49,7 @@ general.profile:
 		To help with Fabrication's overwhelming number of options, Profiles let you pick what kinds
 		of features you want to be enabled by default. When a config value is set to 'unset', it is
 		up to the profile whether it's enabled or disabled.
-		
+
 		I don't even like coffee.
 
 general.profile.green:
