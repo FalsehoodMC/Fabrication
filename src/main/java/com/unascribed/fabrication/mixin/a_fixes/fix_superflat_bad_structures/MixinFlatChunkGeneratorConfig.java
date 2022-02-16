@@ -15,7 +15,7 @@ import java.util.Optional;
 @EligibleIf(configAvailable="*.fix_superflat_bad_structures")
 public class MixinFlatChunkGeneratorConfig {
 
-	@UnnamedMagic(target={"net/minecraft/world/biome/GenerationSettings$Builder.structureFeature(Lnet/minecraft/world/gen/feature/ConfiguredStructureFeature;)Lnet/minecraft/world/biome/GenerationSettings$Builder;", "Lnet/minecraft/class_5485$class_5495;method_30995(Lnet/minecraft/class_5312;)Lnet/minecraft/class_5485$class_5495;"},
+	@UnnamedMagic(target={"Lnet/minecraft/world/biome/GenerationSettings$Builder;structureFeature(Lnet/minecraft/world/gen/feature/ConfiguredStructureFeature;)Lnet/minecraft/world/biome/GenerationSettings$Builder;", "Lnet/minecraft/class_5485$class_5495;method_30995(Lnet/minecraft/class_5312;)Lnet/minecraft/class_5485$class_5495;"},
 			method={"createBiome()Lnet/minecraft/world/biome/Biome;", "method_28917()Lnet/minecraft/class_1959;"})
 	private static Optional fabrication$errorCheckStructureFeature(GenerationSettings.Builder subject, ConfiguredStructureFeature<?, ?> feature) {
 		if (MixinConfigPlugin.isEnabled("*.fix_superflat_bad_structures") && feature == null) {

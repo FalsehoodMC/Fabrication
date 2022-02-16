@@ -72,6 +72,7 @@ public class ModifyReturnInjector {
 												for (int c = 0; c < argTypes.size(); c++) {
 													methodNode.instructions.insertBefore(insn, new VarInsnNode(getStoreOpcode(argTypes.get(argTypes.size()-1-c).getSort()), max++));
 												}
+												methodNode.maxLocals=max;
 												for (Type argType : argTypes) {
 													int opcode = getLoadOpcode(argType.getSort());
 													mod.add(new VarInsnNode(opcode, --max));
@@ -97,13 +98,14 @@ public class ModifyReturnInjector {
 												mod.add(new VarInsnNode(Opcodes.ALOAD, max));
 												mod.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/util/Optional", "isPresent", "()Z", false));
 											}
-											mod.add(new JumpInsnNode(Opcodes.IFEQ, label));
+											mod.add(new JumpInsnNode(optionalReturn ? Opcodes.IFEQ : Opcodes.IFNE, label));
 											if (optionalReturn) {
 												mod.add(new VarInsnNode(Opcodes.ALOAD, max));
 												mod.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/util/Optional", "get", "()"+targetType.getReturnType(), false));
 												mod.add(new JumpInsnNode(Opcodes.GOTO, label2));
 												mod.add(label);
 											}
+											methodNode.maxLocals=max+1;
 											for (Type argType : argTypes) {
 												int opcode = getLoadOpcode(argType.getSort());
 												mod.add(new VarInsnNode(opcode, --max));
@@ -132,7 +134,7 @@ public class ModifyReturnInjector {
 	}
 	public static int getLoadOpcode(int type){
 		switch (type){
-			case Type.INT: return Opcodes.ILOAD;
+			case Type.BOOLEAN: case Type.BYTE: case Type.CHAR: case Type.SHORT: case Type.INT: return Opcodes.ILOAD;
 			case Type.LONG: return Opcodes.LLOAD;
 			case Type.FLOAT: return Opcodes.FLOAD;
 			case Type.DOUBLE: return Opcodes.DLOAD;
