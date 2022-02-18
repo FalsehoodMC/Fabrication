@@ -36,8 +36,8 @@ general.data_upload:
 		Please enable this to give me insight into what features people use, what features conflict,
 		and to help inform development decisions based on version information.
 
-general.runtime_configs:
-	name: Runtime Configs
+general.limit_runtime_configs:
+	name: Limit Runtime Configs
 	since: 2.3.1
 	desc:
 		Makes the game a teensy bit faster, but requires a restart to change features.

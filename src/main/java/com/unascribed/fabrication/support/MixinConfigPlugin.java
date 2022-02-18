@@ -657,7 +657,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 										FabLog.debug("🙈 Dev error! Exploding.");
 										throw devError(cn.name.substring(pkg.length()+1).replace('/', '.')+" references an unknown config key "+v+"\n\nDid you forget to add it to features.txt and run build-features.sh?");
 									}
-									if (config.get("general.runtime_configs") == ConfigValue.TRUE && !isEnabled((String)v))
+									if (config.get("general.limit_runtime_configs") == ConfigValue.TRUE && !isEnabled((String)v))
 										eligible = false;
 									if (isBanned((String)v)) {
 										eligibilityFailures.add("Required config setting "+remap((String)v)+" is banned");
@@ -718,7 +718,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 									}
 								} else if (k.equals("anyConfigAvailable")) {
 									boolean allBanned = true;
-									boolean runtimeCheck = config.get("general.runtime_configs") == ConfigValue.TRUE;
+									boolean runtimeCheck = config.get("general.limit_runtime_configs") == ConfigValue.TRUE;
 									for (String s : (List<String>)v) {
 										s = remap(s);
 										if (runtimeCheck && isEnabled(s))
@@ -829,7 +829,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 
 	@Override
 	public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
-		if (config.get("general.runtime_configs") == ConfigValue.TRUE) finalizeIsEnabled(targetClass);
+		if (config.get("general.limit_runtime_configs") == ConfigValue.TRUE) finalizeIsEnabled(targetClass);
 	}
 
 	public static void finalizeIsEnabled(ClassNode targetClass){
