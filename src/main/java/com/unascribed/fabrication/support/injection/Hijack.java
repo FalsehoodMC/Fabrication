@@ -9,7 +9,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 // if targeting void, return bool otherwise Optional<>
 @Retention(RUNTIME)
 @Target(METHOD)
-public @interface UnnamedMagic {
+public @interface Hijack {
 	String[] method();
 	String[] target();
 }

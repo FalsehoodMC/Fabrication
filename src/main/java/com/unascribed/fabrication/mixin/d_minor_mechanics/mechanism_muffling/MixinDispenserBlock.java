@@ -1,6 +1,6 @@
 package com.unascribed.fabrication.mixin.d_minor_mechanics.mechanism_muffling;
 
-import com.unascribed.fabrication.support.injection.UnnamedMagic;
+import com.unascribed.fabrication.support.injection.Hijack;
 import org.spongepowered.asm.mixin.Mixin;
 
 import com.unascribed.fabrication.logic.MechanismMuffling;
@@ -16,7 +16,7 @@ import net.minecraft.util.math.BlockPos;
 @EligibleIf(configAvailable="*.mechanism_muffling")
 public class MixinDispenserBlock {
 
-	@UnnamedMagic(target={"Lnet/minecraft/server/world/ServerWorld;syncWorldEvent(ILnet/minecraft/util/math/BlockPos;I)V", "Lnet/minecraft/class_3218;method_20290(ILnet/minecraft/class_2338;I)V"},
+	@Hijack(target={"Lnet/minecraft/server/world/ServerWorld;syncWorldEvent(ILnet/minecraft/util/math/BlockPos;I)V", "Lnet/minecraft/class_3218;method_20290(ILnet/minecraft/class_2338;I)V"},
 			method={"dispense(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;)V", "method_10012(Lnet/minecraft/class_3218;Lnet/minecraft/class_2338;)V"})
 	private static boolean fabrication$preventSyncWorldEvent(ServerWorld subject, int event, BlockPos pos) {
 		return event == 1001 && MixinConfigPlugin.isEnabled("*.mechanism_muffling") && MechanismMuffling.isMuffled(subject, pos);

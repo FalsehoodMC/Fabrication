@@ -37,7 +37,7 @@ public class ModifyReturnInjector {
 			methodNode.visibleAnnotations.forEach(annotationNode -> {
 				if ((
 						"Lcom/unascribed/fabrication/support/injection/ModifyReturn;".equals(annotationNode.desc)
-						|| "Lcom/unascribed/fabrication/support/injection/UnnamedMagic;".equals(annotationNode.desc)
+						|| "Lcom/unascribed/fabrication/support/injection/Hijack;".equals(annotationNode.desc)
 					) &&dejavu.add(targetClass.name+methodNode.name+methodNode.desc)
 				) {
 					injects.add(new ToInject((List<String>) annotationNode.values.get(annotationNode.values.indexOf("method") + 1), (List<String>) annotationNode.values.get(annotationNode.values.indexOf("target") + 1), targetClass.name, methodNode.name, methodNode.desc, annotationNode.desc));
@@ -85,7 +85,7 @@ public class ModifyReturnInjector {
 											mod.add(new MethodInsnNode(Opcodes.INVOKESTATIC, toInject.owner, toInject.name, toInject.desc, false));
 											methodNode.instructions.insert(insn, mod);
 											FabLog.debug("Completed ModifyReturn Injection : " + m + "\t" + target);
-										}else if ("Lcom/unascribed/fabrication/support/injection/UnnamedMagic;".equals(toInject.annotation)) {
+										}else if ("Lcom/unascribed/fabrication/support/injection/Hijack;".equals(toInject.annotation)) {
 											for (int c = 0; c < argTypes.size(); c++) {
 												methodNode.instructions.insertBefore(insn, new VarInsnNode(getStoreOpcode(argTypes.get(argTypes.size() - 1 - c).getSort()), max++));
 											}
@@ -118,7 +118,7 @@ public class ModifyReturnInjector {
 
 											methodNode.instructions.insertBefore(insn, mod);
 											methodNode.instructions.insert(insn, optionalReturn? label2 : label);
-											FabLog.debug("Completed UnnamedMagic Injection : " + m + "\t" + target);
+											FabLog.debug("Completed Hijack Injection : " + m + "\t" + target);
 										}
 									}
 								}
