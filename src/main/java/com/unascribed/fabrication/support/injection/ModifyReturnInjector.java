@@ -44,110 +44,107 @@ public class ModifyReturnInjector {
 				}
 			});
 		});
-		targetClass.methods.forEach(methodNode -> {
-			injects.forEach(toInject -> {
-				for (String m : toInject.method){
-					if (!m.equals(methodNode.name+methodNode.desc)) continue;
-					for (AbstractInsnNode insnNode : methodNode.instructions){
-						if (insnNode instanceof MethodInsnNode) {
-							MethodInsnNode insn = (MethodInsnNode) insnNode;
-							for (String target : toInject.target) {
-								if (target.charAt(0) == 'L') target = target.substring(1);
-								if (target.startsWith(insn.owner)) {
-									char d = target.charAt(insn.owner.length());
-									if ((d == '.' || d == ';') && target.substring(insn.owner.length() + 1).equals(insn.name + insn.desc)) {
-										InsnList mod = new InsnList();
-										List<Type> argTypes = new ArrayList<>();
-										if (insn.getOpcode() != Opcodes.INVOKESTATIC)
-											argTypes.add(Type.VOID_TYPE);
-										Type targetType = Type.getMethodType(target.substring(target.indexOf('(')));
-										argTypes.addAll(Arrays.asList(targetType.getArgumentTypes()));
-										Type toInjectType = Type.getMethodType(toInject.desc);
-										int countDesc = toInjectType.getArgumentTypes().length;
-										int max = methodNode.maxLocals;
-										InsnList oldVars = new InsnList();
-										InsnList newVars = new InsnList();
-										//TODO probably never. continue the variable trace after the first method to further reduce allocation
-										//TODO non-ALOAD capture
-										if ("Lcom/unascribed/fabrication/support/injection/ModifyReturn;".equals(toInject.annotation)) {
-											if (--countDesc > 0) {
-												AbstractInsnNode varTrace = insn.getPrevious();
-												boolean isSeqVar = varTrace != null && (isVariableLoader(varTrace.getOpcode()) || isConstantVariableLoader(varTrace.getOpcode()));
-												if (!isSeqVar) varTrace = null;
-												for (int c = 0; c < argTypes.size(); c++) {
-													if (isSeqVar){
-														oldVars.insert(varTrace.clone(new HashMap<>()));
-														AbstractInsnNode tmp = varTrace.getPrevious();
-														if (tmp != null && (isVariableLoader(tmp.getOpcode()) || isConstantVariableLoader(tmp.getOpcode()))) {
-															varTrace = tmp;
-														} else {
-															isSeqVar = false;
-														}
-													} else {
-														int sort = argTypes.get(argTypes.size()-1-c).getSort();
-														newVars.insert(new VarInsnNode(getLoadOpcode(sort), max));
-														methodNode.instructions.insertBefore(varTrace == null ? insn : varTrace, new VarInsnNode(getStoreOpcode(sort), max++));
-													}
-												}
-												methodNode.maxLocals=max;
-												for (AbstractInsnNode a : newVars) {
-													if (countDesc-->0) mod.add(a.clone(new HashMap<>()));
-												}
-												for (AbstractInsnNode a : oldVars) {
-													if (countDesc-->0) mod.add(a.clone(new HashMap<>()));
-												}
-												methodNode.instructions.insertBefore(varTrace == null ? insn : varTrace, newVars);
-												for (int c = 0; c < countDesc; c++) {
-													mod.add(new VarInsnNode(Opcodes.ALOAD, c));
-												}
-											}
-											mod.add(new MethodInsnNode(Opcodes.INVOKESTATIC, toInject.owner, toInject.name, toInject.desc, false));
-											methodNode.instructions.insert(insn, mod);
-											FabLog.debug("Completed ModifyReturn Injection : " + m + "\t" + target);
-										}else if ("Lcom/unascribed/fabrication/support/injection/Hijack;".equals(toInject.annotation)) {
-											//TODO trace var origin at least till method calls
+		targetClass.methods.forEach(methodNode -> injects.forEach(toInject -> {
+			for (String m : toInject.method){
+				if (!m.equals(methodNode.name+methodNode.desc)) continue;
+				for (AbstractInsnNode insnNode : methodNode.instructions){
+					if (insnNode instanceof MethodInsnNode) {
+						MethodInsnNode insn = (MethodInsnNode) insnNode;
+						for (String target : toInject.target) {
+							if (target.charAt(0) == 'L') target = target.substring(1);
+							if (target.startsWith(insn.owner)) {
+								char d = target.charAt(insn.owner.length());
+								if ((d == '.' || d == ';') && target.substring(insn.owner.length() + 1).equals(insn.name + insn.desc)) {
+									InsnList mod = new InsnList();
+									List<Type> argTypes = new ArrayList<>();
+									if (insn.getOpcode() != Opcodes.INVOKESTATIC)
+										argTypes.add(Type.VOID_TYPE);
+									Type targetType = Type.getMethodType(target.substring(target.indexOf('(')));
+									argTypes.addAll(Arrays.asList(targetType.getArgumentTypes()));
+									Type toInjectType = Type.getMethodType(toInject.desc);
+									Type[] toInjectArgTypes = toInjectType.getArgumentTypes();
+									int countDesc = toInjectArgTypes.length;
+									int max = methodNode.maxLocals;
+									InsnList oldVars = new InsnList();
+									InsnList newVars = new InsnList();
+									//TODO probably never. continue the variable trace after the first method to further reduce allocation
+									if ("Lcom/unascribed/fabrication/support/injection/ModifyReturn;".equals(toInject.annotation)) {
+										if (--countDesc > 0) {
+											AbstractInsnNode varTrace = insn.getPrevious();
+											boolean isSeqVar = varTrace != null && isVariableLoader(varTrace.getOpcode());
+											if (!isSeqVar) varTrace = null;
 											for (int c = 0; c < argTypes.size(); c++) {
-												methodNode.instructions.insertBefore(insn, new VarInsnNode(getStoreOpcode(argTypes.get(argTypes.size() - 1 - c).getSort()), max++));
+												if (isSeqVar){
+													oldVars.insert(varTrace.clone(new HashMap<>()));
+													AbstractInsnNode tmp = varTrace.getPrevious();
+													if (tmp != null && isVariableLoader(tmp.getOpcode())) {
+														varTrace = tmp;
+													} else {
+														isSeqVar = false;
+													}
+												} else {
+													int sort = argTypes.get(argTypes.size()-1-c).getSort();
+													newVars.insert(new VarInsnNode(getLoadOpcode(sort), max));
+													methodNode.instructions.insertBefore(varTrace == null ? insn : varTrace, new VarInsnNode(getStoreOpcode(sort), max++));
+												}
 											}
-											LabelNode label = new LabelNode(new Label());
-											LabelNode label2 = new LabelNode(new Label());
-											boolean optionalReturn = toInjectType.getReturnType().getSort() != Type.BOOLEAN;
-											mod.add(new MethodInsnNode(Opcodes.INVOKESTATIC, toInject.owner, toInject.name, toInject.desc, false));
-											if (optionalReturn) {
-												mod.add(new VarInsnNode(Opcodes.ASTORE, max));
-												mod.add(new VarInsnNode(Opcodes.ALOAD, max));
-												mod.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/util/Optional", "isPresent", "()Z", false));
+											methodNode.maxLocals=max;
+											for (AbstractInsnNode a : newVars) {
+												if (countDesc-->0) mod.add(a.clone(new HashMap<>()));
 											}
-											mod.add(new JumpInsnNode(optionalReturn ? Opcodes.IFEQ : Opcodes.IFNE, label));
-											if (optionalReturn) {
-												mod.add(new VarInsnNode(Opcodes.ALOAD, max));
-												mod.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/util/Optional", "get", "()"+targetType.getReturnType(), false));
-												mod.add(new JumpInsnNode(Opcodes.GOTO, label2));
-												mod.add(label);
+											for (AbstractInsnNode a : oldVars) {
+												if (countDesc-->0) mod.add(a.clone(new HashMap<>()));
 											}
-											methodNode.maxLocals=max+1;
-											for (Type argType : argTypes) {
-												int opcode = getLoadOpcode(argType.getSort());
-												mod.add(new VarInsnNode(opcode, --max));
-												if (countDesc-->0)
-													methodNode.instructions.insertBefore(insn, new VarInsnNode(opcode, max));
-											}
+											methodNode.instructions.insertBefore(varTrace == null ? insn : varTrace, newVars);
 											for (int c = 0; c < countDesc; c++) {
-												methodNode.instructions.insertBefore(insn, new VarInsnNode(Opcodes.ALOAD, c));
+												mod.add(new VarInsnNode(getLoadOpcode(toInjectArgTypes[toInjectArgTypes.length-countDesc+c].getSort()), c));
 											}
-
-											methodNode.instructions.insertBefore(insn, mod);
-											methodNode.instructions.insert(insn, optionalReturn? label2 : label);
-											FabLog.debug("Completed Hijack Injection : " + m + "\t" + target);
 										}
+										mod.add(new MethodInsnNode(Opcodes.INVOKESTATIC, toInject.owner, toInject.name, toInject.desc, false));
+										methodNode.instructions.insert(insn, mod);
+										FabLog.debug("Completed ModifyReturn Injection : " + m + "\t" + target);
+									}else if ("Lcom/unascribed/fabrication/support/injection/Hijack;".equals(toInject.annotation)) {
+										for (int c = 0; c < argTypes.size(); c++) {
+											methodNode.instructions.insertBefore(insn, new VarInsnNode(getStoreOpcode(argTypes.get(argTypes.size() - 1 - c).getSort()), max++));
+										}
+										LabelNode label = new LabelNode(new Label());
+										LabelNode label2 = new LabelNode(new Label());
+										boolean optionalReturn = toInjectType.getReturnType().getSort() != Type.BOOLEAN;
+										mod.add(new MethodInsnNode(Opcodes.INVOKESTATIC, toInject.owner, toInject.name, toInject.desc, false));
+										if (optionalReturn) {
+											mod.add(new VarInsnNode(Opcodes.ASTORE, max));
+											mod.add(new VarInsnNode(Opcodes.ALOAD, max));
+											mod.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/util/Optional", "isPresent", "()Z", false));
+										}
+										mod.add(new JumpInsnNode(optionalReturn ? Opcodes.IFEQ : Opcodes.IFNE, label));
+										if (optionalReturn) {
+											mod.add(new VarInsnNode(Opcodes.ALOAD, max));
+											mod.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/util/Optional", "get", "()"+targetType.getReturnType(), false));
+											mod.add(new JumpInsnNode(Opcodes.GOTO, label2));
+											mod.add(label);
+										}
+										methodNode.maxLocals=max+1;
+										for (Type argType : argTypes) {
+											int opcode = getLoadOpcode(argType.getSort());
+											mod.add(new VarInsnNode(opcode, --max));
+											if (countDesc-->0)
+												methodNode.instructions.insertBefore(insn, new VarInsnNode(opcode, max));
+										}
+										for (int c = 0; c < countDesc; c++) {
+											methodNode.instructions.insertBefore(insn, new VarInsnNode(getLoadOpcode(toInjectArgTypes[toInjectArgTypes.length-countDesc+c].getSort()), c));
+										}
+
+										methodNode.instructions.insertBefore(insn, mod);
+										methodNode.instructions.insert(insn, optionalReturn? label2 : label);
+										FabLog.debug("Completed Hijack Injection : " + m + "\t" + target);
 									}
 								}
 							}
 						}
 					}
 				}
-			});
-		});
+			}
+		}));
 	}
 	public static int getStoreOpcode(int type){
 		return getLoadOpcode(type) + 33;
@@ -177,13 +174,6 @@ public class ModifyReturnInjector {
 			case Opcodes.FLOAD:
 			case Opcodes.LLOAD:
 			case Opcodes.ILOAD:
-				return true;
-			default:
-				return false;
-		}
-	}
-	public static boolean isConstantVariableLoader(int opcode){
-		switch (opcode){
 			case Opcodes.ACONST_NULL:
 			case Opcodes.BIPUSH:
 			case Opcodes.DCONST_0:
