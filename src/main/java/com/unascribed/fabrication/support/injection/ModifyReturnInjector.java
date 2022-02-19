@@ -45,7 +45,7 @@ public class ModifyReturnInjector {
 			});
 		});
 		targetClass.methods.forEach(methodNode -> {
-			injects.stream().forEach(toInject -> {
+			injects.forEach(toInject -> {
 				for (String m : toInject.method){
 					if (!m.equals(methodNode.name+methodNode.desc)) continue;
 					for (AbstractInsnNode insnNode : methodNode.instructions){
@@ -65,20 +65,39 @@ public class ModifyReturnInjector {
 										Type toInjectType = Type.getMethodType(toInject.desc);
 										int countDesc = toInjectType.getArgumentTypes().length;
 										int max = methodNode.maxLocals;
-										//TODO trace var origin at least till method calls
+										InsnList oldVars = new InsnList();
+										InsnList newVars = new InsnList();
+										//TODO probably never. continue the variable trace after the first method to further reduce allocation
 										//TODO non-ALOAD capture
 										if ("Lcom/unascribed/fabrication/support/injection/ModifyReturn;".equals(toInject.annotation)) {
 											if (--countDesc > 0) {
+												AbstractInsnNode varTrace = insn.getPrevious();
+												boolean isSeqVar = varTrace != null && (isVariableLoader(varTrace.getOpcode()) || isConstantVariableLoader(varTrace.getOpcode()));
+												if (!isSeqVar) varTrace = null;
 												for (int c = 0; c < argTypes.size(); c++) {
-													methodNode.instructions.insertBefore(insn, new VarInsnNode(getStoreOpcode(argTypes.get(argTypes.size()-1-c).getSort()), max++));
+													if (isSeqVar){
+														oldVars.insert(varTrace.clone(new HashMap<>()));
+														AbstractInsnNode tmp = varTrace.getPrevious();
+														if (tmp != null && (isVariableLoader(tmp.getOpcode()) || isConstantVariableLoader(tmp.getOpcode()))) {
+															varTrace = tmp;
+														} else {
+															isSeqVar = false;
+														}
+													} else {
+														int sort = argTypes.get(argTypes.size()-1-c).getSort();
+														newVars.insert(new VarInsnNode(getLoadOpcode(sort), max));
+														methodNode.instructions.insertBefore(varTrace == null ? insn : varTrace, new VarInsnNode(getStoreOpcode(sort), max++));
+													}
 												}
 												methodNode.maxLocals=max;
-												for (Type argType : argTypes) {
-													int opcode = getLoadOpcode(argType.getSort());
-													mod.add(new VarInsnNode(opcode, --max));
-													methodNode.instructions.insertBefore(insn, new VarInsnNode(opcode, max));
+												for (AbstractInsnNode a : newVars) {
+													if (countDesc-->0) mod.add(a.clone(new HashMap<>()));
 												}
-												for (int c = 0; c < countDesc - argTypes.size(); c++) {
+												for (AbstractInsnNode a : oldVars) {
+													if (countDesc-->0) mod.add(a.clone(new HashMap<>()));
+												}
+												methodNode.instructions.insertBefore(varTrace == null ? insn : varTrace, newVars);
+												for (int c = 0; c < countDesc; c++) {
 													mod.add(new VarInsnNode(Opcodes.ALOAD, c));
 												}
 											}
@@ -86,6 +105,7 @@ public class ModifyReturnInjector {
 											methodNode.instructions.insert(insn, mod);
 											FabLog.debug("Completed ModifyReturn Injection : " + m + "\t" + target);
 										}else if ("Lcom/unascribed/fabrication/support/injection/Hijack;".equals(toInject.annotation)) {
+											//TODO trace var origin at least till method calls
 											for (int c = 0; c < argTypes.size(); c++) {
 												methodNode.instructions.insertBefore(insn, new VarInsnNode(getStoreOpcode(argTypes.get(argTypes.size() - 1 - c).getSort()), max++));
 											}
@@ -134,11 +154,54 @@ public class ModifyReturnInjector {
 	}
 	public static int getLoadOpcode(int type){
 		switch (type){
-			case Type.BOOLEAN: case Type.BYTE: case Type.CHAR: case Type.SHORT: case Type.INT: return Opcodes.ILOAD;
-			case Type.LONG: return Opcodes.LLOAD;
-			case Type.FLOAT: return Opcodes.FLOAD;
-			case Type.DOUBLE: return Opcodes.DLOAD;
-			default: return Opcodes.ALOAD;
+			case Type.BOOLEAN:
+			case Type.BYTE:
+			case Type.CHAR:
+			case Type.SHORT:
+			case Type.INT:
+				return Opcodes.ILOAD;
+			case Type.LONG:
+				return Opcodes.LLOAD;
+			case Type.FLOAT:
+				return Opcodes.FLOAD;
+			case Type.DOUBLE:
+				return Opcodes.DLOAD;
+			default:
+				return Opcodes.ALOAD;
+		}
+	}
+	public static boolean isVariableLoader(int opcode){
+		switch (opcode){
+			case Opcodes.ALOAD:
+			case Opcodes.DLOAD:
+			case Opcodes.FLOAD:
+			case Opcodes.LLOAD:
+			case Opcodes.ILOAD:
+				return true;
+			default:
+				return false;
+		}
+	}
+	public static boolean isConstantVariableLoader(int opcode){
+		switch (opcode){
+			case Opcodes.ACONST_NULL:
+			case Opcodes.BIPUSH:
+			case Opcodes.DCONST_0:
+			case Opcodes.DCONST_1:
+			case Opcodes.ICONST_0:
+			case Opcodes.ICONST_1:
+			case Opcodes.ICONST_2:
+			case Opcodes.ICONST_3:
+			case Opcodes.ICONST_4:
+			case Opcodes.ICONST_5:
+			case Opcodes.ICONST_M1:
+			case Opcodes.LCONST_0:
+			case Opcodes.LCONST_1:
+			case Opcodes.LDC:
+			case Opcodes.SIPUSH:
+				return true;
+			default:
+				return false;
 		}
 	}
 }
