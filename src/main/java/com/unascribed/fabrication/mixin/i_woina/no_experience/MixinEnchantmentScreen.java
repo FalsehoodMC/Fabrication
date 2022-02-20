@@ -4,7 +4,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
@@ -18,6 +23,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.EnchantmentScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
+
 
 @Mixin(EnchantmentScreen.class)
 @EligibleIf(configAvailable="*.no_experience", envMatches=Env.CLIENT)

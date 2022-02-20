@@ -4,10 +4,22 @@ import com.unascribed.fabrication.FabLog;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.*;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.JumpInsnNode;
+import org.objectweb.asm.tree.LabelNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.VarInsnNode;
 import org.spongepowered.asm.util.asm.MethodNodeEx;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 
 public class ModifyReturnInjector {
 	public static class ToInject{
@@ -30,6 +42,7 @@ public class ModifyReturnInjector {
 	public static final Set<String> dejavu = new HashSet<>();
 
 	//TODO figure out how to write to mixin refmap
+	//TODO error reporting (besides failsoft)
 	public static void apply(ClassNode targetClass){
 		List<ToInject> injects = new ArrayList<>();
 		targetClass.methods.forEach(methodNode -> {
