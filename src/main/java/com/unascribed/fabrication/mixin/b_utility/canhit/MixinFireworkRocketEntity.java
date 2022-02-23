@@ -18,8 +18,7 @@ import java.util.Optional;
 @EligibleIf(configAvailable="*.canhit")
 public class MixinFireworkRocketEntity {
 
-	@Hijack(target={"Lnet/minecraft/entity/LivingEntity;damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", "Lnet/minecraft/class_1309;method_5643(Lnet/minecraft/class_1282;F)Z"},
-			method={"explode()V", "method_7475()V"})
+	@Hijack(target="Lnet/minecraft/entity/LivingEntity;damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", method="explode()V")
 	private static Optional<Boolean> fabrication$canDamage(LivingEntity subject, DamageSource source, float amount, FireworkRocketEntity self) {
 		if (MixinConfigPlugin.isEnabled("*.canhit") && self instanceof SetCanHitList) {
 			SetCanHitList schl = (SetCanHitList)self;

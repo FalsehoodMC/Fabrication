@@ -46,8 +46,8 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 		}
 	}
 
-	@ModifyReturn(target={"net/minecraft/recipe/Ingredient.test(Lnet/minecraft/item/ItemStack;)Z", "Lnet/minecraft/class_1856;method_8093(Lnet/minecraft/class_1799;)Z"},
-			method={"interact(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;", "method_5688(Lnet/minecraft/class_1657;Lnet/minecraft/class_1268;)Lnet/minecraft/class_1269;"})
+	@ModifyReturn(target="Lnet/minecraft/recipe/Ingredient;test(Lnet/minecraft/item/ItemStack;)Z",
+			method="interact(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;")
 	private static boolean fabrication$disableVanillaFuel(boolean original) {
 		return !MixinConfigPlugin.isEnabled("*.furnace_minecart_any_fuel") && original;
 	}

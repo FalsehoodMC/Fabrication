@@ -5,6 +5,7 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.JumpInsnNode;
@@ -19,6 +20,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 public class ModifyReturnInjector {
@@ -41,21 +43,34 @@ public class ModifyReturnInjector {
 	}
 	public static final Set<String> dejavu = new HashSet<>();
 
-	//TODO figure out how to write to mixin refmap
-	//TODO error reporting (besides failsoft)
 	public static void apply(ClassNode targetClass){
 		List<ToInject> injects = new ArrayList<>();
 		targetClass.methods.forEach(methodNode -> {
 			if (!(methodNode instanceof MethodNodeEx)) return;
-			methodNode.visibleAnnotations.forEach(annotationNode -> {
+			AnnotationNode inject = null;
+			AnnotationNode mixin = null;
+			for(AnnotationNode annotationNode : methodNode.visibleAnnotations){
 				if ((
 						"Lcom/unascribed/fabrication/support/injection/ModifyReturn;".equals(annotationNode.desc)
 						|| "Lcom/unascribed/fabrication/support/injection/Hijack;".equals(annotationNode.desc)
 					) &&dejavu.add(targetClass.name+methodNode.name+methodNode.desc)
 				) {
-					injects.add(new ToInject((List<String>) annotationNode.values.get(annotationNode.values.indexOf("method") + 1), (List<String>) annotationNode.values.get(annotationNode.values.indexOf("target") + 1), targetClass.name, methodNode.name, methodNode.desc, annotationNode.desc));
+					inject = annotationNode;
+				} else if ("Lorg/spongepowered/asm/mixin/transformer/meta/MixinMerged;".equals(annotationNode.desc)){
+					mixin = annotationNode;
 				}
-			});
+			};
+			if (inject != null && mixin != null) {
+				String mix = (String) mixin.values.get(mixin.values.indexOf("mixin") + 1);
+				injects.add(new ToInject(
+						((List<String>) inject.values.get(inject.values.indexOf("method") + 1)).stream().map(s -> FabRefMap.methodMap(mix, s)).collect(Collectors.toList()),
+						((List<String>) inject.values.get(inject.values.indexOf("target") + 1)).stream().map(s -> FabRefMap.targetMap(mix, s)).collect(Collectors.toList()),
+						targetClass.name,
+						methodNode.name,
+						methodNode.desc,
+						inject.desc
+				));
+			}
 		});
 		targetClass.methods.forEach(methodNode -> injects.forEach(toInject -> {
 			for (String m : toInject.method){

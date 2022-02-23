@@ -14,8 +14,7 @@ import org.spongepowered.asm.mixin.Mixin;
 @EligibleIf(configAvailable="*.canhit")
 public abstract class MixinPlayerEntity {
 
-	@ModifyReturn(target={"Lnet/minecraft/entity/Entity;isAttackable()Z", "Lnet/minecraft/class_1297;method_5732()Z"},
-			method={"attack(Lnet/minecraft/entity/Entity;)V", "method_7324(Lnet/minecraft/class_1297;)V"})
+	@ModifyReturn(target="Lnet/minecraft/entity/Entity;isAttackable()Z", method="attack(Lnet/minecraft/entity/Entity;)V")
 	private static boolean fabrication$canHit(boolean old, Entity entity, PlayerEntity player) {
 		if (!MixinConfigPlugin.isEnabled("*.canhit") || CanHitUtil.isExempt(player)) return old;
 		if (!entity.isAttackable()) return false;

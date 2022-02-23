@@ -10,8 +10,7 @@ import org.spongepowered.asm.mixin.Mixin;
 @Mixin(MinecraftClient.class)
 @EligibleIf(configAvailable="*.use_items_while_riding", envMatches=Env.CLIENT)
 public class MixinMinecraftClient {
-	@ModifyReturn(method={"doItemUse()V", "doAttack()V", "method_1536()V", "method_1583()V"},
-			target={"Lnet/minecraft/client/network/ClientPlayerEntity;isRiding()Z"})
+	@ModifyReturn(method={"doItemUse()V", "doAttack()V"}, target="Lnet/minecraft/client/network/ClientPlayerEntity;isRiding()Z")
 	private static boolean fabrication$allowUsageWhileRiding(boolean old){
 		return !MixinConfigPlugin.isEnabled("*.use_items_while_riding") && old;
 	}

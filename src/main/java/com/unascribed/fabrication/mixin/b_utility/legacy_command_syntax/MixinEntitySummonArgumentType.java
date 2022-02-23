@@ -17,9 +17,9 @@ import net.minecraft.util.Identifier;
 @EligibleIf(configAvailable="*.legacy_command_syntax")
 public class MixinEntitySummonArgumentType {
 
-	@ModifyReturn(target={"Lnet/minecraft/util/Identifier;fromCommandInput(Lcom/mojang/brigadier/StringReader;)Lnet/minecraft/util/Identifier;", "Lnet/minecraft/class_2960;method_12835(Lcom/mojang/brigadier/StringReader;)Lnet/minecraft/class_2960;"},
-			method={"parse(Lcom/mojang/brigadier/StringReader;)Lnet/minecraft/util/Identifier;", "method_9325(Lcom/mojang/brigadier/StringReader;)Lnet/minecraft/class_2960;"})
-	public Identifier fabrication$legacyCommandInput(Identifier original, StringReader sr) {
+	@ModifyReturn(target="Lnet/minecraft/util/Identifier;fromCommandInput(Lcom/mojang/brigadier/StringReader;)Lnet/minecraft/util/Identifier;",
+			method="parse(Lcom/mojang/brigadier/StringReader;)Lnet/minecraft/util/Identifier;")
+	private static Identifier fabrication$legacyCommandInput(Identifier original, StringReader sr) {
 		if (!MixinConfigPlugin.isEnabled("*.legacy_command_syntax")) return original;
 		char peek = sr.peek();
 		if (peek >= 'A' && peek <= 'Z') {

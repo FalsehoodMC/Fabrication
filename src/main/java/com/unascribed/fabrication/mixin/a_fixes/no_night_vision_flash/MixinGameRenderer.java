@@ -11,8 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 @EligibleIf(configAvailable="*.no_night_vision_flash", envMatches=Env.CLIENT)
 public class MixinGameRenderer {
 
-	@ModifyReturn(target={"Lnet/minecraft/util/math/MathHelper;sin(F)F", "Lnet/minecraft/class_3532;method_15374(F)F"},
-			method={"getNightVisionStrength(Lnet/minecraft/entity/LivingEntity;F)F", "method_3174(Lnet/minecraft/class_1309;F)F"})
+	@ModifyReturn(target="Lnet/minecraft/util/math/MathHelper;sin(F)F", method="getNightVisionStrength(Lnet/minecraft/entity/LivingEntity;F)F")
 	private static float fabrication$removeFlash(float original, float f) {
 		if (MixinConfigPlugin.isEnabled("*.no_night_vision_flash")) {
 			float time = (f/((float)Math.PI*0.2f));

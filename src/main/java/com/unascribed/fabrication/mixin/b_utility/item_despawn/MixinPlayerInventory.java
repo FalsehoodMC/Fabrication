@@ -11,8 +11,8 @@ import org.spongepowered.asm.mixin.Mixin;
 @EligibleIf(configAvailable="*.item_despawn")
 public abstract class MixinPlayerInventory {
 
-	@ModifyReturn(target={"net/minecraft/entity/player/PlayerEntity.dropItem(Lnet/minecraft/item/ItemStack;ZZ)Lnet/minecraft/entity/ItemEntity;", "Lnet/minecraft/class_1657;method_7329(Lnet/minecraft/class_1799;ZZ)Lnet/minecraft/class_1542;"},
-			method={"dropAll()V", "method_7388()V"})
+	@ModifyReturn(target="Lnet/minecraft/entity/player/PlayerEntity;dropItem(Lnet/minecraft/item/ItemStack;ZZ)Lnet/minecraft/entity/ItemEntity;",
+			method="dropAll()V")
 	private static ItemEntity fabrication$tagDroppedItem(ItemEntity e) {
 		if (e instanceof SetFromPlayerDeath) {
 			((SetFromPlayerDeath)e).fabrication$setFromPlayerDeath(true);

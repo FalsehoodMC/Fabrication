@@ -17,8 +17,8 @@ import net.minecraft.util.hit.EntityHitResult;
 @EligibleIf(anyConfigAvailable={"*.tridents_accept_power", "*.tridents_accept_sharpness", "*.bedrock_impaling"})
 public class MixinTridentEntity {
 
-	@ModifyReturn(target={"Lnet/minecraft/enchantment/EnchantmentHelper;getAttackDamage(Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/EntityGroup;)F", "Lnet/minecraft/class_1890;method_8218(Lnet/minecraft/class_1799;Lnet/minecraft/class_1310;)F"},
-			method={"onEntityHit(Lnet/minecraft/util/hit/EntityHitResult;)V", "method_7454(Lnet/minecraft/class_3966;)V"})
+	@ModifyReturn(target="Lnet/minecraft/enchantment/EnchantmentHelper;getAttackDamage(Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/EntityGroup;)F",
+			method="onEntityHit(Lnet/minecraft/util/hit/EntityHitResult;)V")
 	private static float fabrication$modifyAttackDamage(float damage, ItemStack stack, EntityGroup grp, TridentEntity self, EntityHitResult ehr) {
 		if (MixinConfigPlugin.isEnabled("*.tridents_accept_sharpness")) {
 			int sharpness = EnchantmentHelper.getLevel(Enchantments.SHARPNESS, stack);

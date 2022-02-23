@@ -15,7 +15,7 @@ import net.minecraft.client.option.KeyBinding;
 @EligibleIf(configAvailable="*.toggle_sprint", envMatches=Env.CLIENT)
 public class MixinClientPlayerEntity {
 
-	@ModifyReturn(target={"Lnet/minecraft/client/option/KeyBinding;isPressed()Z", "Lnet/minecraft/class_304;method_1434()Z"}, method={"tickMovement()V", "method_6007()V"})
+	@ModifyReturn(target="Lnet/minecraft/client/option/KeyBinding;isPressed()Z", method="tickMovement()V")
 	private static boolean fabrication$toggleSprint(boolean old, KeyBinding keyBinding) {
 		if (MixinConfigPlugin.isEnabled("*.toggle_sprint") && keyBinding.getTranslationKey().equals("key.sprint") && FeatureToggleSprint.sprinting) {
 			return true;
