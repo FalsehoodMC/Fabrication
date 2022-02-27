@@ -32,19 +32,22 @@ public class MixinGrindstoneScreenHandlerResultSlotPollen implements SetOwner<Gr
 
 	@Inject(at=@At("HEAD"), method="onTakeItem(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/item/ItemStack;)V", cancellable=true)
 	public void onTakeItemPre(PlayerEntity player, ItemStack stack, CallbackInfo ci) {
-		if (MixinConfigPlugin.isEnabled("*.grindstone_disenchanting") && fabrication$owner.getSlot(1).getStack().getItem() == Items.BOOK) {
-			ItemStack slotStack = fabrication$owner.getSlot(1).getStack();
-			for (Map.Entry<Enchantment, Integer> en : EnchantmentHelper.get(fabrication$owner.getSlot(0).getStack()).entrySet()) {
-				if (en.getKey().isCursed()) continue;
-				if (slotStack.getItem() != Items.ENCHANTED_BOOK) {
-					slotStack = new ItemStack(Items.ENCHANTED_BOOK);
-				}
-				EnchantedBookItem.addEnchantment(slotStack, new EnchantmentLevelEntry(en.getKey(), en.getValue()));
-				((AccessorGrindstoneScreenHandler)fabrication$owner).fabrication$getContext().run((world, pos) -> world.syncWorldEvent(1042, pos, 0));
-				fabrication$owner.getSlot(0).setStack(ItemStack.EMPTY);
-				fabrication$owner.getSlot(1).setStack(slotStack);
-				ci.cancel();
+		if (!MixinConfigPlugin.isEnabled("*.grindstone_disenchanting")) return;
+		ItemStack bookStack = fabrication$owner.getSlot(1).getStack();
+		if (bookStack.getItem() != Items.BOOK) return;
+		ItemStack disenchantStack = fabrication$owner.getSlot(0).getStack();
+		if (disenchantStack.hasEnchantments()) {
+			if (bookStack.getItem() != Items.ENCHANTED_BOOK) {
+				bookStack = new ItemStack(Items.ENCHANTED_BOOK);
 			}
+			for (Map.Entry<Enchantment, Integer> en : EnchantmentHelper.get(disenchantStack).entrySet()) {
+				if (en.getKey().isCursed()) continue;
+				EnchantedBookItem.addEnchantment(bookStack, new EnchantmentLevelEntry(en.getKey(), en.getValue()));
+			}
+			((AccessorGrindstoneScreenHandler)fabrication$owner).fabrication$getContext().run((world, pos) -> world.syncWorldEvent(1042, pos, 0));
+			fabrication$owner.getSlot(0).setStack(ItemStack.EMPTY);
+			fabrication$owner.getSlot(1).setStack(bookStack);
+			ci.cancel();
 		}
 	}
 }
