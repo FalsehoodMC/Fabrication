@@ -212,7 +212,7 @@ public class FabricationConfigScreen extends Screen {
 		if (client.world == null) {
 			//whyCantConfigureServer = "You're not connected to a server.";
 		} else if (client.getServer() != null) {
-			whyCantConfigureServer = "The singleplayer server shares the client settings.";
+			//whyCantConfigureServer = "The singleplayer server shares the client settings.";
 			isSingleplayer = true;
 		} else {
 			CommandDispatcher<?> disp = client.player.networkHandler.getCommandDispatcher();
@@ -606,7 +606,7 @@ public class FabricationConfigScreen extends Screen {
 		matrices.push();
 		matrices.scale((float)(1-(Math.abs(Math.sin(a*Math.PI))/2)), 1, 1);
 		fill(matrices, -60, -8, 0, 8, MathHelper.hsvToRgb(h, 0.9f, 0.9f)|0xFF000000);
-		if (isSingleplayer) {
+		if (isSingleplayer && !FabConf.hasWorldPath()) {
 			fill(matrices, 0, -8, 60, 8, MathHelper.hsvToRgb(0.833333f, 0.9f, 0.9f)|0xFF000000);
 		}
 		matrices.pop();
@@ -627,10 +627,10 @@ public class FabricationConfigScreen extends Screen {
 		boolean darkMode = FabConf.isEnabled("general.dark_mode");
 
 		textRenderer.draw(matrices, "CLIENT", width-115, 4, 0xFF000000);
-		if (client.world == null || FabConf.hasWorldPath()) {
+		if (client.world == null || FabConf.hasWorldPath() || isSingleplayer) {
 			textRenderer.draw(matrices, "WORLD", width - 40, 4, 0xFF000000);
 		} else {
-			textRenderer.draw(matrices, "SERVER", width - 40, 4, whyCantConfigureServer == null || isSingleplayer ? 0xFF000000 : darkMode ? 0x44FFFFFF : 0x44000000);
+			textRenderer.draw(matrices, "SERVER", width - 40, 4, whyCantConfigureServer == null ? 0xFF000000 : darkMode ? 0x44FFFFFF : 0x44000000);
 			if (serverReadOnly && whyCantConfigureServer == null) {
 				RenderSystem.setShaderTexture(0, new Identifier("fabrication", "lock.png"));
 				RenderSystem.setShaderColor(0, 0, 0, 1);
@@ -718,7 +718,7 @@ public class FabricationConfigScreen extends Screen {
 				msg = ((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "§e")+whyCantConfigureServer;
 			} else if (FabConf.hasWorldPath()) {
 				msg = "Click to unselect world";
-			} else if (client.world == null) {
+			} else if (client.world == null || isSingleplayer) {
 				msg = "Click to select world";
 			} else {
 				int srv = serverKnownConfigKeys.size();
@@ -822,22 +822,27 @@ public class FabricationConfigScreen extends Screen {
 				int x = 0;
 				Profile hovered = null;
 				for (Profile p : Profile.values()) {
-					boolean profSel = getRawValue("general.profile").toUpperCase(Locale.ROOT).equals(p.name());
+					boolean profSel = FabConf.hasWorldPath() ? p.equals(FabConf.getWorldProfile()) : getRawValue("general.profile").toUpperCase(Locale.ROOT).equals(p.name());
 					if (mouseX >= 134+x && mouseX <= 134+x+16 && mouseY >= 28 && mouseY <= 28+16) {
 						hovered = p;
-					}
-					if (didClick && mouseX >= 134+x && mouseX <= 134+x+16 && mouseY >= 28 && mouseY <= 28+16) {
-						if (p == Profile.BURNT) {
-							client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_CHIME, 1.8f, 1f));
-							client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.ITEM_FLINTANDSTEEL_USE, 1f));
-							client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_FIRE_AMBIENT, 1f, 1f));
-						} else if (p == Profile.GREEN) {
-							client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_BASS, 0.5f, 1f));
-						} else {
-							client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_COW_BELL, 0.707107f+(p.ordinal()*0.22f), 1f));
+						if (didClick) {
+							if (p == Profile.BURNT) {
+								client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_CHIME, 1.8f, 1f));
+								client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.ITEM_FLINTANDSTEEL_USE, 1f));
+								client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_FIRE_AMBIENT, 1f, 1f));
+							} else if (p == Profile.GREEN) {
+								client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_BASS, 0.5f, 1f));
+							} else {
+								client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_COW_BELL, 0.707107f+(p.ordinal()*0.22f), 1f));
+							}
+							setValue("general.profile", p.name().toLowerCase(Locale.ROOT));
 						}
-						setValue("general.profile", p.name().toLowerCase(Locale.ROOT));
+						if (didRclick && FabConf.hasWorldPath()) {
+							client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.ITEM_AXE_SCRAPE, 0.7f, 1f));
+							if (FabConf.getWorldProfile() != null) setValue("general.profile", "root");
+						}
 					}
+
 					color(PROFILE_COLORS.get(p), profSel ? 1f : (hovered == p ? 0.6f : 0.3f) * (FabConf.isEnabled("general.dark_mode") ? 0.5f : 1));
 					drawTexture(matrices, 134+x, 28, 0, 0, 0, 16, 16, 16, 16);
 					x += 18;
@@ -1264,6 +1269,7 @@ public class FabricationConfigScreen extends Screen {
 
 	@Override
 	public void onClose() {
+		FabConf.resetWorldPath();
 		if (!FabConf.isEnabled("*.reduced_motion") && !leaving) {
 			leaving = true;
 			client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_BARREL_CLOSE, 0.7f));
@@ -1332,6 +1338,13 @@ public class FabricationConfigScreen extends Screen {
 						} else {
 							openWorldSelector();
 							return super.mouseClicked(mouseX, mouseY, button);
+						}
+					} else if (isSingleplayer) {
+						client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_XYLOPHONE, 0.8f, 1));
+						if (FabConf.hasWorldPath()) {
+							FabConf.setWorldPath(null);
+						} else {
+							FabConf.resetWorldPath();
 						}
 					} else if (whyCantConfigureServer == null) {
 						hasClonked = false;

@@ -19,7 +19,7 @@ public class MixinMinecraftServer {
 
 	@Inject(method="loadWorld()V", at=@At("HEAD"))
 	public void getPath(CallbackInfo ci) {
-		FabConf.setWorldPath(session.getDirectory(WorldSavePath.ROOT));
+		FabConf.setWorldPath(session.getDirectory(WorldSavePath.ROOT), true);
 	}
 
 }

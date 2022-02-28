@@ -110,6 +110,7 @@ public class FabConf {
 	private static boolean analyticsSafe = false;
 	private static ImmutableMap<String, Boolean> defaults;
 	private static Path worldPath = null;
+	private static Path lastWorldPath = null;
 	public static boolean loadComplete = false;
 
 	private static class FeaturesIniTransformer implements IniTransformer {
@@ -240,14 +241,24 @@ public class FabConf {
 		return worldPath != null;
 	}
 
+	public static void resetWorldPath(){
+		setWorldPath(lastWorldPath, false);
+	}
+
 	public static void setWorldPath (Path path) {
+		setWorldPath(path, false);
+	}
+
+	public static void setWorldPath (Path path, boolean onLoad) {
 		worldPath = path;
-		worldReload();
 		if (path == null){
 			worldConfig.clear();
 			worldProfile = null;
 			worldDefaults.clear();
+		}else if (onLoad) {
+			lastWorldPath = path;
 		}
+		worldReload();
 	}
 
 	public static String getProfileName(){
@@ -380,6 +391,10 @@ public class FabConf {
 	public static String getRawValue(String configKey) {
 		configKey = remap(configKey);
 		return rawConfig.get(configKey).orElse(configKey.equals("general.profile") ? "light" : "");
+	}
+
+	public static Profile getWorldProfile(){
+		return worldProfile;
 	}
 
 	public static boolean isValid(String configKey) {
