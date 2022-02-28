@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -311,7 +312,7 @@ public class FeatureFabricationCommand implements Feature {
 
 	public static <T extends CommandSource> void addConfig(LiteralArgumentBuilder<T> root, boolean dediServer) {
 		LiteralArgumentBuilder<T> config = LiteralArgumentBuilder.<T>literal("config");
-		config.requires(s -> {
+		Predicate<T> permissionPredicate = s -> {
 			// always allow a client to reconfigure itself
 			if (!(s instanceof ServerCommandSource)) return true;
 
@@ -327,7 +328,7 @@ public class FeatureFabricationCommand implements Feature {
 				}
 			}
 			return false;
-		});
+		};
 		{
 			LiteralArgumentBuilder<T> get = LiteralArgumentBuilder.<T>literal("get");
 			for (String s : FabConf.getAllKeys()) {
@@ -380,6 +381,7 @@ public class FeatureFabricationCommand implements Feature {
 					set.then(short_key);
 				});
 			}
+			set.requires(permissionPredicate);
 			config.then(set);
 			LiteralArgumentBuilder<T> setWorld = LiteralArgumentBuilder.<T>literal("setWorld");
 			for (String s : FabConf.getAllKeys()) {
@@ -414,8 +416,10 @@ public class FeatureFabricationCommand implements Feature {
 					setWorld.then(short_key);
 				});
 			}
+			setWorld.requires(permissionPredicate);
 			config.then(setWorld);
 			config.then(LiteralArgumentBuilder.<T>literal("reload")
+					.requires(permissionPredicate)
 					.executes((c) -> {
 						FabConf.reload();
 						if (c.getSource() instanceof ServerCommandSource) {
@@ -432,7 +436,6 @@ public class FeatureFabricationCommand implements Feature {
 
 	public static <T extends CommandSource> void addFScript(LiteralArgumentBuilder<T> root, boolean dediServer) {
 		LiteralArgumentBuilder<T> script = LiteralArgumentBuilder.<T>literal("fscript");
-		script.requires(s -> s.hasPermissionLevel(2));
 		{
 			LiteralArgumentBuilder<T> get = LiteralArgumentBuilder.<T>literal("get");
 			for (String s : OptionalFScript.predicateProviders.keySet()) {
@@ -459,6 +462,7 @@ public class FeatureFabricationCommand implements Feature {
 				set.then(key);
 				setAltKeys(s, alt -> set.then(LiteralArgumentBuilder.<T>literal(alt).then(value)));
 			}
+			set.requires(s -> s.hasPermissionLevel(2));
 			script.then(set);
 
 			LiteralArgumentBuilder<T> unset = LiteralArgumentBuilder.<T>literal("unset");
@@ -472,14 +476,16 @@ public class FeatureFabricationCommand implements Feature {
 				unset.then(key);
 				setAltKeys(s, alt -> unset.then(LiteralArgumentBuilder.<T>literal(alt).executes(key.getCommand())));
 			}
+			unset.requires(s -> s.hasPermissionLevel(2));
 			script.then(unset);
 			script.then(LiteralArgumentBuilder.<T>literal("reload")
-					.executes((c) -> {
-						LoaderFScript.reload();
-						OptionalFScript.reload();
-						sendFeedback(c, new LiteralText("Fabrication fscript reloaded"), true);
-						return 1;
-					})
+					.requires(s -> s.hasPermissionLevel(2))
+						.executes((c) -> {
+							LoaderFScript.reload();
+							OptionalFScript.reload();
+							sendFeedback(c, new LiteralText("Fabrication fscript reloaded"), true);
+							return 1;
+						})
 					);
 		}
 		root.then(script);
