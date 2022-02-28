@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -12,7 +13,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.interfaces.GetKillMessage;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.entity.Entity;
@@ -32,7 +32,7 @@ public abstract class MixinEntityDamageSource {
 
 	@Inject(at=@At("HEAD"), method="getDeathMessage(Lnet/minecraft/entity/LivingEntity;)Lnet/minecraft/text/Text;", cancellable=true)
 	public void getDeathMessage(LivingEntity victim, CallbackInfoReturnable<Text> rtrn) {
-		if (!MixinConfigPlugin.isEnabled("*.killmessage")) return;
+		if (!FabConf.isEnabled("*.killmessage")) return;
 		Entity attacker = ((EntityDamageSource)(Object)this).getAttacker();
 		if (attacker instanceof GetKillMessage) {
 			Iterator<ItemStack> iter = attacker.getItemsHand().iterator();

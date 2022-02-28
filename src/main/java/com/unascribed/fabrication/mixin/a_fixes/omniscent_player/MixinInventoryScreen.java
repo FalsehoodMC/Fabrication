@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.a_fixes.omniscent_player;
 
+import com.unascribed.fabrication.FabConf;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -7,7 +8,6 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
@@ -24,7 +24,7 @@ public class MixinInventoryScreen {
 	@ModifyVariable(method="drawEntity(IIIFFLnet/minecraft/entity/LivingEntity;)V", at=@At("HEAD"), index=3, argsOnly=true)
 	private static float modifyX(float value, int x, int y, int size, float mouseX, float mouseY, LivingEntity entity) {
 		fabrication$mouseY = mouseY;
-		if (!MixinConfigPlugin.isEnabled("*.omniscent_player")) return value;
+		if (!FabConf.isEnabled("*.omniscent_player")) return value;
 		if (!(entity instanceof PlayerEntity)) return value;
 		MinecraftClient mc = MinecraftClient.getInstance();
 		Window window = mc.getWindow();

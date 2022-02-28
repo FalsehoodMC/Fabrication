@@ -57,6 +57,28 @@ public class QDIni {
 		String transformValueComment(String key, String value, String comment);
 		String transformValue(String key, String value);
 	}
+	@FunctionalInterface
+	public interface ValueIniTransformer{
+		String transformValue(String key, String value);
+	}
+	public static IniTransformer simpleValueIniTransformer(ValueIniTransformer transformer){
+		return new IniTransformer() {
+			@Override
+			public String transformLine(String path, String line) {
+				return line;
+			}
+
+			@Override
+			public String transformValueComment(String key, String value, String comment) {
+				return comment;
+			}
+
+			@Override
+			public String transformValue(String key, String value) {
+				return transformer.transformValue(key, value);
+			}
+		};
+	}
 
 	private static class BlameString {
 		public final String value;

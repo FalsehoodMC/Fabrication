@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.e_mechanics.obsidian_tears;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -7,7 +8,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.logic.ObsidianTears;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.block.AbstractBlock.AbstractBlockState;
 import net.minecraft.block.Blocks;
@@ -30,7 +30,7 @@ public class MixinAbstractBlockState {
 	@Inject(at=@At("HEAD"), method="onUse(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;",
 			cancellable=true)
 	public void onUse(World world, PlayerEntity user, Hand hand, BlockHitResult hit, CallbackInfoReturnable<ActionResult> ci) {
-		if (MixinConfigPlugin.isEnabled("*.obsidian_tears") && world.getBlockState(hit.getBlockPos()).getBlock() == Blocks.CRYING_OBSIDIAN) {
+		if (FabConf.isEnabled("*.obsidian_tears") && world.getBlockState(hit.getBlockPos()).getBlock() == Blocks.CRYING_OBSIDIAN) {
 			ItemStack held = user.getStackInHand(hand);
 			if (held.getItem() == Items.GLASS_BOTTLE) {
 				world.playSound(user, user.getX(), user.getY(), user.getZ(), SoundEvents.ITEM_BOTTLE_FILL, SoundCategory.NEUTRAL, 1, 1);

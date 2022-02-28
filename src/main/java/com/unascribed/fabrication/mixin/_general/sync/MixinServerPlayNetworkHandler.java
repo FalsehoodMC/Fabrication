@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin._general.sync;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -13,7 +14,6 @@ import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.features.FeatureHideArmor;
 import com.unascribed.fabrication.interfaces.SetFabricationConfigAware;
 import com.unascribed.fabrication.loaders.LoaderFScript;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.OptionalFScript;
 
 import io.netty.buffer.Unpooled;
@@ -48,17 +48,18 @@ public class MixinServerPlayNetworkHandler {
 					if (player instanceof SetFabricationConfigAware) {
 						((SetFabricationConfigAware) player).fabrication$setConfigAware(true);
 						FabricationMod.sendConfigUpdate(player.server, null, player);
-						if (MixinConfigPlugin.isEnabled("*.hide_armor")) {
+						if (FabConf.isEnabled("*.hide_armor")) {
 							FeatureHideArmor.sendSuppressedSlotsForSelf(player);
 						}
 					}
-				} else if (id == 1) {
+				} else if (id == 1 || id == 2) {
 					// set
 					if (player.hasPermissionLevel(2)) {
 						String key = recvdData.readString(32767);
-						if (MixinConfigPlugin.isValid(key)) {
+						if (FabConf.isValid(key)) {
 							String value = recvdData.readString(32767);
-							MixinConfigPlugin.set(key, value);
+							if (id == 1) FabConf.set(key, value);
+							else FabConf.worldSet(key, value);
 							if (FabricationMod.isAvailableFeature(key)) {
 								FabricationMod.updateFeature(key);
 							}
@@ -75,7 +76,7 @@ public class MixinServerPlayNetworkHandler {
 				if(id == 0){
 					// get
 					String key = recvdData.readString(32767);
-					if (MixinConfigPlugin.isValid(key)) {
+					if (FabConf.isValid(key)) {
 						PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
 						data.writeVarInt(0);
 						data.writeString(LoaderFScript.get(key));
@@ -84,8 +85,8 @@ public class MixinServerPlayNetworkHandler {
 				}else if (id == 1) {
 					// set
 					if (player.hasPermissionLevel(2)) {
-						String key = MixinConfigPlugin.remap(recvdData.readString(32767));
-						if (MixinConfigPlugin.isValid(key) && FeaturesFile.get(key).fscript != null) {
+						String key = FabConf.remap(recvdData.readString(32767));
+						if (FabConf.isValid(key) && FeaturesFile.get(key).fscript != null) {
 							String value = recvdData.readString(32767);
 							if (Agnos.isModLoaded("fscript") && OptionalFScript.set(key, value, player)) {
 								fabrication$sendCommandFeedback(
@@ -97,8 +98,8 @@ public class MixinServerPlayNetworkHandler {
 				}else if (id == 2) {
 					// unset
 					if (player.hasPermissionLevel(2)) {
-						String key = MixinConfigPlugin.remap(recvdData.readString(32767));
-						if (MixinConfigPlugin.isValid(key) && FeaturesFile.get(key).fscript != null && Agnos.isModLoaded("fscript")) {
+						String key = FabConf.remap(recvdData.readString(32767));
+						if (FabConf.isValid(key) && FeaturesFile.get(key).fscript != null && Agnos.isModLoaded("fscript")) {
 							OptionalFScript.restoreDefault(key);
 							fabrication$sendCommandFeedback(
 									new TranslatableText("chat.type.admin", player.getDisplayName(), new LiteralText(key + " script has been unset"))
@@ -116,6 +117,7 @@ public class MixinServerPlayNetworkHandler {
 								.formatted(Formatting.GRAY, Formatting.ITALIC));
 					}
 				}
+				// TODO id 4 world local SET
 			}
 			ci.cancel();
 		}

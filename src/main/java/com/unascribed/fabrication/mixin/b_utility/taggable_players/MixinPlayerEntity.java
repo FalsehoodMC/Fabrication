@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.b_utility.taggable_players;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -8,7 +9,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.unascribed.fabrication.interfaces.TaggablePlayer;
 import com.unascribed.fabrication.logic.PlayerTag;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.entity.EntityType;
@@ -34,7 +34,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 
 	@Inject(at=@At("HEAD"), method="eatFood(Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;", cancellable=true)
 	public void eatFood(World world, ItemStack stack, CallbackInfoReturnable<ItemStack> ci) {
-		if (MixinConfigPlugin.isEnabled("*.taggable_players") && this instanceof TaggablePlayer) {
+		if (FabConf.isEnabled("*.taggable_players") && this instanceof TaggablePlayer) {
 			if (((TaggablePlayer)this).fabrication$hasTag(PlayerTag.NO_HUNGER)) {
 				Object self = this;
 				Item item = stack.getItem();
@@ -54,7 +54,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 
 	@Inject(at=@At("HEAD"), method="isInvulnerableTo(Lnet/minecraft/entity/damage/DamageSource;)Z", cancellable=true)
 	public void isInvulnerableTo(DamageSource ds, CallbackInfoReturnable<Boolean> ci) {
-		if (MixinConfigPlugin.isEnabled("*.taggable_players") && this instanceof TaggablePlayer) {
+		if (FabConf.isEnabled("*.taggable_players") && this instanceof TaggablePlayer) {
 			if (((TaggablePlayer)this).fabrication$hasTag(PlayerTag.FIREPROOF) && ds.isFire()) {
 				ci.setReturnValue(true);
 			}

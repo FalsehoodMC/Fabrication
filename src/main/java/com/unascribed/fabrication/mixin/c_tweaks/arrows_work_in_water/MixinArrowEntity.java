@@ -1,9 +1,9 @@
 package com.unascribed.fabrication.mixin.c_tweaks.arrows_work_in_water;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.projectile.ArrowEntity;
@@ -21,7 +21,7 @@ public abstract class MixinArrowEntity extends PersistentProjectileEntity {
 
 	@Override
 	protected float getDragInWater() {
-		return MixinConfigPlugin.isEnabled("*.arrows_work_in_water") ? 0.85f : super.getDragInWater();
+		return FabConf.isEnabled("*.arrows_work_in_water") ? 0.85f : super.getDragInWater();
 	}
 
 }

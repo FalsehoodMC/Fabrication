@@ -1,34 +1,5 @@
 package com.unascribed.fabrication.client;
 
-import static com.unascribed.fabrication.client.FabricationConfigScreen.ConfigValueFlag.CLIENT_ONLY;
-import static com.unascribed.fabrication.client.FabricationConfigScreen.ConfigValueFlag.HIGHLIGHT_QUERY_MATCH;
-import static com.unascribed.fabrication.client.FabricationConfigScreen.ConfigValueFlag.REQUIRES_FABRIC_API;
-import static com.unascribed.fabrication.client.FabricationConfigScreen.ConfigValueFlag.SHOW_SOURCE_SECTION;
-
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.brigadier.CommandDispatcher;
-import com.unascribed.fabrication.Agnos;
-import com.unascribed.fabrication.FabricationMod;
-import com.unascribed.fabrication.FabricationModClient;
-import com.unascribed.fabrication.FeaturesFile;
-import com.unascribed.fabrication.FeaturesFile.FeatureEntry;
-import com.unascribed.fabrication.FeaturesFile.Sides;
-import com.unascribed.fabrication.interfaces.GetServerConfig;
-import com.unascribed.fabrication.support.ConfigValue;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
-import com.unascribed.fabrication.support.MixinConfigPlugin.Profile;
-import com.unascribed.fabrication.support.ResolvedConfigValue;
-
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
@@ -38,7 +9,20 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
-
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.brigadier.CommandDispatcher;
+import com.unascribed.fabrication.Agnos;
+import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.FabConf.Profile;
+import com.unascribed.fabrication.FabLog;
+import com.unascribed.fabrication.FabricationMod;
+import com.unascribed.fabrication.FabricationModClient;
+import com.unascribed.fabrication.FeaturesFile;
+import com.unascribed.fabrication.FeaturesFile.FeatureEntry;
+import com.unascribed.fabrication.FeaturesFile.Sides;
+import com.unascribed.fabrication.interfaces.GetServerConfig;
+import com.unascribed.fabrication.support.ConfigValue;
+import com.unascribed.fabrication.support.ResolvedConfigValue;
 import io.github.queerbric.pride.PrideFlag;
 import io.github.queerbric.pride.PrideFlags;
 import io.netty.buffer.Unpooled;
@@ -55,6 +39,8 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.VertexFormat.DrawMode;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.client.texture.NativeImage;
+import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
@@ -66,6 +52,29 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3f;
+import net.minecraft.world.level.storage.SessionLock;
+import org.apache.commons.lang3.ArrayUtils;
+import org.lwjgl.opengl.GL11;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import static com.unascribed.fabrication.client.FabricationConfigScreen.ConfigValueFlag.CLIENT_ONLY;
+import static com.unascribed.fabrication.client.FabricationConfigScreen.ConfigValueFlag.HIGHLIGHT_QUERY_MATCH;
+import static com.unascribed.fabrication.client.FabricationConfigScreen.ConfigValueFlag.REQUIRES_FABRIC_API;
+import static com.unascribed.fabrication.client.FabricationConfigScreen.ConfigValueFlag.SHOW_SOURCE_SECTION;
 
 public class FabricationConfigScreen extends Screen {
 
@@ -99,6 +108,8 @@ public class FabricationConfigScreen extends Screen {
 	private static final Set<String> newlyUnbannedKeysClient = Sets.newHashSet();
 	private static final Set<String> newlyUnbannedKeysServer = Sets.newHashSet();
 
+	private static boolean isFScriptLoaded = Agnos.isModLoaded("fscript");
+
 	private final Screen parent;
 
 	private final PrideFlag prideFlag;
@@ -112,6 +123,7 @@ public class FabricationConfigScreen extends Screen {
 	private float sidebarHeight;
 
 	private boolean didClick;
+	private boolean didRclick;
 	private float selectTime;
 	private String selectedSection;
 	private String prevSelectedSection;
@@ -143,6 +155,7 @@ public class FabricationConfigScreen extends Screen {
 	private final Map<String, Float> becomeBanAnimationTime = Maps.newHashMap();
 	private final Set<String> knownDisabled = Sets.newHashSet();
 	private final Set<String> onlyBannableds = Sets.newHashSet();
+	private final Map<String, Map<String, FeatureSubmenu>> submenus = new HashMap<>();
 
 	private boolean bufferTooltips = false;
 	private final List<Runnable> bufferedTooltips = Lists.newArrayList();
@@ -154,24 +167,42 @@ public class FabricationConfigScreen extends Screen {
 	private boolean emptyQuery = true;
 	private boolean searchingScriptable = false;
 
+
 	public FabricationConfigScreen(Screen parent) {
 		super(new LiteralText("Fabrication configuration"));
 		this.parent = parent;
 		prideFlag = PrideFlags.isPrideMonth() ? PrideFlags.getRandomFlag() : null;
-		for (String sec : MixinConfigPlugin.getAllSections()) {
+		for (String sec : FabConf.getAllSections()) {
 			SECTION_DESCRIPTIONS.put(sec, FeaturesFile.get(sec).desc);
 		}
 		for (Profile prof : Profile.values()) {
-			PROFILE_DESCRIPTIONS.put(prof, FeaturesFile.get("general.profile."+prof.name().toLowerCase(Locale.ROOT)).desc);
+			PROFILE_DESCRIPTIONS.put(prof, FeaturesFile.get("general.profile." + prof.name().toLowerCase(Locale.ROOT)).desc);
 		}
-		for (String key : MixinConfigPlugin.getAllKeys()) {
+		for (String key : FabConf.getAllKeys()) {
 			int dot = key.indexOf('.');
 			String section = key.substring(0, dot);
 			String name = key.substring(dot+1);
 			options.put(section, name);
 		}
+		if (isFScriptLoaded) {
+			for (Map.Entry<String, FeatureEntry> en : FeaturesFile.getAll().entrySet()) {
+				String key = en.getKey();
+				FeatureEntry feature = en.getValue();
+				if (feature.fscript != null || feature.extend != null && FeaturesFile.get(FabConf.remap(feature.extend)).fscript != null) {
+					defaultedSubmenu(key).put("FScript", OptionalFScriptScreen::construct);
+				}
+			}
+		}
+		defaultedSubmenu(FabConf.remap("*.block_logo")).put("Detailed Configs", BlockLogoScreen::new);
+
 		tabs.add("search");
 		tabs.addAll(options.keySet());
+	}
+
+	private Map<String, FeatureSubmenu> defaultedSubmenu(String key) {
+		Map<String, FeatureSubmenu> map = new HashMap<>();
+		if (!submenus.containsKey(key)) submenus.put(key, map);
+		return map;
 	}
 
 	@Override
@@ -179,7 +210,7 @@ public class FabricationConfigScreen extends Screen {
 		super.init();
 		isSingleplayer = false;
 		if (client.world == null) {
-			whyCantConfigureServer = "You're not connected to a server.";
+			//whyCantConfigureServer = "You're not connected to a server.";
 		} else if (client.getServer() != null) {
 			whyCantConfigureServer = "The singleplayer server shares the client settings.";
 			isSingleplayer = true;
@@ -190,7 +221,7 @@ public class FabricationConfigScreen extends Screen {
 			} else {
 				ClientPlayNetworkHandler cpnh = client.getNetworkHandler();
 				if (cpnh instanceof GetServerConfig) {
-					GetServerConfig gsc = (GetServerConfig)cpnh;
+					GetServerConfig gsc = (GetServerConfig) cpnh;
 					if (!gsc.fabrication$hasHandshook()) {
 						whyCantConfigureServer = "This server's version of Fabrication is too old.";
 					} else {
@@ -205,7 +236,7 @@ public class FabricationConfigScreen extends Screen {
 			}
 		}
 		searchField = new TextFieldWidget(textRenderer, 131, 1, width-252, 14, searchField, new LiteralText("Search"));
-		if (Agnos.isModLoaded("fscript")) searchField.setWidth(searchField.getWidth()-16);
+		if (isFScriptLoaded) searchField.setWidth(searchField.getWidth()-16);
 
 		searchField.setChangedListener((s) -> {
 			s = s.trim();
@@ -216,7 +247,7 @@ public class FabricationConfigScreen extends Screen {
 
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		if (timeExisted == 0 && !MixinConfigPlugin.isEnabled("*.reduced_motion")) {
+		if (timeExisted == 0 && !FabConf.isEnabled("*.reduced_motion")) {
 			client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.ENTITY_WITHER_SHOOT, 2f, 0.1f));
 			client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_BARREL_OPEN, 1.2f));
 		}
@@ -224,18 +255,18 @@ public class FabricationConfigScreen extends Screen {
 		if (leaving) {
 			timeLeaving += delta;
 		}
-		if (parent != null && (leaving || timeExisted < 10) && !MixinConfigPlugin.isEnabled("*.reduced_motion")) {
-			float a = sCurve5((leaving ? Math.max(0, 10-timeLeaving) : timeExisted)/10);
+		if (parent != null && (leaving || timeExisted < 10) && !FabConf.isEnabled("*.reduced_motion")) {
+			float a = sCurve5((leaving ? Math.max(0, 10 - timeLeaving) : timeExisted) / 10);
 			matrices.push();
-				matrices.translate(width/2f, height, 0);
-				matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(a*(leaving ? -180 : 180)));
-				matrices.translate(-width/2, -height, 0);
+				matrices.translate(width / 2f, height, 0);
+				matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(a * (leaving ? -180 : 180)));
+				matrices.translate(-width / 2, -height, 0);
 				matrices.push();
 					matrices.translate(0, height, 0);
-					matrices.translate(width/2f, height/2f, 0);
+					matrices.translate(width / 2f, height / 2f, 0);
 					matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(180));
-					matrices.translate(-width/2f, -height/2f, 0);
-					fill(matrices, -width, -height, width*2, 0, MixinConfigPlugin.isEnabled("general.dark_mode") ? 0xFF212020 : 0xFF2196F3);
+					matrices.translate(-width / 2f, -height / 2f, 0);
+					fill(matrices, -width, -height, width * 2, 0, FabConf.isEnabled("general.dark_mode") ? 0xFF212020 : 0xFF2196F3);
 					matrices.push();
 						drawBackground(matrices, -200, -200, delta, 0, 0);
 						drawForeground(matrices, -200, -200, delta);
@@ -247,14 +278,14 @@ public class FabricationConfigScreen extends Screen {
 			MatrixStack projection = new MatrixStack();
 			projection.method_34425(RenderSystem.getProjectionMatrix());
 			projection.push();
-				projection.translate(width/2f, height, 0);
-				projection.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(a*(leaving ? -180 : 180)));
-				projection.translate(-width/2, -height, 0);
+				projection.translate(width / 2f, height, 0);
+				projection.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(a * (leaving ? -180 : 180)));
+				projection.translate(-width / 2, -height, 0);
 				for (int x = -1; x <= 1; x++) {
 					for (int y = -1; y <= 0; y++) {
 						if (x == 0 && y == 0) continue;
 						projection.push();
-						projection.translate(width*x, height*y, 0);
+						projection.translate(width * x, height * y, 0);
 						RenderSystem.setProjectionMatrix(projection.peek().getModel());
 						parent.renderBackgroundTexture(0);
 						projection.pop();
@@ -274,13 +305,20 @@ public class FabricationConfigScreen extends Screen {
 			client.setScreen(parent);
 		}
 	}
+
+	@Override
+	public void renderBackground(MatrixStack matrices) {
+		drawBackground(height, width, client, prideFlag, 0, matrices, 0, 0, 0, 0, 0);
+	}
+
 	private void drawBackground(MatrixStack matrices, int mouseX, int mouseY, float delta, int cutoffX, int cutoffY) {
 		drawBackground(height, width, client, prideFlag, selectedSection == null ? 10-selectTime : prevSelectedSection == null ? selectTime : 0, matrices, mouseX, mouseY, delta, cutoffX, cutoffY);
 	}
+
 	public static void drawBackground(int height, int width, MinecraftClient client, PrideFlag prideFlag, float time, MatrixStack matrices, int mouseX, int mouseY, float delta, int cutoffX, int cutoffY) {
 		float cutoffV = cutoffY/(float)height;
-		Identifier bg = MixinConfigPlugin.isEnabled("general.dark_mode") ? BG_DARK : BG;
-		Identifier bgGrad = MixinConfigPlugin.isEnabled("general.dark_mode") ? BG_GRAD_DARK : BG_GRAD;
+		Identifier bg = FabConf.isEnabled("general.dark_mode") ? BG_DARK : BG;
+		Identifier bgGrad = FabConf.isEnabled("general.dark_mode") ? BG_GRAD_DARK : BG_GRAD;
 		BufferBuilder bb = Tessellator.getInstance().getBuffer();
 		Matrix4f mat = matrices.peek().getModel();
 
@@ -412,7 +450,7 @@ public class FabricationConfigScreen extends Screen {
 			hasClonked = true;
 			client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_BONE_BLOCK_STEP, 1f, 0.5f));
 		}
-		if (configuringServer) {
+		if (configuringServer || FabConf.hasWorldPath()) {
 			a = 1-a;
 		}
 
@@ -536,7 +574,7 @@ public class FabricationConfigScreen extends Screen {
 		float selectedA = sCurve5((10-selectTime)/10f);
 		float prevSelectedA = sCurve5(selectTime/10f);
 		drawSection(matrices, selectedSection, mouseX, mouseY, selectedChoiceY, selectedA, true);
-		if (!MixinConfigPlugin.isEnabled("general.reduced_motion") && !Objects.equal(selectedSection, prevSelectedSection)) {
+		if (!FabConf.isEnabled("general.reduced_motion") && !Objects.equal(selectedSection, prevSelectedSection)) {
 			drawSection(matrices, prevSelectedSection, -200, -200, prevSelectedChoiceY, prevSelectedA, false);
 		}
 
@@ -586,16 +624,20 @@ public class FabricationConfigScreen extends Screen {
 		fill(matrices, -2, -2, 2, 2, 0xFF000000);
 		matrices.pop();
 
-		boolean darkMode = MixinConfigPlugin.isEnabled("general.dark_mode");
+		boolean darkMode = FabConf.isEnabled("general.dark_mode");
 
 		textRenderer.draw(matrices, "CLIENT", width-115, 4, 0xFF000000);
-		textRenderer.draw(matrices, "SERVER", width-40, 4, whyCantConfigureServer == null || isSingleplayer ? 0xFF000000 : darkMode ? 0x44FFFFFF : 0x44000000);
-		if (serverReadOnly && whyCantConfigureServer == null) {
-			RenderSystem.setShaderTexture(0, new Identifier("fabrication", "lock.png"));
-			RenderSystem.setShaderColor(0, 0, 0, 1);
-			drawTexture(matrices, width-49, 3, 0, 0, 0, 8, 8, 8, 8);
+		if (client.world == null || FabConf.hasWorldPath()) {
+			textRenderer.draw(matrices, "WORLD", width - 40, 4, 0xFF000000);
+		} else {
+			textRenderer.draw(matrices, "SERVER", width - 40, 4, whyCantConfigureServer == null || isSingleplayer ? 0xFF000000 : darkMode ? 0x44FFFFFF : 0x44000000);
+			if (serverReadOnly && whyCantConfigureServer == null) {
+				RenderSystem.setShaderTexture(0, new Identifier("fabrication", "lock.png"));
+				RenderSystem.setShaderColor(0, 0, 0, 1);
+				drawTexture(matrices, width-49, 3, 0, 0, 0, 8, 8, 8, 8);
+			}
 		}
-		if (searchSelected && Agnos.isModLoaded("fscript")) {
+		if (searchSelected && isFScriptLoaded) {
 			if(didClick && mouseX >= width-136 && mouseX < width-120 && mouseY <= 16) {
 				client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1f));
 				searchingScriptable = !searchingScriptable;
@@ -660,6 +702,7 @@ public class FabricationConfigScreen extends Screen {
 			onClose();
 		}
 		if (didClick) didClick = false;
+		if (didRclick) didRclick = false;
 
 		super.render(matrices, mouseX, mouseY, delta);
 
@@ -673,9 +716,13 @@ public class FabricationConfigScreen extends Screen {
 			String msg;
 			if (whyCantConfigureServer != null) {
 				msg = ((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "§e")+whyCantConfigureServer;
+			} else if (FabConf.hasWorldPath()) {
+				msg = "Click to unselect world";
+			} else if (client.world == null) {
+				msg = "Click to select world";
 			} else {
 				int srv = serverKnownConfigKeys.size();
-				int cli = MixinConfigPlugin.getAllKeys().size();
+				int cli = FabConf.getAllKeys().size();
 				msg = "§dServer has Fabrication and is recognized.";
 				if (srv != cli) {
 					msg += "\n§oMismatch: Server has "+srv+" options. Client has "+cli+".";
@@ -730,7 +777,7 @@ public class FabricationConfigScreen extends Screen {
 
 	private void drawSection(MatrixStack matrices, String section, float mouseX, float mouseY, float choiceY, float a, boolean selected) {
 		if (a <= 0) return;
-		if (MixinConfigPlugin.isEnabled("general.reduced_motion")) {
+		if (FabConf.isEnabled("general.reduced_motion")) {
 			a = 1;
 		}
 		matrices.push();
@@ -748,7 +795,7 @@ public class FabricationConfigScreen extends Screen {
 					+ "\nClick a category on the left to change settings.";
 			int height = drawWrappedText(matrices, 140, 20, blurb, width-130, -1, false);
 			if (!configuringServer && drawButton(matrices, 140, 20+height+32, 120, 20, "Reload files", mouseX, mouseY)) {
-				MixinConfigPlugin.reload();
+				FabConf.reload();
 			}
 			y += height;
 			y += 22;
@@ -791,7 +838,7 @@ public class FabricationConfigScreen extends Screen {
 						}
 						setValue("general.profile", p.name().toLowerCase(Locale.ROOT));
 					}
-					color(PROFILE_COLORS.get(p), profSel ? 1f : (hovered == p ? 0.6f : 0.3f) * (MixinConfigPlugin.isEnabled("general.dark_mode") ? 0.5f : 1));
+					color(PROFILE_COLORS.get(p), profSel ? 1f : (hovered == p ? 0.6f : 0.3f) * (FabConf.isEnabled("general.dark_mode") ? 0.5f : 1));
 					drawTexture(matrices, 134+x, 28, 0, 0, 0, 16, 16, 16, 16);
 					x += 18;
 				}
@@ -810,11 +857,11 @@ public class FabricationConfigScreen extends Screen {
 				y += 4;
 				Predicate<FeatureEntry> pen;
 				if ("#failed".equals(searchField.getText())) {
-					pen = fe -> MixinConfigPlugin.isFailed(fe.key);
+					pen = fe -> FabConf.isFailed(fe.key);
 				} else {
 					pen = (en) -> emptyQuery || (queryPattern.matcher(en.name).find() || queryPattern.matcher(en.shortName).find() || queryPattern.matcher(en.desc).find());
 				}
-				if (Agnos.isModLoaded("fscript") && searchingScriptable) pen = ((Predicate<FeatureEntry>) en -> en.fscript != null).and(pen);
+				if (isFScriptLoaded && searchingScriptable) pen = ((Predicate<FeatureEntry>) en -> en.fscript != null).and(pen);
 				y = drawConfigValues(matrices, y, mouseX, mouseY, pen, SHOW_SOURCE_SECTION, emptyQuery ? null : HIGHLIGHT_QUERY_MATCH);
 			} else {
 				String name = FeaturesFile.get(section).name;
@@ -866,7 +913,7 @@ public class FabricationConfigScreen extends Screen {
 	private boolean drawButton(MatrixStack matrices, int x, int y, int w, int h, String text, float mouseX, float mouseY) {
 		boolean click = false;
 		boolean hover = mouseX >= x && mouseX <= x+w && mouseY >= y && mouseY <= y+h;
-		fill(matrices, x, y, x+w, y+h, MixinConfigPlugin.isEnabled("general.dark_mode") ? 0x44FFFFFF : 0x55000000);
+		fill(matrices, x, y, x+w, y+h, FabConf.isEnabled("general.dark_mode") ? 0x44FFFFFF : 0x55000000);
 		if (hover) {
 			fill(matrices, x, y, x+w, y+1, -1);
 			fill(matrices, x, y, x+1, y+h, -1);
@@ -980,14 +1027,16 @@ public class FabricationConfigScreen extends Screen {
 			fill(matrices, 134+15, 1, 134+15+15, 10, 0x33000000);
 			fill(matrices, 134+45, 1, 134+45+15, 10, 0x33000000);
 		}
-		matrices.push();
-		matrices.translate(134+(prevX+((curX-prevX)*a)), 0, 0);
-		int knobAlpha = ((int)((noValue ? 1-da : 1) * 255))<<24;
-		fill(matrices, 0, 1, noUnset ? 22 : onlyBannable ? 30 : 15, 10, MathHelper.hsvToRgb(Math.floorMod((int)(prevHue+((curHue-prevHue)*a)), 360)/360f, 0.9f, (prevHSValue+((curHSValue-prevHSValue)*a))/100f)|knobAlpha);
-		if (!noUnset && a >= 1 && currentValue == ConfigValue.UNSET && !onlyBannable) {
-			fill(matrices, keyEnabled ? 15 : -1, 1, keyEnabled ? 16 : 0, 10, MathHelper.hsvToRgb((keyEnabled ? 120 : 0)/360f, 0.9f, 0.8f)|knobAlpha);
+		if (!FabConf.hasWorldPath() || FabConf.doesWorldContainValue(key)) {
+			matrices.push();
+			matrices.translate(134 + (prevX + ((curX - prevX) * a)), 0, 0);
+			int knobAlpha = ((int) ((noValue ? 1 - da : 1) * 255)) << 24;
+			fill(matrices, 0, 1, noUnset ? 22 : onlyBannable ? 30 : 15, 10, MathHelper.hsvToRgb(Math.floorMod((int) (prevHue + ((curHue - prevHue) * a)), 360) / 360f, 0.9f, (prevHSValue + ((curHSValue - prevHSValue) * a)) / 100f) | knobAlpha);
+			if (!noUnset && a >= 1 && currentValue == ConfigValue.UNSET && !onlyBannable) {
+				fill(matrices, keyEnabled ? 15 : -1, 1, keyEnabled ? 16 : 0, 10, MathHelper.hsvToRgb((keyEnabled ? 120 : 0) / 360f, 0.9f, 0.8f) | knobAlpha);
+			}
+			matrices.pop();
 		}
-		matrices.pop();
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 		RenderSystem.setShaderTexture(0, new Identifier("fabrication", "configvalue.png"));
@@ -1045,10 +1094,27 @@ public class FabricationConfigScreen extends Screen {
 									newValue == ConfigValue.UNSET ? SoundEvents.BLOCK_NOTE_BLOCK_COW_BELL :
 										SoundEvents.BLOCK_NOTE_BLOCK_CHIME,
 										0.6f+pitch, 1f));
-					if (newValue != currentValue) {
+					if (newValue != currentValue || (FabConf.hasWorldPath() && !FabConf.doesWorldContainValue(key))) {
 						optionPreviousValues.put(key, currentValue);
 						optionAnimationTime.compute(key, (k, f) -> 5 - (f == null ? 0 : f));
 						setValue(key, newValue.toString().toLowerCase(Locale.ROOT));
+					}
+				}
+			}
+		}
+		if (didRclick && FabConf.hasWorldPath()) {
+			if (mouseX >= 134 && mouseX <= 134+trackSize && mouseY >= y+1 && mouseY <= y+10) {
+				float pitch = y*0.005f;
+				if (disabled) {
+					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO, 0.8f, 1));
+					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO, 0.7f, 1));
+					tooltipBlinkTicks = 20;
+				} else {
+					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.ITEM_AXE_SCRAPE, 0.6f+pitch, 1f));
+					if (FabConf.doesWorldContainValue(key)) {
+						optionPreviousValues.put(key, currentValue);
+						optionAnimationTime.compute(key, (k, f) -> 5 - (f == null ? 0 : f));
+						setValue(key, "root");
 					}
 				}
 			}
@@ -1075,11 +1141,15 @@ public class FabricationConfigScreen extends Screen {
 		y += drawWrappedText(matrices, startX, 2, drawTitle, width-startX-6, 0xFFFFFF | textAlpha, false)*scale;
 		int endX = startY == y-8 ? width - 6 : startX+textRenderer.getWidth(title);
 		//		int endX = textRenderer.draw(matrices, title, startX, 2, 0xFFFFFF | textAlpha);
-		FeatureEntry feature = FeaturesFile.get(key);
-		if (mouseX >= 134+trackSize && mouseX <= endX && mouseY >= startY+1 && mouseY <= startY+10 && (feature.fscript != null || feature.extend !=null && FeaturesFile.get(MixinConfigPlugin.remap(feature.extend)).fscript != null) && Agnos.isModLoaded("fscript")){
+		if (mouseX >= 134+trackSize && mouseX <= endX && mouseY >= startY+1 && mouseY <= startY+10 && submenus.containsKey(key)){
 			if (didClick){
 				client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1f));
-				client.setScreen(OptionalFScriptScreen.construct(this, prideFlag, feature.fscript != null ? title : FeaturesFile.get(MixinConfigPlugin.remap(feature.extend)).name, feature.fscript != null ? key : MixinConfigPlugin.remap(feature.extend)));
+				Map<String, FeatureSubmenu> menus = submenus.get(key);
+				if (menus.size() == 1){
+					client.setScreen(menus.values().stream().findAny().get().construct(this, prideFlag, title, key));
+				} else {
+					client.setScreen(new SelectionScreen(this, new ArrayList<>(menus.keySet()), s -> menus.get(s).construct(this, prideFlag, title, key)));
+				}
 			}
 			fill(matrices, startX-2, 9, endX, 10, -1);
 		}
@@ -1194,7 +1264,7 @@ public class FabricationConfigScreen extends Screen {
 
 	@Override
 	public void onClose() {
-		if (!MixinConfigPlugin.isEnabled("*.reduced_motion") && !leaving) {
+		if (!FabConf.isEnabled("*.reduced_motion") && !leaving) {
 			leaving = true;
 			client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_BARREL_CLOSE, 0.7f));
 			client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_SHROOMLIGHT_PLACE, 2f, 1f));
@@ -1255,12 +1325,20 @@ public class FabricationConfigScreen extends Screen {
 				}
 			} else {
 				if (mouseX > (width-120) && mouseY < 16) {
-					if (whyCantConfigureServer == null) {
+					if (client.world == null) {
+						client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_XYLOPHONE, 0.8f, 1));
+						if (FabConf.hasWorldPath()) {
+							FabConf.setWorldPath(null);
+						} else {
+							openWorldSelector();
+							return super.mouseClicked(mouseX, mouseY, button);
+						}
+					} else if (whyCantConfigureServer == null) {
 						hasClonked = false;
 						serverAnimateTime = 10-serverAnimateTime;
 						configuringServer = true;
 						client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_XYLOPHONE, 1.2f, 1));
-					} else {
+					}  else {
 						client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO, 0.8f, 1));
 						client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO, 0.7f, 1));
 						tooltipBlinkTicks = 20;
@@ -1268,11 +1346,87 @@ public class FabricationConfigScreen extends Screen {
 				}
 			}
 			didClick = true;
+		} else if (button == 1) {
+			didRclick = true;
 		}
 		if ("search".equals(selectedSection)) {
 			searchField.mouseClicked(mouseX, mouseY, button);
 		}
 		return super.mouseClicked(mouseX, mouseY, button);
+	}
+
+	public class DrawableSave implements SelectionScreen.PreciseDrawable {
+		final File file;
+		Identifier icon;
+
+		public DrawableSave(File file) {
+			this.file = file;
+			File iconFile = new File(file, "icon.png");
+			this.icon = new Identifier("fabrication", "worlds/" + this.hashCode());
+			if (iconFile.isFile()) {
+				try {
+					FileInputStream inputStream = new FileInputStream(iconFile);
+					NativeImage nativeImage = NativeImage.read(inputStream);
+					NativeImageBackedTexture nativeImageBackedTexture = new NativeImageBackedTexture(nativeImage);
+					client.getTextureManager().registerTexture(this.icon, nativeImageBackedTexture);
+					inputStream.close();
+				} catch (Throwable e) {
+					FabLog.error("Invalid icon for world {}", e);
+					icon = null;
+				}
+			} else {
+				client.getTextureManager().destroyTexture(this.icon);
+				icon = null;
+			}
+		}
+
+		@Override
+		public void render(MatrixStack matrices, float x, float y, float delta) {
+			textRenderer.drawWithShadow(matrices, file.getName(), 38+x, y, -1);
+			textRenderer.drawWithShadow(matrices, file.getPath(), 38+x, y+20, -1);
+			if (icon != null) {
+				RenderSystem.setShaderTexture(0, icon);
+				drawTexture(matrices, (int) x, (int) y, 0, 0, 0, 32, 32, 32, 32);
+			}
+		}
+
+		@Override
+		public int width() {
+			return 38 + textRenderer.getWidth(file.getPath());
+		}
+
+		@Override
+		public int height() {
+			return 38;
+		}
+
+		@Override
+		public Object val() {
+			return file;
+		}
+	}
+	public void openWorldSelector() {
+		try {
+			Path savesDir = client.getLevelStorage().getSavesDirectory();
+			if (Files.isDirectory(savesDir)) {
+				List<DrawableSave> files = Arrays.stream(savesDir.toFile().listFiles()).filter(f -> {
+					if (!f.isDirectory()) return false;
+					try {
+						return !SessionLock.isLocked(f.toPath());
+					} catch (Exception var10) {
+						return false;
+					}
+				}).map(DrawableSave::new).collect(Collectors.toList());
+				if (files.isEmpty()) return;
+				if (files.size() == 1) setWorldMode(files.get(0).val());
+				else client.setScreen(new SelectionScreen(this, files, this::setWorldMode));
+			}
+		}catch (Exception e) {
+			FabLog.error("Failed to load levels", e);
+		}
+	}
+	public void setWorldMode(Object toFile) {
+		FabConf.setWorldPath(((File)toFile).toPath());
 	}
 
 	@Override
@@ -1335,7 +1489,7 @@ public class FabricationConfigScreen extends Screen {
 		if (configuringServer) {
 			return ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerFailedConfig().contains(key);
 		} else {
-			return MixinConfigPlugin.isFailed(key);
+			return FabConf.isFailed(key);
 		}
 	}
 
@@ -1344,7 +1498,7 @@ public class FabricationConfigScreen extends Screen {
 			return ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerTrileanConfig().containsKey(key) ||
 					((GetServerConfig)client.getNetworkHandler()).fabrication$getServerStringConfig().containsKey(key);
 		} else {
-			return MixinConfigPlugin.isValid(key);
+			return FabConf.isValid(key);
 		}
 	}
 
@@ -1352,7 +1506,7 @@ public class FabricationConfigScreen extends Screen {
 		if (configuringServer) {
 			return ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerTrileanConfig().containsKey(key);
 		} else {
-			return MixinConfigPlugin.isStandardValue(key);
+			return FabConf.isStandardValue(key);
 		}
 	}
 
@@ -1360,7 +1514,7 @@ public class FabricationConfigScreen extends Screen {
 		if (configuringServer) {
 			return ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerTrileanConfig().getOrDefault(key, ResolvedConfigValue.DEFAULT_FALSE);
 		} else {
-			return MixinConfigPlugin.getResolvedValue(key);
+			return FabConf.getResolvedValue(key);
 		}
 	}
 
@@ -1380,7 +1534,7 @@ public class FabricationConfigScreen extends Screen {
 				return ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerStringConfig().get(key);
 			}
 		} else {
-			return MixinConfigPlugin.getRawValue(key);
+			return FabConf.getRawValue(key);
 		}
 	}
 
@@ -1397,7 +1551,8 @@ public class FabricationConfigScreen extends Screen {
 			newlyUnbannedKeys = newlyUnbannedKeysClient;
 		}
 		String oldValue = getRawValue(key);
-		if (!MixinConfigPlugin.isRuntimeConfigurable(key) && !(configuringServer && FeaturesFile.get(key).sides == Sides.CLIENT_ONLY)) {
+		//TODO count banned world values
+		if (!FabConf.isRuntimeConfigurable(key) && !(configuringServer && FeaturesFile.get(key).sides == Sides.CLIENT_ONLY) && !FabConf.hasWorldPath()) {
 			if (value.equals("banned")) {
 				if (newlyUnbannedKeys.contains(key)) {
 					newlyUnbannedKeys.remove(key);
@@ -1418,8 +1573,13 @@ public class FabricationConfigScreen extends Screen {
 			data.writeString(key);
 			data.writeString(value);
 			client.getNetworkHandler().sendPacket(new CustomPayloadC2SPacket(new Identifier("fabrication", "config"), data));
+		} else if (FabConf.hasWorldPath()) {
+			FabConf.worldSet(key, value);
+			if (FabricationMod.isAvailableFeature(key)) {
+				FabricationMod.updateFeature(key);
+			}
 		} else {
-			MixinConfigPlugin.set(key, value);
+			FabConf.set(key, value);
 			if (FabricationMod.isAvailableFeature(key)) {
 				FabricationMod.updateFeature(key);
 			}
@@ -1489,5 +1649,8 @@ public class FabricationConfigScreen extends Screen {
 		}
 	}
 
-
+	@FunctionalInterface
+	public interface FeatureSubmenu {
+		Screen construct(Screen parent, PrideFlag prideFlag, String title, String configKey);
+	}
 }

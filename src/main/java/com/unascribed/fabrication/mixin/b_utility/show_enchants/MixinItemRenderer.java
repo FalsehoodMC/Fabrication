@@ -2,6 +2,7 @@ package com.unascribed.fabrication.mixin.b_utility.show_enchants;
 
 import java.util.List;
 
+import com.unascribed.fabrication.FabConf;
 import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -11,7 +12,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import com.google.common.collect.Lists;
 
@@ -45,7 +45,7 @@ public class MixinItemRenderer {
 		MatrixStack matrixStack = new MatrixStack();
 		matrixStack.translate(0, 0, zOffset + 200);
 		VertexConsumerProvider.Immediate vc = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
-		if (stack.getItem() == Items.ENCHANTED_BOOK && MixinConfigPlugin.isEnabled("*.books_show_enchants")) {
+		if (stack.getItem() == Items.ENCHANTED_BOOK && FabConf.isEnabled("*.books_show_enchants")) {
 			NbtList tag = EnchantedBookItem.getEnchantmentNbt(stack);
 			List<Enchantment> valid = Lists.newArrayList();
 			for (int i = 0; i < tag.size(); i++) {
@@ -88,7 +88,7 @@ public class MixinItemRenderer {
 			renderer.draw(firstCodepoint, x, y + 6 + 3, display.isCursed() ? 0xFFFF5555 : display.isTreasure() ? 0xFF55FFFF : 0xFFFFFFFF, true, matrixStack.peek().getModel(), vc, false, 0, 0xF000F0);
 			vc.draw();
 		}
-		if (MixinConfigPlugin.isEnabled("*.tools_show_important_enchant")) {
+		if (FabConf.isEnabled("*.tools_show_important_enchant")) {
 			Enchantment display = null;
 			if (EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, stack) > 0) {
 				display = Enchantments.SILK_TOUCH;

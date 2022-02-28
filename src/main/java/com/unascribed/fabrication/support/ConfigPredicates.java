@@ -13,7 +13,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-import static com.unascribed.fabrication.support.MixinConfigPlugin.remap;
+import static com.unascribed.fabrication.FabConf.remap;
 
 public class ConfigPredicates {
 

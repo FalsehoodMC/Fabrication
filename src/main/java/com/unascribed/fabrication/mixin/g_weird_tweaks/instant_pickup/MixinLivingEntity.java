@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.g_weird_tweaks.instant_pickup;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -8,7 +9,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.logic.InstantPickup;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -30,7 +30,7 @@ public abstract class MixinLivingEntity extends Entity {
 
 	@Inject(at=@At("TAIL"), method="onDeath(Lnet/minecraft/entity/damage/DamageSource;)V")
 	public void onDeath(DamageSource src, CallbackInfo ci) {
-		if (MixinConfigPlugin.isEnabled("*.instant_pickup") && src.getSource() instanceof PlayerEntity) {
+		if (FabConf.isEnabled("*.instant_pickup") && src.getSource() instanceof PlayerEntity) {
 			InstantPickup.slurp(world, getBoundingBox().expand(0.25), (PlayerEntity)src.getSource());
 		}
 	}

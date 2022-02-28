@@ -1,8 +1,8 @@
 package com.unascribed.fabrication.mixin.g_weird_tweaks.source_dependent_iframes;
 
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.interfaces.TickSourceIFrames;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -31,7 +31,7 @@ public abstract class MixinLivingEntity extends Entity implements TickSourceIFra
 
 	@Inject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z")
 	private void checkDependentIFrames(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-		if (!MixinConfigPlugin.isEnabled("*.source_dependent_iframes")) return;
+		if (!FabConf.isEnabled("*.source_dependent_iframes")) return;
 		if (fabrication$iframeTracker.add(source.getName() + (source.getAttacker() == null || source.getAttacker().getUuid() == null ? ":direct" :  source.getAttacker().getUuid().toString()))) {
 			this.timeUntilRegen = 0;
 		}else {
@@ -40,14 +40,14 @@ public abstract class MixinLivingEntity extends Entity implements TickSourceIFra
 	}
 	@Inject(at=@At(value="INVOKE", target="Lnet/minecraft/entity/LivingEntity;applyDamage(Lnet/minecraft/entity/damage/DamageSource;F)V"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z")
 	private void setSourceDependentIFrames(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-		if (!MixinConfigPlugin.isEnabled("*.source_dependent_iframes")) return;
+		if (!FabConf.isEnabled("*.source_dependent_iframes")) return;
 		if (fabrication$timeUntilRegen == 0){
 			fabrication$timeUntilRegen = 10;
 		}
 	}
 	@Inject(at=@At("HEAD"), method="baseTick()V")
 	private void tickSourceDependentIFrames(CallbackInfo ci) {
-		if (!MixinConfigPlugin.isEnabled("*.source_dependent_iframes") || ((Object)this) instanceof ServerPlayerEntity) return;
+		if (!FabConf.isEnabled("*.source_dependent_iframes") || ((Object)this) instanceof ServerPlayerEntity) return;
 		fabrication$tickSourceDependentIFrames();
 	}
 	@Override
@@ -58,5 +58,5 @@ public abstract class MixinLivingEntity extends Entity implements TickSourceIFra
 			fabrication$iframeTracker.clear();
 		}
 	}
-	
+
 }

@@ -2,6 +2,7 @@ package com.unascribed.fabrication.mixin.b_utility.legacy_command_syntax;
 
 import java.util.Optional;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -11,7 +12,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.logic.LegacyIDs;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import com.google.common.base.CharMatcher;
 
@@ -34,7 +34,7 @@ public class MixinItemStringReader {
 			method="readItem()V")
 	public Optional<Item> getOrEmpty(DefaultedRegistry<Item> subject, Identifier id) {
 		fabrication$legacyDamageNbt = null;
-		if (MixinConfigPlugin.isEnabled("*.legacy_command_syntax")) {
+		if (FabConf.isEnabled("*.legacy_command_syntax")) {
 			String numId;
 			String meta;
 			if (id.getNamespace().equals("minecraft")) {

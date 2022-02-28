@@ -4,11 +4,11 @@ import java.util.Locale;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.unascribed.fabrication.Agnos;
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.client.FabricationConfigScreen;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Feature;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
@@ -35,7 +35,7 @@ public class FeatureToggleStance implements Feature {
 		public Stance next() {
 			switch (this) {
 				case STANDING: return SNEAKING;
-				case SNEAKING: return MixinConfigPlugin.isEnabled("*.crawling") ? CRAWLING : STANDING;
+				case SNEAKING: return FabConf.isEnabled("*.crawling") ? CRAWLING : STANDING;
 				case CRAWLING: return STANDING;
 				default: throw new AssertionError("missing case for "+this);
 			}

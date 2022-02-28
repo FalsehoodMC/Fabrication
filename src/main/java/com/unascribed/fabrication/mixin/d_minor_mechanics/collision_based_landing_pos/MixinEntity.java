@@ -1,7 +1,7 @@
 package com.unascribed.fabrication.mixin.d_minor_mechanics.collision_based_landing_pos;
 
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -26,7 +26,7 @@ public abstract class MixinEntity {
 
 	@Inject(method="getLandingPos()Lnet/minecraft/util/math/BlockPos;", at=@At(value="HEAD"), cancellable=true)
 	public void getLandingPos(CallbackInfoReturnable<BlockPos> cir) {
-		if (!MixinConfigPlugin.isEnabled("*.collision_based_landing_pos")) return;
+		if (!FabConf.isEnabled("*.collision_based_landing_pos")) return;
 		world.getBlockCollisions((Entity)(Object)this, this.entityBounds.offset(0, -0.20000000298023224D, 0), (state, pos) -> pos.getY() <= this.getY()).findFirst().ifPresent(
 				vs -> cir.setReturnValue(new BlockPos(vs.getBoundingBox().getCenter()))
 		);

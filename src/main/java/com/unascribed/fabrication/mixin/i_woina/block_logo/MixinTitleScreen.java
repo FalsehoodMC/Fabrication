@@ -2,6 +2,7 @@ package com.unascribed.fabrication.mixin.i_woina.block_logo;
 
 import java.util.function.BiConsumer;
 
+import com.unascribed.fabrication.FabConf;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,7 +19,6 @@ import com.unascribed.fabrication.loaders.LoaderBlockLogo;
 import com.unascribed.fabrication.logic.LogoBlock;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -76,7 +76,7 @@ public class MixinTitleScreen extends Screen {
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/client/gui/screen/TitleScreen.drawWithOutline(IILjava/util/function/BiConsumer;)V"),
 			method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V", expect=2)
 	public void drawLogo(TitleScreen subject, int x, int y, BiConsumer<Integer, Integer> callback) {
-		if (!MixinConfigPlugin.isEnabled("*.block_logo")) {
+		if (!FabConf.isEnabled("*.block_logo")) {
 			subject.drawWithOutline(x, y, callback);
 			return;
 		}
@@ -88,7 +88,7 @@ public class MixinTitleScreen extends Screen {
 	@ModifyArg(at=@At(value="INVOKE", target="com/mojang/blaze3d/systems/RenderSystem.setShaderTexture(ILnet/minecraft/util/Identifier;)V", ordinal=2),
 			method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V", require=0)
 	public Identifier setShaderTextureDev(Identifier id) {
-		if (MixinConfigPlugin.isEnabled("*.block_logo") && id == EDITION_TITLE_TEXTURE) {
+		if (FabConf.isEnabled("*.block_logo") && id == EDITION_TITLE_TEXTURE) {
 			id = FABRICATION$EMPTY;
 		}
 		return id;
@@ -97,7 +97,7 @@ public class MixinTitleScreen extends Screen {
 	@ModifyArg(at=@At(value="INVOKE", target="com/mojang/blaze3d/systems/RenderSystem.setShaderTexture(ILnet/minecraft/class_2960;)V", ordinal=2),
 			method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V", require=0)
 	public Identifier setShaderTextureObf(Identifier id) {
-		if (MixinConfigPlugin.isEnabled("*.block_logo") && id == EDITION_TITLE_TEXTURE) {
+		if (FabConf.isEnabled("*.block_logo") && id == EDITION_TITLE_TEXTURE) {
 			id = FABRICATION$EMPTY;
 		}
 		return id;
@@ -105,21 +105,21 @@ public class MixinTitleScreen extends Screen {
 
 	@Inject(at=@At("HEAD"), method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
 	public void renderHead(MatrixStack matrices, int mouseX, int mouseY, float tickDelta, CallbackInfo ci) {
-		if (!MixinConfigPlugin.isEnabled("*.block_logo")) return;
+		if (!FabConf.isEnabled("*.block_logo")) return;
 		fabrication$splashText = splashText;
 		splashText = null;
 	}
 
 	@Inject(at=@At("RETURN"), method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
 	public void renderReturn(MatrixStack matrices, int mouseX, int mouseY, float tickDelta, CallbackInfo ci) {
-		if (!MixinConfigPlugin.isEnabled("*.block_logo")) return;
+		if (!FabConf.isEnabled("*.block_logo")) return;
 		splashText = fabrication$splashText;
 		fabrication$splashText = null;
 	}
 
 	@Inject(at=@At("TAIL"), method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
 	public void renderTail(MatrixStack matrices, int mouseX, int mouseY, float tickDelta, CallbackInfo ci) {
-		if (!MixinConfigPlugin.isEnabled("*.block_logo")) return;
+		if (!FabConf.isEnabled("*.block_logo")) return;
 		if (splashText != null) {
 			float fade = doBackgroundFade ? MathHelper.clamp(((Util.getMeasuringTimeMs() - backgroundFadeStart) / 1000f)-1, 0, 1) : 1;
 			int l = MathHelper.ceil(fade * 255.0f) << 24;
@@ -138,7 +138,7 @@ public class MixinTitleScreen extends Screen {
 
 	@Inject(at=@At("TAIL"), method="tick()V")
 	public void tick(CallbackInfo ci) {
-		if (!MixinConfigPlugin.isEnabled("*.block_logo")) return;
+		if (!FabConf.isEnabled("*.block_logo")) return;
 		if (fabrication$blocks != null) {
 			for (LogoBlock[] fabrication$block : fabrication$blocks) {
 				for (LogoBlock blk : fabrication$block) {

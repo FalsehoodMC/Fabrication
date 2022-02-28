@@ -1,11 +1,11 @@
 package com.unascribed.fabrication.mixin.z_combined.trident_enchantments;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -24,17 +24,17 @@ public class MixinTridentEntity {
 			method="onEntityHit(Lnet/minecraft/util/hit/EntityHitResult;)V")
 	public float getAttackDamage(ItemStack stack, EntityGroup grp, EntityHitResult ehr) {
 		ItemStack real = stack;
-		if (MixinConfigPlugin.isEnabled("*.tridents_accept_sharpness") && EnchantmentHelper.getLevel(Enchantments.SHARPNESS, stack) > 0) {
+		if (FabConf.isEnabled("*.tridents_accept_sharpness") && EnchantmentHelper.getLevel(Enchantments.SHARPNESS, stack) > 0) {
 			// prevents sharpness from increasing trident ranged damage, as it does in vanilla
 			// this is a hacky way to do it, but it works and doesn't involve copying code out of EnchantmentHelper
 			stack = real.copy();
 			EnchantmentHelper.set(ImmutableMap.of(Enchantments.SHARPNESS, 0), stack);
 		}
-		if (MixinConfigPlugin.isEnabled("*.bedrock_impaling") && EnchantmentHelper.getLevel(Enchantments.IMPALING, stack) > 0 && ehr.getEntity().isWet()) {
+		if (FabConf.isEnabled("*.bedrock_impaling") && EnchantmentHelper.getLevel(Enchantments.IMPALING, stack) > 0 && ehr.getEntity().isWet()) {
 			grp = EntityGroup.AQUATIC;
 		}
 		float base = 8 + EnchantmentHelper.getAttackDamage(stack, grp);
-		int power = MixinConfigPlugin.isEnabled("*.tridents_accept_power") ? EnchantmentHelper.getLevel(Enchantments.POWER, real) : 0;
+		int power = FabConf.isEnabled("*.tridents_accept_power") ? EnchantmentHelper.getLevel(Enchantments.POWER, real) : 0;
 		if (power > 0) {
 			base *= 1 + (0.25f * (power + 1));
 		}

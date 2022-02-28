@@ -1,7 +1,7 @@
 package com.unascribed.fabrication.mixin.e_mechanics.toggleable_furnace_carts;
 
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.PoweredRailBlock;
@@ -37,7 +37,7 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 
 	@Inject(at=@At("HEAD"), method="moveOnRail(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)V")
 	protected void toggleOnUnpoweredPoweredRail(BlockPos pos, BlockState state, CallbackInfo ci) {
-		if (!MixinConfigPlugin.isEnabled("*.toggleable_furnace_carts")) return;
+		if (!FabConf.isEnabled("*.toggleable_furnace_carts")) return;
 		if (state.isOf(Blocks.POWERED_RAIL) && !state.get(PoweredRailBlock.POWERED)) {
 			if (fuel > 0) {
 				fabrication$pauseFuel += fuel;

@@ -3,6 +3,7 @@ package com.unascribed.fabrication.mixin.g_weird_tweaks.dimensional_tools;
 import java.util.Collections;
 import java.util.Set;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -11,7 +12,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.unascribed.fabrication.loaders.LoaderDimensionalTools;
 import com.unascribed.fabrication.loaders.LoaderDimensionalTools.MohsIdentifier;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import com.google.common.collect.Sets;
 
@@ -37,7 +37,7 @@ public class MixinMiningToolItem {
 	@Inject(at=@At("HEAD"), method="postMine(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/LivingEntity;)Z",
 			cancellable=true)
 	public void postMine(ItemStack stack, World world, BlockState state, BlockPos pos, LivingEntity miner, CallbackInfoReturnable<Boolean> ci) {
-		if (!MixinConfigPlugin.isEnabled("*.dimensional_tools")) return;
+		if (!FabConf.isEnabled("*.dimensional_tools")) return;
 		if (world.isClient) return;
 		if ((!(miner instanceof PlayerEntity) || !((PlayerEntity)miner).getAbilities().creativeMode)) {
 			if (!stack.isDamageable()) return;

@@ -1,10 +1,10 @@
 package com.unascribed.fabrication.mixin.c_tweaks.tridents_in_void_return;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -30,7 +30,7 @@ public abstract class MixinTridentEntity extends Entity {
 	@Override
 	protected void tickInVoid() {
 		TridentEntity self = (TridentEntity)(Object)this;
-		if (MixinConfigPlugin.isEnabled("*.tridents_in_void_return") && self.getOwner() != null) {
+		if (FabConf.isEnabled("*.tridents_in_void_return") && self.getOwner() != null) {
 			int i = this.dataTracker.get(LOYALTY);
 			if (i > 0) {
 				this.dealtDamage = true;

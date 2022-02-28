@@ -1,9 +1,9 @@
 package com.unascribed.fabrication.client;
 
 import com.mojang.brigadier.tree.CommandNode;
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.loaders.LoaderFScript;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.OptionalFScript;
 import io.github.queerbric.pride.PrideFlag;
 import io.netty.buffer.Unpooled;
@@ -18,8 +18,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
 import tf.ssf.sfort.script.ScriptingScreen;
 
-import java.util.Set;
-import java.util.function.Consumer;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class FScriptScreen extends ScriptingScreen {
@@ -98,8 +97,8 @@ public class FScriptScreen extends ScriptingScreen {
 				if (script != null){
 					this.loadScript(script);
 				} else {
-					Set<FeaturesFile.FeatureEntry> eq = MixinConfigPlugin.getEquivalent(configKey).stream().map(FeaturesFile::get).filter(f->f.fscriptDefault!=null).collect(Collectors.toSet());
-					if (!eq.isEmpty()) this.client.setScreen(new SelectScreen(this, eq, this::loadScript));
+					List<String> eq = FabConf.getEquivalent(configKey).stream().map(FeaturesFile::get).filter(f->f.fscriptDefault!=null).map(f->f.name).collect(Collectors.toList());
+					if (!eq.isEmpty()) this.client.setScreen(new SelectionScreen(this, eq, this::fabrication$loadDefaultKey));
 				}
 			}else{
 				PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
@@ -111,6 +110,11 @@ public class FScriptScreen extends ScriptingScreen {
 		}
 	}
 
+	public void fabrication$loadDefaultKey(Object key) {
+		FeaturesFile.FeatureEntry val = FeaturesFile.get(key.toString());
+		if (val != null && val.fscriptDefault != null) loadScript(val.fscriptDefault);
+	}
+
 	public void fabrication$setScript(String script){
 		if(script != null && requestedScript){
 			this.loadScript(script);
@@ -120,12 +124,12 @@ public class FScriptScreen extends ScriptingScreen {
 
 	@Override
 	protected boolean drawButton(MatrixStack matrices, int x, int y, int w, int h, String text, String desc, int mouseX, int mouseY) {
-		fill(matrices, x, y, x+w, y+h, MixinConfigPlugin.isEnabled("general.dark_mode") ? 0x44FFFFFF : 0x55000000);
+		fill(matrices, x, y, x+w, y+h, FabConf.isEnabled("general.dark_mode") ? 0x44FFFFFF : 0x55000000);
 		return super.drawButton(matrices, x, y, w, h, text, desc, mouseX, mouseY);
 	}
 	@Override
 	protected boolean drawToggleButton(MatrixStack matrices, int x, int y, int w, int h, String text, String desc, int mouseX, int mouseY, boolean toggled) {
-		fill(matrices, x, y, x+w, y+h, MixinConfigPlugin.isEnabled("general.dark_mode") ? 0x44FFFFFF : 0x55000000);
+		fill(matrices, x, y, x+w, y+h, FabConf.isEnabled("general.dark_mode") ? 0x44FFFFFF : 0x55000000);
 		return super.drawToggleButton(matrices, x, y, w, h, text, desc, mouseX, mouseY, toggled);
 	}
 	@Override
@@ -137,66 +141,4 @@ public class FScriptScreen extends ScriptingScreen {
 		renderBackground(matrices);
 	}
 
-	private static class SelectScreen extends Screen {
-		final FScriptScreen parent;
-		final Set<FeaturesFile.FeatureEntry> features;
-		final Consumer<String> out;
-		float sidebarScrollTarget;
-		float sidebarScroll;
-		float sidebarHeight;
-		boolean didClick = false;
-
-		protected SelectScreen(FScriptScreen parent, Set<FeaturesFile.FeatureEntry> options, Consumer<String> out) {
-			super(parent.title);
-			this.out = out;
-			this.parent = parent;
-			this.features = options;
-		}
-		@Override
-		public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-			parent.renderBackground(matrices);
-			float scroll = sidebarHeight < height ? 0 : sidebarScroll;
-			sidebarHeight = 20;
-			scroll = (float) (Math.floor((scroll*client.getWindow().getScaleFactor()))/client.getWindow().getScaleFactor());
-			float y = 22-scroll;
-			for (FeaturesFile.FeatureEntry feature : features) {
-				textRenderer.drawWithShadow(matrices, feature.name, 16, y, -1);
-				if (mouseY > y-2 && mouseY < y+10) {
-					fill(matrices, 0, (int) y+11, textRenderer.getWidth(feature.name)+16, (int) y+12, -1);
-					if (didClick){
-						out.accept(feature.fscriptDefault);
-						onClose();
-					}
-				}
-				sidebarHeight+=20;
-				y+=20;
-			}
-
-		}
-		@Override
-		public void tick() {
-			super.tick();
-			if (sidebarHeight > height) {
-				sidebarScroll += (sidebarScrollTarget-sidebarScroll)/2;
-				if (sidebarScrollTarget < 0) sidebarScrollTarget /= 2;
-				float h = sidebarHeight-height;
-				if (sidebarScrollTarget > h) sidebarScrollTarget = h+((sidebarScrollTarget-h)/2);
-			}
-		}
-		@Override
-		public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-			sidebarScrollTarget -= amount*20;
-			return super.mouseScrolled(mouseX, mouseY, amount);
-		}
-		@Override
-		public void onClose() {
-			client.setScreen(parent);
-		}
-		@Override
-		public boolean mouseClicked(double mouseX, double mouseY, int button) {
-			if (button == 0 || button == 1) didClick = true;
-			return super.mouseClicked(mouseX, mouseY, button);
-		}
-
-	}
 }

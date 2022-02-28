@@ -17,7 +17,6 @@ import org.spongepowered.asm.mixin.throwables.MixinError;
 import org.spongepowered.asm.mixin.throwables.MixinException;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.MixinErrorHandler_THIS_ERROR_HANDLER_IS_FOR_SOFT_FAILURE_IN_FABRICATION_ITSELF_AND_DOES_NOT_IMPLY_FABRICATION_IS_RESPONSIBLE_FOR_THE_BELOW_ERROR;
 
 import com.google.common.base.Joiner;
@@ -439,7 +438,7 @@ public class FabRefl {
 				if (requiredBy.isEmpty()) throw rethrow(err);
 				FabLog.warn("Failed to retrieve "+desc+" - force-disabling "+Joiner.on(", ").join(requiredBy));
 				for (String s : requiredBy) {
-					MixinConfigPlugin.addFailure(s);
+					FabConf.addFailure(s);
 				}
 				return null;
 			}

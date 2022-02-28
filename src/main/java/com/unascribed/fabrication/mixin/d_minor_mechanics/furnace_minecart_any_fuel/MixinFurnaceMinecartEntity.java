@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.d_minor_mechanics.furnace_minecart_any_fuel;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -9,7 +10,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.block.entity.FurnaceBlockEntity;
 import net.minecraft.entity.EntityType;
@@ -42,7 +42,7 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 
 	@Inject(at=@At("HEAD"), method="interact(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;")
 	public void interact(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> ci) {
-		if (!MixinConfigPlugin.isEnabled("*.furnace_minecart_any_fuel")) return;
+		if (!FabConf.isEnabled("*.furnace_minecart_any_fuel")) return;
 		ItemStack itemStack = player.getStackInHand(hand);
 		if (FurnaceBlockEntity.canUseAsFuel(itemStack)) {
 			int value = FurnaceBlockEntity.createFuelTimeMap().get(itemStack.getItem())*2;
@@ -58,7 +58,7 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/recipe/Ingredient.test(Lnet/minecraft/item/ItemStack;)Z"),
 			method="interact(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;")
 	public boolean testFuel(Ingredient subject, ItemStack stack) {
-		if (!MixinConfigPlugin.isEnabled("*.furnace_minecart_any_fuel")) return subject.test(stack);
+		if (!FabConf.isEnabled("*.furnace_minecart_any_fuel")) return subject.test(stack);
 		return false;
 	}
 

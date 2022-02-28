@@ -5,8 +5,8 @@ import java.util.function.Predicate;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.FabRefl;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.command.EntitySelector;
@@ -66,7 +66,7 @@ public class CanHitUtil {
 	public static boolean isExempt(Entity shooter) {
 		if (shooter instanceof PlayerEntity) {
 			PlayerEntity p = (PlayerEntity)shooter;
-			return p.getAbilities().creativeMode || (!MixinConfigPlugin.isEnabled("*.adventure_tags_in_survival") && p.canModifyBlocks());
+			return p.getAbilities().creativeMode || (!FabConf.isEnabled("*.adventure_tags_in_survival") && p.canModifyBlocks());
 		}
 		return false;
 	}

@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.z_combined.furnace_minecart;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
@@ -7,7 +8,6 @@ import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 import com.unascribed.fabrication.interfaces.WasShoved;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.entity.vehicle.FurnaceMinecartEntity;
 
@@ -22,7 +22,7 @@ public abstract class MixinFurnaceMinecartEntity {
 		boolean shoved = (this instanceof WasShoved && ((WasShoved)this).fabrication$wasShoved());
 		if (shoved) {
 			speed = 0.2;
-		} else if (MixinConfigPlugin.isEnabled("*.hyperspeed_furnace_minecart") && !shoved) {
+		} else if (FabConf.isEnabled("*.hyperspeed_furnace_minecart") && !shoved) {
 			speed = 2;
 		}
 		if (speed != 1) {

@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.Random;
 
+import com.unascribed.fabrication.FabConf;
 import org.lwjgl.opengl.ARBCopyImage;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
@@ -17,7 +18,6 @@ import com.mojang.blaze3d.platform.TextureUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.loaders.LoaderClassicBlockDrops;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Material;
@@ -60,14 +60,14 @@ public class WoinaDrops {
 	public static boolean mippedBlocksInvalid = true;
 
 	public static int modifyOverlay(ItemStack stack, int overlay) {
-		if (MixinConfigPlugin.isEnabled("*.blinking_drops")) {
+		if (FabConf.isEnabled("*.blinking_drops")) {
 			return OverlayTexture.getUv(Math.max(0, MathHelper.sin((curTimer+(stack.hashCode()%2000))/5.3f))*0.7f, false);
 		}
 		return overlay;
 	}
 
 	public static void interceptRender(ItemRenderer subject, ItemStack stack, ModelTransformation.Mode renderMode, boolean leftHanded, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, BakedModel model) {
-		if (MixinConfigPlugin.isEnabled("*.classic_block_drops")) {
+		if (FabConf.isEnabled("*.classic_block_drops")) {
 			if (stack.getItem() instanceof BlockItem && model instanceof BasicBakedModel && model.hasDepth()) {
 				matrices.push();
 				model.getTransformation().getTransformation(renderMode).apply(leftHanded, matrices);

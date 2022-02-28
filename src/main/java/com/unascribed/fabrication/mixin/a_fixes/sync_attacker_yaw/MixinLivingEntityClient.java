@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.a_fixes.sync_attacker_yaw;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -8,7 +9,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -31,25 +31,25 @@ public abstract class MixinLivingEntityClient extends Entity {
 
 	@Inject(at=@At("HEAD"), method="animateDamage()V")
 	public void animateDamageHead(CallbackInfo ci) {
-		if (!MixinConfigPlugin.isEnabled("*.sync_attacker_yaw")) return;
+		if (!FabConf.isEnabled("*.sync_attacker_yaw")) return;
 		fabrication$lastAttackerYaw = knockbackVelocity;
 	}
 
 	@Inject(at=@At("TAIL"), method="animateDamage()V")
 	public void animateDamageTail(CallbackInfo ci) {
-		if (!MixinConfigPlugin.isEnabled("*.sync_attacker_yaw")) return;
+		if (!FabConf.isEnabled("*.sync_attacker_yaw")) return;
 		knockbackVelocity = fabrication$lastAttackerYaw;
 	}
 
 	@Inject(at=@At("HEAD"), method="handleStatus(B)V")
 	public void handleStatusHead(CallbackInfo ci) {
-		if (!MixinConfigPlugin.isEnabled("*.sync_attacker_yaw")) return;
+		if (!FabConf.isEnabled("*.sync_attacker_yaw")) return;
 		fabrication$lastAttackerYaw = knockbackVelocity;
 	}
 
 	@Inject(at=@At("TAIL"), method="handleStatus(B)V")
 	public void handleStatusTail(CallbackInfo ci) {
-		if (!MixinConfigPlugin.isEnabled("*.sync_attacker_yaw")) return;
+		if (!FabConf.isEnabled("*.sync_attacker_yaw")) return;
 		knockbackVelocity = fabrication$lastAttackerYaw;
 	}
 

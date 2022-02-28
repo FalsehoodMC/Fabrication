@@ -6,6 +6,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.mojang.brigadier.context.CommandContext;
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.features.FeatureFabricationCommand;
@@ -37,7 +38,7 @@ public class OptionalFScript {
 		setScript(configKey, script).ifPresent(e -> FabLog.error("Failed to set script for "+configKey, e));
 	}
 	public static void restoreDefault(String configKey){
-		configKey = MixinConfigPlugin.remap(configKey);
+		configKey = FabConf.remap(configKey);
 		ConfigPredicates.remove(configKey, 2);
 		LoaderFScript.put(configKey, null);
 	}
@@ -47,7 +48,7 @@ public class OptionalFScript {
 		}
 	}
 	private static Optional<Exception> setScript(String configKey, String script){
-		configKey = MixinConfigPlugin.remap(configKey);
+		configKey = FabConf.remap(configKey);
 		try {
 			PredicateProvider<?> predicateProvider = predicateProviders.get(configKey);
 			if (predicateProvider == null) return Optional.of(new Exception("No predicate provider exists for specified key"));

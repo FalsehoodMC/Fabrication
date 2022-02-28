@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.e_mechanics.pursurvers;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -7,7 +8,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -30,7 +30,7 @@ public class MixinServerPlayerInteractionManager {
 			method="processBlockBreakingAction(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/network/packet/c2s/play/PlayerActionC2SPacket$Action;Lnet/minecraft/util/math/Direction;I)V",
 			cancellable=true)
 	public void processBlockBreakingAction(BlockPos pos, PlayerActionC2SPacket.Action action, Direction dir, int worldHeight, CallbackInfo ci) {
-		if (MixinConfigPlugin.isEnabled("*.pursurvers") && action == Action.START_DESTROY_BLOCK) {
+		if (FabConf.isEnabled("*.pursurvers") && action == Action.START_DESTROY_BLOCK) {
 			BlockPos.Mutable mut = new BlockPos.Mutable();
 			for (Direction d : Direction.values()) {
 				mut.set(pos).move(d);

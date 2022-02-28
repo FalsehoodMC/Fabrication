@@ -1,7 +1,7 @@
 package com.unascribed.fabrication.mixin.f_balance.brittle_shields;
 
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ItemStack;
@@ -24,7 +24,7 @@ public abstract class MixinLivingEntity {
 	@Inject(method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z",
 			at=@At(value="INVOKE", target="Lnet/minecraft/entity/LivingEntity;damageShield(F)V"))
 	public void brittleShield(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-		if (!(MixinConfigPlugin.isEnabled("*.brittle_shields") && source.isExplosive())) return;
+		if (!(FabConf.isEnabled("*.brittle_shields") && source.isExplosive())) return;
 		damageShield(activeItemStack.getItem().getMaxDamage());
 	}
 }

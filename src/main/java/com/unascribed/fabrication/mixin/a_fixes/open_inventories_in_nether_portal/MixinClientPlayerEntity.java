@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.a_fixes.open_inventories_in_nether_portal;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -8,7 +9,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -23,12 +23,12 @@ public class MixinClientPlayerEntity {
 
 	@Redirect(method="updateNausea()V", at=@At(value="INVOKE", target="Lnet/minecraft/client/network/ClientPlayerEntity;closeHandledScreen()V"))
 	public void closeHandledScreen(ClientPlayerEntity clientPlayerEntity) {
-		if(!MixinConfigPlugin.isEnabled("*.open_inventories_in_nether_portal"))
+		if(!FabConf.isEnabled("*.open_inventories_in_nether_portal"))
 			clientPlayerEntity.closeHandledScreen();
 	}
 	@Redirect(method="updateNausea()V", at=@At(value="INVOKE", target="Lnet/minecraft/client/MinecraftClient;setScreen(Lnet/minecraft/client/gui/screen/Screen;)V"))
 	public void openScreen(MinecraftClient minecraftClient, Screen screen) {
-		if(!MixinConfigPlugin.isEnabled("*.open_inventories_in_nether_portal"))
+		if(!FabConf.isEnabled("*.open_inventories_in_nether_portal"))
 			client.setScreen(null);
 	}
 }
