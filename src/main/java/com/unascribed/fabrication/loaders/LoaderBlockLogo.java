@@ -1,17 +1,29 @@
 package com.unascribed.fabrication.loaders;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
+import com.google.common.base.Charsets;
+import com.google.common.base.Stopwatch;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.QDIni;
 import com.unascribed.fabrication.support.ConfigLoader;
@@ -35,12 +47,22 @@ public class LoaderBlockLogo implements ConfigLoader {
 	public static boolean unrecoverableLoadError = false;
 	public static NativeImage image;
 	public static BooleanSupplier getReverse = () -> false;
+	public static Reverse rawReverse = Reverse.FALSE;
 	public static final Map<Integer, Supplier<BlockState>> colorToState = Maps.newHashMap();
 	public static boolean sound = false;
 	public static float shadowRed = 0.f;
 	public static float shadowGreen = 0.f;
 	public static float shadowBlue = 0.f;
 	public static float shadowAlpha = 0.f;
+
+	public static int rawShadowRed = 0;
+	public static int rawShadowGreen = 0;
+	public static int rawShadowBlue = 0;
+	public static int rawShadowAlpha = 0;
+	public static final Map<Integer, List<String>> fullColorToState = new HashMap<>();
+	public static final Set<Integer> validColors = new HashSet<>();
+
+	static Path imageFile;
 
 	public enum Reverse {
 		FALSE(() -> false),
@@ -50,6 +72,58 @@ public class LoaderBlockLogo implements ConfigLoader {
 		public final BooleanSupplier sup;
 		Reverse(BooleanSupplier sup) {
 			this.sup = sup;
+		}
+	}
+
+	public static void remove(String key) {
+		Stopwatch watch = Stopwatch.createStarted();
+		StringWriter sw = new StringWriter();
+		Path configFile = Agnos.getConfigDir().resolve("fabrication").resolve("block_logo.ini");
+		try {
+			QDIni.loadAndTransform(configFile, QDIni.simpleLineIniTransformer(((path, line) -> {
+				if (line == null) return null;
+				int i = line.indexOf('=');
+				if (i != -1 && key.equals(path+line.substring(0, i))) {
+					return "";
+				}
+				return line;
+			})), sw);
+			Files.write(configFile, sw.toString().getBytes(Charsets.UTF_8));
+			FabLog.info("Update of "+configFile+" done in "+watch);
+		} catch (IOException e) {
+			FabLog.warn("Failed to update "+configFile+" file", e);
+		}
+	}
+	public static void set(String key, String val) {
+		Stopwatch watch = Stopwatch.createStarted();
+		StringWriter sw = new StringWriter();
+		Path configFile = Agnos.getConfigDir().resolve("fabrication").resolve("block_logo.ini");
+		try {
+			AtomicBoolean found = new AtomicBoolean(false);
+			QDIni.loadAndTransform(configFile, QDIni.simpleValueIniTransformer(((key1, value) -> {
+				if (key1.equals(key)){
+					found.set(true);
+					return val;
+				}
+				return value;
+			})), sw);
+			if (!found.get()){
+				StringWriter sw2 = new StringWriter();
+				QDIni.loadAndTransform("LoaderBlockLogo internal append value", new ByteArrayInputStream(sw.toString().getBytes()),
+						QDIni.simpleLineIniTransformer(((path, line) -> {
+							if (line != null && !found.get() && path != null && !path.isEmpty() && key.startsWith(path)) {
+								found.set(true);
+								return line + "\n" + key.substring(path.length()) + "=" + val;
+							}
+							return line;
+						})), sw2);
+				Files.write(configFile, sw2.toString().getBytes(Charsets.UTF_8));
+			} else {
+				Files.write(configFile, sw.toString().getBytes(Charsets.UTF_8));
+			}
+			FabLog.info("Update of "+configFile+" done in "+watch);
+		} catch (IOException e) {
+			FabLog.warn("Failed to update "+configFile+" file", e);
 		}
 	}
 
@@ -63,19 +137,24 @@ public class LoaderBlockLogo implements ConfigLoader {
 			image = null;
 		}
 
-		getReverse = config.getEnum("general.reverse", Reverse.class).orElse(Reverse.FALSE).sup;
+		rawReverse = config.getEnum("general.reverse", Reverse.class).orElse(Reverse.FALSE);
+		getReverse = rawReverse.sup;
 		sound = config.getBoolean("general.sound").orElse(false);
-		shadowRed = config.getInt("shadow.red").orElse(0) / 255.f;
-		shadowGreen = config.getInt("shadow.green").orElse(0) / 255.f;
-		shadowBlue = config.getInt("shadow.blue").orElse(0) / 255.f;
-		shadowAlpha = config.getInt("shadow.alpha").orElse(225) / 255.f;
+		rawShadowRed = config.getInt("shadow.red").orElse(0);
+		rawShadowGreen = config.getInt("shadow.green").orElse(0);
+		rawShadowBlue = config.getInt("shadow.blue").orElse(0);
+		rawShadowAlpha = config.getInt("shadow.alpha").orElse(0);
+		shadowRed =  rawShadowRed / 255.f;
+		shadowGreen = rawShadowGreen / 255.f;
+		shadowBlue = rawShadowBlue / 255.f;
+		shadowAlpha = rawShadowAlpha / 255.f;
 
 		if (loadError) {
 			unrecoverableLoadError = true;
 			return;
 		}
 		FabLog.timeAndCountWarnings("Loading of block_logo.png", () -> {
-			Path imageFile = configDir.resolve("block_logo.png");
+			imageFile = configDir.resolve("block_logo.png");
 			if (!Files.exists(imageFile)) {
 				try {
 					Resources.asByteSource(MixinConfigPlugin.class.getClassLoader().getResource("default_block_logo.png")).copyTo(MoreFiles.asByteSink(imageFile));
@@ -85,25 +164,8 @@ public class LoaderBlockLogo implements ConfigLoader {
 					return;
 				}
 			}
-			try (InputStream is = Files.newInputStream(imageFile)) {
-				image = NativeImage.read(is);
-			} catch (IOException e) {
-				FabLog.warn("Failed to load block logo", e);
-				unrecoverableLoadError = true;
-				return;
-			}
-			for (int x = 0; x < image.getWidth(); x++) {
-				for (int y = 0; y < image.getHeight(); y++) {
-					int color = image.getPixelColor(x, y);
-					int alpha = (color>>24)&0xFF;
-					if (alpha > 0 && alpha < 255) {
-						FabLog.warn("At "+x+", "+y+" in block_logo.png: Found a pixel that is not fully transparent or fully opaque; ignoring it");
-						image.setPixelColor(x, y, 0);
-					}
-				}
-			}
+			reloadImage();
 		});
-
 		for (String key : config.keySet()) {
 			if (key.startsWith("pixels.")) {
 				String color = key.substring(7);
@@ -116,6 +178,7 @@ public class LoaderBlockLogo implements ConfigLoader {
 				swapped |= (colorInt&0x00FF0000) >> 16;
 					swapped |= (colorInt&0x000000FF) << 16;
 					String[] blocks = config.get(key).orElse("").split(" ");
+					fullColorToState.put(swapped, new ArrayList<>(Arrays.asList(blocks)));
 					colorToState.put(swapped, () -> {
 						// Since this Loader (like all loaders) is called on the mod's initialization,
 						// the block registry might not have been populated by other mods yet.
@@ -146,6 +209,27 @@ public class LoaderBlockLogo implements ConfigLoader {
 		}
 	}
 
+	public static void reloadImage() {
+		try (InputStream is = Files.newInputStream(imageFile)) {
+			image = NativeImage.read(is);
+		} catch (IOException e) {
+			FabLog.warn("Failed to load block logo", e);
+			unrecoverableLoadError = true;
+			return;
+		}
+		validColors.clear();
+		for (int x = 0; x < image.getWidth(); x++) {
+			for (int y = 0; y < image.getHeight(); y++) {
+				int color = image.getPixelColor(x, y);
+				int alpha = (color>>24)&0xFF;
+				if (alpha == 0) validColors.add(color);
+				if (alpha > 0 && alpha < 255) {
+					FabLog.warn("At "+x+", "+y+" in block_logo.png: Found a pixel that is not fully transparent or fully opaque; ignoring it");
+					image.setPixelColor(x, y, 0);
+				}
+			}
+		}
+	}
 	@Override
 	public String getConfigName() {
 		return "block_logo";
