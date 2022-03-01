@@ -61,14 +61,14 @@ public class BlockLogoScreen extends Screen{
 		fill(matrices, 0, startY, width/2, height, FabConf.isEnabled("general.dark_mode") ? 0x44FFFFFF : 0x55000000);
 		if (drawToggleButton(matrices, 5, 5, 60, 20, "Sound", mouseX, mouseY, LoaderBlockLogo.sound)){
 			LoaderBlockLogo.sound = !LoaderBlockLogo.sound;
-			LoaderBlockLogo.set("general.sound", String.valueOf(LoaderBlockLogo.sound));
+			LoaderBlockLogo.instance.set("general.sound", String.valueOf(LoaderBlockLogo.sound));
 		}
 		if (drawToggleButton(matrices, 70, 5, 90, 20, "Reverse: " + LoaderBlockLogo.rawReverse.name(), mouseX, mouseY, false)){
 			int i = LoaderBlockLogo.rawReverse.ordinal()+1;
 			if (i>=LoaderBlockLogo.Reverse.values().length) i=0;
 			LoaderBlockLogo.rawReverse = LoaderBlockLogo.Reverse.values()[i];
 			LoaderBlockLogo.getReverse = LoaderBlockLogo.rawReverse.sup;
-			LoaderBlockLogo.set("general.reverse", LoaderBlockLogo.rawReverse.name().toLowerCase(Locale.ROOT));
+			LoaderBlockLogo.instance.set("general.reverse", LoaderBlockLogo.rawReverse.name().toLowerCase(Locale.ROOT));
 		}
 		textRenderer.draw(matrices, "Shadow Color:", width-160, 2, -1);
 		if (filter.length() != 0) {
@@ -79,32 +79,32 @@ public class BlockLogoScreen extends Screen{
 			LoaderBlockLogo.rawShadowRed = num;
 			LoaderBlockLogo.shadowRed = num / 255.f;
 			num = 0;
-			LoaderBlockLogo.set("shadow.red", String.valueOf(LoaderBlockLogo.rawShadowRed));
+			LoaderBlockLogo.instance.set("shadow.red", String.valueOf(LoaderBlockLogo.rawShadowRed));
 		}
 		if (drawNumSelectable(matrices, width-120, 12, 35, 15, "G: ", LoaderBlockLogo.rawShadowGreen, mouseX, mouseY, 2)){
 			LoaderBlockLogo.rawShadowGreen = num;
 			LoaderBlockLogo.shadowGreen = num / 255.f;
 			num = 0;
-			LoaderBlockLogo.set("shadow.green", String.valueOf(LoaderBlockLogo.rawShadowGreen));
+			LoaderBlockLogo.instance.set("shadow.green", String.valueOf(LoaderBlockLogo.rawShadowGreen));
 		}
 		if (drawNumSelectable(matrices, width-80, 12, 35, 15, "B: ", LoaderBlockLogo.rawShadowBlue, mouseX, mouseY, 3)){
 			LoaderBlockLogo.rawShadowBlue = num;
 			LoaderBlockLogo.shadowBlue = num / 255.f;
 			num = 0;
-			LoaderBlockLogo.set("shadow.blue", String.valueOf(LoaderBlockLogo.rawShadowBlue));
+			LoaderBlockLogo.instance.set("shadow.blue", String.valueOf(LoaderBlockLogo.rawShadowBlue));
 		}
 		if (drawNumSelectable(matrices, width-40, 12, 35, 15, "A: ", LoaderBlockLogo.rawShadowAlpha, mouseX, mouseY, 4)) {
 			LoaderBlockLogo.rawShadowAlpha = num;
 			LoaderBlockLogo.shadowAlpha = num / 255.f;
 			num = 0;
-			LoaderBlockLogo.set("shadow.alpha", String.valueOf(LoaderBlockLogo.rawShadowAlpha));
+			LoaderBlockLogo.instance.set("shadow.alpha", String.valueOf(LoaderBlockLogo.rawShadowAlpha));
 		}
 		if (selectedColor == null) {
 			float scroll = sidebarHeight < height-startY ? 0 : sidebarScroll;
 			scroll = (float) (Math.floor((scroll*client.getWindow().getScaleFactor()))/client.getWindow().getScaleFactor());
 			float y = startY+5-scroll;
 			for (int clr : LoaderBlockLogo.validColors) {
-				if (!(y<startY)) {
+				if (y>=startY) {
 					textRenderer.draw(matrices, String.valueOf(clr), 5+0.2F, y+0.2F, clr ^ 0xFFFFFF);
 					textRenderer.draw(matrices, String.valueOf(clr), 5, y, clr);
 				}
@@ -125,7 +125,7 @@ public class BlockLogoScreen extends Screen{
 				float y = startY+5-scroll;
 				for (Identifier clr : registryBlocks) {
 					if (!clr.toString().contains(filter)) continue;
-					if (!(y < startY)) {
+					if (y >= startY) {
 						textRenderer.drawWithShadow(matrices, clr.toString(), 5, y, -1);
 					}
 					if (didClick && mouseX >= 0 && mouseX <= width / 2 && mouseY > y && mouseY < y + 12) {
@@ -143,7 +143,7 @@ public class BlockLogoScreen extends Screen{
 								return Blocks.AIR.getDefaultState();
 							}
 						});
-						LoaderBlockLogo.set("pixels." + String.format("%06x", selectedColor), String.join(" ", l));
+						LoaderBlockLogo.instance.set("pixels." + String.format("%06x", selectedColor), String.join(" ", l));
 					}
 					y += 12;
 					if (y > height) break;
@@ -165,7 +165,7 @@ public class BlockLogoScreen extends Screen{
 					if (blocks.size() < 1) {
 						LoaderBlockLogo.colorToState.remove(selectedColor);
 						LoaderBlockLogo.fullColorToState.get(selectedColor).clear();
-						LoaderBlockLogo.remove("pixels."+String.format("%06x", selectedColor));
+						LoaderBlockLogo.instance.remove("pixels."+String.format("%06x", selectedColor));
 					} else {
 						LoaderBlockLogo.colorToState.put(selectedColor, () -> {
 							String block = blocks.get(ThreadLocalRandom.current().nextInt(blocks.size()));
@@ -178,7 +178,7 @@ public class BlockLogoScreen extends Screen{
 								return Blocks.AIR.getDefaultState();
 							}
 						});
-						LoaderBlockLogo.set("pixels."+String.format("%06x", selectedColor), String.join(" ", blocks));
+						LoaderBlockLogo.instance.set("pixels."+String.format("%06x", selectedColor), String.join(" ", blocks));
 					}
 				}
 				y += 12;

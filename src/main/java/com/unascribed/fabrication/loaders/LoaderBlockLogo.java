@@ -1,9 +1,23 @@
 package com.unascribed.fabrication.loaders;
 
-import java.io.ByteArrayInputStream;
+import com.google.common.collect.Maps;
+import com.google.common.io.MoreFiles;
+import com.google.common.io.Resources;
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.unascribed.fabrication.FabLog;
+import com.unascribed.fabrication.QDIni;
+import com.unascribed.fabrication.support.ConfigLoader;
+import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.Env;
+import com.unascribed.fabrication.support.MixinConfigPlugin;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.client.texture.NativeImage;
+import net.minecraft.command.argument.BlockArgumentParser;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -15,30 +29,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
-
-import com.google.common.base.Charsets;
-import com.google.common.base.Stopwatch;
-import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.unascribed.fabrication.Agnos;
-import com.unascribed.fabrication.FabLog;
-import com.unascribed.fabrication.QDIni;
-import com.unascribed.fabrication.support.ConfigLoader;
-import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
-
-import com.google.common.collect.Maps;
-import com.google.common.io.MoreFiles;
-import com.google.common.io.Resources;
-
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.command.argument.BlockArgumentParser;
 
 @EligibleIf(envMatches=Env.CLIENT)
 public class LoaderBlockLogo implements ConfigLoader {
@@ -61,6 +53,7 @@ public class LoaderBlockLogo implements ConfigLoader {
 	public static int rawShadowAlpha = 0;
 	public static final Map<Integer, List<String>> fullColorToState = new HashMap<>();
 	public static final Set<Integer> validColors = new HashSet<>();
+	public static final LoaderBlockLogo instance = new LoaderBlockLogo();
 
 	static Path imageFile;
 
@@ -72,58 +65,6 @@ public class LoaderBlockLogo implements ConfigLoader {
 		public final BooleanSupplier sup;
 		Reverse(BooleanSupplier sup) {
 			this.sup = sup;
-		}
-	}
-
-	public static void remove(String key) {
-		Stopwatch watch = Stopwatch.createStarted();
-		StringWriter sw = new StringWriter();
-		Path configFile = Agnos.getConfigDir().resolve("fabrication").resolve("block_logo.ini");
-		try {
-			QDIni.loadAndTransform(configFile, QDIni.simpleLineIniTransformer(((path, line) -> {
-				if (line == null) return null;
-				int i = line.indexOf('=');
-				if (i != -1 && key.equals(path+line.substring(0, i))) {
-					return "";
-				}
-				return line;
-			})), sw);
-			Files.write(configFile, sw.toString().getBytes(Charsets.UTF_8));
-			FabLog.info("Update of "+configFile+" done in "+watch);
-		} catch (IOException e) {
-			FabLog.warn("Failed to update "+configFile+" file", e);
-		}
-	}
-	public static void set(String key, String val) {
-		Stopwatch watch = Stopwatch.createStarted();
-		StringWriter sw = new StringWriter();
-		Path configFile = Agnos.getConfigDir().resolve("fabrication").resolve("block_logo.ini");
-		try {
-			AtomicBoolean found = new AtomicBoolean(false);
-			QDIni.loadAndTransform(configFile, QDIni.simpleValueIniTransformer(((key1, value) -> {
-				if (key1.equals(key)){
-					found.set(true);
-					return val;
-				}
-				return value;
-			})), sw);
-			if (!found.get()){
-				StringWriter sw2 = new StringWriter();
-				QDIni.loadAndTransform("LoaderBlockLogo internal append value", new ByteArrayInputStream(sw.toString().getBytes()),
-						QDIni.simpleLineIniTransformer(((path, line) -> {
-							if (line != null && !found.get() && path != null && !path.isEmpty() && key.startsWith(path)) {
-								found.set(true);
-								return line + "\n" + key.substring(path.length()) + "=" + val;
-							}
-							return line;
-						})), sw2);
-				Files.write(configFile, sw2.toString().getBytes(Charsets.UTF_8));
-			} else {
-				Files.write(configFile, sw.toString().getBytes(Charsets.UTF_8));
-			}
-			FabLog.info("Update of "+configFile+" done in "+watch);
-		} catch (IOException e) {
-			FabLog.warn("Failed to update "+configFile+" file", e);
 		}
 	}
 
