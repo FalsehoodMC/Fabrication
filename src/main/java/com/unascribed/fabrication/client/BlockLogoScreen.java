@@ -267,6 +267,10 @@ public class BlockLogoScreen extends Screen{
 			}
 			didClick = true;
 		} else if (button == 1){
+			if (filter.length() > 0 && mouseY < 40 && mouseX > width/2f-40 && mouseY < width/2f+40) {
+				filter = new StringBuilder();
+				client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON, 1.2f, 1f));
+			}
 			if (selectedColor != null && LoaderBlockLogo.image.getHeight()+90 < mouseY && mouseX < width/2d) {
 				selectedColor = null;
 			}
