@@ -892,5 +892,6 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 						}
 					}
 		});
+	}
 
 }
