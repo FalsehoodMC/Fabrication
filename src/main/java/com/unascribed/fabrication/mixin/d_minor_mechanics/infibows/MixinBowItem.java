@@ -2,7 +2,7 @@ package com.unascribed.fabrication.mixin.d_minor_mechanics.infibows;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
@@ -21,14 +21,11 @@ import net.minecraft.world.World;
 @EligibleIf(configAvailable="*.infibows", classNotPresent="net.parker8283.bif.BowInfinityFix")
 public class MixinBowItem {
 
-	@Inject(at = @At("HEAD"), cancellable = true, method = "use(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/TypedActionResult;")
-	private void use(World world, PlayerEntity player, Hand hand, CallbackInfoReturnable<TypedActionResult<ItemStack>> cir) {
-		if (!MixinConfigPlugin.isEnabled("*.infibows")) return;
-		ItemStack stack = player.getStackInHand(hand);
-		if (EnchantmentHelper.getLevel(Enchantments.INFINITY, stack) > 0) {
-			player.setCurrentHand(hand);
-			cir.setReturnValue(TypedActionResult.success(stack));
-		}
+	@ModifyVariable(at=@At("STORE"), method="use(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/TypedActionResult;")
+	private boolean infiBow(boolean hasArrows, World world, PlayerEntity player, Hand hand) {
+		if (MixinConfigPlugin.isEnabled("*.infibows") && EnchantmentHelper.getLevel(Enchantments.INFINITY, player.getStackInHand(hand)) > 0)
+			return true;
+		return hasArrows;
 	}
 
 }

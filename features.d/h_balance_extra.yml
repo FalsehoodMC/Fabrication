@@ -154,5 +154,13 @@ balance.extra.brittle_shields:
 	desc:
 		Causes explosions to always break shields.
 
+balance.extra.tools_in_bundles:
+	name: Tools in Bundles
+	since: 2.3.1
+	default: burnt
+	sides: server_and_client
+	desc:
+		Allows storing up to 8 nonstackable items in a bundle, as long as nothing else is stored.
+
 # kate: space-indent off
 # vim: noai:noet
