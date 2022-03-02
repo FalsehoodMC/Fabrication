@@ -4,7 +4,7 @@ import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
@@ -17,6 +17,7 @@ import net.minecraft.item.PotionItem;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
 import net.minecraft.world.World;
+import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 @Mixin(PotionItem.class)
 @EligibleIf(configAvailable="*.bottled_air")
@@ -29,13 +30,12 @@ public class MixinPotionItem {
 		}
 	}
 
-	@Redirect(at=@At(value="INVOKE", target="net/minecraft/entity/player/PlayerInventory.insertStack(Lnet/minecraft/item/ItemStack;)Z"),
+	@ModifyArgs(at=@At(value="INVOKE", target="Lnet/minecraft/entity/player/PlayerInventory;insertStack(Lnet/minecraft/item/ItemStack;)Z"),
 			method="finishUsing(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/LivingEntity;)Lnet/minecraft/item/ItemStack;")
-	public boolean insertStack(PlayerInventory subject, ItemStack stack, ItemStack junk, World junk2, LivingEntity user) {
-		if (FabConf.isEnabled("*.bottled_air") && stack.getItem() == Items.GLASS_BOTTLE && user.isSubmergedInWater()) {
-			stack = PotionUtil.setPotion(new ItemStack(Items.POTION), Potions.WATER);
+	public void fabrication$bottledAir(Args args) {
+		if (FabConf.isEnabled("*.bottled_air") && ((ItemStack)args.get(1)).getItem() == Items.GLASS_BOTTLE && ((PlayerInventory)args.get(0)).player.isSubmergedInWater()) {
+			args.set(1, PotionUtil.setPotion(new ItemStack(Items.POTION), Potions.WATER));
 		}
-		return subject.insertStack(stack);
 	}
 
 }

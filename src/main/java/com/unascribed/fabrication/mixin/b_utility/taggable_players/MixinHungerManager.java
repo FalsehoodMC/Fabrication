@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.mixin.b_utility.taggable_players;
 
 import com.unascribed.fabrication.FabConf;
+import net.minecraft.entity.effect.StatusEffects;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,7 +26,7 @@ public abstract class MixinHungerManager implements SetSaturation {
 	@Inject(at=@At("HEAD"), method="update(Lnet/minecraft/entity/player/PlayerEntity;)V", cancellable=true)
 	public void update(PlayerEntity pe, CallbackInfo ci) {
 		if (FabConf.isEnabled("*.taggable_players") && pe instanceof TaggablePlayer) {
-			if (((TaggablePlayer)pe).fabrication$hasTag(PlayerTag.NO_HUNGER)) {
+			if (((TaggablePlayer)pe).fabrication$hasTag(PlayerTag.NO_HUNGER) && !pe.hasStatusEffect(StatusEffects.HUNGER)) {
 				ci.cancel();
 			}
 		}

@@ -77,7 +77,7 @@ public abstract class MixinServerPlayerEntity extends PlayerEntity implements Ta
 	public void tick(CallbackInfo ci) {
 		if (FabConf.isEnabled("*.taggable_players")) {
 			if (fabrication$tags.contains(PlayerTag.NO_HUNGER)) {
-				getHungerManager().setFoodLevel(getHealth() >= getMaxHealth() ? 20 : 17);
+				getHungerManager().setFoodLevel(hasStatusEffect(StatusEffects.HUNGER) ? 0 : getHealth() >= getMaxHealth() ? 20 : 17);
 				// prevent the hunger bar from jiggling
 				((SetSaturation)getHungerManager()).fabrication$setSaturation(10);
 			}

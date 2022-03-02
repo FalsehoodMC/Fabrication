@@ -310,6 +310,10 @@ public class FabConf {
 		return new RuntimeException(msg);
 	}
 
+	public static boolean limitRuntimeConfigs(){
+		return config.get("general.limit_runtime_configs") == ConfigValue.TRUE;
+	}
+
 	public static boolean isAnyEnabled(String configKey) {
 		if (isEnabled(configKey)) return true;
 		return getEquivalent(configKey).stream().anyMatch(FabConf::isEnabled);

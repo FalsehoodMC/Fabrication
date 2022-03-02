@@ -1,8 +1,8 @@
 package com.unascribed.fabrication.mixin.i_woina.drops;
 
+import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.injection.Hijack;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 import com.unascribed.fabrication.logic.WoinaDrops;
 import com.unascribed.fabrication.support.EligibleIf;
@@ -20,10 +20,14 @@ import net.minecraft.item.ItemStack;
 @EligibleIf(anyConfigAvailable= {"*.blinking_drops", "*.classic_block_drops"}, envMatches=Env.CLIENT, modNotLoaded="forge:obfuscate")
 public class MixinItemEntityRendererVanilla {
 
-	@Redirect(at=@At(value="INVOKE", target="net/minecraft/client/render/item/ItemRenderer.renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformation$Mode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/render/model/BakedModel;)V"),
+	@Hijack(target="Lnet/minecraft/client/render/item/ItemRenderer;renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformation$Mode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/render/model/BakedModel;)V",
 			method="render(Lnet/minecraft/entity/ItemEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")
-	public void interceptRender(ItemRenderer subject, ItemStack stack, ModelTransformation.Mode renderMode, boolean leftHanded, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, BakedModel model) {
-		WoinaDrops.interceptRender(subject, stack, renderMode, leftHanded, matrices, vertexConsumers, light, WoinaDrops.modifyOverlay(stack, overlay), model);
+	private static boolean fabrication$renderClassicBlockDrops(ItemRenderer subject, ItemStack stack, ModelTransformation.Mode renderMode, boolean leftHanded, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, BakedModel model) {
+		if (FabConf.isEnabled("*.classic_block_drops")) {
+			WoinaDrops.interceptRender(subject, stack, renderMode, leftHanded, matrices, vertexConsumers, light, WoinaDrops.modifyOverlay(stack, overlay), model);
+			return true;
+		}
+		return false;
 	}
 
 }

@@ -15,13 +15,24 @@ import com.unascribed.fabrication.support.injection.FailsoftModifyArgsInjectionI
 import com.unascribed.fabrication.support.injection.FailsoftModifyConstantInjectionInfo;
 import com.unascribed.fabrication.support.injection.FailsoftModifyVariableInjectionInfo;
 import com.unascribed.fabrication.support.injection.FailsoftRedirectInjectionInfo;
+import com.unascribed.fabrication.support.injection.ModifyReturnInjector;
 import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.JumpInsnNode;
+import org.objectweb.asm.tree.LabelNode;
+import org.objectweb.asm.tree.LdcInsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
 import org.spongepowered.asm.mixin.Mixins;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 import org.spongepowered.asm.mixin.injection.struct.InjectionInfo;
+import org.spongepowered.asm.util.asm.MethodNodeEx;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -168,8 +179,11 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 									}
 								} else if (k.equals("anyConfigAvailable")) {
 									boolean allBanned = true;
+									boolean runtimeCheck = FabConf.limitRuntimeConfigs();
 									for (String s : (List<String>)v) {
 										s = FabConf.remap(s);
+										if (runtimeCheck && FabConf.isEnabled(s))
+											runtimeCheck = false;
 										if (FabConf.isBanned(s)) {
 											eligibilityNotes.add("Relevant config setting "+s+" is banned");
 										} else {
@@ -178,6 +192,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 										}
 										configKeysForDiscoveredClasses.put(ci.getName(), s);
 									}
+									if (runtimeCheck)
+										eligible = false;
 									if (allBanned) {
 										eligibilityFailures.add("All of the relevant config settings are banned");
 										eligible = false;
@@ -274,6 +290,57 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 
 	@Override
 	public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
+		if (FabConf.limitRuntimeConfigs()) finalizeIsEnabled(targetClass);
+		ModifyReturnInjector.apply(targetClass);
+		if(Agnos.isModLoaded("lithium") && "com.unascribed.fabrication.mixin.e_mechanics.colorful_redstone.MixinRedstoneWireBlock".equals(mixinClassName)) {
+			targetClass.methods.forEach(methodNode -> {
+				if (methodNode instanceof MethodNodeEx && "getReceivedPowerFaster".equals(((MethodNodeEx) methodNode).getOriginalName())){
+					methodNode.visibleAnnotations.forEach(annotationNode -> {
+						if (!"Lorg/spongepowered/asm/mixin/transformer/meta/MixinMerged;".equals(annotationNode.desc)) return;
+						for (int i=0; i<annotationNode.values.size(); i++){
+							if ("mixin".equals(annotationNode.values.get(i))){
+								i++;
+								if (i<annotationNode.values.size() && "me.jellysquid.mods.lithium.mixin.block.redstone_wire.RedstoneWireBlockMixin".equals(annotationNode.values.get(i))){
+									LabelNode label = new LabelNode(new Label());
+									InsnList earlyRet = new InsnList();
+									earlyRet.add(new LdcInsnNode("*.colorful_redstone"));
+									earlyRet.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/unascribed/fabrication/FabConf", "isEnabled", "(Ljava/lang/String;)Z", false));
+									earlyRet.add(new JumpInsnNode(Opcodes.IFEQ, label));
+									earlyRet.add(new InsnNode(Opcodes.RETURN));
+									earlyRet.add(label);
+									methodNode.instructions.insert(earlyRet);
+								}
+								break;
+							}
+						}
+					});
+				}
+			});
+		}
+	}
+
+	public static void finalizeIsEnabled(ClassNode targetClass){
+		targetClass.methods.forEach(methodNode -> {
+					for (AbstractInsnNode insnNode : methodNode.instructions){
+						if (insnNode instanceof MethodInsnNode) {
+							MethodInsnNode insn = (MethodInsnNode) insnNode;
+							if (insn.getOpcode() == Opcodes.INVOKESTATIC && "com/unascribed/fabrication/FabConf".equals(insn.owner) && "(Ljava/lang/String;)Z".equals(insn.desc)) {
+								AbstractInsnNode prevInsn = insn.getPrevious();
+								if (prevInsn.getOpcode() == Opcodes.LDC){
+									Object key = ((LdcInsnNode)prevInsn).cst;
+									if ("isEnabled".equals(insn.name)){
+										methodNode.instructions.insertBefore(prevInsn, new InsnNode(FabConf.isEnabled((String)key)? Opcodes.ICONST_1 : Opcodes.ICONST_0));
+									}else if ("isAnyEnabled".equals(insn.name)){
+										methodNode.instructions.insertBefore(prevInsn, new InsnNode(FabConf.isAnyEnabled((String)key)? Opcodes.ICONST_1 : Opcodes.ICONST_0));
+									}else continue;
+									methodNode.instructions.remove(prevInsn);
+									methodNode.instructions.remove(insn);
+									FabLog.debug("Removed IsEnabled Check from : "+targetClass.name+";"+methodNode.name+methodNode.desc);
+								}
+							}
+						}
+					}
+		});
 	}
 
 }

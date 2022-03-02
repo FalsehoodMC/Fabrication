@@ -1,7 +1,9 @@
 package com.unascribed.fabrication.mixin.i_woina.instant_bow;
 
+import net.minecraft.entity.LivingEntity;
 import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -18,18 +20,17 @@ import net.minecraft.world.World;
 
 @Mixin(BowItem.class)
 @EligibleIf(configAvailable="*.instant_bow")
-public class MixinBowItem {
+public abstract class MixinBowItem {
 
-	@Inject(method = "use(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/TypedActionResult;",
-			at = @At("HEAD"), cancellable = true)
+	@Shadow
+	public abstract void onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks);
+
+	@Inject(method="use(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/TypedActionResult;",
+			at=@At(value="INVOKE", target="Lnet/minecraft/entity/player/PlayerEntity;setCurrentHand(Lnet/minecraft/util/Hand;)V", shift=At.Shift.BEFORE), cancellable=true)
 	private void getUseAction(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<TypedActionResult<ItemStack>> cir){
-		if(FabConf.isEnabled("*.instant_bow") && ConfigPredicates.shouldRun("*.instant_bow", user)) {
-			ItemStack itemStack = user.getStackInHand(hand);
-			Object self = this;
-			if (user.getAbilities().creativeMode || !user.getArrowType(itemStack).isEmpty()) {
-				((BowItem) self).onStoppedUsing(itemStack, world, user, 0);
-			}
-			cir.setReturnValue(TypedActionResult.fail(itemStack));
-		}
+		if(!(FabConf.isEnabled("*.instant_bow") && ConfigPredicates.shouldRun("*.instant_bow", user))) return;
+		ItemStack itemStack = user.getStackInHand(hand);
+		onStoppedUsing(itemStack, world, user, 0);
+		cir.setReturnValue(TypedActionResult.fail(itemStack));
 	}
 }

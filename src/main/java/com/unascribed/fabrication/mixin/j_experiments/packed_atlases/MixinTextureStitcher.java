@@ -1,9 +1,8 @@
 package com.unascribed.fabrication.mixin.j_experiments.packed_atlases;
 
+import com.unascribed.fabrication.support.injection.ModifyReturn;
 import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
@@ -15,11 +14,10 @@ import net.minecraft.util.math.MathHelper;
 @EligibleIf(envMatches=Env.CLIENT, configAvailable="*.packed_atlases")
 public class MixinTextureStitcher {
 
-	@Redirect(at=@At(value="INVOKE", target="net/minecraft/util/math/MathHelper.smallestEncompassingPowerOfTwo(I)I"),
-			method="stitch()V", expect=2)
-	public int shortCircuitPowerOfTwo(int in) {
+	@ModifyReturn(target="Lnet/minecraft/util/math/MathHelper;smallestEncompassingPowerOfTwo(I)I", method="stitch()V")
+	private static int fabrication$shortCircuitPowerOfTwo(int original, int in) {
 		if (FabConf.isEnabled("*.packed_atlases")) return in;
-		return MathHelper.smallestEncompassingPowerOfTwo(in);
+		return original;
 	}
 
 }

@@ -1,12 +1,11 @@
 package com.unascribed.fabrication.mixin.d_minor_mechanics.furnace_minecart_any_fuel;
 
 import com.unascribed.fabrication.FabConf;
-import org.spongepowered.asm.mixin.Final;
+import com.unascribed.fabrication.support.injection.ModifyReturn;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
@@ -17,7 +16,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.AbstractMinecartEntity;
 import net.minecraft.entity.vehicle.FurnaceMinecartEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.Ingredient;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
@@ -30,15 +28,8 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 		super(entityType, world);
 	}
 
-	@Shadow @Final
-	private static Ingredient ACCEPTABLE_FUEL;
 	@Shadow
 	private int fuel;
-
-	@Shadow
-	public double pushX;
-	@Shadow
-	public double pushZ;
 
 	@Inject(at=@At("HEAD"), method="interact(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;")
 	public void interact(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> ci) {
@@ -55,11 +46,10 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 		}
 	}
 
-	@Redirect(at=@At(value="INVOKE", target="net/minecraft/recipe/Ingredient.test(Lnet/minecraft/item/ItemStack;)Z"),
+	@ModifyReturn(target="Lnet/minecraft/recipe/Ingredient;test(Lnet/minecraft/item/ItemStack;)Z",
 			method="interact(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;")
-	public boolean testFuel(Ingredient subject, ItemStack stack) {
-		if (!FabConf.isEnabled("*.furnace_minecart_any_fuel")) return subject.test(stack);
-		return false;
+	private static boolean fabrication$disableVanillaFuel(boolean original) {
+		return !FabConf.isEnabled("*.furnace_minecart_any_fuel") && original;
 	}
 
 }
