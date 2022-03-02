@@ -13,7 +13,7 @@ public abstract class MixinEntity {
 
 	@ModifyReturn(target="Lnet/minecraft/entity/Entity;bypassesSteppingEffects()Z",
 			method="move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V")
-	private static boolean dontBypassSteppingEffects(boolean old, Entity self) {
+	private static boolean fabrication$dontBypassSteppingEffects(boolean old, Entity self) {
 		if (FabConf.isEnabled("*.no_sneak_bypass") && ConfigPredicates.shouldRun("*.no_sneak_bypass", self)) return false;
 		return old;
 	}
