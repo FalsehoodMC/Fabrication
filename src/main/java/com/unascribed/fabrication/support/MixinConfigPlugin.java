@@ -27,6 +27,8 @@ import javax.swing.UIManager;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
@@ -667,6 +669,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 										FabLog.debug("🙈 Dev error! Exploding.");
 										throw devError(cn.name.substring(pkg.length()+1).replace('/', '.')+" references an unknown config key "+v+"\n\nDid you forget to add it to features.txt and run build-features.sh?");
 									}
+									if (config.get("general.limit_runtime_configs") == ConfigValue.TRUE && !isEnabled((String)v))
+										eligible = false;
 									if (isBanned((String)v)) {
 										eligibilityFailures.add("Required config setting "+remap((String)v)+" is banned");
 										eligible = false;
@@ -726,8 +730,11 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 									}
 								} else if (k.equals("anyConfigAvailable")) {
 									boolean allBanned = true;
+									boolean runtimeCheck = config.get("general.limit_runtime_configs") == ConfigValue.TRUE;
 									for (String s : (List<String>)v) {
 										s = remap(s);
+										if (runtimeCheck && isEnabled(s))
+											runtimeCheck = false;
 										if (isBanned(s)) {
 											eligibilityNotes.add("Relevant config setting "+s+" is banned");
 										} else {
@@ -736,6 +743,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 										}
 										configKeysForDiscoveredClasses.put(ci.getName(), s);
 									}
+									if (runtimeCheck)
+										eligible = false;
 									if (allBanned) {
 										eligibilityFailures.add("All of the relevant config settings are banned");
 										eligible = false;
@@ -832,6 +841,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 
 	@Override
 	public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
+		if (config.get("general.limit_runtime_configs") == ConfigValue.TRUE) finalizeIsEnabled(targetClass);
 		ModifyReturnInjector.apply(targetClass);
 		if(Agnos.isModLoaded("lithium") && "com.unascribed.fabrication.mixin.e_mechanics.colorful_redstone.MixinRedstoneWireBlock".equals(mixinClassName)) {
 			targetClass.methods.forEach(methodNode -> {
@@ -858,6 +868,30 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 				}
 			});
 		}
+	}
+
+	public static void finalizeIsEnabled(ClassNode targetClass){
+		targetClass.methods.forEach(methodNode -> {
+					for (AbstractInsnNode insnNode : methodNode.instructions){
+						if (insnNode instanceof MethodInsnNode) {
+							MethodInsnNode insn = (MethodInsnNode) insnNode;
+							if (insn.getOpcode() == Opcodes.INVOKESTATIC && "com/unascribed/fabrication/support/MixinConfigPlugin".equals(insn.owner) && "(Ljava/lang/String;)Z".equals(insn.desc)) {
+								AbstractInsnNode prevInsn = insn.getPrevious();
+								if (prevInsn.getOpcode() == Opcodes.LDC){
+									Object key = ((LdcInsnNode)prevInsn).cst;
+									if ("isEnabled".equals(insn.name)){
+										methodNode.instructions.insertBefore(prevInsn, new InsnNode(isEnabled((String)key)? Opcodes.ICONST_1 : Opcodes.ICONST_0));
+									}else if ("isAnyEnabled".equals(insn.name)){
+										methodNode.instructions.insertBefore(prevInsn, new InsnNode(isAnyEnabled((String)key)? Opcodes.ICONST_1 : Opcodes.ICONST_0));
+									}else continue;
+									methodNode.instructions.remove(prevInsn);
+									methodNode.instructions.remove(insn);
+									FabLog.debug("Removed IsEnabled Check from : "+targetClass.name+";"+methodNode.name+methodNode.desc);
+								}
+							}
+						}
+					}
+		});
 	}
 
 }
