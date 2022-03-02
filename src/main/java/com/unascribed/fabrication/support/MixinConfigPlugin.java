@@ -58,6 +58,7 @@ import com.unascribed.fabrication.support.injection.FailsoftModifyArgsInjectionI
 import com.unascribed.fabrication.support.injection.FailsoftModifyConstantInjectionInfo;
 import com.unascribed.fabrication.support.injection.FailsoftModifyVariableInjectionInfo;
 import com.unascribed.fabrication.support.injection.FailsoftRedirectInjectionInfo;
+import com.unascribed.fabrication.support.injection.ModifyReturnInjector;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Enums;
@@ -831,6 +832,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 
 	@Override
 	public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
+		ModifyReturnInjector.apply(targetClass);
 		if(Agnos.isModLoaded("lithium") && "com.unascribed.fabrication.mixin.e_mechanics.colorful_redstone.MixinRedstoneWireBlock".equals(mixinClassName)) {
 			targetClass.methods.forEach(methodNode -> {
 				if (methodNode instanceof MethodNodeEx && "getReceivedPowerFaster".equals(((MethodNodeEx) methodNode).getOriginalName())){

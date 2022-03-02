@@ -2,13 +2,11 @@ package com.unascribed.fabrication.mixin.b_utility.legacy_command_syntax;
 
 import java.util.Locale;
 
+import com.unascribed.fabrication.support.injection.ModifyReturn;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 
@@ -19,10 +17,10 @@ import net.minecraft.util.Identifier;
 @EligibleIf(configAvailable="*.legacy_command_syntax")
 public class MixinEntitySummonArgumentType {
 
-	@Redirect(at=@At(value="INVOKE", target="net/minecraft/util/Identifier.fromCommandInput(Lcom/mojang/brigadier/StringReader;)Lnet/minecraft/util/Identifier;"),
+	@ModifyReturn(target="Lnet/minecraft/util/Identifier;fromCommandInput(Lcom/mojang/brigadier/StringReader;)Lnet/minecraft/util/Identifier;",
 			method="parse(Lcom/mojang/brigadier/StringReader;)Lnet/minecraft/util/Identifier;")
-	public Identifier fromCommandInput(StringReader sr) throws CommandSyntaxException {
-		if (!MixinConfigPlugin.isEnabled("*.legacy_command_syntax")) return Identifier.fromCommandInput(sr);
+	private static Identifier fabrication$legacyCommandInput(Identifier original, StringReader sr) {
+		if (!MixinConfigPlugin.isEnabled("*.legacy_command_syntax")) return original;
 		char peek = sr.peek();
 		if (peek >= 'A' && peek <= 'Z') {
 			int start = sr.getCursor();
@@ -33,7 +31,7 @@ public class MixinEntitySummonArgumentType {
 					.replaceAll("([a-z])([A-Z])", "$1_$2")
 					.toLowerCase(Locale.ROOT));
 		}
-		return Identifier.fromCommandInput(sr);
+		return original;
 	}
 
 	@Unique
