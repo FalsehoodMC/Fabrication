@@ -30,10 +30,15 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.AnnotationNode;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.JumpInsnNode;
+import org.objectweb.asm.tree.InsnNode;
 import org.spongepowered.asm.mixin.Mixins;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -55,6 +60,7 @@ import com.unascribed.fabrication.support.injection.FailsoftModifyArgsInjectionI
 import com.unascribed.fabrication.support.injection.FailsoftModifyConstantInjectionInfo;
 import com.unascribed.fabrication.support.injection.FailsoftModifyVariableInjectionInfo;
 import com.unascribed.fabrication.support.injection.FailsoftRedirectInjectionInfo;
+import com.unascribed.fabrication.support.injection.ModifyReturnInjector;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Enums;
@@ -79,6 +85,7 @@ import com.google.common.reflect.ClassPath.ClassInfo;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import org.spongepowered.asm.util.asm.MethodNodeEx;
 
 public class MixinConfigPlugin implements IMixinConfigPlugin {
 
@@ -835,6 +842,32 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	@Override
 	public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
 		if (config.get("general.limit_runtime_configs") == ConfigValue.TRUE) finalizeIsEnabled(targetClass);
+		ModifyReturnInjector.apply(targetClass);
+		if(Agnos.isModLoaded("lithium") && "com.unascribed.fabrication.mixin.e_mechanics.colorful_redstone.MixinRedstoneWireBlock".equals(mixinClassName)) {
+			targetClass.methods.forEach(methodNode -> {
+				if (methodNode instanceof MethodNodeEx && "getReceivedPowerFaster".equals(((MethodNodeEx) methodNode).getOriginalName())){
+					methodNode.visibleAnnotations.forEach(annotationNode -> {
+						if (!"Lorg/spongepowered/asm/mixin/transformer/meta/MixinMerged;".equals(annotationNode.desc)) return;
+						for (int i=0; i<annotationNode.values.size(); i++){
+							if ("mixin".equals(annotationNode.values.get(i))){
+								i++;
+								if (i<annotationNode.values.size() && "me.jellysquid.mods.lithium.mixin.block.redstone_wire.RedstoneWireBlockMixin".equals(annotationNode.values.get(i))){
+									LabelNode label = new LabelNode(new Label());
+									InsnList earlyRet = new InsnList();
+									earlyRet.add(new LdcInsnNode("*.colorful_redstone"));
+									earlyRet.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/unascribed/fabrication/support/MixinConfigPlugin", "isEnabled", "(Ljava/lang/String;)Z", false));
+									earlyRet.add(new JumpInsnNode(Opcodes.IFEQ, label));
+									earlyRet.add(new InsnNode(Opcodes.RETURN));
+									earlyRet.add(label);
+									methodNode.instructions.insert(earlyRet);
+								}
+								break;
+							}
+						}
+					});
+				}
+			});
+		}
 	}
 
 	public static void finalizeIsEnabled(ClassNode targetClass){
@@ -859,6 +892,5 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 						}
 					}
 		});
-	}
 
 }

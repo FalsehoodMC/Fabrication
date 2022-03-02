@@ -1,10 +1,12 @@
 package com.unascribed.fabrication.mixin.i_woina.no_experience;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -21,6 +23,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.EnchantmentScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
+
 
 @Mixin(EnchantmentScreen.class)
 @EligibleIf(configAvailable="*.no_experience", envMatches=Env.CLIENT)
@@ -40,16 +43,18 @@ public abstract class MixinEnchantmentScreen extends HandledScreen<EnchantmentSc
 		return subject.experienceLevel;
 	}
 
-	@Redirect(at=@At(value="INVOKE", target="java/util/List.add(Ljava/lang/Object;)Z"),
-			method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
-	public boolean add(List subject, Object obj) {
-		if (obj instanceof TranslatableText) {
-			TranslatableText tt = (TranslatableText)obj;
-			if (tt.getKey().startsWith("container.enchant.level")) {
-				return false;
-			}
+	@ModifyArg(method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V", index=1,
+			at=@At(value="INVOKE", target="Lnet/minecraft/client/gui/screen/ingame/EnchantmentScreen;renderTooltip(Lnet/minecraft/client/util/math/MatrixStack;Ljava/util/List;II)V"))
+	public List<Text> removeLevelText(List<Text> original){
+		if (MixinConfigPlugin.isEnabled("*.no_experience")){
+			original = original.stream().filter(text ->{
+				if (text instanceof TranslatableText) {
+					return !((TranslatableText) text).getKey().startsWith("container.enchant.level");
+				}
+				return true;
+			}).collect(Collectors.toList());
 		}
-		return subject.add(obj);
+		return original;
 	}
 
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/client/gui/screen/ingame/EnchantmentScreen.drawTexture(Lnet/minecraft/client/util/math/MatrixStack;IIIIII)V"),

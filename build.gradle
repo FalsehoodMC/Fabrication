@@ -1,3 +1,5 @@
+import java.nio.file.Files
+
 plugins {
 	id 'fabric-loom' version '0.8-SNAPSHOT'
 	id 'maven-publish'
@@ -53,6 +55,9 @@ dependencies {
 		transitive = false
 	}
 	modRuntime fabricApi.module("fabric-screen-api-v1", "${project.fabric_version}")
+
+	annotationProcessor project(":ap"){
+	}
 }
 
 minecraft {
@@ -85,7 +90,119 @@ jar {
 			}
 		})
 		file('build/tmp/classes.txt').text = bldr.toString();
+
+		def lge = project.getExtensions().getByType(net.fabricmc.loom.LoomGradleExtension.class)
+		def mappings = lge.getMappingsProvider().getMappings()
+		Map<String, Mapp> toInter = new HashMap<>()
+		List<String> toParse = Files.readAllLines(file('build/tmp/fabToRefMap').toPath())
+		for (int i=0; i+3<toParse.size(); i++){
+			toInter.put(toParse.get(i), new Mapp(toParse.get(++i).split('\t'), toParse.get(++i).split('\t'), toParse.get(++i).split('\t')))
+		}
+		Map<String, String> targetMap = new HashMap<>()
+		Map<String, String> methodMap = new HashMap<>()
+		Map<String, String> classMap = new HashMap<>();
+		for (def cl : mappings.classes){
+			for (def map : toInter.values()){
+				String clName = cl.getName("named")
+				String clNameRez = cl.getName("intermediary")
+				if (map.mixin.contains(clName.replace('/', '.'))) {
+					if (clName.equals("net/minecraft/world/gen/PhantomSpawner"))
+					{def aeaoeaoeaoe =""}
+						for (def clMethod : cl.methods) {
+						for (String mthd : map.method) {
+							int col = mthd.indexOf(';')
+							int dot = mthd.indexOf('.')
+							if (col == -1 || dot < col && dot != -1) col = dot
+							int brc = mthd.indexOf('(')
+							String desc = mthd.substring(brc)
+							String name = mthd.substring(col == -1 || brc<col ? 0 : col+1, brc)
+							if ((name.equals(clMethod.getName("named")) || name.equals(clMethod.getName("intermediary"))) && (desc.equals(clMethod.getDescriptor("named")) || desc.equals(clMethod.getDescriptor("intermediary")))) {
+								methodMap.put(clName+";"+name+desc, clMethod.getName("intermediary") + clMethod.getDescriptor("intermediary"))
+							}
+						}
+					}
+				}
+				for (Mapp.Target mapt : map.target) {
+					String target = mapt.self
+					int col = target.indexOf(';')
+					int dot = target.indexOf('.')
+					if (col == -1 || dot < col && dot != -1) col = dot
+					if (mapt.applicable.contains(clName.replace('/', '.'))){
+						classMap.put(clName, clNameRez)
+						int brc = target.indexOf('(')
+						String desc = target.substring(brc)
+						String name = target.substring(col+1, brc)
+						for (def clMethod : cl.methods) {
+							if ((clMethod.getName("named").equals(name) || clMethod.getName("intermediary").equals(name)) && (clMethod.getDescriptor("named").equals(desc) || clMethod.getDescriptor("intermediary").equals(desc))){
+								targetMap.put(target, clMethod.getName("intermediary")+clMethod.getDescriptor("intermediary"))
+							}
+						}
+					}
+				}
+			}
+		}
+		StringBuilder strbldr = new StringBuilder()
+		for (def intr : toInter){
+			strbldr.append(intr.key)
+			strbldr.append('\n')
+			boolean frst = true;
+			for (String s : intr.value.method) {
+				for (String c : intr.value.mixin) {
+					String set = methodMap.get(c.replace('.', '/')+";"+s);
+					if (set != null){
+						if (frst) frst = false;
+						else strbldr.append('\t')
+						strbldr.append(s+" "+set)
+						break
+					}
+				}
+			}
+			strbldr.append('\n')
+			frst = true
+			for (Mapp.Target tar : intr.value.target){
+				String s = tar.self
+				String ad = targetMap.get(s);
+				if (ad != null) {
+					int col = s.indexOf(';')
+					int dot = s.indexOf('.')
+					if (col == -1 || dot < col && dot != -1) col = dot
+					if (frst) frst = false;
+					else strbldr.append('\t')
+					strbldr.append(s+" "+"L"+classMap.get(s.substring(s.charAt(0) == 'L' as char ? 1 : 0, col))+";"+ad)
+				}
+			}
+			strbldr.append('\n')
+		}
+		file('build/tmp/fabRefMap.txt').text = strbldr.toString();
 	}
+
 	from "LICENSE"
 	from "build/tmp/classes.txt"
+	from "build/tmp/fabRefMap.txt"
+}
+
+class Mapp{
+	class Target{
+		Target(String target){
+			int i = target.indexOf(' ');
+			if (i == -1){
+				this.self = target
+				this.applicable = new ArrayList<>();
+			} else {
+				this.self = target.substring(0, i);
+				this.applicable = target.substring(i).split(' ')
+			}
+		}
+		public String self
+		public List<String> applicable
+	}
+	Mapp(String[] mixin, String[] method, String[] target){
+		this.mixin = mixin;
+		this.method = method;
+		this.target = new ArrayList<>();
+		for (String s : target) this.target.add(new Target(s))
+	}
+	public List<String> mixin;
+	public List<String> method;
+	public List<Target> target;
 }
