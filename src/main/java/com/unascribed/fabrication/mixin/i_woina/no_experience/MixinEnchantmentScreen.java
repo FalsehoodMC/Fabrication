@@ -3,6 +3,7 @@ package com.unascribed.fabrication.mixin.i_woina.no_experience;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
@@ -13,7 +14,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.client.gui.screen.ingame.EnchantmentScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -39,14 +39,14 @@ public abstract class MixinEnchantmentScreen extends HandledScreen<EnchantmentSc
 					"render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V"
 	})
 	public int amendExperienceLevel(ClientPlayerEntity subject) {
-		if (MixinConfigPlugin.isEnabled("*.no_experience")) return 65535;
+		if (FabConf.isEnabled("*.no_experience")) return 65535;
 		return subject.experienceLevel;
 	}
 
 	@ModifyArg(method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V", index=1,
 			at=@At(value="INVOKE", target="Lnet/minecraft/client/gui/screen/ingame/EnchantmentScreen;renderTooltip(Lnet/minecraft/client/util/math/MatrixStack;Ljava/util/List;II)V"))
 	public List<Text> removeLevelText(List<Text> original){
-		if (MixinConfigPlugin.isEnabled("*.no_experience")){
+		if (FabConf.isEnabled("*.no_experience")){
 			original = original.stream().filter(text ->{
 				if (text instanceof TranslatableText) {
 					return !((TranslatableText) text).getKey().startsWith("container.enchant.level");
@@ -60,7 +60,7 @@ public abstract class MixinEnchantmentScreen extends HandledScreen<EnchantmentSc
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/client/gui/screen/ingame/EnchantmentScreen.drawTexture(Lnet/minecraft/client/util/math/MatrixStack;IIIIII)V"),
 			method="drawBackground(Lnet/minecraft/client/util/math/MatrixStack;FII)V")
 	public void drawTexture(EnchantmentScreen subject, MatrixStack matrices, int x, int y, int u, int v, int width, int height) {
-		if (MixinConfigPlugin.isEnabled("*.no_experience") && (v == 223 || v == 239)) {
+		if (FabConf.isEnabled("*.no_experience") && (v == 223 || v == 239)) {
 			if (v == 223) {
 				textRenderer.drawWithShadow(matrices, ""+((u/16)+1), x+98, y+8, 0x5577FF);
 			}
@@ -72,14 +72,14 @@ public abstract class MixinEnchantmentScreen extends HandledScreen<EnchantmentSc
 	@ModifyVariable(at=@At(value="INVOKE", target="net/minecraft/client/font/TextRenderer.getWidth(Ljava/lang/String;)I", ordinal=0),
 			method="drawBackground(Lnet/minecraft/client/util/math/MatrixStack;FII)V", ordinal=0)
 	public String modifyLevelText(String orig) {
-		if (MixinConfigPlugin.isEnabled("*.no_experience")) return "";
+		if (FabConf.isEnabled("*.no_experience")) return "";
 		return orig;
 	}
 
 	@ModifyConstant(constant=@Constant(intValue=20, ordinal=0),
 			method="drawBackground(Lnet/minecraft/client/util/math/MatrixStack;FII)V", require=0)
 	public int modifyPhraseOffset(int orig) {
-		if (MixinConfigPlugin.isEnabled("*.no_experience")) return 3;
+		if (FabConf.isEnabled("*.no_experience")) return 3;
 		return orig;
 	}
 

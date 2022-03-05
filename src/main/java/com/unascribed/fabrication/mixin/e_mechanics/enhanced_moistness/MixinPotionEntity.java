@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.e_mechanics.enhanced_moistness;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -8,7 +9,6 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import com.unascribed.fabrication.interfaces.MarkWet;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -29,7 +29,7 @@ public abstract class MixinPotionEntity extends ThrownItemEntity {
 
 	@Inject(at=@At("TAIL"), method="damageEntitiesHurtByWater()V", locals=LocalCapture.CAPTURE_FAILHARD)
 	public void damageEntitiesHurtByWater(CallbackInfo ci, Box box) {
-		if (!MixinConfigPlugin.isEnabled("*.enhanced_moistness") || world.isClient) return;
+		if (!FabConf.isEnabled("*.enhanced_moistness") || world.isClient) return;
 		for (Entity e : world.getEntitiesByClass(Entity.class, box, e -> true)) {
 			if (e instanceof MarkWet) {
 				((MarkWet)e).fabrication$markWet();

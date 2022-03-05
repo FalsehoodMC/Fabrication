@@ -1,12 +1,12 @@
 package com.unascribed.fabrication.mixin.c_tweaks.cracking_spawn_eggs;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -28,7 +28,7 @@ public class MixinEntityType {
 
 	@Inject(at=@At("RETURN"), method="spawnFromItemStack(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/SpawnReason;ZZ)Lnet/minecraft/entity/Entity;")
 	public void spawnFromItemStack(ServerWorld world, ItemStack stack, PlayerEntity player, BlockPos pos, SpawnReason reason, boolean alignPosition, boolean invertY, CallbackInfoReturnable<Entity> ci) {
-		if (!MixinConfigPlugin.isEnabled("*.cracking_spawn_eggs") || stack == null) return;
+		if (!FabConf.isEnabled("*.cracking_spawn_eggs") || stack == null) return;
 		if (stack.getItem() instanceof SpawnEggItem) {
 			Entity e = ci.getReturnValue();
 			Box box = e.getBoundingBox();

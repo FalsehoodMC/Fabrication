@@ -2,7 +2,7 @@ package com.unascribed.fabrication.logic;
 
 import com.google.common.collect.ImmutableSet;
 
-import com.unascribed.fabrication.support.MixinConfigPlugin;
+import com.unascribed.fabrication.FabConf;
 import net.minecraft.block.BlockState;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.tag.FluidTags;
@@ -34,7 +34,7 @@ public class WaterFillsOnBreak {
 				}
 			}
 		}
-		if (!(MixinConfigPlugin.isEnabled("*.water_fills_on_break_strict") && countWater == 1)){
+		if (!(FabConf.isEnabled("*.water_fills_on_break_strict") && countWater == 1)){
 			return countWater > countAir;
 		}
 

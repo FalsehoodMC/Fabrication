@@ -1,9 +1,9 @@
 package com.unascribed.fabrication.mixin.a_fixes.fix_nether_portal_nausea;
 
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.interfaces.PortalRenderFix;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.util.math.MatrixStack;
@@ -26,7 +26,7 @@ public abstract class MixinInGameHud {
 
 	@Inject(method="render(Lnet/minecraft/client/util/math/MatrixStack;F)V", at=@At(value="INVOKE",target="Lnet/minecraft/client/network/ClientPlayerEntity;hasStatusEffect(Lnet/minecraft/entity/effect/StatusEffect;)Z"))
 	private void fixPortal(MatrixStack matrices, float tickDelta, CallbackInfo ci){
-		if (!MixinConfigPlugin.isEnabled("*.fix_nether_portal_nausea")) return;
+		if (!FabConf.isEnabled("*.fix_nether_portal_nausea")) return;
 		if (((PortalRenderFix)this.client.player).fabrication$shouldRenderPortal()) {
 			this.renderPortalOverlay(((PortalRenderFix)this.client.player).fabrication$getPortalRenderProgress(tickDelta));
 		}

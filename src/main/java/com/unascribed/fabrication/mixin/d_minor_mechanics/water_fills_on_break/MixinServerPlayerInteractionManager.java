@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.d_minor_mechanics.water_fills_on_break;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -8,7 +9,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.logic.WaterFillsOnBreak;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.SpecialEligibility;
 
 import net.minecraft.fluid.Fluids;
@@ -28,7 +28,7 @@ public class MixinServerPlayerInteractionManager {
 
 	@Inject(at=@At("RETURN"), method="tryBreakBlock(Lnet/minecraft/util/math/BlockPos;)Z", cancellable=true)
 	public void tryBreakBlock(BlockPos pos, CallbackInfoReturnable<Boolean> ci) {
-		if (MixinConfigPlugin.isAnyEnabled("*.water_fills_on_break") && ci.getReturnValueZ()) {
+		if (FabConf.isAnyEnabled("*.water_fills_on_break") && ci.getReturnValueZ()) {
 			if (WaterFillsOnBreak.shouldFill(world, pos) && world.getBlockState(pos).isAir()) {
 				world.setBlockState(pos, Fluids.WATER.getDefaultState().getBlockState());
 			}

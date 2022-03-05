@@ -1,10 +1,10 @@
 package com.unascribed.fabrication.mixin.a_fixes.fix_nether_portal_nausea;
 
 import com.mojang.authlib.GameProfile;
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.interfaces.PortalRenderFix;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
@@ -29,7 +29,7 @@ public abstract class MixinClientPlayerEntity extends PlayerEntity implements Po
 
 	@Inject(method="tickMovement()V", at=@At("HEAD"))
 	private void fixPortalNausea(CallbackInfo ci){
-		if (!MixinConfigPlugin.isEnabled("*.fix_nether_portal_nausea")) return;
+		if (!FabConf.isEnabled("*.fix_nether_portal_nausea")) return;
 		fabrication$lastClientPortalTicks = fabrication$nextClientPortalTicks;
 		if (inNetherPortal) {
 			if (fabrication$nextClientPortalTicks < 1.0F){

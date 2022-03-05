@@ -53,9 +53,57 @@ public class QDIni {
 	}
 
 	public interface IniTransformer {
+		static IniTransformer simpleValueIniTransformer(ValueIniTransformer transformer){
+			return new IniTransformer() {
+				@Override
+				public String transformLine(String path, String line) {
+					return line;
+				}
+
+				@Override
+				public String transformValueComment(String key, String value, String comment) {
+					return comment;
+				}
+
+				@Override
+				public String transformValue(String key, String value) {
+					return transformer.transformValue(key, value);
+				}
+			};
+		}
+
+		static IniTransformer simpleLineIniTransformer(ValueLineTransformer transformer){
+			return new IniTransformer() {
+				@Override
+				public String transformLine(String path, String line) {
+					return transformer.transformLine(path, line);
+				}
+
+				@Override
+				public String transformValueComment(String key, String value, String comment) {
+					return comment;
+				}
+
+				@Override
+				public String transformValue(String key, String value) {
+					return value;
+				}
+			};
+		}
+
 		String transformLine(String path, String line);
 		String transformValueComment(String key, String value, String comment);
 		String transformValue(String key, String value);
+	}
+
+	@FunctionalInterface
+	public interface ValueIniTransformer{
+		String transformValue(String key, String value);
+	}
+
+	@FunctionalInterface
+	public interface ValueLineTransformer{
+		String transformLine(String path, String line);
 	}
 
 	private static class BlameString {

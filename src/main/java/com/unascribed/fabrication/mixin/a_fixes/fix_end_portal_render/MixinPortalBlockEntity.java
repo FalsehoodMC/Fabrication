@@ -1,8 +1,8 @@
 package com.unascribed.fabrication.mixin.a_fixes.fix_end_portal_render;
 
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -25,7 +25,7 @@ public abstract class MixinPortalBlockEntity extends BlockEntity {
 
 	@Inject(at=@At("HEAD"), method="shouldDrawSide(Lnet/minecraft/util/math/Direction;)Z", cancellable=true)
 	public void renderAllSides(Direction direction, CallbackInfoReturnable<Boolean> cir) {
-		if (MixinConfigPlugin.isEnabled("*.fix_end_portal_render"))
+		if (FabConf.isEnabled("*.fix_end_portal_render"))
 			cir.setReturnValue(Block.shouldDrawSide(this.getCachedState(), this.world, this.getPos(), direction, this.getPos().offset(direction)));
 	}
 

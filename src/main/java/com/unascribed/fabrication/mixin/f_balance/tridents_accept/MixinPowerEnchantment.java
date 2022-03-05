@@ -1,9 +1,9 @@
 package com.unascribed.fabrication.mixin.f_balance.tridents_accept;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.enchantment.DamageEnchantment;
 import net.minecraft.enchantment.Enchantment;
@@ -31,7 +31,7 @@ public class MixinPowerEnchantment extends Enchantment {
 
 	@Override
 	public boolean isAcceptableItem(ItemStack stack) {
-		return (MixinConfigPlugin.isEnabled("*.tridents_accept_power") && stack.getItem() == Items.TRIDENT) || super.isAcceptableItem(stack);
+		return (FabConf.isEnabled("*.tridents_accept_power") && stack.getItem() == Items.TRIDENT) || super.isAcceptableItem(stack);
 	}
 
 }

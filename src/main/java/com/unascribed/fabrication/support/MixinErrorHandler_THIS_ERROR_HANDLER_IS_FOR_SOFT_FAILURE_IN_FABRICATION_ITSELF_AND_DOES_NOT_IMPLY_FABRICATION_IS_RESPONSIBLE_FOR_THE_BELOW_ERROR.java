@@ -2,6 +2,7 @@ package com.unascribed.fabrication.support;
 
 import java.util.Set;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfig;
 import org.spongepowered.asm.mixin.extensibility.IMixinErrorHandler;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -41,12 +42,12 @@ public class MixinErrorHandler_THIS_ERROR_HANDLER_IS_FOR_SOFT_FAILURE_IN_FABRICA
 					"Mixin", mixin.getClassName()
 					));
 			if (action == ErrorAction.ERROR) {
-				Set<String> keys = MixinConfigPlugin.getConfigKeysForDiscoveredClass(mixin.getClassName());
+				Set<String> keys = FabConf.getConfigKeysForDiscoveredClass(mixin.getClassName());
 				if (!keys.isEmpty()) {
 					FabLog.debug("Original Mixin error", th);
 					FabLog.warn("Mixin "+mixin.getClassName()+" failed to "+verb+"! Force-disabling "+Joiner.on(", ").join(keys));
 					for (String opt : keys) {
-						MixinConfigPlugin.addFailure(opt);
+						FabConf.addFailure(opt);
 					}
 					return ErrorAction.NONE;
 				} else {

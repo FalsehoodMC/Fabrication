@@ -1,9 +1,9 @@
 package com.unascribed.fabrication.mixin.c_tweaks.less_restrictive_note_blocks;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -28,7 +28,7 @@ public abstract class MixinNoteBlock extends Block {
 
 	@Inject(method="playNote(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V", at=@At("HEAD"), cancellable=true)
 	private void playNote(World world, BlockPos pos, CallbackInfo ci) {
-		if (!MixinConfigPlugin.isEnabled("*.less_restrictive_note_blocks")) return;
+		if (!FabConf.isEnabled("*.less_restrictive_note_blocks")) return;
 		Direction[] directions = {
 				Direction.UP,
 				Direction.NORTH,

@@ -4,6 +4,7 @@ import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Set;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,7 +17,6 @@ import com.unascribed.fabrication.interfaces.SetSaturation;
 import com.unascribed.fabrication.interfaces.TaggablePlayer;
 import com.unascribed.fabrication.logic.PlayerTag;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import com.google.common.base.Enums;
 import com.google.common.collect.ImmutableSet;
@@ -75,7 +75,7 @@ public abstract class MixinServerPlayerEntity extends PlayerEntity implements Ta
 
 	@Inject(at=@At("TAIL"), method="tick()V")
 	public void tick(CallbackInfo ci) {
-		if (MixinConfigPlugin.isEnabled("*.taggable_players")) {
+		if (FabConf.isEnabled("*.taggable_players")) {
 			if (fabrication$tags.contains(PlayerTag.NO_HUNGER)) {
 				getHungerManager().setFoodLevel(hasStatusEffect(StatusEffects.HUNGER) ? 0 : getHealth() >= getMaxHealth() ? 20 : 17);
 				// prevent the hunger bar from jiggling

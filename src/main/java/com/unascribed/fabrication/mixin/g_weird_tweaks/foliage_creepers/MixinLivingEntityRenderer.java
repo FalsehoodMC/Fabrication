@@ -1,8 +1,8 @@
 package com.unascribed.fabrication.mixin.g_weird_tweaks.foliage_creepers;
 
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.client.color.world.BiomeColors;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.CreeperEntityRenderer;
@@ -33,7 +33,7 @@ public abstract class MixinLivingEntityRenderer {
 	@ModifyArgs(at=@At(value="INVOKE", target="Lnet/minecraft/client/render/entity/model/EntityModel;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;IIFFFF)V"),
 			method="render(Lnet/minecraft/entity/LivingEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")
 	public void render(Args args) {
-		if (!(MixinConfigPlugin.isEnabled("*.foliage_creepers") && fabrication$capturedRenderEntity instanceof CreeperEntity)) return;
+		if (!(FabConf.isEnabled("*.foliage_creepers") && fabrication$capturedRenderEntity instanceof CreeperEntity)) return;
 		int i = fabrication$capturedRenderEntity.world.getColor(fabrication$capturedRenderEntity.getBlockPos(), BiomeColors.FOLIAGE_COLOR);
 		args.set(4, (i >> 16 & 255) / 255f);
 		args.set(5, (i >> 8 & 255) / 255f);
@@ -42,7 +42,7 @@ public abstract class MixinLivingEntityRenderer {
 
 	@ModifyVariable(at=@At("STORE"), method="getRenderLayer(Lnet/minecraft/entity/LivingEntity;ZZZ)Lnet/minecraft/client/render/RenderLayer;")
 	public Identifier transformCreeperIdentifier(Identifier id){
-		if (!(MixinConfigPlugin.isEnabled("*.foliage_creepers") && ((Object)this) instanceof CreeperEntityRenderer && Identifier.DEFAULT_NAMESPACE.equals(id.getNamespace()))) return id;
+		if (!(FabConf.isEnabled("*.foliage_creepers") && ((Object)this) instanceof CreeperEntityRenderer && Identifier.DEFAULT_NAMESPACE.equals(id.getNamespace()))) return id;
 		return new Identifier("fabrication_grayscale", id.getPath());
 	}
 

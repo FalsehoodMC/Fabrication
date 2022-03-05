@@ -1,11 +1,11 @@
 package com.unascribed.fabrication.mixin.c_tweaks.creepers_explode_when_on_fire;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -24,7 +24,7 @@ public abstract class MixinCreeperEntity extends HostileEntity {
 	@Override
 	public void setFireTicks(int ticks) {
 		super.setFireTicks(ticks);
-		if (MixinConfigPlugin.isEnabled("*.creepers_explode_when_on_fire") && !world.isClient &&
+		if (FabConf.isEnabled("*.creepers_explode_when_on_fire") && !world.isClient &&
 				ConfigPredicates.shouldRun("*.creepers_explode_when_on_fire", (LivingEntity)this)) {
 			ignite();
 		}

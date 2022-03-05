@@ -1,8 +1,8 @@
 package com.unascribed.fabrication.mixin.g_weird_tweaks.curable_piglins;
 
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.interfaces.ZombImmunizableEntity;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.entity.mob.HoglinEntity;
 import net.minecraft.nbt.NbtCompound;
 import org.spongepowered.asm.mixin.Mixin;
@@ -40,6 +40,6 @@ public class MixinHoglinEntity implements ZombImmunizableEntity {
 
 	@Inject(at=@At("HEAD"), method="isImmuneToZombification()Z", cancellable=true)
 	public void isImmuneToZombification(CallbackInfoReturnable<Boolean> cir) {
-		if (MixinConfigPlugin.isEnabled("*.curable_piglins") && fabrication$isImmuneToZombification) cir.setReturnValue(true);
+		if (FabConf.isEnabled("*.curable_piglins") && fabrication$isImmuneToZombification) cir.setReturnValue(true);
 	}
 }

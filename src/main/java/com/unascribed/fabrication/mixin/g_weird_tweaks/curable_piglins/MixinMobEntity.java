@@ -1,9 +1,9 @@
 package com.unascribed.fabrication.mixin.g_weird_tweaks.curable_piglins;
 
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.interfaces.GetPreZombified;
 import com.unascribed.fabrication.interfaces.ZombImmunizableEntity;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffects;
@@ -36,7 +36,7 @@ public abstract class MixinMobEntity extends LivingEntity {
 
 	@Inject(method="interactMob(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;", at=@At("HEAD"), cancellable=true)
 	public void immunizePiglin(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
-		if (!MixinConfigPlugin.isEnabled("*.curable_piglins")) return;
+		if (!FabConf.isEnabled("*.curable_piglins")) return;
 		Object self = this;
 		boolean can = self instanceof ZombImmunizableEntity;
 		boolean zombified = self instanceof GetPreZombified;

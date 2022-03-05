@@ -24,7 +24,11 @@ public class FabRefMap {
 	public static final Map<String, Map<String, String>> methodMap = new HashMap<>();
 	public static final Map<String, Map<String, String>> targetMap = new HashMap<>();
 	static {
-		//TODO dont try if dev env
+		boolean printErr = true;
+		try {
+			Class.forName("net.minecraft.util.Identifier", false, FabRefMap.class.getClassLoader());
+			printErr = false;
+		} catch (ClassNotFoundException ignore) {}
 		try {
 			InputStream is = FabRefMap.class.getResourceAsStream("/fabRefMap.txt");
 			BufferedReader read = new BufferedReader(new InputStreamReader(is));
@@ -48,7 +52,9 @@ public class FabRefMap {
 				}
 			}
 		} catch (Exception e) {
-			FabLog.error("Could not parse fabRefMap", e);
+			if (printErr) {
+				FabLog.error("Could not parse fabRefMap", e);
+			}
 		}
 	}
 }

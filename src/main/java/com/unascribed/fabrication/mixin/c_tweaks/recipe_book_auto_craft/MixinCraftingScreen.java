@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.c_tweaks.recipe_book_auto_craft;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -8,7 +9,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.client.gui.screen.ingame.CraftingScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -31,7 +31,7 @@ public abstract class MixinCraftingScreen extends HandledScreen<CraftingScreenHa
 
 	@Inject(method="mouseClicked(DDI)Z", at=@At(value="INVOKE", target="Lnet/minecraft/client/gui/screen/ingame/CraftingScreen;setFocused(Lnet/minecraft/client/gui/Element;)V"))
 	private void mouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir){
-		if (MixinConfigPlugin.isEnabled("*.recipe_book_auto_craft") && button == 0)
+		if (FabConf.isEnabled("*.recipe_book_auto_craft") && button == 0)
 			onMouseClick(handler.getSlot(handler.getCraftingResultSlotIndex()), handler.getCraftingResultSlotIndex(), 0, hasShiftDown() ? SlotActionType.QUICK_MOVE : SlotActionType.PICKUP);
 	}
 }

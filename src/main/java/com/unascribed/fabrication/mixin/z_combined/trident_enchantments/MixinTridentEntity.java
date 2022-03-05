@@ -1,10 +1,11 @@
 package com.unascribed.fabrication.mixin.z_combined.trident_enchantments;
 
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.injection.ModifyReturn;
 import org.spongepowered.asm.mixin.Mixin;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
+import com.google.common.collect.ImmutableMap;
 
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
@@ -20,19 +21,19 @@ public class MixinTridentEntity {
 	@ModifyReturn(target="Lnet/minecraft/enchantment/EnchantmentHelper;getAttackDamage(Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/EntityGroup;)F",
 			method="onEntityHit(Lnet/minecraft/util/hit/EntityHitResult;)V")
 	private static float fabrication$modifyAttackDamage(float damage, ItemStack stack, EntityGroup grp, TridentEntity self, EntityHitResult ehr) {
-		if (MixinConfigPlugin.isEnabled("*.tridents_accept_sharpness")) {
+		if (FabConf.isEnabled("*.tridents_accept_sharpness")) {
 			int sharpness = EnchantmentHelper.getLevel(Enchantments.SHARPNESS, stack);
 			if (sharpness > 0) {
 				damage -= Enchantments.SHARPNESS.getAttackDamage(sharpness, grp);
 			}
 		}
-		if (MixinConfigPlugin.isEnabled("*.bedrock_impaling") && grp != EntityGroup.AQUATIC) {
+		if (FabConf.isEnabled("*.bedrock_impaling") && grp != EntityGroup.AQUATIC) {
 			int impaling = EnchantmentHelper.getLevel(Enchantments.IMPALING, stack);
 			if (impaling > 0 && ehr.getEntity().isWet()) {
 				damage += Enchantments.IMPALING.getAttackDamage(impaling, EntityGroup.AQUATIC);
 			}
 		}
-		if (MixinConfigPlugin.isEnabled("*.tridents_accept_power")) {
+		if (FabConf.isEnabled("*.tridents_accept_power")) {
 			int power = EnchantmentHelper.getLevel(Enchantments.POWER, stack);
 			if (power > 0) {
 				damage *= 1 + (0.25f * (power + 1));

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -20,6 +21,7 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.CommandNode;
 import com.unascribed.fabrication.Agnos;
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.FabricationClientCommands;
 import com.unascribed.fabrication.FabricationMod;
@@ -29,8 +31,6 @@ import com.unascribed.fabrication.interfaces.TaggablePlayer;
 import com.unascribed.fabrication.loaders.LoaderFScript;
 import com.unascribed.fabrication.logic.PlayerTag;
 import com.unascribed.fabrication.support.Feature;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
-import com.unascribed.fabrication.support.MixinConfigPlugin.Profile;
 import com.unascribed.fabrication.support.OptionalFScript;
 import com.unascribed.fabrication.util.Cardinal;
 
@@ -77,7 +77,7 @@ public class FeatureFabricationCommand implements Feature {
 				if (Agnos.isModLoaded("fscript")) addFScript(root, dedi);
 
 				LiteralArgumentBuilder<ServerCommandSource> tag = LiteralArgumentBuilder.<ServerCommandSource>literal("tag");
-				tag.requires(scs -> MixinConfigPlugin.isEnabled("*.taggable_players") && scs.hasPermissionLevel(2));
+				tag.requires(scs -> FabConf.isEnabled("*.taggable_players") && scs.hasPermissionLevel(2));
 				{
 					LiteralArgumentBuilder<ServerCommandSource> add = LiteralArgumentBuilder.<ServerCommandSource>literal("add");
 					LiteralArgumentBuilder<ServerCommandSource> remove = LiteralArgumentBuilder.<ServerCommandSource>literal("remove");
@@ -312,7 +312,7 @@ public class FeatureFabricationCommand implements Feature {
 
 	public static <T extends CommandSource> void addConfig(LiteralArgumentBuilder<T> root, boolean dediServer) {
 		LiteralArgumentBuilder<T> config = LiteralArgumentBuilder.<T>literal("config");
-		config.requires(s -> {
+		Predicate<T> permissionPredicate = s -> {
 			// always allow a client to reconfigure itself
 			if (!(s instanceof ServerCommandSource)) return true;
 
@@ -328,18 +328,18 @@ public class FeatureFabricationCommand implements Feature {
 				}
 			}
 			return false;
-		});
+		};
 		{
 			LiteralArgumentBuilder<T> get = LiteralArgumentBuilder.<T>literal("get");
-			for (String s : MixinConfigPlugin.getAllKeys()) {
+			for (String s : FabConf.getAllKeys()) {
 				LiteralArgumentBuilder<T> key = LiteralArgumentBuilder.<T>literal(s);
 				key.executes((c) -> {
-					String value = MixinConfigPlugin.getRawValue(s);
-					boolean tri = MixinConfigPlugin.isStandardValue(s);
+					String value = FabConf.getRawValue(s);
+					boolean tri = FabConf.isStandardValue(s);
 					if (value.isEmpty() && tri) value = "unset";
-					boolean def = MixinConfigPlugin.getDefault(s);
+					boolean def = FabConf.getDefault(s);
 					LiteralText txt = new LiteralText(s+" = "+value+(tri ? " (default "+def+")" : ""));
-					if (tri && !MixinConfigPlugin.isEnabled(s)) {
+					if (tri && !FabConf.isEnabled(s)) {
 						// so that command blocks report failure
 						throw new CommandException(txt.formatted(Formatting.WHITE));
 					} else {
@@ -352,7 +352,7 @@ public class FeatureFabricationCommand implements Feature {
 			}
 			config.then(get);
 			LiteralArgumentBuilder<T> set = LiteralArgumentBuilder.<T>literal("set");
-			for (String s : MixinConfigPlugin.getAllKeys()) {
+			for (String s : FabConf.getAllKeys()) {
 				if (dediServer && FeaturesFile.get(s).sides == Sides.CLIENT_ONLY) continue;
 				LiteralArgumentBuilder<T> key = LiteralArgumentBuilder.<T>literal(s);
 
@@ -360,7 +360,7 @@ public class FeatureFabricationCommand implements Feature {
 				if (s.equals("general.reduced_motion") || s.equals("general.data_upload")) {
 					values = new String[]{"true", "false"};
 				} else if (s.equals("general.profile")) {
-					values = Profile.stringValues();
+					values = FabConf.Profile.stringValues();
 				} else {
 					values = new String[]{"unset", "true", "false", "banned"};
 				}
@@ -368,7 +368,7 @@ public class FeatureFabricationCommand implements Feature {
 					LiteralArgumentBuilder<T> value =
 							LiteralArgumentBuilder.<T>literal(v)
 							.executes((c) -> {
-								setKeyWithFeedback(c, s, v);
+								setKeyWithFeedback(c, s, v, false);
 								return 1;
 							});
 					key.then(value);
@@ -381,10 +381,42 @@ public class FeatureFabricationCommand implements Feature {
 					set.then(short_key);
 				});
 			}
+			set.requires(permissionPredicate);
 			config.then(set);
+			LiteralArgumentBuilder<T> setWorld = LiteralArgumentBuilder.<T>literal("setWorld");
+			for (String s : FabConf.getAllKeys()) {
+				if (dediServer && FeaturesFile.get(s).sides == Sides.CLIENT_ONLY) continue;
+				LiteralArgumentBuilder<T> key = LiteralArgumentBuilder.<T>literal(s);
+
+				String[] values;
+				if (s.equals("general.reduced_motion") || s.equals("general.data_upload")) {
+					values = new String[]{"true", "false"};
+				} else if (s.equals("general.profile")) {
+					values = FabConf.Profile.stringValues();
+				} else {
+					values = new String[]{"unset", "true", "false", "banned"};
+				}
+				for (String v : values) {
+					key.then(LiteralArgumentBuilder.<T>literal(v)
+							.executes((c) -> {
+								setKeyWithFeedback(c, s, v, true);
+								return 1;
+							}));
+				}
+				setWorld.then(key);
+				setAltKeys(s, alt -> {
+					LiteralArgumentBuilder<T> short_key = LiteralArgumentBuilder.<T>literal(alt);
+					for (CommandNode<T> arg : key.getArguments())
+						short_key.then(arg);
+					setWorld.then(short_key);
+				});
+			}
+			setWorld.requires(permissionPredicate);
+			config.then(setWorld);
 			config.then(LiteralArgumentBuilder.<T>literal("reload")
+					.requires(permissionPredicate)
 					.executes((c) -> {
-						MixinConfigPlugin.reload();
+						FabConf.reload();
 						if (c.getSource() instanceof ServerCommandSource) {
 							FabricationMod.sendConfigUpdate(((ServerCommandSource)c.getSource()).getServer(), null);
 						}
@@ -399,7 +431,6 @@ public class FeatureFabricationCommand implements Feature {
 
 	public static <T extends CommandSource> void addFScript(LiteralArgumentBuilder<T> root, boolean dediServer) {
 		LiteralArgumentBuilder<T> script = LiteralArgumentBuilder.<T>literal("fscript");
-		script.requires(s -> s.hasPermissionLevel(2));
 		{
 			LiteralArgumentBuilder<T> get = LiteralArgumentBuilder.<T>literal("get");
 			for (String s : OptionalFScript.predicateProviders.keySet()) {
@@ -426,6 +457,7 @@ public class FeatureFabricationCommand implements Feature {
 				set.then(key);
 				setAltKeys(s, alt -> set.then(LiteralArgumentBuilder.<T>literal(alt).then(value)));
 			}
+			set.requires(s -> s.hasPermissionLevel(2));
 			script.then(set);
 
 			LiteralArgumentBuilder<T> unset = LiteralArgumentBuilder.<T>literal("unset");
@@ -439,14 +471,16 @@ public class FeatureFabricationCommand implements Feature {
 				unset.then(key);
 				setAltKeys(s, alt -> unset.then(LiteralArgumentBuilder.<T>literal(alt).executes(key.getCommand())));
 			}
+			unset.requires(s -> s.hasPermissionLevel(2));
 			script.then(unset);
 			script.then(LiteralArgumentBuilder.<T>literal("reload")
-					.executes((c) -> {
-						LoaderFScript.reload();
-						OptionalFScript.reload();
-						sendFeedback(c, new LiteralText("Fabrication fscript reloaded"), true);
-						return 1;
-					})
+					.requires(s -> s.hasPermissionLevel(2))
+						.executes((c) -> {
+							LoaderFScript.reload();
+							OptionalFScript.reload();
+							sendFeedback(c, new LiteralText("Fabrication fscript reloaded"), true);
+							return 1;
+						})
 					);
 		}
 		root.then(script);
@@ -500,18 +534,19 @@ public class FeatureFabricationCommand implements Feature {
 		return 1;
 	}
 
-	private static void setKeyWithFeedback(CommandContext<? extends CommandSource> c, String key, String value) {
-		String oldValue = MixinConfigPlugin.getRawValue(key);
-		boolean def = MixinConfigPlugin.getDefault(key);
-		boolean tri = MixinConfigPlugin.isStandardValue(key);
+	private static void setKeyWithFeedback(CommandContext<? extends CommandSource> c, String key, String value, boolean local) {
+		String oldValue = FabConf.getRawValue(key);
+		boolean def = FabConf.getDefault(key);
+		boolean tri = FabConf.isStandardValue(key);
 		if (value.equals(oldValue)) {
 			sendFeedback(c, new LiteralText(key+" is already set to "+value+(tri ? " (default "+def+")" : "")), false);
 		} else {
-			MixinConfigPlugin.set(key, value);
+			if (local) FabConf.worldSet(key, value);
+			else FabConf.set(key, value);
 			if (c.getSource() instanceof ServerCommandSource) {
 				FabricationMod.sendConfigUpdate(((ServerCommandSource)c.getSource()).getServer(), key);
 			}
-			sendFeedback(c, new LiteralText(key+" is now set to "+value+(tri ? " (default "+def+")" : "")), true);
+			sendFeedback(c, new LiteralText(key+" is now set to "+value+(tri ? " (default "+def+")" : "")+(local ? " for this world" : "")), true);
 			if (FabricationMod.isAvailableFeature(key)) {
 				if (FabricationMod.updateFeature(key)) {
 					return;

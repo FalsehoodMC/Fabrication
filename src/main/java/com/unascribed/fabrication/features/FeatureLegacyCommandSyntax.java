@@ -15,10 +15,10 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.unascribed.fabrication.Agnos;
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Feature;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import com.google.common.collect.Iterables;
 import com.google.common.primitives.Ints;
@@ -48,7 +48,7 @@ public class FeatureLegacyCommandSyntax implements Feature {
 		Agnos.runForCommandRegistration((dispatcher, dedi) -> {
 			try {
 				LiteralArgumentBuilder<ServerCommandSource> gmCmd = CommandManager.literal("gamemode")
-						.requires(scs -> MixinConfigPlugin.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2));
+						.requires(scs -> FabConf.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2));
 				for (GameMode mode : GameMode.values()) {
 					gmCmd.then(CommandManager.literal(Integer.toString(mode.getId()))
 							.executes(c -> (int)invoke(gmExecute, c, Collections.singleton(c.getSource().getPlayer()), mode))
@@ -59,7 +59,7 @@ public class FeatureLegacyCommandSyntax implements Feature {
 				dispatcher.register(gmCmd);
 
 				LiteralArgumentBuilder<ServerCommandSource> diffCmd = CommandManager.literal("difficulty")
-						.requires(scs -> MixinConfigPlugin.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2));
+						.requires(scs -> FabConf.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2));
 				for (Difficulty difficulty : Difficulty.values()) {
 					diffCmd.then(CommandManager.literal(Integer.toString(difficulty.getId()))
 							.executes(c -> DifficultyCommand.execute(c.getSource(), difficulty)));
@@ -67,7 +67,7 @@ public class FeatureLegacyCommandSyntax implements Feature {
 				dispatcher.register(diffCmd);
 
 				dispatcher.register(CommandManager.literal("experience")
-						.requires(scs -> MixinConfigPlugin.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2))
+						.requires(scs -> FabConf.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2))
 						.then(CommandManager.argument("amount", IntegerArgumentType.integer())
 								.executes(c -> {
 									return addExperience(c.getSource(), Collections.singleton(c.getSource().getPlayer()), IntegerArgumentType.getInteger(c,"amount"), false);
@@ -90,7 +90,7 @@ public class FeatureLegacyCommandSyntax implements Feature {
 								));
 
 				dispatcher.register(CommandManager.literal("toggledownfall")
-						.requires(scs -> MixinConfigPlugin.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2))
+						.requires(scs -> FabConf.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2))
 						.executes(c -> {
 							ServerWorld world = c.getSource().getWorld();
 							ServerWorldProperties props = (ServerWorldProperties) invoke(worldProperties, world);

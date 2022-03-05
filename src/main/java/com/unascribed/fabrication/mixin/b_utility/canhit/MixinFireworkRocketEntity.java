@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.mixin.b_utility.canhit;
 
 import com.unascribed.fabrication.support.injection.Hijack;
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 
 import com.unascribed.fabrication.interfaces.SetCanHitList;
@@ -20,7 +21,7 @@ public class MixinFireworkRocketEntity {
 
 	@Hijack(target="Lnet/minecraft/entity/LivingEntity;damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", method="explode()V")
 	private static Optional<Boolean> fabrication$canDamage(LivingEntity subject, DamageSource source, float amount, FireworkRocketEntity self) {
-		if (MixinConfigPlugin.isEnabled("*.canhit") && self instanceof SetCanHitList) {
+		if (FabConf.isEnabled("*.canhit") && self instanceof SetCanHitList) {
 			SetCanHitList schl = (SetCanHitList)self;
 			if (!CanHitUtil.canHit(schl.fabrication$getCanHitList(), subject) || !CanHitUtil.canHit(schl.fabrication$getCanHitList2(), subject)) {
 				return Optional.of(false);

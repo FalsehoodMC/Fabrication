@@ -60,7 +60,7 @@ public class FabricationMod implements ModInitializer {
 		MixinConfigPlugin.loadComplete = true;
 		for (String str : MixinConfigPlugin.discoverClassesInPackage("com.unascribed.fabrication.loaders", false)) {
 			try {
-				MixinConfigPlugin.introduce((ConfigLoader)Class.forName(str).newInstance());
+				FabConf.introduce((ConfigLoader)Class.forName(str).newInstance());
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
@@ -69,8 +69,8 @@ public class FabricationMod implements ModInitializer {
 		for (String s : MixinConfigPlugin.discoverClassesInPackage("com.unascribed.fabrication.features", false)) {
 			try {
 				Feature r = (Feature)Class.forName(s).newInstance();
-				String key = MixinConfigPlugin.remap(r.getConfigKey());
-				if (key == null || MixinConfigPlugin.isEnabled(key)) {
+				String key = FabConf.remap(r.getConfigKey());
+				if (key == null || FabConf.isEnabled(key)) {
 					try {
 						r.apply();
 						if (key != null) {
@@ -91,17 +91,17 @@ public class FabricationMod implements ModInitializer {
 			}
 		}
 		if (Agnos.eventsAvailable() && Agnos.getCurrentEnv() == Env.CLIENT) {
-			if (MixinConfigPlugin.getValue("*.long_levelup_sound_at_30") != ConfigValue.FALSE) {
+			if (FabConf.getValue("*.long_levelup_sound_at_30") != ConfigValue.FALSE) {
 				LEVELUP_LONG = Agnos.registerSoundEvent(new Identifier("fabrication", "levelup_long"), new SoundEvent(new Identifier("fabrication", "levelup_long")));
 			}
-			if (MixinConfigPlugin.getValue("*.oof") != ConfigValue.FALSE) {
+			if (FabConf.getValue("*.oof") != ConfigValue.FALSE) {
 				OOF = Agnos.registerSoundEvent(new Identifier("fabrication", "oof"), new SoundEvent(new Identifier("fabrication", "oof")));
 			}
-			if (MixinConfigPlugin.getValue("*.alt_absorption_sound") != ConfigValue.FALSE) {
+			if (FabConf.getValue("*.alt_absorption_sound") != ConfigValue.FALSE) {
 				ABSORPTION_HURT = Agnos.registerSoundEvent(new Identifier("fabrication", "absorption_hurt"), new SoundEvent(new Identifier("fabrication", "absorption_hurt")));
 			}
 		}
-		MixinConfigPlugin.submitConfigAnalytics();
+		FabConf.submitConfigAnalytics();
 		Analytics.submit("game_launch");
 		if (FabRefl.FORGE && Agnos.getCurrentEnv() == Env.CLIENT) {
 			initPrideLib();
@@ -124,7 +124,7 @@ public class FabricationMod implements ModInitializer {
 		} else {
 			FabLog.warn("Feature "+clazz.getName()+" failed to apply! Force-disabling "+configKey);
 		}
-		MixinConfigPlugin.addFailure(configKey);
+		FabConf.addFailure(configKey);
 	}
 
 	public static Identifier createIdWithCustomDefault(String namespace, String pathOrId) {
@@ -135,12 +135,12 @@ public class FabricationMod implements ModInitializer {
 	}
 
 	public static boolean isAvailableFeature(String configKey) {
-		return features.containsKey(MixinConfigPlugin.remap(configKey));
+		return features.containsKey(FabConf.remap(configKey));
 	}
 
 	public static boolean updateFeature(String configKey) {
-		configKey = MixinConfigPlugin.remap(configKey);
-		boolean enabled = MixinConfigPlugin.isEnabled(configKey);
+		configKey = FabConf.remap(configKey);
+		boolean enabled = FabConf.isEnabled(configKey);
 		if (enabledFeatures.contains(configKey) == enabled) return true;
 		if (enabled) {
 			features.get(configKey).apply();
@@ -197,11 +197,11 @@ public class FabricationMod implements ModInitializer {
 		if (key == null) {
 			Map<String, ResolvedConfigValue> trileans = Maps.newHashMap();
 			Map<String, String> strings = Maps.newHashMap();
-			for (String k : MixinConfigPlugin.getAllKeys()) {
-				if (MixinConfigPlugin.isStandardValue(k)) {
-					trileans.put(k, MixinConfigPlugin.getResolvedValue(k));
+			for (String k : FabConf.getAllKeys()) {
+				if (FabConf.isStandardValue(k)) {
+					trileans.put(k, FabConf.getResolvedValue(k));
 				} else {
-					strings.put(k, MixinConfigPlugin.getRawValue(k));
+					strings.put(k, FabConf.getRawValue(k));
 				}
 			}
 			data.writeVarInt(trileans.size());
@@ -210,27 +210,27 @@ public class FabricationMod implements ModInitializer {
 			strings.entrySet().forEach(en -> data.writeString(en.getKey()).writeString(en.getValue()));
 			data.writeLong(LAUNCH_ID);
 		} else {
-			if (MixinConfigPlugin.isStandardValue(key)) {
+			if (FabConf.isStandardValue(key)) {
 				data.writeVarInt(1);
 				data.writeString(key);
-				data.writeByte(MixinConfigPlugin.getResolvedValue(key).ordinal());
+				data.writeByte(FabConf.getResolvedValue(key).ordinal());
 				data.writeVarInt(0);
 				data.writeLong(LAUNCH_ID);
 			} else {
 				data.writeVarInt(0);
 				data.writeVarInt(1);
 				data.writeString(key);
-				data.writeString(MixinConfigPlugin.getRawValue(key));
+				data.writeString(FabConf.getRawValue(key));
 				data.writeLong(LAUNCH_ID);
 			}
 		}
 		data.writeString(Agnos.getModVersion());
-		data.writeVarInt(MixinConfigPlugin.getAllFailures().size());
-		for (String k : MixinConfigPlugin.getAllFailures()) {
+		data.writeVarInt(FabConf.getAllFailures().size());
+		for (String k : FabConf.getAllFailures()) {
 			data.writeString(k);
 		}
-		data.writeVarInt(MixinConfigPlugin.getAllBanned().size());
-		for (String k : MixinConfigPlugin.getAllBanned()) {
+		data.writeVarInt(FabConf.getAllBanned().size());
+		for (String k : FabConf.getAllBanned()) {
 			data.writeString(k);
 		}
 		CustomPayloadS2CPacket pkt = new CustomPayloadS2CPacket(CONFIG, data);

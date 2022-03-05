@@ -1,7 +1,7 @@
 package com.unascribed.fabrication.mixin.g_weird_tweaks.disable_lightning_fire;
 
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.entity.LightningEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -14,7 +14,7 @@ public class MixinLightningEntity {
 
 	@Inject(at=@At("HEAD"), method="spawnFire(I)V", cancellable=true)
 	public void preventFire(int spreadAttempts, CallbackInfo ci) {
-		if (MixinConfigPlugin.isEnabled("*.disable_lightning_fire")) ci.cancel();
+		if (FabConf.isEnabled("*.disable_lightning_fire")) ci.cancel();
 	}
 
 }

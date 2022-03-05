@@ -3,6 +3,7 @@ package com.unascribed.fabrication.mixin.b_utility.ping_privacy;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -12,7 +13,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.logic.PingPrivacyPersistentState;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import io.netty.util.concurrent.GenericFutureListener;
 import net.minecraft.network.ClientConnection;
@@ -32,7 +32,7 @@ public class MixinServerPlayNetworkHandler {
 
 	@Inject(at=@At("HEAD"), method="sendPacket(Lnet/minecraft/network/Packet;Lio/netty/util/concurrent/GenericFutureListener;)V")
 	public void sendPacket(Packet<?> p, GenericFutureListener<?> l, CallbackInfo ci) {
-		if (MixinConfigPlugin.isEnabled("*.ping_privacy") && p instanceof GameJoinS2CPacket) {
+		if (FabConf.isEnabled("*.ping_privacy") && p instanceof GameJoinS2CPacket) {
 			SocketAddress addr = connection.getAddress();
 			if (addr instanceof InetSocketAddress) {
 				PingPrivacyPersistentState.get(server.getOverworld()).addKnownIp(((InetSocketAddress)addr).getAddress());
