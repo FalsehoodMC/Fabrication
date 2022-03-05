@@ -19,12 +19,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 
-public class ModifyReturnInjector {
+public class FabInjector {
 	public static class ToInject{
+		public Map<String, String> done = new HashMap<>();
 		public List<String> method;
 		public List<String> target;
 		public String owner;
@@ -79,6 +81,7 @@ public class ModifyReturnInjector {
 					if (insnNode instanceof MethodInsnNode) {
 						MethodInsnNode insn = (MethodInsnNode) insnNode;
 						for (String target : toInject.target) {
+							String unchangedTarget = target;
 							if (target.charAt(0) == 'L') target = target.substring(1);
 							if (target.startsWith(insn.owner)) {
 								char d = target.charAt(insn.owner.length());
@@ -130,7 +133,8 @@ public class ModifyReturnInjector {
 										}
 										mod.add(new MethodInsnNode(Opcodes.INVOKESTATIC, toInject.owner, toInject.name, toInject.desc, false));
 										methodNode.instructions.insert(insn, mod);
-										FabLog.debug("Completed ModifyReturn Injection : " + m + "\t" + target);
+										toInject.done.put(m, unchangedTarget);
+										FabLog.debug("Completed ModifyReturn Injection : "+toInject.owner+";"+m+"\t"+unchangedTarget);
 									}else if ("Lcom/unascribed/fabrication/support/injection/Hijack;".equals(toInject.annotation)) {
 										for (int c = 0; c < argTypes.size(); c++) {
 											methodNode.instructions.insertBefore(insn, new VarInsnNode(getStoreOpcode(argTypes.get(argTypes.size() - 1 - c).getSort()), max++));
@@ -164,7 +168,8 @@ public class ModifyReturnInjector {
 
 										methodNode.instructions.insertBefore(insn, mod);
 										methodNode.instructions.insert(insn, optionalReturn? label2 : label);
-										FabLog.debug("Completed Hijack Injection : " + m + "\t" + target);
+										toInject.done.put(m, unchangedTarget);
+										FabLog.debug("Completed Hijack Injection : "+toInject.owner+";"+m+"\t"+unchangedTarget);
 									}
 								}
 							}
@@ -173,6 +178,9 @@ public class ModifyReturnInjector {
 				}
 			}
 		}));
+		injects.forEach(ti -> ti.method.forEach(m -> ti.target.forEach(t ->{
+			if (!t.equals(ti.done.get(m))) FabLog.error("FabInjector failed to find injection point for "+ti.owner+";"+m+"\t"+t);
+		})));
 	}
 	public static int getStoreOpcode(int type){
 		return getLoadOpcode(type) + 33;

@@ -15,7 +15,7 @@ import com.unascribed.fabrication.support.injection.FailsoftModifyArgsInjectionI
 import com.unascribed.fabrication.support.injection.FailsoftModifyConstantInjectionInfo;
 import com.unascribed.fabrication.support.injection.FailsoftModifyVariableInjectionInfo;
 import com.unascribed.fabrication.support.injection.FailsoftRedirectInjectionInfo;
-import com.unascribed.fabrication.support.injection.ModifyReturnInjector;
+import com.unascribed.fabrication.support.injection.FabInjector;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
@@ -291,7 +291,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	@Override
 	public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
 		if (FabConf.limitRuntimeConfigs()) finalizeIsEnabled(targetClass);
-		ModifyReturnInjector.apply(targetClass);
+		FabInjector.apply(targetClass);
 		if(Agnos.isModLoaded("lithium") && "com.unascribed.fabrication.mixin.e_mechanics.colorful_redstone.MixinRedstoneWireBlock".equals(mixinClassName)) {
 			targetClass.methods.forEach(methodNode -> {
 				if (methodNode instanceof MethodNodeEx && "getReceivedPowerFaster".equals(((MethodNodeEx) methodNode).getOriginalName())){
