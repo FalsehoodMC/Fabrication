@@ -396,11 +396,6 @@ public class FeatureFabricationCommand implements Feature {
 				} else {
 					values = new String[]{"unset", "true", "false", "banned"};
 				}
-				key.then(LiteralArgumentBuilder.<T>literal("root")
-						.executes((c) -> {
-							setKeyWithFeedback(c, s, "root", true);
-							return 1;
-						}));
 				for (String v : values) {
 					key.then(LiteralArgumentBuilder.<T>literal(v)
 							.executes((c) -> {

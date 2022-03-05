@@ -27,10 +27,8 @@ import com.unascribed.fabrication.support.ConfigValue;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.ResolvedConfigValue;
 import com.unascribed.fabrication.support.SpecialEligibility;
-import jdk.vm.ci.meta.Value;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.server.MinecraftServer;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -38,7 +36,6 @@ import javax.swing.UIManager;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import java.awt.Toolkit;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
@@ -101,8 +98,8 @@ public class FabConf {
 	private static final Set<String> failures = Sets.newHashSet();
 	private static final Set<String> failuresReadOnly = Collections.unmodifiableSet(failures);
 	private static final SetMultimap<String, String> configKeysForDiscoveredClasses = HashMultimap.create();
-	private static final Map<String, ConfigValue> worldConfig = new HashMap<>();
-	private static final Map<String, Boolean> worldDefaults = new HashMap<>();
+	private static Map<String, ConfigValue> worldConfig = new HashMap<>();
+	private static Map<String, Boolean> worldDefaults = new HashMap<>();
 	private static Profile worldProfile;
 	private static Profile profile;
 	private static QDIni rawConfig;
@@ -253,8 +250,8 @@ public class FabConf {
 		worldPath = path;
 		if (path == null){
 			worldConfig.clear();
-			worldProfile = null;
-			worldDefaults.clear();
+			worldProfile = Profile.GREEN;
+			worldDefaults = defaultsByProfile.row(worldProfile);
 		}else if (onLoad) {
 			lastWorldPath = path;
 		}
@@ -327,13 +324,10 @@ public class FabConf {
 			return false;
 		}
 		ConfigValue worldVal = worldConfig.get(configKey);
-		if (worldVal != null) {
-			if (worldVal == ConfigValue.UNSET){
-				Boolean worldResult = worldDefaults.get(configKey);
-				if (worldResult != null) return worldResult;
-			} else {
-				return worldVal == ConfigValue.TRUE;
-			}
+		if (worldVal == ConfigValue.UNSET) {
+			if (worldDefaults != null && worldDefaults.get(configKey) == Boolean.TRUE) return true;
+		} else {
+			return worldVal == ConfigValue.TRUE;
 		}
 		if (!config.containsKey(configKey))
 			return defaults != null && defaults.get(configKey);
@@ -365,21 +359,23 @@ public class FabConf {
 		if (isBanned(configKey)) return ConfigValue.BANNED;
 		if (isFailed(configKey)) return ConfigValue.FALSE;
 		ConfigValue worldVal = worldConfig.get(configKey);
-		if (worldVal != null) return worldVal;
+		if (worldVal != ConfigValue.UNSET) return worldVal;
 		return config.getOrDefault(remap(configKey), ConfigValue.UNSET);
 	}
 
 	public static boolean doesWorldContainValue(String configKey){
-		return worldConfig.get(configKey) != null || worldDefaults.get(configKey) != null;
+		return worldConfig.get(configKey) != ConfigValue.UNSET || worldDefaults != null && worldDefaults.get(configKey) == Boolean.TRUE;
 	}
 
 	public static ResolvedConfigValue getResolvedValue(String configKey) {
 		if (isBanned(configKey)) return ResolvedConfigValue.BANNED;
 		if (isFailed(configKey)) return ResolvedConfigValue.FALSE;
-		ConfigValue worldVal = worldConfig.get(configKey);
-		if (worldVal != null) {
-			Boolean worldResult = worldDefaults.get(configKey);
-			return worldVal.resolveSemantically(worldResult != null ? worldResult : defaults != null && defaults.getOrDefault(configKey, false));
+		if (hasWorldPath()) {
+			ConfigValue cv = config.get(remap(configKey));
+			return worldConfig.getOrDefault(remap(configKey), ConfigValue.UNSET).resolveSemantically(
+					worldDefaults != null && worldDefaults.getOrDefault(configKey, false) ||
+					 cv == ConfigValue.TRUE ||
+					cv == ConfigValue.UNSET && defaults != null && defaults.getOrDefault(configKey, false));
 		}
 		return config.getOrDefault(remap(configKey), ConfigValue.UNSET).resolveSemantically(defaults != null && defaults.getOrDefault(configKey, false));
 	}
@@ -436,38 +432,7 @@ public class FabConf {
 		failures.add(remap(configKey));
 	}
 
-	public static void worldSet(String configKey, String newValue) {
-		if (worldPath != null) {
-			if (isStandardValue(configKey)) {
-				switch (newValue) {
-					case "banned": case "true": case "false": case "unset": case "root":
-						break;
-					default: throw new IllegalArgumentException("Standard key "+configKey+" cannot be set to "+newValue);
-				}
-			} else if ("general.profile".equals(configKey)) {
-				if (!("root".equals(newValue) || Enums.getIfPresent(Profile.class, newValue.toUpperCase(Locale.ROOT)).isPresent())) {
-					throw new IllegalArgumentException("Cannot set profile to "+newValue);
-				}
-			}
-			if ("general.profile".equals(configKey)) {
-				if ("root".equals(newValue)){
-					worldProfile = null;
-					worldDefaults.clear();
-				} else {
-					worldProfile = Profile.valueOf(newValue.toUpperCase(Locale.ROOT));
-					worldDefaults.clear();
-				}
-			} else {
-				if ("root".equals(newValue)) worldConfig.remove(configKey);
-				else worldConfig.put(configKey, ConfigValue.parseTrilean(newValue));
-			}
-			write(configKey, newValue, worldPath.resolve("fabrication").resolve("features.ini"));
-		} else {
-			FabLog.warn("worldSet was called with no valid path ");
-		}
-	}
-
-	public static void set(String configKey, String newValue) {
+	private static void set(String configKey, String newValue, Path path, boolean isWorld) {
 		if (isStandardValue(configKey)) {
 			switch (newValue) {
 				case "banned": case "true": case "false": case "unset":
@@ -479,12 +444,21 @@ public class FabConf {
 				throw new IllegalArgumentException("Cannot set profile to "+newValue);
 			}
 		}
-		rawConfig.put(configKey, newValue);
+		if (!isWorld) rawConfig.put(configKey, newValue);
 		if ("general.profile".equals(configKey)) {
-			profile = rawConfig.getEnum("general.profile", Profile.class).orElse(Profile.LIGHT);
-			defaults = defaultsByProfile.row(profile);
+			if (isWorld) {
+				try {
+					worldProfile = Profile.valueOf(newValue.toUpperCase(Locale.ROOT));
+				} catch (Exception e){
+					worldProfile = Profile.GREEN;
+				}
+				worldDefaults = defaultsByProfile.row(profile);
+			} else {
+				profile = rawConfig.getEnum("general.profile", Profile.class).orElse(Profile.LIGHT);
+				defaults = defaultsByProfile.row(profile);
+			}
 		} else {
-			config.put(configKey, ConfigValue.parseTrilean(newValue));
+			(isWorld? worldConfig : config).put(configKey, ConfigValue.parseTrilean(newValue));
 		}
 		if ("general.data_upload".equals(configKey)) {
 			if ("true".equals(newValue)) {
@@ -494,7 +468,19 @@ public class FabConf {
 				Analytics.deleteId();
 			}
 		}
-		write(configKey, newValue, Agnos.getConfigDir().resolve("fabrication").resolve("features.ini"));
+		write(configKey, newValue, path);
+	}
+
+	public static void worldSet(String configKey, String newValue) {
+		if (worldPath == null) {
+			FabLog.error("worldSet was called while path was null");
+			return;
+		}
+		set(configKey, newValue, worldPath.resolve("fabrication").resolve("features.ini"), true);
+	}
+
+	public static void set(String configKey, String newValue) {
+		set(configKey, newValue, Agnos.getConfigDir().resolve("fabrication").resolve("features.ini"), false);
 	}
 
 	private static void write(String configKey, String newValue, Path configFile){
@@ -607,33 +593,30 @@ public class FabConf {
 			throw new RuntimeException("Failed to create fabrication world config directory", e1);
 		}
 		Path configFile = dir.resolve("features.ini");
-		checkForAndSaveDefaultsOrUpgrade(configFile, "default_features_config.ini", (QDIni.simpleValueIniTransformer((key, value) -> "root")));
+		checkForAndSaveDefaultsOrUpgrade(configFile, "default_features_config.ini", IniTransformer.simpleValueIniTransformer(((key, value) -> "general.profile".equals(key)? "green" : value)));
 		FabLog.timeAndCountWarnings("Loading of features.ini", () -> {
 			StringWriter sw = new StringWriter();
-			worldProfile = null;
-			worldDefaults.clear();
-			worldConfig.clear();
 			try {
 				QDIni rawConfig = QDIni.loadAndTransform(configFile, featuresIniTransformer.reset(), sw);
-				if (!rawConfig.get("general.profile").map("root"::equals).orElse(true))
-					worldProfile = rawConfig.getEnum("general.profile", Profile.class).orElse(null);
-				if (worldProfile != null)
-					worldDefaults.clear();
+				worldProfile = rawConfig.getEnum("general.profile", Profile.class).orElse(Profile.GREEN);
+				worldDefaults = defaultsByProfile.row(worldProfile);
+				worldConfig = new HashMap<>();
 				for (String k : rawConfig.keySet()) {
-					if (isStandardValue(k) && !rawConfig.get(k).map("root"::equals).orElse(true)) {
+					if (isStandardValue(k)) {
 						try {
 							worldConfig.put(k, rawConfig.getEnum(k, ConfigValue.class).get());
 						} catch (BadValueException e) {
-							FabLog.warn(e.getMessage() + " - assuming root");
+							FabLog.warn(e.getMessage() + " - assuming unset");
+							worldConfig.put(k, ConfigValue.UNSET);
 						}
 					}
 				}
 			} catch (SyntaxErrorException e) {
 				FabLog.warn("Failed to load configuration file: " + e.getMessage() + "; will assume defaults");
-				config = Maps.transformValues(defaults, v -> ConfigValue.UNSET);
+				worldConfig = Maps.transformValues(worldDefaults, v -> ConfigValue.UNSET);
 			} catch (IOException e) {
 				FabLog.warn("Failed to load configuration file; will assume defaults", e);
-				config = Maps.transformValues(defaults, v -> ConfigValue.UNSET);
+				worldConfig = Maps.transformValues(worldDefaults, v -> ConfigValue.UNSET);
 			}
 			try {
 				Files.write(configFile, sw.toString().getBytes(Charsets.UTF_8));
@@ -689,7 +672,7 @@ public class FabConf {
 			if (transformer == null && Files.exists(configFileOld)){
 				try {
 					QDIni currentValues = QDIni.load(configFileOld);
-					transformer = QDIni.simpleValueIniTransformer((key, value) -> currentValues.get(key).orElse(value));
+					transformer = IniTransformer.simpleValueIniTransformer((key, value) -> currentValues.get(key).orElse(value));
 					loadedLegacy = true;
 				} catch (IOException e) {
 					throw new RuntimeException("Failed to upgrade config", e);

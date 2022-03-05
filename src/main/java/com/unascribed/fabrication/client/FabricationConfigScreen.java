@@ -123,7 +123,6 @@ public class FabricationConfigScreen extends Screen {
 	private float sidebarHeight;
 
 	private boolean didClick;
-	private boolean didRclick;
 	private float selectTime;
 	private String selectedSection;
 	private String prevSelectedSection;
@@ -703,7 +702,6 @@ public class FabricationConfigScreen extends Screen {
 			onClose();
 		}
 		if (didClick) didClick = false;
-		if (didRclick) didRclick = false;
 
 		super.render(matrices, mouseX, mouseY, delta);
 
@@ -837,10 +835,6 @@ public class FabricationConfigScreen extends Screen {
 								client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_COW_BELL, 0.707107f+(p.ordinal()*0.22f), 1f));
 							}
 							setValue("general.profile", p.name().toLowerCase(Locale.ROOT));
-						}
-						if (didRclick && FabConf.hasWorldPath()) {
-							client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.ITEM_AXE_SCRAPE, 0.7f, 1f));
-							if (FabConf.getWorldProfile() != null) setValue("general.profile", "root");
 						}
 					}
 
@@ -999,7 +993,7 @@ public class FabricationConfigScreen extends Screen {
 		float scale = 1;
 		boolean noUnset = key.startsWith("general.");
 		ConfigValue currentValue = noUnset ? (isEnabled(key) ? ConfigValue.TRUE : ConfigValue.FALSE) : onlyBannable ? getValue(key) == ConfigValue.BANNED ? ConfigValue.BANNED : ConfigValue.UNSET : getValue(key);
-		boolean keyEnabled = isEnabled(key);
+		boolean keyEnabled = getResolvedValue(key) == ResolvedConfigValue.DEFAULT_TRUE;
 		ConfigValue prevValue = animateDisabled ? currentValue : optionPreviousValues.getOrDefault(key, currentValue);
 		int[] xes;
 		if (noUnset) {
@@ -1033,16 +1027,14 @@ public class FabricationConfigScreen extends Screen {
 			fill(matrices, 134+15, 1, 134+15+15, 10, 0x33000000);
 			fill(matrices, 134+45, 1, 134+45+15, 10, 0x33000000);
 		}
-		if (!FabConf.hasWorldPath() || FabConf.doesWorldContainValue(key)) {
-			matrices.push();
-			matrices.translate(134 + (prevX + ((curX - prevX) * a)), 0, 0);
-			int knobAlpha = ((int) ((noValue ? 1 - da : 1) * 255)) << 24;
-			fill(matrices, 0, 1, noUnset ? 22 : onlyBannable ? 30 : 15, 10, MathHelper.hsvToRgb(Math.floorMod((int) (prevHue + ((curHue - prevHue) * a)), 360) / 360f, 0.9f, (prevHSValue + ((curHSValue - prevHSValue) * a)) / 100f) | knobAlpha);
-			if (!noUnset && a >= 1 && currentValue == ConfigValue.UNSET && !onlyBannable) {
-				fill(matrices, keyEnabled ? 15 : -1, 1, keyEnabled ? 16 : 0, 10, MathHelper.hsvToRgb((keyEnabled ? 120 : 0) / 360f, 0.9f, 0.8f) | knobAlpha);
-			}
-			matrices.pop();
+		matrices.push();
+		matrices.translate(134 + (prevX + ((curX - prevX) * a)), 0, 0);
+		int knobAlpha = ((int) ((noValue ? 1 - da : 1) * 255)) << 24;
+		fill(matrices, 0, 1, noUnset ? 22 : onlyBannable ? 30 : 15, 10, MathHelper.hsvToRgb(Math.floorMod((int) (prevHue + ((curHue - prevHue) * a)), 360) / 360f, 0.9f, (prevHSValue + ((curHSValue - prevHSValue) * a)) / 100f) | knobAlpha);
+		if (!noUnset && a >= 1 && (currentValue == ConfigValue.UNSET || FabConf.hasWorldPath()) && !onlyBannable) {
+			fill(matrices, keyEnabled ? 15 : -1, 1, keyEnabled ? 16 : 0, 10, MathHelper.hsvToRgb((keyEnabled ? 120 : 0) / 360f, 0.9f, 0.8f) | knobAlpha);
 		}
+		matrices.pop();
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 		RenderSystem.setShaderTexture(0, new Identifier("fabrication", "configvalue.png"));
@@ -1065,9 +1057,7 @@ public class FabricationConfigScreen extends Screen {
 			if (mouseX >= 134 && mouseX <= 134+trackSize && mouseY >= y+1 && mouseY <= y+10) {
 				float pitch = y*0.005f;
 				if (disabled) {
-					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO, 0.8f, 1));
-					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO, 0.7f, 1));
-					tooltipBlinkTicks = 20;
+					didgeridoo();
 				} else {
 					int clickedIndex = (int)((mouseX-134)/(noUnset ? 22 : onlyBannable ? 30 : 15));
 					ConfigValue newValue;
@@ -1104,23 +1094,6 @@ public class FabricationConfigScreen extends Screen {
 						optionPreviousValues.put(key, currentValue);
 						optionAnimationTime.compute(key, (k, f) -> 5 - (f == null ? 0 : f));
 						setValue(key, newValue.toString().toLowerCase(Locale.ROOT));
-					}
-				}
-			}
-		}
-		if (didRclick && FabConf.hasWorldPath()) {
-			if (mouseX >= 134 && mouseX <= 134+trackSize && mouseY >= y+1 && mouseY <= y+10) {
-				float pitch = y*0.005f;
-				if (disabled) {
-					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO, 0.8f, 1));
-					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO, 0.7f, 1));
-					tooltipBlinkTicks = 20;
-				} else {
-					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.ITEM_AXE_SCRAPE, 0.6f+pitch, 1f));
-					if (FabConf.doesWorldContainValue(key)) {
-						optionPreviousValues.put(key, currentValue);
-						optionAnimationTime.compute(key, (k, f) -> 5 - (f == null ? 0 : f));
-						setValue(key, "root");
 					}
 				}
 			}
@@ -1235,6 +1208,12 @@ public class FabricationConfigScreen extends Screen {
 
 	private void renderWrappedTooltip(MatrixStack matrices, String str, float mouseX, float mouseY) {
 		renderOrderedTooltip(matrices, textRenderer.wrapLines(new LiteralText(str), mouseX < width/2 ? (int)(width-mouseX-30) : (int)mouseX-20), (int)(mouseX), (int)(20+mouseY));
+	}
+
+	private void didgeridoo(){
+		client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO, 0.8f, 1));
+		client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO, 0.7f, 1));
+		tooltipBlinkTicks = 20;
 	}
 
 	public static String formatTitleCase(String in) {
@@ -1353,15 +1332,11 @@ public class FabricationConfigScreen extends Screen {
 						configuringServer = true;
 						client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_XYLOPHONE, 1.2f, 1));
 					}  else {
-						client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO, 0.8f, 1));
-						client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO, 0.7f, 1));
-						tooltipBlinkTicks = 20;
+						didgeridoo();
 					}
 				}
 			}
 			didClick = true;
-		} else if (button == 1) {
-			didRclick = true;
 		}
 		if ("search".equals(selectedSection)) {
 			searchField.mouseClicked(mouseX, mouseY, button);

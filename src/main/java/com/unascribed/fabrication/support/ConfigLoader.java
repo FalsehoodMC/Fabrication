@@ -24,7 +24,7 @@ public interface ConfigLoader {
 		StringWriter sw = new StringWriter();
 		Path configFile = Agnos.getConfigDir().resolve("fabrication").resolve(getConfigName()+".ini");
 		try {
-			QDIni.loadAndTransform(configFile, QDIni.simpleLineIniTransformer(((path, line) -> {
+			QDIni.loadAndTransform(configFile, QDIni.IniTransformer.simpleLineIniTransformer(((path, line) -> {
 				if (line == null) return null;
 				int i = line.indexOf('=');
 				if (i != -1 && key.equals(path+line.substring(0, i))) {
@@ -45,7 +45,7 @@ public interface ConfigLoader {
 		Path configFile = Agnos.getConfigDir().resolve("fabrication").resolve(getConfigName()+".ini");
 		try {
 			AtomicBoolean found = new AtomicBoolean(false);
-			QDIni.loadAndTransform(configFile, QDIni.simpleValueIniTransformer(((key1, value) -> {
+			QDIni.loadAndTransform(configFile, QDIni.IniTransformer.simpleValueIniTransformer(((key1, value) -> {
 				if (key1.equals(key)){
 					found.set(true);
 					return val;
