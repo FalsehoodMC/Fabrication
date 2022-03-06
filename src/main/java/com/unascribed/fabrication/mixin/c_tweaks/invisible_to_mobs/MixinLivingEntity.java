@@ -1,24 +1,22 @@
-package com.unascribed.fabrication.mixin.b_utility.taggable_players;
+package com.unascribed.fabrication.mixin.c_tweaks.invisible_to_mobs;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.ConfigPredicates;
+import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import com.unascribed.fabrication.interfaces.TaggablePlayer;
-import com.unascribed.fabrication.logic.PlayerTag;
 import com.unascribed.fabrication.support.EligibleIf;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.mob.CreeperEntity;
-import net.minecraft.entity.mob.PhantomEntity;
 import net.minecraft.world.World;
 
 @Mixin(LivingEntity.class)
-@EligibleIf(configAvailable="*.taggable_players")
+@EligibleIf(configAvailable="*.invisible_to_mobs")
 public abstract class MixinLivingEntity extends Entity {
 
 	protected MixinLivingEntity(EntityType<? extends Entity> entityType, World world) {
@@ -27,22 +25,11 @@ public abstract class MixinLivingEntity extends Entity {
 
 	@Inject(at=@At("HEAD"), method="canTarget(Lnet/minecraft/entity/LivingEntity;)Z", cancellable=true)
 	public void canTarget(LivingEntity other, CallbackInfoReturnable<Boolean> ci) {
-		if (FabConf.isEnabled("*.taggable_players") && other instanceof TaggablePlayer) {
-			TaggablePlayer tp = ((TaggablePlayer)other);
-			if (tp.fabrication$hasTag(PlayerTag.INVISIBLE_TO_MOBS)) {
-				ci.setReturnValue(false);
-			}
-			Object self = this;
-			if (self instanceof CreeperEntity) {
-				if (tp.fabrication$hasTag(PlayerTag.SCARES_CREEPERS)) {
-					ci.setReturnValue(false);
-				}
-			} else if (self instanceof PhantomEntity) {
-				if (tp.fabrication$hasTag(PlayerTag.NO_PHANTOMS)) {
-					ci.setReturnValue(false);
-				}
-			}
+		if (!(FabConf.isEnabled("*.invisible_to_mobs") && other instanceof PlayerEntity)) return;
+		if (ConfigPredicates.shouldRun("*.invisible_to_mobs", (PlayerEntity)other)) {
+			ci.setReturnValue(false);
 		}
+
 	}
 
 }

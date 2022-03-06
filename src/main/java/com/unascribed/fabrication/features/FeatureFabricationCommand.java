@@ -29,14 +29,13 @@ import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.FeaturesFile.Sides;
 import com.unascribed.fabrication.interfaces.TaggablePlayer;
 import com.unascribed.fabrication.loaders.LoaderFScript;
-import com.unascribed.fabrication.logic.PlayerTag;
+import com.unascribed.fabrication.loaders.LoaderTaggablePlayers;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.OptionalFScript;
 import com.unascribed.fabrication.util.Cardinal;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -83,29 +82,42 @@ public class FeatureFabricationCommand implements Feature {
 					LiteralArgumentBuilder<ServerCommandSource> remove = LiteralArgumentBuilder.<ServerCommandSource>literal("remove");
 					LiteralArgumentBuilder<ServerCommandSource> get = LiteralArgumentBuilder.<ServerCommandSource>literal("get");
 					LiteralArgumentBuilder<ServerCommandSource> clear = LiteralArgumentBuilder.<ServerCommandSource>literal("clear");
+					LiteralArgumentBuilder<ServerCommandSource> push = LiteralArgumentBuilder.<ServerCommandSource>literal("push");
+					LiteralArgumentBuilder<ServerCommandSource> pull = LiteralArgumentBuilder.<ServerCommandSource>literal("pull");
 
-					for (PlayerTag pt : PlayerTag.values()) {
-						add.then(CommandManager.literal(pt.lowerName())
+
+					for (String key : FeatureTaggablePlayers.validTags) {
+						add.then(CommandManager.literal(key)
 								.executes(c -> {
-									return addTag(c, Collections.singleton(c.getSource().getPlayer()), pt);
+									return addTag(c, Collections.singleton(c.getSource().getPlayer()), key);
 								})
 								.then(CommandManager.argument("players", EntityArgumentType.players())
 										.executes(c -> {
-											return addTag(c, EntityArgumentType.getPlayers(c, "players"), pt);
+											return addTag(c, EntityArgumentType.getPlayers(c, "players"), key);
 										})
 										)
 								);
 
-						remove.then(CommandManager.literal(pt.lowerName())
+						remove.then(CommandManager.literal(key)
 								.executes(c -> {
-									return removeTag(c, Collections.singleton(c.getSource().getPlayer()), pt);
+									return removeTag(c, Collections.singleton(c.getSource().getPlayer()), key);
 								})
 								.then(CommandManager.argument("players", EntityArgumentType.players())
 										.executes(c -> {
-											return removeTag(c, EntityArgumentType.getPlayers(c, "players"), pt);
+											return removeTag(c, EntityArgumentType.getPlayers(c, "players"), key);
 										})
 										)
 								);
+						push.then(CommandManager.literal(key).executes(c -> {
+							c.getSource().sendFeedback(new LiteralText("TaggablePlayers added "+key), true);
+							FeatureTaggablePlayers.add(key);
+							return 1;
+						}));
+						pull.then(CommandManager.literal(key).executes(c -> {
+							c.getSource().sendFeedback(new LiteralText("TaggablePlayers removed "+key), true);
+							FeatureTaggablePlayers.remove(key);
+							return 1;
+						}));
 					}
 
 					get.executes(c -> {
@@ -128,6 +140,8 @@ public class FeatureFabricationCommand implements Feature {
 					tag.then(remove);
 					tag.then(get);
 					tag.then(clear);
+					tag.then(push);
+					tag.then(pull);
 
 				}
 				root.then(tag);
@@ -508,28 +522,35 @@ public class FeatureFabricationCommand implements Feature {
 
 	private int getTags(CommandContext<ServerCommandSource> c, ServerPlayerEntity player) {
 		LiteralText lt = new LiteralText("Tags: ");
-		Set<PlayerTag> tags = ((TaggablePlayer)player).fabrication$getTags();
+		Set<String> tags = ((TaggablePlayer)player).fabrication$getTags();
 		if (tags.isEmpty()) {
 			lt.append("none");
 		} else {
-			lt.append(Joiner.on(", ").join(Collections2.transform(tags, PlayerTag::lowerName)));
+			lt.append(Joiner.on(", ").join(tags));
 		}
 		c.getSource().sendFeedback(lt, false);
 		return 1;
 	}
 
-	private int addTag(CommandContext<ServerCommandSource> c, Collection<ServerPlayerEntity> players, PlayerTag pt) {
+	private int addTag(CommandContext<ServerCommandSource> c, Collection<ServerPlayerEntity> players, String key) {
+		if (!FabConf.isEnabled(key)) {
+			c.getSource().sendFeedback(new LiteralText(key+" has to be enabled for this tag to work"), true);
+		}
+		if (!LoaderTaggablePlayers.activeTags.contains(key)) {
+			c.getSource().sendFeedback(new LiteralText("Automatically switched "+key+" to TaggablePlayers because a player was tagged with it"), true);
+			FeatureTaggablePlayers.add(key);
+		}
 		for (ServerPlayerEntity spe : players) {
-			((TaggablePlayer)spe).fabrication$setTag(pt, true);
-			c.getSource().sendFeedback(new LiteralText("Added tag "+pt.lowerName()+" to ").append(spe.getDisplayName()), true);
+			((TaggablePlayer)spe).fabrication$setTag(key, true);
+			c.getSource().sendFeedback(new LiteralText("Added tag "+key+" to ").append(spe.getDisplayName()), true);
 		}
 		return 1;
 	}
 
-	private int removeTag(CommandContext<ServerCommandSource> c, Collection<ServerPlayerEntity> players, PlayerTag pt) {
+	private int removeTag(CommandContext<ServerCommandSource> c, Collection<ServerPlayerEntity> players, String pt) {
 		for (ServerPlayerEntity spe : players) {
 			((TaggablePlayer)spe).fabrication$setTag(pt, false);
-			c.getSource().sendFeedback(new LiteralText("Removed tag "+pt.lowerName()+" from ").append(spe.getDisplayName()), true);
+			c.getSource().sendFeedback(new LiteralText("Removed tag "+pt+" from ").append(spe.getDisplayName()), true);
 		}
 		return 1;
 	}
