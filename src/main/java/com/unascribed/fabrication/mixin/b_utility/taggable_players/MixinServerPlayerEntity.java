@@ -1,26 +1,13 @@
 package com.unascribed.fabrication.mixin.b_utility.taggable_players;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import com.unascribed.fabrication.FabConf;
+import com.google.common.collect.ImmutableSet;
+import com.mojang.authlib.GameProfile;
 import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.features.FeatureTaggablePlayers;
-import com.unascribed.fabrication.loaders.LoaderTaggablePlayers;
-import com.unascribed.fabrication.util.EffectNedsReplacing;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import com.mojang.authlib.GameProfile;
 import com.unascribed.fabrication.interfaces.TaggablePlayer;
+import com.unascribed.fabrication.loaders.LoaderTaggablePlayers;
 import com.unascribed.fabrication.support.EligibleIf;
-
-import com.google.common.collect.ImmutableSet;
-
 import net.fabricmc.fabric.api.util.NbtType;
-import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
@@ -28,6 +15,13 @@ import net.minecraft.nbt.NbtString;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Mixin(ServerPlayerEntity.class)
 @EligibleIf(configAvailable="*.taggable_players")

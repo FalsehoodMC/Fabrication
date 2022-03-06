@@ -32,7 +32,7 @@ tweaks.extra.permanent_dolphins_grace:
 	default: never
 	sides: server_only
 	desc:
-		Prevents wandering traders.
+		Players always have Dolphins Grace.
 
 tweaks.extra.permanent_conduit_power:
 	name: Permanent Conduit Power

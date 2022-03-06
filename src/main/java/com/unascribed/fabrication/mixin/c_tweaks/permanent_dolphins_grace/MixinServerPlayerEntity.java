@@ -4,7 +4,7 @@ import com.mojang.authlib.GameProfile;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.util.EffectNedsReplacing;
+import com.unascribed.fabrication.util.EffectNeedsReplacing;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
@@ -31,7 +31,7 @@ public abstract class MixinServerPlayerEntity extends PlayerEntity {
 	public void tick(CallbackInfo ci) {
 		if (FabConf.isEnabled("*.permanent_dolphins_grace") && ConfigPredicates.shouldRun("*.permanent_dolphins_grace", (PlayerEntity)this)) {
 			if (!fabrication$permDolphinsGrace) fabrication$permDolphinsGrace = true;
-			if (EffectNedsReplacing.needsReplacing(this, StatusEffects.DOLPHINS_GRACE)) {
+			if (EffectNeedsReplacing.needsReplacing(this, StatusEffects.DOLPHINS_GRACE)) {
 				addStatusEffect(new StatusEffectInstance(StatusEffects.DOLPHINS_GRACE, Integer.MAX_VALUE, 0, true, false));
 			}
 		} else if (fabrication$permDolphinsGrace) {

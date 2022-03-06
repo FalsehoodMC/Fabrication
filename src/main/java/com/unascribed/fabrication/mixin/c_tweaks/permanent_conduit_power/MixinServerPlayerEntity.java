@@ -2,19 +2,13 @@ package com.unascribed.fabrication.mixin.c_tweaks.permanent_conduit_power;
 
 import com.mojang.authlib.GameProfile;
 import com.unascribed.fabrication.FabConf;
-import com.unascribed.fabrication.FabLog;
-import com.unascribed.fabrication.features.FeatureTaggablePlayers;
-import com.unascribed.fabrication.loaders.LoaderTaggablePlayers;
 import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.util.EffectNedsReplacing;
-import net.fabricmc.fabric.api.util.NbtType;
+import com.unascribed.fabrication.util.EffectNeedsReplacing;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.nbt.NbtString;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -37,7 +31,7 @@ public abstract class MixinServerPlayerEntity extends PlayerEntity {
 	public void tick(CallbackInfo ci) {
 		if (FabConf.isEnabled("*.permanent_conduit_power") && ConfigPredicates.shouldRun("*.permanent_conduit_power", (PlayerEntity)this)) {
 			if (!fabrication$permConduitPower) fabrication$permConduitPower = true;
-			if (EffectNedsReplacing.needsReplacing(this, StatusEffects.CONDUIT_POWER)) {
+			if (EffectNeedsReplacing.needsReplacing(this, StatusEffects.CONDUIT_POWER)) {
 				addStatusEffect(new StatusEffectInstance(StatusEffects.CONDUIT_POWER, Integer.MAX_VALUE, 0, true, false));
 			}
 		} else if (fabrication$permConduitPower) {
