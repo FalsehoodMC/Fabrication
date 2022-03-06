@@ -1,19 +1,17 @@
-package com.unascribed.fabrication.mixin.b_utility.taggable_players;
+package com.unascribed.fabrication.mixin.c_tweaks.no_hunger;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.ConfigPredicates;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import com.unascribed.fabrication.interfaces.TaggablePlayer;
-import com.unascribed.fabrication.logic.PlayerTag;
 import com.unascribed.fabrication.support.EligibleIf;
 
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.FoodComponent;
 import net.minecraft.item.Item;
@@ -25,7 +23,7 @@ import net.minecraft.stat.Stats;
 import net.minecraft.world.World;
 
 @Mixin(PlayerEntity.class)
-@EligibleIf(configAvailable="*.taggable_players")
+@EligibleIf(configAvailable="*.no_hunger")
 public abstract class MixinPlayerEntity extends LivingEntity {
 
 	protected MixinPlayerEntity(EntityType<? extends LivingEntity> entityType, World world) {
@@ -34,8 +32,8 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 
 	@Inject(at=@At("HEAD"), method="eatFood(Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;", cancellable=true)
 	public void eatFood(World world, ItemStack stack, CallbackInfoReturnable<ItemStack> ci) {
-		if (FabConf.isEnabled("*.taggable_players") && this instanceof TaggablePlayer) {
-			if (((TaggablePlayer)this).fabrication$hasTag(PlayerTag.NO_HUNGER)) {
+		if (FabConf.isEnabled("*.no_hunger")) {
+			if (ConfigPredicates.shouldRun("*.no_hunger", (PlayerEntity)(Object)this)) {
 				Object self = this;
 				Item item = stack.getItem();
 				if (item.isFood()) {
@@ -48,15 +46,6 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 					Criteria.CONSUME_ITEM.trigger((ServerPlayerEntity)self, stack);
 				}
 				ci.setReturnValue(super.eatFood(world, stack));
-			}
-		}
-	}
-
-	@Inject(at=@At("HEAD"), method="isInvulnerableTo(Lnet/minecraft/entity/damage/DamageSource;)Z", cancellable=true)
-	public void isInvulnerableTo(DamageSource ds, CallbackInfoReturnable<Boolean> ci) {
-		if (FabConf.isEnabled("*.taggable_players") && this instanceof TaggablePlayer) {
-			if (((TaggablePlayer)this).fabrication$hasTag(PlayerTag.FIREPROOF) && ds.isFire()) {
-				ci.setReturnValue(true);
 			}
 		}
 	}

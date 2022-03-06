@@ -323,11 +323,13 @@ public class FabConf {
 			FabLog.error("Cannot look up value for config key "+configKey+" with no default");
 			return false;
 		}
-		ConfigValue worldVal = worldConfig.get(configKey);
-		if (worldVal == ConfigValue.UNSET) {
-			if (worldDefaults != null && worldDefaults.get(configKey) == Boolean.TRUE) return true;
-		} else {
-			return worldVal == ConfigValue.TRUE;
+		if (hasWorldPath()) {
+			ConfigValue worldVal = worldConfig.get(configKey);
+			if (worldVal == ConfigValue.UNSET) {
+				if (worldDefaults != null && worldDefaults.get(configKey) == Boolean.TRUE) return true;
+			} else {
+				return worldVal == ConfigValue.TRUE;
+			}
 		}
 		if (!config.containsKey(configKey))
 			return defaults != null && defaults.get(configKey);
@@ -358,8 +360,10 @@ public class FabConf {
 	public static ConfigValue getValue(String configKey) {
 		if (isBanned(configKey)) return ConfigValue.BANNED;
 		if (isFailed(configKey)) return ConfigValue.FALSE;
-		ConfigValue worldVal = worldConfig.get(configKey);
-		if (worldVal != ConfigValue.UNSET) return worldVal;
+		if (hasWorldPath()) {
+			ConfigValue worldVal = worldConfig.get(configKey);
+			if (worldVal != ConfigValue.UNSET) return worldVal;
+		}
 		return config.getOrDefault(remap(configKey), ConfigValue.UNSET);
 	}
 

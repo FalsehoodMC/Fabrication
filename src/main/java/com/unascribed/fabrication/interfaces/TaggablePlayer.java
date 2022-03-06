@@ -6,9 +6,9 @@ import com.unascribed.fabrication.logic.PlayerTag;
 
 public interface TaggablePlayer {
 
-	Set<PlayerTag> fabrication$getTags();
+	Set<String> fabrication$getTags();
 	void fabrication$clearTags();
-	void fabrication$setTag(PlayerTag tag, boolean enabled);
-	boolean fabrication$hasTag(PlayerTag tag);
+	void fabrication$setTag(String tag, boolean enabled);
+	boolean fabrication$hasTag(String tag);
 
 }
