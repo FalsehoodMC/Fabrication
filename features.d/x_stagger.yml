@@ -4,4 +4,4 @@ balance.extra.interrupting_damage:
 	sides: server_only
 	enabled: burnt
 	desc:
-		taking more then a heart of damage interrupts the current action of any mob / player.
+		Taking more then a heart of damage interrupts the current action of any mob / player.
