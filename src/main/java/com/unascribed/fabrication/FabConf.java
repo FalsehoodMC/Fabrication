@@ -370,6 +370,9 @@ public class FabConf {
 	public static boolean doesWorldContainValue(String configKey){
 		return worldConfig.get(configKey) != ConfigValue.UNSET || worldDefaults != null && worldDefaults.get(configKey) == Boolean.TRUE;
 	}
+	public static boolean doesWorldContainValue(String configKey, String configVal){
+		return worldConfig.get(configKey).toString().equals(configVal.toUpperCase(Locale.ROOT));
+	}
 
 	public static ResolvedConfigValue getResolvedValue(String configKey) {
 		if (isBanned(configKey)) return ResolvedConfigValue.BANNED;

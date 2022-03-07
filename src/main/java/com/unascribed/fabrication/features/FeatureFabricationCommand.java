@@ -559,7 +559,7 @@ public class FeatureFabricationCommand implements Feature {
 		String oldValue = FabConf.getRawValue(key);
 		boolean def = FabConf.getDefault(key);
 		boolean tri = FabConf.isStandardValue(key);
-		if (value.equals(oldValue)) {
+		if (!local && value.equals(oldValue) || local && FabConf.doesWorldContainValue(key, value)) {
 			sendFeedback(c, new LiteralText(key+" is already set to "+value+(tri ? " (default "+def+")" : "")), false);
 		} else {
 			if (local) FabConf.worldSet(key, value);
