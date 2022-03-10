@@ -13,7 +13,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.predicate.entity.EntityPredicates;
 
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.function.Predicate;
 
@@ -61,7 +60,7 @@ public class FeatureTaggablePlayers implements Feature {
 	}
 
 	private static void set(String key, int type){
-		Predicate<?> p = getPredicate(key.substring(key.lastIndexOf('.')+1).toUpperCase(Locale.ROOT), type);
+		Predicate<?> p = getPredicate(key.substring(key.lastIndexOf('.')+1), type);
 		ConfigPredicates.put(key, ConfigPredicates.defaults.containsKey(key) ? p.and((Predicate)ConfigPredicates.defaults.get(key)) : p, 1);
 	}
 

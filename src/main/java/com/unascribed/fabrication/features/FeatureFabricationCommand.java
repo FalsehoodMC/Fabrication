@@ -9,7 +9,6 @@ import java.math.MathContext;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -570,7 +569,7 @@ public class FeatureFabricationCommand implements Feature {
 			FeatureTaggablePlayers.add(key, 0);
 		}
 		for (ServerPlayerEntity spe : players) {
-			((TaggablePlayer)spe).fabrication$setTag(key.substring(key.lastIndexOf('.')+1).toUpperCase(Locale.ROOT), true);
+			((TaggablePlayer)spe).fabrication$setTag(key.substring(key.lastIndexOf('.')+1), true);
 			c.getSource().sendFeedback(new LiteralText("Added tag "+key+" to ").append(spe.getDisplayName()), true);
 		}
 		return 1;
@@ -578,7 +577,7 @@ public class FeatureFabricationCommand implements Feature {
 
 	private int removeTag(CommandContext<ServerCommandSource> c, Collection<ServerPlayerEntity> players, String pt) {
 		for (ServerPlayerEntity spe : players) {
-			((TaggablePlayer)spe).fabrication$setTag(pt.substring(pt.lastIndexOf('.')+1).toUpperCase(Locale.ROOT), false);
+			((TaggablePlayer)spe).fabrication$setTag(pt.substring(pt.lastIndexOf('.')+1), false);
 			c.getSource().sendFeedback(new LiteralText("Removed tag "+pt+" from ").append(spe.getDisplayName()), true);
 		}
 		return 1;
