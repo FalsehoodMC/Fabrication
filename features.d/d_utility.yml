@@ -31,7 +31,10 @@ utility.taggable_players:
 	short_desc: Allows assigning various "tags" to players, such as no_hunger or invisible_to_mobs
 	desc:
 		Allows you to assign or unassign various "tags" from players via /fabrication tag.
-		Valid tags consist of feature keys which are player_entity scriptable.
+		Valid tags consist of feature keys which are living_entity scriptable.
+		The following features are set taggable by default:
+		can_breathe_water, no_wandering_trader, no_phantoms, scares_creepers,
+		permanent_dolphins_grace, permanent_conduit_power, fireproof, no_hunger, invisible_to_mobs.
 
 utility.legacy_command_syntax:
 	name: Legacy Command Syntax

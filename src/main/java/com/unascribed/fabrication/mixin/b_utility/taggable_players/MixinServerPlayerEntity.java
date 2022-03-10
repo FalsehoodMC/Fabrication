@@ -2,6 +2,7 @@ package com.unascribed.fabrication.mixin.b_utility.taggable_players;
 
 import com.google.common.collect.ImmutableSet;
 import com.mojang.authlib.GameProfile;
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.features.FeatureTaggablePlayers;
 import com.unascribed.fabrication.interfaces.TaggablePlayer;
@@ -21,6 +22,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 @Mixin(ServerPlayerEntity.class)
@@ -80,9 +82,10 @@ public abstract class MixinServerPlayerEntity extends PlayerEntity implements Ta
 		NbtList li = tag.getList("fabrication:Tags", NbtType.STRING);
 		for (int i = 0; i < li.size(); i++) {
 			String key = li.getString(i);
-			if (LoaderTaggablePlayers.activeTags.add(key)) {
-				FabLog.warn("TaggablePlayers added "+key+" as a valid option because a player was tagged with it");
-				FeatureTaggablePlayers.add(key);
+			String fullKey = FabConf.remap("*."+key.toLowerCase(Locale.ROOT));
+			if (!FeatureTaggablePlayers.activeTags.containsKey(fullKey)) {
+				FabLog.warn("TaggablePlayers added "+fullKey+" as a valid option because a player was tagged with it");
+				FeatureTaggablePlayers.add(fullKey, 0);
 			}
 			fabrication$tags.add(key);
 		}

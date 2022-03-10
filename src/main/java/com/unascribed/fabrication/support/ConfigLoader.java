@@ -71,7 +71,7 @@ public interface ConfigLoader {
 											insertNext = true;
 										} else if (path != null && !path.isEmpty() && key.startsWith(path)) {
 											found.set(true);
-											return key.substring(path.length()+1) + "=" + val + "\n" + line;
+											return key.substring(path.length()) + "=" + val + "\n" + line;
 										}
 									} else {
 										found.set(true);

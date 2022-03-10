@@ -9,6 +9,7 @@ import java.math.MathContext;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -29,7 +30,6 @@ import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.FeaturesFile.Sides;
 import com.unascribed.fabrication.interfaces.TaggablePlayer;
 import com.unascribed.fabrication.loaders.LoaderFScript;
-import com.unascribed.fabrication.loaders.LoaderTaggablePlayers;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.OptionalFScript;
 import com.unascribed.fabrication.util.Cardinal;
@@ -86,38 +86,59 @@ public class FeatureFabricationCommand implements Feature {
 					LiteralArgumentBuilder<ServerCommandSource> pull = LiteralArgumentBuilder.<ServerCommandSource>literal("pull");
 
 
-					for (String key : FeatureTaggablePlayers.validTags) {
-						add.then(CommandManager.literal(key)
-								.executes(c -> {
-									return addTag(c, Collections.singleton(c.getSource().getPlayer()), key);
-								})
-								.then(CommandManager.argument("players", EntityArgumentType.players())
-										.executes(c -> {
-											return addTag(c, EntityArgumentType.getPlayers(c, "players"), key);
-										})
-										)
-								);
-
-						remove.then(CommandManager.literal(key)
-								.executes(c -> {
-									return removeTag(c, Collections.singleton(c.getSource().getPlayer()), key);
-								})
-								.then(CommandManager.argument("players", EntityArgumentType.players())
-										.executes(c -> {
-											return removeTag(c, EntityArgumentType.getPlayers(c, "players"), key);
-										})
-										)
-								);
-						push.then(CommandManager.literal(key).executes(c -> {
-							c.getSource().sendFeedback(new LiteralText("TaggablePlayers added "+key), true);
-							FeatureTaggablePlayers.add(key);
-							return 1;
-						}));
-						pull.then(CommandManager.literal(key).executes(c -> {
-							c.getSource().sendFeedback(new LiteralText("TaggablePlayers removed "+key), true);
-							FeatureTaggablePlayers.remove(key);
-							return 1;
-						}));
+					for (String key : FeatureTaggablePlayers.validTags.keySet()) {
+						{
+							LiteralArgumentBuilder<ServerCommandSource> literalKey = CommandManager.literal(key);
+							literalKey.executes(c -> {
+										return addTag(c, Collections.singleton(c.getSource().getPlayer()), key);
+									})
+									.then(CommandManager.argument("players", EntityArgumentType.players()).executes(c -> {
+										return addTag(c, EntityArgumentType.getPlayers(c, "players"), key);
+									}));
+							add.then(literalKey);
+							setAltKeys(key, alt -> add.then(LiteralArgumentBuilder.<ServerCommandSource>literal(alt).executes(literalKey.getCommand())));
+						}
+						{
+							LiteralArgumentBuilder<ServerCommandSource> literalKey = CommandManager.literal(key);
+							literalKey.executes(c -> {
+										return removeTag(c, Collections.singleton(c.getSource().getPlayer()), key);
+									})
+									.then(CommandManager.argument("players", EntityArgumentType.players()).executes(c -> {
+										return removeTag(c, EntityArgumentType.getPlayers(c, "players"), key);
+									}));
+							remove.then(literalKey);
+							setAltKeys(key, alt -> remove.then(LiteralArgumentBuilder.<ServerCommandSource>literal(alt).executes(literalKey.getCommand())));
+						}
+						{
+							{
+								LiteralArgumentBuilder<ServerCommandSource> literalKey = CommandManager.literal(key);
+								literalKey.executes(createPushTagCommandContextFor(key, 0));
+								literalKey.then(CommandManager.literal("0").executes(createPushTagCommandContextFor(key, 0)));
+								literalKey.then(CommandManager.literal("1").executes(createPushTagCommandContextFor(key, 1)));
+								literalKey.then(CommandManager.literal("2").executes(createPushTagCommandContextFor(key, 2)));
+								literalKey.then(CommandManager.literal("3").executes(createPushTagCommandContextFor(key, 3)));
+								push.then(literalKey);
+							}
+							setAltKeys(key, alt -> {
+								LiteralArgumentBuilder<ServerCommandSource> literalKey = CommandManager.literal(alt);
+								literalKey.executes(createPushTagCommandContextFor(key, 0));
+								literalKey.then(CommandManager.literal("0").executes(createPushTagCommandContextFor(key, 0)));
+								literalKey.then(CommandManager.literal("1").executes(createPushTagCommandContextFor(key, 1)));
+								literalKey.then(CommandManager.literal("2").executes(createPushTagCommandContextFor(key, 2)));
+								literalKey.then(CommandManager.literal("3").executes(createPushTagCommandContextFor(key, 3)));
+								push.then(literalKey);
+							});
+						}
+						{
+							LiteralArgumentBuilder<ServerCommandSource> literalKey = CommandManager.literal(key);
+							literalKey.executes(c -> {
+								c.getSource().sendFeedback(new LiteralText("TaggablePlayers removed " + key), true);
+								FeatureTaggablePlayers.remove(key);
+								return 1;
+							});
+							pull.then(literalKey);
+							setAltKeys(key, alt -> pull.then(LiteralArgumentBuilder.<ServerCommandSource>literal(alt).executes(literalKey.getCommand())));
+						}
 					}
 
 					get.executes(c -> {
@@ -189,6 +210,14 @@ public class FeatureFabricationCommand implements Feature {
 				FabricationMod.featureError(this, t);
 			}
 		});
+	}
+
+	private static Command<ServerCommandSource> createPushTagCommandContextFor(String key, int type){
+		return c -> {
+			c.getSource().sendFeedback(new LiteralText("TaggablePlayers added " + key), true);
+			FeatureTaggablePlayers.add(key, type);
+			return 1;
+		};
 	}
 
 	private int analyzeBlockDistribution(CommandContext<ServerCommandSource> c, World world, Set<Identifier> biomesIn) {
@@ -536,12 +565,12 @@ public class FeatureFabricationCommand implements Feature {
 		if (!FabConf.isEnabled(key)) {
 			c.getSource().sendFeedback(new LiteralText(key+" has to be enabled for this tag to work"), true);
 		}
-		if (!LoaderTaggablePlayers.activeTags.contains(key)) {
+		if (!FeatureTaggablePlayers.activeTags.containsKey(key)) {
 			c.getSource().sendFeedback(new LiteralText("Automatically switched "+key+" to TaggablePlayers because a player was tagged with it"), true);
-			FeatureTaggablePlayers.add(key);
+			FeatureTaggablePlayers.add(key, 0);
 		}
 		for (ServerPlayerEntity spe : players) {
-			((TaggablePlayer)spe).fabrication$setTag(key, true);
+			((TaggablePlayer)spe).fabrication$setTag(key.substring(key.lastIndexOf('.')+1).toUpperCase(Locale.ROOT), true);
 			c.getSource().sendFeedback(new LiteralText("Added tag "+key+" to ").append(spe.getDisplayName()), true);
 		}
 		return 1;
@@ -549,7 +578,7 @@ public class FeatureFabricationCommand implements Feature {
 
 	private int removeTag(CommandContext<ServerCommandSource> c, Collection<ServerPlayerEntity> players, String pt) {
 		for (ServerPlayerEntity spe : players) {
-			((TaggablePlayer)spe).fabrication$setTag(pt, false);
+			((TaggablePlayer)spe).fabrication$setTag(pt.substring(pt.lastIndexOf('.')+1).toUpperCase(Locale.ROOT), false);
 			c.getSource().sendFeedback(new LiteralText("Removed tag "+pt+" from ").append(spe.getDisplayName()), true);
 		}
 		return 1;
