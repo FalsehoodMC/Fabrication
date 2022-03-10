@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.features;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.interfaces.TaggablePlayer;
 import com.unascribed.fabrication.loaders.LoaderTaggablePlayers;
@@ -18,13 +19,19 @@ import java.util.function.Predicate;
 
 @EligibleIf(configAvailable="*.taggable_players")
 public class FeatureTaggablePlayers implements Feature {
+
+	//TODO should probably be automatic
+	public static final ImmutableSet<String> INVALID_TAGS = ImmutableSet.of(
+			"weird_tweaks.extra.creepers_explode_when_on_fire"
+	);
+
 	public static final ImmutableMap<String, Integer> validTags;
 	public static Map<String, Integer> activeTags = new HashMap<>();
 
 	static {
 		Map<String, Integer> tags = new HashMap<>();
 		FeaturesFile.getAll().forEach((key, val)->{
-			if (val.fscript == null) return;
+			if (val.fscript == null || INVALID_TAGS.contains(key)) return;
 			switch (val.fscript){
 				case "PLAYER_ENTITY" :
 				case "SERVER_PLAYER_ENTITY" :
