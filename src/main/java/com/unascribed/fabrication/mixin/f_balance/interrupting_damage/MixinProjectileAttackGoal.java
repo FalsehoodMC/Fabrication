@@ -26,10 +26,15 @@ public abstract class MixinProjectileAttackGoal<T extends HostileEntity & Ranged
 	@Shadow
 	public abstract boolean canStart();
 
+	@Shadow
+	@Final
+	private int minIntervalTicks;
+
 	@Override
 	public void fabrication$interruptRangedMob() {
 		if (canStart()) {
-			this.owner.attack(this.target, 0.1F);
+			if (this.updateCountdownTicks >=0 && this.updateCountdownTicks < minIntervalTicks-10)
+				this.owner.attack(this.target, 0.4F);
 			this.updateCountdownTicks = -1;
 		}
 	}

@@ -30,7 +30,8 @@ public abstract class MixinBowAttackGoal<T extends HostileEntity & RangedAttackM
 		LivingEntity target = this.actor.getTarget();
 		if (target != null && this.actor.isUsingItem()) {
 			this.actor.clearActiveItem();
-			this.actor.attack(target, BowItem.getPullProgress(this.actor.getItemUseTime()));
+			if (BowItem.getPullProgress(this.actor.getItemUseTime()) > 0.4f)
+				this.actor.attack(target, 0.4f);
 			this.cooldown = this.attackInterval;
 		}
 	}
