@@ -15,7 +15,7 @@ public abstract class MixinTripwireBlock {
 	@Hijack(target="Lnet/minecraft/block/TripwireBlock;updatePowered(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V",
 			method="scheduledTick(Lnet/minecraft/block/BlockState;Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;Ljava/util/Random;)V")
 	private static boolean fabrication$breakWire(TripwireBlock self, ServerWorld world, BlockPos pos){
-		if (!FabConf.isEnabled("*.flimsy_tripwire")) return false;
+		if (!(FabConf.isEnabled("*.flimsy_tripwire") && world.getBlockState(pos).get(TripwireBlock.ATTACHED))) return false;
 		world.breakBlock(pos, true);
 		return true;
 	}
