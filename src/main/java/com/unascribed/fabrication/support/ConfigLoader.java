@@ -79,7 +79,11 @@ public interface ConfigLoader {
 										if (dot == -1) {
 											return "[]\n" + key + "=" + val;
 										} else {
-											return "[" + key.substring(0, dot) + "]\n" + key.substring(dot+1) + "=" + val;
+											if (path != null && !path.isEmpty() && key.startsWith(path)) {
+												return key.substring(path.length()) + "=" + val;
+											} else {
+												return "[" + key.substring(0, dot) + "]\n" + key.substring(dot + 1) + "=" + val;
+											}
 										}
 									}
 								}
