@@ -18,6 +18,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 
@@ -39,7 +40,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 		ItemStack stack = getMainHandStack();
 		if (!stack.isEmpty()) {
 			if (stack.hasNbt() && stack.getNbt().contains("CanDestroy")) {
-				ci.setReturnValue(!stack.canDestroy(world.getTagManager(), new CachedBlockPosition(world, pos, false)));
+				ci.setReturnValue(!stack.canDestroy(world.getRegistryManager().get(Registry.BLOCK_KEY), new CachedBlockPosition(world, pos, false)));
 			}
 		}
 	}
@@ -52,7 +53,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 		if (!MixinConfigPlugin.isEnabled("*.adventure_tags_in_survival") || abilities.creativeMode || !abilities.allowModifyWorld) return;
 		if (!stack.isEmpty()) {
 			if (stack.hasNbt() && stack.getNbt().contains("CanPlaceOn")) {
-				ci.setReturnValue(stack.canPlaceOn(world.getTagManager(), new CachedBlockPosition(world, pos.offset(dir.getOpposite()), false)));
+				ci.setReturnValue(stack.canPlaceOn(world.getRegistryManager().get(Registry.BLOCK_KEY), new CachedBlockPosition(world, pos.offset(dir.getOpposite()), false)));
 			}
 		}
 	}

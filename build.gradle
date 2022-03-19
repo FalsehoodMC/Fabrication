@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '0.10-SNAPSHOT'
+	id 'fabric-loom' version '0.11-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -48,15 +48,17 @@ dependencies {
 	modImplementation include(fabricApi.module("fabric-item-api-v1", "${project.fabric_version}"))
 	modImplementation include(fabricApi.module("fabric-key-binding-api-v1", "${project.fabric_version}"))
 	modImplementation include(fabricApi.module("fabric-rendering-v1", "${project.fabric_version}"))
+	// Required since 1.18.2 due to Fabric not doing things the right way
+	modImplementation include(fabricApi.module("fabric-registry-sync-v0", "${project.fabric_version}"))
 	
 	modImplementation(include("io.github.queerbric:pridelib:1.1.0+1.17")) {
 		transitive = false
 	}
-	modImplementation("com.terraformersmc:modmenu:2.0.3") {
+	modImplementation("com.terraformersmc:modmenu:3.1.0") {
 		transitive = false
 	}
-	modImplementation "com.unascribed:ears-api:1.4.1"
-	modImplementation("tf.ssf.sfort:fscript:1.1.5") {
+	modImplementation "com.unascribed:ears-api:1.4.5"
+	modImplementation("tf.ssf.sfort:fscript:2.2.0") {
 		transitive = false
 	}
 	modRuntimeOnly fabricApi.module("fabric-screen-api-v1", "${project.fabric_version}")

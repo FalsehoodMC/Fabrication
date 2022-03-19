@@ -11,7 +11,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.resource.ReloadableResourceManager;
+import net.minecraft.resource.ReloadableResourceManagerImpl;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceReloader;
 import net.minecraft.util.Unit;
@@ -24,7 +24,7 @@ public class FabricationModClient implements ClientModInitializer {
 
 		if (!MixinConfigPlugin.isBanned("*.classic_block_drops")) {
 			MinecraftClient.getInstance().send(() -> {
-				((ReloadableResourceManager)MinecraftClient.getInstance().getResourceManager()).registerReloader(new ResourceReloader() {
+				((ReloadableResourceManagerImpl)MinecraftClient.getInstance().getResourceManager()).registerReloader(new ResourceReloader() {
 					@Override
 					public CompletableFuture<Void> reload(Synchronizer synchronizer, ResourceManager manager, Profiler prepareProfiler, Profiler applyProfiler, Executor prepareExecutor, Executor applyExecutor) {
 						return synchronizer.whenPrepared(Unit.INSTANCE).thenRunAsync(() -> {

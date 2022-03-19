@@ -20,7 +20,7 @@ import net.minecraft.entity.player.PlayerEntity;
 public abstract class MixinHungerManager implements SetSaturation {
 
 	@Shadow
-	private float foodSaturationLevel;
+	private float saturationLevel;
 
 	@Inject(at=@At("HEAD"), method="update(Lnet/minecraft/entity/player/PlayerEntity;)V", cancellable=true)
 	public void update(PlayerEntity pe, CallbackInfo ci) {
@@ -33,7 +33,7 @@ public abstract class MixinHungerManager implements SetSaturation {
 
 	@Override
 	public void fabrication$setSaturation(float sat) {
-		foodSaturationLevel = sat;
+		saturationLevel = sat;
 	}
 
 }
