@@ -6,7 +6,7 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-// if targeting void, return bool otherwise Optional<>
+// if targeting void, return bool otherwise HijackReturn<>
 @Retention(RUNTIME)
 @Target(METHOD)
 public @interface Hijack {
