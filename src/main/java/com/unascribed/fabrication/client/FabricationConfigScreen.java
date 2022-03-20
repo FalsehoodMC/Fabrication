@@ -657,7 +657,7 @@ public class FabricationConfigScreen extends Screen {
 		}
 
 		if (drawButton(matrices, width-100, height-20, 100, 20, "Done", mouseX, mouseY)) {
-			onClose();
+			close();
 		}
 		if (didClick) didClick = false;
 
@@ -1193,7 +1193,7 @@ public class FabricationConfigScreen extends Screen {
 	}
 
 	@Override
-	public void onClose() {
+	public void close() {
 		if (!MixinConfigPlugin.isEnabled("*.reduced_motion") && !leaving) {
 			leaving = true;
 			client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_BARREL_CLOSE, 0.7f));

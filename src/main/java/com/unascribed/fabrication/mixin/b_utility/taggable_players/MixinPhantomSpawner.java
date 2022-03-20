@@ -9,7 +9,7 @@ import com.unascribed.fabrication.logic.PlayerTag;
 import com.unascribed.fabrication.support.EligibleIf;
 
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.world.gen.PhantomSpawner;
+import net.minecraft.world.spawner.PhantomSpawner;
 
 @Mixin(PhantomSpawner.class)
 @EligibleIf(configAvailable="*.taggable_players")

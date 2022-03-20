@@ -139,7 +139,7 @@ public class FeatureFabricationCommand implements Feature {
 					LiteralArgumentBuilder<ServerCommandSource> biome = CommandManager.literal("biome");
 
 
-					for (Map.Entry<RegistryKey<Biome>, Biome> en : BuiltinRegistries.BIOME.getEntries()) {
+					for (Map.Entry<RegistryKey<Biome>, Biome> en : BuiltinRegistries.BIOME.getEntrySet()) {
 						Identifier id = en.getKey().getValue();
 						Identifier b = en.getKey().getValue();
 						Command<ServerCommandSource> exec = c -> {
@@ -230,7 +230,7 @@ public class FeatureFabricationCommand implements Feature {
 								for (int cZ = 0; cZ < 16; cZ++) {
 									if (biomes != null) {
 										ChunkGenerator generator = ((ServerWorld)world).getChunkManager().getChunkGenerator();
-										Biome b = generator.getBiomeSource().getBiome(cX+chunk.getPos().getStartX(), cY, cZ+chunk.getPos().getStartZ(), generator.getMultiNoiseSampler());
+										Biome b = generator.getBiomeSource().getBiome(cX+chunk.getPos().getStartX(), cY, cZ+chunk.getPos().getStartZ(), generator.getMultiNoiseSampler()).value();
 										if (!biomes.contains(b)) {
 											skipped++;
 											if (skipped > goal && scanned == 0) {

@@ -36,9 +36,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.EntityPositionS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.tag.BlockTags;
-import net.minecraft.tag.ItemTags;
-import net.minecraft.tag.Tag;
+import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
@@ -151,8 +149,8 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 				}
 			}
 			for (Map.Entry<Identifier, ParsedTime> en : LoaderItemDespawn.tagDespawns.entrySet()) {
-				Tag<Item> itemTag = ItemTags.getTagGroup().getTag(en.getKey());
-				if (itemTag != null && itemTag.contains(stack.getItem())) {
+				TagKey<Item> itemTag = TagKey.of(Registry.ITEM_KEY, en.getKey());
+				if (stack.isIn(itemTag)) {
 					if (en.getValue().overshadows(time)) {
 						if (debug) System.out.println("Found a tag; it overshadows: "+en.getValue());
 						time = en.getValue();
@@ -160,8 +158,8 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 				}
 				if (stack.getItem() instanceof BlockItem) {
 					BlockItem bi = (BlockItem)stack.getItem();
-					Tag<Block> blockTag = BlockTags.getTagGroup().getTag(en.getKey());
-					if (blockTag != null && blockTag.contains(bi.getBlock())) {
+					TagKey<Block> blockTag = TagKey.of(Registry.BLOCK_KEY, en.getKey());
+					if (bi.getBlock().getRegistryEntry().isIn(blockTag)) {
 						if (en.getValue().overshadows(time)) {
 							if (debug) System.out.println("Found a tag; it overshadows: "+en.getValue());
 							time = en.getValue();

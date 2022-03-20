@@ -24,9 +24,7 @@ import com.google.common.primitives.Ints;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
-import net.minecraft.tag.BlockTags;
-import net.minecraft.tag.ItemTags;
-import net.minecraft.tag.Tag;
+import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
@@ -191,10 +189,10 @@ public class LoaderGearComponents implements ConfigLoader {
 
 	private static Supplier<Item> tagResolver(Identifier id) {
 		return () -> {
-			Tag<Item> itemTag = ItemTags.getTagGroup().getTag(id);
-			if (itemTag != null) return itemTag.getRandom(rand);
-			Tag<Block> blockTag = BlockTags.getTagGroup().getTag(id);
-			if (blockTag != null) return blockTag.getRandom(rand).asItem();
+			TagKey<Item> itemTag = TagKey.of(Registry.ITEM_KEY, id);
+			if (Registry.ITEM.containsTag(itemTag)) return Registry.ITEM.getEntryList(itemTag).flatMap(items -> items.getRandom(rand)).map(itemEntry -> itemEntry.value()).orElse(null);
+			TagKey<Block> blockTag = TagKey.of(Registry.BLOCK_KEY, id);
+			if (Registry.BLOCK.containsTag(blockTag)) return Registry.BLOCK.getEntryList(blockTag).flatMap(blocks -> blocks.getRandom(rand)).map(blockEntry -> blockEntry.value().asItem()).orElse(null);
 			return null;
 		};
 	}

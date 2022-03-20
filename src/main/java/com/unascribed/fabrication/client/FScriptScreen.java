@@ -165,7 +165,7 @@ public class FScriptScreen extends ScriptingScreen {
 					fill(matrices, 0, (int) y+11, textRenderer.getWidth(feature.name)+16, (int) y+12, -1);
 					if (didClick){
 						out.accept(feature.fscriptDefault);
-						onClose();
+						close();
 					}
 				}
 				sidebarHeight+=20;
@@ -189,7 +189,7 @@ public class FScriptScreen extends ScriptingScreen {
 			return super.mouseScrolled(mouseX, mouseY, amount);
 		}
 		@Override
-		public void onClose() {
+		public void close() {
 			client.setScreen(parent);
 		}
 		@Override

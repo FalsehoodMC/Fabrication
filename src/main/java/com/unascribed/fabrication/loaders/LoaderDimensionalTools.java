@@ -33,13 +33,12 @@ import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.tag.BlockTags;
-import net.minecraft.tag.ItemTags;
-import net.minecraft.tag.Tag;
-import net.minecraft.tag.TagGroup;
+import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryEntry;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.dimension.DimensionType;
 
 public class LoaderDimensionalTools implements ConfigLoader {
@@ -181,7 +180,7 @@ public class LoaderDimensionalTools implements ConfigLoader {
 	}
 
 	public static Set<MohsIdentifier> getAssociatedDimensionsForTool(ItemStack stack) {
-		Set<MohsIdentifier> dims = processTags(toolAssociations.get(Registry.ITEM.getId(stack.getItem())), toolTagAssociations, ItemTags.getTagGroup(), stack.getItem());
+		Set<MohsIdentifier> dims = processTags(toolAssociations.get(Registry.ITEM.getId(stack.getItem())), toolTagAssociations, Registry.ITEM_KEY, stack.getItem().getRegistryEntry());
 		if (stack.hasNbt()) {
 			if (stack.getNbt().getBoolean("fabrication:ActLikeGold")) {
 				dims = Sets.newHashSet(dims);
@@ -203,18 +202,18 @@ public class LoaderDimensionalTools implements ConfigLoader {
 	}
 
 	public static Set<MohsIdentifier> getAssociatedDimensionsForIngredient(ItemStack stack) {
-		return processTags(ingredientAssociations.get(Registry.ITEM.getId(stack.getItem())), ingredientTagAssociations, ItemTags.getTagGroup(), stack.getItem());
+		return processTags(ingredientAssociations.get(Registry.ITEM.getId(stack.getItem())), ingredientTagAssociations, Registry.ITEM_KEY, stack.getItem().getRegistryEntry());
 	}
 
 	public static Set<MohsIdentifier> getAssociatedDimensions(Block block) {
-		return processTags(blockAssociations.get(Registry.BLOCK.getId(block)), blockTagAssociations, BlockTags.getTagGroup(), block);
+		return processTags(blockAssociations.get(Registry.BLOCK.getId(block)), blockTagAssociations, Registry.BLOCK_KEY, block.getRegistryEntry());
 	}
 
-	private static <T, U> Set<U> processTags(Set<U> out, SetMultimap<Identifier, U> assoc, TagGroup<T> tagGroup, T entry) {
+	private static <T, U> Set<U> processTags(Set<U> out, SetMultimap<Identifier, U> assoc, RegistryKey<? extends Registry<T>> key, RegistryEntry<T> entry) {
 		boolean cloned = false;
 		for (Map.Entry<Identifier, U> en : assoc.entries()) {
-			Tag<T> tag = tagGroup.getTag(en.getKey());
-			if (tag != null && tag.contains(entry)) {
+			TagKey<T> tag = TagKey.of(key, en.getKey());
+			if (entry.isIn(tag)) {
 				if (!cloned) {
 					out = Sets.newHashSet(out);
 					cloned = true;
@@ -228,8 +227,8 @@ public class LoaderDimensionalTools implements ConfigLoader {
 	public static boolean isSubstitutable(Item item) {
 		if (substitutableItems.contains(Registry.ITEM.getId(item))) return true;
 		for (Identifier id : substitutableItemTags) {
-			Tag<Item> tag = ItemTags.getTagGroup().getTag(id);
-			if (tag != null && tag.contains(item)) return true;
+			TagKey<Item> tag = TagKey.of(Registry.ITEM_KEY, id);
+			if (item.getRegistryEntry().isIn(tag)) return true;
 		}
 		return false;
 	}
