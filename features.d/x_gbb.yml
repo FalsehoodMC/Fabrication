@@ -1,0 +1,8 @@
+minor_mechanics.gradual_block_breaking:
+	name: Gradual Block Breaking
+	since: 2.3.1
+	sides: server_only
+	fscript: player_entity
+	desc:
+		Snow layers and slabs will be mined a layer at a time.
+		Only applies to snow when using a shovel.
