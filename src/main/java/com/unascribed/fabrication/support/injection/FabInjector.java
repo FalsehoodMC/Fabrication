@@ -131,11 +131,13 @@ public class FabInjector {
 								}
 							}
 						}
-						for (String target : toInject.potentiallyRedirected) {
-							if (target.equals(insn.name + insn.desc)) {
-								if (performInjection(methodNode, insn, toInject, target)) {
-									String type = toInject.annotation.substring(toInject.annotation.lastIndexOf('/'), toInject.annotation.length() - 1);
-									FabLog.debug("Completed " + type + " Injection over existing Redirect : " + toInject.owner + ";" + m + "\t" + target);
+						if (toInject.owner.equals(insn.owner)) {
+							for (String target : toInject.potentiallyRedirected) {
+								if (target.equals(insn.name + insn.desc)) {
+									if (performInjection(methodNode, insn, toInject, target)) {
+										String type = toInject.annotation.substring(toInject.annotation.lastIndexOf('/'), toInject.annotation.length() - 1);
+										FabLog.debug("Completed " + type + " Injection over existing Redirect : " + toInject.owner + ";" + m + "\t" + target);
+									}
 								}
 							}
 						}
