@@ -14,7 +14,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 @Mixin(MinecraftClient.class)
 @EligibleIf(configAvailable="*.use_items_while_riding", envMatches=Env.CLIENT)
 public class MixinMinecraftClient {
-	@Redirect(method="doAttack()V", at=@At(value="INVOKE", target="Lnet/minecraft/client/network/ClientPlayerEntity;isRiding()Z"))
+	@Redirect(method="doAttack()Z", at=@At(value="INVOKE", target="Lnet/minecraft/client/network/ClientPlayerEntity;isRiding()Z"))
 	public boolean canAttack(ClientPlayerEntity clientPlayerEntity){
 		return !MixinConfigPlugin.isEnabled("*.use_items_while_riding") && clientPlayerEntity.isRiding();
 	}
