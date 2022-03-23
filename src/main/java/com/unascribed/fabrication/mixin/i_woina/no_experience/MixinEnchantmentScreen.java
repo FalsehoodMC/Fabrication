@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.injection.Hijack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
@@ -57,16 +58,16 @@ public abstract class MixinEnchantmentScreen extends HandledScreen<EnchantmentSc
 		return original;
 	}
 
-	@Redirect(at=@At(value="INVOKE", target="net/minecraft/client/gui/screen/ingame/EnchantmentScreen.drawTexture(Lnet/minecraft/client/util/math/MatrixStack;IIIIII)V"),
+	@Hijack(target="net/minecraft/client/gui/screen/ingame/EnchantmentScreen.drawTexture(Lnet/minecraft/client/util/math/MatrixStack;IIIIII)V",
 			method="drawBackground(Lnet/minecraft/client/util/math/MatrixStack;FII)V")
-	public void drawTexture(EnchantmentScreen subject, MatrixStack matrices, int x, int y, int u, int v, int width, int height) {
+	public boolean fabrication$noXpHijackDrawTexture(EnchantmentScreen subject, MatrixStack matrices, int x, int y, int u, int v) {
 		if (FabConf.isEnabled("*.no_experience") && (v == 223 || v == 239)) {
 			if (v == 223) {
 				textRenderer.drawWithShadow(matrices, ""+((u/16)+1), x+98, y+8, 0x5577FF);
 			}
-			return;
+			return true;
 		}
-		subject.drawTexture(matrices, x, y, u, v, width, height);
+		return false;
 	}
 
 	@ModifyVariable(at=@At(value="INVOKE", target="net/minecraft/client/font/TextRenderer.getWidth(Ljava/lang/String;)I", ordinal=0),

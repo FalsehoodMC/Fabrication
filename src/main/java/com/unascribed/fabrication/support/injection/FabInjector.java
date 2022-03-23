@@ -37,14 +37,16 @@ public class FabInjector {
 		public String owner;
 		public String name;
 		public String desc;
+		public int access;
 		public String annotation;
 
-		public ToInject(List<String> method, List<String> target, String owner, String name, String desc, String annotation){
+		public ToInject(List<String> method, List<String> target, String owner, String name, String desc, int opcode, String annotation){
 			this.method = method;
 			this.target = target;
 			this.owner = owner;
 			this.name = name;
 			this.desc = desc;
+			this.access = opcode;
 			this.annotation = annotation;
 		}
 	}
@@ -98,6 +100,7 @@ public class FabInjector {
 						targetClass.name,
 						methodNode.name,
 						methodNode.desc,
+						methodNode.access,
 						inject.desc
 				));
 			}
@@ -151,6 +154,7 @@ public class FabInjector {
 	}
 
 	public static boolean performInjection(MethodNode methodNode, MethodInsnNode insn, ToInject toInject, String target) {
+		boolean toInjectIsStatic = (toInject.access & Opcodes.ACC_STATIC) != 0;
 		InsnList mod = new InsnList();
 		List<Type> argTypes = new ArrayList<>();
 		if (insn.getOpcode() != Opcodes.INVOKESTATIC)
@@ -185,6 +189,7 @@ public class FabInjector {
 					}
 				}
 				methodNode.maxLocals=max;
+				if (!toInjectIsStatic) mod.add(new VarInsnNode(Opcodes.ALOAD, 0));
 				for (AbstractInsnNode a : newVars) {
 					if (countDesc-->0) mod.add(a.clone(new HashMap<>()));
 				}
@@ -192,11 +197,11 @@ public class FabInjector {
 					if (countDesc-->0) mod.add(a.clone(new HashMap<>()));
 				}
 				methodNode.instructions.insertBefore(varTrace == null ? insn : varTrace, newVars);
-				for (int c = 0; c < countDesc; c++) {
+				for (int c = toInjectIsStatic ? 0 : 1; c < countDesc; c++) {
 					mod.add(new VarInsnNode(getLoadOpcode(toInjectArgTypes[toInjectArgTypes.length-countDesc+c].getSort()), c));
 				}
 			}
-			mod.add(new MethodInsnNode(Opcodes.INVOKESTATIC, toInject.owner, toInject.name, toInject.desc, false));
+			mod.add(new MethodInsnNode(toInjectIsStatic ? Opcodes.INVOKESTATIC : Opcodes.INVOKEVIRTUAL, toInject.owner, toInject.name, toInject.desc, false));
 			methodNode.instructions.insert(insn, mod);
 			return true;
 		} else if ("Lcom/unascribed/fabrication/support/injection/Hijack;".equals(toInject.annotation)) {
@@ -206,7 +211,7 @@ public class FabInjector {
 			LabelNode label = new LabelNode(new Label());
 			LabelNode label2 = new LabelNode(new Label());
 			boolean optionalReturn = toInjectType.getReturnType().getSort() != Type.BOOLEAN;
-			mod.add(new MethodInsnNode(Opcodes.INVOKESTATIC, toInject.owner, toInject.name, toInject.desc, false));
+			mod.add(new MethodInsnNode(toInjectIsStatic ? Opcodes.INVOKESTATIC : Opcodes.INVOKEVIRTUAL, toInject.owner, toInject.name, toInject.desc, false));
 			if (optionalReturn) {
 				mod.add(new VarInsnNode(Opcodes.ASTORE, max));
 				mod.add(new VarInsnNode(Opcodes.ALOAD, max));
@@ -220,13 +225,14 @@ public class FabInjector {
 				mod.add(label);
 			}
 			methodNode.maxLocals=max+1;
+			if (!toInjectIsStatic) methodNode.instructions.insertBefore(insn, new VarInsnNode(Opcodes.ALOAD, 0));
 			for (Type argType : argTypes) {
 				int opcode = getLoadOpcode(argType.getSort());
 				mod.add(new VarInsnNode(opcode, --max));
 				if (countDesc-->0)
 					methodNode.instructions.insertBefore(insn, new VarInsnNode(opcode, max));
 			}
-			for (int c = 0; c < countDesc; c++) {
+			for (int c = toInjectIsStatic ? 0 : 1; c < countDesc; c++) {
 				methodNode.instructions.insertBefore(insn, new VarInsnNode(getLoadOpcode(toInjectArgTypes[toInjectArgTypes.length-countDesc+c].getSort()), c));
 			}
 
