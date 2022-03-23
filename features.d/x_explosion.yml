@@ -1,0 +1,6 @@
+woina.more_explosion_particles:
+	name: More Explosion Particles
+	since: 2.3.1
+	sides: server_only
+	desc:
+		Adds smoke and poof particles to explosions.
