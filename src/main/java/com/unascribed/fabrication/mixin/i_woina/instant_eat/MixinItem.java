@@ -13,7 +13,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 @Mixin(Item.class)
-@EligibleIf(configAvailable="*.instant_eat", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.instant_eat")
 public class MixinItem {
 
 	@Inject(method="getMaxUseTime(Lnet/minecraft/item/ItemStack;)I", at=@At(value="HEAD"), cancellable = true)
