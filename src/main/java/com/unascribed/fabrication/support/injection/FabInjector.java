@@ -148,9 +148,8 @@ public class FabInjector {
 										if (optionalReturn) {
 											mod.add(new VarInsnNode(Opcodes.ASTORE, max));
 											mod.add(new VarInsnNode(Opcodes.ALOAD, max));
-											mod.add(new FieldInsnNode(Opcodes.GETFIELD, "com/unascribed/fabrication/support/injection/HijackReturn", "cancel", "Z"));
 										}
-										mod.add(new JumpInsnNode(optionalReturn ? Opcodes.IFEQ : Opcodes.IFNE, label));
+										mod.add(new JumpInsnNode(optionalReturn ? Opcodes.IFNULL : Opcodes.IFNE, label));
 										if (optionalReturn) {
 											mod.add(new VarInsnNode(Opcodes.ALOAD, max));
 											mod.add(new FieldInsnNode(Opcodes.GETFIELD, "com/unascribed/fabrication/support/injection/HijackReturn", "object", "Ljava/lang/Object;"));

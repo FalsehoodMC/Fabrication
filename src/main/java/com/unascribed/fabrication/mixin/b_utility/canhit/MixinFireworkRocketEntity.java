@@ -25,7 +25,7 @@ public class MixinFireworkRocketEntity {
 				return new HijackReturn(false);
 			}
 		}
-		return HijackReturn.empty;
+		return null;
 	}
 
 }

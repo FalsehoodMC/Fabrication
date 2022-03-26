@@ -21,7 +21,7 @@ public class MixinFlatChunkGeneratorConfig {
 			FabLog.debug("Preventing a bad structure from being added to a flat world generator.");
 			return new HijackReturn(null);
 		}
-		return HijackReturn.empty;
+		return null;
 	}
 
 }

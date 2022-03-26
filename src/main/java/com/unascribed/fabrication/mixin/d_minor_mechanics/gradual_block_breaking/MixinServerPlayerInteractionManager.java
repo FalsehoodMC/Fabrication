@@ -37,6 +37,7 @@ public class MixinServerPlayerInteractionManager implements GradualBreak {
 
 	private BlockState fabrication$gradualBreakState = null;
 
+	//TODO switch to virtual and remove the accessor once 436 is on the same branch
 	@ModifyReturn(target="Lnet/minecraft/server/world/ServerWorld;getBlockState(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;",
 			method="tryBreakBlock(Lnet/minecraft/util/math/BlockPos;)Z")
 	private static BlockState fabrication$gradualBreak(BlockState state, ServerWorld world, BlockPos pos, ServerPlayerInteractionManager self) {
@@ -74,14 +75,14 @@ public class MixinServerPlayerInteractionManager implements GradualBreak {
 	@Hijack(target="Lnet/minecraft/server/world/ServerWorld;removeBlock(Lnet/minecraft/util/math/BlockPos;Z)Z",
 			method="tryBreakBlock(Lnet/minecraft/util/math/BlockPos;)Z")
 	private static HijackReturn fabrication$gradualBreak(ServerWorld world, BlockPos pos, boolean move, ServerPlayerInteractionManager self) {
-		if (!(FabConf.isEnabled("*.gradual_block_breaking") && self instanceof GradualBreak)) return HijackReturn.empty;
+		if (!(FabConf.isEnabled("*.gradual_block_breaking") && self instanceof GradualBreak)) return null;
 		BlockState state = ((GradualBreak)self).fabrication$getGradualBreak();
 		if (state != null) {
 			world.setBlockState(pos, state);
 			((GradualBreak)self).fabrication$setGradualBreak(null);
 			return new HijackReturn(true);
 		}
-		return HijackReturn.empty;
+		return null;
 	}
 
 	@Override
