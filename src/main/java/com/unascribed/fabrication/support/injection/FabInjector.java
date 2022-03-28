@@ -201,9 +201,9 @@ public class FabInjector {
 					mod.add(new VarInsnNode(getLoadOpcode(toInjectArgTypes[toInjectArgTypes.length-countDesc+c].getSort()), c));
 				}
 			} else if (!toInjectIsStatic) {
-				mod.add(new VarInsnNode(getStoreOpcode(argTypes.get(0).getSort()), methodNode.maxLocals));
+				mod.add(new VarInsnNode(getStoreOpcode(targetType.getReturnType().getSort()), methodNode.maxLocals));
 				mod.add(new VarInsnNode(Opcodes.ALOAD, 0));
-				mod.add(new VarInsnNode(getLoadOpcode(argTypes.get(0).getSort()), methodNode.maxLocals));
+				mod.add(new VarInsnNode(getLoadOpcode(targetType.getReturnType().getSort()), methodNode.maxLocals));
 				methodNode.maxLocals += 1;
 			}
 			mod.add(new MethodInsnNode(toInjectIsStatic ? Opcodes.INVOKESTATIC : Opcodes.INVOKEVIRTUAL, toInject.owner, toInject.name, toInject.desc, false));
