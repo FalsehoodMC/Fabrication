@@ -1,6 +1,6 @@
 package com.unascribed.fabrication.mixin.g_weird_tweaks.encroaching_emeralds;
 
-import com.unascribed.fabrication.interfaces.GenerationSettingsBuilderContains;
+import com.unascribed.fabrication.interfaces.GenerationSettingsAddEmeralds;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.world.biome.GenerationSettings;
@@ -16,13 +16,7 @@ public abstract class MixinDefaultBiomeFeatures {
 
 	@Inject(at=@At("HEAD"), method="addDefaultOres(Lnet/minecraft/world/biome/GenerationSettings$Builder;)V")
 	private static void addEmeralds(GenerationSettings.Builder builder, CallbackInfo ci){
-		if (!MixinConfigPlugin.isEnabled("*.encroaching_emeralds") || ((GenerationSettingsBuilderContains)builder).fabrication$hasEmeralds()) return;
-		DefaultBiomeFeatures.addEmeraldOre(builder);
-	}
-	@Inject(at=@At("HEAD"), method="addEmeraldOre(Lnet/minecraft/world/biome/GenerationSettings$Builder;)V", cancellable=true)
-	private static void removeEmeralds(GenerationSettings.Builder builder, CallbackInfo ci){
-		if (!MixinConfigPlugin.isEnabled("*.encroaching_emeralds")) return;
-		if (((GenerationSettingsBuilderContains)builder).fabrication$hasEmeralds()) ci.cancel();
-		((GenerationSettingsBuilderContains)builder).fabrication$setEmeralds();
+		if (!(MixinConfigPlugin.isEnabled("*.encroaching_emeralds") && builder instanceof GenerationSettingsAddEmeralds)) return;
+		((GenerationSettingsAddEmeralds)builder).fabrication$addEmeralds();
 	}
 }
