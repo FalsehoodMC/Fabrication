@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(MeleeAttackGoal.class)
 @EligibleIf(configAvailable="*.melee_mobs_keep_attacking")
-public abstract class MixinEntityNavigation {
+public abstract class MixinMeleeAttackGoal {
 
 	@Shadow @Final
 	protected PathAwareEntity mob;
