@@ -41,12 +41,13 @@ public abstract class MixinClientWorld extends World {
 		if (!FabConf.isEnabled("*.void_fog_particles") || this.getDimension().hasCeiling()) return;
 		int floor = this.getDimension().getMinimumY();
 		if (floor+24<centerY) return;
+		BlockPos.Mutable mutablePos = new BlockPos.Mutable();
 		for(int i=0; i<1000; ++i) {
 			int x = centerX + this.random.nextInt(16) - this.random.nextInt(16);
 			int y = centerY + this.random.nextInt(16) - this.random.nextInt(16);
 			int z = centerZ + this.random.nextInt(16) - this.random.nextInt(16);
 			//Source checked for Material.AIR, assuming this is the same
-			if(this.isAir(new BlockPos(x, y, z))) {
+			if(this.isAir(mutablePos.set(x, y, z))) {
 				if(this.random.nextInt(8)+floor > y) {
 					//Source specified "depthsuspend" particle, which has been removed
 					this.client.particleManager.addParticle(new DepthSuspendParticle((ClientWorld)(Object)this, x + this.random.nextFloat(), y + this.random.nextFloat(), z + this.random.nextFloat()));
