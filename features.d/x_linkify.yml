@@ -1,0 +1,6 @@
+utility.linkify_urls:
+	name: Linkify Urls
+	since: 2.3.1
+	sides: client_only
+	desc:
+		Links in chat are clickable.
