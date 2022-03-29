@@ -2,6 +2,7 @@ package com.unascribed.fabrication.mixin.i_woina.more_explosion_particles;
 
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.Env;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -17,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.List;
 
 @Mixin(Explosion.class)
-@EligibleIf(configAvailable="*.more_explosion_particles")
+@EligibleIf(configAvailable="*.more_explosion_particles", envMatches=Env.CLIENT)
 public class MixinExplosion {
 
 	@Shadow @Final
