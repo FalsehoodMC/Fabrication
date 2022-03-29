@@ -5,9 +5,10 @@ balance.anvil_no_level_limit:
 	desc:
 		Anvils don't become "Too Expensive".
 
-balance.anvil_no_xp_cost:
+balance.extra.anvil_no_xp_cost:
 	name: Anvil No Xp Cost
 	since: 2.3.1
 	sides: server_only
+	default: never
 	desc:
 		Anvils don't cost any xp.
