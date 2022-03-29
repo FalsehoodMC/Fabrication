@@ -48,7 +48,7 @@ public class MixinTitleScreen extends Screen {
 	@Shadow
 	private long backgroundFadeStart;
 
-	@Hijack(target="net/minecraft/client/gui/screen/TitleScreen.drawWithOutline(IILjava/util/function/BiConsumer;)V",
+	@Hijack(target="Lnet/minecraft/client/gui/screen/TitleScreen;drawWithOutline(IILjava/util/function/BiConsumer;)V",
 			method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
 	public boolean fabrication$drawBlockLogo() {
 		if (FabConf.isEnabled("*.block_logo")) {

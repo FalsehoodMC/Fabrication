@@ -9,7 +9,6 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
@@ -31,8 +30,6 @@ public class AnnotationProcessor extends AbstractProcessor {
 		for (TypeElement te: annotations) {
 			for (Element e : roundEnv.getElementsAnnotatedWith(te)) {
 				Element source = e.getEnclosingElement();
-				if (!e.getModifiers().contains(Modifier.STATIC))
-					processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, source.toString()+ ";" + e + " should be static");
 				bldr.append(source);
 				bldr.append('\n');
 				Set<String> mixin = new HashSet<>();
@@ -50,10 +47,15 @@ public class AnnotationProcessor extends AbstractProcessor {
 							mixin.add(ad);
 							try {
 								Class<?> cl = Class.forName(ad, false, this.getClass().getClassLoader());
-								for (Class<?> cla : cl.getInterfaces()) mixin.add(cla.getName());
-								for (Method m : cl.getMethods()) mixin.add(m.getDeclaringClass().getName());
+								//Loops quite a few too many times but eh it's a build only operation
+								while (cl != null) {
+									mixin.add(cl.getName());
+									for (Class<?> cla : cl.getInterfaces()) mixin.add(cla.getName());
+									for (Method m : cl.getMethods()) mixin.add(m.getDeclaringClass().getName());
+									cl = cl.getSuperclass();
+								}
 							} catch (Exception ex) {
-								processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, "failed to reflect class " + ad + "\n" + e);
+								processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "failed to reflect class " + ad + "\n" + e);
 								ex.printStackTrace();
 							}
 						}
@@ -78,10 +80,15 @@ public class AnnotationProcessor extends AbstractProcessor {
 								if (col == -1 || dot < col && dot != -1) col = dot;
 								try {
 									Class<?> cl = Class.forName(ad.substring(ad.charAt(0) == 'L' ? 1 : 0, col).replace('/', '.'), false, this.getClass().getClassLoader());
-									for (Class<?> cla : cl.getInterfaces()) add.add(cla.getName());
-									for (Method m : cl.getMethods()) add.add(m.getDeclaringClass().getName());
+									//Loops quite a few too many times but eh it's a build only operation
+									while (cl != null) {
+										add.add(cl.getName());
+										for (Class<?> cla : cl.getInterfaces()) add.add(cla.getName());
+										for (Method m : cl.getMethods()) add.add(m.getDeclaringClass().getName());
+										cl = cl.getSuperclass();
+									}
 								} catch (Exception ex) {
-									processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, "failed to reflect class " + ad + "\n" + e);
+									processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "failed to reflect class " + ad + "\n" + e);
 									ex.printStackTrace();
 								}
 								for (String s : add){
