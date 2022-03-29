@@ -2,6 +2,7 @@ package com.unascribed.fabrication.support;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -27,15 +28,15 @@ public class OptionalFScript {
 	}
 
 	public static void set(CommandContext<? extends CommandSource> c, String configKey, String script){
-		setScript(configKey, script).ifPresent(e -> FeatureFabricationCommand.sendFeedback(c, new LiteralText("Failed to set script for "+configKey+"\n"+e.getLocalizedMessage()), true));
+		set(configKey, script, e -> FeatureFabricationCommand.sendFeedback(c, new LiteralText("Failed to set script for "+configKey+"\n"+e.getLocalizedMessage()), true));
 	}
 	public static boolean set(String configKey, String script, ServerPlayerEntity spe){
 		Optional<Exception> err = setScript(configKey, script);
 		err.ifPresent(e -> spe.sendSystemMessage(new LiteralText("Failed to set script for "+configKey+"\n"+e.getLocalizedMessage()), Util.NIL_UUID));
-		return err.isEmpty();
+		return !err.isPresent();
 	}
-	public static void set(String configKey, String script){
-		setScript(configKey, script).ifPresent(e -> FabLog.error("Failed to set script for "+configKey, e));
+	public static void set(String configKey, String script, Consumer<Exception> errReporter){
+		setScript(configKey, script).ifPresent(errReporter);
 	}
 	public static void restoreDefault(String configKey){
 		configKey = FabConf.remap(configKey);
@@ -44,7 +45,7 @@ public class OptionalFScript {
 	}
 	public static void reload(){
 		for (Map.Entry<String, String> entry : LoaderFScript.getMap().entrySet()){
-			set(entry.getKey(), entry.getValue());
+			setScript(entry.getKey(), entry.getValue());
 		}
 	}
 	private static Optional<Exception> setScript(String configKey, String script){
@@ -57,6 +58,7 @@ public class OptionalFScript {
 			ConfigPredicates.put(configKey, predicate, 2);
 			LoaderFScript.put(configKey, script);
 		}catch (Exception e){
+			FabLog.error("Failed to set script for "+configKey, e);
 			return Optional.of(e);
 		}
 		return Optional.empty();
