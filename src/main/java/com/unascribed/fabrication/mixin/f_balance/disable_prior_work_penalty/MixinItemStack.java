@@ -11,12 +11,12 @@ import com.unascribed.fabrication.support.EligibleIf;
 import net.minecraft.item.ItemStack;
 
 @Mixin(ItemStack.class)
-@EligibleIf(configAvailable="*.disable_prior_work_penalty")
+@EligibleIf(anyConfigAvailable={"*.disable_prior_work_penalty", "*.anvil_no_xp_cost"})
 public class MixinItemStack {
 
 	@Inject(at=@At("HEAD"), method="getRepairCost()I", cancellable=true)
 	public void getRepairCost(CallbackInfoReturnable<Integer> cir) {
-		if (!FabConf.isEnabled("*.disable_prior_work_penalty")) return;
+		if (!(FabConf.isEnabled("*.disable_prior_work_penalty") || FabConf.isEnabled("*.anvil_no_xp_cost"))) return;
 		cir.setReturnValue(0);
 	}
 
