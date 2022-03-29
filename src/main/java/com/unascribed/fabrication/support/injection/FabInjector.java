@@ -191,7 +191,12 @@ public class FabInjector {
 					}
 				}
 				methodNode.maxLocals=max;
-				if (!toInjectIsStatic) mod.add(new VarInsnNode(Opcodes.ALOAD, 0));
+				if (!toInjectIsStatic) {
+					mod.add(new VarInsnNode(getStoreOpcode(targetType.getReturnType().getSort()), methodNode.maxLocals));
+					mod.add(new VarInsnNode(Opcodes.ALOAD, 0));
+					mod.add(new VarInsnNode(getLoadOpcode(targetType.getReturnType().getSort()), methodNode.maxLocals));
+					methodNode.maxLocals += 1;
+				}
 				for (AbstractInsnNode a : newVars) {
 					if (countDesc-->0) mod.add(a.clone(new HashMap<>()));
 				}

@@ -1,7 +1,6 @@
 package com.unascribed.fabrication.mixin.d_minor_mechanics.gradual_block_breaking;
 
 import com.unascribed.fabrication.FabConf;
-import com.unascribed.fabrication.interfaces.GradualBreak;
 import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.injection.Hijack;
@@ -26,7 +25,7 @@ import java.util.Optional;
 
 @Mixin(ServerPlayerInteractionManager.class)
 @EligibleIf(configAvailable="*.gradual_block_breaking")
-public class MixinServerPlayerInteractionManager implements GradualBreak {
+public class MixinServerPlayerInteractionManager {
 
 	@Shadow
 	@Final
@@ -37,12 +36,10 @@ public class MixinServerPlayerInteractionManager implements GradualBreak {
 
 	private BlockState fabrication$gradualBreakState = null;
 
-	//TODO switch to virtual and remove the accessor once 436 is on the same branch
 	@ModifyReturn(target="Lnet/minecraft/server/world/ServerWorld;getBlockState(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;",
 			method="tryBreakBlock(Lnet/minecraft/util/math/BlockPos;)Z")
-	private static BlockState fabrication$gradualBreak(BlockState state, ServerWorld world, BlockPos pos, ServerPlayerInteractionManager self) {
-		if (!(FabConf.isEnabled("*.gradual_block_breaking") && self instanceof AccessorServerPlayerInteractionManager && self instanceof GradualBreak)) return state;
-		ServerPlayerEntity player = ((AccessorServerPlayerInteractionManager)self).fabrication$getPlayer();
+	public BlockState fabrication$gradualBreak(BlockState state, ServerWorld world, BlockPos pos) {
+		if (!FabConf.isEnabled("*.gradual_block_breaking")) return state;
 		if (player == null || !ConfigPredicates.shouldRun("*.gradual_block_breaking", (PlayerEntity)player)) return state;
 		if (state.contains(SlabBlock.TYPE)) {
 			if (state.get(SlabBlock.TYPE) == SlabType.DOUBLE) {
@@ -54,10 +51,10 @@ public class MixinServerPlayerInteractionManager implements GradualBreak {
 				Optional<Vec3d> optional = box.raycast(camPos, vec3d3);
 				if (optional.isPresent()) {
 					if (optional.get().y-pos.getY() < 0.5) {
-						((GradualBreak)self).fabrication$setGradualBreak(state.with(SlabBlock.TYPE, SlabType.TOP));
+						fabrication$gradualBreakState = state.with(SlabBlock.TYPE, SlabType.TOP);
 						return state.with(SlabBlock.TYPE, SlabType.BOTTOM);
 					} else {
-						((GradualBreak)self).fabrication$setGradualBreak(state.with(SlabBlock.TYPE, SlabType.BOTTOM));
+						fabrication$gradualBreakState = state.with(SlabBlock.TYPE, SlabType.BOTTOM);
 						return  state.with(SlabBlock.TYPE, SlabType.TOP);
 					}
 				}
@@ -65,7 +62,7 @@ public class MixinServerPlayerInteractionManager implements GradualBreak {
 		} else if (state.contains(SnowBlock.LAYERS)) {
 			int layers = state.get(SnowBlock.LAYERS);
 			if (layers > 1) {
-				((GradualBreak)self).fabrication$setGradualBreak(state.with(SnowBlock.LAYERS, layers-1));
+				fabrication$gradualBreakState = state.with(SnowBlock.LAYERS, layers-1);
 				return state.with(SnowBlock.LAYERS, 1);
 			}
 		}
@@ -74,25 +71,14 @@ public class MixinServerPlayerInteractionManager implements GradualBreak {
 
 	@Hijack(target="Lnet/minecraft/server/world/ServerWorld;removeBlock(Lnet/minecraft/util/math/BlockPos;Z)Z",
 			method="tryBreakBlock(Lnet/minecraft/util/math/BlockPos;)Z")
-	private static HijackReturn fabrication$gradualBreak(ServerWorld world, BlockPos pos, boolean move, ServerPlayerInteractionManager self) {
-		if (!(FabConf.isEnabled("*.gradual_block_breaking") && self instanceof GradualBreak)) return null;
-		BlockState state = ((GradualBreak)self).fabrication$getGradualBreak();
-		if (state != null) {
-			world.setBlockState(pos, state);
-			((GradualBreak)self).fabrication$setGradualBreak(null);
+	public HijackReturn fabrication$gradualBreak(ServerWorld world, BlockPos pos) {
+		if (!FabConf.isEnabled("*.gradual_block_breaking")) return null;
+		if (fabrication$gradualBreakState != null) {
+			world.setBlockState(pos, fabrication$gradualBreakState);
+			fabrication$gradualBreakState = null;
 			return new HijackReturn(true);
 		}
 		return null;
-	}
-
-	@Override
-	public void fabrication$setGradualBreak(BlockState state) {
-		fabrication$gradualBreakState = state;
-	}
-
-	@Override
-	public BlockState fabrication$getGradualBreak() {
-		return fabrication$gradualBreakState;
 	}
 
 }
