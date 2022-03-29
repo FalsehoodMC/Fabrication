@@ -11,6 +11,25 @@ public class LoaderTaggablePlayers implements ConfigLoader {
 
 	public static final LoaderTaggablePlayers instance = new LoaderTaggablePlayers();
 
+	public void set(String key, int val) {
+		switch (val){
+			case 0:
+				set(key, "tagged_players_only");
+				break;
+			case 1:
+				set(key, "untagged_players_only");
+				break;
+			case 2:
+				set(key, "tagged_players");
+				break;
+			case 3:
+				set(key, "untagged_players");
+				break;
+			default:
+				set(key, String.valueOf(val));
+		}
+	}
+
 	@Override
 	public void load(Path configDir, QDIni config, boolean loadError) {
 		for (String key : config.keySet()){

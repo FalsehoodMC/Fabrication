@@ -72,7 +72,7 @@ public class FeatureTaggablePlayers implements Feature {
 		type &= validTags.get(key);
 		set(key, type);
 		activeTags.put(key, type);
-		if (save) LoaderTaggablePlayers.instance.set(key, String.valueOf(type));
+		if (save) LoaderTaggablePlayers.instance.set(key, type);
 	}
 	public static void remove(String key) {
 		ConfigPredicates.remove(key, 1);
