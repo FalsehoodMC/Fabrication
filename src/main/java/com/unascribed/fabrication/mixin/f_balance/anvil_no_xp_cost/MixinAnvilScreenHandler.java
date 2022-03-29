@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(AnvilScreenHandler.class)
 @EligibleIf(configAvailable="*.anvil_no_xp_cost")
-public abstract class MixinItemStack {
+public abstract class MixinAnvilScreenHandler {
 
 	@Shadow @Final
 	private Property levelCost;
