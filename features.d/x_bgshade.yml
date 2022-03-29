@@ -1,0 +1,6 @@
+woina.old_background_shade:
+	name: Old Background Shade
+	since: 2.3.1
+	sides: client_only
+	desc:
+		Inventories, pause and other menus will have a blue gradient.
