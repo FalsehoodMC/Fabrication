@@ -13,3 +13,5 @@ mutable field net/minecraft/world/gen/feature/SpringFeatureConfig field_21287 Lj
 
 accessible class net/minecraft/server/world/ThreadedAnvilChunkStorage$EntityTracker
 accessible class net/minecraft/client/texture/Sprite$Animation
+accessible class net/minecraft/entity/ai/brain/task/CrossbowAttackTask$CrossbowState
+accessible class net/minecraft/entity/ai/goal/CrossbowAttackGoal$Stage
