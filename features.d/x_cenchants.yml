@@ -1,0 +1,8 @@
+mechanics.extra.swap_conflicting_enchants:
+	name: Swap Conflicting Enchants
+	since: 2.3.1
+	sides: server_only
+	default: never
+	desc:
+		When adding enchants that would normally not be compatible it will instead get added in an inactive state.
+		Conflicting enchants can be swapped on the go by shift right-clicking the item.
