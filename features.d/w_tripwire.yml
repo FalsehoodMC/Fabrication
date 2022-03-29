@@ -1,0 +1,6 @@
+weird_tweaks.extra.flimsy_tripwire:
+	name: Flimsy Tripwire
+	since: 2.3.1
+	sides: server_only
+	desc:
+		Tripwire breaks after being activated.

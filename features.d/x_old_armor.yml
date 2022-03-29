@@ -1,0 +1,15 @@
+woina.old_armor_scale:
+	name: Old Armor Scale
+	since: 2.3.1
+	sides: server_only
+	fscript: living_entity
+	desc:
+		Armor value is reduced with durability.
+
+woina.old_armor:
+	name: Old Armor
+	since: 2.3.1
+	sides: server_only
+	fscript: living_entity
+	desc:
+		All armor has the same protection.

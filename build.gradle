@@ -106,9 +106,7 @@ jar {
 				String clName = cl.getName("named")
 				String clNameRez = cl.getName("intermediary")
 				if (map.mixin.contains(clName.replace('/', '.'))) {
-					if (clName.equals("net/minecraft/world/gen/PhantomSpawner"))
-					{def aeaoeaoeaoe =""}
-						for (def clMethod : cl.methods) {
+					for (def clMethod : cl.methods) {
 						for (String mthd : map.method) {
 							int col = mthd.indexOf(';')
 							int dot = mthd.indexOf('.')
