@@ -5,6 +5,7 @@ import com.unascribed.fabrication.features.FeatureTaggablePlayers;
 import com.unascribed.fabrication.support.ConfigLoader;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 public class LoaderTaggablePlayers implements ConfigLoader {
 
@@ -13,7 +14,24 @@ public class LoaderTaggablePlayers implements ConfigLoader {
 	@Override
 	public void load(Path configDir, QDIni config, boolean loadError) {
 		for (String key : config.keySet()){
-			FeatureTaggablePlayers.add(key, config.getInt(key).orElse(0), false);
+			Optional<Integer> i = config.getInt(key);
+			if (i.isPresent()) {
+				FeatureTaggablePlayers.add(key, i.get(), false);
+				continue;
+			}
+			int val = 0;
+			switch (config.get(key).orElse("").trim()) {
+				case "untagged_players_only":
+					val = 1;
+					break;
+				case "tagged_players":
+					val = 2;
+					break;
+				case "untagged_players":
+					val = 3;
+					break;
+			}
+			FeatureTaggablePlayers.add(key, val, false);
 		}
 	}
 
