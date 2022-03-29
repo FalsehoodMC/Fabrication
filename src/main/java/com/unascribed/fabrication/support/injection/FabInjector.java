@@ -7,10 +7,12 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 import org.spongepowered.asm.util.asm.MethodNodeEx;
 
@@ -146,12 +148,12 @@ public class FabInjector {
 										if (optionalReturn) {
 											mod.add(new VarInsnNode(Opcodes.ASTORE, max));
 											mod.add(new VarInsnNode(Opcodes.ALOAD, max));
-											mod.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/util/Optional", "isPresent", "()Z", false));
 										}
-										mod.add(new JumpInsnNode(optionalReturn ? Opcodes.IFEQ : Opcodes.IFNE, label));
+										mod.add(new JumpInsnNode(optionalReturn ? Opcodes.IFNULL : Opcodes.IFNE, label));
 										if (optionalReturn) {
 											mod.add(new VarInsnNode(Opcodes.ALOAD, max));
-											mod.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/util/Optional", "get", "()"+targetType.getReturnType(), false));
+											mod.add(new FieldInsnNode(Opcodes.GETFIELD, "com/unascribed/fabrication/support/injection/HijackReturn", "object", "Ljava/lang/Object;"));
+											castHijackReturnResult(targetType.getReturnType(), mod);
 											mod.add(new JumpInsnNode(Opcodes.GOTO, label2));
 											mod.add(label);
 										}
@@ -182,6 +184,47 @@ public class FabInjector {
 			if (!t.equals(ti.done.get(m))) FabLog.error("FabInjector failed to find injection point for "+ti.owner+";"+m+"\t"+t);
 		})));
 	}
+	public static void castHijackReturnResult(Type desc, InsnList mod) {
+		switch (desc.getSort()) {
+			case Type.BOOLEAN:
+				mod.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Boolean"));
+				mod.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue", "()Z", false));
+				break;
+			case Type.BYTE:
+				mod.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Byte"));
+				mod.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Byte", "byteValue", "()B", false));
+				break;
+			case Type.CHAR:
+				mod.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Character"));
+				mod.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Character", "charValue", "()C", false));
+				break;
+			case Type.SHORT:
+				mod.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Short"));
+				mod.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Short", "shortValue", "()S", false));
+				break;
+			case Type.INT:
+				mod.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Integer"));
+				mod.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Integer", "intValue", "()I", false));
+				break;
+			case Type.LONG:
+				mod.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Long"));
+				mod.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Long", "longValue", "()J", false));
+				break;
+			case Type.FLOAT:
+				mod.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Float"));
+				mod.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Float", "floatValue", "()F", false));
+				break;
+			case Type.DOUBLE:
+				mod.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Double"));
+				mod.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Double", "doubleValue", "()D", false));
+				break;
+			default:
+				String descStr = desc.toString();
+				mod.add(new TypeInsnNode(Opcodes.CHECKCAST, descStr.substring(1, descStr.length()-1)));
+
+		}
+	}
+
 	public static int getStoreOpcode(int type){
 		return getLoadOpcode(type) + 33;
 	}
