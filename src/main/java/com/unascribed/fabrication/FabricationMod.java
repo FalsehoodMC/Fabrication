@@ -11,6 +11,7 @@ import com.unascribed.fabrication.interfaces.SetFabricationConfigAware;
 import com.unascribed.fabrication.support.ConfigLoader;
 import com.unascribed.fabrication.support.ConfigValue;
 import com.unascribed.fabrication.support.Env;
+import com.unascribed.fabrication.support.FabConst;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.OptionalFScript;
@@ -103,7 +104,7 @@ public class FabricationMod implements ModInitializer {
 		}
 		FabConf.submitConfigAnalytics();
 		Analytics.submit("game_launch");
-		if (FabRefl.FORGE && Agnos.getCurrentEnv() == Env.CLIENT) {
+		if (FabConst.FORGE && Agnos.getCurrentEnv() == Env.CLIENT) {
 			initPrideLib();
 		}
 	}

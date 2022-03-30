@@ -94,6 +94,24 @@ jar {
 		def lge = project.getExtensions().getByType(net.fabricmc.loom.LoomGradleExtension.class)
 		def mappings = lge.getMappingsProvider().getMappings()
 		Map<String, Mapp> toInter = new HashMap<>()
+		Map<String, Map<String, String>> fabReflFields = new HashMap<>()
+		List<Map.Entry<String, String>> fabReflBldr = new ArrayList<>()
+		List<String> fabRefl = Files.readAllLines(file('build/tmp/fabReflToMap').toPath())
+		if (fabRefl.size() > 0) {
+			for (String fog : fabRefl.get(0).split("\t")){
+				String f = (fog.charAt(0) == 'L' as char? fog.substring(1) : fog).replace('.', '/')
+				int col = f.indexOf(';')
+				String fKey = f.substring(0, col);
+				if (!fabReflFields.containsKey(fKey)) fabReflFields.put(fKey, new HashMap<String, String>())
+				fabReflFields.get(fKey).put(f.substring(col+1), fog)
+			}
+			if (fabRefl.size() > 1) {
+				for (String f : fabRefl.get(1).split("\t")){
+					if (toInter.containsKey("FabRefl")) toInter.get("FabRefl").add(new Mapp.Target[]{new Mapp.Target(f)})
+					else toInter.put("FabRefl", new Mapp(new String[]{}, new String[]{}, new Mapp.Target[]{new Mapp.Target(f)}))
+				}
+			}
+		}
 		List<String> toParse = Files.readAllLines(file('build/tmp/fabToRefMap').toPath())
 		for (int i=0; i+3<toParse.size(); i++){
 			String toInterKey = toParse.get(i)
@@ -104,9 +122,21 @@ jar {
 		Map<String, String> methodMap = new HashMap<>()
 		Map<String, String> classMap = new HashMap<>();
 		for (def cl : mappings.classes){
+			String clName = cl.getName("named")
+			String clNameRez = cl.getName("intermediary")
+			if (fabReflFields.containsKey(clName)){
+				Map<String, String> inmap = fabReflFields.get(clName);
+				for (Map.Entry<String, String> entry : inmap) {
+					String toFind = entry.getKey();
+					for (def fld : cl.fields) {
+						if (toFind.equals(fld.getName("named"))) {
+							fabReflBldr.add(new AbstractMap.SimpleEntry<String, String>(entry.getValue(), fld.getName("intermediary")));
+							break
+						}
+					}
+				}
+			}
 			for (def map : toInter.values()){
-				String clName = cl.getName("named")
-				String clNameRez = cl.getName("intermediary")
 				if (map.mixin.contains(clName.replace('/', '.'))) {
 					for (def clMethod : cl.methods) {
 						for (String mthd : map.method) {
@@ -152,10 +182,18 @@ jar {
 					if (set != null){
 						if (frst) frst = false;
 						else strbldr.append('\t')
-						strbldr.append(s+" "+set)
+						strbldr.append(s).append(" ").append(set)
 						break
 					}
 				}
+			}
+			if ("FabRefl".equals(intr.getKey())){
+				StringBuilder fabReflStrbldr = new StringBuilder();
+				for (Map.Entry<String, String> entry : fabReflBldr) {
+					if (!fabReflStrbldr.isEmpty()) fabReflStrbldr.append('\t')
+					fabReflStrbldr.append(entry.getKey()).append(' ').append(entry.getValue())
+				}
+				strbldr.append(fabReflStrbldr)
 			}
 			strbldr.append('\n')
 			frst = true
@@ -182,7 +220,7 @@ jar {
 }
 
 class Mapp{
-	class Target{
+	static class Target{
 		Target(String target){
 			int i = target.indexOf(' ');
 			if (i == -1){
@@ -201,11 +239,19 @@ class Mapp{
 		for (String s : method) this.method.add(s)
 		for (String s : target) this.target.add(new Target(s))
 	}
+	void add(Target[] target){
+		for (Target s : target) this.target.add(s)
+	}
 	Mapp(String[] mixin, String[] method, String[] target){
 		this.mixin = mixin
 		this.method = method
 		this.target = new ArrayList<>()
 		for (String s : target) this.target.add(new Target(s))
+	}
+	Mapp(String[] mixin, String[] method, Target[] target){
+		this.mixin = mixin;
+		this.method = method;
+		this.target = target;
 	}
 	public List<String> mixin
 	public List<String> method
