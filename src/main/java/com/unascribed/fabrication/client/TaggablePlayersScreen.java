@@ -12,6 +12,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.LiteralText;
 
+import java.util.Map;
 import java.util.regex.Pattern;
 
 @Environment(EnvType.CLIENT)
@@ -49,15 +50,17 @@ public class TaggablePlayersScreen extends Screen{
 		searchField.render(matrices, mouseX, mouseY, delta);
 		float scroll = (float) (Math.floor(((sidebarHeight < height ? 0 : sidebarScroll) * client.getWindow().getScaleFactor())) / client.getWindow().getScaleFactor());
 		float y = 22 - scroll;
-		for (String key : FeatureTaggablePlayers.validTags.keySet()) {
+		for (Map.Entry<String, Integer> entry : FeatureTaggablePlayers.validTags.entrySet()) {
+			String key = entry.getKey();
 			if (!filter.matcher(key).find()) continue;
 			boolean isActive = FeatureTaggablePlayers.activeTags.containsKey(key);
 			textRenderer.drawWithShadow(matrices, key, 5, y, isActive ? FabConf.isEnabled(key) ? -1 : 0xffff2222 : 0xffaaaaaa);
 			if (isActive) {
 				int val = FeatureTaggablePlayers.activeTags.get(key);
-				if (drawToggleButton(matrices, width-160, (int)y, 45, 10, "Invert", mouseX, mouseY, (val & 0b1) != 0)) {
+				int mask = entry.getValue();
+				if ((mask&0b1) != 0 && drawToggleButton(matrices, width-160, (int)y, 45, 10, "Invert", mouseX, mouseY, (val & 0b1) != 0)) {
 					FeatureTaggablePlayers.add(key, val ^ 0b1);
-				} else if (drawToggleButton(matrices, width-100, (int)y, 90, 10, "Player Exclusive", mouseX, mouseY, (val & 0b10) == 0)) {
+				} else if ((mask&0b10) != 0 && drawToggleButton(matrices, width-100, (int)y, 90, 10, "Player Exclusive", mouseX, mouseY, (val & 0b10) == 0)) {
 					FeatureTaggablePlayers.add(key, val ^ 0b10);
 				} else if (didClick && mouseY > y && mouseY < y + 12) {
 					FeatureTaggablePlayers.remove(key);
