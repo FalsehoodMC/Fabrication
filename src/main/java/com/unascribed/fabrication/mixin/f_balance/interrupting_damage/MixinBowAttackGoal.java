@@ -13,11 +13,11 @@ import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(BowAttackGoal.class)
 @EligibleIf(configAvailable="*.interrupting_damage")
-public abstract class MixinBowAttackGoal<T extends HostileEntity & RangedAttackMob> implements InterruptableRangedMob {
+public abstract class MixinBowAttackGoal implements InterruptableRangedMob {
 
 	@Shadow
 	@Final
-	private T actor;
+	private HostileEntity actor;
 
 	@Shadow
 	private int cooldown;
@@ -31,7 +31,7 @@ public abstract class MixinBowAttackGoal<T extends HostileEntity & RangedAttackM
 		if (target != null && this.actor.isUsingItem()) {
 			this.actor.clearActiveItem();
 			if (BowItem.getPullProgress(this.actor.getItemUseTime()) > 0.4f)
-				this.actor.attack(target, 0.4f);
+				((RangedAttackMob)this.actor).attack(target, 0.4f);
 			this.cooldown = this.attackInterval;
 		}
 	}
