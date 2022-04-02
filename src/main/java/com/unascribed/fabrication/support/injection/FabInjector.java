@@ -15,11 +15,8 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.util.asm.MethodNodeEx;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -41,8 +38,9 @@ public class FabInjector {
 		public String desc;
 		public int access;
 		public String annotation;
+		public String mixin;
 
-		public ToInject(List<String> method, List<String> target, String owner, String name, String desc, int opcode, String annotation){
+		public ToInject(List<String> method, List<String> target, String owner, String name, String desc, int opcode, String annotation, String mixin){
 			this.method = method;
 			this.target = target;
 			this.owner = owner;
@@ -50,6 +48,7 @@ public class FabInjector {
 			this.desc = desc;
 			this.access = opcode;
 			this.annotation = annotation;
+			this.mixin = mixin;
 		}
 	}
 	public static final Set<String> dejavu = new HashSet<>();
@@ -58,12 +57,12 @@ public class FabInjector {
 		String name;
 		String desc;
 		String mixin;
-		Redirect redirect;
-		EntryMixinMerged(String name, String desc, String mixin, Redirect redirect) {
+		String target;
+		EntryMixinMerged(String name, String desc, String mixin, String target) {
 			this.name = name;
 			this.desc = desc;
 			this.mixin = mixin;
-			this.redirect = redirect;
+			this.target = target;
 		}
 	}
 
@@ -83,14 +82,8 @@ public class FabInjector {
 					inject = annotationNode;
 				} else if ("Lorg/spongepowered/asm/mixin/transformer/meta/MixinMerged;".equals(annotationNode.desc)){
 					mixin = (String) annotationNode.values.get(annotationNode.values.indexOf("mixin") + 1);
-					if (methodNode.name.startsWith("redirect$")) {
-						try {
-							for (Method m : Class.forName(mixin, false, Mixin.class.getClassLoader()).getMethods()) {
-								if (m.isAnnotationPresent(Redirect.class) && methodNode.name.endsWith("$"+m.getName())) {
-									redirects.add(new EntryMixinMerged(methodNode.name, methodNode.desc, mixin, m.getAnnotation(Redirect.class)));
-								}
-							}
-						} catch (Exception ignore) {}
+					if (FailsoftRedirectInjectionInfo.fabrication$allExistingRedirects.containsKey(methodNode.name)) {
+						redirects.add(new EntryMixinMerged(methodNode.name, methodNode.desc, mixin, FailsoftRedirectInjectionInfo.fabrication$allExistingRedirects.get(methodNode.name)));
 					}
 				}
 			};
@@ -103,15 +96,14 @@ public class FabInjector {
 						methodNode.name,
 						methodNode.desc,
 						methodNode.access,
-						inject.desc
+						inject.desc,
+						mixin
 				));
 			}
 		});
 		injects.forEach(toInject -> redirects.forEach(redirect -> {
-			if (redirect.redirect.at() == null) return;
 			//TODO target should probably match other formats?
-			String target = FabRefMap.targetMap(redirect.mixin, redirect.redirect.at().target());
-			if (toInject.target.contains(target) && target.endsWith(redirect.desc.substring(redirect.desc.indexOf(';')+1))) {
+			if (toInject.target.contains(FabRefMap.targetMap(toInject.mixin, redirect.target))) {
 				toInject.potentiallyRedirected.add(redirect.name+redirect.desc);
 				FabLog.warn("FabInjector found a Redirect from "+redirect.mixin+";"+redirect.name+";"+" which has been added to "+toInject.owner+";"+toInject.name);
 			}
