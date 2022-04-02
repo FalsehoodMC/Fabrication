@@ -2,7 +2,6 @@ package com.unascribed.fabrication.mixin.f_balance.interrupting_damage;
 
 import com.unascribed.fabrication.interfaces.InterruptableRangedMob;
 import com.unascribed.fabrication.support.EligibleIf;
-import net.minecraft.entity.CrossbowUser;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.RangedAttackMob;
 import net.minecraft.entity.ai.goal.CrossbowAttackGoal;
@@ -17,14 +16,14 @@ import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(CrossbowAttackGoal.class)
 @EligibleIf(configAvailable="*.interrupting_damage")
-public abstract class MixinCrossbowAttackGoal<T extends HostileEntity & RangedAttackMob & CrossbowUser> implements InterruptableRangedMob {
+public abstract class MixinCrossbowAttackGoal implements InterruptableRangedMob {
 
 
 	@Shadow
 	private CrossbowAttackGoal.Stage stage;
 
 	@Shadow @Final
-	private T actor;
+	private HostileEntity actor;
 
 	@Override
 	public void fabrication$interruptRangedMob() {
@@ -33,7 +32,7 @@ public abstract class MixinCrossbowAttackGoal<T extends HostileEntity & RangedAt
 			case READY_TO_ATTACK:
 				LivingEntity target = actor.getTarget();
 				if (target != null) {
-					this.actor.attack(target, 1.0F);
+					((RangedAttackMob)this.actor).attack(target, 1.0F);
 					ItemStack itemStack2 = this.actor.getStackInHand(ProjectileUtil.getHandPossiblyHolding(this.actor, Items.CROSSBOW));
 					CrossbowItem.setCharged(itemStack2, false);
 				}

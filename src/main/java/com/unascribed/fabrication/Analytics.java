@@ -13,6 +13,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import com.unascribed.fabrication.support.FabConst;
 import org.lwjgl.opengl.GL11;
 
 import com.google.gson.Gson;
@@ -96,7 +97,7 @@ public class Analytics {
 				}
 				extra.put("Java VM", vm);
 				extra.put("Minecraft Version", SharedConstants.getGameVersion().getName());
-				extra.put("Loader", (FabRefl.FORGE ? "Forge" : "Fabric")+" "+Agnos.getLoaderVersion());
+				extra.put("Loader", (FabConst.FORGE ? "Forge" : "Fabric")+" "+Agnos.getLoaderVersion());
 				extra.put("Environment", Agnos.getCurrentEnv().name());
 				extra.put("Profile", FabConf.getRawValue("general.profile"));
 				if (Agnos.getCurrentEnv() == Env.CLIENT) {
