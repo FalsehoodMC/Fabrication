@@ -227,16 +227,17 @@ public class FabInjector {
 			if (optionalReturn) {
 				mod.add(new VarInsnNode(Opcodes.ASTORE, max));
 				mod.add(new VarInsnNode(Opcodes.ALOAD, max));
-			}
-			mod.add(new JumpInsnNode(optionalReturn ? Opcodes.IFNULL : Opcodes.IFNE, label));
-			if (optionalReturn) {
+				mod.add(new JumpInsnNode(Opcodes.IFNULL, label));
 				mod.add(new VarInsnNode(Opcodes.ALOAD, max));
 				mod.add(new FieldInsnNode(Opcodes.GETFIELD, "com/unascribed/fabrication/support/injection/HijackReturn", "object", "Ljava/lang/Object;"));
 				castHijackReturnResult(targetType.getReturnType(), mod);
 				mod.add(new JumpInsnNode(Opcodes.GOTO, label2));
 				mod.add(label);
+				methodNode.maxLocals=max+1;
+			} else {
+				mod.add(new JumpInsnNode(Opcodes.IFNE, label));
+				methodNode.maxLocals=max;
 			}
-			methodNode.maxLocals=max+1;
 			if (!toInjectIsStatic) methodNode.instructions.insertBefore(insn, new VarInsnNode(Opcodes.ALOAD, 0));
 			for (Type argType : argTypes) {
 				int opcode = getLoadOpcode(argType.getSort());

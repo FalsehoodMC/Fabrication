@@ -120,6 +120,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 										FabLog.debug("🙈 Dev error! Exploding.");
 										throw FabConf.devError(cn.name.substring(pkg.length()+1).replace('/', '.')+" references an unknown config key "+v+"\n\nDid you forget to add it to features.txt and run build-features.sh?");
 									}
+									if (FabConf.limitRuntimeConfigs() && !FabConf.isEnabled((String) v))
+										eligible = false;
 									if (FabConf.isBanned((String)v)) {
 										eligibilityFailures.add("Required config setting "+ FabConf.remap((String)v)+" is banned");
 										eligible = false;
