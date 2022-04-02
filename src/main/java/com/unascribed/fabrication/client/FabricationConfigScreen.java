@@ -194,6 +194,7 @@ public class FabricationConfigScreen extends Screen {
 		}
 		defaultedSubmenu(FabConf.remap("*.block_logo")).put("Detailed Configs", BlockLogoScreen::new);
 		defaultedSubmenu(FabConf.remap("*.yeet_recipes")).put("Detailed Configs", YeetRecipesScreen::new);
+		defaultedSubmenu(FabConf.remap("*.taggable_players")).put("Detailed Configs", TaggablePlayersScreen::new);
 
 		tabs.add("search");
 		tabs.addAll(options.keySet());

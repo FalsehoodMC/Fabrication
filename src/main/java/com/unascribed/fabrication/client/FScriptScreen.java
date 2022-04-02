@@ -22,10 +22,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class FScriptScreen extends ScriptingScreen {
-	String configKey;
-	PrideFlag prideFlag;
-	boolean writeLocal = true;
-	boolean requestedScript = false;
+	final String fabrication$title;
+	String fabrication$key;
+	String fabrication$err;
+	int fabrication$errBlink = 0;
+	PrideFlag fabrication$prideFlag;
+	boolean fabrication$writeLocal = true;
+	boolean fabrication$requestedScript = false;
 
 	public FScriptScreen(Screen parent, PrideFlag prideFlag, String title, String configKey) {
 		super(new LiteralText("Fabrication Scripting"), parent, new Script(
@@ -34,28 +37,29 @@ public class FScriptScreen extends ScriptingScreen {
 				null, null, null,
 				default_embed
 				));
-		this.prideFlag = prideFlag;
-		this.configKey = configKey;
+		fabrication$title = "§bFabrication - " + title;
+		this.fabrication$prideFlag = prideFlag;
+		this.fabrication$key = configKey;
 		this.renderTips = true;
 		if (this.client !=null && client.player != null) {
 			CommandNode<CommandSource> cmd = client.player.networkHandler.getCommandDispatcher().getRoot().getChild("fabrication");
 			if (!(cmd == null || cmd.getChild("fscript") == null || cmd.getChild("fscript").getChild("set") == null))
-				writeLocal = false;
+				fabrication$writeLocal = false;
 		}
 	}
 
 	@Override
 	protected void drawOptionButtons(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		if (drawButton(matrices, width - 83, 1, 35, 10, writeLocal ? "Client" : "Server", "Toggle where scripts are saved/loaded", mouseX, mouseY)) {
+		if (drawButton(matrices, width - 83, 1, 35, 10, fabrication$writeLocal ? "Client" : "Server", "Toggle where scripts are saved/loaded", mouseX, mouseY)) {
 			if (this.client == null || client.player == null) {
 				super.drawOptionButtons(matrices, mouseX, mouseY, delta);
 				return;
 			}
 			CommandNode<CommandSource> cmd = client.player.networkHandler.getCommandDispatcher().getRoot().getChild("fabrication");
 			if (!(cmd == null || cmd.getChild("fscript") == null || cmd.getChild("fscript").getChild("set") == null)) {
-				writeLocal = !writeLocal;
+				fabrication$writeLocal = !fabrication$writeLocal;
 			} else {
-				writeLocal = true;
+				fabrication$writeLocal = true;
 				client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO, 0.8f, 1));
 				client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO, 0.7f, 1));
 			}
@@ -67,12 +71,12 @@ public class FScriptScreen extends ScriptingScreen {
 	protected void drawScriptButtons(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		int x = this.width - 100;
 		if (this.drawButton(matrices, x, this.height - 20, 50, 20, "Save", null, mouseX, mouseY)) {
-			if (writeLocal){
-				OptionalFScript.set(configKey, this.unloadScript());
+			if (fabrication$writeLocal){
+				OptionalFScript.set(fabrication$key, this.unloadScript(), e -> fabrication$failedSave());
 			}else {
 				PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
 				data.writeVarInt(1);
-				data.writeString(configKey);
+				data.writeString(fabrication$key);
 				data.writeString(this.unloadScript());
 				client.getNetworkHandler().sendPacket(new CustomPayloadC2SPacket(new Identifier("fabrication", "fscript"), data));
 			}
@@ -80,45 +84,61 @@ public class FScriptScreen extends ScriptingScreen {
 		x -= 50;
 
 		if (this.drawButton(matrices, x, this.height - 20, 50, 20, "Reset", "Restore Fabrications default behaviour", mouseX, mouseY)) {
-			if (writeLocal){
-				OptionalFScript.restoreDefault(configKey);
+			if (fabrication$writeLocal){
+				OptionalFScript.restoreDefault(fabrication$key);
 			}else{
 				PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
 				data.writeVarInt(2);
-				data.writeString(configKey);
+				data.writeString(fabrication$key);
 				client.getNetworkHandler().sendPacket(new CustomPayloadC2SPacket(new Identifier("fabrication", "fscript"), data));
 			}
 		}
 		x -= 50;
 
 		if (this.drawButton(matrices, x, this.height - 20, 50, 20, "Load", null, mouseX, mouseY)) {
-			if (writeLocal) {
-				String script = LoaderFScript.get(configKey);
+			if (fabrication$writeLocal) {
+				String script = LoaderFScript.get(fabrication$key);
 				if (script != null){
 					this.loadScript(script);
 				} else {
-					List<String> eq = FabConf.getEquivalent(configKey).stream().map(FeaturesFile::get).filter(f->f.fscriptDefault!=null).map(f->f.name).collect(Collectors.toList());
+					List<String> eq = FabConf.getEquivalent(fabrication$key).stream().map(FeaturesFile::get).filter(f->f.fscriptDefault!=null).map(f->f.name).collect(Collectors.toList());
 					if (!eq.isEmpty()) this.client.setScreen(new SelectionScreen(this, eq, this::fabrication$loadDefaultKey));
 				}
 			}else{
 				PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
 				data.writeVarInt(0);
-				data.writeString(configKey);
+				data.writeString(fabrication$key);
 				client.getNetworkHandler().sendPacket(new CustomPayloadC2SPacket(new Identifier("fabrication", "fscript"), data));
-				requestedScript = true;
+				fabrication$requestedScript = true;
 			}
 		}
 	}
 
+	public void fabrication$failedSave(){
+		fabrication$err = "Failed To Save Script; Check Logs";
+		fabrication$errBlink = 80;
+	}
 	public void fabrication$loadDefaultKey(Object key) {
 		FeaturesFile.FeatureEntry val = FeaturesFile.get(key.toString());
 		if (val != null && val.fscriptDefault != null) loadScript(val.fscriptDefault);
 	}
 
 	public void fabrication$setScript(String script){
-		if(script != null && requestedScript){
+		if(script != null && fabrication$requestedScript){
 			this.loadScript(script);
-			requestedScript = false;
+			fabrication$requestedScript = false;
+		}
+	}
+
+	@Override
+	public void tick() {
+		super.tick();
+		if (fabrication$errBlink > 0 && fabrication$err != null){
+			this.script.name = ((fabrication$errBlink & 4) == 0 ? "§c" : "§e")+ fabrication$err;
+			fabrication$errBlink--;
+			if (fabrication$errBlink == 0) {
+				this.script.name = fabrication$title;
+			}
 		}
 	}
 
@@ -134,7 +154,7 @@ public class FScriptScreen extends ScriptingScreen {
 	}
 	@Override
 	public void renderBackground(MatrixStack matrices) {
-		FabricationConfigScreen.drawBackground(height, width, client, prideFlag, 0, matrices, 0, 0, 0, 0, 0);
+		FabricationConfigScreen.drawBackground(height, width, client, fabrication$prideFlag, 0, matrices, 0, 0, 0, 0, 0);
 	}
 	@Override
 	protected void renderWorldBackground(MatrixStack matrices) {

@@ -1,7 +1,7 @@
 package com.unascribed.fabrication.features;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.interfaces.TaggablePlayer;
 import com.unascribed.fabrication.loaders.LoaderTaggablePlayers;
@@ -12,36 +12,77 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.predicate.entity.EntityPredicates;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Predicate;
 
 @EligibleIf(configAvailable="*.taggable_players")
 public class FeatureTaggablePlayers implements Feature {
-	public static final ImmutableSet<String> validTags;
+
+	//TODO should probably be automatic
+	public static final ImmutableSet<String> INVALID_TAGS = ImmutableSet.of(
+			"weird_tweaks.extra.creepers_explode_when_on_fire"
+	);
+
+	public static final ImmutableMap<String, Integer> validTags;
+	public static Map<String, Integer> activeTags = new HashMap<>();
 
 	static {
-		Set<String> tags = new HashSet<>();
+		Map<String, Integer> tags = new HashMap<>();
 		FeaturesFile.getAll().forEach((key, val)->{
-			if ("PLAYER_ENTITY".equals(val.fscript)) tags.add("*"+key.substring(key.lastIndexOf('.')));
+			if (val.fscript == null || INVALID_TAGS.contains(key)) return;
+			switch (val.fscript){
+				case "PLAYER_ENTITY" :
+				case "SERVER_PLAYER_ENTITY" :
+					tags.put(key, 0b01);
+					break;
+				case "LIVING_ENTITY" :
+					tags.put(key, 0b11);
+					break;
+			}
 		});
-		validTags = ImmutableSet.copyOf(tags);
+		validTags = ImmutableMap.copyOf(tags);
 	}
 
 	private Predicate<Entity> originalUntargetablePredicate;
-	public static void add(String key) {
-		ConfigPredicates.put(key, pe -> pe instanceof TaggablePlayer && ((TaggablePlayer) pe).fabrication$hasTag("*"+key.substring(key.lastIndexOf('.'))), 1);
-		LoaderTaggablePlayers.instance.set(key, "true");
+
+	private static Predicate<?> getPredicate(String key, int type) {
+		switch (type) {
+			case 1:
+				return pe -> pe instanceof TaggablePlayer && !((TaggablePlayer) pe).fabrication$hasTag(key);
+			case 2:
+				return pe -> !(pe instanceof TaggablePlayer) || ((TaggablePlayer) pe).fabrication$hasTag(key);
+			case 3:
+				return pe -> !(pe instanceof TaggablePlayer) || !((TaggablePlayer) pe).fabrication$hasTag(key);
+			default:
+				return pe -> pe instanceof TaggablePlayer && ((TaggablePlayer) pe).fabrication$hasTag(key);
+		}
+	}
+
+	private static void set(String key, int type){
+		Predicate<?> p = getPredicate(key.substring(key.lastIndexOf('.')+1), type);
+		ConfigPredicates.put(key, ConfigPredicates.defaults.containsKey(key) ? p.and((Predicate)ConfigPredicates.defaults.get(key)) : p, 1);
+	}
+
+	public static void add(String key, int type) {
+		add(key, type, true);
+	}
+
+	public static void add(String key, int type, boolean save) {
+		type &= validTags.get(key);
+		set(key, type);
+		activeTags.put(key, type);
+		if (save) LoaderTaggablePlayers.instance.set(key, type);
 	}
 	public static void remove(String key) {
 		ConfigPredicates.remove(key, 1);
+		activeTags.remove(key);
 		LoaderTaggablePlayers.instance.remove(key);
 	}
+
 	@Override
 	public void apply() {
-		for (String key : LoaderTaggablePlayers.activeTags) {
-			ConfigPredicates.put(key, pe -> pe instanceof TaggablePlayer && ((TaggablePlayer) pe).fabrication$hasTag("*"+key.substring(key.lastIndexOf('.'))), 1);
-		}
+		activeTags.forEach(FeatureTaggablePlayers::set);
 		originalUntargetablePredicate = EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR;
 		amendUntargetablePredicate(e -> {
 			if (e instanceof PlayerEntity && ConfigPredicates.shouldRun("*.invisible_to_mobs", (PlayerEntity)e)) return false;
@@ -55,6 +96,7 @@ public class FeatureTaggablePlayers implements Feature {
 
 	@Override
 	public boolean undo() {
+		activeTags.keySet().forEach(k->ConfigPredicates.remove(k, 1));
 		if (originalUntargetablePredicate != null) {
 			amendUntargetablePredicate(originalUntargetablePredicate);
 		}

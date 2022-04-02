@@ -71,7 +71,7 @@ public interface ConfigLoader {
 											insertNext = true;
 										} else if (path != null && !path.isEmpty() && key.startsWith(path)) {
 											found.set(true);
-											return key.substring(path.length()+1) + "=" + val + "\n" + line;
+											return key.substring(path.length()) + "=" + val + "\n" + line;
 										}
 									} else {
 										found.set(true);
@@ -79,7 +79,11 @@ public interface ConfigLoader {
 										if (dot == -1) {
 											return "[]\n" + key + "=" + val;
 										} else {
-											return "[" + key.substring(0, dot) + "]\n" + key.substring(dot+1) + "=" + val;
+											if (path != null && !path.isEmpty() && key.startsWith(path)) {
+												return key.substring(path.length()) + "=" + val;
+											} else {
+												return "[" + key.substring(0, dot) + "]\n" + key.substring(dot + 1) + "=" + val;
+											}
 										}
 									}
 								}
