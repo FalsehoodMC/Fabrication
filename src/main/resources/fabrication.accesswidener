@@ -16,3 +16,4 @@ accessible class net/minecraft/client/texture/Sprite$Animation
 accessible class net/minecraft/entity/ai/brain/task/CrossbowAttackTask$CrossbowState
 accessible class net/minecraft/entity/ai/goal/CrossbowAttackGoal$Stage
 accessible class net/minecraft/client/render/RenderLayer$MultiPhaseParameters
+accessible class net/minecraft/client/render/RenderLayer$MultiPhase
