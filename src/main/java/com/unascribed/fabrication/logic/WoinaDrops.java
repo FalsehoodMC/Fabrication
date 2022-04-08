@@ -59,9 +59,9 @@ public class WoinaDrops {
 
 	public static boolean mippedBlocksInvalid = true;
 
-	public static int modifyOverlay(ItemStack stack, int overlay) {
+	public static int modifyOverlay(int hash, int overlay) {
 		if (FabConf.isEnabled("*.blinking_drops")) {
-			return OverlayTexture.getUv(Math.max(0, MathHelper.sin((curTimer+(stack.hashCode()%2000))/5.3f))*0.7f, false);
+			return OverlayTexture.getUv(Math.max(0, MathHelper.sin((curTimer+(hash%2000))/5.3f))*0.7f, false);
 		}
 		return overlay;
 	}
