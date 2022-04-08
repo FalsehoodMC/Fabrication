@@ -26,7 +26,7 @@ public abstract class MixinRenderLayer extends RenderPhase {
 
 	static {
 		RenderLayer.MultiPhaseParameters fab$multiPhaseParameters = RenderLayer.MultiPhaseParameters.builder().shader(ENTITY_CUTOUT_SHADER).texture(new Texture(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, false, false)).transparency(TRANSLUCENT_TRANSPARENCY).target(ITEM_TARGET).lightmap(ENABLE_LIGHTMAP).overlay(ENABLE_OVERLAY_COLOR).writeMaskState(RenderPhase.ALL_MASK).build(true);
-		BlinkingDropsOverlay.renderLayerFunction = of("item_entity_translucent_cull", VertexFormats.POSITION_COLOR_TEXTURE_OVERLAY_LIGHT_NORMAL, VertexFormat.DrawMode.QUADS, 256, true, true, fab$multiPhaseParameters);
+		BlinkingDropsOverlay.renderLayer = of("item_entity_translucent_cull", VertexFormats.POSITION_COLOR_TEXTURE_OVERLAY_LIGHT_NORMAL, VertexFormat.DrawMode.QUADS, 256, true, true, fab$multiPhaseParameters);
 	}
 
 }
