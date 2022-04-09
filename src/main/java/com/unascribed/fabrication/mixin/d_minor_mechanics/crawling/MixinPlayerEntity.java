@@ -15,11 +15,6 @@ public class MixinPlayerEntity implements SetCrawling {
 
 	private boolean fabrication$crawling;
 
-	@ModifyReturn(method="travel(Lnet/minecraft/util/math/Vec3d;)V", target="Lnet/minecraft/entity/player/PlayerEntity;isSwimming()Z")
-	public boolean correctFalling(boolean old){
-		return !(FabConf.isEnabled("*.crawling") && old) ? old : !fabrication$crawling;
-	}
-
 	@ModifyReturn(method="updatePose()V", target="Lnet/minecraft/entity/player/PlayerEntity;isSwimming()Z")
 	public boolean updateSwimming(boolean old) {
 		return !(FabConf.isEnabled("*.crawling") && !old) ? old : fabrication$crawling;
