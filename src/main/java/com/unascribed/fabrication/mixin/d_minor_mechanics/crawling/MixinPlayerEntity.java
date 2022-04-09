@@ -1,10 +1,8 @@
 package com.unascribed.fabrication.mixin.d_minor_mechanics.crawling;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.injection.ModifyReturn;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.interfaces.SetCrawling;
 import com.unascribed.fabrication.support.EligibleIf;
@@ -17,19 +15,14 @@ public class MixinPlayerEntity implements SetCrawling {
 
 	private boolean fabrication$crawling;
 
-	@Inject(at=@At("HEAD"), method="jump()V", cancellable=true)
-	public void jump(CallbackInfo ci) {
-		if (FabConf.isEnabled("*.crawling") && fabrication$crawling) {
-			ci.cancel();
-		}
+	@ModifyReturn(method="travel(Lnet/minecraft/util/math/Vec3d;)V", target="Lnet/minecraft/entity/player/PlayerEntity;isSwimming()Z")
+	public boolean correctFalling(boolean old){
+		return !(FabConf.isEnabled("*.crawling") && old) ? old : !fabrication$crawling;
 	}
 
-	@Inject(at=@At("HEAD"), method="updateSwimming()V", cancellable=true)
-	public void updateSwimming(CallbackInfo ci) {
-		if (FabConf.isEnabled("*.crawling") && fabrication$crawling) {
-			((PlayerEntity)(Object)this).setSwimming(true);
-			ci.cancel();
-		}
+	@ModifyReturn(method="updatePose()V", target="Lnet/minecraft/entity/player/PlayerEntity;isSwimming()Z")
+	public boolean updateSwimming(boolean old) {
+		return !(FabConf.isEnabled("*.crawling") && !old) ? old : fabrication$crawling;
 	}
 
 	@Override
