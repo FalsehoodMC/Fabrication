@@ -63,32 +63,30 @@ public class YeetRecipesScreen extends Screen{
 			float y = 22 - scroll;
 			for (Recipe<?> clr : client.world.getRecipeManager().values()) {
 				if (!filter.matcher(clr.getId().toString()).find()) continue;
-				if (y > 0) {
+				if (y > 20) {
 					textRenderer.drawWithShadow(matrices, clr.getId().toString(), 5, y, -1);
 				}
-				if (didClick && mouseY > 22 && mouseY > y && mouseY < y + 12) {
+				if (didClick && y > 20 && mouseY > 22 && mouseY > y && mouseY < y + 12) {
 					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON, 1.2f, 1f));
 					LoaderYeetRecipes.recipesToYeet.add(clr.getId());
-					String adding = clr.getId().toString();
-					int col = adding.indexOf(':');
-					LoaderYeetRecipes.instance.set(col==-1? adding : (adding.substring(0, ++col)+"."+adding.substring(col)), "true");
+					LoaderYeetRecipes.instance.set(clr.getId().toString(), "true");
 				}
 				y += 12;
 				if (y > height/2f) break;
 			}
-			sidebar2Height = client.world.getRecipeManager().values().stream().filter(r->filter.matcher(r.getId().toString()).find()).count() * 12 + 8;
+			sidebar2Height = client.world.getRecipeManager().values().stream().filter(r->filter.matcher(r.getId().toString()).find()).count() * 12 + 20;
 
 		}
 		float scroll = sidebarHeight < height ? 0 : sidebarScroll;
 		scroll = (float) (Math.floor((scroll * client.getWindow().getScaleFactor())) / client.getWindow().getScaleFactor());
-		float y = 10 + height/2f - scroll;
+		float y = 12 + height/2f - scroll;
 		Iterator<Identifier> iter = LoaderYeetRecipes.recipesToYeet.iterator();
 		while (iter.hasNext()) {
 			Identifier clr = iter.next();
-			if (y > height/2f) {
+			if (y > 10 + height/2f) {
 				textRenderer.drawWithShadow(matrices, clr.toString(), 5, y, -1);
 			}
-			if (didRClick && mouseY > height/2 && mouseY > y && mouseY < y + 12) {
+			if (didRClick && mouseY > 10 + height/2 && mouseY > y && mouseY < y + 12) {
 				client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON, 1.2f, 1f));
 				iter.remove();
 				LoaderYeetRecipes.instance.remove(clr.toString());
@@ -96,7 +94,7 @@ public class YeetRecipesScreen extends Screen{
 			y += 12;
 			if (y > height) break;
 		}
-		sidebarHeight = LoaderYeetRecipes.recipesToYeet.size() * 12 + 8;
+		sidebarHeight = LoaderYeetRecipes.recipesToYeet.size() * 12 + 20;
 
 		if (didClick) didClick = false;
 		if (didRClick) didRClick = false;
@@ -105,16 +103,16 @@ public class YeetRecipesScreen extends Screen{
 	@Override
 	public void tick() {
 		super.tick();
-		if (sidebarHeight > height) {
+		if (sidebarHeight > height/2f) {
 			sidebarScroll += (sidebarScrollTarget-sidebarScroll)/2;
 			if (sidebarScrollTarget < 0) sidebarScrollTarget /= 2;
-			float h = sidebarHeight-height;
+			float h = sidebarHeight-height/2f;
 			if (sidebarScrollTarget > h) sidebarScrollTarget = h+((sidebarScrollTarget-h)/2);
 		}
-		if (sidebar2Height > height) {
+		if (sidebar2Height > height/2f) {
 			sidebar2Scroll += (sidebar2ScrollTarget-sidebar2Scroll)/2;
 			if (sidebar2ScrollTarget < 0) sidebar2ScrollTarget /= 2;
-			float h = sidebar2Height-height;
+			float h = sidebar2Height-height/2f;
 			if (sidebar2ScrollTarget > h) sidebar2ScrollTarget = h+((sidebar2ScrollTarget-h)/2);
 		}
 	}

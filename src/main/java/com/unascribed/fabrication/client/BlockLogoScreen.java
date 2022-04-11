@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.regex.Pattern;
 
 @Environment(EnvType.CLIENT)
 public class BlockLogoScreen extends Screen{
@@ -41,7 +42,8 @@ public class BlockLogoScreen extends Screen{
 	final Set<Identifier> registryBlocks = Registry.BLOCK.getIds();
 	Integer selectedColor = null;
 	BlockLogoRenderer blockLogo = new BlockLogoRenderer();
-	StringBuilder filter = new StringBuilder();
+	Pattern filter = Pattern.compile("");
+	boolean canFilter = false;
 	Screen parent;
 	PrideFlag prideFlag;
 	boolean didClick;
@@ -71,7 +73,7 @@ public class BlockLogoScreen extends Screen{
 			LoaderBlockLogo.instance.set("general.reverse", LoaderBlockLogo.rawReverse.name().toLowerCase(Locale.ROOT));
 		}
 		textRenderer.draw(matrices, "Shadow Color:", width-160, 2, -1);
-		if (filter.length() != 0) {
+		if (filter.pattern().length() > 0) {
 			textRenderer.draw(matrices, "Filter:", width/2f-20, 2, -1);
 			textRenderer.draw(matrices, filter.toString(), width/2f-20, 12, -1);
 		}
@@ -111,7 +113,7 @@ public class BlockLogoScreen extends Screen{
 				if (didClick && mouseX >= 0 && mouseX <= width/2 && mouseY > y && mouseY < y+12) {
 					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON, 1.2f, 1f));
 					selectedColor = clr;
-					filter = new StringBuilder();
+					filter = Pattern.compile("");
 					if (!LoaderBlockLogo.fullColorToState.containsKey(clr)) LoaderBlockLogo.fullColorToState.put(clr, new ArrayList<>());
 				}
 				y += 12;
@@ -124,7 +126,7 @@ public class BlockLogoScreen extends Screen{
 				scroll = (float) (Math.floor((scroll * client.getWindow().getScaleFactor())) / client.getWindow().getScaleFactor());
 				float y = startY+5-scroll;
 				for (Identifier clr : registryBlocks) {
-					if (!clr.toString().contains(filter)) continue;
+					if (!filter.matcher(clr.toString()).find()) continue;
 					if (y >= startY) {
 						textRenderer.drawWithShadow(matrices, clr.toString(), 5, y, -1);
 					}
@@ -148,7 +150,7 @@ public class BlockLogoScreen extends Screen{
 					y += 12;
 					if (y > height) break;
 				}
-				sidebarHeight = registryBlocks.stream().filter(i->i.toString().contains(filter)).count()*12+8;
+				sidebarHeight = registryBlocks.stream().filter(i->filter.matcher(i.toString()).find()).count()*12+8;
 			}
 			float scroll = sidebar2Height < height-startY ? 0 : sidebar2Scroll;
 			scroll = (float) (Math.floor((scroll*client.getWindow().getScaleFactor()))/client.getWindow().getScaleFactor());
@@ -267,11 +269,13 @@ public class BlockLogoScreen extends Screen{
 			}
 			didClick = true;
 		} else if (button == 1){
-			if (filter.length() > 0 && mouseY < 40 && mouseX > width/2f-40 && mouseY < width/2f+40) {
-				filter = new StringBuilder();
+			if (filter.pattern().length() != 0 && mouseY < 40 && mouseX > width/2f-40 && mouseY < width/2f+40) {
+				filter = Pattern.compile("");
 				client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON, 1.2f, 1f));
 			}
 			if (selectedColor != null && LoaderBlockLogo.image.getHeight()+90 < mouseY && mouseX < width/2d) {
+				filter = Pattern.compile("");
+				client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON, 1.2f, 1f));
 				selectedColor = null;
 			}
 			didRClick = true;
@@ -303,14 +307,26 @@ public class BlockLogoScreen extends Screen{
 				num = num*10 + keyCode - GLFW.GLFW_KEY_0;
 			return super.keyPressed(keyCode, scanCode, modifiers);
 		} else if (selectedColor != null) {
+			if (!canFilter) canFilter = true;
 			if (keyCode == GLFW.GLFW_KEY_BACKSPACE) {
-				if (hasShiftDown()) filter = new StringBuilder();
-				else if (filter.length() > 0) filter.deleteCharAt(filter.length()-1);
-			} else {
-				String c = GLFW.glfwGetKeyName(keyCode, scanCode);
-				if (c != null) filter.append(c);
+				String str = filter.pattern();
+				if (hasShiftDown() || str.length() == 1){
+					filter = Pattern.compile("");
+				} else if (str.length() != 0){
+					filter = Pattern.compile(str.substring(0, str.length()-1), Pattern.LITERAL | Pattern.CASE_INSENSITIVE);
+				}
 			}
+		} else {
+			if (canFilter) canFilter = false;
 		}
 		return super.keyPressed(keyCode, scanCode, modifiers);
+	}
+
+	@Override
+	public boolean charTyped(char chr, int modifiers) {
+		if (canFilter) {
+			filter = Pattern.compile(filter.pattern()+chr, Pattern.LITERAL | Pattern.CASE_INSENSITIVE);
+		}
+		return super.charTyped(chr, modifiers);
 	}
 }
