@@ -201,9 +201,12 @@ public class FabricationConfigScreen extends Screen {
 	}
 
 	private Map<String, FeatureSubmenu> defaultedSubmenu(String key) {
-		Map<String, FeatureSubmenu> map = new HashMap<>();
-		if (!submenus.containsKey(key)) submenus.put(key, map);
-		return map;
+		if (!submenus.containsKey(key)){
+			Map<String, FeatureSubmenu> map = new HashMap<>();
+			submenus.put(key, map);
+			return map;
+		}
+		return submenus.get(key);
 	}
 
 	@Override
@@ -941,7 +944,7 @@ public class FabricationConfigScreen extends Screen {
 		boolean noFabricApi = false; //!configuringServer && requiresFabricApi && !FabricLoader.getInstance().isModLoaded("fabric");
 		boolean failed = isFailed(key);
 		boolean banned = !configuringServer && FabricationModClient.isBannedByServer(key);
-		boolean disabled = failed || banned || noFabricApi || (configuringServer && serverReadOnly) || !isValid(key);
+		boolean disabled = banned || noFabricApi || (configuringServer && serverReadOnly) || !isValid(key);
 		boolean noValue = noFabricApi || (configuringServer && clientOnly || !isValid(key));
 		float time = optionAnimationTime.getOrDefault(key, 0f);
 		float disabledTime = disabledAnimationTime.getOrDefault(key, 0f);
@@ -1014,7 +1017,7 @@ public class FabricationConfigScreen extends Screen {
 		int curHSValue = values[currentValue.ordinal()];
 		float a = sCurve5((5-time)/5f);
 		float da = sCurve5((5-disabledTime)/5f);
-		if (!disabled) {
+		if (!(disabled || failed)) {
 			da = 1-da;
 		}
 		int trackSize = (noUnset?45:60);
@@ -1155,13 +1158,13 @@ public class FabricationConfigScreen extends Screen {
 						renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"This option requires Fabric API"), (int)mouseX, (int)mouseY);
 					} else if (noValue) {
 						renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"The server does not recognize this option"), (int)mouseX, (int)mouseY);
-					} else if (failed) {
-						renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"This feature failed to initialize"), (int)mouseX, (int)mouseY);
 					} else if (banned) {
 						renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"This feature is banned by the server"), (int)mouseX, (int)mouseY);
 					} else {
 						renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"You cannot configure this server"), (int)mouseX, (int)mouseY);
 					}
+				} else if (failed) {
+					renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"This feature failed to initialize"), (int)mouseX, (int)mouseY);
 				} else {
 					int index = (int)((mouseX-134)/(noUnset ? 22 : onlyBannable ? 30 : 15));
 					if (onlyBannable) {

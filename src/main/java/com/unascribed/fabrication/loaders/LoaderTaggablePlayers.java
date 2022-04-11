@@ -33,24 +33,26 @@ public class LoaderTaggablePlayers implements ConfigLoader {
 	@Override
 	public void load(Path configDir, QDIni config, boolean loadError) {
 		for (String key : config.keySet()){
-			Optional<Integer> i = config.getInt(key);
-			if (i.isPresent()) {
-				FeatureTaggablePlayers.add(key, i.get(), false);
-				continue;
+			Optional<String> val = config.get(key);
+			if (val.isPresent()) {
+				try {
+					FeatureTaggablePlayers.add(key, Integer.parseInt(val.get()), false);
+					continue;
+				} catch (IllegalArgumentException ignore){}
 			}
-			int val = 0;
-			switch (config.get(key).orElse("").trim()) {
+			int i = 0;
+			switch (val.orElse("").trim()) {
 				case "untagged_players_only":
-					val = 1;
+					i = 1;
 					break;
 				case "tagged_players":
-					val = 2;
+					i = 2;
 					break;
 				case "untagged_players":
-					val = 3;
+					i = 3;
 					break;
 			}
-			FeatureTaggablePlayers.add(key, val, false);
+			FeatureTaggablePlayers.add(key, i, false);
 		}
 	}
 
