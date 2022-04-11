@@ -10,6 +10,7 @@ import io.github.queerbric.pride.PrideFlag;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
@@ -31,13 +32,9 @@ import java.util.regex.Pattern;
 public class BlockLogoScreen extends Screen{
 	int selected = 0;
 	int num = 0;
-	float sidebarScrollTarget;
-	float sidebarScroll;
-	float sidebarHeight;
-	float sidebar2ScrollTarget;
-	float sidebar2Scroll;
-	float sidebar2Height;
 	int startY = LoaderBlockLogo.image.getHeight()+90;
+	ScrollBar leftBar = new ScrollBar(height-startY);
+	ScrollBar rightBar = new ScrollBar(leftBar.displayHeight);
 
 	final Set<Identifier> registryBlocks = Registry.BLOCK.getIds();
 	Integer selectedColor = null;
@@ -102,9 +99,7 @@ public class BlockLogoScreen extends Screen{
 			LoaderBlockLogo.instance.set("shadow.alpha", String.valueOf(LoaderBlockLogo.rawShadowAlpha));
 		}
 		if (selectedColor == null) {
-			float scroll = sidebarHeight < height-startY ? 0 : sidebarScroll;
-			scroll = (float) (Math.floor((scroll*client.getWindow().getScaleFactor()))/client.getWindow().getScaleFactor());
-			float y = startY+5-scroll;
+			float y = startY+5-leftBar.getScaledScroll(client);
 			for (int clr : LoaderBlockLogo.validColors) {
 				if (y>=startY) {
 					textRenderer.draw(matrices, String.valueOf(clr), 5+0.2F, y+0.2F, clr ^ 0xFFFFFF);
@@ -119,12 +114,10 @@ public class BlockLogoScreen extends Screen{
 				y += 12;
 				if (y>height) break;
 			}
-			sidebarHeight = LoaderBlockLogo.validColors.size()*12+8;
+			leftBar.height = LoaderBlockLogo.validColors.size()*12+8;
 		} else {
 			{
-				float scroll = sidebarHeight < height - startY ? 0 : sidebarScroll;
-				scroll = (float) (Math.floor((scroll * client.getWindow().getScaleFactor())) / client.getWindow().getScaleFactor());
-				float y = startY+5-scroll;
+				float y = startY+5-leftBar.getScaledScroll(client);
 				for (Identifier clr : registryBlocks) {
 					if (!filter.matcher(clr.toString()).find()) continue;
 					if (y >= startY) {
@@ -150,11 +143,9 @@ public class BlockLogoScreen extends Screen{
 					y += 12;
 					if (y > height) break;
 				}
-				sidebarHeight = registryBlocks.stream().filter(i->filter.matcher(i.toString()).find()).count()*12+8;
+				leftBar.height = registryBlocks.stream().filter(i->filter.matcher(i.toString()).find()).count()*12+8;
 			}
-			float scroll = sidebar2Height < height-startY ? 0 : sidebar2Scroll;
-			scroll = (float) (Math.floor((scroll*client.getWindow().getScaleFactor()))/client.getWindow().getScaleFactor());
-			float y = startY-scroll;
+			float y = startY-rightBar.getScaledScroll(client);
 			List<String> blocks = LoaderBlockLogo.fullColorToState.get(selectedColor);
 			for (int i = 0; i<blocks.size(); i++) {
 				String clr = blocks.get(i);
@@ -186,7 +177,7 @@ public class BlockLogoScreen extends Screen{
 				y += 12;
 				if (y>height) break;
 			}
-			sidebar2Height = blocks.size()*12+8;
+			rightBar.displayHeight = blocks.size()*12+8;
 		}
 		blockLogo.drawLogo(false, 0, delta);
 		if (didClick) didClick = false;
@@ -213,40 +204,15 @@ public class BlockLogoScreen extends Screen{
 	}
 
 	private boolean drawToggleButton(MatrixStack matrices, int x, int y, int w, int h, String text, float mouseX, float mouseY, boolean toggle) {
-		boolean click = false;
-		boolean hover = mouseX >= x && mouseX <= x+w && mouseY >= y && mouseY <= y+h;
-		if (hover ^ toggle) {
-			fill(matrices, x, y, x + w, y + 1, -1);
-			fill(matrices, x, y, x + 1, y + h, -1);
-			fill(matrices, x, y + h - 1, x + w, y + h, -1);
-			fill(matrices, x + w - 1, y, x + w, y + h, -1);
-		}
-		if (hover && didClick) {
-			client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1f));
-			click = true;
-		}
-		int textWidth = textRenderer.getWidth(text);
-		textRenderer.draw(matrices, text, x+((w-textWidth)/2f), y+((h-8)/2f), -1);
-		return click;
+		return FabricationConfigScreen.drawToggleButton(matrices, x, y, w, h, text, mouseX, mouseY, toggle, didClick, client);
 	}
 
 	@Override
 	public void tick() {
 		super.tick();
 		blockLogo.tick();
-
-		if (sidebarHeight > height-startY) {
-			sidebarScroll += (sidebarScrollTarget-sidebarScroll)/2;
-			if (sidebarScrollTarget < 0) sidebarScrollTarget /= 2;
-			float h = sidebarHeight-height-startY;
-			if (sidebarScrollTarget > h) sidebarScrollTarget = h+((sidebarScrollTarget-h)/2);
-		}
-		if (sidebar2Height > height-startY) {
-			sidebar2Scroll += (sidebar2ScrollTarget-sidebar2Scroll)/2;
-			if (sidebar2ScrollTarget < 0) sidebar2ScrollTarget /= 2;
-			float h = sidebar2Height-height-startY;
-			if (sidebar2ScrollTarget > h) sidebar2ScrollTarget = h+((sidebar2ScrollTarget-h)/2);
-		}
+		leftBar.tick();
+		rightBar.tick();
 	}
 
 	@Override
@@ -286,9 +252,9 @@ public class BlockLogoScreen extends Screen{
 	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
 		if (mouseY>=startY) {
 			if (mouseX <= width/2d) {
-				sidebarScrollTarget -= amount * 20;
+				leftBar.scroll(amount * 20);
 			} else {
-				sidebar2ScrollTarget -= amount * 20;
+				rightBar.scroll(amount * 20);
 			}
 		} else if (mouseY < 40 && mouseX>width-160 && selected != 0){
 			num+=amount;
@@ -329,4 +295,12 @@ public class BlockLogoScreen extends Screen{
 		}
 		return super.charTyped(chr, modifiers);
 	}
+
+	@Override
+	public void resize(MinecraftClient client, int width, int height) {
+		leftBar.displayHeight = height-startY;
+		rightBar.displayHeight = leftBar.displayHeight;
+		super.resize(client, width, height);
+	}
+
 }

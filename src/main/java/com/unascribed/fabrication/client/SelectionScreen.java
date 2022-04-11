@@ -2,6 +2,7 @@ package com.unascribed.fabrication.client;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 
@@ -14,9 +15,7 @@ class SelectionScreen<T> extends Screen {
 	final Screen parent;
 	final List<? extends PreciseDrawable> features;
 	final Consumer<T> out;
-	float sidebarScrollTarget;
-	float sidebarScroll;
-	float sidebarHeight;
+	final ScrollBar scrollBar = new ScrollBar(height);
 	boolean didClick = false;
 
 	public SelectionScreen(Screen parent, List<?> options, Consumer<T> out) {
@@ -69,8 +68,8 @@ class SelectionScreen<T> extends Screen {
 		parent.height = this.height;
 		parent.width = this.width;
 		parent.renderBackground(matrices);
-		float scroll = sidebarHeight < height ? 0 : sidebarScroll;
-		sidebarHeight = 20;
+		float scroll = scrollBar.getScaledScroll(client);
+		scrollBar.height = 20;
 		scroll = (float) (Math.floor((scroll * client.getWindow().getScaleFactor())) / client.getWindow().getScaleFactor());
 		float y = 22 - scroll;
 		for (PreciseDrawable feature : features) {
@@ -83,7 +82,7 @@ class SelectionScreen<T> extends Screen {
 					onClose();
 				}
 			}
-			sidebarHeight += 9+height;
+			scrollBar.height += 9+height;
 			y += 9+height;
 		}
 
@@ -92,17 +91,12 @@ class SelectionScreen<T> extends Screen {
 	@Override
 	public void tick() {
 		super.tick();
-		if (sidebarHeight > height) {
-			sidebarScroll += (sidebarScrollTarget - sidebarScroll) / 2;
-			if (sidebarScrollTarget < 0) sidebarScrollTarget /= 2;
-			float h = sidebarHeight - height;
-			if (sidebarScrollTarget > h) sidebarScrollTarget = h + ((sidebarScrollTarget - h) / 2);
-		}
+		scrollBar.tick();
 	}
 
 	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		sidebarScrollTarget -= amount * 20;
+		scrollBar.scroll(amount * 20);
 		return super.mouseScrolled(mouseX, mouseY, amount);
 	}
 
@@ -115,6 +109,12 @@ class SelectionScreen<T> extends Screen {
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		if (button == 0 || button == 1) didClick = true;
 		return super.mouseClicked(mouseX, mouseY, button);
+	}
+
+	@Override
+	public void resize(MinecraftClient client, int width, int height) {
+		scrollBar.displayHeight = height;
+		super.resize(client, width, height);
 	}
 
 }

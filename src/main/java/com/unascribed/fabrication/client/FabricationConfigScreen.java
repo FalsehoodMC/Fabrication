@@ -195,6 +195,7 @@ public class FabricationConfigScreen extends Screen {
 		defaultedSubmenu(FabConf.remap("*.block_logo")).put("Detailed Configs", BlockLogoScreen::new);
 		defaultedSubmenu(FabConf.remap("*.yeet_recipes")).put("Detailed Configs", YeetRecipesScreen::new);
 		defaultedSubmenu(FabConf.remap("*.taggable_players")).put("Detailed Configs", TaggablePlayersScreen::new);
+		defaultedSubmenu(FabConf.remap("*.classic_block_drops")).put("Detailed Configs", ClassicBlockDropsScreen::new);
 
 		tabs.add("search");
 		tabs.addAll(options.keySet());
@@ -915,6 +916,10 @@ public class FabricationConfigScreen extends Screen {
 	}
 
 	private boolean drawButton(MatrixStack matrices, int x, int y, int w, int h, String text, float mouseX, float mouseY) {
+		return drawButton(matrices, x, y, w, h, text, mouseX, mouseY, didClick, client);
+	}
+
+	public static boolean drawButton(MatrixStack matrices, int x, int y, int w, int h, String text, float mouseX, float mouseY, boolean didClick, MinecraftClient client) {
 		boolean click = false;
 		boolean hover = mouseX >= x && mouseX <= x+w && mouseY >= y && mouseY <= y+h;
 		fill(matrices, x, y, x+w, y+h, FabConf.isEnabled("general.dark_mode") ? 0x44FFFFFF : 0x55000000);
@@ -928,8 +933,26 @@ public class FabricationConfigScreen extends Screen {
 				click = true;
 			}
 		}
-		int textWidth = textRenderer.getWidth(text);
-		textRenderer.draw(matrices, text, x+((w-textWidth)/2), y+((h-8)/2), -1);
+		int textWidth = client.textRenderer.getWidth(text);
+		client.textRenderer.draw(matrices, text, x+((w-textWidth)/2), y+((h-8)/2), -1);
+		return click;
+	}
+
+	public static boolean drawToggleButton(MatrixStack matrices, int x, int y, int w, int h, String text, float mouseX, float mouseY, boolean toggle, boolean didClick, MinecraftClient client) {
+		boolean click = false;
+		boolean hover = mouseX >= x && mouseX <= x+w && mouseY >= y && mouseY <= y+h;
+		if (hover ^ toggle) {
+			fill(matrices, x, y, x + w, y + 1, -1);
+			fill(matrices, x, y, x + 1, y + h, -1);
+			fill(matrices, x, y + h - 1, x + w, y + h, -1);
+			fill(matrices, x + w - 1, y, x + w, y + h, -1);
+		}
+		if (hover && didClick) {
+			client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1f));
+			click = true;
+		}
+		int textWidth = client.textRenderer.getWidth(text);
+		client.textRenderer.draw(matrices, text, x+((w-textWidth)/2f), y+((h-8)/2f)+0.5f, -1);
 		return click;
 	}
 
