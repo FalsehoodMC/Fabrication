@@ -3,4 +3,4 @@ utility.rmb_clears_text_fields:
 	since: 2.3.1
 	sides: client_only
 	desc:
-		Right Mouse Button will clear text / search fields.
+		Right Mouse Button will clear text fields.
