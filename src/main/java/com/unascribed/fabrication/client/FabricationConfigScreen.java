@@ -260,7 +260,7 @@ public class FabricationConfigScreen extends Screen {
 		if (leaving) {
 			timeLeaving += delta;
 		}
-		if (parent != null && (leaving || timeExisted < 10) && !FabConf.isEnabled("*.reduced_motion")) {
+		if ((leaving || timeExisted < 10) && !FabConf.isEnabled("*.reduced_motion")) {
 			float a = sCurve5((leaving ? Math.max(0, 10 - timeLeaving) : timeExisted) / 10);
 			matrices.push();
 				matrices.translate(width / 2f, height, 0);
@@ -280,26 +280,28 @@ public class FabricationConfigScreen extends Screen {
 			matrices.pop();
 
 			// background rendering ignores the matrixstack, so we have to Make A Mess in the projection matrix instead
-			MatrixStack projection = new MatrixStack();
-			projection.method_34425(RenderSystem.getProjectionMatrix());
-			projection.push();
-				projection.translate(width / 2f, height, 0);
-				projection.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(a * (leaving ? -180 : 180)));
-				projection.translate(-width / 2, -height, 0);
-				for (int x = -1; x <= 1; x++) {
-					for (int y = -1; y <= 0; y++) {
-						if (x == 0 && y == 0) continue;
-						projection.push();
-						projection.translate(width * x, height * y, 0);
-						RenderSystem.setProjectionMatrix(projection.peek().getModel());
-						parent.renderBackgroundTexture(0);
-						projection.pop();
+			if (parent != null) {
+				MatrixStack projection = new MatrixStack();
+				projection.method_34425(RenderSystem.getProjectionMatrix());
+				projection.push();
+					projection.translate(width / 2f, height, 0);
+					projection.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(a * (leaving ? -180 : 180)));
+					projection.translate(-width / 2, -height, 0);
+					for (int x = -1; x <= 1; x++) {
+						for (int y = -1; y <= 0; y++) {
+							if (x == 0 && y == 0) continue;
+							projection.push();
+							projection.translate(width * x, height * y, 0);
+							RenderSystem.setProjectionMatrix(projection.peek().getModel());
+							parent.renderBackgroundTexture(0);
+							projection.pop();
+						}
 					}
-				}
+					RenderSystem.setProjectionMatrix(projection.peek().getModel());
+					parent.render(matrices, -200, -200, delta);
+				projection.pop();
 				RenderSystem.setProjectionMatrix(projection.peek().getModel());
-				parent.render(matrices, -200, -200, delta);
-			projection.pop();
-			RenderSystem.setProjectionMatrix(projection.peek().getModel());
+			}
 		} else {
 			matrices.push();
 				drawBackground(matrices, mouseX, mouseY, delta, 0, 0);
@@ -506,7 +508,7 @@ public class FabricationConfigScreen extends Screen {
 			}
 			y += 12;
 			thisHeight += 12;
-			if (!"search".equals(s)) {
+			if (!"search".equals(s) && y < height) {
 				String desc = SECTION_DESCRIPTIONS.getOrDefault(s, "No description available");
 				int x = 8;
 				int line = 0;
@@ -963,7 +965,7 @@ public class FabricationConfigScreen extends Screen {
 		boolean requiresFabricApi = ArrayUtils.contains(flags, REQUIRES_FABRIC_API);
 		boolean showSourceSection = ArrayUtils.contains(flags, SHOW_SOURCE_SECTION);
 		boolean highlightQueryMatch = ArrayUtils.contains(flags, HIGHLIGHT_QUERY_MATCH);
-		// presence of Fabric API is implied by the fact you need ModMenu to access this menu
+		// presence of Fabric API is implied by the fact you need ModMenu to access this menu *kinda (/fabrication:client ui)
 		boolean noFabricApi = false; //!configuringServer && requiresFabricApi && !FabricLoader.getInstance().isModLoaded("fabric");
 		boolean failed = isFailed(key);
 		boolean banned = !configuringServer && FabricationModClient.isBannedByServer(key);

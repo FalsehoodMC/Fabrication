@@ -15,6 +15,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.unascribed.fabrication.client.AtlasTracking;
 import com.unascribed.fabrication.client.AtlasViewerScreen;
+import com.unascribed.fabrication.client.FabricationConfigScreen;
 import com.unascribed.fabrication.client.OptionalFScriptScreen;
 import com.unascribed.fabrication.features.FeatureFabricationCommand;
 import com.unascribed.fabrication.support.OptionalFScript;
@@ -60,6 +61,13 @@ public class FabricationClientCommands {
 		LiteralArgumentBuilder<FabricClientCommandSource> root = LiteralArgumentBuilder.<FabricClientCommandSource>literal("fabrication:client");
 		if (Agnos.isModLoaded("fscript")) addFScript(root);
 		FeatureFabricationCommand.addConfig(root, false);
+		root.then(LiteralArgumentBuilder.<FabricClientCommandSource>literal("ui")
+				.executes((c) -> {
+					MinecraftClient.getInstance().send(() -> {
+						MinecraftClient.getInstance().setScreen(new FabricationConfigScreen(null));
+					});
+					return 1;
+				}));
 		if (!FabConf.isFailed("atlas_viewer")) {
 			root.then(LiteralArgumentBuilder.<FabricClientCommandSource>literal("atlas")
 					.then(LiteralArgumentBuilder.<FabricClientCommandSource>literal("view")
