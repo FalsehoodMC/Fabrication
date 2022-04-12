@@ -9,7 +9,6 @@ import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Feature;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.predicate.entity.EntityPredicates;
 
 import java.util.HashMap;
@@ -43,8 +42,6 @@ public class FeatureTaggablePlayers implements Feature {
 		});
 		validTags = ImmutableMap.copyOf(tags);
 	}
-
-	private Predicate<Entity> originalUntargetablePredicate;
 
 	private static Predicate<?> getPredicate(String key, int type) {
 		switch (type) {
@@ -83,23 +80,11 @@ public class FeatureTaggablePlayers implements Feature {
 	@Override
 	public void apply() {
 		activeTags.forEach(FeatureTaggablePlayers::set);
-		originalUntargetablePredicate = EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR;
-		amendUntargetablePredicate(e -> {
-			if (e instanceof PlayerEntity && ConfigPredicates.shouldRun("*.invisible_to_mobs", (PlayerEntity)e)) return false;
-			return originalUntargetablePredicate.test(e);
-		});
-	}
-
-	private void amendUntargetablePredicate(Predicate<Entity> p) {
-		EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR = p;
 	}
 
 	@Override
 	public boolean undo() {
 		activeTags.keySet().forEach(k->ConfigPredicates.remove(k, 1));
-		if (originalUntargetablePredicate != null) {
-			amendUntargetablePredicate(originalUntargetablePredicate);
-		}
 		return true;
 	}
 
