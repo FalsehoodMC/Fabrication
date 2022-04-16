@@ -103,7 +103,7 @@ public class FabConf {
 	private static Profile worldProfile;
 	private static Profile profile;
 	private static QDIni rawConfig;
-	private static Map<String, ConfigValue> config;
+	private static Map<String, ConfigValue> config = new HashMap<>();
 	private static boolean analyticsSafe = false;
 	private static ImmutableMap<String, Boolean> defaults;
 	private static Path worldPath = null;
