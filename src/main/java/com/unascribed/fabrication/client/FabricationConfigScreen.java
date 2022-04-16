@@ -195,15 +195,19 @@ public class FabricationConfigScreen extends Screen {
 		defaultedSubmenu(FabConf.remap("*.block_logo")).put("Detailed Configs", BlockLogoScreen::new);
 		defaultedSubmenu(FabConf.remap("*.yeet_recipes")).put("Detailed Configs", YeetRecipesScreen::new);
 		defaultedSubmenu(FabConf.remap("*.taggable_players")).put("Detailed Configs", TaggablePlayersScreen::new);
+		defaultedSubmenu(FabConf.remap("*.classic_block_drops")).put("Detailed Configs", ClassicBlockDropsScreen::new);
 
 		tabs.add("search");
 		tabs.addAll(options.keySet());
 	}
 
 	private Map<String, FeatureSubmenu> defaultedSubmenu(String key) {
-		Map<String, FeatureSubmenu> map = new HashMap<>();
-		if (!submenus.containsKey(key)) submenus.put(key, map);
-		return map;
+		if (!submenus.containsKey(key)){
+			Map<String, FeatureSubmenu> map = new HashMap<>();
+			submenus.put(key, map);
+			return map;
+		}
+		return submenus.get(key);
 	}
 
 	@Override
@@ -256,7 +260,7 @@ public class FabricationConfigScreen extends Screen {
 		if (leaving) {
 			timeLeaving += delta;
 		}
-		if (parent != null && (leaving || timeExisted < 10) && !FabConf.isEnabled("*.reduced_motion")) {
+		if ((leaving || timeExisted < 10) && !FabConf.isEnabled("*.reduced_motion")) {
 			float a = sCurve5((leaving ? Math.max(0, 10 - timeLeaving) : timeExisted) / 10);
 			matrices.push();
 				matrices.translate(width / 2f, height, 0);
@@ -276,26 +280,28 @@ public class FabricationConfigScreen extends Screen {
 			matrices.pop();
 
 			// background rendering ignores the matrixstack, so we have to Make A Mess in the projection matrix instead
-			MatrixStack projection = new MatrixStack();
-			projection.method_34425(RenderSystem.getProjectionMatrix());
-			projection.push();
-				projection.translate(width / 2f, height, 0);
-				projection.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(a * (leaving ? -180 : 180)));
-				projection.translate(-width / 2, -height, 0);
-				for (int x = -1; x <= 1; x++) {
-					for (int y = -1; y <= 0; y++) {
-						if (x == 0 && y == 0) continue;
-						projection.push();
-						projection.translate(width * x, height * y, 0);
-						RenderSystem.setProjectionMatrix(projection.peek().getModel());
-						parent.renderBackgroundTexture(0);
-						projection.pop();
+			if (parent != null) {
+				MatrixStack projection = new MatrixStack();
+				projection.method_34425(RenderSystem.getProjectionMatrix());
+				projection.push();
+					projection.translate(width / 2f, height, 0);
+					projection.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(a * (leaving ? -180 : 180)));
+					projection.translate(-width / 2, -height, 0);
+					for (int x = -1; x <= 1; x++) {
+						for (int y = -1; y <= 0; y++) {
+							if (x == 0 && y == 0) continue;
+							projection.push();
+							projection.translate(width * x, height * y, 0);
+							RenderSystem.setProjectionMatrix(projection.peek().getModel());
+							parent.renderBackgroundTexture(0);
+							projection.pop();
+						}
 					}
-				}
+					RenderSystem.setProjectionMatrix(projection.peek().getModel());
+					parent.render(matrices, -200, -200, delta);
+				projection.pop();
 				RenderSystem.setProjectionMatrix(projection.peek().getModel());
-				parent.render(matrices, -200, -200, delta);
-			projection.pop();
-			RenderSystem.setProjectionMatrix(projection.peek().getModel());
+			}
 		} else {
 			matrices.push();
 				drawBackground(matrices, mouseX, mouseY, delta, 0, 0);
@@ -502,7 +508,7 @@ public class FabricationConfigScreen extends Screen {
 			}
 			y += 12;
 			thisHeight += 12;
-			if (!"search".equals(s)) {
+			if (!"search".equals(s) && y < height) {
 				String desc = SECTION_DESCRIPTIONS.getOrDefault(s, "No description available");
 				int x = 8;
 				int line = 0;
@@ -912,6 +918,10 @@ public class FabricationConfigScreen extends Screen {
 	}
 
 	private boolean drawButton(MatrixStack matrices, int x, int y, int w, int h, String text, float mouseX, float mouseY) {
+		return drawButton(matrices, x, y, w, h, text, mouseX, mouseY, didClick, client);
+	}
+
+	public static boolean drawButton(MatrixStack matrices, int x, int y, int w, int h, String text, float mouseX, float mouseY, boolean didClick, MinecraftClient client) {
 		boolean click = false;
 		boolean hover = mouseX >= x && mouseX <= x+w && mouseY >= y && mouseY <= y+h;
 		fill(matrices, x, y, x+w, y+h, FabConf.isEnabled("general.dark_mode") ? 0x44FFFFFF : 0x55000000);
@@ -925,8 +935,26 @@ public class FabricationConfigScreen extends Screen {
 				click = true;
 			}
 		}
-		int textWidth = textRenderer.getWidth(text);
-		textRenderer.draw(matrices, text, x+((w-textWidth)/2), y+((h-8)/2), -1);
+		int textWidth = client.textRenderer.getWidth(text);
+		client.textRenderer.draw(matrices, text, x+((w-textWidth)/2), y+((h-8)/2), -1);
+		return click;
+	}
+
+	public static boolean drawToggleButton(MatrixStack matrices, int x, int y, int w, int h, String text, float mouseX, float mouseY, boolean toggle, boolean didClick, MinecraftClient client) {
+		boolean click = false;
+		boolean hover = mouseX >= x && mouseX <= x+w && mouseY >= y && mouseY <= y+h;
+		if (hover ^ toggle) {
+			fill(matrices, x, y, x + w, y + 1, -1);
+			fill(matrices, x, y, x + 1, y + h, -1);
+			fill(matrices, x, y + h - 1, x + w, y + h, -1);
+			fill(matrices, x + w - 1, y, x + w, y + h, -1);
+		}
+		if (hover && didClick) {
+			client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1f));
+			click = true;
+		}
+		int textWidth = client.textRenderer.getWidth(text);
+		client.textRenderer.draw(matrices, text, x+((w-textWidth)/2f), y+((h-8)/2f)+0.5f, -1);
 		return click;
 	}
 
@@ -937,11 +965,11 @@ public class FabricationConfigScreen extends Screen {
 		boolean requiresFabricApi = ArrayUtils.contains(flags, REQUIRES_FABRIC_API);
 		boolean showSourceSection = ArrayUtils.contains(flags, SHOW_SOURCE_SECTION);
 		boolean highlightQueryMatch = ArrayUtils.contains(flags, HIGHLIGHT_QUERY_MATCH);
-		// presence of Fabric API is implied by the fact you need ModMenu to access this menu
+		// presence of Fabric API is implied by the fact you need ModMenu to access this menu *kinda (/fabrication:client ui)
 		boolean noFabricApi = false; //!configuringServer && requiresFabricApi && !FabricLoader.getInstance().isModLoaded("fabric");
 		boolean failed = isFailed(key);
 		boolean banned = !configuringServer && FabricationModClient.isBannedByServer(key);
-		boolean disabled = failed || banned || noFabricApi || (configuringServer && serverReadOnly) || !isValid(key);
+		boolean disabled = banned || noFabricApi || (configuringServer && serverReadOnly) || !isValid(key);
 		boolean noValue = noFabricApi || (configuringServer && clientOnly || !isValid(key));
 		float time = optionAnimationTime.getOrDefault(key, 0f);
 		float disabledTime = disabledAnimationTime.getOrDefault(key, 0f);
@@ -1014,7 +1042,7 @@ public class FabricationConfigScreen extends Screen {
 		int curHSValue = values[currentValue.ordinal()];
 		float a = sCurve5((5-time)/5f);
 		float da = sCurve5((5-disabledTime)/5f);
-		if (!disabled) {
+		if (!(disabled || failed)) {
 			da = 1-da;
 		}
 		int trackSize = (noUnset?45:60);
@@ -1155,13 +1183,13 @@ public class FabricationConfigScreen extends Screen {
 						renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"This option requires Fabric API"), (int)mouseX, (int)mouseY);
 					} else if (noValue) {
 						renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"The server does not recognize this option"), (int)mouseX, (int)mouseY);
-					} else if (failed) {
-						renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"This feature failed to initialize"), (int)mouseX, (int)mouseY);
 					} else if (banned) {
 						renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"This feature is banned by the server"), (int)mouseX, (int)mouseY);
 					} else {
 						renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"You cannot configure this server"), (int)mouseX, (int)mouseY);
 					}
+				} else if (failed) {
+					renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"This feature failed to initialize"), (int)mouseX, (int)mouseY);
 				} else {
 					int index = (int)((mouseX-134)/(noUnset ? 22 : onlyBannable ? 30 : 15));
 					if (onlyBannable) {

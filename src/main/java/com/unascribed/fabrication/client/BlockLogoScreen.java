@@ -10,6 +10,7 @@ import io.github.queerbric.pride.PrideFlag;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
@@ -25,23 +26,21 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.regex.Pattern;
 
 @Environment(EnvType.CLIENT)
 public class BlockLogoScreen extends Screen{
 	int selected = 0;
 	int num = 0;
-	float sidebarScrollTarget;
-	float sidebarScroll;
-	float sidebarHeight;
-	float sidebar2ScrollTarget;
-	float sidebar2Scroll;
-	float sidebar2Height;
 	int startY = LoaderBlockLogo.image.getHeight()+90;
+	ScrollBar leftBar = new ScrollBar(height-startY);
+	ScrollBar rightBar = new ScrollBar(leftBar.displayHeight);
 
 	final Set<Identifier> registryBlocks = Registry.BLOCK.getIds();
 	Integer selectedColor = null;
 	BlockLogoRenderer blockLogo = new BlockLogoRenderer();
-	StringBuilder filter = new StringBuilder();
+	Pattern filter = Pattern.compile("");
+	boolean canFilter = false;
 	Screen parent;
 	PrideFlag prideFlag;
 	boolean didClick;
@@ -71,7 +70,7 @@ public class BlockLogoScreen extends Screen{
 			LoaderBlockLogo.instance.set("general.reverse", LoaderBlockLogo.rawReverse.name().toLowerCase(Locale.ROOT));
 		}
 		textRenderer.draw(matrices, "Shadow Color:", width-160, 2, -1);
-		if (filter.length() != 0) {
+		if (filter.pattern().length() > 0) {
 			textRenderer.draw(matrices, "Filter:", width/2f-20, 2, -1);
 			textRenderer.draw(matrices, filter.toString(), width/2f-20, 12, -1);
 		}
@@ -100,9 +99,7 @@ public class BlockLogoScreen extends Screen{
 			LoaderBlockLogo.instance.set("shadow.alpha", String.valueOf(LoaderBlockLogo.rawShadowAlpha));
 		}
 		if (selectedColor == null) {
-			float scroll = sidebarHeight < height-startY ? 0 : sidebarScroll;
-			scroll = (float) (Math.floor((scroll*client.getWindow().getScaleFactor()))/client.getWindow().getScaleFactor());
-			float y = startY+5-scroll;
+			float y = startY+5-leftBar.getScaledScroll(client);
 			for (int clr : LoaderBlockLogo.validColors) {
 				if (y>=startY) {
 					textRenderer.draw(matrices, String.valueOf(clr), 5+0.2F, y+0.2F, clr ^ 0xFFFFFF);
@@ -111,20 +108,18 @@ public class BlockLogoScreen extends Screen{
 				if (didClick && mouseX >= 0 && mouseX <= width/2 && mouseY > y && mouseY < y+12) {
 					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON, 1.2f, 1f));
 					selectedColor = clr;
-					filter = new StringBuilder();
+					filter = Pattern.compile("");
 					if (!LoaderBlockLogo.fullColorToState.containsKey(clr)) LoaderBlockLogo.fullColorToState.put(clr, new ArrayList<>());
 				}
 				y += 12;
 				if (y>height) break;
 			}
-			sidebarHeight = LoaderBlockLogo.validColors.size()*12+8;
+			leftBar.height = LoaderBlockLogo.validColors.size()*12+8;
 		} else {
 			{
-				float scroll = sidebarHeight < height - startY ? 0 : sidebarScroll;
-				scroll = (float) (Math.floor((scroll * client.getWindow().getScaleFactor())) / client.getWindow().getScaleFactor());
-				float y = startY+5-scroll;
+				float y = startY+5-leftBar.getScaledScroll(client);
 				for (Identifier clr : registryBlocks) {
-					if (!clr.toString().contains(filter)) continue;
+					if (!filter.matcher(clr.toString()).find()) continue;
 					if (y >= startY) {
 						textRenderer.drawWithShadow(matrices, clr.toString(), 5, y, -1);
 					}
@@ -148,11 +143,9 @@ public class BlockLogoScreen extends Screen{
 					y += 12;
 					if (y > height) break;
 				}
-				sidebarHeight = registryBlocks.stream().filter(i->i.toString().contains(filter)).count()*12+8;
+				leftBar.height = registryBlocks.stream().filter(i->filter.matcher(i.toString()).find()).count()*12+8;
 			}
-			float scroll = sidebar2Height < height-startY ? 0 : sidebar2Scroll;
-			scroll = (float) (Math.floor((scroll*client.getWindow().getScaleFactor()))/client.getWindow().getScaleFactor());
-			float y = startY-scroll;
+			float y = startY-rightBar.getScaledScroll(client);
 			List<String> blocks = LoaderBlockLogo.fullColorToState.get(selectedColor);
 			for (int i = 0; i<blocks.size(); i++) {
 				String clr = blocks.get(i);
@@ -184,7 +177,7 @@ public class BlockLogoScreen extends Screen{
 				y += 12;
 				if (y>height) break;
 			}
-			sidebar2Height = blocks.size()*12+8;
+			rightBar.displayHeight = blocks.size()*12+8;
 		}
 		blockLogo.drawLogo(false, 0, delta);
 		if (didClick) didClick = false;
@@ -211,40 +204,15 @@ public class BlockLogoScreen extends Screen{
 	}
 
 	private boolean drawToggleButton(MatrixStack matrices, int x, int y, int w, int h, String text, float mouseX, float mouseY, boolean toggle) {
-		boolean click = false;
-		boolean hover = mouseX >= x && mouseX <= x+w && mouseY >= y && mouseY <= y+h;
-		if (hover ^ toggle) {
-			fill(matrices, x, y, x + w, y + 1, -1);
-			fill(matrices, x, y, x + 1, y + h, -1);
-			fill(matrices, x, y + h - 1, x + w, y + h, -1);
-			fill(matrices, x + w - 1, y, x + w, y + h, -1);
-		}
-		if (hover && didClick) {
-			client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1f));
-			click = true;
-		}
-		int textWidth = textRenderer.getWidth(text);
-		textRenderer.draw(matrices, text, x+((w-textWidth)/2f), y+((h-8)/2f), -1);
-		return click;
+		return FabricationConfigScreen.drawToggleButton(matrices, x, y, w, h, text, mouseX, mouseY, toggle, didClick, client);
 	}
 
 	@Override
 	public void tick() {
 		super.tick();
 		blockLogo.tick();
-
-		if (sidebarHeight > height-startY) {
-			sidebarScroll += (sidebarScrollTarget-sidebarScroll)/2;
-			if (sidebarScrollTarget < 0) sidebarScrollTarget /= 2;
-			float h = sidebarHeight-height-startY;
-			if (sidebarScrollTarget > h) sidebarScrollTarget = h+((sidebarScrollTarget-h)/2);
-		}
-		if (sidebar2Height > height-startY) {
-			sidebar2Scroll += (sidebar2ScrollTarget-sidebar2Scroll)/2;
-			if (sidebar2ScrollTarget < 0) sidebar2ScrollTarget /= 2;
-			float h = sidebar2Height-height-startY;
-			if (sidebar2ScrollTarget > h) sidebar2ScrollTarget = h+((sidebar2ScrollTarget-h)/2);
-		}
+		leftBar.tick();
+		rightBar.tick();
 	}
 
 	@Override
@@ -267,11 +235,13 @@ public class BlockLogoScreen extends Screen{
 			}
 			didClick = true;
 		} else if (button == 1){
-			if (filter.length() > 0 && mouseY < 40 && mouseX > width/2f-40 && mouseY < width/2f+40) {
-				filter = new StringBuilder();
+			if (filter.pattern().length() != 0 && mouseY < 40 && mouseX > width/2f-40 && mouseY < width/2f+40) {
+				filter = Pattern.compile("");
 				client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON, 1.2f, 1f));
 			}
 			if (selectedColor != null && LoaderBlockLogo.image.getHeight()+90 < mouseY && mouseX < width/2d) {
+				filter = Pattern.compile("");
+				client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON, 1.2f, 1f));
 				selectedColor = null;
 			}
 			didRClick = true;
@@ -282,9 +252,9 @@ public class BlockLogoScreen extends Screen{
 	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
 		if (mouseY>=startY) {
 			if (mouseX <= width/2d) {
-				sidebarScrollTarget -= amount * 20;
+				leftBar.scroll(amount * 20);
 			} else {
-				sidebar2ScrollTarget -= amount * 20;
+				rightBar.scroll(amount * 20);
 			}
 		} else if (mouseY < 40 && mouseX>width-160 && selected != 0){
 			num+=amount;
@@ -303,14 +273,34 @@ public class BlockLogoScreen extends Screen{
 				num = num*10 + keyCode - GLFW.GLFW_KEY_0;
 			return super.keyPressed(keyCode, scanCode, modifiers);
 		} else if (selectedColor != null) {
+			if (!canFilter) canFilter = true;
 			if (keyCode == GLFW.GLFW_KEY_BACKSPACE) {
-				if (hasShiftDown()) filter = new StringBuilder();
-				else if (filter.length() > 0) filter.deleteCharAt(filter.length()-1);
-			} else {
-				String c = GLFW.glfwGetKeyName(keyCode, scanCode);
-				if (c != null) filter.append(c);
+				String str = filter.pattern();
+				if (hasShiftDown() || str.length() == 1){
+					filter = Pattern.compile("");
+				} else if (str.length() != 0){
+					filter = Pattern.compile(str.substring(0, str.length()-1), Pattern.LITERAL | Pattern.CASE_INSENSITIVE);
+				}
 			}
+		} else {
+			if (canFilter) canFilter = false;
 		}
 		return super.keyPressed(keyCode, scanCode, modifiers);
 	}
+
+	@Override
+	public boolean charTyped(char chr, int modifiers) {
+		if (canFilter) {
+			filter = Pattern.compile(filter.pattern()+chr, Pattern.LITERAL | Pattern.CASE_INSENSITIVE);
+		}
+		return super.charTyped(chr, modifiers);
+	}
+
+	@Override
+	public void resize(MinecraftClient client, int width, int height) {
+		leftBar.displayHeight = height-startY;
+		rightBar.displayHeight = leftBar.displayHeight;
+		super.resize(client, width, height);
+	}
+
 }

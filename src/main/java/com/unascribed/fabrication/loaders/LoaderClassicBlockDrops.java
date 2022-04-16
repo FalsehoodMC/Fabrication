@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.loaders;
 
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -25,7 +26,10 @@ import net.minecraft.util.registry.Registry;
 public class LoaderClassicBlockDrops implements ConfigLoader {
 
 	public static final List<Function<Identifier, ConfigValue>> rules = Lists.newArrayList();
+	public static final Map<String, Optional<Boolean>> literals = new HashMap<>();
+	public static final Map<String, Optional<Boolean>> heuristics = new HashMap<>();
 	private static final Map<Block, Boolean> cache = new WeakHashMap<>();
+	public static final LoaderClassicBlockDrops instance = new LoaderClassicBlockDrops();
 
 	public static boolean isSafe(Block b) {
 		if (cache.containsKey(b)) return cache.get(b);
@@ -43,41 +47,55 @@ public class LoaderClassicBlockDrops implements ConfigLoader {
 		return false;
 	}
 
-	@Override
-	public void load(Path configDir, QDIni config, boolean loadError) {
+	public void reload() {
 		rules.clear();
 		cache.clear();
-		for (String k : config.keySet()) {
-			if (k.startsWith("@heuristics.")) {
-				if (k.contains("\\E") || k.contains("\\Q"))
-					throw new IllegalArgumentException("No.");
-				StringBuffer buf = new StringBuffer("^\\Q");
-				Matcher m = Pattern.compile("*", Pattern.LITERAL).matcher(k.substring(12));
-				while (m.find()) {
-					m.appendReplacement(buf, "\\\\E.*\\\\Q");
-				}
-				m.appendTail(buf);
-				buf.append("\\E$");
-				Pattern p = Pattern.compile(buf.toString());
-				Optional<Boolean> valueOpt = config.getBoolean(k);
-				if (valueOpt.isPresent()) {
-					boolean value = valueOpt.get();
-					rules.add(id -> {
-						if (p.matcher(id.getPath()).matches()) return value ? ConfigValue.TRUE : ConfigValue.FALSE;
-						return ConfigValue.UNSET;
-					});
-				}
-			} else {
-				Optional<Boolean> valueOpt = config.getBoolean(k);
-				if (valueOpt.isPresent()) {
-					boolean value = valueOpt.get();
-					rules.add(id -> {
-						if (id.toString().equals(k)) return value ? ConfigValue.TRUE : ConfigValue.FALSE;
-						return ConfigValue.UNSET;
-					});
-				}
+		Map<String, Boolean> validLiterals = new HashMap<>();
+		for (Map.Entry<String, Optional<Boolean>> entry : literals.entrySet()) {
+			if (entry.getValue().isPresent()) {
+				validLiterals.put(entry.getKey(), entry.getValue().get());
 			}
 		}
+		rules.add(id -> {
+			Boolean k = validLiterals.get(id.toString());
+			if (k == null) return ConfigValue.UNSET;
+			return k ? ConfigValue.TRUE : ConfigValue.FALSE;
+		});
+		for (Map.Entry<String, Optional<Boolean>> entry : heuristics.entrySet()) {
+			String k = entry.getKey();
+			if (k.contains("\\E") || k.contains("\\Q"))
+				throw new IllegalArgumentException("No.");
+			StringBuffer buf = new StringBuffer("^\\Q");
+			Matcher m = Pattern.compile("*", Pattern.LITERAL).matcher(k);
+			while (m.find()) {
+				m.appendReplacement(buf, "\\\\E.*\\\\Q");
+			}
+			m.appendTail(buf);
+			buf.append("\\E$");
+			Pattern p = Pattern.compile(buf.toString());
+			Optional<Boolean> valueOpt = entry.getValue();
+			if (valueOpt.isPresent()) {
+				boolean value = valueOpt.get();
+				rules.add(id -> {
+					if (p.matcher(id.getPath()).matches()) return value ? ConfigValue.TRUE : ConfigValue.FALSE;
+					return ConfigValue.UNSET;
+				});
+			}
+		}
+	}
+
+	@Override
+	public void load(Path configDir, QDIni config, boolean loadError) {
+		heuristics.clear();
+		literals.clear();
+		for (String k : config.keySet()) {
+			if (k.startsWith("@heuristics.")) {
+				heuristics.put(k.substring(12), config.getBoolean(k));
+			} else {
+				literals.put(k, config.getBoolean(k));
+			}
+		}
+		reload();
 	}
 
 	@Override

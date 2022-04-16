@@ -5,6 +5,7 @@ import com.unascribed.fabrication.features.FeatureTaggablePlayers;
 import io.github.queerbric.pride.PrideFlag;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.sound.PositionedSoundInstance;
@@ -18,9 +19,7 @@ import java.util.regex.Pattern;
 @Environment(EnvType.CLIENT)
 public class TaggablePlayersScreen extends Screen{
 
-	float sidebarScrollTarget;
-	float sidebarScroll;
-	float sidebarHeight;
+	final ScrollBar scrollBar = new ScrollBar(height);
 
 	private TextFieldWidget searchField;
 	Pattern filter = Pattern.compile("");
@@ -48,63 +47,46 @@ public class TaggablePlayersScreen extends Screen{
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		renderBackground(matrices);
 		searchField.render(matrices, mouseX, mouseY, delta);
-		float scroll = (float) (Math.floor(((sidebarHeight < height ? 0 : sidebarScroll) * client.getWindow().getScaleFactor())) / client.getWindow().getScaleFactor());
+		float scroll = scrollBar.getScaledScroll(client);
 		float y = 22 - scroll;
 		for (Map.Entry<String, Integer> entry : FeatureTaggablePlayers.validTags.entrySet()) {
 			String key = entry.getKey();
 			if (!filter.matcher(key).find()) continue;
-			boolean isActive = FeatureTaggablePlayers.activeTags.containsKey(key);
-			textRenderer.drawWithShadow(matrices, key, 5, y, isActive ? FabConf.isEnabled(key) ? -1 : 0xffff2222 : 0xffaaaaaa);
-			if (isActive) {
-				int val = FeatureTaggablePlayers.activeTags.get(key);
-				int mask = entry.getValue();
-				if ((mask&0b1) != 0 && drawToggleButton(matrices, width-160, (int)y, 45, 10, "Invert", mouseX, mouseY, (val & 0b1) != 0)) {
-					FeatureTaggablePlayers.add(key, val ^ 0b1);
-				} else if ((mask&0b10) != 0 && drawToggleButton(matrices, width-100, (int)y, 90, 10, "Player Exclusive", mouseX, mouseY, (val & 0b10) == 0)) {
-					FeatureTaggablePlayers.add(key, val ^ 0b10);
+			if (y>22) {
+				boolean isActive = FeatureTaggablePlayers.activeTags.containsKey(key);
+				textRenderer.drawWithShadow(matrices, key, 5, y, isActive ? FabConf.isEnabled(key) ? -1 : 0xffff2222 : 0xffaaaaaa);
+				if (isActive) {
+					int val = FeatureTaggablePlayers.activeTags.get(key);
+					int mask = entry.getValue();
+					if ((mask & 0b1) != 0 && drawToggleButton(matrices, width - 160, (int) y, 45, 10, "Invert", mouseX, mouseY, (val & 0b1) != 0)) {
+						FeatureTaggablePlayers.add(key, val ^ 0b1);
+					} else if ((mask & 0b10) != 0 && drawToggleButton(matrices, width - 100, (int) y, 90, 10, "Player Exclusive", mouseX, mouseY, (val & 0b10) == 0)) {
+						FeatureTaggablePlayers.add(key, val ^ 0b10);
+					} else if (didClick && mouseY > y && mouseY < y + 12) {
+						FeatureTaggablePlayers.remove(key);
+					}
 				} else if (didClick && mouseY > y && mouseY < y + 12) {
-					FeatureTaggablePlayers.remove(key);
+					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON, 1.2f, 1f));
+					FeatureTaggablePlayers.add(key, 0);
 				}
-			} else if (didClick && mouseY > y && mouseY < y + 12) {
-				client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON, 1.2f, 1f));
-				FeatureTaggablePlayers.add(key, 0);
 			}
 
 			y += 12;
 			if (y > height) break;
 		}
-		sidebarHeight = FeatureTaggablePlayers.validTags.size() * 12 + 8;
+		scrollBar.height = FeatureTaggablePlayers.validTags.size() * 12 + 8;
 
 		if (didClick) didClick = false;
 	}
 
 	private boolean drawToggleButton(MatrixStack matrices, int x, int y, int w, int h, String text, float mouseX, float mouseY, boolean toggle) {
-		boolean click = false;
-		boolean hover = mouseX >= x && mouseX <= x+w && mouseY >= y && mouseY <= y+h;
-		if (hover ^ toggle) {
-			fill(matrices, x, y, x + w, y + 1, -1);
-			fill(matrices, x, y, x + 1, y + h, -1);
-			fill(matrices, x, y + h - 1, x + w, y + h, -1);
-			fill(matrices, x + w - 1, y, x + w, y + h, -1);
-		}
-		if (hover && didClick) {
-			client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1f));
-			click = true;
-		}
-		int textWidth = textRenderer.getWidth(text);
-		textRenderer.draw(matrices, text, x+((w-textWidth)/2f), y+((h-8)/2f), -1);
-		return click;
+		return FabricationConfigScreen.drawToggleButton(matrices, x, y, w, h, text, mouseX, mouseY, toggle, didClick, client);
 	}
 
 	@Override
 	public void tick() {
 		super.tick();
-		if (sidebarHeight > height) {
-			sidebarScroll += (sidebarScrollTarget-sidebarScroll)/2;
-			if (sidebarScrollTarget < 0) sidebarScrollTarget /= 2;
-			float h = sidebarHeight-height;
-			if (sidebarScrollTarget > h) sidebarScrollTarget = h+((sidebarScrollTarget-h)/2);
-		}
+		scrollBar.tick();
 	}
 
 	@Override
@@ -127,7 +109,7 @@ public class TaggablePlayersScreen extends Screen{
 	}
 	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		sidebarScrollTarget -= amount * 20;
+		scrollBar.scroll(amount * 20);
 		return super.mouseScrolled(mouseX, mouseY, amount);
 	}
 
@@ -164,6 +146,12 @@ public class TaggablePlayersScreen extends Screen{
 	public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
 		searchField.keyReleased(keyCode, scanCode, modifiers);
 		return super.keyReleased(keyCode, scanCode, modifiers);
+	}
+
+	@Override
+	public void resize(MinecraftClient client, int width, int height) {
+		scrollBar.displayHeight = height;
+		super.resize(client, width, height);
 	}
 
 }
