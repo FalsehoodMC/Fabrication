@@ -1,4 +1,4 @@
-woina.weaponized_pearls:
+mechanics.weaponized_pearls:
 	name: Weaponized Pearls
 	since: 2.3.1
 	sides: server_only
