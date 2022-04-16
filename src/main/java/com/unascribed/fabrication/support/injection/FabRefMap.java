@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.support.injection;
 
 import com.unascribed.fabrication.FabLog;
+import com.unascribed.fabrication.logic.CommandSourceInterfaceHack;
 import com.unascribed.fabrication.support.FabConst;
 
 import java.io.BufferedReader;
