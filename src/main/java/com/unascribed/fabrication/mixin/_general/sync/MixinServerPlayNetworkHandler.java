@@ -41,6 +41,7 @@ public class MixinServerPlayNetworkHandler {
 		Identifier channel = FabRefl.getChannel(packet);
 		if (channel.getNamespace().equals("fabrication")) {
 			if (channel.getPath().equals("config")) {
+				ci.cancel();
 				PacketByteBuf recvdData = FabRefl.getData(packet);
 				int id = recvdData.readVarInt();
 				if (id == 0) {
@@ -70,7 +71,8 @@ public class MixinServerPlayNetworkHandler {
 						}
 					}
 				}
-			}else if (channel.getPath().equals("fscript")) {
+			} else if (channel.getPath().equals("fscript")) {
+				ci.cancel();
 				PacketByteBuf recvdData = FabRefl.getData(packet);
 				int id = recvdData.readVarInt();
 				if(id == 0){
@@ -119,7 +121,6 @@ public class MixinServerPlayNetworkHandler {
 				}
 				// TODO id 4 world local SET
 			}
-			ci.cancel();
 		}
 	}
 	public void fabrication$sendCommandFeedback(Text text){
