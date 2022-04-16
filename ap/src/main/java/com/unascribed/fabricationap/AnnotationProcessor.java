@@ -36,7 +36,10 @@ public class AnnotationProcessor extends AbstractProcessor {
 				Set<String> methods = new HashSet<>();
 				Set<String> targets = new HashSet<>();
 				for (AnnotationMirror am : source.getAnnotationMirrors()) {
-					if (!"org.spongepowered.asm.mixin.Mixin".equals(am.getAnnotationType().toString())) continue;
+					if (!(
+							"org.spongepowered.asm.mixin.Mixin".equals(am.getAnnotationType().toString())
+							|| "com.unascribed.fabrication.support.injection.FakeMixin".equals(am.getAnnotationType().toString())
+					)) continue;
 					for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> ae : am.getElementValues().entrySet()){
 						Name key = ae.getKey().getSimpleName();
 						Object l = ae.getValue().getValue();

@@ -65,29 +65,32 @@ public class FabInjector {
 			this.target = target;
 		}
 	}
-
-	public static void apply(ClassNode targetClass){
+	public static void apply(ClassNode targetClass) {
+		apply(targetClass, null);
+	}
+	public static void apply(ClassNode targetClass, List<ToInject> injectIn) {
 		List<ToInject> injects = new ArrayList<>();
 		List<EntryMixinMerged> redirects = new ArrayList<>();
 		targetClass.methods.forEach(methodNode -> {
 			if (!(methodNode instanceof MethodNodeEx)) return;
 			AnnotationNode inject = null;
 			String mixin = null;
-			for(AnnotationNode annotationNode : methodNode.visibleAnnotations){
+			for (AnnotationNode annotationNode : methodNode.visibleAnnotations) {
 				if ((
 						"Lcom/unascribed/fabrication/support/injection/ModifyReturn;".equals(annotationNode.desc)
-						|| "Lcom/unascribed/fabrication/support/injection/Hijack;".equals(annotationNode.desc)
-					) &&dejavu.add(targetClass.name+methodNode.name+methodNode.desc)
+								|| "Lcom/unascribed/fabrication/support/injection/Hijack;".equals(annotationNode.desc)
+				) && dejavu.add(targetClass.name + methodNode.name + methodNode.desc)
 				) {
 					inject = annotationNode;
-				} else if ("Lorg/spongepowered/asm/mixin/transformer/meta/MixinMerged;".equals(annotationNode.desc)){
+				} else if ("Lorg/spongepowered/asm/mixin/transformer/meta/MixinMerged;".equals(annotationNode.desc)) {
 					mixin = (String) annotationNode.values.get(annotationNode.values.indexOf("mixin") + 1);
 					if (FailsoftRedirectInjectionInfo.fabrication$allExistingRedirects.containsKey(methodNode.name)) {
 						redirects.add(new EntryMixinMerged(methodNode.name, methodNode.desc, mixin, FailsoftRedirectInjectionInfo.fabrication$allExistingRedirects.get(methodNode.name)));
 					}
 				}
-			};
-			if (inject != null && mixin != null) {
+			}
+			;
+			if (inject != null && mixin != null && injectIn == null) {
 				final String mix = mixin;
 				injects.add(new ToInject(
 						((List<String>) inject.values.get(inject.values.indexOf("method") + 1)).stream().map(s -> FabRefMap.methodMap(mix, s)).collect(Collectors.toList()),
@@ -101,6 +104,9 @@ public class FabInjector {
 				));
 			}
 		});
+		apply(targetClass, injectIn != null ? injectIn : injects, redirects);
+	}
+	public static void apply(ClassNode targetClass, List<ToInject> injects, List<EntryMixinMerged> redirects){
 		injects.forEach(toInject -> redirects.forEach(redirect -> {
 			//TODO target should probably match other formats?
 			if (toInject.target.contains(FabRefMap.targetMap(toInject.mixin, redirect.target))) {

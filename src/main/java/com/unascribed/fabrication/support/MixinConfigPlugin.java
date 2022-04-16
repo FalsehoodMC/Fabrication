@@ -9,6 +9,7 @@ import com.google.common.reflect.ClassPath.ClassInfo;
 import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.FabLog;
+import com.unascribed.fabrication.support.injection.FabRefMap;
 import com.unascribed.fabrication.support.injection.FailsoftCallbackInjectionInfo;
 import com.unascribed.fabrication.support.injection.FailsoftModifyArgInjectionInfo;
 import com.unascribed.fabrication.support.injection.FailsoftModifyArgsInjectionInfo;
@@ -16,9 +17,13 @@ import com.unascribed.fabrication.support.injection.FailsoftModifyConstantInject
 import com.unascribed.fabrication.support.injection.FailsoftModifyVariableInjectionInfo;
 import com.unascribed.fabrication.support.injection.FailsoftRedirectInjectionInfo;
 import com.unascribed.fabrication.support.injection.FabInjector;
+import com.unascribed.fabrication.support.injection.Hijack;
+import com.unascribed.fabrication.support.injection.ModifyReturn;
+import com.unascribed.fabrication.support.injection.FakeMixinHack;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
@@ -39,9 +44,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class MixinConfigPlugin implements IMixinConfigPlugin {
 
@@ -293,7 +302,56 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	@Override
 	public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
 		if (FabConf.limitRuntimeConfigs()) finalizeIsEnabled(targetClass);
+		fakeMixinHack(targetClass, mixinClassName);
 		FabInjector.apply(targetClass);
+		lithiumCompat(targetClass, mixinClassName);
+		if (targetClass.visibleAnnotations != null) {
+			targetClass.visibleAnnotations.removeIf(an -> an.desc.startsWith("Lcom/unascribed/fabrication"));
+		}
+	}
+
+	public static void fakeMixinHack(ClassNode targetClass, String mixinClassName){
+		try {
+			FakeMixinHack sih = Class.forName(mixinClassName, false, MixinConfigPlugin.class.getClassLoader()).getAnnotation(FakeMixinHack.class);
+			if (sih != null){
+				List<FabInjector.ToInject> toInject = new ArrayList<>();
+				for (Class<?> cl : sih.value()){
+					for (Method mthd : cl.getMethods()){
+						ModifyReturn mr = mthd.getAnnotation(ModifyReturn.class);
+						Hijack hi = mthd.getAnnotation(Hijack.class);
+						String[] method = null;
+						String[] target = null;
+						String desc = null;
+						if (mr != null) {
+							method = mr.method();
+							target = mr.target();
+							desc = "Lcom/unascribed/fabrication/support/injection/ModifyReturn;";
+						} else if (hi != null) {
+							method = hi.method();
+							target = hi.target();
+							desc = "Lcom/unascribed/fabrication/support/injection/Hijack;";
+						}
+						if (target != null && method != null && desc != null) {
+							toInject.add(new FabInjector.ToInject(
+									Arrays.stream(method).map(s -> FabRefMap.methodMap(cl.getName(), s)).collect(Collectors.toList()),
+									Arrays.stream(target).map(s -> FabRefMap.targetMap(cl.getName(), s)).collect(Collectors.toList()),
+									cl.getName().replace('.', '/'),
+									mthd.getName(),
+									Type.getMethodDescriptor(mthd),
+									Opcodes.INVOKESTATIC,
+									desc,
+									cl.getName()
+							));
+						}
+
+					}
+				}
+				FabInjector.apply(targetClass, toInject);
+			}
+		} catch (Exception ignore) {}
+	}
+
+	public static void lithiumCompat(ClassNode targetClass, String mixinClassName){
 		if(Agnos.isModLoaded("lithium") && "com.unascribed.fabrication.mixin.e_mechanics.colorful_redstone.MixinRedstoneWireBlock".equals(mixinClassName)) {
 			targetClass.methods.forEach(methodNode -> {
 				if (methodNode instanceof MethodNodeEx && "getReceivedPowerFaster".equals(((MethodNodeEx) methodNode).getOriginalName())){
