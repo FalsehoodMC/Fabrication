@@ -1,0 +1,6 @@
+woina.weaponized_pearls:
+	name: Weaponized Pearls
+	since: 2.3.1
+	sides: server_only
+	desc:
+		Pearls will teleport entities they hit and pull nearby ones.
