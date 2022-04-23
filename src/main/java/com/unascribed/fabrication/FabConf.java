@@ -371,6 +371,7 @@ public class FabConf {
 		return worldConfig.get(configKey) != ConfigValue.UNSET || worldDefaults != null && worldDefaults.get(configKey) == Boolean.TRUE;
 	}
 	public static boolean doesWorldContainValue(String configKey, String configVal){
+		if (!worldConfig.containsKey(configKey)) return false;
 		return worldConfig.get(configKey).toString().equals(configVal.toUpperCase(Locale.ROOT));
 	}
 
