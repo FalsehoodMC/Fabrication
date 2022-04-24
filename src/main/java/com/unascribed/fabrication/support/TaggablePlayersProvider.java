@@ -13,7 +13,7 @@ import java.util.function.Predicate;
 
 public class TaggablePlayersProvider implements PredicateProvider<ServerPlayerEntity>, Help {
 	public static final TaggablePlayersProvider INSTANCE = new TaggablePlayersProvider();
-	public final Map<String, String> help = Collections.singletonMap("fabrication$tag fab$tag:FabricationTaggablePlayersID", "Require player to have the specified taggable players feature active");
+	public final Map<String, String> help = Collections.singletonMap("fabrication_tag fab_tag:FabricationTaggablePlayersID", "Require player to have the specified taggable players feature active");
 
 	@Override
 	public Map<String, String> getHelp() {
@@ -23,8 +23,8 @@ public class TaggablePlayersProvider implements PredicateProvider<ServerPlayerEn
 	@Override
 	public Predicate<ServerPlayerEntity> getPredicate(String key, String arg, Set<String> dejavu) {
 		switch (key) {
-			case "fabrication$tag":
-			case "fab$tag":
+			case "fabrication_tag":
+			case "fab_tag":
 				String tag = FabConf.remap(arg);
 				String reKey = tag.substring(tag.lastIndexOf('.')+1);
 				if (FeatureTaggablePlayers.validTags.containsKey(tag)) {
