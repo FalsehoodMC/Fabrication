@@ -8,8 +8,6 @@ import com.unascribed.fabrication.loaders.LoaderTaggablePlayers;
 import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Feature;
-import net.minecraft.entity.Entity;
-import net.minecraft.predicate.entity.EntityPredicates;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -43,7 +41,7 @@ public class FeatureTaggablePlayers implements Feature {
 		validTags = ImmutableMap.copyOf(tags);
 	}
 
-	private static Predicate<?> getPredicate(String key, int type) {
+	public static Predicate<Object> getPredicate(String key, int type) {
 		switch (type) {
 			case 1:
 				return pe -> pe instanceof TaggablePlayer && !((TaggablePlayer) pe).fabrication$hasTag(key);
