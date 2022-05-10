@@ -16,9 +16,11 @@ public class InstantPickup {
 			if (!ie.isAlive()) continue;
 			int oldPickupDelay = FabRefl.getPickupDelay(ie);
 			ie.setPickupDelay(0);
+			ie.getScoreboardTags().add("interactic.ignore_auto_pickup_rule");
 			ie.onPlayerCollision(breaker);
 			if (ie.isAlive()) {
 				ie.setPickupDelay(oldPickupDelay);
+				ie.getScoreboardTags().remove("interactic.ignore_auto_pickup_rule");
 			}
 		}
 	}
