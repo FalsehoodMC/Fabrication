@@ -17,7 +17,7 @@ public abstract class MixinAnimalEntity {
 	public float damage(float amount, DamageSource source) {
 		Object self = this;
 		if (self instanceof SheepEntity && FabConf.isEnabled("*.wool_protected_sheep") && !((SheepEntity)self).isSheared()
-				&& !source.isUnblockable() && amount > 0 && !source.bypassesArmor()) {
+				&& !source.isUnblockable() && amount > 0 && !source.bypassesArmor() && !source.isOutOfWorld()) {
 			return Math.max(0, amount-1);
 		}
 		return amount;
