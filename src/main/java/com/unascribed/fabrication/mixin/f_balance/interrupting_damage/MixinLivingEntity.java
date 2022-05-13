@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.f_balance.interrupting_damage;
 
+import com.google.common.collect.ImmutableList;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.interfaces.InterruptableRangedMob;
 import com.unascribed.fabrication.support.ConfigPredicates;
@@ -24,7 +25,7 @@ public abstract class MixinLivingEntity {
 
 	@Inject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z")
 	public void interruptUsage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-		if (!(FabConf.isEnabled("*.interrupting_damage") && amount >= 2 && ConfigPredicates.shouldRun("*.interrupting_damage", (LivingEntity)(Object)this))) return;
+		if (!(FabConf.isEnabled("*.interrupting_damage") && amount >= 2 && ConfigPredicates.shouldRun("*.interrupting_damage", ImmutableList.of(this, source)))) return;
 		if (this instanceof InterruptableRangedMob) ((InterruptableRangedMob)this).fabrication$interruptRangedMob();
 		if (isUsingItem()) stopUsingItem();
 	}

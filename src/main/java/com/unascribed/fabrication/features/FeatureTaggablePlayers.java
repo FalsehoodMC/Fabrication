@@ -10,7 +10,10 @@ import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Feature;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 
 @EligibleIf(configAvailable="*.taggable_players")
@@ -22,23 +25,28 @@ public class FeatureTaggablePlayers implements Feature {
 	);
 
 	public static final ImmutableMap<String, Integer> validTags;
+	public static final ImmutableSet<String> listTags;
 	public static Map<String, Integer> activeTags = new HashMap<>();
 
 	static {
 		Map<String, Integer> tags = new HashMap<>();
+		Set<String> list = new HashSet<>();
 		FeaturesFile.getAll().forEach((key, val)->{
 			if (val.fscript == null || INVALID_TAGS.contains(key)) return;
 			switch (val.fscript){
 				case "PLAYER_ENTITY" :
 				case "SERVER_PLAYER_ENTITY" :
 					tags.put(key, 0b01);
+					if (!val.extraFscript.isEmpty()) list.add(key);
 					break;
 				case "LIVING_ENTITY" :
 					tags.put(key, 0b11);
+					if (!val.extraFscript.isEmpty()) list.add(key);
 					break;
 			}
 		});
 		validTags = ImmutableMap.copyOf(tags);
+		listTags = ImmutableSet.copyOf(list);
 	}
 
 	public static Predicate<Object> getPredicate(String key, int type) {
@@ -55,7 +63,11 @@ public class FeatureTaggablePlayers implements Feature {
 	}
 
 	private static void set(String key, int type){
-		Predicate<?> p = getPredicate(key.substring(key.lastIndexOf('.')+1), type);
+		Predicate p = getPredicate(key.substring(key.lastIndexOf('.')+1), type);
+		if (listTags.contains(key)){
+			Predicate tmp = p;
+			p = o -> tmp.test(((List<Object>)o).get(0));
+		}
 		ConfigPredicates.put(key, ConfigPredicates.defaults.containsKey(key) ? p.and((Predicate)ConfigPredicates.defaults.get(key)) : p, 1);
 	}
 

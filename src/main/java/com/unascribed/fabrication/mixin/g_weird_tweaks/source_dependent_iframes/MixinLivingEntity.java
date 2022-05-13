@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.g_weird_tweaks.source_dependent_iframes;
 
+import com.google.common.collect.ImmutableMap;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.interfaces.TickSourceIFrames;
 import com.unascribed.fabrication.support.ConfigPredicates;
@@ -32,7 +33,7 @@ public abstract class MixinLivingEntity extends Entity implements TickSourceIFra
 
 	@Inject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z")
 	private void checkDependentIFrames(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-		if (!(FabConf.isEnabled("*.source_dependent_iframes") && ConfigPredicates.shouldRun("*.source_dependent_iframes", (LivingEntity)(Object)this))) return;
+		if (!(FabConf.isEnabled("*.source_dependent_iframes") && ConfigPredicates.shouldRun("*.source_dependent_iframes", ImmutableMap.of(this, source)))) return;
 		String origin = source.getName() + (source.getAttacker() == null || source.getAttacker().getUuid() == null ? ":direct" :  source.getAttacker().getUuid().toString());
 		if (fabrication$iframeTracker.containsKey(origin)) {
 			this.timeUntilRegen = 20;
@@ -43,7 +44,7 @@ public abstract class MixinLivingEntity extends Entity implements TickSourceIFra
 	}
 	@Inject(at=@At(value="INVOKE", target="Lnet/minecraft/entity/LivingEntity;applyDamage(Lnet/minecraft/entity/damage/DamageSource;F)V"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z")
 	private void setSourceDependentIFrames(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-		if (!(FabConf.isEnabled("*.source_dependent_iframes") && ConfigPredicates.shouldRun("*.source_dependent_iframes", (LivingEntity)(Object)this))) return;
+		if (!(FabConf.isEnabled("*.source_dependent_iframes") && ConfigPredicates.shouldRun("*.source_dependent_iframes", ImmutableMap.of(this, source)))) return;
 		if (fabrication$timeUntilRegen == 0){
 			fabrication$timeUntilRegen = 10;
 		}

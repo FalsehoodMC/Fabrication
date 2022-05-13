@@ -2,14 +2,13 @@ package com.unascribed.fabrication;
 
 import com.unascribed.fabrication.features.FeatureTaggablePlayers;
 import com.unascribed.fabrication.support.TaggablePlayersProvider;
-import net.fabricmc.api.ModInitializer;
 import tf.ssf.sfort.script.Default;
 import tf.ssf.sfort.script.ExtendablePredicateProvider;
 import tf.ssf.sfort.script.PredicateProvider;
 
-public class FScriptInitializer implements ModInitializer {
+public class FScriptInitializer implements Runnable {
 	@Override
-	public void onInitialize() {
+	public void run() {
 		PredicateProvider<?> p = Default.getDefaultMap().get("SERVER_PLAYER_ENTITY");
 		if (p instanceof ExtendablePredicateProvider) {
 			try {

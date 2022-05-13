@@ -3,6 +3,7 @@ balance.extra.interrupting_damage:
 	since: 2.3.1
 	sides: server_only
 	fscript: living_entity
-	enabled: burnt
+	extra_fscript: damage_source+~damage_source:DAMAGE_SOURCE+Damage Source
+	default: burnt
 	desc:
 		Taking more then a heart of damage interrupts the current action of any mob / player.
