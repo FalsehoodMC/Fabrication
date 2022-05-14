@@ -1,0 +1,16 @@
+pedantry.entities_cant_climb:
+	name: Entities Can't Climb
+	since: 2.3.1
+	sides: server_only
+	fscript: living_entity
+	desc:
+		Entities can no longer climb climbable blocks (mostly applies to ladders).
+		This on it's own disables ladders, the feature is intended to be used by other features.
+
+pedantry.creepers_cant_climb:
+	name: Creepers Can't climb
+	since: 2.3.1
+	sides: server_only
+	extend: *.entities_cant_climb
+	desc:
+		Creepers can no longer climb climbable blocks.
