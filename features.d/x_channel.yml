@@ -1,0 +1,6 @@
+minor_mechanics.channeling_two:
+	name: Channeling Two
+	since: 2.3.1
+	sides: server_only_with_client_helper
+	desc:
+		Makes Channeling II a valid enchant that works while raining as well.
