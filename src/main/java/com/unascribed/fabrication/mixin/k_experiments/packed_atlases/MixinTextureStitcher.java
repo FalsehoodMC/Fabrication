@@ -1,4 +1,4 @@
-package com.unascribed.fabrication.mixin.j_experiments.packed_atlases;
+package com.unascribed.fabrication.mixin.k_experiments.packed_atlases;
 
 import com.unascribed.fabrication.support.injection.ModifyReturn;
 import com.unascribed.fabrication.FabConf;
@@ -8,7 +8,6 @@ import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 
 import net.minecraft.client.texture.TextureStitcher;
-import net.minecraft.util.math.MathHelper;
 
 @Mixin(TextureStitcher.class)
 @EligibleIf(envMatches=Env.CLIENT, configAvailable="*.packed_atlases")

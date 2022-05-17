@@ -1,4 +1,4 @@
-package com.unascribed.fabrication.mixin.j_experiments.no_set_window_pos;
+package com.unascribed.fabrication.mixin.k_experiments.no_set_window_pos;
 
 import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
