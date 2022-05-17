@@ -4,4 +4,4 @@ fixes.melee_mobs_keep_attacking:
 	sides: server_only
 	desc:
 		Through some mystical mojank reasoning mobs would normally stop looking for the player after reaching
-		the players last knows location, this fixes that.
+		the players last known location, this fixes that.

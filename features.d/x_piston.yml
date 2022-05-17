@@ -4,4 +4,4 @@ minor_mechanics.extra.launching_pistons:
 	default: never
 	sides: server_only
 	desc:
-		Pistons launch players up as if they ware pushing slime blocks.
+		Pistons launch players up as if they were pushing slime blocks.

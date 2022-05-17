@@ -26,6 +26,7 @@ import com.unascribed.fabrication.support.ResolvedConfigValue;
 import io.github.queerbric.pride.PrideFlag;
 import io.github.queerbric.pride.PrideFlags;
 import io.netty.buffer.Unpooled;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -482,33 +483,29 @@ public class FabricationConfigScreen extends Screen {
 				selectA = 0;
 			}
 			float startY = y;
-			if (y >= -24 && y < height) {
-				int icoY = 0;
-				int size = 28;
-				if ("search".equals(s)) {
-					size = 12;
-					icoY = -4;
-				}
-				Identifier id = new Identifier("fabrication", "category/"+s+".png");
-				RenderSystem.enableBlend();
-				RenderSystem.defaultBlendFunc();
-				client.getTextureManager().bindTexture(id);
-				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-				RenderSystem.setShaderColor(1, 1, 1, 0.3f);
-				RenderSystem.setShaderTexture(0, id);
-				matrices.push();
-				matrices.translate((130-4-size), icoY+y, 0);
-				matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(5));
-				drawTexture(matrices, 0, 0, 0, 0, 0, size, Math.min(size, (int)Math.ceil(height-y)), size, size);
-				matrices.pop();
+			int icoY = 0;
+			int size = 28;
+			if ("search".equals(s)) {
+				size = 12;
+				icoY = -4;
 			}
-			if (y >= -12 && y < height) {
-				textRenderer.draw(matrices, "§l"+FeaturesFile.get(s).shortName, 4, y, -1);
-			}
+			Identifier id = new Identifier("fabrication", "category/"+s+".png");
+			RenderSystem.enableBlend();
+			RenderSystem.defaultBlendFunc();
+			client.getTextureManager().bindTexture(id);
+			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+			RenderSystem.setShaderColor(1, 1, 1, 0.3f);
+			RenderSystem.setShaderTexture(0, id);
+			matrices.push();
+			matrices.translate((130-4-size), icoY+y, 0);
+			matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(5));
+			drawTexture(matrices, 0, 0, 0, 0, 0, size, Math.min(size, (int)Math.ceil(height-y)), size, size);
+			matrices.pop();
+			textRenderer.draw(matrices, "§l"+FeaturesFile.get(s).shortName, 4, y, -1);
 			y += 12;
 			thisHeight += 12;
-			if (!"search".equals(s) && y < height) {
+			if (!"search".equals(s)) {
 				String desc = SECTION_DESCRIPTIONS.getOrDefault(s, "No description available");
 				int x = 8;
 				int line = 0;
@@ -954,7 +951,7 @@ public class FabricationConfigScreen extends Screen {
 			click = true;
 		}
 		int textWidth = client.textRenderer.getWidth(text);
-		client.textRenderer.draw(matrices, text, x+((w-textWidth)/2f), y+((h-8)/2f)+0.5f, -1);
+		client.textRenderer.draw(matrices, text, x+((w-textWidth)/2f), y+((h-8)/2f), -1);
 		return click;
 	}
 
@@ -965,8 +962,7 @@ public class FabricationConfigScreen extends Screen {
 		boolean requiresFabricApi = ArrayUtils.contains(flags, REQUIRES_FABRIC_API);
 		boolean showSourceSection = ArrayUtils.contains(flags, SHOW_SOURCE_SECTION);
 		boolean highlightQueryMatch = ArrayUtils.contains(flags, HIGHLIGHT_QUERY_MATCH);
-		// presence of Fabric API is implied by the fact you need ModMenu to access this menu *kinda (/fabrication:client ui)
-		boolean noFabricApi = false; //!configuringServer && requiresFabricApi && !FabricLoader.getInstance().isModLoaded("fabric");
+		boolean noFabricApi = !configuringServer && requiresFabricApi && !FabricLoader.getInstance().isModLoaded("fabric");
 		boolean failed = isFailed(key);
 		boolean banned = !configuringServer && FabricationModClient.isBannedByServer(key);
 		boolean disabled = banned || noFabricApi || (configuringServer && serverReadOnly) || !isValid(key);
@@ -1086,7 +1082,7 @@ public class FabricationConfigScreen extends Screen {
 			if (mouseX >= 134 && mouseX <= 134+trackSize && mouseY >= y+1 && mouseY <= y+10) {
 				float pitch = y*0.005f;
 				if (disabled) {
-					didgeridoo();
+					playErrorFeedback();
 				} else {
 					int clickedIndex = (int)((mouseX-134)/(noUnset ? 22 : onlyBannable ? 30 : 15));
 					ConfigValue newValue;
@@ -1239,7 +1235,7 @@ public class FabricationConfigScreen extends Screen {
 		renderOrderedTooltip(matrices, textRenderer.wrapLines(new LiteralText(str), mouseX < width/2 ? (int)(width-mouseX-30) : (int)mouseX-20), (int)(mouseX), (int)(20+mouseY));
 	}
 
-	private void didgeridoo(){
+	private void playErrorFeedback(){
 		client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO, 0.8f, 1));
 		client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO, 0.7f, 1));
 		tooltipBlinkTicks = 20;
@@ -1361,7 +1357,7 @@ public class FabricationConfigScreen extends Screen {
 						configuringServer = true;
 						client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_XYLOPHONE, 1.2f, 1));
 					}  else {
-						didgeridoo();
+						playErrorFeedback();
 					}
 				}
 			}
@@ -1373,7 +1369,7 @@ public class FabricationConfigScreen extends Screen {
 		return super.mouseClicked(mouseX, mouseY, button);
 	}
 
-	public class DrawableSave implements SelectionScreen.PreciseDrawable {
+	public class DrawableSave implements SelectionScreen.PreciseDrawable<File> {
 		final File file;
 		Identifier icon;
 
@@ -1404,7 +1400,10 @@ public class FabricationConfigScreen extends Screen {
 			textRenderer.drawWithShadow(matrices, file.getPath(), 38+x, y+20, -1);
 			if (icon != null) {
 				RenderSystem.setShaderTexture(0, icon);
-				drawTexture(matrices, (int) x, (int) y, 0, 0, 0, 32, 32, 32, 32);
+				matrices.push();
+					matrices.translate(x%1, y%1, 0);
+					drawTexture(matrices, (int) x, (int) y, 0, 0, 0, 32, 32, 32, 32);
+				matrices.pop();
 			}
 		}
 
@@ -1419,10 +1418,11 @@ public class FabricationConfigScreen extends Screen {
 		}
 
 		@Override
-		public Object val() {
+		public File val() {
 			return file;
 		}
 	}
+	
 	public void openWorldSelector() {
 		try {
 			Path savesDir = client.getLevelStorage().getSavesDirectory();
@@ -1437,7 +1437,7 @@ public class FabricationConfigScreen extends Screen {
 				}).map(DrawableSave::new).collect(Collectors.toList());
 				if (files.isEmpty()) return;
 				if (files.size() == 1) setWorldMode(files.get(0).val());
-				else client.setScreen(new SelectionScreen(this, files, this::setWorldMode));
+				else client.setScreen(new SelectionScreen<>(this, files, this::setWorldMode));
 			}
 		}catch (Exception e) {
 			FabLog.error("Failed to load levels", e);

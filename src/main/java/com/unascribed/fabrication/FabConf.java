@@ -242,11 +242,11 @@ public class FabConf {
 		setWorldPath(lastWorldPath, false);
 	}
 
-	public static void setWorldPath (Path path) {
+	public static void setWorldPath(Path path) {
 		setWorldPath(path, false);
 	}
 
-	public static void setWorldPath (Path path, boolean onLoad) {
+	public static void setWorldPath(Path path, boolean onLoad) {
 		worldPath = path;
 		if (path == null){
 			worldConfig.clear();
@@ -258,7 +258,7 @@ public class FabConf {
 		worldReload();
 	}
 
-	public static String getProfileName(){
+	public static String getProfileName() {
 		return profile.name();
 	}
 
@@ -307,7 +307,7 @@ public class FabConf {
 		return new RuntimeException(msg);
 	}
 
-	public static boolean limitRuntimeConfigs(){
+	public static boolean limitRuntimeConfigs() {
 		return config.get("general.limit_runtime_configs") == ConfigValue.TRUE;
 	}
 

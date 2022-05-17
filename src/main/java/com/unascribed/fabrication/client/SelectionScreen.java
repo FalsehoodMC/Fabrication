@@ -8,28 +8,27 @@ import net.minecraft.client.util.math.MatrixStack;
 
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 @Environment(EnvType.CLIENT)
 class SelectionScreen<T> extends Screen {
 	final Screen parent;
-	final List<? extends PreciseDrawable> features;
+	final List<? extends PreciseDrawable<T>> features;
 	final Consumer<T> out;
 	final ScrollBar scrollBar = new ScrollBar(height);
 	boolean didClick = false;
 
-	public SelectionScreen(Screen parent, List<?> options, Consumer<T> out) {
+	public SelectionScreen(Screen parent, List<? extends PreciseDrawable<T>> options, Consumer<T> out) {
 		super(parent.getTitle());
 		this.out = out;
 		this.parent = parent;
-		this.features = options.get(0) instanceof PreciseDrawable ? (List<? extends PreciseDrawable>) options : options.stream().map(TextWidget::new).collect(Collectors.toList());
+		this.features = options;
 	}
 
-	public class TextWidget implements PreciseDrawable {
-		final Object o;
+	public class TextWidget<T> implements PreciseDrawable<T> {
+		final T o;
 		final String text;
 
-		public TextWidget(Object o){
+		public TextWidget(T o){
 			this.o = o;
 			this.text = o.toString();
 		}
@@ -50,16 +49,16 @@ class SelectionScreen<T> extends Screen {
 		}
 
 		@Override
-		public Object val(){
+		public T val(){
 			return o;
 		}
 	}
 
-	public interface PreciseDrawable {
+	public interface PreciseDrawable<T> {
 		void render(MatrixStack matrices, float x, float y, float delta);
 		int width();
 		int height();
-		Object val();
+		T val();
 	}
 
 
@@ -72,7 +71,7 @@ class SelectionScreen<T> extends Screen {
 		scrollBar.height = 20;
 		scroll = (float) (Math.floor((scroll * client.getWindow().getScaleFactor())) / client.getWindow().getScaleFactor());
 		float y = 22 - scroll;
-		for (PreciseDrawable feature : features) {
+		for (PreciseDrawable<?> feature : features) {
 			feature.render(matrices, 16, y, delta);
 			int height = feature.height();
 			if (mouseY > y - 2 && mouseY < y + height) {
