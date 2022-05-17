@@ -53,11 +53,15 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
+	modImplementation include(fabricApi.module('fabric-api-base', project.fabric_version))
 	modImplementation include(fabricApi.module('fabric-resource-loader-v0', project.fabric_version))
 	modImplementation include(fabricApi.module('fabric-command-api-v1', project.fabric_version))
 	modImplementation include(fabricApi.module('fabric-item-api-v1', project.fabric_version))
 	modImplementation include(fabricApi.module('fabric-key-binding-api-v1', project.fabric_version))
 	modImplementation include(fabricApi.module('fabric-rendering-v1', project.fabric_version))
+	// TODO I would really like to not dep on these two
+	modImplementation include(fabricApi.module('fabric-registry-sync-v0', project.fabric_version))
+	modImplementation include(fabricApi.module('fabric-networking-api-v1', project.fabric_version))
 	
 	modImplementation(include('io.github.queerbric:pridelib:1.1.0+1.17')) {
 		transitive = false
@@ -113,7 +117,7 @@ jar {
 		})
 		file('build/tmp/classes.txt').text = bldr.toString();
 
-		def lge = project.getExtensions().getByType(net.fabricmc.loom.LoomGradleExtension.class)
+		def lge = project.getExtensions().getByType(net.fabricmc.loom.api.LoomGradleExtensionAPI.class)
 		def mappings = lge.getMappingsProvider().getMappings()
 		Map<String, Mapp> toInter = new HashMap<>()
 		Map<String, Map<String, String>> fabReflFields = new HashMap<>()
@@ -168,8 +172,8 @@ jar {
 							int brc = mthd.indexOf('(')
 							String desc = mthd.substring(brc)
 							String name = mthd.substring(col == -1 || brc<col ? 0 : col+1, brc)
-							if ((name.equals(clMethod.getName('named')) || name.equals(clMethod.getName('intermediary'))) && (desc.equals(clMethod.getDescriptor('named')) || desc.equals(clMethod.getDescriptor('intermediary')))) {
-								methodMap.put(clName+';'+name+desc, clMethod.getName('intermediary') + clMethod.getDescriptor('intermediary'))
+							if ((name.equals(clMethod.getName('named')) || name.equals(clMethod.getName('intermediary'))) && (desc.equals(clMethod.getDesc('named')) || desc.equals(clMethod.getDesc('intermediary')))) {
+								methodMap.put(clName+';'+name+desc, clMethod.getName('intermediary') + clMethod.getDesc('intermediary'))
 							}
 						}
 					}
@@ -185,8 +189,8 @@ jar {
 						String desc = target.substring(brc)
 						String name = target.substring(col+1, brc)
 						for (def clMethod : cl.methods) {
-							if ((clMethod.getName('named').equals(name) || clMethod.getName('intermediary').equals(name)) && (clMethod.getDescriptor('named').equals(desc) || clMethod.getDescriptor('intermediary').equals(desc))){
-								targetMap.put(target, clMethod.getName('intermediary')+clMethod.getDescriptor('intermediary'))
+							if ((clMethod.getName('named').equals(name) || clMethod.getName('intermediary').equals(name)) && (clMethod.getDesc('named').equals(desc) || clMethod.getDesc('intermediary').equals(desc))){
+								targetMap.put(target, clMethod.getName('intermediary')+clMethod.getDesc('intermediary'))
 							}
 						}
 					}

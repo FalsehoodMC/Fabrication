@@ -5,7 +5,7 @@ import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.injection.ModifyReturn;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.world.gen.PhantomSpawner;
+import net.minecraft.world.spawner.PhantomSpawner;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(PhantomSpawner.class)

@@ -81,7 +81,7 @@ public abstract class MixinScreen extends AbstractParentElement implements Drawa
 				l = m;
 				for(int s = 0; s < components.size(); ++s) {
 					TooltipComponent component = components.get(s);
-					component.drawItems(client.textRenderer, k, l, matrices, this.itemRenderer, 400, client.getTextureManager());
+					component.drawItems(client.textRenderer, k, l, matrices, this.itemRenderer, 400);
 					l += component.getHeight() + (s == 0 ? 2 : 0);
 				}
 				ci.cancel();

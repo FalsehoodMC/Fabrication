@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 @EligibleIf(configAvailable="*.entities_cant_climb")
 public class MixinLivingEntity {
 
-	@ModifyReturn(method="isClimbing()Z", target="Lnet/minecraft/block/BlockState;isIn(Lnet/minecraft/tag/Tag;)Z")
+	@ModifyReturn(method="isClimbing()Z", target="Lnet/minecraft/block/BlockState;isIn(Lnet/minecraft/tag/TagKey;)Z")
 	public boolean fabrication$disableClimbing(boolean old) {
 		if (!(old && FabConf.isAnyEnabled("*.entities_cant_climb") && ConfigPredicates.shouldRun("*.entities_cant_climb", (LivingEntity)(Object)this))) return old;
 		return false;

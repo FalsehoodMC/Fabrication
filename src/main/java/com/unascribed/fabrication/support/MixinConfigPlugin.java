@@ -2,10 +2,12 @@ package com.unascribed.fabrication.support;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.SetMultimap;
+import com.google.common.io.ByteSource;
+import com.google.common.io.Resources;
 import com.google.common.reflect.ClassPath;
-import com.google.common.reflect.ClassPath.ClassInfo;
 import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.FabLog;
@@ -43,7 +45,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -271,8 +272,6 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	private static Iterable<ClassInfo> getClassesInPackage(String pkg) {
 		try (InputStream is = MixinConfigPlugin.class.getClassLoader().getResourceAsStream("classes.txt")) {
 			if (is != null) {
-				Constructor<ClassInfo> cons = ClassInfo.class.getDeclaredConstructor(String.class, ClassLoader.class);
-				cons.setAccessible(true);
 				List<ClassInfo> rtrn = Lists.newArrayList();
 				BufferedReader br = new BufferedReader(new InputStreamReader(is, Charsets.UTF_8));
 				String prefix = pkg.replace('.', '/')+"/";
@@ -280,7 +279,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 					String line = br.readLine();
 					if (line == null) break;
 					if (line.startsWith(prefix)) {
-						rtrn.add(cons.newInstance(line, MixinConfigPlugin.class.getClassLoader()));
+						rtrn.add(new BareClassInfo(line, MixinConfigPlugin.class.getClassLoader()));
 					}
 				}
 				return rtrn;
@@ -289,7 +288,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			e.printStackTrace();
 		}
 		try {
-			return ClassPath.from(MixinConfigPlugin.class.getClassLoader()).getTopLevelClassesRecursive(pkg);
+			return Iterables.transform(ClassPath.from(MixinConfigPlugin.class.getClassLoader()).getTopLevelClassesRecursive(pkg), GuavaClassInfo::new);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -403,4 +402,53 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		});
 	}
 
+	private interface ClassInfo {
+
+		String getName();
+		ByteSource asByteSource();
+
+	}
+
+	private static class BareClassInfo implements ClassInfo {
+
+		private final String name;
+		private final ClassLoader loader;
+
+		public BareClassInfo(String name, ClassLoader loader) {
+			this.name = name;
+			this.loader = loader;
+		}
+
+		@Override
+		public String getName() {
+			return name.replace('/', '.').replace(".class", "");
+		}
+
+		@Override
+		public ByteSource asByteSource() {
+			return Resources.asByteSource(loader.getResource(name));
+		}
+
+	}
+
+	private static class GuavaClassInfo implements ClassInfo {
+
+		private final ClassPath.ClassInfo delegate;
+
+		public GuavaClassInfo(ClassPath.ClassInfo delegate) {
+			this.delegate = delegate;
+		}
+
+		@Override
+		public String getName() {
+			return delegate.getName();
+		}
+
+		@Override
+		public ByteSource asByteSource() {
+			return delegate.asByteSource();
+		}
+
+	}
+	
 }

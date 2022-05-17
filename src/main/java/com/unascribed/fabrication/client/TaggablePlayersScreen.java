@@ -95,7 +95,7 @@ public class TaggablePlayersScreen extends Screen{
 	}
 
 	@Override
-	public void onClose() {
+	public void close() {
 		client.setScreen(parent);
 	}
 

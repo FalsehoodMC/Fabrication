@@ -15,8 +15,7 @@ import org.spongepowered.asm.mixin.Shadow;
 @EligibleIf(configAvailable="*.interrupting_damage")
 public abstract class MixinBowAttackGoal implements InterruptableRangedMob {
 
-	@Shadow
-	@Final
+	@Shadow @Final
 	private HostileEntity actor;
 
 	@Shadow

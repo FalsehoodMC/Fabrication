@@ -38,7 +38,7 @@ public abstract class MixinLivingEntity extends Entity {
 	}
 
 	@Shadow
-	protected abstract ItemStack getArmorInSlot(EquipmentSlot slot);
+	protected abstract ItemStack getEquippedStack(EquipmentSlot slot);
 
 	@Shadow
 	public abstract AttributeContainer getAttributes();
@@ -47,7 +47,7 @@ public abstract class MixinLivingEntity extends Entity {
 	public void refreshArmor(DamageSource source, float amount, CallbackInfoReturnable<Float> cir){
 		for(EquipmentSlot slot : EquipmentSlot.values()) {
 			if (slot.getType() != EquipmentSlot.Type.ARMOR) continue;
-			ItemStack itemStack3 = this.getArmorInSlot(slot);
+			ItemStack itemStack3 = this.getEquippedStack(slot);
 				if (!itemStack3.isEmpty()) {
 					this.getAttributes().removeModifiers(fabrication$oldArmor(itemStack3.getAttributeModifiers(slot), itemStack3, slot, (LivingEntity)(Object)this));
 					this.getAttributes().addTemporaryModifiers(fabrication$oldArmor(itemStack3.getAttributeModifiers(slot), itemStack3, slot, (LivingEntity)(Object)this));
@@ -62,7 +62,7 @@ public abstract class MixinLivingEntity extends Entity {
 	}
 
 	@ModifyReturn(target="Lnet/minecraft/item/ItemStack;getAttributeModifiers(Lnet/minecraft/entity/EquipmentSlot;)Lcom/google/common/collect/Multimap;",
-			method="getEquipment()Ljava/util/Map;")
+			method="getEquipmentChanges()Ljava/util/Map;")
 	private static Multimap<EntityAttribute, EntityAttributeModifier> fabrication$oldArmor(Multimap<EntityAttribute, EntityAttributeModifier> map, ItemStack stack, EquipmentSlot slot, LivingEntity self) {
 		final boolean scale = FabConf.isEnabled("*.old_armor_scale") && ConfigPredicates.shouldRun("*.old_armor_scale", self);
 		final boolean old = FabConf.isEnabled("*.old_armor") && ConfigPredicates.shouldRun("*.old_armor", self);

@@ -106,7 +106,7 @@ public class YeetRecipesScreen extends Screen{
 	}
 
 	@Override
-	public void onClose() {
+	public void close() {
 		client.setScreen(parent);
 	}
 

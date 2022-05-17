@@ -73,7 +73,7 @@ public class BlockLogoRenderer {
 				NativeImage img = LoaderBlockLogo.image;
 				for (int x = 0; x < logoDataWidth; x++) {
 					for (int y = 0; y < logoDataHeight; y++) {
-						int color = img.getPixelColor(x, y);
+						int color = img.getColor(x, y);
 						if ((color&0xFF000000) == 0) continue;
 						BlockState state = LoaderBlockLogo.colorToState.getOrDefault(color&0x00FFFFFF, Blocks.AIR::getDefaultState).get();
 						if (state.isAir() || state.getRenderType() == BlockRenderType.INVISIBLE) continue;
@@ -98,7 +98,7 @@ public class BlockLogoRenderer {
 		RenderSystem.depthMask(true);
 		RenderSystem.setupLevelDiffuseLighting(
 				Util.make(new Vec3f(0f, -1.0f, -0.7f), Vec3f::normalize),
-				Util.make(new Vec3f(0f, -1.0f, -0.7f), Vec3f::normalize), matrices.peek().getModel());
+				Util.make(new Vec3f(0f, -1.0f, -0.7f), Vec3f::normalize), matrices.peek().getPositionMatrix());
 		BlockRenderManager brm = mc.getBlockRenderManager();
 		BufferBuilder bb = Tessellator.getInstance().getBuffer();
 		for (int pass = 0; pass < 2; pass++) {
@@ -175,7 +175,7 @@ public class BlockLogoRenderer {
 							float maxU = missing.getMaxU();
 							float maxV = missing.getMaxV();
 
-							Matrix4f mat = matrices.peek().getModel();
+							Matrix4f mat = matrices.peek().getPositionMatrix();
 							bb.vertex(mat, 0, 0, 0).texture(minU, minV).color(255, 255, 255, 255).normal(0, -1, 0).next();
 							bb.vertex(mat, 1, 0, 0).texture(maxU, minV).color(255, 255, 255, 255).normal(0, -1, 0).next();
 							bb.vertex(mat, 1, 0, 1).texture(maxU, maxV).color(255, 255, 255, 255).normal(0, -1, 0).next();
@@ -219,7 +219,7 @@ public class BlockLogoRenderer {
 								LoaderBlockLogo.shadowRed, LoaderBlockLogo.shadowGreen, LoaderBlockLogo.shadowBlue,
 								LoaderBlockLogo.shadowAlpha*alpha*fade);
 						bb.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
-						Matrix4f mat = matrices.peek().getModel();
+						Matrix4f mat = matrices.peek().getPositionMatrix();
 						bb.vertex(mat, 0, 0, 0).next();
 						bb.vertex(mat, 1, 0, 0).next();
 						bb.vertex(mat, 1, 0, 1).next();

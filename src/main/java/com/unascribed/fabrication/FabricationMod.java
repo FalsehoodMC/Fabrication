@@ -47,9 +47,9 @@ import net.minecraft.world.World;
 
 public class FabricationMod implements ModInitializer {
 
-	public static final String MOD_NAME = MixinConfigPlugin.isMet(SpecialEligibility.FORGE) ? "Forgery" : "Fabrication";
+	public static final String MOD_NAME = FabConf.isMet(SpecialEligibility.FORGE) ? "Forgery" : "Fabrication";
 	// NOT the modid. We keep the mod id as "fabrication" even on Forge to keep things from getting too nutty.
-	public static final String MOD_NAME_LOWER = MixinConfigPlugin.isMet(SpecialEligibility.FORGE) ? "forgery" : "fabrication";
+	public static final String MOD_NAME_LOWER = FabConf.isMet(SpecialEligibility.FORGE) ? "forgery" : "fabrication";
 	
 	private static final Map<String, Feature> features = Maps.newHashMap();
 	private static final List<Feature> unconfigurableFeatures = Lists.newArrayList();

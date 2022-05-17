@@ -11,9 +11,9 @@ public class DepthSuspendParticle extends SpriteBillboardParticle {
 	public DepthSuspendParticle(ClientWorld world, double x, double y, double z) {
 		super(world, x, y, z);
 		float brightness = this.random.nextFloat() * 0.1F + 0.2F;
-		this.colorRed = brightness;
-		this.colorGreen = brightness;
-		this.colorBlue = brightness;
+		this.red = brightness;
+		this.green = brightness;
+		this.blue = brightness;
 		this.setBoundingBoxSpacing(0.02F, 0.02F);
 		//source specified nextFloat() * 0.6F + 0.5F, which is too big since extending SpriteBillboardParticle
 		this.scale(this.random.nextFloat() * 0.2F);
@@ -29,7 +29,7 @@ public class DepthSuspendParticle extends SpriteBillboardParticle {
 		this.collidesWithWorld = false;
 		
 		//definitely hacky, but i give up trying to understand how to add a single white pixel
-		this.setSprite(MinecraftClient.getInstance().getBlockRenderManager().getModels().getSprite(Blocks.WHITE_WOOL.getDefaultState()));
+		this.setSprite(MinecraftClient.getInstance().getBlockRenderManager().getModels().getModelParticleSprite(Blocks.WHITE_WOOL.getDefaultState()));
 	}
 	public void tick(){
 		if (this.age++ >= this.maxAge) {

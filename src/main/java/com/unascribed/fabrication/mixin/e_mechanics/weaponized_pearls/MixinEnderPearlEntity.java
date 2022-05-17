@@ -52,7 +52,7 @@ public abstract class MixinEnderPearlEntity extends ThrownItemEntity {
 
 			for (int i = 0; i < 16; ++i) {
 				double g = hit.getX() + (random.nextDouble() - 0.5D) * 24.0D;
-				double h = MathHelper.clamp(hit.getY() + (double) (random.nextInt(24) - 12), world.getBottomY(), (world.getBottomY() + world.getLogicalHeight() - 1));
+				double h = MathHelper.clamp(hit.getY() + (random.nextInt(24) - 12), world.getBottomY(), (world.getBottomY() + world.getHeight() - 1));
 				double j = hit.getZ() + (random.nextDouble() - 0.5D) * 24.0D;
 
 				if (hit.teleport(g, h, j, true)) {

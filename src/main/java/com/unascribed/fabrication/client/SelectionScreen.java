@@ -78,7 +78,7 @@ class SelectionScreen<T> extends Screen {
 				fill(matrices, 0, (int) y+height, feature.width()+16, (int) y+height+1, -1);
 				if (didClick) {
 					out.accept((T) feature.val());
-					onClose();
+					close();
 				}
 			}
 			scrollBar.height += 9+height;
@@ -100,7 +100,7 @@ class SelectionScreen<T> extends Screen {
 	}
 
 	@Override
-	public void onClose() {
+	public void close() {
 		client.setScreen(parent);
 	}
 
