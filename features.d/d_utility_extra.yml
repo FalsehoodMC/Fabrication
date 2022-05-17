@@ -6,6 +6,7 @@ utility.extra.all_damage_is_fatal:
 	since: 1.0.1
 	sides: server_only
 	fscript: living_entity
+	extra_fscript: damage_source+~damage_source:DAMAGE_SOURCE+Damage Source
 	default: never
 	media: https://unascribed.com/fabrication/all_damage_is_fatal.mp4
 	desc:

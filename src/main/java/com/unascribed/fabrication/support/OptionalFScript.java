@@ -1,11 +1,12 @@
 package com.unascribed.fabrication.support;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
+import com.google.common.collect.ImmutableMap;
 import com.mojang.brigadier.context.CommandContext;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.FabLog;
@@ -20,11 +21,25 @@ import net.minecraft.util.Util;
 import tf.ssf.sfort.script.Default;
 import tf.ssf.sfort.script.PredicateProvider;
 import tf.ssf.sfort.script.ScriptParser;
+import tf.ssf.sfort.script.StitchedPredicateProvider;
 
 public class OptionalFScript {
-	public static Map<String, PredicateProvider<?>> predicateProviders;
+	public static ImmutableMap<String, PredicateProvider<?>> predicateProviders;
 	static {
-		predicateProviders = FeaturesFile.getAll().entrySet().stream().filter(f -> f.getValue().fscript != null).collect(Collectors.toMap(Map.Entry::getKey, v -> Default.getDefaultMap().get(v.getValue().fscript)));
+		Map<String, PredicateProvider<?>> providers = new HashMap<>();
+		for (Map.Entry<String, FeaturesFile.FeatureEntry> entry : FeaturesFile.getAll().entrySet()) {
+			FeaturesFile.FeatureEntry f = entry.getValue();
+			if (f.fscript == null) continue;
+			PredicateProvider<?> p = Default.getDefaultMap().get(f.fscript);
+			if (!f.extraFscript.isEmpty()) {
+				p = new StitchedPredicateProvider(p);
+				for (Map.Entry<String, Map.Entry<String, String>> extraEntry : f.extraFscript.entrySet()){
+					((StitchedPredicateProvider)p).addEmbed(Default.getDefaultMap().get(extraEntry.getKey()), extraEntry.getValue().getKey(), extraEntry.getValue().getValue());
+				}
+			}
+			providers.put(entry.getKey(), p);
+		}
+		predicateProviders = ImmutableMap.copyOf(providers);
 	}
 
 	public static void set(CommandContext<? extends CommandSource> c, String configKey, String script){
@@ -53,7 +68,7 @@ public class OptionalFScript {
 		try {
 			PredicateProvider<?> predicateProvider = predicateProviders.get(configKey);
 			if (predicateProvider == null) return Optional.of(new Exception("No predicate provider exists for specified key"));
-			Predicate<?> predicate = new ScriptParser<>(predicateProvider).parse(script);
+			Predicate<?> predicate = predicateProvider.parse(script);
 			if (predicate == null ) return Optional.of(new Exception("FScript returned null, likely because an invalid script was given"));
 			ConfigPredicates.put(configKey, predicate, 2);
 			LoaderFScript.put(configKey, script);

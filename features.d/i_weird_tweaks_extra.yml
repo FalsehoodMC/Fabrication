@@ -98,6 +98,7 @@ weird_tweaks.extra.source_dependent_iframes:
 	since: 2.1.0
 	sides: server_only
 	fscript: living_entity
+	extra_fscript: damage_source+~damage_source:DAMAGE_SOURCE+Damage Source
 	default: never
 	desc:
 		Allows entities to take damage multiple times if it's from multiple sources.

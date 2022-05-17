@@ -116,6 +116,10 @@ public class FeatureFabricationCommand implements Feature {
 								literalKey.then(CommandManager.literal("1").executes(createPushTagCommandContextFor(key, 1)));
 								literalKey.then(CommandManager.literal("2").executes(createPushTagCommandContextFor(key, 2)));
 								literalKey.then(CommandManager.literal("3").executes(createPushTagCommandContextFor(key, 3)));
+								literalKey.then(CommandManager.literal("tagged_players_only").executes(createPushTagCommandContextFor(key, 0)));
+								literalKey.then(CommandManager.literal("untagged_players_only").executes(createPushTagCommandContextFor(key, 1)));
+								literalKey.then(CommandManager.literal("tagged_players").executes(createPushTagCommandContextFor(key, 2)));
+								literalKey.then(CommandManager.literal("untagged_players").executes(createPushTagCommandContextFor(key, 3)));
 								push.then(literalKey);
 							}
 							setAltKeys(key, alt -> {
@@ -125,6 +129,10 @@ public class FeatureFabricationCommand implements Feature {
 								literalKey.then(CommandManager.literal("1").executes(createPushTagCommandContextFor(key, 1)));
 								literalKey.then(CommandManager.literal("2").executes(createPushTagCommandContextFor(key, 2)));
 								literalKey.then(CommandManager.literal("3").executes(createPushTagCommandContextFor(key, 3)));
+								literalKey.then(CommandManager.literal("tagged_players_only").executes(createPushTagCommandContextFor(key, 0)));
+								literalKey.then(CommandManager.literal("untagged_players_only").executes(createPushTagCommandContextFor(key, 1)));
+								literalKey.then(CommandManager.literal("tagged_players").executes(createPushTagCommandContextFor(key, 2)));
+								literalKey.then(CommandManager.literal("untagged_players").executes(createPushTagCommandContextFor(key, 3)));
 								push.then(literalKey);
 							});
 						}
