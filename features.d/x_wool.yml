@@ -1,0 +1,6 @@
+mechanics.wool_protected_sheep:
+	name: Wool Protected Sheep
+	since: 2.3.1
+	sides: server_only
+	desc:
+		Sheep wool slightly reduces some types of damage.
