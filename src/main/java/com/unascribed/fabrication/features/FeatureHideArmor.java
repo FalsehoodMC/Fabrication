@@ -11,12 +11,12 @@ import com.unascribed.ears.api.EarsStateType;
 import com.unascribed.ears.api.OverrideResult;
 import com.unascribed.ears.api.registry.EarsStateOverriderRegistry;
 import com.unascribed.fabrication.Agnos;
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.interfaces.GetSuppressedSlots;
 import com.unascribed.fabrication.interfaces.SetFabricationConfigAware;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Feature;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import com.google.common.collect.Lists;
 
@@ -58,11 +58,11 @@ public class FeatureHideArmor implements Feature {
 			}
 		}
 	}
-	
+
 	private static final class EarsCompat {
 		public static void init() {
 			EarsStateOverriderRegistry.register("fabrication", (state, peer) -> {
-				if (!MixinConfigPlugin.isEnabled("*.hide_armor")) return OverrideResult.DEFAULT;
+				if (!FabConf.isEnabled("*.hide_armor")) return OverrideResult.DEFAULT;
 				if (!(peer instanceof GetSuppressedSlots)) return OverrideResult.DEFAULT;
 				GetSuppressedSlots gsg = (GetSuppressedSlots)peer;
 				if (state == EarsStateType.WEARING_HELMET && gsg.fabrication$getSuppressedSlots().contains(EquipmentSlot.HEAD)) {
@@ -84,7 +84,7 @@ public class FeatureHideArmor implements Feature {
 
 	private LiteralArgumentBuilder<ServerCommandSource> buildCommand(String cmd, boolean hidden) {
 		return CommandManager.literal(cmd)
-				.requires(scs -> MixinConfigPlugin.isEnabled("*.hide_armor") && applied)
+				.requires(scs -> FabConf.isEnabled("*.hide_armor") && applied)
 				.then(CommandManager.literal("all").executes((c) -> setArmorHidden(c, hidden, ALL_ARMOR)))
 				.then(CommandManager.literal("head").executes((c) -> setArmorHidden(c, hidden, EquipmentSlot.HEAD)))
 				.then(CommandManager.literal("chest").executes((c) -> setArmorHidden(c, hidden, EquipmentSlot.CHEST)))
@@ -147,7 +147,7 @@ public class FeatureHideArmor implements Feature {
 	}
 
 	public static List<Pair<EquipmentSlot, ItemStack>> muddle(Entity entity, List<Pair<EquipmentSlot, ItemStack>> equipmentList) {
-		if (MixinConfigPlugin.isEnabled("*.hide_armor")) {
+		if (FabConf.isEnabled("*.hide_armor")) {
 			if (entity instanceof GetSuppressedSlots) {
 				Set<EquipmentSlot> slots = ((GetSuppressedSlots) entity).fabrication$getSuppressedSlots();
 				return Lists.transform(equipmentList, (pair) -> slots.contains(pair.getFirst()) ? Pair.of(pair.getFirst(), ItemStack.EMPTY) : pair);

@@ -2,24 +2,22 @@ package com.unascribed.fabrication.mixin.b_utility.legacy_command_syntax;
 
 import java.util.Optional;
 
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
+import com.google.common.base.CharMatcher;
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.logic.LegacyIDs;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
-
-import com.google.common.base.CharMatcher;
-
+import com.unascribed.fabrication.support.injection.Hijack;
+import com.unascribed.fabrication.support.injection.HijackReturn;
 import net.minecraft.command.argument.ItemStringReader;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.DefaultedRegistry;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ItemStringReader.class)
 @EligibleIf(configAvailable="*.legacy_command_syntax")
@@ -30,11 +28,11 @@ public class MixinItemStringReader {
 
 	private NbtCompound fabrication$legacyDamageNbt = null;
 
-	@Redirect(at=@At(value="INVOKE", target="net/minecraft/util/registry/DefaultedRegistry.getOrEmpty(Lnet/minecraft/util/Identifier;)Ljava/util/Optional;"),
+	@Hijack(target="Lnet/minecraft/util/registry/DefaultedRegistry;getOrEmpty(Lnet/minecraft/util/Identifier;)Ljava/util/Optional;",
 			method="readItem()V")
-	public Optional<Item> getOrEmpty(DefaultedRegistry<Item> subject, Identifier id) {
+	public HijackReturn fabrication$legacyDamageGetOrEmpty(DefaultedRegistry<Item> subject, Identifier id) {
 		fabrication$legacyDamageNbt = null;
-		if (MixinConfigPlugin.isEnabled("*.legacy_command_syntax")) {
+		if (FabConf.isEnabled("*.legacy_command_syntax")) {
 			String numId;
 			String meta;
 			if (id.getNamespace().equals("minecraft")) {
@@ -63,17 +61,17 @@ public class MixinItemStringReader {
 					i = LegacyIDs.lookup(numIdI, 0);
 					metaAsDamage = true;
 					if (i == null) {
-						return Optional.empty();
+						return new HijackReturn(Optional.empty());
 					}
 				}
 				if (i.isDamageable() && metaAsDamage) {
 					fabrication$legacyDamageNbt = new NbtCompound();
 					fabrication$legacyDamageNbt.putInt("Damage", metaI);
 				}
-				return Optional.of(i);
+				return new HijackReturn(Optional.of(i));
 			}
 		}
-		return subject.getOrEmpty(id);
+		return null;
 	}
 
 	@Inject(at=@At("RETURN"), method="consume()Lnet/minecraft/command/argument/ItemStringReader;")

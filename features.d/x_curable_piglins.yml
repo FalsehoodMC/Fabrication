@@ -1,0 +1,6 @@
+weird_tweaks.extra.curable_piglins:
+	name: Curable Piglins
+	since: 2.3.1
+	sides: server_only
+	desc:
+		Piglins and hoglins can be made immune with a golden apple or cured if they also have weakness.

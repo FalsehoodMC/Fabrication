@@ -2,10 +2,10 @@ package com.unascribed.fabrication.mixin.e_mechanics.detecting_powered_rails;
 
 import java.util.Random;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.block.AbstractRailBlock;
 import net.minecraft.block.BlockState;
@@ -31,23 +31,23 @@ public abstract class MixinPoweredRailBlock extends AbstractRailBlock {
 
 	@Override
 	public boolean emitsRedstonePower(BlockState state) {
-		return MixinConfigPlugin.isEnabled("*.detecting_powered_rails");
+		return FabConf.isEnabled("*.detecting_powered_rails");
 	}
 
 	@Override
 	public boolean hasComparatorOutput(BlockState state) {
-		return MixinConfigPlugin.isEnabled("*.detecting_powered_rails");
+		return FabConf.isEnabled("*.detecting_powered_rails");
 	}
 
 	@Override
 	public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
-		if (!MixinConfigPlugin.isEnabled("*.detecting_powered_rails")) return 0;
+		if (!FabConf.isEnabled("*.detecting_powered_rails")) return 0;
 		return Blocks.DETECTOR_RAIL.getComparatorOutput(Blocks.DETECTOR_RAIL.getDefaultState().with(DetectorRailBlock.POWERED, true), world, pos);
 	}
 
 	@Override
 	public int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
-		if (!MixinConfigPlugin.isEnabled("*.detecting_powered_rails")) return 0;
+		if (!FabConf.isEnabled("*.detecting_powered_rails")) return 0;
 		if (!(world instanceof World)) return 0;
 		BlockState who = world.getBlockState(pos.offset(direction.getOpposite()));
 		if (!who.isOf(Blocks.REPEATER)) return 0;
@@ -57,7 +57,7 @@ public abstract class MixinPoweredRailBlock extends AbstractRailBlock {
 
 	@Override
 	public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-		if (!MixinConfigPlugin.isEnabled("*.detecting_powered_rails")) return;
+		if (!FabConf.isEnabled("*.detecting_powered_rails")) return;
 		world.updateComparators(pos, this);
 		for (Direction d : Direction.Type.HORIZONTAL) {
 			BlockPos ofs = pos.offset(d);
@@ -70,7 +70,7 @@ public abstract class MixinPoweredRailBlock extends AbstractRailBlock {
 
 	@Override
 	public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
-		if (!MixinConfigPlugin.isEnabled("*.detecting_powered_rails")) return;
+		if (!FabConf.isEnabled("*.detecting_powered_rails")) return;
 		if (!world.isClient) {
 			if (entity instanceof AbstractMinecartEntity) {
 				for (Direction d : Direction.Type.HORIZONTAL) {

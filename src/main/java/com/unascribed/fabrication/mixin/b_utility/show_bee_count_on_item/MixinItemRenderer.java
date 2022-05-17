@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.b_utility.show_bee_count_on_item;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -8,7 +9,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.Tessellator;
@@ -29,7 +29,7 @@ public class MixinItemRenderer {
 
 	@Inject(at=@At("TAIL"), method="renderGuiItemOverlay(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V")
 	public void renderGuiItemOverlay(TextRenderer renderer, ItemStack stack, int x, int y, String countLabel, CallbackInfo ci) {
-		if (!(MixinConfigPlugin.isEnabled("*.show_bee_count_on_item") && stack.hasNbt())) return;
+		if (!(FabConf.isEnabled("*.show_bee_count_on_item") && stack.hasNbt())) return;
 		NbtCompound tag = stack.getNbt().getCompound("BlockEntityTag");
 		if (tag == null || !tag.contains("Bees", NbtElement.LIST_TYPE)) return;
 

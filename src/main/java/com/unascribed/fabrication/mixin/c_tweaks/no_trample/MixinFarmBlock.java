@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.c_tweaks.no_trample;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -7,7 +8,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -28,7 +28,7 @@ public abstract class MixinFarmBlock extends Block {
 	@Inject(method="onLandedUpon(Lnet/minecraft/world/World;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/Entity;F)V",
 			at=@At("HEAD"), cancellable=true)
 	public void onLandedUpon(World world, BlockState state, BlockPos pos, Entity entity, float fallDistance, CallbackInfo ci) {
-		if (!MixinConfigPlugin.isAnyEnabled("*.no_trample")) return;
+		if (!FabConf.isAnyEnabled("*.no_trample")) return;
 		if (entity instanceof LivingEntity && ConfigPredicates.shouldRun("*.no_trample", (LivingEntity)entity)) {
 			super.onLandedUpon(world, state, pos, entity, fallDistance);
 			ci.cancel();

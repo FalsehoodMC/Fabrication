@@ -1,12 +1,12 @@
 package com.unascribed.fabrication.mixin.e_mechanics.grindstone_disenchanting;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
@@ -23,7 +23,7 @@ public class MixinGrindstoneScreenHandlerInputSlot2 extends Slot {
 
 	@Inject(at=@At("HEAD"), method="canInsert(Lnet/minecraft/item/ItemStack;)Z", cancellable=true)
 	public void canInsert(ItemStack stack, CallbackInfoReturnable<Boolean> ci) {
-		if (MixinConfigPlugin.isEnabled("*.grindstone_disenchanting") && stack.getItem() == Items.BOOK) {
+		if (FabConf.isEnabled("*.grindstone_disenchanting") && stack.getItem() == Items.BOOK) {
 			ci.setReturnValue(true);
 		}
 	}

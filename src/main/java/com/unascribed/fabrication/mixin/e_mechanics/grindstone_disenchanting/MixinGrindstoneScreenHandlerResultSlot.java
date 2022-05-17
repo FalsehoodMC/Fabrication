@@ -2,6 +2,7 @@ package com.unascribed.fabrication.mixin.e_mechanics.grindstone_disenchanting;
 
 import java.util.Map;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -11,7 +12,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.interfaces.SetOwner;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -40,7 +40,7 @@ public class MixinGrindstoneScreenHandlerResultSlot implements SetOwner<Grindsto
 	@Inject(at=@At("HEAD"), method="onTakeItem(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/item/ItemStack;)V")
 	public void onTakeItemPre(PlayerEntity player, ItemStack stack, CallbackInfo ci) {
 		fabrication$storedResultBook = null;
-		if (MixinConfigPlugin.isEnabled("*.grindstone_disenchanting") && fabrication$owner.getSlot(1).getStack().getItem() == Items.BOOK) {
+		if (FabConf.isEnabled("*.grindstone_disenchanting") && fabrication$owner.getSlot(1).getStack().getItem() == Items.BOOK) {
 			fabrication$storedResultBook = fabrication$owner.getSlot(1).getStack();
 			for (Map.Entry<Enchantment, Integer> en : EnchantmentHelper.get(fabrication$owner.getSlot(0).getStack()).entrySet()) {
 				if (en.getKey().isCursed()) continue;

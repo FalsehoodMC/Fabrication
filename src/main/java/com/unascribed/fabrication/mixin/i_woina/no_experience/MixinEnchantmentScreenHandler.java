@@ -1,11 +1,11 @@
 package com.unascribed.fabrication.mixin.i_woina.no_experience;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.screen.EnchantmentScreenHandler;
@@ -20,7 +20,7 @@ public class MixinEnchantmentScreenHandler {
 					"onContentChanged(Lnet/minecraft/inventory/Inventory;)V"
 	})
 	public int amendExperienceLevel(PlayerEntity subject) {
-		if (MixinConfigPlugin.isEnabled("*.no_experience")) return 65535;
+		if (FabConf.isEnabled("*.no_experience")) return 65535;
 		return subject.experienceLevel;
 	}
 

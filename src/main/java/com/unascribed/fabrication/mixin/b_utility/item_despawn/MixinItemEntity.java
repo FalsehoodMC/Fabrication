@@ -3,6 +3,7 @@ package com.unascribed.fabrication.mixin.b_utility.item_despawn;
 import java.util.Map;
 import java.util.UUID;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -16,7 +17,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.unascribed.fabrication.interfaces.SetFromPlayerDeath;
 import com.unascribed.fabrication.loaders.LoaderItemDespawn;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.util.ParsedTime;
 import com.unascribed.fabrication.util.Resolvable;
 
@@ -83,7 +83,7 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 
 	@Inject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", cancellable=true)
 	public void damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> ci) {
-		if (fabrication$invincible || (MixinConfigPlugin.isEnabled("*.item_despawn") && world.isClient)) {
+		if (fabrication$invincible || (FabConf.isEnabled("*.item_despawn") && world.isClient)) {
 			ci.setReturnValue(false);
 		}
 	}

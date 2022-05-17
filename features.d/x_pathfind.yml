@@ -1,0 +1,7 @@
+fixes.melee_mobs_keep_attacking:
+	name: Melee Mobs Keep Attacking
+	since: 2.3.1
+	sides: server_only
+	desc:
+		Through some mystical mojank reasoning mobs would normally stop looking for the player after reaching
+		the players last known location, this fixes that.

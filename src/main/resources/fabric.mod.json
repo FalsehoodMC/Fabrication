@@ -21,7 +21,8 @@
   "entrypoints": {
     "main": ["com.unascribed.fabrication.FabricationMod"],
     "client": ["com.unascribed.fabrication.FabricationModClient"],
-    "modmenu": ["com.unascribed.fabrication.ModMenuInitializer"]
+    "modmenu": ["com.unascribed.fabrication.ModMenuInitializer"],
+    "fscript": ["com.unascribed.fabrication.FScriptInitializer"]
   },
   "mixins": ["fabrication.mixins.json"],
   "accessWidener": "fabrication.accesswidener",

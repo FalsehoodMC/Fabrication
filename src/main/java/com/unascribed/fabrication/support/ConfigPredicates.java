@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.ImmutableMap;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EquipmentSlot;
@@ -13,13 +14,13 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-import static com.unascribed.fabrication.support.MixinConfigPlugin.remap;
+import static com.unascribed.fabrication.FabConf.remap;
 
 public class ConfigPredicates {
 
 	private static Map<String, Object> active;
 	private static Map<String, Feature> idle = new HashMap<>();
-	private static final Map<String, Object> defaults = new HashMap<>();
+	public static final ImmutableMap<String, Object> defaults;
 
 	public static<T> boolean shouldRun(String configKey, T test) {
 		return shouldRun(configKey, test, true);
@@ -62,31 +63,32 @@ public class ConfigPredicates {
 	}
 
 	static{
-		defaults.put(remap("*.cactus_walk_doesnt_hurt_with_boots"),
+		Map<String, Object> defaultsMap = new HashMap<>();
+		defaultsMap.put(remap("*.cactus_walk_doesnt_hurt_with_boots"),
 				(Predicate<LivingEntity>) livingEntity ->
 		!livingEntity.getEquippedStack(EquipmentSlot.FEET).isEmpty()
 				);
-		defaults.put(remap("*.cactus_brush_doesnt_hurt_with_chest"),
+		defaultsMap.put(remap("*.cactus_brush_doesnt_hurt_with_chest"),
 				(Predicate<LivingEntity>) livingEntity ->
 		!livingEntity.getEquippedStack(EquipmentSlot.CHEST).isEmpty()
 				);
-		defaults.put(remap("*.creepers_explode_when_on_fire"),
+		defaultsMap.put(remap("*.creepers_explode_when_on_fire"),
 				(Predicate<LivingEntity>) livingEntity ->
 		livingEntity.getFireTicks() > 0 && !livingEntity.hasStatusEffect(StatusEffects.FIRE_RESISTANCE)
 				);
-		defaults.put(remap("*.cactus_punching_hurts"),
+		defaultsMap.put(remap("*.cactus_punching_hurts"),
 				(Predicate<ServerPlayerEntity>) serverPlayerEntity ->
 		serverPlayerEntity.getMainHandStack().isEmpty()
 				);
-		defaults.put(remap("*.feather_falling_five"),
+		defaultsMap.put(remap("*.feather_falling_five"),
 				(Predicate<LivingEntity>) livingEntity ->
 		EnchantmentHelper.getLevel(Enchantments.FEATHER_FALLING, livingEntity.getEquippedStack(EquipmentSlot.FEET)) >= 5
 				);
-		defaults.put(remap("*.feather_falling_five_damages_boots"),
+		defaultsMap.put(remap("*.feather_falling_five_damages_boots"),
 				(Predicate<LivingEntity>) livingEntity ->
 		EnchantmentHelper.getLevel(Enchantments.FEATHER_FALLING, livingEntity.getEquippedStack(EquipmentSlot.FEET)) >= 5
 				);
-
+		defaults = ImmutableMap.copyOf(defaultsMap);
 		active = defaults.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
 

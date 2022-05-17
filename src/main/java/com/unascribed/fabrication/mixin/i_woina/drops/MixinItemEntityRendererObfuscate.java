@@ -24,7 +24,7 @@ public class MixinItemEntityRendererObfuscate {
 	@ModifyVariable(at=@At("HEAD"), method="fireRenderEntityItem",
 			index=7, argsOnly=true, remap=false)
 	private static int modifyOverlay(int orig, ItemRenderer subject, ItemStack stack) {
-		return WoinaDrops.modifyOverlay(stack, orig);
+		return WoinaDrops.modifyOverlay(stack.hashCode(), orig);
 	}
 
 	@Redirect(at=@At(value="INVOKE", target="net/minecraft/client/render/item/ItemRenderer.renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformation$Mode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/render/model/BakedModel;)V"),

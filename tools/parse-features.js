@@ -74,6 +74,7 @@ let defaults = (curKey, cur) => ({
 	brand_new: cur && cur.since && cur.since === currentVersion,
 	fscript: null,
 	fscript_default: null,
+	extra_fscript: null,
 	extend: null,
 	new: (cur ? cur.since_code ? cur.since_code : versionNamesToCodes[cur.since] : 9999) >= currentVersionCode-1
 });

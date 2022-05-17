@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.b_utility.canhit;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -9,7 +10,6 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import com.unascribed.fabrication.interfaces.SetCanHitList;
 import com.unascribed.fabrication.logic.CanHitUtil;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.entity.LivingEntity;
@@ -31,7 +31,7 @@ public class MixinBowItem {
 			locals=LocalCapture.CAPTURE_FAILHARD)
 	public void onStoppedUsing(ItemStack bowStack, World world, LivingEntity user, int remaining, CallbackInfo ci,
 			PlayerEntity entity, boolean infinity, ItemStack arrowStack, int i, float f, boolean b2, ArrowItem ai, PersistentProjectileEntity arrow) {
-		if (!MixinConfigPlugin.isEnabled("*.canhit") || CanHitUtil.isExempt(entity)) return;
+		if (!FabConf.isEnabled("*.canhit") || CanHitUtil.isExempt(entity)) return;
 		NbtList canHitList = bowStack.hasNbt() && bowStack.getNbt().contains("CanHit") ? bowStack.getNbt().getList("CanHit", NbtType.STRING) : null;
 		NbtList canHitList2 = arrowStack.hasNbt() && arrowStack.getNbt().contains("CanHit") ? arrowStack.getNbt().getList("CanHit", NbtType.STRING) : null;
 		if (arrow instanceof SetCanHitList) {

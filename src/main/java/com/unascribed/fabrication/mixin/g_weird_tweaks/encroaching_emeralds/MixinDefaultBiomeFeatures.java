@@ -2,7 +2,7 @@ package com.unascribed.fabrication.mixin.g_weird_tweaks.encroaching_emeralds;
 
 import com.unascribed.fabrication.interfaces.GenerationSettingsAddEmeralds;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
+import com.unascribed.fabrication.FabConf;
 import net.minecraft.world.biome.GenerationSettings;
 import net.minecraft.world.gen.feature.DefaultBiomeFeatures;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,7 +16,7 @@ public abstract class MixinDefaultBiomeFeatures {
 
 	@Inject(at=@At("HEAD"), method="addDefaultOres(Lnet/minecraft/world/biome/GenerationSettings$Builder;)V")
 	private static void addEmeralds(GenerationSettings.Builder builder, CallbackInfo ci){
-		if (!(MixinConfigPlugin.isEnabled("*.encroaching_emeralds") && builder instanceof GenerationSettingsAddEmeralds)) return;
+		if (!(FabConf.isEnabled("*.encroaching_emeralds") && builder instanceof GenerationSettingsAddEmeralds)) return;
 		((GenerationSettingsAddEmeralds)builder).fabrication$addEmeralds();
 	}
 }

@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.c_tweaks.alt_absorption_sound;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -12,7 +13,6 @@ import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.interfaces.DidJustAbsorp;
 import com.unascribed.fabrication.interfaces.SetFabricationConfigAware;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.Entity;
@@ -64,7 +64,7 @@ public abstract class MixinLivingEntity extends Entity implements DidJustAbsorp 
 	@Inject(at=@At("HEAD"), method="playHurtSound(Lnet/minecraft/entity/damage/DamageSource;)V",
 			cancellable=true)
 	public void playHurtSound(DamageSource src, CallbackInfo ci) {
-		if (!MixinConfigPlugin.isEnabled("*.alt_absorption_sound")) return;
+		if (!FabConf.isEnabled("*.alt_absorption_sound")) return;
 		Object self = this;
 		if (fabrication$didJustAbsorp()) {
 			PacketByteBuf data = new PacketByteBuf(Unpooled.buffer(4));

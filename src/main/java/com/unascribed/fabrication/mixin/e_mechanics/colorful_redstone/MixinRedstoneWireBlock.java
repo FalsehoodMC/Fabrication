@@ -29,7 +29,7 @@ public class MixinRedstoneWireBlock {
 
 	@Inject(at=@At("RETURN"), method="getRenderConnectionType(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;Z)Lnet/minecraft/block/enums/WireConnection;", cancellable=true)
 	private void getRenderConnectionType(BlockView blockView, BlockPos blockPos, Direction direction, boolean bl, CallbackInfoReturnable<WireConnection> ci) {
-		if (!MixinConfigPlugin.isEnabled("*.colorful_redstone")) return;
+		if (!FabConf.isEnabled("*.colorful_redstone")) return;
 		if (ci.getReturnValue() != WireConnection.NONE && !fabrication$canConnect(blockView, blockPos, direction)) {
 			ci.setReturnValue(WireConnection.NONE);
 		}
@@ -65,14 +65,14 @@ public class MixinRedstoneWireBlock {
 	@Inject(at=@At(value="INVOKE_ASSIGN", target="net/minecraft/world/World.getBlockState(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;"),
 			method="getReceivedRedstonePower(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)I", locals=LocalCapture.CAPTURE_FAILHARD)
 	private void captureLocals(World world, BlockPos ourPos, CallbackInfoReturnable<Integer> ci, int i, int j, Iterator var5, Direction dir, BlockPos theirPos) {
-		if (!MixinConfigPlugin.isEnabled("*.colorful_redstone")) return;
+		if (!FabConf.isEnabled("*.colorful_redstone")) return;
 		fabrication$capturedDirection.set(dir);
 	}
 	
 	@ModifyVariable(at=@At(value="INVOKE_ASSIGN", target="net/minecraft/world/World.getBlockState(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;"),
 			method="getReceivedRedstonePower(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)I", ordinal=0)
 	private BlockState hideNonConnectedBlockState(BlockState orig, World world, BlockPos ourPos) {
-		if (!MixinConfigPlugin.isEnabled("*.colorful_redstone")) return orig;
+		if (!FabConf.isEnabled("*.colorful_redstone")) return orig;
 		if (!fabrication$canConnect(world, ourPos, fabrication$capturedDirection.get())) {
 			return Blocks.AIR.getDefaultState();
 		}
@@ -82,7 +82,7 @@ public class MixinRedstoneWireBlock {
 	@ModifyVariable(at=@At(value="INVOKE", target="net/minecraft/block/BlockState.isSolidBlock(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)Z"),
 			method="getReceivedRedstonePower(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)I", ordinal=1)
 	private BlockPos mockNonsolidBelowForDisconnect(BlockPos orig, World world, BlockPos ourPos) {
-		if (!MixinConfigPlugin.isEnabled("*.colorful_redstone")) return orig;
+		if (!FabConf.isEnabled("*.colorful_redstone")) return orig;
 		if (!fabrication$canConnect(world, ourPos, fabrication$capturedDirection.get())) {
 			// redstone wire (which we are guaranteed to be) is not solid
 			// this short-circuits the check for wires below us

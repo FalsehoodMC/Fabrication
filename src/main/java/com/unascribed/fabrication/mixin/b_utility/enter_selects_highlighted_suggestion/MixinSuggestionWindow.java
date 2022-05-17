@@ -1,8 +1,8 @@
 package com.unascribed.fabrication.mixin.b_utility.enter_selects_highlighted_suggestion;
 
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.client.gui.screen.CommandSuggestor;
 
@@ -27,7 +27,7 @@ public abstract class MixinSuggestionWindow {
 
 	@Inject(at=@At(value="HEAD"), method="keyPressed(III)Z", cancellable=true)
 	public void onStoppedUsing(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
-		if (!MixinConfigPlugin.isEnabled("*.enter_selects_highlighted_suggestion")) return;
+		if (!FabConf.isEnabled("*.enter_selects_highlighted_suggestion")) return;
 		if ((keyCode == GLFW_KEY_ENTER || keyCode == GLFW_KEY_KP_ENTER) && !this.completed){
 			this.complete();
 			cir.setReturnValue(true);

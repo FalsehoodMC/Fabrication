@@ -13,6 +13,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import com.unascribed.fabrication.support.FabConst;
 import org.lwjgl.opengl.GL11;
 
 import com.google.gson.Gson;
@@ -21,7 +22,6 @@ import com.google.gson.JsonObject;
 import com.sun.jna.Platform;
 import com.unascribed.fabrication.support.ConfigValue;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.ResolvedConfigValue;
 
 import com.google.common.base.CharMatcher;
@@ -61,7 +61,7 @@ public class Analytics {
 	}
 
 	public static void submit(String action, Map<String, String> extraScoped) {
-		if (!MixinConfigPlugin.isEnabled("*.data_upload")) return;
+		if (!FabConf.isEnabled("*.data_upload")) return;
 		exec.execute(() -> {
 			ensureUserIdPresent();
 			Escaper ue = UrlEscapers.urlPathSegmentEscaper();
@@ -97,9 +97,9 @@ public class Analytics {
 				}
 				extra.put("Java VM", vm);
 				extra.put("Minecraft Version", SharedConstants.getGameVersion().getName());
-				extra.put("Loader", (FabRefl.FORGE ? "Forge" : "Fabric")+" "+Agnos.getLoaderVersion());
+				extra.put("Loader", (FabConst.FORGE ? "Forge" : "Fabric")+" "+Agnos.getLoaderVersion());
 				extra.put("Environment", Agnos.getCurrentEnv().name());
-				extra.put("Profile", MixinConfigPlugin.getRawValue("general.profile"));
+				extra.put("Profile", FabConf.getRawValue("general.profile"));
 				if (Agnos.getCurrentEnv() == Env.CLIENT) {
 					addClientData(extra);
 				}
@@ -117,14 +117,14 @@ public class Analytics {
 	}
 
 	public static void submitConfig() {
-		if (!MixinConfigPlugin.isEnabled("*.data_upload")) return;
+		if (!FabConf.isEnabled("*.data_upload")) return;
 		exec.execute(() -> {
 			ensureUserIdPresent();
 			Escaper ue = UrlEscapers.urlPathSegmentEscaper();
 			try {
 				JsonArray requests = new JsonArray();
-				for (String key : MixinConfigPlugin.getAllKeys()) {
-					ResolvedConfigValue rt = MixinConfigPlugin.getResolvedValue(key);
+				for (String key : FabConf.getAllKeys()) {
+					ResolvedConfigValue rt = FabConf.getResolvedValue(key);
 					requests.add("?_id="+userId+"&_idts="+first+"&_viewts="+last+
 							"&url=https://unascribed.com/fabrication/value/"+rt.value+
 							"&idsite=2&rec=1&apiv=1&action_name="+ue.escape(key)+"&cookie=0"+

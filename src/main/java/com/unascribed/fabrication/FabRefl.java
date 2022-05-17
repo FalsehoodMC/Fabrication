@@ -13,11 +13,12 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import com.unascribed.fabrication.support.FabReflField;
+import com.unascribed.fabrication.support.injection.FabRefMap;
 import org.spongepowered.asm.mixin.throwables.MixinError;
 import org.spongepowered.asm.mixin.throwables.MixinException;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.MixinErrorHandler_THIS_ERROR_HANDLER_IS_FOR_SOFT_FAILURE_IN_FABRICATION_ITSELF_AND_DOES_NOT_IMPLY_FABRICATION_IS_RESPONSIBLE_FOR_THE_BELOW_ERROR;
 
 import com.google.common.base.Joiner;
@@ -66,35 +67,14 @@ import net.minecraft.util.Identifier;
 
 public class FabRefl {
 
-	public static final boolean DEV;
-	public static final boolean FORGE;
-	static {
-		boolean devTmp;
-		boolean forgeTmp;
-		try {
-			Class.forName("net.minecraft.util.Identifier");
-			devTmp = true;
-			forgeTmp = false;
-		} catch (ClassNotFoundException e) {
-			devTmp = false;
-			try {
-				Class.forName("net.minecraft.resources.ResourceLocation");
-				forgeTmp = true;
-			} catch (ClassNotFoundException e2) {
-				forgeTmp = false;
-			}
-		}
-		DEV = devTmp;
-		FORGE = forgeTmp;
-		FabLog.debug("Detected runtime: "+(DEV ? "Fabric Dev" : FORGE ? "Forge" : "Fabric"));
-	}
-
 	// "muh performance"
 	// invokeExact becomes a standard INVOKE* insn after the JIT gets its hands on it. The entire
 	// purpose of MethodHandles is to be basically free. the catch is there can be *no* abstraction
 	// on an invokeExact or the calltime signature will be wrong and the JVM will get confused.
 
-	private static final MethodHandle cpc2sp_channel = unreflectGetter("CustomPayloadC2SPacket", () -> CustomPayloadC2SPacket.class, "channel", "field_12830", "f_133980_").get();
+	@FabReflField
+	private static final String cpc2sp_channel_field = "net/minecraft/network/packet/c2s/play/CustomPayloadC2SPacket;channel";
+	private static final MethodHandle cpc2sp_channel = unreflectGetter("CustomPayloadC2SPacket", () -> CustomPayloadC2SPacket.class, cpc2sp_channel_field).get();
 	public static Identifier getChannel(CustomPayloadC2SPacket subject) {
 		try {
 			return (Identifier)checkHandle(cpc2sp_channel).invokeExact(subject);
@@ -103,7 +83,9 @@ public class FabRefl {
 		}
 	}
 
-	private static final MethodHandle cpc2sp_data = unreflectGetter("CustomPayloadC2SPacket", () -> CustomPayloadC2SPacket.class, "data", "field_12832", "f_133981_").get();
+	@FabReflField
+	private static final String cpc2sp_data_field = "net/minecraft/network/packet/c2s/play/CustomPayloadC2SPacket;data";
+	private static final MethodHandle cpc2sp_data = unreflectGetter("CustomPayloadC2SPacket", () -> CustomPayloadC2SPacket.class, cpc2sp_data_field).get();
 	public static PacketByteBuf getData(CustomPayloadC2SPacket subject) {
 		try {
 			return (PacketByteBuf)checkHandle(cpc2sp_data).invokeExact(subject);
@@ -112,7 +94,9 @@ public class FabRefl {
 		}
 	}
 
-	private static final MethodHandle feg_withinRangePredicate = unreflectGetter("FleeEntityGoal", () -> FleeEntityGoal.class, "withinRangePredicate", "field_18084", "f_25025_")
+	@FabReflField
+	private static final String feg_withinRangePredicate_field = "net/minecraft/entity/ai/goal/FleeEntityGoal;withinRangePredicate";
+	private static final MethodHandle feg_withinRangePredicate = unreflectGetter("FleeEntityGoal", () -> FleeEntityGoal.class, feg_withinRangePredicate_field)
 			.requiredBy("*.taggable_players").get();
 	public static TargetPredicate getWithinRangePredicate(FleeEntityGoal<?> subject) {
 		try {
@@ -122,7 +106,9 @@ public class FabRefl {
 		}
 	}
 
-	private static final MethodHandle es_basePredicate = unreflectGetter("EntitySelector", () -> EntitySelector.class, "basePredicate", "field_10820", "f_121114_")
+	@FabReflField
+	private static final String es_basePredicate_field = "net/minecraft/command/EntitySelector;basePredicate";
+	private static final MethodHandle es_basePredicate = unreflectGetter("EntitySelector", () -> EntitySelector.class, es_basePredicate_field)
 			.requiredBy("*.canhit").get();
 	public static Predicate<Entity> getBasePredicate(EntitySelector subject) {
 		try {
@@ -132,7 +118,9 @@ public class FabRefl {
 		}
 	}
 
-	private static final MethodHandle tacs_entityTrackers = unreflectGetter("ThreadedAnvilChunkStorage", () -> ThreadedAnvilChunkStorage.class, "entityTrackers", "field_18242", "f_140150_")
+	@FabReflField
+	private static final String tacs_entityTrackers_field = "net/minecraft/server/world/ThreadedAnvilChunkStorage;entityTrackers";
+	private static final MethodHandle tacs_entityTrackers = unreflectGetter("ThreadedAnvilChunkStorage", () -> ThreadedAnvilChunkStorage.class, tacs_entityTrackers_field)
 			.requiredBy("*.sync_attacker_yaw", "*.despawning_items_blink").get();
 	public static Int2ObjectMap<EntityTracker> getEntityTrackers(ThreadedAnvilChunkStorage subject) {
 		try {
@@ -142,7 +130,9 @@ public class FabRefl {
 		}
 	}
 
-	private static final MethodHandle et_playersTracking = unreflectGetter("EntityTracker", () -> EntityTracker.class, "listeners", "field_18250", "f_140475_")
+	@FabReflField
+	private static final String et_playersTracking_field = "net/minecraft/server/world/ThreadedAnvilChunkStorage$EntityTracker;listeners";
+	private static final MethodHandle et_playersTracking = unreflectGetter("EntityTracker", () -> EntityTracker.class, et_playersTracking_field)
 			.requiredBy("*.sync_attacker_yaw", "*.despawning_items_blink").get();
 	public static Set<EntityTrackingListener> getPlayersTracking(EntityTracker subject) {
 		try {
@@ -152,7 +142,9 @@ public class FabRefl {
 		}
 	}
 
-	private static final MethodHandle rpm_providers_get = unreflectGetter("ResourcePackManager", () -> ResourcePackManager.class, "providers", "field_14227", "f_10497_")
+	@FabReflField
+	private static final String rpm_providers_get_field = "net/minecraft/resource/ResourcePackManager;providers";
+	private static final MethodHandle rpm_providers_get = unreflectGetter("ResourcePackManager", () -> ResourcePackManager.class, rpm_providers_get_field)
 			.requiredBy("*.oak_is_apple", "*.tnt_is_dynamite").get();
 	public static Set<ResourcePackProvider> getProviders(ResourcePackManager subject) {
 		try {
@@ -162,7 +154,7 @@ public class FabRefl {
 		}
 	}
 
-	private static final MethodHandle rpm_providers_set = unreflectSetter("ResourcePackManager", () -> ResourcePackManager.class, "providers", "field_14227", "f_10497_")
+	private static final MethodHandle rpm_providers_set = unreflectSetter("ResourcePackManager", () -> ResourcePackManager.class, rpm_providers_get_field)
 			.requiredBy("*.oak_is_apple", "*.tnt_is_dynamite").get();
 	public static void setProviders(ResourcePackManager subject, Set<ResourcePackProvider> providers) {
 		try {
@@ -172,7 +164,9 @@ public class FabRefl {
 		}
 	}
 
-	private static final MethodHandle abs_hardness_get = unreflectGetter("AbstractBlockState", () -> AbstractBlockState.class, "hardness", "field_23172", "f_60599_")
+	@FabReflField
+	private static final String abs_hardness_get_field = "net/minecraft/block/AbstractBlock$AbstractBlockState;hardness";
+	private static final MethodHandle abs_hardness_get = unreflectGetter("AbstractBlockState", () -> AbstractBlockState.class, abs_hardness_get_field)
 			.requiredBy("*.faster_obsidian").get();
 	public static float getHardness(AbstractBlockState subject) {
 		try {
@@ -182,7 +176,7 @@ public class FabRefl {
 		}
 	}
 
-	private static final MethodHandle abs_hardness_set = unreflectSetter("AbstractBlockState", () -> AbstractBlockState.class, "hardness", "field_23172", "f_60599_")
+	private static final MethodHandle abs_hardness_set = unreflectSetter("AbstractBlockState", () -> AbstractBlockState.class, abs_hardness_get_field)
 			.requiredBy("*.faster_obsidian").get();
 	public static void setHardness(AbstractBlockState subject, float hardness) {
 		try {
@@ -192,7 +186,9 @@ public class FabRefl {
 		}
 	}
 
-	private static final MethodHandle fb_burnChances = unreflectGetter("FireBlock", () -> FireBlock.class, "burnChances", "field_11095", "f_53421_")
+	@FabReflField
+	private static final String fb_burnChances_field = "net/minecraft/block/FireBlock;burnChances";
+	private static final MethodHandle fb_burnChances = unreflectGetter("FireBlock", () -> FireBlock.class, fb_burnChances_field)
 			.requiredBy("*.flammable_cobwebs").get();
 	public static Object2IntMap<Block> getBurnChances(FireBlock subject) {
 		try {
@@ -202,7 +198,9 @@ public class FabRefl {
 		}
 	}
 
-	private static final MethodHandle fb_spreadChances = unreflectGetter("FireBlock", () -> FireBlock.class, "spreadChances", "field_11091", "f_53422_")
+	@FabReflField
+	private static final String fb_spreadChances_field = "net/minecraft/block/FireBlock;spreadChances";
+	private static final MethodHandle fb_spreadChances = unreflectGetter("FireBlock", () -> FireBlock.class, fb_spreadChances_field)
 			.requiredBy("*.flammable_cobwebs").get();
 	public static Object2IntMap<Block> getSpreadChances(FireBlock subject) {
 		try {
@@ -212,7 +210,9 @@ public class FabRefl {
 		}
 	}
 
-	private static final MethodHandle ie_pickupDelay = unreflectGetter("ItemEntity", () -> ItemEntity.class, "pickupDelay", "field_7202", "f_31986_")
+	@FabReflField
+	private static final String ie_pickupDelay_field = "net/minecraft/entity/ItemEntity;pickupDelay";
+	private static final MethodHandle ie_pickupDelay = unreflectGetter("ItemEntity", () -> ItemEntity.class, ie_pickupDelay_field)
 			.requiredBy("*.instant_pickup").get();
 	public static int getPickupDelay(ItemEntity subject) {
 		try {
@@ -222,8 +222,9 @@ public class FabRefl {
 		}
 	}
 
-
-	private static final MethodHandle gc_execute = unreflectMethod("GiveCommand", () -> GiveCommand.class, "execute", "method_13401", "m_137778_",
+	@FabReflField
+	private static final String gc_execute_field = "Lnet/minecraft/server/command/GiveCommand;execute(Lnet/minecraft/server/command/ServerCommandSource;Lnet/minecraft/command/argument/ItemStackArgument;Ljava/util/Collection;I)I";
+	private static final MethodHandle gc_execute = unreflectMethod("GiveCommand", () -> GiveCommand.class, gc_execute_field,
 			int.class,
 			ServerCommandSource.class, ItemStackArgument.class, Collection.class, int.class)
 			.requiredBy("*.i_and_more").get();
@@ -235,7 +236,9 @@ public class FabRefl {
 		}
 	}
 
-	private static final MethodHandle me_getDropChance = unreflectMethod("MobEntity", () -> MobEntity.class, "getDropChance", "method_5929", "m_21519_",
+	@FabReflField
+	private static final String me_getDropChance_field = "Lnet/minecraft/entity/mob/MobEntity;getDropChance(Lnet/minecraft/entity/EquipmentSlot;)F";
+	private static final MethodHandle me_getDropChance = unreflectMethod("MobEntity", () -> MobEntity.class, me_getDropChance_field,
 			float.class,
 			EquipmentSlot.class)
 			.requiredBy("*.broken_tools_drop_components").get();
@@ -247,7 +250,9 @@ public class FabRefl {
 		}
 	}
 
-	private static final MethodHandle fb_registerFlammableBlock = unreflectMethod("FireBlock", () -> FireBlock.class, "registerFlammableBlock", "method_10189", "m_53444_",
+	@FabReflField
+	private static final String fb_registerFlammableBlock_field = "Lnet/minecraft/block/FireBlock;registerFlammableBlock(Lnet/minecraft/block/Block;II)V";
+	private static final MethodHandle fb_registerFlammableBlock = unreflectMethod("FireBlock", () -> FireBlock.class, fb_registerFlammableBlock_field,
 			void.class,
 			Block.class, int.class, int.class)
 			.requiredBy("*.flammable_cobwebs").get();
@@ -262,7 +267,9 @@ public class FabRefl {
 	@Environment(EnvType.CLIENT)
 	public static final class Client {
 
-		private static final MethodHandle satd_width = unreflectGetter("SpriteAtlasTexture.Data", () -> SpriteAtlasTexture.Data.class, "width", "field_17901", "f_118332_")
+		@FabReflField
+		private static final String satd_width_field = "net/minecraft/client/texture/SpriteAtlasTexture$Data;width";
+		private static final MethodHandle satd_width = unreflectGetter("SpriteAtlasTexture.Data", () -> SpriteAtlasTexture.Data.class, satd_width_field)
 				.requiredBy("*.old_lava").get();
 		public static int getWidth(SpriteAtlasTexture.Data subject) {
 			try {
@@ -272,7 +279,9 @@ public class FabRefl {
 			}
 		}
 
-		private static final MethodHandle satd_height = unreflectGetter("SpriteAtlasTexture.Data", () -> SpriteAtlasTexture.Data.class, "height", "field_17902", "f_118333_")
+		@FabReflField
+		private static final String satd_height_field = "net/minecraft/client/texture/SpriteAtlasTexture$Data;height";
+		private static final MethodHandle satd_height = unreflectGetter("SpriteAtlasTexture.Data", () -> SpriteAtlasTexture.Data.class, satd_height_field)
 				.requiredBy("*.old_lava").get();
 		public static int getHeight(SpriteAtlasTexture.Data subject) {
 			try {
@@ -282,7 +291,9 @@ public class FabRefl {
 			}
 		}
 
-		private static final MethodHandle satd_maxLevel = unreflectGetter("SpriteAtlasTexture.Data", () -> SpriteAtlasTexture.Data.class, "maxLevel", "field_21795", "f_118334_")
+		@FabReflField
+		private static final String satd_maxLevel_field = "net/minecraft/client/texture/SpriteAtlasTexture$Data;maxLevel";
+		private static final MethodHandle satd_maxLevel = unreflectGetter("SpriteAtlasTexture.Data", () -> SpriteAtlasTexture.Data.class, satd_maxLevel_field)
 				.requiredBy("*.old_lava").get();
 		public static int getMaxLevel(SpriteAtlasTexture.Data subject) {
 			try {
@@ -292,7 +303,9 @@ public class FabRefl {
 			}
 		}
 
-		private static final MethodHandle sprite_x = unreflectGetter("Sprite", () -> Sprite.class, "x", "field_5258", "f_118349_")
+		@FabReflField
+		private static final String sprite_x_field = "net/minecraft/client/texture/Sprite;x";
+		private static final MethodHandle sprite_x = unreflectGetter("Sprite", () -> Sprite.class, sprite_x_field)
 				.requiredBy("*.old_lava", "atlas_viewer").get();
 		public static int getX(Sprite subject) {
 			try {
@@ -302,7 +315,9 @@ public class FabRefl {
 			}
 		}
 
-		private static final MethodHandle sprite_y = unreflectGetter("Sprite", () -> Sprite.class, "y", "field_5256", "f_118350_")
+		@FabReflField
+		private static final String sprite_y_field = "net/minecraft/client/texture/Sprite;y";
+		private static final MethodHandle sprite_y = unreflectGetter("Sprite", () -> Sprite.class, sprite_y_field)
 				.requiredBy("*.old_lava", "atlas_viewer").get();
 		public static int getY(Sprite subject) {
 			try {
@@ -312,7 +327,9 @@ public class FabRefl {
 			}
 		}
 
-		private static final MethodHandle spriteAnimation_frameIndex = unreflectGetter("Sprite.Animation", () -> Sprite.Animation.class, "frameIndex", "field_28470", "f_174748_")
+		@FabReflField
+		private static final String spriteAnimation_frameIndex_field = "net/minecraft/client/texture/Sprite$Animation;frameIndex";
+		private static final MethodHandle spriteAnimation_frameIndex = unreflectGetter("Sprite.Animation", () -> Sprite.Animation.class, spriteAnimation_frameIndex_field)
 				.requiredBy("atlas_viewer").get();
 		public static int getFrameIndex(Sprite.Animation subject) {
 			try {
@@ -322,7 +339,9 @@ public class FabRefl {
 			}
 		}
 
-		private static final MethodHandle spriteAnimation_frameTicks = unreflectGetter("Sprite.Animation", () -> Sprite.Animation.class, "frameTicks", "field_28471", "f_174749_")
+		@FabReflField
+		private static final String spriteAnimation_frameTicks_field = "net/minecraft/client/texture/Sprite$Animation;frameTicks";
+		private static final MethodHandle spriteAnimation_frameTicks = unreflectGetter("Sprite.Animation", () -> Sprite.Animation.class, spriteAnimation_frameTicks_field)
 				.requiredBy("atlas_viewer").get();
 		public static int getFrameTicks(Sprite.Animation subject) {
 			try {
@@ -332,7 +351,9 @@ public class FabRefl {
 			}
 		}
 
-		private static final MethodHandle sat_sprites = unreflectGetter("SpriteAtlasTexture", () -> SpriteAtlasTexture.class, "sprites", "field_5280", "f_118264_")
+		@FabReflField
+		private static final String sat_sprites_field = "net/minecraft/client/texture/SpriteAtlasTexture;sprites";
+		private static final MethodHandle sat_sprites = unreflectGetter("SpriteAtlasTexture", () -> SpriteAtlasTexture.class, sat_sprites_field)
 				.requiredBy("*.old_lava", "atlas_viewer").get();
 		public static Map<Identifier, Sprite> getSprites(SpriteAtlasTexture subject) {
 			try {
@@ -342,7 +363,9 @@ public class FabRefl {
 			}
 		}
 
-		private static final MethodHandle sat_animatedSprites = unreflectGetter("SpriteAtlasTexture", () -> SpriteAtlasTexture.class, "animatedSprites", "field_5276", "f_118262_")
+		@FabReflField
+		private static final String sat_animatedSprites_field = "net/minecraft/client/texture/SpriteAtlasTexture;animatedSprites";
+		private static final MethodHandle sat_animatedSprites = unreflectGetter("SpriteAtlasTexture", () -> SpriteAtlasTexture.class, sat_animatedSprites_field)
 				.requiredBy("*.old_lava").get();
 		public static List<Sprite> getAnimatedSprites(SpriteAtlasTexture subject) {
 			try {
@@ -352,7 +375,9 @@ public class FabRefl {
 			}
 		}
 
-		private static final MethodHandle mc_itemColors = unreflectGetter("MinecraftClient", () -> MinecraftClient.class, "itemColors", "field_1760", "f_91041_")
+		@FabReflField
+		private static final String mc_itemColors_field = "net/minecraft/client/MinecraftClient;itemColors";
+		private static final MethodHandle mc_itemColors = unreflectGetter("MinecraftClient", () -> MinecraftClient.class, mc_itemColors_field)
 				.requiredBy("*.colored_crack_particles", "*.classic_block_drops").get();
 		public static ItemColors getItemColors(MinecraftClient subject) {
 			try {
@@ -362,7 +387,9 @@ public class FabRefl {
 			}
 		}
 
-		private static final MethodHandle mh_blend = unreflectMethod("MipmapHelper", () -> MipmapHelper.class, "blend", "method_24101", "m_118048_",
+		@FabReflField
+		private static final String mh_blend_field = "Lnet/minecraft/client/texture/MipmapHelper;blend(IIIIZ)I";
+		private static final MethodHandle mh_blend = unreflectMethod("MipmapHelper", () -> MipmapHelper.class, mh_blend_field,
 				int.class,
 				int.class, int.class, int.class, int.class, boolean.class)
 				.requiredBy("*.old_lava").get();
@@ -385,7 +412,9 @@ public class FabRefl {
 			}
 		}
 
-		private static final MethodHandle ir_renderBakedItemModel = unreflectMethod("ItemRenderer", () -> ItemRenderer.class, "renderBakedItemModel", "method_23182", "m_115189_",
+		@FabReflField
+		private static final String ir_renderBakedItemModel_field = "Lnet/minecraft/client/render/item/ItemRenderer;renderBakedItemModel(Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/item/ItemStack;IILnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;)V";
+		private static final MethodHandle ir_renderBakedItemModel = unreflectMethod("ItemRenderer", () -> ItemRenderer.class, ir_renderBakedItemModel_field,
 				void.class,
 				BakedModel.class, ItemStack.class, int.class, int.class, MatrixStack.class, VertexConsumer.class)
 				.requiredBy("*.classic_block_drops").get();
@@ -397,7 +426,9 @@ public class FabRefl {
 			}
 		}
 
-		private static final MethodHandle s_getFrameCount = unreflectMethod("Sprite", () -> Sprite.class, "getFrameCount", "method_4592", "m_118415_",
+		@FabReflField
+		private static final String s_getFrameCount_field = "Lnet/minecraft/client/texture/Sprite;getFrameCount()I";
+		private static final MethodHandle s_getFrameCount = unreflectMethod("Sprite", () -> Sprite.class, s_getFrameCount_field,
 				int.class)
 				.requiredBy("*.atlas_viewer").get();
 		public static int getFrameCount(Sprite subject) {
@@ -438,7 +469,7 @@ public class FabRefl {
 				if (requiredBy.isEmpty()) throw rethrow(err);
 				FabLog.warn("Failed to retrieve "+desc+" - force-disabling "+Joiner.on(", ").join(requiredBy));
 				for (String s : requiredBy) {
-					MixinConfigPlugin.addFailure(s);
+					FabConf.addFailure(s);
 				}
 				return null;
 			}
@@ -453,8 +484,10 @@ public class FabRefl {
 		}
 	}
 
-	private static UnreflResult unreflectGetter(String className, Supplier<Class<?>> clazz, String yarnName, String interName, String srgName) {
-		String name = DEV ? yarnName : FORGE ? srgName : interName;
+	private static UnreflResult unreflectGetter(String className, Supplier<Class<?>> clazz, String yarnName) {
+		String name = FabRefMap.methodMap("FabRefl", yarnName);
+		int col = name.indexOf(';');
+		if (col != -1) name = name.substring(col+1);
 		String desc = "field "+className+"#"+name+" (deobf name "+yarnName+")";
 		try {
 			Field f = clazz.get().getDeclaredField(name);
@@ -465,8 +498,10 @@ public class FabRefl {
 		}
 	}
 
-	private static UnreflResult unreflectSetter(String className, Supplier<Class<?>> clazz, String yarnName, String interName, String srgName) {
-		String name = DEV ? yarnName : FORGE ? srgName : interName;
+	private static UnreflResult unreflectSetter(String className, Supplier<Class<?>> clazz, String yarnName) {
+		String name = FabRefMap.methodMap("FabRefl", yarnName);
+		int col = name.indexOf(';');
+		if (col != -1) name = name.substring(col+1);
 		String desc = "field "+className+"#"+name+" (deobf name "+yarnName+")";
 		try {
 			Field f = clazz.get().getDeclaredField(name);
@@ -477,8 +512,9 @@ public class FabRefl {
 		}
 	}
 
-	private static UnreflResult unreflectMethod(String className, Supplier<Class<?>> clazz, String yarnName, String interName, String srgName, Class<?> returnType, Class<?>... args) {
-		String name = DEV ? yarnName : FORGE ? srgName : interName;
+	private static UnreflResult unreflectMethod(String className, Supplier<Class<?>> clazz, String yarnName, Class<?> returnType, Class<?>... args) {
+		String name = FabRefMap.targetMap("FabRefl", yarnName);
+		name = name.substring(name.indexOf(';')+1, name.indexOf('('));
 		String desc = "method "+className+"."+name+signatureToString(args)+" (deobf name "+yarnName+")";
 		try {
 			Method m = clazz.get().getDeclaredMethod(name, args);

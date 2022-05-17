@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,7 +17,6 @@ import com.unascribed.fabrication.loaders.LoaderGearComponents;
 import com.unascribed.fabrication.loaders.LoaderGearComponents.ItemMaterialValue;
 import com.unascribed.fabrication.loaders.LoaderGearComponents.MaterialData;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.util.Resolvable;
 
 import com.google.common.collect.Lists;
@@ -57,7 +57,7 @@ public abstract class MixinLivingEntity extends Entity {
 
 	@Unique
 	private void shatter(EquipmentSlot slot, ItemStack stack) {
-		if (!MixinConfigPlugin.isEnabled("*.broken_tools_drop_components")) return;
+		if (!FabConf.isEnabled("*.broken_tools_drop_components")) return;
 		Item item = stack.getItem();
 		if (LoaderGearComponents.ignoreVanishing && EnchantmentHelper.hasVanishingCurse(stack)) return;
 		if (stack.hasNbt() && stack.getNbt().getBoolean("fabrication:ShatteredAlready")) return;

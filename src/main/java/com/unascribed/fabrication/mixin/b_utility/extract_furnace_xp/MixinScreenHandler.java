@@ -1,12 +1,12 @@
 package com.unascribed.fabrication.mixin.b_utility.extract_furnace_xp;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -22,7 +22,7 @@ public class MixinScreenHandler {
 
 	@Inject(at=@At("HEAD"), method="onSlotClick(IILnet/minecraft/screen/slot/SlotActionType;Lnet/minecraft/entity/player/PlayerEntity;)V")
 	public void onSlotClick(int slotIndex, int button, SlotActionType actionType, PlayerEntity player, CallbackInfo ci) {
-		if (!MixinConfigPlugin.isEnabled("*.extract_furnace_xp")) return;
+		if (!FabConf.isEnabled("*.extract_furnace_xp")) return;
 		Object self = this;
 		if (self instanceof AbstractFurnaceScreenHandler) {
 			AbstractFurnaceScreenHandler afsh = (AbstractFurnaceScreenHandler)self;
@@ -34,5 +34,5 @@ public class MixinScreenHandler {
 			}
 		}
 	}
-	
+
 }

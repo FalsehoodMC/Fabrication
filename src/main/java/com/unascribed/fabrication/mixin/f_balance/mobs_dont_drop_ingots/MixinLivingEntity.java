@@ -2,12 +2,12 @@ package com.unascribed.fabrication.mixin.f_balance.mobs_dont_drop_ingots;
 
 import java.util.function.Consumer;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
@@ -22,7 +22,7 @@ public class MixinLivingEntity {
 
 	@ModifyArg(method="dropLoot(Lnet/minecraft/entity/damage/DamageSource;Z)V", at=@At(value="INVOKE", target="Lnet/minecraft/loot/LootTable;generateLoot(Lnet/minecraft/loot/context/LootContext;Ljava/util/function/Consumer;)V"))
 	public Consumer<ItemStack> generateLoot(Consumer<ItemStack> lootConsumer) {
-		if(!MixinConfigPlugin.isEnabled("*.mobs_dont_drop_ingots")) return lootConsumer;
+		if(!FabConf.isEnabled("*.mobs_dont_drop_ingots")) return lootConsumer;
 		return (stack)-> {
 			Item replacement = null;
 			Item current = stack.getItem();

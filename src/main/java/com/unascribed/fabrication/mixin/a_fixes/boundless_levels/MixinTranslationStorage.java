@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.a_fixes.boundless_levels;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -7,7 +8,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.util.RomanNumeral;
 
 import com.google.common.primitives.Ints;
@@ -20,7 +20,7 @@ public class MixinTranslationStorage {
 
 	@Inject(at=@At("HEAD"), method="get(Ljava/lang/String;)Ljava/lang/String;", cancellable=true)
 	public void get(String key, CallbackInfoReturnable<String> ci) {
-		if (!MixinConfigPlugin.isEnabled("*.boundless_levels")) return;
+		if (!FabConf.isEnabled("*.boundless_levels")) return;
 		if (key.startsWith("enchantment.level.")) {
 			Integer i = Ints.tryParse(key.substring(18));
 			if (i != null) {

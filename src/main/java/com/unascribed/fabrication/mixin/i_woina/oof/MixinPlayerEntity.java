@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.i_woina.oof;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -10,7 +11,6 @@ import com.mojang.authlib.GameProfile;
 import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
@@ -27,7 +27,7 @@ public abstract class MixinPlayerEntity {
 	@Inject(at=@At("HEAD"), method="getHurtSound(Lnet/minecraft/entity/damage/DamageSource;)Lnet/minecraft/sound/SoundEvent;",
 			cancellable=true)
 	public void getHurtSound(DamageSource src, CallbackInfoReturnable<SoundEvent> ci) {
-		if (!MixinConfigPlugin.isEnabled("*.oof") || !((PlayerEntity)(Object)this).world.isClient) return;
+		if (!FabConf.isEnabled("*.oof") || !((PlayerEntity)(Object)this).world.isClient) return;
 		if (src == DamageSource.DROWN) {
 			ci.setReturnValue(SoundEvents.ENTITY_PLAYER_HURT_DROWN);
 		} else {

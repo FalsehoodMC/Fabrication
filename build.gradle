@@ -1,9 +1,12 @@
+import java.nio.file.Files
+
 plugins {
 	id 'fabric-loom' version '0.11-SNAPSHOT'
+	id 'io.github.juuxel.loom-quiltflower' version '1.6.0'
 	id 'maven-publish'
 }
 
-sourceCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
 archivesBaseName = project.archives_base_name
@@ -12,27 +15,34 @@ group = project.maven_group
 
 repositories {
 	maven {
-		url 'https://repo.unascribed.com'
+		url 'https://repo.sleeping.town'
 		content {
-			includeGroup "com.unascribed"
+			includeGroup 'com.unascribed'
 		}
 	}
 	maven {
 		url 'https://maven.terraformersmc.com/releases'
 		content {
-			includeGroup "com.terraformersmc"
+			includeGroup 'com.terraformersmc'
 		}
 	}
 	maven {
 		url 'https://maven.ssf.tf/'
 		content {
-			includeGroup "tf.ssf.sfort"
+			includeGroup 'tf.ssf.sfort'
 		}
 	}
 	maven {
 		url 'https://maven.gegy.dev/releases'
 		content {
-			includeGroup "io.github.queerbric"
+			includeGroup 'io.github.queerbric'
+		}
+	}
+	maven {
+		url 'https://repo.fabricmc.net'
+		content {
+			includeGroup 'net.fabricmc'
+			includeGroup 'net.fabricmc.api'
 		}
 	}
 }
@@ -43,34 +53,44 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	modImplementation include(fabricApi.module("fabric-resource-loader-v0", "${project.fabric_version}"))
-	modImplementation include(fabricApi.module("fabric-command-api-v1", "${project.fabric_version}"))
-	modImplementation include(fabricApi.module("fabric-item-api-v1", "${project.fabric_version}"))
-	modImplementation include(fabricApi.module("fabric-key-binding-api-v1", "${project.fabric_version}"))
-	modImplementation include(fabricApi.module("fabric-rendering-v1", "${project.fabric_version}"))
-	// Required since 1.18.2 due to Fabric not doing things the right way
-	modImplementation include(fabricApi.module("fabric-registry-sync-v0", "${project.fabric_version}"))
+	modImplementation include(fabricApi.module('fabric-resource-loader-v0', project.fabric_version))
+	modImplementation include(fabricApi.module('fabric-command-api-v1', project.fabric_version))
+	modImplementation include(fabricApi.module('fabric-item-api-v1', project.fabric_version))
+	modImplementation include(fabricApi.module('fabric-key-binding-api-v1', project.fabric_version))
+	modImplementation include(fabricApi.module('fabric-rendering-v1', project.fabric_version))
 	
-	modImplementation(include("io.github.queerbric:pridelib:1.1.0+1.17")) {
+	modImplementation(include('io.github.queerbric:pridelib:1.1.0+1.17')) {
 		transitive = false
 	}
-	modImplementation("com.terraformersmc:modmenu:3.1.0") {
+	modImplementation('com.terraformersmc:modmenu:3.1.0') {
 		transitive = false
 	}
-	modImplementation "com.unascribed:ears-api:1.4.5"
-	modImplementation("tf.ssf.sfort:fscript:2.2.0") {
+	modImplementation 'com.unascribed:ears-api:1.4.5'
+	modImplementation('tf.ssf.sfort:fscript:3.1.2-1.18.1') {
 		transitive = false
 	}
-	modRuntimeOnly fabricApi.module("fabric-screen-api-v1", "${project.fabric_version}")
+	modRuntimeOnly fabricApi.module('fabric-screen-api-v1', project.fabric_version)
+
+	annotationProcessor project(':ap'){
+	}
 }
 
-loom.accessWidenerPath = file("src/main/resources/fabrication.accesswidener")
+loom.accessWidenerPath = file('src/main/resources/fabrication.accesswidener')
 
 processResources {
-	inputs.property "version", project.version
+	inputs.property 'version', project.version
 
-	filesMatching("fabric.mod.json") {
-		expand "version": project.version
+	filesMatching('fabric.mod.json') {
+		expand 'version': project.version
+	}
+}
+
+sourceSets {
+	dummy {
+		compileClasspath += configurations.compileClasspath
+	}
+	main {
+		compileClasspath += dummy.output
 	}
 }
 
@@ -78,7 +98,7 @@ processResources {
 // this fixes some edge cases with special characters not displaying correctly
 // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
 tasks.withType(JavaCompile) {
-	options.encoding = "UTF-8"
+	options.encoding = 'UTF-8'
 }
 
 jar {
@@ -86,13 +106,176 @@ jar {
 		StringBuilder bldr = new StringBuilder();
 		File dir = file('build/classes/java/main');
 		dir.eachFileRecurse(groovy.io.FileType.FILES, {
-			if (it.name.endsWith(".class")) {
+			if (it.name.endsWith('.class')) {
 				bldr.append(it.getAbsolutePath().substring(dir.getAbsolutePath().length()+1))
-				bldr.append("\n")
+				bldr.append('\n')
 			}
 		})
 		file('build/tmp/classes.txt').text = bldr.toString();
+
+		def lge = project.getExtensions().getByType(net.fabricmc.loom.LoomGradleExtension.class)
+		def mappings = lge.getMappingsProvider().getMappings()
+		Map<String, Mapp> toInter = new HashMap<>()
+		Map<String, Map<String, String>> fabReflFields = new HashMap<>()
+		List<Map.Entry<String, String>> fabReflBldr = new ArrayList<>()
+		List<String> fabRefl = Files.readAllLines(file('build/tmp/fabReflToMap').toPath())
+		if (fabRefl.size() > 0) {
+			for (String fog : fabRefl.get(0).split('\t')){
+				String f = (fog.charAt(0) == 'L' as char? fog.substring(1) : fog).replace('.', '/')
+				int col = f.indexOf(';')
+				String fKey = f.substring(0, col);
+				if (!fabReflFields.containsKey(fKey)) fabReflFields.put(fKey, new HashMap<String, String>())
+				fabReflFields.get(fKey).put(f.substring(col+1), fog)
+			}
+			if (fabRefl.size() > 1) {
+				for (String f : fabRefl.get(1).split('\t')){
+					if (toInter.containsKey('FabRefl')) toInter.get('FabRefl').add(new Mapp.Target[]{new Mapp.Target(f)})
+					else toInter.put('FabRefl', new Mapp(new String[]{}, new String[]{}, new Mapp.Target[]{new Mapp.Target(f)}))
+				}
+			}
+		}
+		List<String> toParse = Files.readAllLines(file('build/tmp/fabToRefMap').toPath())
+		for (int i=0; i+3<toParse.size(); i++){
+			String toInterKey = toParse.get(i)
+			if (toInter.containsKey(toInterKey)) toInter.get(toInterKey).add(toParse.get(++i).split('\t'), toParse.get(++i).split('\t'), toParse.get(++i).split('\t'))
+			else toInter.put(toInterKey, new Mapp(toParse.get(++i).split('\t'), toParse.get(++i).split('\t'), toParse.get(++i).split('\t')))
+		}
+		Map<String, String> targetMap = new HashMap<>()
+		Map<String, String> methodMap = new HashMap<>()
+		Map<String, String> classMap = new HashMap<>();
+		for (def cl : mappings.classes){
+			String clName = cl.getName('named')
+			String clNameRez = cl.getName('intermediary')
+			if (fabReflFields.containsKey(clName)){
+				Map<String, String> inmap = fabReflFields.get(clName);
+				for (Map.Entry<String, String> entry : inmap) {
+					String toFind = entry.getKey();
+					for (def fld : cl.fields) {
+						if (toFind.equals(fld.getName('named'))) {
+							fabReflBldr.add(new AbstractMap.SimpleEntry<String, String>(entry.getValue(), fld.getName('intermediary')));
+							break
+						}
+					}
+				}
+			}
+			for (def map : toInter.values()){
+				if (map.mixin.contains(clName.replace('/', '.'))) {
+					for (def clMethod : cl.methods) {
+						for (String mthd : map.method) {
+							int col = mthd.indexOf(';')
+							int dot = mthd.indexOf('.')
+							if (col == -1 || dot < col && dot != -1) col = dot
+							int brc = mthd.indexOf('(')
+							String desc = mthd.substring(brc)
+							String name = mthd.substring(col == -1 || brc<col ? 0 : col+1, brc)
+							if ((name.equals(clMethod.getName('named')) || name.equals(clMethod.getName('intermediary'))) && (desc.equals(clMethod.getDescriptor('named')) || desc.equals(clMethod.getDescriptor('intermediary')))) {
+								methodMap.put(clName+';'+name+desc, clMethod.getName('intermediary') + clMethod.getDescriptor('intermediary'))
+							}
+						}
+					}
+				}
+				for (Mapp.Target mapt : map.target) {
+					String target = mapt.self
+					int col = target.indexOf(';')
+					int dot = target.indexOf('.')
+					if (col == -1 || dot < col && dot != -1) col = dot
+					if (mapt.applicable.contains(clName.replace('/', '.'))){
+						classMap.put(clName, clNameRez)
+						int brc = target.indexOf('(')
+						String desc = target.substring(brc)
+						String name = target.substring(col+1, brc)
+						for (def clMethod : cl.methods) {
+							if ((clMethod.getName('named').equals(name) || clMethod.getName('intermediary').equals(name)) && (clMethod.getDescriptor('named').equals(desc) || clMethod.getDescriptor('intermediary').equals(desc))){
+								targetMap.put(target, clMethod.getName('intermediary')+clMethod.getDescriptor('intermediary'))
+							}
+						}
+					}
+				}
+			}
+		}
+		StringBuilder strbldr = new StringBuilder()
+		for (def intr : toInter){
+			strbldr.append(intr.key)
+			strbldr.append('\n')
+			boolean frst = true
+			for (String s : intr.value.method) {
+				for (String c : intr.value.mixin) {
+					String set = methodMap.get(c.replace('.', '/')+';'+s)
+					if (set != null){
+						if (frst) frst = false;
+						else strbldr.append('\t')
+						strbldr.append(s).append(' ').append(set)
+						break
+					}
+				}
+			}
+			if ('FabRefl'.equals(intr.getKey())){
+				StringBuilder fabReflStrbldr = new StringBuilder();
+				for (Map.Entry<String, String> entry : fabReflBldr) {
+					if (!fabReflStrbldr.isEmpty()) fabReflStrbldr.append('\t')
+					fabReflStrbldr.append(entry.getKey()).append(' ').append(entry.getValue())
+				}
+				strbldr.append(fabReflStrbldr)
+			}
+			strbldr.append('\n')
+			frst = true
+			for (Mapp.Target tar : intr.value.target){
+				String s = tar.self
+				String ad = targetMap.get(s);
+				if (ad != null) {
+					int col = s.indexOf(';')
+					int dot = s.indexOf('.')
+					if (col == -1 || dot < col && dot != -1) col = dot
+					if (frst) frst = false;
+					else strbldr.append('\t')
+					strbldr.append(s+' '+'L'+classMap.get(s.substring(s.charAt(0) == 'L' as char ? 1 : 0, col))+';'+ad)
+				}
+			}
+			strbldr.append('\n')
+		}
+		file('build/tmp/fabRefMap.txt').text = strbldr.toString()
 	}
-	from "LICENSE"
-	from "build/tmp/classes.txt"
+
+	from 'LICENSE'
+	from 'build/tmp/classes.txt'
+	from 'build/tmp/fabRefMap.txt'
+}
+
+class Mapp{
+	static class Target{
+		Target(String target){
+			int i = target.indexOf(' ');
+			if (i == -1){
+				this.self = target
+				this.applicable = new ArrayList<>()
+			} else {
+				this.self = target.substring(0, i)
+				this.applicable = target.substring(i).split(' ')
+			}
+		}
+		public String self
+		public List<String> applicable
+	}
+	void add(String[] mixin, String[] method, String[] target){
+		for (String s : mixin) this.mixin.add(s)
+		for (String s : method) this.method.add(s)
+		for (String s : target) this.target.add(new Target(s))
+	}
+	void add(Target[] target){
+		for (Target s : target) this.target.add(s)
+	}
+	Mapp(String[] mixin, String[] method, String[] target){
+		this.mixin = mixin
+		this.method = method
+		this.target = new ArrayList<>()
+		for (String s : target) this.target.add(new Target(s))
+	}
+	Mapp(String[] mixin, String[] method, Target[] target){
+		this.mixin = mixin;
+		this.method = method;
+		this.target = target;
+	}
+	public List<String> mixin
+	public List<String> method
+	public List<Target> target
 }

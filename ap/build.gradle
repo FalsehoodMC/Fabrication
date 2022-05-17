@@ -1,0 +1,14 @@
+plugins {
+    id 'java'
+    id 'fabric-loom'
+}
+sourceCompatibility = JavaVersion.VERSION_16
+targetCompatibility = JavaVersion.VERSION_16
+//Required to tell if a virtual method is overwritten, which is needed since overwrites don't have mapping entries
+dependencies {
+    minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
+    mappings "net.fabricmc:yarn:${rootProject.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${rootProject.loader_version}"
+}
+group 'com.unascribed'
+version '2.2.1'
