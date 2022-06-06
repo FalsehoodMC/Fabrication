@@ -1,6 +1,0 @@
-woina.no_stance_transition:
-	name: No Stance Transition
-	since: 2.3.1
-	sides: client_only
-	desc:
-		Removes the gradual crouch / crawl camera transition.

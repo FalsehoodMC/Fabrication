@@ -5,7 +5,6 @@ experiments:
 	name: Experiments
 	section: true
 	since: 1.2.8
-	default: never
 	desc:
 		Bad ideas given form.
 
@@ -16,7 +15,7 @@ experiments.packed_atlases:
 	desc:
 		Disables rounding of atlases to the next power-of-two. GPU drivers have supported "NPOT"
 		textures since forever.
-		
+
 		Possibly reduces VRAM usage. May reduce performance. Might cause incompatibilites.
 
 experiments.no_set_window_pos:

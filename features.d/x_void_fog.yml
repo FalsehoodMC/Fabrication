@@ -1,6 +1,0 @@
-woina.void_fog_particles:
-	name: Void Fog Particles
-	since: 2.3.1
-	sides: client_only
-	desc:
-		Returns void fog particles from pre 1.8.

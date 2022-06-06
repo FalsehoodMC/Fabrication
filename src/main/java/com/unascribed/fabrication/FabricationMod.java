@@ -50,7 +50,7 @@ public class FabricationMod implements ModInitializer {
 	public static final String MOD_NAME = FabConf.isMet(SpecialEligibility.FORGE) ? "Forgery" : "Fabrication";
 	// NOT the modid. We keep the mod id as "fabrication" even on Forge to keep things from getting too nutty.
 	public static final String MOD_NAME_LOWER = FabConf.isMet(SpecialEligibility.FORGE) ? "forgery" : "fabrication";
-	
+
 	private static final Map<String, Feature> features = Maps.newHashMap();
 	private static final List<Feature> unconfigurableFeatures = Lists.newArrayList();
 	private static final Set<String> enabledFeatures = Sets.newHashSet();
@@ -198,17 +198,13 @@ public class FabricationMod implements ModInitializer {
 	private static final Identifier CONFIG = new Identifier("fabrication", "config");
 
 	public static void sendConfigUpdate(MinecraftServer server, String key, ServerPlayerEntity spe) {
-		if ("general.profile".equals(key)) key = null;
+		if (key.startsWith("general.category")) key = null;
 		PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
 		if (key == null) {
 			Map<String, ResolvedConfigValue> trileans = Maps.newHashMap();
 			Map<String, String> strings = Maps.newHashMap();
 			for (String k : FabConf.getAllKeys()) {
-				if (FabConf.isStandardValue(k)) {
-					trileans.put(k, FabConf.getResolvedValue(k));
-				} else {
-					strings.put(k, FabConf.getRawValue(k));
-				}
+				trileans.put(k, FabConf.getResolvedValue(k));
 			}
 			data.writeVarInt(trileans.size());
 			trileans.entrySet().forEach(en -> data.writeString(en.getKey()).writeByte(en.getValue().ordinal()));
@@ -216,19 +212,11 @@ public class FabricationMod implements ModInitializer {
 			strings.entrySet().forEach(en -> data.writeString(en.getKey()).writeString(en.getValue()));
 			data.writeLong(LAUNCH_ID);
 		} else {
-			if (FabConf.isStandardValue(key)) {
-				data.writeVarInt(1);
-				data.writeString(key);
-				data.writeByte(FabConf.getResolvedValue(key).ordinal());
-				data.writeVarInt(0);
-				data.writeLong(LAUNCH_ID);
-			} else {
-				data.writeVarInt(0);
-				data.writeVarInt(1);
-				data.writeString(key);
-				data.writeString(FabConf.getRawValue(key));
-				data.writeLong(LAUNCH_ID);
-			}
+			data.writeVarInt(1);
+			data.writeString(key);
+			data.writeByte(FabConf.getResolvedValue(key).ordinal());
+			data.writeVarInt(0);
+			data.writeLong(LAUNCH_ID);
 		}
 		data.writeString(Agnos.getModVersion());
 		data.writeVarInt(FabConf.getAllFailures().size());

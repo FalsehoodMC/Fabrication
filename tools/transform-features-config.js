@@ -36,13 +36,16 @@ lines.forEach((line) => {
 			if (sides_friendly) {
 				desc = sides_friendly+"\n\n"+desc;
 			}
-			if (k === 'general.profile') {
-				desc += '\n\nThe available profiles are:\n';
-				['green', 'blonde', 'light', 'medium', 'dark', 'vienna', 'burnt'].forEach((p) => {
-					en = data['general.profile.'+p];
-					desc += '* '+en.name+': '+en.desc+'\n';
-				});
-				val = "light";
+			if (k.indexOf('general.category.') === 0) {
+				if (k === "general.category.fixes") {
+					val = "true";
+				} else if (k === "general.category.utility") {
+					val = "true";
+				} else if (k === "general.category.tweaks") {
+					val = "true";
+                } else {
+					val = "false";
+				}
 			} else if (k === "general.runtime_checks") {
 				val = "true";
 			} else if (k === "general.reduced_motion") {

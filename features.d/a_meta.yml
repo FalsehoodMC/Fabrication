@@ -7,7 +7,7 @@ config_screen:
 	media: https://unascribed.com/fabrication/config_screen.mp4
 	desc:
 		Fabrication has a nice ingame configuration GUI accessed via Mod Menu on Fabric or the
-		built-in Mods screen on Forge. It can be used to change profiles and toggle all features.
+		built-in Mods screen on Forge. It can be used to toggle all features.
 
 		The GUI is client/server aware (note Fabrication does not currently have config syncing
 		outside of the GUI) and can be used to view the server's config, or even change it if you're

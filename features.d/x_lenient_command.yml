@@ -1,6 +1,0 @@
-utility.lenient_command_suggestions:
-	name: Lenient Command Suggestions
-	since: 2.3.1
-	sides: server_only
-	desc:
-		Command suggestions for modded ids will still appear even if the id namespace is not explicitly specified.

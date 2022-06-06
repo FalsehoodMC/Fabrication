@@ -1,0 +1,14 @@
+# This is not actually a YAML file; it's only .yml for syntax highlighting.
+# Tab indentation *must* be used.
+
+fixes.extra.bubble_column_pop:
+	name: Bubble Column Pop
+	since: 2.1.0
+	sides: client_only
+	desc:
+		Re-adds bubble columns having a bubble pop particle and sound at the top.
+
+		Was present in 18w07a, got removed before 1.13 release.
+
+# kate: space-indent off
+# vim: noai:noet

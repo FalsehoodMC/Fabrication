@@ -1,7 +1,0 @@
-minor_mechanics.water_fills_on_break_strict:
-	name: Water Fills On Break Strict
-	since: 2.3.1
-	sides: server_only
-	extend: *.water_fills_on_break
-	desc:
-		Requires water_fills_on_break to have at least 2 water sources.

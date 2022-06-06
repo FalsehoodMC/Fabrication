@@ -5,7 +5,6 @@ pedantry:
 	name: Pedantry
 	section: true
 	since: 1.0.1
-	default: never
 	desc:
 		Fixes for non-problems.
 
@@ -17,10 +16,10 @@ pedantry.tnt_is_dynamite:
 	desc:
 		TNT is renamed to Dynamite and doesn't say TNT on it. TNT is more stable than Minecraft's
 		representation of it, and the texture is clearly dynamite.
-		
+
 		(Technically dynamite is made from nitroglycerin, but nitro is so incredibly unstable that
 		you would need to change a dozen different mechanics to make it "correct".)
-		
+
 		Gunpowder is also renamed to Creeper Dust, because gunpowder is not that explosive.
 
 pedantry.oak_is_apple:
@@ -30,6 +29,23 @@ pedantry.oak_is_apple:
 	media: https://unascribed.com/fabrication/oak_is_apple.png
 	desc:
 		Oak trees become apple trees. Because oak trees do not grow apples.
+
+pedantry.entities_cant_climb:
+	name: Entities Can't Climb
+	since: 3.0.0
+	sides: server_only
+	fscript: living_entity
+	desc:
+		Entities can no longer climb climbable blocks (mostly applies to ladders).
+		This on it's own disables ladders, the feature is intended to be used by other features.
+
+pedantry.creepers_cant_climb:
+	name: Creepers Can't climb
+	since: 3.0.0
+	sides: server_only
+	extend: *.entities_cant_climb
+	desc:
+		Creepers can no longer climb climbable blocks.
 
 # kate: space-indent off
 # vim: noai:noet

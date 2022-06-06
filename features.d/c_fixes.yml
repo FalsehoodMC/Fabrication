@@ -5,7 +5,6 @@ fixes:
 	name: Fixes
 	section: true
 	since: 1.0
-	default: blonde
 	desc:
 		Fixes for bugs and weird behavior.
 
@@ -19,9 +18,9 @@ fixes.sync_attacker_yaw:
 		Makes the last attacker yaw field sync properly when the player is damaged, instead of
 		always being zero. Causes the camera shake animation when being hurt to tilt away from the
 		source of damage instead of always tilting right.
-		
+
 		Fixes MC-26678, which is closed as Won't Fix.
-		
+
 		Needed on both client and server, but doesn't break vanilla clients.
 
 fixes.furnace_minecart_pushing:
@@ -33,7 +32,7 @@ fixes.furnace_minecart_pushing:
 	desc:
 		Right-clicking a furnace minecart with a non-fuel while it's out of fuel gives it a little
 		bit of fuel, allowing you to "push" it.
-		
+
 		Removed some time after 17w46a (1.13 pre releases); nobody seems to have noticed, and it
 		wasn't announced.
 
@@ -83,7 +82,7 @@ fixes.uncap_menu_fps:
 	desc:
 		Removes the hardcoded 60 FPS cap in menu screens, instead using whatever you have the
 		framerate cap set to.
-		
+
 		Primarily added because in prior versions the cap was 30 FPS and I thought it still was.
 		Maybe this is nice if you have a 144Hz display?
 
@@ -95,7 +94,7 @@ fixes.adventure_tags_in_survival:
 	short_desc: Makes CanDestroy/CanPlaceOn work in Survival
 	desc:
 		Makes the CanDestroy and CanPlaceOn tags be honored in survival mode instead of just adventure mode.
-		
+
 		Only needed on server, but the experience is more seamless if it's also on the client.
 
 fixes.stable_cacti:
@@ -172,7 +171,7 @@ fixes.open_inventories_in_nether_portal:
 	media: https://unascribed.com/fabrication/open_inventories_in_nether_portal.mp4
 	desc:
 		Allows players to open inventories while in a nether portal.
-		
+
 		Vanilla originally made this change to fix a dupe exploit in Beta. The underlying cause of
 		this dupe was fixed a very long time ago.
 
@@ -186,22 +185,27 @@ fixes.fix_charm_amethyst_dupe:
 		you have another mod that can make item frames invisible, such as Fabrication's own
 		Invisibility Splash On Inanimates.
 
-fixes.bubble_column_pop:
-	name: Bubble Column Pop
-	since: 2.1.0
-	sides: client_only
-	default: vienna
-	desc:
-		Re-adds bubble columns having a bubble pop particle and sound at the top.
-		
-		Was present in 18w07a, got removed before 1.13 release.
-
 fixes.fix_end_portal_render:
 	name: Fix End Portal Render
 	since: 2.3.0
 	sides: client_only
 	desc:
 		End portal block will render from all sides.
+
+fixes.fix_nether_portal_nausea:
+	name: Fix Nether Portal Nausea
+	since: 3.0.0
+	sides: client_only
+	desc:
+		Render the nether portal UI texture even if player has nausea.
+
+fixes.melee_mobs_keep_attacking:
+	name: Melee Mobs Keep Attacking
+	since: 3.0.0
+	sides: server_only
+	desc:
+		Through some mystical mojank reasoning mobs would normally stop looking for the player after reaching
+		the players last known location, this fixes that.
 
 # kate: space-indent off
 # vim: noai:noet

@@ -1,7 +1,0 @@
-minor_mechanics.extra.launching_pistons:
-	name: Launching Pistons
-	since: 2.3.1
-	default: never
-	sides: server_only
-	desc:
-		Pistons launch players up as if they were pushing slime blocks.

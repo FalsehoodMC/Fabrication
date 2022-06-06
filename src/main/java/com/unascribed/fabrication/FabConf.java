@@ -1,20 +1,16 @@
 package com.unascribed.fabrication;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.Enums;
 import com.google.common.base.Joiner;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
-import com.google.common.collect.Table;
-import com.google.common.collect.Tables;
 import com.google.common.io.BaseEncoding;
 import com.google.common.io.MoreFiles;
 import com.google.common.io.Resources;
@@ -51,13 +47,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class FabConf {
 
-	private static final ImmutableSet<String> NON_STANDARD = ImmutableSet.of(
-			"general.profile"
-			);
 	private static final ImmutableSet<String> RUNTIME_CONFIGURABLE = ImmutableSet.of(
 			"general.reduced_motion",
 			"general.data_upload",
@@ -65,47 +59,22 @@ public class FabConf {
 			"minor_mechanics.observers_see_entities_living_only"
 			);
 
-	public enum Profile {
-		GREEN,
-		BLONDE,
-		LIGHT,
-		MEDIUM,
-		DARK,
-		VIENNA,
-		BURNT,
-		;
-		public final ImmutableSet<String> sections;
-		Profile(String... sections) {
-			this.sections = ImmutableSet.copyOf(sections);
-		}
-		public static String[] stringValues() {
-			Profile[] values = values();
-			String[] out = new String[values.length];
-			for (int i = 0; i < values.length; i++) {
-				out[i] = values[i].name().toLowerCase(Locale.ROOT);
-			}
-			return out;
-		}
-	}
-
-	private static final ImmutableTable<Profile, String, Boolean> defaultsByProfile;
 	private static final ImmutableSet<String> validSections;
 	private static final ImmutableSet<String> validKeys;
 	private static final ImmutableMap<String, String> starMap;
-	private static final ImmutableMap<String, Set<String>> equivalanceMap;
+	private static final ImmutableMap<String, ImmutableSet<String>> equivalanceMap;
+	private static final ImmutableMap<String, ImmutableSet<String>> sectionFeatureKeyToFeatures;
 	private static final List<ConfigLoader> loaders = Lists.newArrayList();
 	private static final Set<SpecialEligibility> metSpecialEligibility = EnumSet.noneOf(SpecialEligibility.class);
 	private static final Set<String> failures = Sets.newHashSet();
 	private static final Set<String> failuresReadOnly = Collections.unmodifiableSet(failures);
 	private static final SetMultimap<String, String> configKeysForDiscoveredClasses = HashMultimap.create();
 	private static Map<String, ConfigValue> worldConfig = new HashMap<>();
-	private static Map<String, Boolean> worldDefaults = new HashMap<>();
-	private static Profile worldProfile;
-	private static Profile profile;
+	private static ImmutableSet<String> worldDefaults = ImmutableSet.of();
 	private static QDIni rawConfig;
 	private static Map<String, ConfigValue> config = new HashMap<>();
 	private static boolean analyticsSafe = false;
-	private static ImmutableMap<String, Boolean> defaults;
+	private static ImmutableSet<String> defaults = ImmutableSet.of();
 	private static Path worldPath = null;
 	private static Path lastWorldPath = null;
 	public static boolean loadComplete = false;
@@ -184,7 +153,7 @@ public class FabConf {
 		}
 		Map<String, String> starMapBldr = Maps.newLinkedHashMap();
 		Map<String, Set<String>> equivalanceMapBldr = Maps.newLinkedHashMap();
-		Table<Profile, String, Boolean> profilesBldr = Tables.newCustomTable(Maps.newLinkedHashMap(), Maps::newLinkedHashMap);
+		Map<String, Set<String>> sectionFeatureKeyToFeaturesBldr = Maps.newLinkedHashMap();
 		Set<String> keys = Sets.newLinkedHashSet();
 		Set<String> sections = Sets.newLinkedHashSet();
 		for (Map.Entry<String, FeatureEntry> en : FeaturesFile.getAll().entrySet()) {
@@ -196,6 +165,9 @@ public class FabConf {
 				continue;
 			}
 			String key = en.getKey();
+			if (key.startsWith("general.category.")) {
+				sectionFeatureKeyToFeaturesBldr.put(key.substring(17), Sets.newHashSet());
+			}
 			String extend = en.getValue().extend;
 			if (extend != null){
 				if (!equivalanceMapBldr.containsKey(extend)) equivalanceMapBldr.put(extend, new HashSet<>());
@@ -203,35 +175,29 @@ public class FabConf {
 			}
 			keys.add(key);
 			int dot = key.indexOf('.');
-			String parent = null;
 			if (dot != -1) {
 				starMapBldr.put("*"+key.substring(dot), key);
 				int lastDot = key.lastIndexOf('.');
 				if (lastDot != dot) {
 					starMapBldr.put("*"+key.substring(lastDot), key);
 				}
-				parent = key.substring(0, dot);
-			}
-			Profile defAt = null;
-			String def = en.getValue().def;
-			if ("inherit".equals(def)) {
-				if (parent != null) {
-					FeatureEntry pfe = FeaturesFile.get(parent);
-					defAt = Enums.getIfPresent(Profile.class, pfe.def.toUpperCase(Locale.ROOT)).orNull();
-				}
-			} else {
-				defAt = Enums.getIfPresent(Profile.class, def.toUpperCase(Locale.ROOT)).orNull();
-			}
-			for (Profile p : Profile.values()) {
-				boolean enabled = defAt != null && p.ordinal() >= defAt.ordinal();
-				profilesBldr.put(p, en.getKey(), enabled);
 			}
 		}
+		for (String key : keys) {
+			if (FeaturesFile.get(key).extra) continue;
+			int dot = key.indexOf('.');
+			if (dot == -1) continue;
+			Set<String> set = sectionFeatureKeyToFeaturesBldr.get(key.substring(0, dot));
+			if (set != null) {
+				set.add(key);
+			}
+		}
+
 		starMap = ImmutableMap.copyOf(starMapBldr);
-		equivalanceMap = ImmutableMap.copyOf(equivalanceMapBldr.entrySet().stream().map(e-> new AbstractMap.SimpleImmutableEntry<>(remap(e.getKey()), e.getValue())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+		equivalanceMap = ImmutableMap.copyOf(equivalanceMapBldr.entrySet().stream().map(e-> new AbstractMap.SimpleImmutableEntry<>(remap(e.getKey()), ImmutableSet.copyOf(e.getValue()))).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
 		validKeys = ImmutableSet.copyOf(keys);
 		validSections = ImmutableSet.copyOf(sections);
-		defaultsByProfile = ImmutableTable.copyOf(profilesBldr);
+		sectionFeatureKeyToFeatures = ImmutableMap.copyOf(sectionFeatureKeyToFeaturesBldr.entrySet().stream().map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), ImmutableSet.copyOf(e.getValue()))).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
 	}
 
 	public static boolean hasWorldPath(){
@@ -250,16 +216,11 @@ public class FabConf {
 		worldPath = path;
 		if (path == null){
 			worldConfig.clear();
-			worldProfile = Profile.GREEN;
-			worldDefaults = defaultsByProfile.row(worldProfile);
+			worldDefaults = ImmutableSet.of();
 		}else if (onLoad) {
 			lastWorldPath = path;
 		}
 		worldReload();
-	}
-
-	public static String getProfileName() {
-		return profile.name();
 	}
 
 	public static void setMet(SpecialEligibility se, boolean met) {
@@ -283,8 +244,8 @@ public class FabConf {
 		return starMap.getOrDefault(configKey, configKey);
 	}
 
-	public static Set<String> getEquivalent(String configKey) {
-		return equivalanceMap.getOrDefault(remap(configKey), new HashSet<>());
+	public static ImmutableSet<String> getEquivalent(String configKey) {
+		return equivalanceMap.getOrDefault(remap(configKey), ImmutableSet.of());
 	}
 
 	public static Set<String> getConfigKeysForDiscoveredClass(String clazz) {
@@ -326,14 +287,14 @@ public class FabConf {
 		if (hasWorldPath()) {
 			ConfigValue worldVal = worldConfig.get(configKey);
 			if (worldVal == ConfigValue.UNSET) {
-				if (worldDefaults != null && worldDefaults.get(configKey) == Boolean.TRUE) return true;
+				if (worldDefaults.contains(configKey)) return true;
 			} else {
 				return worldVal == ConfigValue.TRUE;
 			}
 		}
 		if (!config.containsKey(configKey))
-			return defaults != null && defaults.get(configKey);
-		return config.get(configKey).resolve(defaults != null && defaults.get(configKey));
+			return defaults.contains(configKey);
+		return config.get(configKey).resolve(defaults.contains(configKey));
 	}
 
 	public static boolean isBanned(String configKey) {
@@ -368,7 +329,7 @@ public class FabConf {
 	}
 
 	public static boolean doesWorldContainValue(String configKey){
-		return worldConfig.get(configKey) != ConfigValue.UNSET || worldDefaults != null && worldDefaults.get(configKey) == Boolean.TRUE;
+		return worldConfig.get(configKey) != ConfigValue.UNSET || worldDefaults.contains(configKey);
 	}
 	public static boolean doesWorldContainValue(String configKey, String configVal){
 		if (!worldConfig.containsKey(configKey)) return false;
@@ -381,15 +342,11 @@ public class FabConf {
 		if (hasWorldPath()) {
 			ConfigValue cv = config.get(remap(configKey));
 			return worldConfig.getOrDefault(remap(configKey), ConfigValue.UNSET).resolveSemantically(
-					worldDefaults != null && worldDefaults.getOrDefault(configKey, false) ||
-					 cv == ConfigValue.TRUE ||
-					cv == ConfigValue.UNSET && defaults != null && defaults.getOrDefault(configKey, false));
+					worldDefaults.contains(configKey) ||
+					cv == ConfigValue.TRUE ||
+					cv == ConfigValue.UNSET && defaults.contains(configKey));
 		}
-		return config.getOrDefault(remap(configKey), ConfigValue.UNSET).resolveSemantically(defaults != null && defaults.getOrDefault(configKey, false));
-	}
-
-	public static boolean isStandardValue(String s) {
-		return !NON_STANDARD.contains(s);
+		return config.getOrDefault(remap(configKey), ConfigValue.UNSET).resolveSemantically(defaults.contains(configKey));
 	}
 
 	public static boolean isRuntimeConfigurable(String s) {
@@ -398,11 +355,7 @@ public class FabConf {
 
 	public static String getRawValue(String configKey) {
 		configKey = remap(configKey);
-		return rawConfig.get(configKey).orElse(configKey.equals("general.profile") ? "light" : "");
-	}
-
-	public static Profile getWorldProfile(){
-		return worldProfile;
+		return rawConfig.get(configKey).orElse("");
 	}
 
 	public static boolean isValid(String configKey) {
@@ -410,11 +363,7 @@ public class FabConf {
 	}
 
 	public static boolean getDefault(String configKey) {
-		return defaults != null && defaults.get(remap(configKey));
-	}
-
-	public static boolean defaultContains(String configKey) {
-		return defaults != null && defaults.containsKey(remap(configKey));
+		return defaults.contains(remap(configKey));
 	}
 
 	public static ImmutableSet<String> getAllKeys() {
@@ -440,30 +389,28 @@ public class FabConf {
 		failures.add(remap(configKey));
 	}
 
-	private static void set(String configKey, String newValue, Path path, boolean isWorld) {
-		if (isStandardValue(configKey)) {
-			switch (newValue) {
-				case "banned": case "true": case "false": case "unset":
-					break;
-				default: throw new IllegalArgumentException("Standard key "+configKey+" cannot be set to "+newValue);
-			}
-		} else if ("general.profile".equals(configKey)) {
-			if (!Enums.getIfPresent(Profile.class, newValue.toUpperCase(Locale.ROOT)).isPresent()) {
-				throw new IllegalArgumentException("Cannot set profile to "+newValue);
-			}
+	private static ImmutableSet<String> getDefaults(Predicate<String> shouldSkipSection) {
+		ImmutableSet.Builder<String> builder = ImmutableSet.builder();
+		for (Map.Entry<String, ImmutableSet<String>> entry : sectionFeatureKeyToFeatures.entrySet()) {
+			if (shouldSkipSection.test("general.category."+entry.getKey())) continue;
+			builder.addAll(entry.getValue());
 		}
+		return builder.build();
+	}
+	private static void set(String configKey, String newValue, Path path, boolean isWorld) {
+		switch (newValue) {
+			case "banned": case "true": case "false": case "unset":
+				break;
+			default:
+				throw new IllegalArgumentException("Standard key " + configKey + " cannot be set to " + newValue);
+		}
+
 		if (!isWorld) rawConfig.put(configKey, newValue);
-		if ("general.profile".equals(configKey)) {
+		if (configKey.startsWith("general.category.")) {
 			if (isWorld) {
-				try {
-					worldProfile = Profile.valueOf(newValue.toUpperCase(Locale.ROOT));
-				} catch (Exception e){
-					worldProfile = Profile.GREEN;
-				}
-				worldDefaults = defaultsByProfile.row(profile);
+				worldDefaults = getDefaults(s -> worldConfig.get(s) != ConfigValue.TRUE);
 			} else {
-				profile = rawConfig.getEnum("general.profile", Profile.class).orElse(Profile.LIGHT);
-				defaults = defaultsByProfile.row(profile);
+				defaults = getDefaults(s -> config.get(s) != ConfigValue.TRUE);
 			}
 		} else {
 			(isWorld? worldConfig : config).put(configKey, ConfigValue.parseTrilean(newValue));
@@ -557,25 +504,22 @@ public class FabConf {
 			StringWriter sw = new StringWriter();
 			try {
 				rawConfig = QDIni.loadAndTransform(configFile, featuresIniTransformer.reset(), sw);
-				profile = rawConfig.getEnum("general.profile", Profile.class).orElse(Profile.LIGHT);
-				defaults = defaultsByProfile.row(profile);
+				defaults = getDefaults(s -> !rawConfig.get(s).map("true"::equals).orElse(false));
 				config = new HashMap<>();
 				for (String k : rawConfig.keySet()) {
-					if (isStandardValue(k)) {
-						try {
-							config.put(k, rawConfig.getEnum(k, ConfigValue.class).get());
-						} catch (BadValueException e) {
-							FabLog.warn(e.getMessage()+" - assuming unset");
-							config.put(k, ConfigValue.UNSET);
-						}
+					try {
+						config.put(k, rawConfig.getEnum(k, ConfigValue.class).get());
+					} catch (BadValueException e) {
+						FabLog.warn(e.getMessage() + " - assuming unset");
+						config.put(k, ConfigValue.UNSET);
 					}
 				}
 			} catch (SyntaxErrorException e) {
 				FabLog.warn("Failed to load configuration file: "+e.getMessage()+"; will assume defaults");
-				config = Maps.transformValues(defaults, v -> ConfigValue.UNSET);
+				config = validKeys.stream().collect(Collectors.toMap(v -> v, v -> ConfigValue.UNSET));
 			} catch (IOException e) {
 				FabLog.warn("Failed to load configuration file; will assume defaults", e);
-				config = Maps.transformValues(defaults, v -> ConfigValue.UNSET);
+				config = validKeys.stream().collect(Collectors.toMap(v -> v, v -> ConfigValue.UNSET));
 			}
 			try {
 				Files.write(configFile, sw.toString().getBytes(Charsets.UTF_8));
@@ -606,25 +550,22 @@ public class FabConf {
 			StringWriter sw = new StringWriter();
 			try {
 				QDIni rawConfig = QDIni.loadAndTransform(configFile, featuresIniTransformer.reset(), sw);
-				worldProfile = rawConfig.getEnum("general.profile", Profile.class).orElse(Profile.GREEN);
-				worldDefaults = defaultsByProfile.row(worldProfile);
+				worldDefaults = getDefaults(s -> !rawConfig.get(s).map("true"::equals).orElse(false));
 				worldConfig = new HashMap<>();
 				for (String k : rawConfig.keySet()) {
-					if (isStandardValue(k)) {
-						try {
-							worldConfig.put(k, rawConfig.getEnum(k, ConfigValue.class).get());
-						} catch (BadValueException e) {
-							FabLog.warn(e.getMessage() + " - assuming unset");
-							worldConfig.put(k, ConfigValue.UNSET);
-						}
+					try {
+						worldConfig.put(k, rawConfig.getEnum(k, ConfigValue.class).get());
+					} catch (BadValueException e) {
+						FabLog.warn(e.getMessage() + " - assuming unset");
+						worldConfig.put(k, ConfigValue.UNSET);
 					}
 				}
 			} catch (SyntaxErrorException e) {
 				FabLog.warn("Failed to load configuration file: " + e.getMessage() + "; will assume defaults");
-				worldConfig = Maps.transformValues(worldDefaults, v -> ConfigValue.UNSET);
+				worldConfig = validKeys.stream().collect(Collectors.toMap(v -> v, v -> ConfigValue.UNSET));
 			} catch (IOException e) {
 				FabLog.warn("Failed to load configuration file; will assume defaults", e);
-				worldConfig = Maps.transformValues(worldDefaults, v -> ConfigValue.UNSET);
+				worldConfig = validKeys.stream().collect(Collectors.toMap(v -> v, v -> ConfigValue.UNSET));
 			}
 			try {
 				Files.write(configFile, sw.toString().getBytes(Charsets.UTF_8));

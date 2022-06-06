@@ -6,7 +6,6 @@ woina:
 	section: true
 	short_name: W.O.I.N.A.
 	since: 1.2.4
-	default: vienna
 	desc:
 		Forward ports of forgotten tidbits.
 
@@ -18,7 +17,7 @@ woina.block_logo:
 	desc:
 		Resurrects the Beta 1.2-era animated falling block logo. Because it looked sweet and it is
 		shameful they removed it.
-		
+
 		The block logo is completely customizable in config/fabrication/block_logo.png and
 		config/fabrication/block_logo.ini. The default is identical to how it was in Beta 1.2.
 
@@ -47,7 +46,7 @@ woina.classic_block_drops:
 
 		This option uses a whitelist in config/fabrication/classic_block_drops.ini to emulate the
 		old behavior, and for anything not whitelisted, uses mipmapped textures.
-		
+
 		This looks pretty neat.
 
 woina.blinking_drops:
@@ -61,7 +60,7 @@ woina.blinking_drops:
 	desc:
 		Back in Survival Test, drops blinked white to make them stand out more. This is an
 		implementation of that.
-		
+
 		If Utility > Despawning Items Blink is enabled, that tweak's disappear-flashing will be
 		disabled, and instead this tweak's white flashing will get faster and faster as despawn
 		approaches.
@@ -79,6 +78,43 @@ woina.yellow_button_hover:
 	sides: client_only
 	desc:
 		Hovered buttons will have yellow text.
+
+woina.old_background_shade:
+	name: Old Background Shade
+	since: 3.0.0
+	sides: client_only
+	desc:
+		Inventories, pause and other menus will have a blue gradient.
+
+woina.more_explosion_particles:
+	name: More Explosion Particles
+	since: 3.0.0
+	sides: client_only
+	desc:
+		Adds smoke and poof particles to explosions.
+
+woina.old_armor_scale:
+	name: Old Armor Scale
+	since: 3.0.0
+	sides: server_only
+	fscript: living_entity
+	desc:
+		Armor value is reduced with durability.
+
+woina.old_armor:
+	name: Old Armor
+	since: 3.0.0
+	sides: server_only
+	fscript: living_entity
+	desc:
+		All armor has the same protection.
+
+woina.void_fog_particles:
+	name: Void Fog Particles
+	since: 3.0.0
+	sides: client_only
+	desc:
+		Returns void fog particles from pre 1.8.
 
 # kate: space-indent off
 # vim: noai:noet
