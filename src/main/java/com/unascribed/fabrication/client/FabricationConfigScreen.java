@@ -61,6 +61,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -800,9 +801,20 @@ public class FabricationConfigScreen extends Screen {
 				if (y > 0) {
 					textRenderer.draw(matrices, "§lGeneral", 135, y-12, -1);
 				}
-				//TODO general.category should probably have it's own bit
-				y = 50;
-				y = drawConfigValues(matrices, y, mouseX, mouseY, (en) -> en.key.startsWith("general."));
+				y = drawConfigValues(matrices, y, mouseX, mouseY, (en) -> !en.key.startsWith("general.category.") && en.key.startsWith("general."));
+				y += 25;
+				textRenderer.draw(matrices, "§lCategory Defaults", 135, y-12, -1);
+				RenderSystem.setShaderColor(1, 1, 1, 1);
+				List<Map.Entry<String, FeatureEntry>> categories = FeaturesFile.getAll().entrySet().stream()
+						.filter((en) -> en.getKey().startsWith("general.category."))
+						.sorted(Comparator.comparing(e -> {
+							int i = tabs.indexOf(e.getKey().substring(17));
+							return i == -1 ? Integer.MAX_VALUE : i;
+						})).toList();
+				for (Map.Entry<String, FeatureEntry> en : categories) {
+					FeatureEntry fe = en.getValue();
+					y = drawConfigValue(matrices, en.getKey(), fe.name, fe.desc, y, mouseX, mouseY);
+				}
 			} else if ("search".equals(section)) {
 				y += 4;
 				Predicate<FeatureEntry> pen;

@@ -198,7 +198,7 @@ public class FabricationMod implements ModInitializer {
 	private static final Identifier CONFIG = new Identifier("fabrication", "config");
 
 	public static void sendConfigUpdate(MinecraftServer server, String key, ServerPlayerEntity spe) {
-		if (key.startsWith("general.category")) key = null;
+		if (key != null && key.startsWith("general.category")) key = null;
 		PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
 		if (key == null) {
 			Map<String, ResolvedConfigValue> trileans = Maps.newHashMap();

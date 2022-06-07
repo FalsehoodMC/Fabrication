@@ -114,6 +114,7 @@ function parseFile(file) {
 	}
 
 	function createCategory() {
+		if (cur.key === "general") return;
 		curDupe = { ...cur};
 		curDupe.key = 'general.category.' + cur.key
 		curDupe.desc = 'Enable all features in ' + cur.name + "\n" + (cur.desc != null ? cur.desc : "")

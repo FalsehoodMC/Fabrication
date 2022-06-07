@@ -5,7 +5,6 @@ minor_mechanics:
 	name: Minor Mechanics
 	section: true
 	since: 1.0
-	default: medium
 	desc:
 		Small additions to vanilla mechanics.
 

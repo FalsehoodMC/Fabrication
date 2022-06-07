@@ -406,14 +406,13 @@ public class FabConf {
 		}
 
 		if (!isWorld) rawConfig.put(configKey, newValue);
+		(isWorld? worldConfig : config).put(configKey, ConfigValue.parseTrilean(newValue));
 		if (configKey.startsWith("general.category.")) {
 			if (isWorld) {
 				worldDefaults = getDefaults(s -> worldConfig.get(s) != ConfigValue.TRUE);
 			} else {
 				defaults = getDefaults(s -> config.get(s) != ConfigValue.TRUE);
 			}
-		} else {
-			(isWorld? worldConfig : config).put(configKey, ConfigValue.parseTrilean(newValue));
 		}
 		if ("general.data_upload".equals(configKey)) {
 			if ("true".equals(newValue)) {
