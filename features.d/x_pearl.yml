@@ -1,6 +1,0 @@
-tweaks.ender_pearl_sound:
-	name: Ender Pearl Sound
-	since: 2.3.1
-	sides: server_only
-	desc:
-		Ender pearls play enderman teleport sound when breaking.

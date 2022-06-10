@@ -39,7 +39,7 @@ public class FabricationModClient implements ClientModInitializer {
 	public static boolean isBannedByServer(String configKey) {
 		if (MinecraftClient.getInstance() == null) return false;
 		ClientPlayNetworkHandler net = MinecraftClient.getInstance().getNetworkHandler();
-		if (net != null && net instanceof GetServerConfig) {
+		if (net instanceof GetServerConfig) {
 			return ((GetServerConfig)net).fabrication$getServerBanned().contains(configKey);
 		}
 		return false;

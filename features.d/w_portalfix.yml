@@ -1,6 +1,0 @@
-fixes.fix_nether_portal_nausea:
-	name: Fix Nether Portal Nausea
-	since: 2.3.1
-	sides: client_only
-	desc:
-		Render the nether portal UI texture even if player has nausea.

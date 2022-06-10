@@ -5,7 +5,6 @@ minor_mechanics:
 	name: Minor Mechanics
 	section: true
 	since: 1.0
-	default: medium
 	desc:
 		Small additions to vanilla mechanics.
 
@@ -19,7 +18,7 @@ minor_mechanics.feather_falling_five:
 	desc:
 		Makes Feather Falling V a valid enchant that completely negates fall damage. Optionally does
 		damage to the boots.
-		
+
 		If present on the client, makes the enchantment available in the Creative menu.
 
 minor_mechanics.feather_falling_five_damages_boots:
@@ -46,7 +45,7 @@ minor_mechanics.infibows:
 	media: https://unascribed.com/fabrication/infibows.mp4
 	desc:
 		Makes Infinity bows not require an arrow in your inventory to fire.
-		
+
 		If not present on client, firing bows with no arrows is a bit janky.
 
 minor_mechanics.note_blocks_play_on_landing:
@@ -96,7 +95,7 @@ minor_mechanics.spiders_cant_climb_glazed_terracotta:
 	desc:
 		Makes spiders unable to climb glazed terracotta, to make farming them less of a chore if you
 		go to the trouble to make glazed terracotta.
-		
+
 		Logic: Slime blocks can't stick to glazed terracotta. Are spiders really stickier than solid
 		slime?
 
@@ -122,7 +121,7 @@ minor_mechanics.invisibility_splash_on_inanimates:
 		invisible. They will become visible again if they become wet. This enables the vanilla
 		"invisible" flag, which doesn't work on inanimates unless Fixes > Inanimates Can Be
 		Invisible is also enabled.
-		
+
 		Logic: Invisibility potions coat the outer surface of the object. Living entities absorb and
 		eventually eliminate the compound, and when drank it exudes from the pores, but inanimate
 		objects do not have metabolisms, so the invisibility hangs around indefinitely unless washed
@@ -138,7 +137,7 @@ minor_mechanics.fire_aspect_is_flint_and_steel:
 		Right-clicking a block with no action with a Fire Aspect tool emulates a click with flint
 		and steel, allowing you to light fires and such with a Fire Aspect tool instead of having to
 		carry around flint and steel.
-		
+
 		Since it emulates clicking with a Flint and Steel, it's highly compatible.
 
 minor_mechanics.mechanism_muffling:
@@ -157,7 +156,7 @@ minor_mechanics.crawling:
 	desc:
 		Adds a key to explicitly enter the "crawling" stance. No more smushing yourself with a
 		trapdoor. Needed on both the server and client, but doesn't break vanilla clients.
-		
+
 		Honors the vanilla "Sneak" Accessibility Option. Interacts with Utility > Toggle Stance.
 
 minor_mechanics.unsaddle_creatures:
@@ -196,11 +195,26 @@ minor_mechanics.protection_on_any_item:
 
 minor_mechanics.spreadable_moss:
 	name: Spreadable Moss
-	since: 2.3.1
+	since: 3.0.0
 	sides: server_only
 	desc:
 		Using bone meal on a stone block with a moss block nearby grows moss to that block, to make
 		it a bit easier to work with for building.
+
+minor_mechanics.channeling_two:
+	name: Channeling Two
+	since: 3.0.0
+	sides: server_only_with_client_helper
+	desc:
+		Makes Channeling II a valid enchant that works while raining as well.
+
+minor_mechanics.gradual_block_breaking:
+	name: Gradual Block Breaking
+	since: 3.0.0
+	sides: server_only
+	fscript: player_entity
+	desc:
+		Snow layers and slabs will be mined a layer at a time.
 
 # kate: space-indent off
 # vim: noai:noet

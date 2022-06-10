@@ -40,16 +40,16 @@ public class LoaderFScript implements ConfigLoader {
 	}
 	public static void save() {
 		StringBuilder builder = new StringBuilder();
-		AtomicReference<String> catagory = new AtomicReference<>();
+		AtomicReference<String> category = new AtomicReference<>();
 		scripts.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach((entry) -> {
 			String key1 = entry.getKey();
 			int i = 0;
 			if(key1.contains(".")){
 				i = key1.lastIndexOf('.');
 				String cat = key1.substring(0, i);
-				if (!cat.equals(catagory.get())){
+				if (!cat.equals(category.get())){
 					builder.append('[').append(key1, 0, i).append(']').append('\n');
-					catagory.set(cat);
+					category.set(cat);
 				}
 				i++;
 			}

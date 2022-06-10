@@ -43,7 +43,7 @@ let versionNamesToCodes = {
 	'2.2.0': 42,
 	'2.2.1': 42,
 	'2.3.0': 43,
-	'2.3.1': 44
+	'3.0.0': 44
 };
 
 let currentVersion = /version\s+=\s+(.*?)\s+/.exec(fs.readFileSync('gradle.properties').toString('utf8'))[1];
@@ -61,7 +61,6 @@ let defaults = (curKey, cur) => ({
 	since_code: cur && cur.since ? versionNamesToCodes[cur.since] : null,
 	sides: "irrelevant",
 	needs: [],
-	default: "inherit",
 	parent: null,
 	media: null,
 	media_text: cur && cur.media ? (/\.mp4$/.exec(cur.media) ? 'Demonstration video' : 'Demonstration image') : null,
@@ -102,15 +101,28 @@ function parseFile(file) {
 		commitMultiline();
 		cur = Object.assign(defaults(curKey, cur), cur);
 		cur.key = curKey;
+		let isSection = cur
 		if (curKey.indexOf(".extra.") > -1) {
 			cur.extra = true;
+		}
+		if (cur.section) {
+			createCategory();
 		}
 		data.push(cur);
 		curKey = null;
 		cur = {};
 	}
 
+	function createCategory() {
+		if (cur.key === "general") return;
+		curDupe = { ...cur};
+		curDupe.key = 'general.category.' + cur.key
+		curDupe.desc = 'Enable all features in ' + cur.name + "\n" + (cur.desc != null ? cur.desc : "")
+		curDupe.section = false
+		data.push(curDupe)
+	}
 
+	let addedExtraCategories = new Set()
 	let lines = fs.readFileSync(file).toString('utf8').split(/\r?\n/g);
 	let curKey = null;
 	let cur = {};

@@ -387,11 +387,10 @@ public class FeatureFabricationCommand implements Feature {
 				LiteralArgumentBuilder<T> key = LiteralArgumentBuilder.<T>literal(s);
 				key.executes((c) -> {
 					String value = FabConf.getRawValue(s);
-					boolean tri = FabConf.isStandardValue(s);
-					if (value.isEmpty() && tri) value = "unset";
+					if (value.isEmpty()) value = "unset";
 					boolean def = FabConf.getDefault(s);
-					LiteralText txt = new LiteralText(s+" = "+value+(tri ? " (default "+def+")" : ""));
-					if (tri && !FabConf.isEnabled(s)) {
+					LiteralText txt = new LiteralText(s+" = "+value+(" (default "+def+")"));
+					if (!FabConf.isEnabled(s)) {
 						// so that command blocks report failure
 						throw new CommandException(txt.formatted(Formatting.WHITE));
 					} else {
@@ -409,10 +408,8 @@ public class FeatureFabricationCommand implements Feature {
 				LiteralArgumentBuilder<T> key = LiteralArgumentBuilder.<T>literal(s);
 
 				String[] values;
-				if (s.equals("general.reduced_motion") || s.equals("general.data_upload")) {
+				if (s.startsWith("general.")) {
 					values = new String[]{"true", "false"};
-				} else if (s.equals("general.profile")) {
-					values = FabConf.Profile.stringValues();
 				} else {
 					values = new String[]{"unset", "true", "false", "banned"};
 				}
@@ -441,10 +438,8 @@ public class FeatureFabricationCommand implements Feature {
 				LiteralArgumentBuilder<T> key = LiteralArgumentBuilder.<T>literal(s);
 
 				String[] values;
-				if (s.equals("general.reduced_motion") || s.equals("general.data_upload")) {
+				if (s.startsWith("general.")) {
 					values = new String[]{"true", "false"};
-				} else if (s.equals("general.profile")) {
-					values = FabConf.Profile.stringValues();
 				} else {
 					values = new String[]{"unset", "true", "false", "banned"};
 				}
@@ -596,16 +591,15 @@ public class FeatureFabricationCommand implements Feature {
 	private static void setKeyWithFeedback(CommandContext<? extends CommandSource> c, String key, String value, boolean local) {
 		String oldValue = FabConf.getRawValue(key);
 		boolean def = FabConf.getDefault(key);
-		boolean tri = FabConf.isStandardValue(key);
 		if (!local && value.equals(oldValue) || local && FabConf.doesWorldContainValue(key, value)) {
-			sendFeedback(c, new LiteralText(key+" is already set to "+value+(tri ? " (default "+def+")" : "")), false);
+			sendFeedback(c, new LiteralText(key+" is already set to "+value+(" (default "+def+")")), false);
 		} else {
 			if (local) FabConf.worldSet(key, value);
 			else FabConf.set(key, value);
 			if (c.getSource() instanceof ServerCommandSource) {
 				FabricationMod.sendConfigUpdate(((ServerCommandSource)c.getSource()).getServer(), key);
 			}
-			sendFeedback(c, new LiteralText(key+" is now set to "+value+(tri ? " (default "+def+")" : "")+(local ? " for this world" : "")), true);
+			sendFeedback(c, new LiteralText(key+" is now set to "+value+(" (default "+def+")")+(local ? " for this world" : "")), true);
 			if (FabricationMod.isAvailableFeature(key)) {
 				if (FabricationMod.updateFeature(key)) {
 					return;

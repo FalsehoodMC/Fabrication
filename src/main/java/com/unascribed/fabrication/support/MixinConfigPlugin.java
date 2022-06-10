@@ -90,7 +90,6 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 
 	@Override
 	public List<String> getMixins() {
-		FabLog.debug("☕ Profile: "+FabConf.getProfileName().toLowerCase(Locale.ROOT));
 		return discoverClassesInPackage("com.unascribed.fabrication.mixin", true);
 	}
 
@@ -126,7 +125,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 								String k = (String)an.values.get(i);
 								Object v = an.values.get(i+1);
 								if (k.equals("configAvailable")) {
-									if (!FabConf.defaultContains((String)v)) {
+									if (!FabConf.isValid((String)v)) {
 										FabLog.debug("🙈 Dev error! Exploding.");
 										throw FabConf.devError(cn.name.substring(pkg.length()+1).replace('/', '.')+" references an unknown config key "+v+"\n\nDid you forget to add it to features.txt and run build-features.sh?");
 									}
@@ -450,5 +449,5 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		}
 
 	}
-	
+
 }

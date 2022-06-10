@@ -3,7 +3,6 @@ package com.unascribed.fabrication.client;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -13,7 +12,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.brigadier.CommandDispatcher;
 import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.FabConf;
-import com.unascribed.fabrication.FabConf.Profile;
 import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.FabricationModClient;
@@ -63,6 +61,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -84,18 +83,6 @@ public class FabricationConfigScreen extends Screen {
 	}
 
 	private final Map<String, String> SECTION_DESCRIPTIONS = Maps.newHashMap();
-	private final Map<Profile, String> PROFILE_DESCRIPTIONS = Maps.newHashMap();
-
-	private static final ImmutableMap<Profile, Integer> PROFILE_COLORS = ImmutableMap.<Profile, Integer>builder()
-			.put(Profile.GREEN, 0xFF8BC34A)
-			.put(Profile.BLONDE, 0xFFFFCC80)
-			.put(Profile.LIGHT, 0xFFA1887F)
-			.put(Profile.MEDIUM, 0xFF6D4C41)
-			.put(Profile.DARK, 0xFF4E342E)
-			.put(Profile.VIENNA, 0xFF2B1B18)
-			.put(Profile.BURNT, 0xFF12181B)
-			.build();
-
 	private static final Identifier BG = new Identifier("fabrication", "bg.png");
 	private static final Identifier BG_DARK = new Identifier("fabrication", "bg-dark.png");
 	private static final Identifier BG_GRAD = new Identifier("fabrication", "bg-grad.png");
@@ -174,9 +161,6 @@ public class FabricationConfigScreen extends Screen {
 		prideFlag = PrideFlags.isPrideMonth() ? PrideFlags.getRandomFlag() : null;
 		for (String sec : FabConf.getAllSections()) {
 			SECTION_DESCRIPTIONS.put(sec, FeaturesFile.get(sec).desc);
-		}
-		for (Profile prof : Profile.values()) {
-			PROFILE_DESCRIPTIONS.put(prof, FeaturesFile.get("general.profile." + prof.name().toLowerCase(Locale.ROOT)).desc);
 		}
 		for (String key : FabConf.getAllKeys()) {
 			int dot = key.indexOf('.');
@@ -817,46 +801,20 @@ public class FabricationConfigScreen extends Screen {
 				if (y > 0) {
 					textRenderer.draw(matrices, "§lGeneral", 135, y-12, -1);
 				}
-				RenderSystem.enableBlend();
-				RenderSystem.defaultBlendFunc();
-				RenderSystem.setShaderTexture(0, new Identifier("fabrication", "coffee_bean.png"));
-				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-				int x = 0;
-				Profile hovered = null;
-				for (Profile p : Profile.values()) {
-					boolean profSel = FabConf.hasWorldPath() ? p.equals(FabConf.getWorldProfile()) : getRawValue("general.profile").toUpperCase(Locale.ROOT).equals(p.name());
-					if (mouseX >= 134+x && mouseX <= 134+x+16 && mouseY >= 28 && mouseY <= 28+16) {
-						hovered = p;
-						if (didClick) {
-							if (p == Profile.BURNT) {
-								client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_CHIME, 1.8f, 1f));
-								client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.ITEM_FLINTANDSTEEL_USE, 1f));
-								client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_FIRE_AMBIENT, 1f, 1f));
-							} else if (p == Profile.GREEN) {
-								client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_BASS, 0.5f, 1f));
-							} else {
-								client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_COW_BELL, 0.707107f+(p.ordinal()*0.22f), 1f));
-							}
-							setValue("general.profile", p.name().toLowerCase(Locale.ROOT));
-						}
-					}
-
-					color(PROFILE_COLORS.get(p), profSel ? 1f : (hovered == p ? 0.6f : 0.3f) * (FabConf.isEnabled("general.dark_mode") ? 0.5f : 1));
-					drawTexture(matrices, 134+x, 28, 0, 0, 0, 16, 16, 16, 16);
-					x += 18;
+				y = drawConfigValues(matrices, y, mouseX, mouseY, (en) -> !en.key.startsWith("general.category.") && en.key.startsWith("general."));
+				y += 25;
+				textRenderer.draw(matrices, "§lCategory Defaults", 135, y-12, -1);
+				RenderSystem.setShaderColor(1, 1, 1, 1);
+				List<Map.Entry<String, FeatureEntry>> categories = FeaturesFile.getAll().entrySet().stream()
+						.filter((en) -> en.getKey().startsWith("general.category."))
+						.sorted(Comparator.comparing(e -> {
+							int i = tabs.indexOf(e.getKey().substring(17));
+							return i == -1 ? Integer.MAX_VALUE : i;
+						})).toList();
+				for (Map.Entry<String, FeatureEntry> en : categories) {
+					FeatureEntry fe = en.getValue();
+					y = drawConfigValue(matrices, en.getKey(), fe.name, fe.desc, y, mouseX, mouseY);
 				}
-				FeatureEntry profile = FeaturesFile.get("general.profile");
-				int textRight = textRenderer.draw(matrices, profile.name, 135, 16, -1);
-				if (mouseX >= 136 && mouseX <= textRight && mouseY >= 6 && mouseY <= 18) {
-					renderWrappedTooltip(matrices, profile.desc, mouseX, mouseY);
-				}
-				if (hovered != null) {
-					FeatureEntry hoveredEntry = FeaturesFile.get("general.profile."+hovered.name().toLowerCase(Locale.ROOT));
-					renderWrappedTooltip(matrices, "§l"+hoveredEntry.name+"\n§f"+hoveredEntry.desc, mouseX, mouseY);
-				}
-				y = 50;
-				y = drawConfigValues(matrices, y, mouseX, mouseY, (en) -> en.key.startsWith("general."));
 			} else if ("search".equals(section)) {
 				y += 4;
 				Predicate<FeatureEntry> pen;
@@ -1422,7 +1380,7 @@ public class FabricationConfigScreen extends Screen {
 			return file;
 		}
 	}
-	
+
 	public void openWorldSelector() {
 		try {
 			Path savesDir = client.getLevelStorage().getSavesDirectory();
@@ -1520,14 +1478,6 @@ public class FabricationConfigScreen extends Screen {
 		}
 	}
 
-	private boolean isTrilean(String key) {
-		if (configuringServer) {
-			return ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerTrileanConfig().containsKey(key);
-		} else {
-			return FabConf.isStandardValue(key);
-		}
-	}
-
 	private ResolvedConfigValue getResolvedValue(String key) {
 		if (configuringServer) {
 			return ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerTrileanConfig().getOrDefault(key, ResolvedConfigValue.DEFAULT_FALSE);
@@ -1546,11 +1496,7 @@ public class FabricationConfigScreen extends Screen {
 
 	private String getRawValue(String key) {
 		if (configuringServer) {
-			if (isTrilean(key)) {
-				return getValue(key).toString().toLowerCase(Locale.ROOT);
-			} else {
-				return ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerStringConfig().get(key);
-			}
+			return getValue(key).toString().toLowerCase(Locale.ROOT);
 		} else {
 			return FabConf.getRawValue(key);
 		}
