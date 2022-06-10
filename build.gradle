@@ -63,10 +63,10 @@ dependencies {
 	modImplementation include(fabricApi.module('fabric-registry-sync-v0', project.fabric_version))
 	modImplementation include(fabricApi.module('fabric-networking-api-v1', project.fabric_version))
 	
-	modImplementation(include('io.github.queerbric:pridelib:1.1.0+1.17')) {
+	modImplementation(include('io.github.queerbric:pridelib:1.1.2+1.19')) {
 		transitive = false
 	}
-	modImplementation('com.terraformersmc:modmenu:3.1.0') {
+	modImplementation('com.terraformersmc:modmenu:4.0.0') {
 		transitive = false
 	}
 	modImplementation 'com.unascribed:ears-api:1.4.5'

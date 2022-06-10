@@ -1,25 +1,31 @@
 package com.unascribed.fabrication.mixin.g_weird_tweaks.foliage_creepers;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.interfaces.FilterableResource;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.util.GrayscaleIdentifier;
-import net.minecraft.client.texture.TextureManager;
+import com.unascribed.fabrication.util.Grayscale;
+import net.minecraft.resource.NamespaceResourceManager;
+import net.minecraft.resource.Resource;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyArgs;
-import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(TextureManager.class)
+import java.util.Optional;
+
+@Mixin(NamespaceResourceManager.class)
 @EligibleIf(configAvailable="*.foliage_creepers", envMatches= Env.CLIENT)
 public abstract class MixinResourceTexture {
 
-	@ModifyArgs(at=@At(value="INVOKE", target="Lnet/minecraft/client/texture/ResourceTexture;<init>(Lnet/minecraft/util/Identifier;)V"), method= "getTexture(Lnet/minecraft/util/Identifier;)Lnet/minecraft/client/texture/AbstractTexture;")
-	public void convertToGrayscale(Args args){
-		Identifier id = args.get(0);
+	@Inject(at=@At("RETURN"), method="getResource(Lnet/minecraft/util/Identifier;)Ljava/util/Optional;")
+	public void generateGrayscale(Identifier id, CallbackInfoReturnable<Optional<Resource>> cir){
 		if (!(FabConf.isEnabled("*.foliage_creepers") && "fabrication_grayscale".equals(id.getNamespace()))) return;
-		args.set(0, new GrayscaleIdentifier(id.getPath()));
+		Optional<Resource> ret = cir.getReturnValue();
+		if (ret.isPresent() && ret.get() instanceof FilterableResource) {
+			((FilterableResource)ret.get()).fabrication$applyFilter(Grayscale::new);
+		}
 	}
 
 }

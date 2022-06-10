@@ -46,7 +46,7 @@ public class OptionalFScript {
 	}
 	public static boolean set(String configKey, String script, ServerPlayerEntity spe){
 		Optional<Exception> err = setScript(configKey, script);
-		err.ifPresent(e -> spe.sendSystemMessage(Text.literal("Failed to set script for "+configKey+"\n"+e.getLocalizedMessage()), Util.NIL_UUID));
+		err.ifPresent(e -> spe.sendMessage(Text.literal("Failed to set script for "+configKey+"\n"+e.getLocalizedMessage())));
 		return !err.isPresent();
 	}
 	public static void set(String configKey, String script, Consumer<Exception> errReporter){

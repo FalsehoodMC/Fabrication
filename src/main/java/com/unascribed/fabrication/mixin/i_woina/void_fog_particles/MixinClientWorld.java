@@ -30,8 +30,8 @@ public abstract class MixinClientWorld extends World {
 	@Final
 	private MinecraftClient client;
 
-	protected MixinClientWorld(MutableWorldProperties properties, RegistryKey<World> registryRef, RegistryEntry<DimensionType> registryEntry, Supplier<Profiler> profiler, boolean isClient, boolean debugWorld, long seed) {
-		super(properties, registryRef, registryEntry, profiler, isClient, debugWorld, seed);
+	protected MixinClientWorld(MutableWorldProperties properties, RegistryKey<World> registryRef, RegistryEntry<DimensionType> dimension, Supplier<Profiler> profiler, boolean isClient, boolean debugWorld, long seed, int maxChainedNeighborUpdates) {
+		super(properties, registryRef, dimension, profiler, isClient, debugWorld, seed, maxChainedNeighborUpdates);
 	}
 
 	//Ported from 1.7.10
@@ -40,7 +40,7 @@ public abstract class MixinClientWorld extends World {
 	@Inject(at=@At("HEAD"), method="doRandomBlockDisplayTicks(III)V")
 	public void voidParticles(int centerX, int centerY, int centerZ, CallbackInfo ci){
 		if (!FabConf.isEnabled("*.void_fog_particles") || this.getDimension().hasCeiling()) return;
-		int floor = this.getDimension().getMinimumY();
+		int floor = this.getDimension().minY();
 		if (floor+24<centerY) return;
 		BlockPos.Mutable mutablePos = new BlockPos.Mutable();
 		for(int i=0; i<1000; ++i) {

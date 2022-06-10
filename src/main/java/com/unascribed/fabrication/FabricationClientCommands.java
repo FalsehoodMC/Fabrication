@@ -21,7 +21,7 @@ import com.unascribed.fabrication.features.FeatureFabricationCommand;
 import com.unascribed.fabrication.support.OptionalFScript;
 
 import io.github.queerbric.pride.PrideFlags;
-import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.command.CommandException;

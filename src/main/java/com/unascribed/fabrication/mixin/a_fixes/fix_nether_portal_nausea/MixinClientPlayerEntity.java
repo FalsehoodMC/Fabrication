@@ -8,9 +8,11 @@ import com.unascribed.fabrication.support.Env;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.encryption.PlayerPublicKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -20,12 +22,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @EligibleIf(configAvailable="*.fix_nether_portal_nausea", envMatches=Env.CLIENT)
 public abstract class MixinClientPlayerEntity extends PlayerEntity implements PortalRenderFix {
 
-	public MixinClientPlayerEntity(World world, BlockPos pos, float yaw, GameProfile profile) {
-		super(world, pos, yaw, profile);
-	}
-
 	private float fabrication$lastClientPortalTicks = 0;
 	private float fabrication$nextClientPortalTicks = 0;
+
+	public MixinClientPlayerEntity(World world, BlockPos pos, float yaw, GameProfile gameProfile, @Nullable PlayerPublicKey publicKey) {
+		super(world, pos, yaw, gameProfile, publicKey);
+	}
 
 	@Inject(method="tickMovement()V", at=@At("HEAD"))
 	private void fixPortalNausea(CallbackInfo ci){

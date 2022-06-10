@@ -1,14 +1,7 @@
 package com.unascribed.fabrication.mixin.e_mechanics.obsidian_tears;
 
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
 import com.unascribed.fabrication.logic.ObsidianTears;
 import com.unascribed.fabrication.support.EligibleIf;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.DispenserBlock;
@@ -17,13 +10,18 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPointer;
 import net.minecraft.util.math.BlockPos;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(targets="net.minecraft.block.dispenser.DispenserBehavior$24")
+@Mixin(targets="net.minecraft.block.dispenser.DispenserBehavior$17")
 @EligibleIf(configAvailable="*.obsidian_tears")
-public class MixinGlassBottleDispenserBehavior extends FallibleItemDispenserBehavior {
+public abstract class MixinGlassBottleDispenserBehavior extends FallibleItemDispenserBehavior {
 
 	@Shadow
-	private ItemStack tryPutFilledBottle(BlockPointer pointer, ItemStack emptyBottleStack, ItemStack filledBottleStack) { return null; }
+	protected abstract ItemStack tryPutFilledBottle(BlockPointer pointer, ItemStack emptyBottleStack, ItemStack filledBottleStack);
 
 	@Inject(at=@At("HEAD"), method="dispenseSilently(Lnet/minecraft/util/math/BlockPointer;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;",
 			cancellable=true)

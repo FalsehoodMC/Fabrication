@@ -125,12 +125,12 @@ public class MixinServerPlayNetworkHandler {
 		if (player.server.getGameRules().getBoolean(GameRules.SEND_COMMAND_FEEDBACK)) {
 			for (ServerPlayerEntity spe : player.server.getPlayerManager().getPlayerList()) {
 				if (player.server.getPlayerManager().isOperator(spe.getGameProfile())) {
-					spe.sendSystemMessage(text, Util.NIL_UUID);
+					spe.sendMessage(text);
 				}
 			}
 		}
 		if (player.server.getGameRules().getBoolean(GameRules.LOG_ADMIN_COMMANDS)) {
-			player.server.sendSystemMessage(text, Util.NIL_UUID);
+			player.server.sendMessage(text);
 		}
 	}
 

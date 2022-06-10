@@ -1,5 +1,7 @@
 package com.unascribed.fabrication.mixin.a_fixes.sync_attacker_yaw;
 
+import net.minecraft.network.encryption.PlayerPublicKey;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -18,8 +20,8 @@ import net.minecraft.world.World;
 @EligibleIf(configAvailable="*.sync_attacker_yaw")
 public abstract class MixinServerPlayerEntity extends PlayerEntity {
 
-	public MixinServerPlayerEntity(World world, BlockPos pos, float yaw, GameProfile profile) {
-		super(world, pos, yaw, profile);
+	public MixinServerPlayerEntity(World world, BlockPos pos, float yaw, GameProfile gameProfile, @Nullable PlayerPublicKey publicKey) {
+		super(world, pos, yaw, gameProfile, publicKey);
 	}
 
 	@Inject(at=@At("HEAD"), method="copyFrom(Lnet/minecraft/server/network/ServerPlayerEntity;Z)V")

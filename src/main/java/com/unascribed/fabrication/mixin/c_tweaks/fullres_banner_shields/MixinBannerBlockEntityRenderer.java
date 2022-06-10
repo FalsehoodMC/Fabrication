@@ -1,8 +1,12 @@
 package com.unascribed.fabrication.mixin.c_tweaks.fullres_banner_shields;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.unascribed.fabrication.FabConf;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryEntry;
+import net.minecraft.util.registry.RegistryKey;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -39,7 +43,7 @@ public class MixinBannerBlockEntityRenderer {
 
 	@Inject(at=@At(value="INVOKE", target="net/minecraft/client/model/ModelPart.render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;II)V",
 			shift=Shift.AFTER, ordinal=0), method=RENDER_CANVAS, cancellable=true)
-	private static void renderCanvasHead(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, ModelPart canvas, SpriteIdentifier baseSprite, boolean isBanner, List<Pair<BannerPattern, DyeColor>> patterns, boolean bl2, CallbackInfo ci) {
+	private static void renderCanvasHead(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, ModelPart canvas, SpriteIdentifier baseSprite, boolean isBanner, List<Pair<RegistryEntry<BannerPattern>, DyeColor>> patterns, boolean glint, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.fullres_banner_shields")) return;
 		if (!(vertexConsumers instanceof Immediate)) return;
 		if (!isBanner) {
@@ -48,9 +52,11 @@ public class MixinBannerBlockEntityRenderer {
 			RenderSystem.polygonOffset(-3, -3);
 			Matrix4f mdl = matrices.peek().getPositionMatrix();
 			Matrix3f nrm = matrices.peek().getNormalMatrix();
-			for (Pair<BannerPattern, DyeColor> pattern : patterns) {
+			for (Pair<RegistryEntry<BannerPattern>, DyeColor> pattern : patterns) {
 				float[] col = pattern.getSecond().getColorComponents();
-				SpriteIdentifier si = new SpriteIdentifier(TexturedRenderLayers.BANNER_PATTERNS_ATLAS_TEXTURE, pattern.getFirst().getSpriteId(true));
+				Optional<RegistryKey<BannerPattern>> patternKey = pattern.getFirst().getKey();
+				if (patternKey.isEmpty()) continue;
+				SpriteIdentifier si = TexturedRenderLayers.getBannerPatternTextureId(patternKey.get());
 				VertexConsumer vc = si.getVertexConsumer(vertexConsumers, RenderLayer::getEntityNoOutline);
 				Sprite sprite = si.getSprite();
 				float minU = sprite.getMinU();

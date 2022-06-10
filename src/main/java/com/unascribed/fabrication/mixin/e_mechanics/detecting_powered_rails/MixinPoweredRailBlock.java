@@ -1,8 +1,7 @@
 package com.unascribed.fabrication.mixin.e_mechanics.detecting_powered_rails;
 
-import java.util.Random;
-
 import com.unascribed.fabrication.FabConf;
+import net.minecraft.util.math.random.Random;
 import org.spongepowered.asm.mixin.Mixin;
 
 import com.unascribed.fabrication.support.EligibleIf;
