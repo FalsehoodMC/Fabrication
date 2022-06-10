@@ -8,11 +8,14 @@ import com.unascribed.fabrication.logic.LegacyIDs;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.injection.Hijack;
 import com.unascribed.fabrication.support.injection.HijackReturn;
+import net.minecraft.command.CommandRegistryWrapper;
 import net.minecraft.command.argument.ItemStringReader;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.DefaultedRegistry;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -29,13 +32,14 @@ public class MixinItemStringReader {
 
 	private NbtCompound fabrication$legacyDamageNbt = null;
 
-	@Hijack(target="Lnet/minecraft/util/registry/DefaultedRegistry;getOrEmpty(Lnet/minecraft/util/Identifier;)Ljava/util/Optional;",
+	@Hijack(target="Lnet/minecraft/command/CommandRegistryWrapper;getEntry(Lnet/minecraft/util/registry/RegistryKey;)Ljava/util/Optional;",
 			method="readItem()V")
-	public HijackReturn fabrication$legacyDamageGetOrEmpty(DefaultedRegistry<Item> subject, Identifier id) {
+	public HijackReturn fabrication$legacyDamageGetOrEmpty(CommandRegistryWrapper<Item> subject, RegistryKey<Item> rid) {
 		fabrication$legacyDamageNbt = null;
 		if (FabConf.isEnabled("*.legacy_command_syntax")) {
 			String numId;
 			String meta;
+			Identifier id = rid.getValue();
 			if (id.getNamespace().equals("minecraft")) {
 				if (!id.getPath().isEmpty() && CharMatcher.digit().matchesAllOf(id.getPath())) {
 					numId = id.getPath();
@@ -69,7 +73,7 @@ public class MixinItemStringReader {
 					fabrication$legacyDamageNbt = new NbtCompound();
 					fabrication$legacyDamageNbt.putInt("Damage", metaI);
 				}
-				return new HijackReturn(Optional.of(i));
+				return new HijackReturn(subject.getEntry(RegistryKey.of(Registry.ITEM_KEY, LegacyIDs.lookup_id(numIdI, metaI))));
 			}
 		}
 		return null;
