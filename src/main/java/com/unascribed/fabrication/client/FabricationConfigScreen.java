@@ -44,7 +44,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -156,7 +155,7 @@ public class FabricationConfigScreen extends Screen {
 
 
 	public FabricationConfigScreen(Screen parent) {
-		super(new LiteralText("Fabrication configuration"));
+		super(Text.literal("Fabrication configuration"));
 		this.parent = parent;
 		prideFlag = PrideFlags.isPrideMonth() ? PrideFlags.getRandomFlag() : null;
 		for (String sec : FabConf.getAllSections()) {
@@ -225,7 +224,7 @@ public class FabricationConfigScreen extends Screen {
 				}
 			}
 		}
-		searchField = new TextFieldWidget(textRenderer, 131, 1, width-252, 14, searchField, new LiteralText("Search"));
+		searchField = new TextFieldWidget(textRenderer, 131, 1, width-252, 14, searchField, Text.literal("Search"));
 		if (isFScriptLoaded) searchField.setWidth(searchField.getWidth()-16);
 
 		searchField.setChangedListener((s) -> {
@@ -673,10 +672,10 @@ public class FabricationConfigScreen extends Screen {
 			if (!notes.isEmpty()) {
 				List<Text> lines = Lists.newArrayList();
 				for (String s : notes.get(noteIndex).replace("{}", configuringServer ? "server" : "client").split("\n")) {
-					lines.add(new LiteralText(s));
+					lines.add(Text.literal(s));
 				}
 				if (notes.size() > 1) {
-					lines.add(new LiteralText("§7Click to see other notes"));
+					lines.add(Text.literal("§7Click to see other notes"));
 				}
 				renderTooltip(matrices, lines, mouseX, mouseY);
 				if (didClick && notes.size() > 1) {
@@ -730,7 +729,7 @@ public class FabricationConfigScreen extends Screen {
 				msg += "\n§fChanges will apply to the "+(configuringServer ? "§dSERVER" : "§6CLIENT")+"§f.";
 			}
 			renderTooltip(matrices, Lists.transform(Lists.newArrayList(msg.split("\n")),
-					s -> new LiteralText(s)), mouseX+10, 20+mouseY);
+					Text::of), mouseX+10, 20+mouseY);
 		}
 		matrices.pop();
 	}
@@ -749,7 +748,7 @@ public class FabricationConfigScreen extends Screen {
 
 	private int drawWrappedText(MatrixStack matrices, float x, float y, String str, int width, int color, boolean fromBottom) {
 		int height = 0;
-		List<OrderedText> lines = textRenderer.wrapLines(new LiteralText(str), width);
+		List<OrderedText> lines = textRenderer.wrapLines(Text.literal(str), width);
 		if (fromBottom) {
 			y -= 12;
 			lines = Lists.reverse(lines);
@@ -1134,53 +1133,53 @@ public class FabricationConfigScreen extends Screen {
 			} else if (mouseX >= 134 && mouseX <= 134+trackSize && mouseY >= startY && mouseY <= startY+10) {
 				if (disabled) {
 					if (noFabricApi) {
-						renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"This option requires Fabric API"), (int)mouseX, (int)mouseY);
+						renderTooltip(matrices, Text.literal(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"This option requires Fabric API"), (int)mouseX, (int)mouseY);
 					} else if (noValue) {
-						renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"The server does not recognize this option"), (int)mouseX, (int)mouseY);
+						renderTooltip(matrices, Text.literal(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"The server does not recognize this option"), (int)mouseX, (int)mouseY);
 					} else if (banned) {
-						renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"This feature is banned by the server"), (int)mouseX, (int)mouseY);
+						renderTooltip(matrices, Text.literal(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"This feature is banned by the server"), (int)mouseX, (int)mouseY);
 					} else {
-						renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"You cannot configure this server"), (int)mouseX, (int)mouseY);
+						renderTooltip(matrices, Text.literal(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"You cannot configure this server"), (int)mouseX, (int)mouseY);
 					}
 				} else if (failed) {
-					renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"This feature failed to initialize"), (int)mouseX, (int)mouseY);
+					renderTooltip(matrices, Text.literal(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"This feature failed to initialize"), (int)mouseX, (int)mouseY);
 				} else {
 					int index = (int)((mouseX-134)/(noUnset ? 22 : onlyBannable ? 30 : 15));
 					if (onlyBannable) {
 						if (index == 0) {
 							renderTooltip(matrices, Lists.newArrayList(
-									new LiteralText("§7Ban"),
-									new LiteralText("Disallow use by clients")
+									Text.literal("§7Ban"),
+									Text.literal("Disallow use by clients")
 									), (int)mouseX, (int)mouseY);
 						} else {
 							renderTooltip(matrices, Lists.newArrayList(
-									new LiteralText("§eUnset"),
-									new LiteralText("Allow use by clients")
+									Text.literal("§eUnset"),
+									Text.literal("Allow use by clients")
 									), (int)mouseX, (int)mouseY);
 						}
 					} else {
 						if (index == (noUnset ? 0 : 1)) {
-							renderTooltip(matrices, new LiteralText("§cDisable"), (int)mouseX, (int)mouseY);
+							renderTooltip(matrices, Text.literal("§cDisable"), (int)mouseX, (int)mouseY);
 						} else if (index == (noUnset ? -99 : 2)) {
 							if (currentValue == ConfigValue.UNSET) {
 								renderTooltip(matrices, Lists.newArrayList(
-										new LiteralText("§eUse default value §f(see General > Profile)"),
-										new LiteralText("§rCurrent default: "+(keyEnabled ? "§aEnabled" : "§cDisabled"))
+										Text.literal("§eUse default value §f(see General > Profile)"),
+										Text.literal("§rCurrent default: "+(keyEnabled ? "§aEnabled" : "§cDisabled"))
 										), (int)mouseX, (int)mouseY);
 							} else {
-								renderTooltip(matrices, new LiteralText("§eUse default value §f(see General > Profile)"), (int)mouseX, (int)mouseY);
+								renderTooltip(matrices, Text.literal("§eUse default value §f(see General > Profile)"), (int)mouseX, (int)mouseY);
 							}
 						} else if (index == 0) {
 							List<Text> li = Lists.newArrayList(
-									new LiteralText("§7Ban"),
-									new LiteralText("Prevent feature from loading entirely")
+									Text.literal("§7Ban"),
+									Text.literal("Prevent feature from loading entirely")
 									);
 							if (configuringServer) {
-								li.add(new LiteralText("and disallow usage by clients"));
+								li.add(Text.literal("and disallow usage by clients"));
 							}
 							renderTooltip(matrices, li, (int)mouseX, (int)mouseY);
 						} else {
-							renderTooltip(matrices, new LiteralText("§aEnable"), (int)mouseX, (int)mouseY);
+							renderTooltip(matrices, Text.literal("§aEnable"), (int)mouseX, (int)mouseY);
 						}
 					}
 				}
@@ -1190,7 +1189,7 @@ public class FabricationConfigScreen extends Screen {
 	}
 
 	private void renderWrappedTooltip(MatrixStack matrices, String str, float mouseX, float mouseY) {
-		renderOrderedTooltip(matrices, textRenderer.wrapLines(new LiteralText(str), mouseX < width/2 ? (int)(width-mouseX-30) : (int)mouseX-20), (int)(mouseX), (int)(20+mouseY));
+		renderOrderedTooltip(matrices, textRenderer.wrapLines(Text.literal(str), mouseX < width/2 ? (int)(width-mouseX-30) : (int)mouseX-20), (int)(mouseX), (int)(20+mouseY));
 	}
 
 	private void playErrorFeedback(){

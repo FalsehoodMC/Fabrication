@@ -10,7 +10,6 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -35,7 +34,7 @@ public class AtlasViewerScreen extends Screen {
 	private int level = 0;
 
 	public AtlasViewerScreen(Identifier atlas) {
-		super(new LiteralText("Atlas viewer"));
+		super(Text.literal("Atlas viewer"));
 		this.atlas = atlas;
 	}
 
@@ -120,8 +119,8 @@ public class AtlasViewerScreen extends Screen {
 
 		SpriteAtlasTexture sat = getAtlas();
 		renderTooltip(matrices, Lists.<Text>newArrayList(
-				new LiteralText(atlas.toString()),
-				new LiteralText("§7"+atlasWidth+"×"+atlasHeight+"×"+(atlasMaxLevel+1)+" @"+(level+1)+" §f|§7 "+FabRefl.Client.getSprites(sat).size()+" sprites")
+				Text.literal(atlas.toString()),
+				Text.literal("§7"+atlasWidth+"×"+atlasHeight+"×"+(atlasMaxLevel+1)+" @"+(level+1)+" §f|§7 "+FabRefl.Client.getSprites(sat).size()+" sprites")
 			), -9, 15);
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
@@ -158,9 +157,9 @@ public class AtlasViewerScreen extends Screen {
 		if (sprites.isEmpty()) {
 			if (mouseX >= 0 && mouseY >= 0 && mouseX < atlasWidth && mouseY < atlasHeight) {
 				renderTooltip(matrices, Lists.<Text>newArrayList(
-						new LiteralText("<nothing>"),
-						new LiteralText("§7"+mouseX+", "+mouseY),
-						new LiteralText("If there is something here, it's either garbage from your graphics driver or an unregistered sprite")
+						Text.literal("<nothing>"),
+						Text.literal("§7"+mouseX+", "+mouseY),
+						Text.literal("If there is something here, it's either garbage from your graphics driver or an unregistered sprite")
 					), (int)(mouseX+panX), (int)(mouseY+panY));
 			}
 		} else if (sprites.size() == 1) {
@@ -187,26 +186,26 @@ public class AtlasViewerScreen extends Screen {
 				anim = " @"+FabRefl.Client.getFrameIndex(sa)+"."+FabRefl.Client.getFrameTicks(sa);
 			}
 			renderTooltip(matrices, Lists.<Text>newArrayList(
-				new LiteralText(s.getId().toString()),
-				new LiteralText("§7At "+x+","+y+" "+w+"×"+h+"×"+FabRefl.Client.getFrameCount(s)+anim),
-				new LiteralText("§7From §f"+src)
+				Text.literal(s.getId().toString()),
+				Text.literal("§7At "+x+","+y+" "+w+"×"+h+"×"+FabRefl.Client.getFrameCount(s)+anim),
+				Text.literal("§7From §f"+src)
 			), (int)(mouseX+panX), (int)(mouseY+panY));
 		} else {
 			List<Text> li = Lists.newArrayList(
-				new LiteralText("§c\u26A0 MULTIPLE SPRITES \u26A0")
+				Text.literal("§c\u26A0 MULTIPLE SPRITES \u26A0")
 			);
 			for (Sprite s : sprites) {
 				int x = FabRefl.Client.getX(s);
 				int y = FabRefl.Client.getY(s);
 				int w = s.getWidth();
 				int h = s.getHeight();
-				li.add(new LiteralText(s.getId().toString()));
+				li.add(Text.literal(s.getId().toString()));
 				String anim = "";
 				if (s.getAnimation() != null) {
 					Sprite.Animation sa = (Sprite.Animation)s.getAnimation();
 					anim = " @"+FabRefl.Client.getFrameIndex(sa)+"."+FabRefl.Client.getFrameTicks(sa);
 				}
-				li.add(new LiteralText("§7At "+x+","+y+" "+w+"×"+h+"×"+FabRefl.Client.getFrameCount(s)+anim));
+				li.add(Text.literal("§7At "+x+","+y+" "+w+"×"+h+"×"+FabRefl.Client.getFrameCount(s)+anim));
 			}
 			renderTooltip(matrices, li, (int)(mouseX+panX), (int)(mouseY+panY));
 		}

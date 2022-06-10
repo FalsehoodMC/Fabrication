@@ -1,7 +1,7 @@
 import java.nio.file.Files
 
 plugins {
-	id 'fabric-loom' version '0.11-SNAPSHOT'
+	id 'fabric-loom' version '0.12-SNAPSHOT'
 	id 'io.github.juuxel.loom-quiltflower' version '1.6.0'
 	id 'maven-publish'
 }
@@ -55,7 +55,7 @@ dependencies {
 
 	modImplementation include(fabricApi.module('fabric-api-base', project.fabric_version))
 	modImplementation include(fabricApi.module('fabric-resource-loader-v0', project.fabric_version))
-	modImplementation include(fabricApi.module('fabric-command-api-v1', project.fabric_version))
+	modImplementation include(fabricApi.module('fabric-command-api-v2', project.fabric_version))
 	modImplementation include(fabricApi.module('fabric-item-api-v1', project.fabric_version))
 	modImplementation include(fabricApi.module('fabric-key-binding-api-v1', project.fabric_version))
 	modImplementation include(fabricApi.module('fabric-rendering-v1', project.fabric_version))
@@ -70,13 +70,12 @@ dependencies {
 		transitive = false
 	}
 	modImplementation 'com.unascribed:ears-api:1.4.5'
-	modImplementation('tf.ssf.sfort:fscript:3.1.2-1.18.1') {
+	modImplementation('tf.ssf.sfort:fscript:3.1.3') {
 		transitive = false
 	}
 	modRuntimeOnly fabricApi.module('fabric-screen-api-v1', project.fabric_version)
 
-	annotationProcessor project(':ap'){
-	}
+	annotationProcessor project(':ap')
 }
 
 loom.accessWidenerPath = file('src/main/resources/fabrication.accesswidener')

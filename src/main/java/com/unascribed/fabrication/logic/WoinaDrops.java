@@ -169,7 +169,7 @@ public class WoinaDrops {
 		normal.transform(ent.getNormalMatrix());
 		int j = data.length / 8;
 		try (MemoryStack stack = MemoryStack.stackPush()) {
-			ByteBuffer buf = stack.malloc(VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL.getVertexSize());
+			ByteBuffer buf = stack.malloc(VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL.getVertexSizeByte());
 			IntBuffer iBuf = buf.asIntBuffer();
 			float minU = Float.POSITIVE_INFINITY;
 			float maxU = Float.NEGATIVE_INFINITY;

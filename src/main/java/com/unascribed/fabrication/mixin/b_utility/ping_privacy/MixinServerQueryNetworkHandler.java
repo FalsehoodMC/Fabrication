@@ -7,6 +7,7 @@ import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 import com.unascribed.fabrication.FabConf;
+import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -27,7 +28,6 @@ import net.minecraft.server.ServerMetadata;
 import net.minecraft.server.ServerMetadata.Players;
 import net.minecraft.server.ServerMetadata.Version;
 import net.minecraft.server.network.ServerQueryNetworkHandler;
-import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
 
 @Mixin(ServerQueryNetworkHandler.class)
@@ -56,10 +56,10 @@ public class MixinServerQueryNetworkHandler {
 					if (PingPrivacy.isEvil(((InetSocketAddress)sa).getAddress())) {
 						playerCount = tlr.nextInt(128)+128;
 						v = new Version("?", 99999999);
-						junkData.setDescription(new LiteralText("A Minecraft Server"));
+						junkData.setDescription(Text.literal("A Minecraft Server"));
 					} else {
 						playerCount = 12;
-						junkData.setDescription(new LiteralText("To protect the privacy of this server and its\nusers, you must log in once to see ping data.").formatted(Formatting.ITALIC));
+						junkData.setDescription(Text.literal("To protect the privacy of this server and its\nusers, you must log in once to see ping data.").formatted(Formatting.ITALIC));
 						v = new Version("§7?§8/§7"+realData.getPlayers().getPlayerLimit(), 99999999);
 					}
 					GameProfile[] sample = new GameProfile[playerCount];

@@ -12,7 +12,7 @@ import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import java.util.Iterator;
@@ -33,14 +33,14 @@ public class YeetRecipesScreen extends Screen{
 
 
 	public YeetRecipesScreen(Screen parent, PrideFlag prideFlag, String title, String configKey) {
-		super(new LiteralText("Fabrication Yeet Recipes"));
+		super(Text.literal("Fabrication Yeet Recipes"));
 		this.parent = parent;
 		this.prideFlag = prideFlag;
 	}
 	@Override
 	protected void init() {
 		super.init();
-		searchField = new TextFieldWidget(textRenderer, 0, 0, width, 20, searchField, new LiteralText("Filter"));
+		searchField = new TextFieldWidget(textRenderer, 0, 0, width, 20, searchField, Text.literal("Filter"));
 		searchField.setChangedListener((s) -> {
 			s = s.trim();
 			filter = Pattern.compile(s, Pattern.LITERAL | Pattern.CASE_INSENSITIVE);

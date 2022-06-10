@@ -16,9 +16,9 @@ import net.fabricmc.loader.api.metadata.Person;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 @EligibleIf(configAvailable="*.mods_command", specialConditions=SpecialEligibility.NOT_FORGE)
@@ -49,7 +49,7 @@ public class FeatureModsCommandFabric implements Feature {
 				} catch (Throwable t) {
 					dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("plugins")
 							.executes((c) -> {
-								c.getSource().sendFeedback(new LiteralText("§cThis ain't no Bukkit!\nTry /mods"), false);
+								c.getSource().sendFeedback(Text.literal("§cThis ain't no Bukkit!\nTry /mods"), false);
 								return 1;
 							}));
 				}
@@ -65,14 +65,14 @@ public class FeatureModsCommandFabric implements Feature {
 	}
 
 	private void sendMods(CommandContext<ServerCommandSource> c, boolean all) {
-		MutableText mt = new LiteralText("Mods: ");
+		MutableText mt = Text.literal("Mods: ");
 		boolean first = true;
 		for (ModContainer mc : FabricLoader.getInstance().getAllMods()) {
 			ModMetadata mm = mc.getMetadata();
 			if (mm.getId().equals("minecraft")) continue;
 			if (mm.getId().startsWith("fabric-") && !all) continue;
 			if (!first) {
-				mt.append(new LiteralText(", ").setStyle(Style.EMPTY.withColor(Formatting.RESET)));
+				mt.append(Text.literal(", ").setStyle(Style.EMPTY.withColor(Formatting.RESET)));
 			} else {
 				first = false;
 			}
@@ -95,9 +95,9 @@ public class FeatureModsCommandFabric implements Feature {
 			}
 			desc.append("ID: ");
 			desc.append(mm.getId());
-			LiteralText lt = new LiteralText(mm.getName());
+			MutableText lt = Text.literal(mm.getName());
 			Style s = Style.EMPTY.withColor(Formatting.GREEN)
-					.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(desc.toString())));
+					.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal(desc.toString())));
 			if (mm.getContact() != null && mm.getContact().get("homepage").isPresent()) {
 				s = s.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, mm.getContact().get("homepage").get()));
 			}

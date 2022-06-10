@@ -48,7 +48,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 		if (!FabConf.isEnabled("*.repelling_void")) return;
 		if (onGround) {
 			fabrication$lastGroundPos = getPos();
-			fabrication$lastLandingPos = getLandingPos();
+			fabrication$lastLandingPos = getSteppingPos();
 			fabrication$voidFallTrail.clear();
 		} else if (fabrication$voidFallTrail.size() < 20) {
 			fabrication$voidFallTrail.add(getPos());

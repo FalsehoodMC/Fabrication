@@ -5,6 +5,8 @@ import java.util.stream.Collectors;
 
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.injection.Hijack;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.TranslatableTextContent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
@@ -23,7 +25,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.EnchantmentScreenHandler;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 
 
 @Mixin(EnchantmentScreen.class)
@@ -49,8 +50,8 @@ public abstract class MixinEnchantmentScreen extends HandledScreen<EnchantmentSc
 	public List<Text> removeLevelText(List<Text> original){
 		if (FabConf.isEnabled("*.no_experience")){
 			original = original.stream().filter(text ->{
-				if (text instanceof TranslatableText) {
-					return !((TranslatableText) text).getKey().startsWith("container.enchant.level");
+				if (text instanceof MutableText && text.getContent() instanceof TranslatableTextContent) {
+					return !((TranslatableTextContent) text.getContent()).getKey().startsWith("container.enchant.level");
 				}
 				return true;
 			}).collect(Collectors.toList());

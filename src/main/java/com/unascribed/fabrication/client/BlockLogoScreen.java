@@ -16,7 +16,7 @@ import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.command.argument.BlockArgumentParser;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.lwjgl.glfw.GLFW;
@@ -48,7 +48,7 @@ public class BlockLogoScreen extends Screen{
 
 
 	public BlockLogoScreen(Screen parent, PrideFlag prideFlag, String title, String configKey) {
-		super(new LiteralText("Fabrication Block Logo"));
+		super(Text.literal("Fabrication Block Logo"));
 		this.parent = parent;
 		this.prideFlag = prideFlag;
 	}

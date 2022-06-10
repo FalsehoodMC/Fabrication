@@ -16,7 +16,6 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
 @Mixin(EntityRenderer.class)
@@ -39,7 +38,7 @@ public abstract class MixinEntityRenderer {
 			matrices.scale(0.5f, 0.5f, 0.5f);
 			try {
 				fabrication$mobIdsShiftTextDown = true;
-				renderLabelIfPresent(e, new LiteralText(e.getUuidAsString()), matrices, vcp, light);
+				renderLabelIfPresent(e, Text.literal(e.getUuidAsString()), matrices, vcp, light);
 			} finally {
 				fabrication$mobIdsShiftTextDown = false;
 			}

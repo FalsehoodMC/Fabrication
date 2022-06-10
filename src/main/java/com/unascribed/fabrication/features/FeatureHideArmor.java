@@ -31,7 +31,7 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 @EligibleIf(configAvailable="*.hide_armor")
@@ -98,7 +98,7 @@ public class FeatureHideArmor implements Feature {
 	}
 
 	private int setArmorHidden(CommandContext<ServerCommandSource> c, boolean hidden, EquipmentSlot... slots) throws CommandSyntaxException {
-		ServerPlayerEntity ent = c.getSource().getPlayer();
+		ServerPlayerEntity ent = c.getSource().getPlayerOrThrow();
 		if (ent instanceof GetSuppressedSlots) {
 			Set<EquipmentSlot> suppressed = ((GetSuppressedSlots)ent).fabrication$getSuppressedSlots();
 			int amt = 0;
@@ -121,16 +121,16 @@ public class FeatureHideArmor implements Feature {
 			sendSuppressedSlotsForSelf(ent);
 			String verb = hidden ? "hidden" : "shown";
 			if (amt == 4) {
-				c.getSource().sendFeedback(new LiteralText("All armor slots "+verb), false);
+				c.getSource().sendFeedback(Text.literal("All armor slots "+verb), false);
 			} else if (amt > 1) {
-				c.getSource().sendFeedback(new LiteralText(amt+" armor slots "+verb), false);
+				c.getSource().sendFeedback(Text.literal(amt+" armor slots "+verb), false);
 			} else if (amt > 0) {
-				c.getSource().sendFeedback(new LiteralText("1 armor slot "+verb), false);
+				c.getSource().sendFeedback(Text.literal("1 armor slot "+verb), false);
 			} else {
-				c.getSource().sendFeedback(new LiteralText("All specified slots are already "+verb), false);
+				c.getSource().sendFeedback(Text.literal("All specified slots are already "+verb), false);
 			}
 		} else {
-			c.getSource().sendFeedback(new LiteralText("Patch error!"), false);
+			c.getSource().sendFeedback(Text.literal("Patch error!"), false);
 		}
 		return 1;
 	}
