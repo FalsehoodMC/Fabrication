@@ -45,7 +45,6 @@ public class FabRefMap {
 				for (String m : l.split("\t")) {
 					int i = m.indexOf(' ');
 					if (i == -1) {
-						FabLog.error("Bad method mapping for "+key+" on line "+line);
 						continue;
 					}
 					methodMap.get(key).put(m.substring(0, i), m.substring(i+1));
@@ -56,7 +55,6 @@ public class FabRefMap {
 				for (String m : l.split("\t")) {
 					int i = m.indexOf(' ');
 					if (i == -1) {
-						FabLog.error("Bad target mapping for "+key+" on line "+line);
 						continue;
 					}
 					targetMap.get(key).put(m.substring(0, i), m.substring(i+1));

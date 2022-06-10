@@ -197,20 +197,39 @@ jar {
 				}
 			}
 		}
+		for (Map<String, String> inmap : fabReflFields.values()) {
+			for (String s : inmap.values()) {
+				boolean missing = true
+				for (Map.Entry<String, String> entry : fabReflBldr) {
+					if (entry.getKey().equals(s)){
+						missing = false
+						break
+					}
+				}
+				if (missing) {
+					logger.log(LogLevel.ERROR, "Failed to map "+s+" for FabReflField")
+				}
+			}
+		}
 		StringBuilder strbldr = new StringBuilder()
 		for (def intr : toInter){
 			strbldr.append(intr.key)
 			strbldr.append('\n')
 			boolean frst = true
 			for (String s : intr.value.method) {
+				boolean missedMthd = true
 				for (String c : intr.value.mixin) {
 					String set = methodMap.get(c.replace('.', '/')+';'+s)
 					if (set != null){
 						if (frst) frst = false;
 						else strbldr.append('\t')
 						strbldr.append(s).append(' ').append(set)
+						missedMthd = false
 						break
 					}
+				}
+				if (missedMthd) {
+					logger.log(LogLevel.ERROR, "Failed to map "+s+" for "+intr.key)
 				}
 			}
 			if ('FabRefl'.equals(intr.getKey())){
@@ -233,6 +252,8 @@ jar {
 					if (frst) frst = false;
 					else strbldr.append('\t')
 					strbldr.append(s+' '+'L'+classMap.get(s.substring(s.charAt(0) == 'L' as char ? 1 : 0, col))+';'+ad)
+				} else {
+					logger.log(LogLevel.ERROR, "Failed to map "+s+" for "+intr.key)
 				}
 			}
 			strbldr.append('\n')
