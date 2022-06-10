@@ -43,7 +43,7 @@ public class MixinTitleScreen extends Screen {
 	private String splashText;
 	private String fabrication$splashText;
 
-	@Shadow
+	@Shadow @Final
 	private boolean doBackgroundFade;
 	@Shadow
 	private long backgroundFadeStart;
@@ -69,7 +69,7 @@ public class MixinTitleScreen extends Screen {
 		return id;
 	}
 
-	@ModifyArg(at=@At(value="INVOKE", target="com/mojang/blaze3d/systems/RenderSystem.setShaderTexture(ILnet/minecraft/class_2960;)V", ordinal=2),
+	@ModifyArg(at=@At(value="INVOKE", target="com/mojang/blaze3d/systems/RenderSystem.setShaderTexture(ILnet/minecraft/util/Identifier;)V", ordinal=2),
 			method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V", require=0)
 	public Identifier setShaderTextureObf(Identifier id) {
 		if (FabConf.isEnabled("*.block_logo") && id == EDITION_TITLE_TEXTURE) {

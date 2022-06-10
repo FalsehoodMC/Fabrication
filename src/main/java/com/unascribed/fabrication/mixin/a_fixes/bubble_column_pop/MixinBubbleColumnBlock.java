@@ -1,8 +1,7 @@
 package com.unascribed.fabrication.mixin.a_fixes.bubble_column_pop;
 
-import java.util.Random;
-
 import com.unascribed.fabrication.FabConf;
+import net.minecraft.util.math.random.Random;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -28,7 +27,7 @@ public class MixinBubbleColumnBlock {
 
 	@Shadow @Final public static BooleanProperty DRAG;
 
-	@Inject(at=@At("HEAD"), method="randomDisplayTick(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Ljava/util/Random;)V")
+	@Inject(at=@At("HEAD"), method="randomDisplayTick(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/random/Random;)V")
 	public void addBubblePop(BlockState state, World world, BlockPos pos, Random random, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.bubble_column_pop")) return;
 		if (!state.get(DRAG) && world.isAir(pos.up())) {

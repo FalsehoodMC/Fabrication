@@ -18,12 +18,12 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPointer;
 import net.minecraft.util.math.BlockPos;
 
-@Mixin(targets="net.minecraft.block.dispenser.DispenserBehavior$17")
+@Mixin(targets="net.minecraft.block.dispenser.DispenserBehavior$24")
 @EligibleIf(configAvailable="*.obsidian_tears")
 public class MixinGlassBottleDispenserBehavior extends FallibleItemDispenserBehavior {
 
 	@Shadow
-	private ItemStack tryPutFilledBottle(BlockPointer blockPointer, ItemStack emptyBottleStack, ItemStack filledBottleStack) { return null; }
+	private ItemStack tryPutFilledBottle(BlockPointer pointer, ItemStack emptyBottleStack, ItemStack filledBottleStack) { return null; }
 
 	@Inject(at=@At("HEAD"), method="dispenseSilently(Lnet/minecraft/util/math/BlockPointer;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;",
 			cancellable=true)

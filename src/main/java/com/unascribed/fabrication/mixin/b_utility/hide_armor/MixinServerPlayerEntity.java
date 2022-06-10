@@ -20,7 +20,7 @@ public abstract class MixinServerPlayerEntity {
 		FeatureHideArmor.sendSuppressedSlotsForSelf((ServerPlayerEntity)(Object)this);
 	}
 
-	@Inject(at=@At("HEAD"), method="copyFrom(Lnet/minecraft/server/network/ServerPlayerEntity;Z)V", cancellable=true)
+	@Inject(at=@At("HEAD"), method="copyFrom(Lnet/minecraft/server/network/ServerPlayerEntity;Z)V")
 	public void copyFrom(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
 		((GetSuppressedSlots)this).fabrication$getSuppressedSlots().clear();
 		((GetSuppressedSlots)this).fabrication$getSuppressedSlots().addAll(((GetSuppressedSlots)oldPlayer).fabrication$getSuppressedSlots());

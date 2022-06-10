@@ -27,7 +27,7 @@ import net.minecraft.world.World;
 public abstract class MixinEntity {
 
 	@Shadow
-	public Vec3d pos;
+	private Vec3d pos;
 	@Shadow
 	public World world;
 

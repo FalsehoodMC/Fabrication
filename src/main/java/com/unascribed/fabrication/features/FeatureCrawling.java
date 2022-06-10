@@ -28,7 +28,7 @@ public class FeatureCrawling implements Feature {
 			public void setPressed(boolean pressed) {
 				boolean send = !forced && isPressed() != pressed && MinecraftClient.getInstance().getNetworkHandler() != null;
 				boolean state = pressed;
-				boolean toggle = MinecraftClient.getInstance().options.sneakToggled;
+				boolean toggle = MinecraftClient.getInstance().options.getSneakToggled().getValue();
 				if (toggle && !pressed) {
 					send = false;
 				}

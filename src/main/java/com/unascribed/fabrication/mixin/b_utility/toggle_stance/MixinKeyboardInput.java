@@ -16,8 +16,8 @@ import net.minecraft.client.input.KeyboardInput;
 @EligibleIf(configAvailable="*.toggle_stance", envMatches=Env.CLIENT)
 public class MixinKeyboardInput {
 
-	@Inject(at=@At("TAIL"), method="tick(Z)V")
-	public void tick(boolean slowDown, CallbackInfo ci) {
+	@Inject(at=@At("TAIL"), method="tick(ZF)V")
+	public void tick(boolean slowDown, float f, CallbackInfo ci) {
 		if (FabConf.isEnabled("*.toggle_stance") && FeatureToggleStance.currentStance.sneaking) {
 			((KeyboardInput)(Object)this).sneaking = true;
 		}

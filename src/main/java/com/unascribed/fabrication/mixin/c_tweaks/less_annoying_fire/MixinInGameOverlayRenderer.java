@@ -30,7 +30,7 @@ public class MixinInGameOverlayRenderer {
 		}
 	}
 
-	@Inject(at=@At("TAIL"), method="renderFireOverlay(Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/util/math/MatrixStack;)V", cancellable=true)
+	@Inject(at=@At("TAIL"), method="renderFireOverlay(Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/util/math/MatrixStack;)V")
 	private static void renderFireOverlayTail(MinecraftClient client, MatrixStack stack, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.less_annoying_fire")) return;
 		stack.pop();

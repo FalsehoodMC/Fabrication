@@ -50,6 +50,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.Property;
 import net.minecraft.text.MutableText;
@@ -65,12 +66,13 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.gen.noise.NoiseConfig;
 
 public class FeatureFabricationCommand implements Feature {
 
 	@Override
 	public void apply() {
-		Agnos.runForCommandRegistration((dispatcher, dedi) -> {
+		Agnos.runForCommandRegistration((dispatcher, registryAccess, dedi) -> {
 			try {
 				LiteralArgumentBuilder<ServerCommandSource> root = LiteralArgumentBuilder.<ServerCommandSource>literal(FabricationMod.MOD_NAME_LOWER);
 				addConfig(root, dedi);
@@ -281,7 +283,8 @@ public class FeatureFabricationCommand implements Feature {
 								for (int cZ = 0; cZ < 16; cZ++) {
 									if (biomes != null) {
 										ChunkGenerator generator = ((ServerWorld)world).getChunkManager().getChunkGenerator();
-										Biome b = generator.getBiomeSource().getBiome(cX+chunk.getPos().getStartX(), cY, cZ+chunk.getPos().getStartZ(), generator.getMultiNoiseSampler()).value();
+										NoiseConfig noiseConfig = ((ServerWorld)world).getChunkManager().getNoiseConfig();
+										Biome b = generator.getBiomeSource().getBiome(cX+chunk.getPos().getStartX(), cY, cZ+chunk.getPos().getStartZ(), noiseConfig.getMultiNoiseSampler()).value();
 										if (!biomes.contains(b)) {
 											skipped++;
 											if (skipped > goal && scanned == 0) {
@@ -374,7 +377,7 @@ public class FeatureFabricationCommand implements Feature {
 			if (scs.getServer().isSingleplayer() && scs.getEntity() != null) {
 				Entity e = scs.getEntity();
 				if (e instanceof PlayerEntity) {
-					if (scs.getServer().getSinglePlayerName().equals(((PlayerEntity)e).getGameProfile().getName())) {
+					if (scs.getServer().isHost(((PlayerEntity)e).getGameProfile())) {
 						// always allow in singleplayer, even if cheats are off
 						return true;
 					}

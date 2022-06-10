@@ -27,7 +27,7 @@ public abstract class MixinLivingEntityClient extends Entity {
 
 	// actually attackerYaw. has the wrong name in this version of yarn
 	@Shadow
-	private float knockbackVelocity;
+	public float knockbackVelocity;
 
 	@Inject(at=@At("HEAD"), method="animateDamage()V")
 	public void animateDamageHead(CallbackInfo ci) {

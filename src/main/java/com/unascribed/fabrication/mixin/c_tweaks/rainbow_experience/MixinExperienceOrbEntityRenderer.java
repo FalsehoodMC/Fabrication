@@ -31,7 +31,7 @@ public class MixinExperienceOrbEntityRenderer {
 		fabrication$colorDecider.setSeed(experienceOrbEntity.getUuid().hashCode());
 	}
 
-	@ModifyArgs(at=@At(value="INVOKE", target="net/minecraft/client/render/entity/ExperienceOrbEntityRenderer.method_23171(Lnet/minecraft/client/render/VertexConsumer;Lnet/minecraft/util/math/Matrix4f;Lnet/minecraft/util/math/Matrix3f;FFIIIFFI)V"),
+	@ModifyArgs(at=@At(value="INVOKE", target="Lnet/minecraft/client/render/entity/ExperienceOrbEntityRenderer;vertex(Lnet/minecraft/client/render/VertexConsumer;Lnet/minecraft/util/math/Matrix4f;Lnet/minecraft/util/math/Matrix3f;FFIIIFFI)V"),
 			method="render(Lnet/minecraft/entity/ExperienceOrbEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")
 	public void addVertex(Args args) {
 		if (FabConf.isEnabled("*.rainbow_experience")) {

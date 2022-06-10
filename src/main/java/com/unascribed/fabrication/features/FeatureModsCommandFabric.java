@@ -8,7 +8,7 @@ import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.SpecialEligibility;
 
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
@@ -30,7 +30,7 @@ public class FeatureModsCommandFabric implements Feature {
 	public void apply() {
 		if (applied) return;
 		applied = true;
-		CommandRegistrationCallback.EVENT.register((dispatcher, dedi) -> {
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
 			try {
 				dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("mods")
 						.requires(s -> FabConf.isEnabled("*.mods_command"))

@@ -45,11 +45,11 @@ public abstract class MixinLivingEntity extends Entity implements DidJustAbsorp 
 	@Shadow
 	public abstract float getAbsorptionAmount();
 	@Shadow
-	public abstract SoundEvent getHurtSound(DamageSource src);
+	protected abstract SoundEvent getHurtSound(DamageSource src);
 	@Shadow
 	protected abstract float getSoundVolume();
 	@Shadow
-	protected abstract float getSoundPitch();
+	public abstract float getSoundPitch();
 
 	@Inject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z")
 	public void damage(DamageSource ds, float amount, CallbackInfoReturnable<Boolean> cir) {

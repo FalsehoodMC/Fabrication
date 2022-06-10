@@ -2,14 +2,13 @@ package com.unascribed.fabrication.mixin.a_fixes.stable_cacti;
 
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.Random;
 
 import com.unascribed.fabrication.FabConf;
+import net.minecraft.util.math.random.Random;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -64,7 +63,7 @@ public class MixinCactusBlock extends Block {
 		}
 	}
 
-	@Inject(at=@At("HEAD"), method="scheduledTick(Lnet/minecraft/block/BlockState;Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;Ljava/util/Random;)V", cancellable=true)
+	@Inject(at=@At("HEAD"), method="scheduledTick(Lnet/minecraft/block/BlockState;Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/random/Random;)V", cancellable=true)
 	public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.stable_cacti")) return;
 		world.breakBlock(pos, true);

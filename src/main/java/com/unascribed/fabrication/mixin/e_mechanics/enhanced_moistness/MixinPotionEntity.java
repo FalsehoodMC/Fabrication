@@ -27,7 +27,7 @@ public abstract class MixinPotionEntity extends ThrownItemEntity {
 	}
 
 
-	@Inject(at=@At("TAIL"), method="damageEntitiesHurtByWater()V", locals=LocalCapture.CAPTURE_FAILHARD)
+	@Inject(at=@At("TAIL"), method="applyWater()V", locals=LocalCapture.CAPTURE_FAILHARD)
 	public void damageEntitiesHurtByWater(CallbackInfo ci, Box box) {
 		if (!FabConf.isEnabled("*.enhanced_moistness") || world.isClient) return;
 		for (Entity e : world.getEntitiesByClass(Entity.class, box, e -> true)) {

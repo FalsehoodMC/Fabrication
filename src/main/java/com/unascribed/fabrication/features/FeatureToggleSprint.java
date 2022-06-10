@@ -25,7 +25,7 @@ public class FeatureToggleSprint implements Feature {
 					// reset() was probably called, so, reset
 					sprinting = false;
 				}
-				if(MinecraftClient.getInstance().options.sprintToggled){
+				if(MinecraftClient.getInstance().options.getSprintToggled().getValue()){
 					sprinting = pressed;
 				}else if (!isPressed() && pressed) {
 					sprinting = !sprinting;

@@ -24,7 +24,7 @@ import net.minecraft.item.Items;
 public class MixinItemRenderer {
 
 	@Shadow
-	private float zOffset;
+	public float zOffset;
 
 	@Inject(at=@At("TAIL"), method="renderGuiItemOverlay(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V")
 	public void renderGuiItemOverlay(TextRenderer renderer, ItemStack stack, int x, int y, String countLabel, CallbackInfo ci) {

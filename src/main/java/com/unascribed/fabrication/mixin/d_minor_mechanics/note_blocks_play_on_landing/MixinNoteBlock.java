@@ -28,14 +28,14 @@ public abstract class MixinNoteBlock extends Block {
 	}
 
 	@Shadow
-	private void playNote(World world, BlockPos pos) {}
+	private void playNote(Entity entity, World world, BlockPos pos) {}
 
 	@Override
 	public void onLandedUpon(World world, BlockState state, BlockPos pos, Entity entity, float distance) {
 		super.onLandedUpon(world, state, pos, entity, distance);
 		if (!world.isClient && FabConf.isEnabled("*.note_blocks_play_on_landing")) {
 			for (int i = 0; i < Math.min(8, Math.ceil(distance/2)); i++) {
-				playNote(world, pos);
+				playNote(entity, world, pos);
 			}
 			if (entity instanceof PlayerEntity) {
 				((PlayerEntity)entity).incrementStat(Stats.PLAY_NOTEBLOCK);

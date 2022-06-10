@@ -70,8 +70,7 @@ public class AtlasViewerScreen extends Screen {
 			bb.vertex(mat, width, 0, 0).texture(width/8, 0).next();
 			bb.vertex(mat, width, height, 0).texture(width/8, height/8).next();
 			bb.vertex(mat, 0, height, 0).texture(0, height/8).next();
-		bb.end();
-		BufferRenderer.draw(bb);
+		BufferRenderer.drawWithShader(bb.end());
 
 		client.getTextureManager().bindTexture(atlas);
 
@@ -92,8 +91,7 @@ public class AtlasViewerScreen extends Screen {
 			bb.vertex(mat, atlasWidth, 0, 0).next();
 			bb.vertex(mat, atlasWidth, atlasHeight, 0).next();
 			bb.vertex(mat, 0, atlasHeight, 0).next();
-		bb.end();
-		BufferRenderer.draw(bb);
+		BufferRenderer.drawWithShader(bb.end());
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, level);
 
@@ -107,8 +105,7 @@ public class AtlasViewerScreen extends Screen {
 			bb.vertex(mat, atlasWidth, 0, 0).texture(1, 0).next();
 			bb.vertex(mat, atlasWidth, atlasHeight, 0).texture(1, 1).next();
 			bb.vertex(mat, 0, atlasHeight, 0).texture(0, 1).next();
-		bb.end();
-		BufferRenderer.draw(bb);
+		BufferRenderer.drawWithShader(bb.end());
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 		matrices.pop();
@@ -149,8 +146,7 @@ public class AtlasViewerScreen extends Screen {
 				bb.vertex(mat, panX+x+w, panY+y, 0).next();
 				bb.vertex(mat, panX+x+w, panY+y+h, 0).next();
 				bb.vertex(mat, panX+x, panY+y+h, 0).next();
-			bb.end();
-			BufferRenderer.draw(bb);
+			BufferRenderer.drawWithShader(bb.end());
 		}
 		RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 		RenderSystem.enableTexture();
@@ -172,7 +168,7 @@ public class AtlasViewerScreen extends Screen {
 			String src;
 			if (s.getClass() == Sprite.class) {
 				try {
-					src = client.getResourceManager().getResource(tex).getResourcePackName();
+					src = client.getResourceManager().getResource(tex).get().getResourcePackName();
 				} catch (Throwable t) {
 					t.printStackTrace();
 					src = "??";

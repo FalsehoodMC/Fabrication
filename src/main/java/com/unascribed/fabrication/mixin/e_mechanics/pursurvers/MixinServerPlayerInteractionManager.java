@@ -12,7 +12,6 @@ import com.unascribed.fabrication.support.EligibleIf;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.ObserverBlock;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket.Action;
 import net.minecraft.server.network.ServerPlayerInteractionManager;
 import net.minecraft.server.world.ServerWorld;
@@ -24,12 +23,11 @@ import net.minecraft.util.math.Direction;
 public class MixinServerPlayerInteractionManager {
 
 	@Shadow
-	public ServerWorld world;
+	protected ServerWorld world;
 
 	@Inject(at=@At(value="INVOKE", target="net/minecraft/block/BlockState.onBlockBreakStart(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/player/PlayerEntity;)V"),
-			method="processBlockBreakingAction(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/network/packet/c2s/play/PlayerActionC2SPacket$Action;Lnet/minecraft/util/math/Direction;I)V",
-			cancellable=true)
-	public void processBlockBreakingAction(BlockPos pos, PlayerActionC2SPacket.Action action, Direction dir, int worldHeight, CallbackInfo ci) {
+			method="processBlockBreakingAction(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/network/packet/c2s/play/PlayerActionC2SPacket$Action;Lnet/minecraft/util/math/Direction;II)V")
+	public void processBlockBreakingAction(BlockPos pos, Action action, Direction direction, int worldHeight, int sequence, CallbackInfo ci) {
 		if (FabConf.isEnabled("*.pursurvers") && action == Action.START_DESTROY_BLOCK) {
 			BlockPos.Mutable mut = new BlockPos.Mutable();
 			for (Direction d : Direction.values()) {

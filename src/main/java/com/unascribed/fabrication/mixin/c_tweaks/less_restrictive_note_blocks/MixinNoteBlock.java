@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.mixin.c_tweaks.less_restrictive_note_blocks;
 
 import com.unascribed.fabrication.FabConf;
+import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 
 import com.unascribed.fabrication.support.EligibleIf;
@@ -26,8 +27,8 @@ public abstract class MixinNoteBlock extends Block {
 		super(settings);
 	}
 
-	@Inject(method="playNote(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V", at=@At("HEAD"), cancellable=true)
-	private void playNote(World world, BlockPos pos, CallbackInfo ci) {
+	@Inject(method="playNote(Lnet/minecraft/entity/Entity;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V", at=@At("HEAD"), cancellable=true)
+	private void playNote(Entity entity, World world, BlockPos pos, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.less_restrictive_note_blocks")) return;
 		Direction[] directions = {
 				Direction.UP,

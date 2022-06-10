@@ -43,14 +43,14 @@ public class FeatureIMore implements Feature {
 		applied = true;
 		if (!registered) {
 			registered = true;
-			Agnos.runForCommandRegistration((dispatcher, dedi) -> {
+			Agnos.runForCommandRegistration((dispatcher, registryAccess, dedi) -> {
 				Predicate<ServerCommandSource> requirement = s -> s.hasPermissionLevel(2) && FabConf.isEnabled("*.i_and_more") && applied;
 				// I tried redirect(). It doesn't work.
 				String[] itemCommandNames = { "item", "i" };
 				for (String name : itemCommandNames) {
 					dispatcher.register(CommandManager.literal(name)
 							.requires(requirement)
-							.then(CommandManager.argument("item", ItemStackArgumentType.itemStack())
+							.then(CommandManager.argument("item", ItemStackArgumentType.itemStack(registryAccess))
 									.then(CommandManager.argument("count", IntegerArgumentType.integer(1))
 											.executes(this::item))
 									.executes(this::item)));

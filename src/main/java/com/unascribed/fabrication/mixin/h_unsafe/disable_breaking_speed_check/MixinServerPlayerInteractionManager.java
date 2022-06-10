@@ -13,7 +13,7 @@ import net.minecraft.server.network.ServerPlayerInteractionManager;
 @EligibleIf(configAvailable="*.disable_breaking_speed_check")
 public abstract class MixinServerPlayerInteractionManager {
 
-	@ModifyConstant(constant=@Constant(floatValue=0.7F), method="processBlockBreakingAction(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/network/packet/c2s/play/PlayerActionC2SPacket$Action;Lnet/minecraft/util/math/Direction;I)V")
+	@ModifyConstant(constant=@Constant(floatValue=0.7F), method="processBlockBreakingAction(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/network/packet/c2s/play/PlayerActionC2SPacket$Action;Lnet/minecraft/util/math/Direction;II)V")
 	private float disableBreakingSpeedCheck(float old) {
 		if (!FabConf.isEnabled("*.disable_breaking_speed_check")) return old;
 		return 0.1F;

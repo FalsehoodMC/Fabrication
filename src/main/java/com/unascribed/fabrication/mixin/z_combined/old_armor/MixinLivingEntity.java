@@ -38,7 +38,7 @@ public abstract class MixinLivingEntity extends Entity {
 	}
 
 	@Shadow
-	protected abstract ItemStack getEquippedStack(EquipmentSlot slot);
+	public abstract ItemStack getEquippedStack(EquipmentSlot slot);
 
 	@Shadow
 	public abstract AttributeContainer getAttributes();

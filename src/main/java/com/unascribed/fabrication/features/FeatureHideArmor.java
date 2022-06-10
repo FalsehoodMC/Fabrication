@@ -47,7 +47,7 @@ public class FeatureHideArmor implements Feature {
 		applied = true;
 		if (!registered) {
 			registered = true;
-			Agnos.runForCommandRegistration((dispatcher, dedi) -> {
+			Agnos.runForCommandRegistration((dispatcher, registryAccess, dedi) -> {
 				dispatcher.register(buildCommand("hidearmor", true));
 				dispatcher.register(buildCommand("showarmor", false));
 			});

@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ItemStringReader.class)
@@ -74,8 +75,8 @@ public class MixinItemStringReader {
 		return null;
 	}
 
-	@Inject(at=@At("RETURN"), method="consume()Lnet/minecraft/command/argument/ItemStringReader;")
-	public void consume(CallbackInfoReturnable<ItemStringReader> ci) {
+	@Inject(at=@At("RETURN"), method="consume()V")
+	public void consume(CallbackInfo ci) {
 		if (fabrication$legacyDamageNbt != null) {
 			if (nbt == null) {
 				nbt = fabrication$legacyDamageNbt;
