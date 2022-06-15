@@ -6,10 +6,10 @@ import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.util.Regex;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.text.ClickEvent;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.Formatting;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,23 +21,23 @@ import java.util.regex.Matcher;
 @EligibleIf(configAvailable="*.linkify_urls", envMatches=Env.CLIENT)
 public class MixinInGameHud {
 
-	@ModifyVariable(at=@At(value="HEAD"), method="addChatMessage(Lnet/minecraft/network/MessageType;Lnet/minecraft/text/Text;Ljava/util/UUID;)V", argsOnly=true)
+	@ModifyVariable(at=@At(value="HEAD"), method="onChatMessage(Lnet/minecraft/network/message/MessageType;Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSender;)V", argsOnly=true)
 	public Text consume(Text message) {
 		if (!FabConf.isEnabled("*.linkify_urls")) return message;
-		if (!(message instanceof TranslatableText && "chat.type.text".equals(((TranslatableText)message).getKey()))) return message;
-		Object[] args = ((TranslatableText) message).getArgs();
+		if (!(message instanceof MutableText && message.getContent() instanceof TranslatableTextContent && "chat.type.text".equals(((TranslatableTextContent)message.getContent()).getKey()))) return message;
+		Object[] args = ((TranslatableTextContent)message.getContent()).getArgs();
 		boolean anyMatch = false;
 		for (int i=0; i<args.length; i++) {
 			if (args[i] instanceof String && !((String)args[i]).isEmpty()) {
-				LiteralText newLine = null;
+				MutableText newLine = null;
 				String astr = (String) args[i];
 				Matcher matcher = Regex.webUrl.matcher(astr);
 				int last = 0;
 				while (matcher.find()) {
-					if (newLine == null) newLine = new LiteralText(astr.substring(last, matcher.start()));
+					if (newLine == null) newLine = Text.literal(astr.substring(last, matcher.start()));
 					else newLine.append(astr.substring(last, matcher.start()));
 					String str = matcher.group();
-					LiteralText lt = new LiteralText(str);
+					MutableText lt = Text.literal(str);
 					lt.setStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, str)).withUnderline(true).withItalic(true).withColor(Formatting.AQUA));
 					newLine.append(lt);
 					last = matcher.end();
@@ -49,7 +49,7 @@ public class MixinInGameHud {
 				}
 			}
 		}
-		if (anyMatch) return new TranslatableText(((TranslatableText) message).getKey(), args);
+		if (anyMatch) return Text.translatable(((TranslatableTextContent) message.getContent()).getKey(), args);
 		return message;
 	}
 

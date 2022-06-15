@@ -18,6 +18,7 @@ import net.minecraft.util.registry.Registry;
 public class LegacyIDs {
 
 	private static final Int2ObjectOpenHashMap<Item> data = new Int2ObjectOpenHashMap<>();
+	private static final Int2ObjectOpenHashMap<Identifier> data_id = new Int2ObjectOpenHashMap<>();
 
 	static {
 		try {
@@ -28,7 +29,9 @@ public class LegacyIDs {
 				int id = Integer.parseInt(en.getKey().substring(0, colon));
 				int meta = Integer.parseInt(en.getKey().substring(colon+1));
 				int key = id << 16 | meta;
-				data.put(key, Registry.ITEM.get(new Identifier(en.getValue().getAsString())));
+				Identifier ident = new Identifier(en.getValue().getAsString());
+				data.put(key, Registry.ITEM.get(ident));
+				data_id.put(key, ident);
 			}
 		} catch (Throwable t) {
 			FabLog.warn("Failed to load legacy IDs", t);
@@ -37,6 +40,10 @@ public class LegacyIDs {
 
 	public static Item lookup(int id, int meta) {
 		return data.get(id << 16 | meta);
+	}
+
+	public static Identifier lookup_id(int id, int meta) {
+		return data_id.get(id << 16 | meta);
 	}
 
 }

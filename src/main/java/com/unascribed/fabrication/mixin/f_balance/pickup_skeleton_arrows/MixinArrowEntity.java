@@ -8,7 +8,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -26,7 +26,7 @@ public abstract class MixinArrowEntity implements TagStrayArrow {
 		if (!(FabConf.isEnabled("*.pickup_skeleton_arrows") && fabrication$firedByStray)) return;
 		ItemStack arrow = cir.getReturnValue();
 		if (!arrow.hasCustomName())
-			arrow.setCustomName(new TranslatableText("item.minecraft.tipped_arrow.effect.slowness"));
+			arrow.setCustomName(Text.translatable("item.minecraft.tipped_arrow.effect.slowness"));
 		if (!(arrow.hasNbt() && arrow.getNbt().contains("CustomPotionColor")))
 			arrow.getOrCreateNbt().putInt("CustomPotionColor", PotionUtil.getColor(Potions.SLOWNESS));
 	}

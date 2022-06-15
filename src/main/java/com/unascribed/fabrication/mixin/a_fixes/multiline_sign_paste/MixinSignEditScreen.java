@@ -19,7 +19,6 @@ import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.SignEditScreen;
 import net.minecraft.client.util.SelectionManager;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
 @Mixin(SignEditScreen.class)
@@ -47,12 +46,12 @@ public abstract class MixinSignEditScreen extends Screen {
 				for (int i = 0; i < lines.length; i++) {
 					String line = lines[i];
 					text[currentRow+i] = line;
-					sign.setTextOnRow(currentRow+i, new LiteralText(line));
+					sign.setTextOnRow(currentRow+i, Text.literal(line));
 				}
 				currentRow += lines.length-1;
 			} else {
 				text[currentRow] = pasted;
-				sign.setTextOnRow(currentRow, new LiteralText(pasted));
+				sign.setTextOnRow(currentRow, Text.literal(pasted));
 			}
 		}, SelectionManager.makeClipboardGetter(client),
 				SelectionManager.makeClipboardSetter(client),

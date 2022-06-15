@@ -14,7 +14,7 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import tf.ssf.sfort.script.Help;
 import tf.ssf.sfort.script.ScriptingScreen;
@@ -32,7 +32,7 @@ public class FScriptScreen extends ScriptingScreen {
 	boolean fabrication$requestedScript = false;
 
 	public FScriptScreen(Screen parent, PrideFlag prideFlag, String title, String configKey) {
-		super(new LiteralText("Fabrication Scripting"), parent, new Script(
+		super(Text.literal("Fabrication Scripting"), parent, new Script(
 				"§bFabrication - " + title,
 				OptionalFScript.predicateProviders.get(configKey) instanceof Help ? (Help)OptionalFScript.predicateProviders.get(configKey) : default_embed.get(FeaturesFile.get(configKey).fscript),
 				null, null, null,

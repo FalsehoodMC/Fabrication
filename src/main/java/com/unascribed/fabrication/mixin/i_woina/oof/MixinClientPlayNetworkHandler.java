@@ -13,11 +13,11 @@ import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 
-@Mixin(value = ClientPlayNetworkHandler.class, priority = 1049)
+@Mixin(ClientPlayNetworkHandler.class)
 @EligibleIf(configAvailable="*.oof", envMatches= Env.CLIENT)
 public class MixinClientPlayNetworkHandler {
 
-	@ModifyArg(method= "onPlaySound(Lnet/minecraft/network/packet/s2c/play/PlaySoundS2CPacket;)V", at=@At(value="INVOKE", target = "Lnet/minecraft/client/world/ClientWorld;playSound(Lnet/minecraft/entity/player/PlayerEntity;DDDLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FF)V"))
+	@ModifyArg(method= "onPlaySound(Lnet/minecraft/network/packet/s2c/play/PlaySoundS2CPacket;)V", at=@At(value="INVOKE", target="Lnet/minecraft/client/world/ClientWorld;playSound(Lnet/minecraft/entity/player/PlayerEntity;DDDLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FFJ)V"))
 	private SoundEvent playSound(SoundEvent event) {
 		if (FabConf.isEnabled("*.oof") &&
 				(event.equals(SoundEvents.ENTITY_PLAYER_HURT_SWEET_BERRY_BUSH) || event.equals(SoundEvents.ENTITY_PLAYER_HURT) ||

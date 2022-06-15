@@ -11,7 +11,7 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -29,14 +29,14 @@ public class TaggablePlayersScreen extends Screen{
 
 
 	public TaggablePlayersScreen(Screen parent, PrideFlag prideFlag, String title, String configKey) {
-		super(new LiteralText("Fabrication Taggable Players"));
+		super(Text.literal("Fabrication Taggable Players"));
 		this.parent = parent;
 		this.prideFlag = prideFlag;
 	}
 	@Override
 	protected void init() {
 		super.init();
-		searchField = new TextFieldWidget(textRenderer, 0, 0, width, 20, searchField, new LiteralText("Filter"));
+		searchField = new TextFieldWidget(textRenderer, 0, 0, width, 20, searchField, Text.literal("Filter"));
 		searchField.setChangedListener((s) -> {
 			s = s.trim();
 			filter = Pattern.compile(s, Pattern.LITERAL | Pattern.CASE_INSENSITIVE);

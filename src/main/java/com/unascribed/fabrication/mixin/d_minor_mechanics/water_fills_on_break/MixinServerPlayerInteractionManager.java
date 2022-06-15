@@ -21,12 +21,12 @@ import net.minecraft.util.math.BlockPos;
 public class MixinServerPlayerInteractionManager {
 
 	@Shadow
-	public ServerWorld world;
+	protected ServerWorld world;
 
 	// Forge replaces the call to World.removeBlock with one into IForgeBlockState.removedByPlayer
 	// I can't mixin to a default interface method, so this will have to do
 
-	@Inject(at=@At("RETURN"), method="tryBreakBlock(Lnet/minecraft/util/math/BlockPos;)Z", cancellable=true)
+	@Inject(at=@At("RETURN"), method="tryBreakBlock(Lnet/minecraft/util/math/BlockPos;)Z")
 	public void tryBreakBlock(BlockPos pos, CallbackInfoReturnable<Boolean> ci) {
 		if (FabConf.isAnyEnabled("*.water_fills_on_break") && ci.getReturnValueZ()) {
 			if (WaterFillsOnBreak.shouldFill(world, pos) && world.getBlockState(pos).isAir()) {

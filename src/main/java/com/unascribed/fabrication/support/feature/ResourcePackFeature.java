@@ -24,7 +24,7 @@ import net.minecraft.resource.ResourcePackProfile.InsertionPosition;
 import net.minecraft.resource.ResourcePackProvider;
 import net.minecraft.resource.ResourcePackSource;
 import net.minecraft.resource.metadata.PackResourceMetadata;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 public abstract class ResourcePackFeature implements Feature, ResourcePackProvider {
 
@@ -60,8 +60,8 @@ public abstract class ResourcePackFeature implements Feature, ResourcePackProvid
 	public void register(Consumer<ResourcePackProfile> consumer, Factory factory) {
 		if (active) {
 			Supplier<ResourcePack> f = () -> new FabricationResourcePack(path);
-			consumer.accept(factory.create(FabricationMod.MOD_NAME+" "+path, new LiteralText("Internal "+FabricationMod.MOD_NAME+" resources"),true, f,
-					new PackResourceMetadata(new LiteralText("Internal "+FabricationMod.MOD_NAME+" resources"), 7),
+			consumer.accept(factory.create(FabricationMod.MOD_NAME+" "+path, Text.literal("Internal "+FabricationMod.MOD_NAME+" resources"),true, f,
+					new PackResourceMetadata(Text.literal("Internal " + FabricationMod.MOD_NAME + " resources"), 7),
 					InsertionPosition.TOP, ResourcePackSource.PACK_SOURCE_BUILTIN));
 		}
 	}

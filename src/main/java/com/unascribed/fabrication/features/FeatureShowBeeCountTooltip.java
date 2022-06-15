@@ -4,11 +4,10 @@ import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Feature;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 @EligibleIf(configAvailable="*.show_bee_count_tooltip", envMatches=Env.CLIENT)
 public class FeatureShowBeeCountTooltip implements Feature {
@@ -26,7 +25,7 @@ public class FeatureShowBeeCountTooltip implements Feature {
 					NbtCompound tag = stack.getNbt().getCompound("BlockEntityTag");
 					if (tag == null || !tag.contains("Bees", NbtElement.LIST_TYPE)) return;
 
-					lines.add(new LiteralText("Bees: " + ((NbtList) tag.get("Bees")).size()));
+					lines.add(Text.literal("Bees: " + ((NbtList) tag.get("Bees")).size()));
 				}
 			});
 		}

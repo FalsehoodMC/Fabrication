@@ -16,7 +16,7 @@ import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.command.argument.BlockArgumentParser;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.lwjgl.glfw.GLFW;
@@ -48,7 +48,7 @@ public class BlockLogoScreen extends Screen{
 
 
 	public BlockLogoScreen(Screen parent, PrideFlag prideFlag, String title, String configKey) {
-		super(new LiteralText("Fabrication Block Logo"));
+		super(Text.literal("Fabrication Block Logo"));
 		this.parent = parent;
 		this.prideFlag = prideFlag;
 	}
@@ -130,9 +130,7 @@ public class BlockLogoScreen extends Screen{
 						LoaderBlockLogo.colorToState.put(selectedColor, () -> {
 							String block = l.get(ThreadLocalRandom.current().nextInt(l.size()));
 							try {
-								BlockArgumentParser parser = new BlockArgumentParser(new StringReader(block), false);
-								parser.parse(false);
-								return parser.getBlockState();
+								return BlockArgumentParser.block(Registry.BLOCK, new StringReader(block), false).blockState();
 							} catch (CommandSyntaxException e) {
 								FabLog.warn(block + " is not a valid identifier");
 								return Blocks.AIR.getDefaultState();
@@ -163,9 +161,7 @@ public class BlockLogoScreen extends Screen{
 						LoaderBlockLogo.colorToState.put(selectedColor, () -> {
 							String block = blocks.get(ThreadLocalRandom.current().nextInt(blocks.size()));
 							try {
-								BlockArgumentParser parser = new BlockArgumentParser(new StringReader(block), false);
-								parser.parse(false);
-								return parser.getBlockState();
+								return BlockArgumentParser.block(Registry.BLOCK, new StringReader(block), false).blockState();
 							} catch (CommandSyntaxException e) {
 								FabLog.warn(block+" is not a valid identifier");
 								return Blocks.AIR.getDefaultState();

@@ -21,8 +21,9 @@ import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.Language;
 
 @EligibleIf(configAvailable="*.dimensional_tools")
@@ -55,10 +56,10 @@ public class FeatureDimensionalTools implements Feature {
 				for (int i = 0; i < lines.size(); i++) {
 					Object t = lines.get(i);
 					double part = stack.getNbt().getDouble("fabrication:PartialDamage");
-					if (t instanceof TranslatableText) {
-						if (((TranslatableText) t).getKey().equals("item.durability")) {
-							lines.set(i, new TranslatableText("item.durability",
-									format.format((stack.getMaxDamage() - stack.getDamage())+(1-part)), stack.getMaxDamage()));
+					if (t instanceof MutableText && ((MutableText) t).getContent() instanceof TranslatableTextContent) {
+						if (((TranslatableTextContent) ((MutableText) t).getContent()).getKey().equals("item.durability")) {
+							lines.set(i, Text.translatable("item.durability",
+									format.format((stack.getMaxDamage() - stack.getDamage()) + (1 - part)), stack.getMaxDamage()));
 						}
 					}
 				}
@@ -107,7 +108,7 @@ public class FeatureDimensionalTools implements Feature {
 							s = s.replace(sub.find, sub.replace);
 						}
 					}
-					stack.setCustomName(new LiteralText("§f"+s));
+					stack.setCustomName(Text.literal("§f"+s));
 					NbtList li = new NbtList();
 					for (MohsIdentifier dim : finalDimensions) {
 						li.add(NbtString.of(dim.toString()));

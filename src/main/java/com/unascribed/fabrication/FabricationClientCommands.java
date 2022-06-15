@@ -21,13 +21,13 @@ import com.unascribed.fabrication.features.FeatureFabricationCommand;
 import com.unascribed.fabrication.support.OptionalFScript;
 
 import io.github.queerbric.pride.PrideFlags;
-import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.screen.PlayerScreenHandler;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class FabricationClientCommands {
@@ -40,7 +40,7 @@ public class FabricationClientCommands {
 			for (SpriteAtlasTexture sat : AtlasTracking.allAtlases) {
 				if (sat.getId().equals(id)) return id;
 			}
-			throw new CommandException(new LiteralText("There is no atlas with ID "+id));
+			throw new CommandException(Text.literal("There is no atlas with ID " + id));
 		}
 
 		@Override
@@ -100,8 +100,8 @@ public class FabricationClientCommands {
 		}
 		root.then(script);
 	}
-	public static void sendFeedback(CommandContext<? extends CommandSource> c, LiteralText text) {
-		((FabricClientCommandSource)c.getSource()).sendFeedback(new LiteralText("§b[CLIENT]§r ").append(text));
+	public static void sendFeedback(CommandContext<? extends CommandSource> c, Text text) {
+		((FabricClientCommandSource)c.getSource()).sendFeedback(Text.literal("§b[CLIENT]§r ").append(text));
 	}
 
 }

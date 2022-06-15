@@ -11,7 +11,6 @@ import com.unascribed.fabrication.support.Env;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
 @Mixin(Entity.class)
@@ -24,7 +23,7 @@ public class MixinEntity {
 		if (!FabConf.isEnabled("*.mob_ids") || !e.world.isClient) return;
 		MinecraftClient mc = MinecraftClient.getInstance();
 		if (mc.player != null && mc.player.isCreative() && mc.options.debugEnabled) {
-			ci.setReturnValue(new LiteralText(Integer.toString(e.getId())));
+			ci.setReturnValue(Text.literal(Integer.toString(e.getId())));
 		}
 	}
 

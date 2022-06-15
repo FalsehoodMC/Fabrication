@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.mixin.c_tweaks.play_note_blocks_in_creative;
 
 import com.unascribed.fabrication.FabConf;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,9 +22,9 @@ import net.minecraft.util.math.BlockPos;
 public class MixinServerPlayerInteractionManager {
 
 	@Shadow
-	public ServerWorld world;
-	@Shadow
-	public ServerPlayerEntity player;
+	protected ServerWorld world;
+	@Shadow @Final
+	protected ServerPlayerEntity player;
 
 	@Inject(at=@At("HEAD"), method="tryBreakBlock(Lnet/minecraft/util/math/BlockPos;)Z", cancellable=true)
 	public void tryBreakBlock(BlockPos pos, CallbackInfoReturnable<Boolean> ci) {

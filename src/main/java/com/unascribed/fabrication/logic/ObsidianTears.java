@@ -15,7 +15,7 @@ import net.minecraft.potion.Potions;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPointer;
 import net.minecraft.util.math.BlockPos;
@@ -56,7 +56,7 @@ public class ObsidianTears {
 
 	public static ItemStack createStack(World world, BlockPos blockPos) {
 		ItemStack stack = PotionUtil.setPotion(new ItemStack(Items.POTION), Potions.THICK);
-		stack.setCustomName(new LiteralText("§fObsidian Tears"));
+		stack.setCustomName(Text.literal("§fObsidian Tears"));
 		NbtCompound tag = stack.getOrCreateNbt();
 		tag.putBoolean("fabrication:ObsidianTears", true);
 		tag.putLong("fabrication:ObsidianTearsOrigin", blockPos.asLong());

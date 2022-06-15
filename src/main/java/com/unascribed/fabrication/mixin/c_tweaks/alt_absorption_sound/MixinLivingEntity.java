@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.mixin.c_tweaks.alt_absorption_sound;
 
 import com.unascribed.fabrication.FabConf;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -45,11 +46,11 @@ public abstract class MixinLivingEntity extends Entity implements DidJustAbsorp 
 	@Shadow
 	public abstract float getAbsorptionAmount();
 	@Shadow
-	public abstract SoundEvent getHurtSound(DamageSource src);
+	protected abstract SoundEvent getHurtSound(DamageSource src);
 	@Shadow
 	protected abstract float getSoundVolume();
 	@Shadow
-	protected abstract float getSoundPitch();
+	public abstract float getSoundPitch();
 
 	@Inject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z")
 	public void damage(DamageSource ds, float amount, CallbackInfoReturnable<Boolean> cir) {
@@ -71,7 +72,7 @@ public abstract class MixinLivingEntity extends Entity implements DidJustAbsorp 
 			data.writeInt(getId());
 			CustomPayloadS2CPacket fabPkt = new CustomPayloadS2CPacket(new Identifier("fabrication", "play_absorp_sound"), data);
 			SoundEvent defHurtSound = getHurtSound(src);
-			PlaySoundFromEntityS2CPacket vanPkt = defHurtSound == null ? null : new PlaySoundFromEntityS2CPacket(defHurtSound, getSoundCategory(), this, getSoundVolume(), getSoundPitch());
+			PlaySoundFromEntityS2CPacket vanPkt = defHurtSound == null ? null : new PlaySoundFromEntityS2CPacket(defHurtSound, getSoundCategory(), this, getSoundVolume(), getSoundPitch(), this.random.nextLong());
 			for (EntityTrackingListener etl : FabricationMod.getTrackers(this)) {
 				ServerPlayerEntity spe = etl.getPlayer();
 				//TODO access spe.entity for instanceof check

@@ -19,7 +19,6 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
@@ -34,24 +33,24 @@ public class MixinItemStackClient {
 		if (!FabConf.isEnabled("*.canhit")) return;
 		ItemStack self = (ItemStack)(Object)this;
 		if (self.hasNbt() && self.getNbt().contains("CanHit", NbtType.LIST) && !self.getNbt().getBoolean("HideCanHit")) {
-			list.add(LiteralText.EMPTY);
-			list.add(new LiteralText("Can hit:").formatted(Formatting.GRAY));
+			list.add(Text.empty());
+			list.add(Text.literal("Can hit:").formatted(Formatting.GRAY));
 			NbtList canhit = self.getNbt().getList("CanHit", NbtType.STRING);
 			if (canhit.isEmpty()) {
-				list.add(new LiteralText("Nothing").formatted(Formatting.GRAY));
+				list.add(Text.literal("Nothing").formatted(Formatting.GRAY));
 			}
 			for (int i = 0; i < canhit.size(); i++) {
 				String s = canhit.getString(i);
 				if (s.contains("-")) {
 					try {
 						UUID.fromString(s);
-						list.add(new LiteralText(s).formatted(Formatting.DARK_GRAY));
+						list.add(Text.literal(s).formatted(Formatting.DARK_GRAY));
 						continue;
 					} catch (IllegalArgumentException ex) {}
 				}
 				if (s.startsWith("@")) {
 					// TODO parse and format complex selectors? (oh god)
-					list.add(new LiteralText(s).formatted(Formatting.DARK_GRAY));
+					list.add(Text.literal(s).formatted(Formatting.DARK_GRAY));
 				} else {
 					boolean negated = false;
 					if (s.startsWith("!")) {
@@ -61,9 +60,9 @@ public class MixinItemStackClient {
 					final String id = s.contains(":") ? s : "minecraft:"+s;
 					EntityType<?> type = EntityType.get(id).orElse(null);
 					if (type == null) {
-						list.add(new LiteralText("missingno").formatted(Formatting.DARK_GRAY));
+						list.add(Text.literal("missingno").formatted(Formatting.DARK_GRAY));
 					} else {
-						list.add(new LiteralText(negated ? "Not " : "").formatted(Formatting.DARK_GRAY).append(type.getName()));
+						list.add(Text.literal(negated ? "Not " : "").formatted(Formatting.DARK_GRAY).append(type.getName()));
 					}
 				}
 			}

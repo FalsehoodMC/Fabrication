@@ -4,6 +4,8 @@ import java.nio.file.Path;
 import java.util.List;
 
 import com.unascribed.fabrication.support.FabConst;
+import net.minecraft.command.CommandRegistryAccess;
+import net.minecraft.server.command.CommandManager;
 import org.spongepowered.asm.mixin.MixinEnvironment;
 import org.spongepowered.asm.mixin.transformer.IMixinTransformer;
 
@@ -37,7 +39,7 @@ import net.minecraft.util.registry.Registry;
 public final class Agnos {
 
 	public interface CommandRegistrationCallback {
-		void register(CommandDispatcher<ServerCommandSource> dispatcher, boolean dedicated);
+		void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, boolean isDedi);
 	}
 
 	public interface TooltipRenderCallback {
@@ -49,7 +51,7 @@ public final class Agnos {
 	}
 
 	public static void runForCommandRegistration(CommandRegistrationCallback r) {
-		net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback.EVENT.register(r::register);
+		net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback.EVENT.register((d, reg, side) -> r.register(d, reg, side == CommandManager.RegistrationEnvironment.DEDICATED));
 	}
 
 	@Environment(EnvType.CLIENT)
@@ -59,7 +61,7 @@ public final class Agnos {
 
 	@Environment(EnvType.CLIENT)
 	public static void runForHudRender(HudRenderCallback r) {
-		net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback.EVENT.register((ms, d) -> r.render(ms, d));
+		net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback.EVENT.register(r::render);
 	}
 
 	public static SoundEvent registerSoundEvent(Identifier id, SoundEvent soundEvent) {

@@ -37,7 +37,7 @@ public abstract class MixinLivingEntity extends Entity implements SetAttackerYaw
 
 	// actually attackerYaw. has the wrong name in this version of yarn
 	@Shadow
-	private float knockbackVelocity;
+	public float knockbackVelocity;
 
 	@Inject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z")
 	public void damageHead(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {

@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import net.minecraft.world.dimension.DimensionTypes;
 import org.jetbrains.annotations.Nullable;
 
 import com.unascribed.fabrication.FabLog;
@@ -184,7 +185,7 @@ public class LoaderDimensionalTools implements ConfigLoader {
 		if (stack.hasNbt()) {
 			if (stack.getNbt().getBoolean("fabrication:ActLikeGold")) {
 				dims = Sets.newHashSet(dims);
-				dims.add(new MohsIdentifier(true, DimensionType.THE_NETHER_ID));
+				dims.add(new MohsIdentifier(true, DimensionTypes.THE_NETHER_ID));
 			}
 			if (stack.getNbt().contains("fabrication:HonoraryDimensions", NbtType.LIST)) {
 				dims = Sets.newHashSet(dims);

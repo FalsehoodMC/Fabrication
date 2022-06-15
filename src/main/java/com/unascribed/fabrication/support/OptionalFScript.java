@@ -16,11 +16,10 @@ import com.unascribed.fabrication.loaders.LoaderFScript;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import tf.ssf.sfort.script.Default;
 import tf.ssf.sfort.script.PredicateProvider;
-import tf.ssf.sfort.script.ScriptParser;
 import tf.ssf.sfort.script.StitchedPredicateProvider;
 
 public class OptionalFScript {
@@ -43,11 +42,11 @@ public class OptionalFScript {
 	}
 
 	public static void set(CommandContext<? extends CommandSource> c, String configKey, String script){
-		set(configKey, script, e -> FeatureFabricationCommand.sendFeedback(c, new LiteralText("Failed to set script for "+configKey+"\n"+e.getLocalizedMessage()), true));
+		set(configKey, script, e -> FeatureFabricationCommand.sendFeedback(c, Text.literal("Failed to set script for " + configKey + "\n" + e.getLocalizedMessage()), true));
 	}
 	public static boolean set(String configKey, String script, ServerPlayerEntity spe){
 		Optional<Exception> err = setScript(configKey, script);
-		err.ifPresent(e -> spe.sendSystemMessage(new LiteralText("Failed to set script for "+configKey+"\n"+e.getLocalizedMessage()), Util.NIL_UUID));
+		err.ifPresent(e -> spe.sendMessage(Text.literal("Failed to set script for "+configKey+"\n"+e.getLocalizedMessage())));
 		return !err.isPresent();
 	}
 	public static void set(String configKey, String script, Consumer<Exception> errReporter){

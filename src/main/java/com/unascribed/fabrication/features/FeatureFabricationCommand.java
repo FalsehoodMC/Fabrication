@@ -50,9 +50,11 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.Property;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.BuiltinRegistries;
@@ -64,12 +66,13 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.gen.noise.NoiseConfig;
 
 public class FeatureFabricationCommand implements Feature {
 
 	@Override
 	public void apply() {
-		Agnos.runForCommandRegistration((dispatcher, dedi) -> {
+		Agnos.runForCommandRegistration((dispatcher, registryAccess, dedi) -> {
 			try {
 				LiteralArgumentBuilder<ServerCommandSource> root = LiteralArgumentBuilder.<ServerCommandSource>literal(FabricationMod.MOD_NAME_LOWER);
 				addConfig(root, dedi);
@@ -90,7 +93,7 @@ public class FeatureFabricationCommand implements Feature {
 						{
 							LiteralArgumentBuilder<ServerCommandSource> literalKey = CommandManager.literal(key);
 							literalKey.executes(c -> {
-										return addTag(c, Collections.singleton(c.getSource().getPlayer()), key);
+										return addTag(c, Collections.singleton(c.getSource().getPlayerOrThrow()), key);
 									})
 									.then(CommandManager.argument("players", EntityArgumentType.players()).executes(c -> {
 										return addTag(c, EntityArgumentType.getPlayers(c, "players"), key);
@@ -101,7 +104,7 @@ public class FeatureFabricationCommand implements Feature {
 						{
 							LiteralArgumentBuilder<ServerCommandSource> literalKey = CommandManager.literal(key);
 							literalKey.executes(c -> {
-										return removeTag(c, Collections.singleton(c.getSource().getPlayer()), key);
+										return removeTag(c, Collections.singleton(c.getSource().getPlayerOrThrow()), key);
 									})
 									.then(CommandManager.argument("players", EntityArgumentType.players()).executes(c -> {
 										return removeTag(c, EntityArgumentType.getPlayers(c, "players"), key);
@@ -140,7 +143,7 @@ public class FeatureFabricationCommand implements Feature {
 						{
 							LiteralArgumentBuilder<ServerCommandSource> literalKey = CommandManager.literal(key);
 							literalKey.executes(c -> {
-								c.getSource().sendFeedback(new LiteralText("TaggablePlayers removed " + key), true);
+								c.getSource().sendFeedback(Text.literal("TaggablePlayers removed " + key), true);
 								FeatureTaggablePlayers.remove(key);
 								return 1;
 							});
@@ -150,7 +153,7 @@ public class FeatureFabricationCommand implements Feature {
 					}
 
 					get.executes(c -> {
-						return getTags(c, c.getSource().getPlayer());
+						return getTags(c, c.getSource().getPlayerOrThrow());
 					}).then(CommandManager.argument("player", EntityArgumentType.player())
 							.executes(c -> {
 								return getTags(c, EntityArgumentType.getPlayer(c, "player"));
@@ -158,7 +161,7 @@ public class FeatureFabricationCommand implements Feature {
 							);
 
 					clear.executes(c -> {
-						return clearTags(c, Collections.singleton(c.getSource().getPlayer()));
+						return clearTags(c, Collections.singleton(c.getSource().getPlayerOrThrow()));
 					}).then(CommandManager.argument("players", EntityArgumentType.players())
 							.executes(c -> {
 								return clearTags(c, EntityArgumentType.getPlayers(c, "players"));
@@ -222,7 +225,7 @@ public class FeatureFabricationCommand implements Feature {
 
 	private static Command<ServerCommandSource> createPushTagCommandContextFor(String key, int type){
 		return c -> {
-			c.getSource().sendFeedback(new LiteralText("TaggablePlayers added " + key), true);
+			c.getSource().sendFeedback(Text.literal("TaggablePlayers added " + key), true);
 			FeatureTaggablePlayers.add(key, type);
 			return 1;
 		};
@@ -239,10 +242,10 @@ public class FeatureFabricationCommand implements Feature {
 			biomes = null;
 		}
 		String name = FabricationMod.MOD_NAME_LOWER+"_block_distribution_"+System.currentTimeMillis()+".tsv";
-		c.getSource().sendFeedback(new LiteralText("Starting background block distribution analysis"), false);
-		c.getSource().sendFeedback(new LiteralText("This could take a while, but the server should remain usable"), false);
-		c.getSource().sendFeedback(new LiteralText("Once complete a file named "+name+" will appear in the server directory"), false);
-		c.getSource().sendFeedback(new LiteralText("Progress reports will go to the console"), false);
+		c.getSource().sendFeedback(Text.literal("Starting background block distribution analysis"), false);
+		c.getSource().sendFeedback(Text.literal("This could take a while, but the server should remain usable"), false);
+		c.getSource().sendFeedback(Text.literal("Once complete a file named "+name+" will appear in the server directory"), false);
+		c.getSource().sendFeedback(Text.literal("Progress reports will go to the console"), false);
 		new Thread((Runnable)() -> {
 			int x = 0;
 			int z = 0;
@@ -280,7 +283,8 @@ public class FeatureFabricationCommand implements Feature {
 								for (int cZ = 0; cZ < 16; cZ++) {
 									if (biomes != null) {
 										ChunkGenerator generator = ((ServerWorld)world).getChunkManager().getChunkGenerator();
-										Biome b = generator.getBiomeSource().getBiome(cX+chunk.getPos().getStartX(), cY, cZ+chunk.getPos().getStartZ(), generator.getMultiNoiseSampler()).value();
+										NoiseConfig noiseConfig = ((ServerWorld)world).getChunkManager().getNoiseConfig();
+										Biome b = generator.getBiomeSource().getBiome(cX+chunk.getPos().getStartX(), cY, cZ+chunk.getPos().getStartZ(), noiseConfig.getMultiNoiseSampler()).value();
 										if (!biomes.contains(b)) {
 											skipped++;
 											if (skipped > goal && scanned == 0) {
@@ -373,7 +377,7 @@ public class FeatureFabricationCommand implements Feature {
 			if (scs.getServer().isSingleplayer() && scs.getEntity() != null) {
 				Entity e = scs.getEntity();
 				if (e instanceof PlayerEntity) {
-					if (scs.getServer().getSinglePlayerName().equals(((PlayerEntity)e).getGameProfile().getName())) {
+					if (scs.getServer().isHost(((PlayerEntity)e).getGameProfile())) {
 						// always allow in singleplayer, even if cheats are off
 						return true;
 					}
@@ -389,7 +393,7 @@ public class FeatureFabricationCommand implements Feature {
 					String value = FabConf.getRawValue(s);
 					if (value.isEmpty()) value = "unset";
 					boolean def = FabConf.getDefault(s);
-					LiteralText txt = new LiteralText(s+" = "+value+(" (default "+def+")"));
+					MutableText txt = Text.literal(s+" = "+value+(" (default "+def+")"));
 					if (!FabConf.isEnabled(s)) {
 						// so that command blocks report failure
 						throw new CommandException(txt.formatted(Formatting.WHITE));
@@ -467,8 +471,8 @@ public class FeatureFabricationCommand implements Feature {
 						if (c.getSource() instanceof ServerCommandSource) {
 							FabricationMod.sendConfigUpdate(((ServerCommandSource)c.getSource()).getServer(), null);
 						}
-						sendFeedback(c, new LiteralText(FabricationMod.MOD_NAME+" configuration reloaded"), true);
-						sendFeedback(c, new LiteralText("§eYou may need to restart the game for the changes to take effect."), false);
+						sendFeedback(c, Text.literal(FabricationMod.MOD_NAME+" configuration reloaded"), true);
+						sendFeedback(c, Text.literal("§eYou may need to restart the game for the changes to take effect."), false);
 						return 1;
 					})
 					);
@@ -483,7 +487,7 @@ public class FeatureFabricationCommand implements Feature {
 			for (String s : OptionalFScript.predicateProviders.keySet()) {
 				if (dediServer && FeaturesFile.get(s).sides == FeaturesFile.Sides.CLIENT_ONLY) continue;
 				LiteralArgumentBuilder<T> key = LiteralArgumentBuilder.<T>literal(s).executes((c) -> {
-					sendFeedback(c, new LiteralText(s+ ": "+ LoaderFScript.get(s)), false);
+					sendFeedback(c, Text.literal(s+ ": "+ LoaderFScript.get(s)), false);
 					return 1;
 				});
 				get.then(key);
@@ -512,7 +516,7 @@ public class FeatureFabricationCommand implements Feature {
 				if (dediServer && FeaturesFile.get(s).sides == FeaturesFile.Sides.CLIENT_ONLY) continue;
 				LiteralArgumentBuilder<T> key = LiteralArgumentBuilder.<T>literal(s).executes((c) -> {
 					OptionalFScript.restoreDefault(s);
-					sendFeedback(c, new LiteralText("Restored default behaviour for "+s), true);
+					sendFeedback(c, Text.literal("Restored default behaviour for "+s), true);
 					return 1;
 				});
 				unset.then(key);
@@ -525,7 +529,7 @@ public class FeatureFabricationCommand implements Feature {
 						.executes((c) -> {
 							LoaderFScript.reload();
 							OptionalFScript.reload();
-							sendFeedback(c, new LiteralText("Fabrication fscript reloaded"), true);
+							sendFeedback(c, Text.literal("Fabrication fscript reloaded"), true);
 							return 1;
 						})
 					);
@@ -533,7 +537,7 @@ public class FeatureFabricationCommand implements Feature {
 		root.then(script);
 	}
 
-	public static void sendFeedback(CommandContext<? extends CommandSource> c, LiteralText text, boolean broadcast) {
+	public static void sendFeedback(CommandContext<? extends CommandSource> c, MutableText text, boolean broadcast) {
 		if (c.getSource() instanceof ServerCommandSource) {
 			((ServerCommandSource)c.getSource()).sendFeedback(text, broadcast);
 		} else {
@@ -541,20 +545,20 @@ public class FeatureFabricationCommand implements Feature {
 		}
 	}
 
-	private static void sendFeedbackClient(CommandContext<? extends CommandSource> c, LiteralText text) {
+	private static void sendFeedbackClient(CommandContext<? extends CommandSource> c, MutableText text) {
 		FabricationClientCommands.sendFeedback(c, text);
 	}
 
 	private int clearTags(CommandContext<ServerCommandSource> c, Collection<ServerPlayerEntity> players) {
 		for (ServerPlayerEntity spe : players) {
 			((TaggablePlayer)spe).fabrication$clearTags();
-			c.getSource().sendFeedback(new LiteralText("Cleared tags for ").append(spe.getDisplayName()), true);
+			c.getSource().sendFeedback(Text.literal("Cleared tags for ").append(spe.getDisplayName()), true);
 		}
 		return 1;
 	}
 
 	private int getTags(CommandContext<ServerCommandSource> c, ServerPlayerEntity player) {
-		LiteralText lt = new LiteralText("Tags: ");
+		MutableText lt = Text.literal("Tags: ");
 		Set<String> tags = ((TaggablePlayer)player).fabrication$getTags();
 		if (tags.isEmpty()) {
 			lt.append("none");
@@ -567,15 +571,15 @@ public class FeatureFabricationCommand implements Feature {
 
 	private int addTag(CommandContext<ServerCommandSource> c, Collection<ServerPlayerEntity> players, String key) {
 		if (!FabConf.isEnabled(key)) {
-			c.getSource().sendFeedback(new LiteralText(key+" has to be enabled for this tag to work"), true);
+			c.getSource().sendFeedback(Text.literal(key+" has to be enabled for this tag to work"), true);
 		}
 		if (!FeatureTaggablePlayers.activeTags.containsKey(key)) {
-			c.getSource().sendFeedback(new LiteralText("Automatically switched "+key+" to TaggablePlayers because a player was tagged with it"), true);
+			c.getSource().sendFeedback(Text.literal("Automatically switched "+key+" to TaggablePlayers because a player was tagged with it"), true);
 			FeatureTaggablePlayers.add(key, 0);
 		}
 		for (ServerPlayerEntity spe : players) {
 			((TaggablePlayer)spe).fabrication$setTag(key.substring(key.lastIndexOf('.')+1), true);
-			c.getSource().sendFeedback(new LiteralText("Added tag "+key+" to ").append(spe.getDisplayName()), true);
+			c.getSource().sendFeedback(Text.literal("Added tag "+key+" to ").append(spe.getDisplayName()), true);
 		}
 		return 1;
 	}
@@ -583,7 +587,7 @@ public class FeatureFabricationCommand implements Feature {
 	private int removeTag(CommandContext<ServerCommandSource> c, Collection<ServerPlayerEntity> players, String pt) {
 		for (ServerPlayerEntity spe : players) {
 			((TaggablePlayer)spe).fabrication$setTag(pt.substring(pt.lastIndexOf('.')+1), false);
-			c.getSource().sendFeedback(new LiteralText("Removed tag "+pt+" from ").append(spe.getDisplayName()), true);
+			c.getSource().sendFeedback(Text.literal("Removed tag "+pt+" from ").append(spe.getDisplayName()), true);
 		}
 		return 1;
 	}
@@ -592,14 +596,14 @@ public class FeatureFabricationCommand implements Feature {
 		String oldValue = FabConf.getRawValue(key);
 		boolean def = FabConf.getDefault(key);
 		if (!local && value.equals(oldValue) || local && FabConf.doesWorldContainValue(key, value)) {
-			sendFeedback(c, new LiteralText(key+" is already set to "+value+(" (default "+def+")")), false);
+			sendFeedback(c, Text.literal(key+" is already set to "+value+(" (default "+def+")")), false);
 		} else {
 			if (local) FabConf.worldSet(key, value);
 			else FabConf.set(key, value);
 			if (c.getSource() instanceof ServerCommandSource) {
 				FabricationMod.sendConfigUpdate(((ServerCommandSource)c.getSource()).getServer(), key);
 			}
-			sendFeedback(c, new LiteralText(key+" is now set to "+value+(" (default "+def+")")+(local ? " for this world" : "")), true);
+			sendFeedback(c, Text.literal(key+" is now set to "+value+(" (default "+def+")")+(local ? " for this world" : "")), true);
 			if (FabricationMod.isAvailableFeature(key)) {
 				if (FabricationMod.updateFeature(key)) {
 					return;

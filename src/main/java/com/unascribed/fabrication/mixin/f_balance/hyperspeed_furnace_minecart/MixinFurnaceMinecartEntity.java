@@ -25,7 +25,7 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 	}
 
 	@Shadow
-	public int fuel;
+	private int fuel;
 
 	@Inject(at=@At("HEAD"), method="tick()V")
 	public void tick(CallbackInfo ci) {
@@ -35,7 +35,7 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 		}
 	}
 
-	@Inject(at=@At("RETURN"), method="getMaxOffRailSpeed()D", cancellable=true)
+	@Inject(at=@At("RETURN"), method="getMaxSpeed()D", cancellable=true)
 	public void getMaxOffRailSpeed(CallbackInfoReturnable<Double> ci) {
 		if (FabConf.isEnabled("*.hyperspeed_furnace_minecart")) {
 			ci.setReturnValue(Math.max(ci.getReturnValueD(), 0.6));

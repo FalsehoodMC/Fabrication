@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.mixin.d_minor_mechanics.unsaddle_creatures;
 
 import com.unascribed.fabrication.FabConf;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,7 +21,7 @@ import net.minecraft.util.Hand;
 @Mixin(StriderEntity.class)
 @EligibleIf(configAvailable="*.unsaddle_creatures")
 public abstract class MixinStriderEntity implements Saddleable {
-	@Shadow
+	@Shadow @Final
 	private SaddledComponent saddledComponent;
 
 	@Inject(method = "interactMob(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;",

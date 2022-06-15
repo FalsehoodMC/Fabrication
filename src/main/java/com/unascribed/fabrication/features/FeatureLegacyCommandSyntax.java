@@ -30,8 +30,7 @@ import net.minecraft.server.command.GameModeCommand;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.level.ServerWorldProperties;
@@ -45,13 +44,13 @@ public class FeatureLegacyCommandSyntax implements Feature {
 	public void apply() {
 		if (applied) return;
 		applied = true;
-		Agnos.runForCommandRegistration((dispatcher, dedi) -> {
+		Agnos.runForCommandRegistration((dispatcher, registryAccess, dedi) -> {
 			try {
 				LiteralArgumentBuilder<ServerCommandSource> gmCmd = CommandManager.literal("gamemode")
 						.requires(scs -> FabConf.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2));
 				for (GameMode mode : GameMode.values()) {
 					gmCmd.then(CommandManager.literal(Integer.toString(mode.getId()))
-							.executes(c -> (int)invoke(gmExecute, c, Collections.singleton(c.getSource().getPlayer()), mode))
+							.executes(c -> (int)invoke(gmExecute, c, Collections.singleton(c.getSource().getPlayerOrThrow()), mode))
 							.then(CommandManager.argument("target", EntityArgumentType.players())
 									.executes(c -> (int)invoke(gmExecute, c, EntityArgumentType.getPlayers(c, "target"), mode)))
 							);
@@ -70,7 +69,7 @@ public class FeatureLegacyCommandSyntax implements Feature {
 						.requires(scs -> FabConf.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2))
 						.then(CommandManager.argument("amount", IntegerArgumentType.integer())
 								.executes(c -> {
-									return addExperience(c.getSource(), Collections.singleton(c.getSource().getPlayer()), IntegerArgumentType.getInteger(c,"amount"), false);
+									return addExperience(c.getSource(), Collections.singleton(c.getSource().getPlayerOrThrow()), IntegerArgumentType.getInteger(c,"amount"), false);
 								})
 								.then(CommandManager.argument("targets", EntityArgumentType.players())
 										.executes(c -> {
@@ -80,7 +79,7 @@ public class FeatureLegacyCommandSyntax implements Feature {
 								)
 						.then(CommandManager.argument("lvlAmount", StringArgumentType.word())
 								.executes((c) -> {
-									return addExperience(c.getSource(), Collections.singleton(c.getSource().getPlayer()), StringArgumentType.getString(c, "lvlAmount"));
+									return addExperience(c.getSource(), Collections.singleton(c.getSource().getPlayerOrThrow()), StringArgumentType.getString(c, "lvlAmount"));
 								})
 								.then(CommandManager.argument("targets", EntityArgumentType.players())
 										.executes(c ->{
@@ -99,7 +98,7 @@ public class FeatureLegacyCommandSyntax implements Feature {
 							} else {
 								world.setWeather(0, 12000, true, props.isThundering());
 							}
-							c.getSource().sendFeedback(new LiteralText("Toggled downfall"), true);
+							c.getSource().sendFeedback(Text.literal("Toggled downfall"), true);
 							return 1;
 						}));
 			} catch (Throwable t) {
@@ -120,9 +119,9 @@ public class FeatureLegacyCommandSyntax implements Feature {
 		}
 		String thing = (areLevels ? "levels" : "points");
 		if (targets.size() == 1) {
-			source.sendFeedback(new TranslatableText("commands.experience.add."+thing+".success.single", amount, Iterables.getOnlyElement(targets).getDisplayName()), true);
+			source.sendFeedback(Text.translatable("commands.experience.add."+thing+".success.single", amount, Iterables.getOnlyElement(targets).getDisplayName()), true);
 		} else {
-			source.sendFeedback(new TranslatableText("commands.experience.add."+thing+".success.multiple", amount, targets.size()), true);
+			source.sendFeedback(Text.translatable("commands.experience.add."+thing+".success.multiple", amount, targets.size()), true);
 		}
 		return targets.size();
 	}
@@ -134,7 +133,7 @@ public class FeatureLegacyCommandSyntax implements Feature {
 				return addExperience(source, targets, i, true);
 			}
 		}
-		throw new SimpleCommandExceptionType(new LiteralText("Invalid XP amount")).create();
+		throw new SimpleCommandExceptionType(Text.literal("Invalid XP amount")).create();
 	}
 
 	private final MethodHandle gmExecute = unreflect(GameModeCommand.class, "method_13387", "func_198484_a", "execute", CommandContext.class, Collection.class, GameMode.class);

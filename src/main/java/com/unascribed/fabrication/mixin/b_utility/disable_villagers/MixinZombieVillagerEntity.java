@@ -21,7 +21,7 @@ public abstract class MixinZombieVillagerEntity extends ZombieEntity {
 		super(entityType, world);
 	}
 
-	@Inject(at=@At("HEAD"), method="tick()V", cancellable=true)
+	@Inject(at=@At("HEAD"), method="tick()V")
 	public void tick(CallbackInfo ci) {
 		if (FabConf.isEnabled("*.disable_villagers")) {
 			discard();

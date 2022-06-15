@@ -22,9 +22,7 @@ import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
@@ -66,7 +64,7 @@ public class MixinServerPlayNetworkHandler {
 							}
 							FabricationMod.sendConfigUpdate(player.server, key);
 							fabrication$sendCommandFeedback(
-									new TranslatableText("chat.type.admin", player.getDisplayName(), new LiteralText(key + " is now set to " + value))
+									Text.translatable("chat.type.admin", player.getDisplayName(), Text.literal(key + " is now set to " + value))
 									.formatted(Formatting.GRAY, Formatting.ITALIC));
 						}
 					}
@@ -92,7 +90,7 @@ public class MixinServerPlayNetworkHandler {
 							String value = recvdData.readString(32767);
 							if (Agnos.isModLoaded("fscript") && OptionalFScript.set(key, value, player)) {
 								fabrication$sendCommandFeedback(
-										new TranslatableText("chat.type.admin", player.getDisplayName(), new LiteralText(key + " script is now set to " + value))
+										Text.translatable("chat.type.admin", player.getDisplayName(), Text.literal(key + " script is now set to " + value))
 										.formatted(Formatting.GRAY, Formatting.ITALIC));
 							}
 						}
@@ -104,7 +102,7 @@ public class MixinServerPlayNetworkHandler {
 						if (FabConf.isValid(key) && FeaturesFile.get(key).fscript != null && Agnos.isModLoaded("fscript")) {
 							OptionalFScript.restoreDefault(key);
 							fabrication$sendCommandFeedback(
-									new TranslatableText("chat.type.admin", player.getDisplayName(), new LiteralText(key + " script has been unset"))
+									Text.translatable("chat.type.admin", player.getDisplayName(), Text.literal(key + " script has been unset"))
 									.formatted(Formatting.GRAY, Formatting.ITALIC));
 						}
 					}
@@ -115,7 +113,7 @@ public class MixinServerPlayNetworkHandler {
 						LoaderFScript.reload();
 						if (Agnos.isModLoaded("fscript")) OptionalFScript.reload();
 						fabrication$sendCommandFeedback(
-								new TranslatableText("chat.type.admin", player.getDisplayName(), new LiteralText(" scripts have been reloaded"))
+								Text.translatable("chat.type.admin", player.getDisplayName(), Text.literal(" scripts have been reloaded"))
 								.formatted(Formatting.GRAY, Formatting.ITALIC));
 					}
 				}
@@ -127,12 +125,12 @@ public class MixinServerPlayNetworkHandler {
 		if (player.server.getGameRules().getBoolean(GameRules.SEND_COMMAND_FEEDBACK)) {
 			for (ServerPlayerEntity spe : player.server.getPlayerManager().getPlayerList()) {
 				if (player.server.getPlayerManager().isOperator(spe.getGameProfile())) {
-					spe.sendSystemMessage(text, Util.NIL_UUID);
+					spe.sendMessage(text);
 				}
 			}
 		}
 		if (player.server.getGameRules().getBoolean(GameRules.LOG_ADMIN_COMMANDS)) {
-			player.server.sendSystemMessage(text, Util.NIL_UUID);
+			player.server.sendMessage(text);
 		}
 	}
 

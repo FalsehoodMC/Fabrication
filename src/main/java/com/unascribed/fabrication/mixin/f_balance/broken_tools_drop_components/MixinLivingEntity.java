@@ -149,7 +149,7 @@ public abstract class MixinLivingEntity extends Entity {
 				if (values.length == 1) {
 					enchantables.get(world.random.nextInt(enchantables.size())).addEnchantment(en.getKey(), values[0]);
 				} else {
-					Collections.shuffle(enchantables, world.random);
+					Collections.shuffle(enchantables);
 					for (int i = 0; i < values.length; i++) {
 						enchantables.get(i).addEnchantment(en.getKey(), values[i]);
 					}

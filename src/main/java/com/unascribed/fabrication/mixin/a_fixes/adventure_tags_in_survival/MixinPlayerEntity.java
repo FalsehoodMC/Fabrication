@@ -31,7 +31,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 	}
 
 	@Shadow @Final
-	public PlayerAbilities abilities;
+	private PlayerAbilities abilities;
 
 	@Inject(at=@At("HEAD"), method="isBlockBreakingRestricted(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/world/GameMode;)Z",
 			cancellable=true)

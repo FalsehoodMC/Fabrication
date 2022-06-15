@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.util.Random;
 
 import com.unascribed.fabrication.FabConf;
+import net.minecraft.util.math.random.Random;
 import org.lwjgl.opengl.ARBCopyImage;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
@@ -73,7 +73,7 @@ public class WoinaDrops {
 				model.getTransformation().getTransformation(renderMode).apply(leftHanded, matrices);
 				matrices.translate(-0.5, -0.5, -0.5);
 				if (LoaderClassicBlockDrops.isSafe(((BlockItem)stack.getItem()).getBlock())) {
-					Random r = new Random();
+					Random r = Random.create();
 					long seed = 42;
 					RenderLayer layer = RenderLayers.getItemLayer(stack, true);
 					VertexConsumer vertices = vertexConsumers.getBuffer(layer);
@@ -169,7 +169,7 @@ public class WoinaDrops {
 		normal.transform(ent.getNormalMatrix());
 		int j = data.length / 8;
 		try (MemoryStack stack = MemoryStack.stackPush()) {
-			ByteBuffer buf = stack.malloc(VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL.getVertexSize());
+			ByteBuffer buf = stack.malloc(VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL.getVertexSizeByte());
 			IntBuffer iBuf = buf.asIntBuffer();
 			float minU = Float.POSITIVE_INFINITY;
 			float maxU = Float.NEGATIVE_INFINITY;

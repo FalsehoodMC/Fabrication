@@ -5,6 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.unascribed.fabrication.FabConf;
+import net.minecraft.text.MutableText;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,7 +21,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.EntityDamageSource;
 import net.minecraft.entity.damage.ProjectileDamageSource;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
 @Mixin({EntityDamageSource.class, ProjectileDamageSource.class})
@@ -53,7 +53,7 @@ public abstract class MixinEntityDamageSource {
 				Matcher m = fabrication$placeholderPattern.matcher(msg);
 				if (m.find()) {
 					m.reset(msg);
-					LiteralText base = new LiteralText("");
+					MutableText base = Text.empty();
 					int prev = 0;
 					int defIdx = 0;
 					while (m.find()) {
@@ -82,7 +82,7 @@ public abstract class MixinEntityDamageSource {
 					}
 					rtrn.setReturnValue(base);
 				} else {
-					rtrn.setReturnValue(new LiteralText(msg));
+					rtrn.setReturnValue(Text.literal(msg));
 				}
 			}
 		}

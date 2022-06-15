@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import com.unascribed.fabrication.FabConf;
+import net.minecraft.entity.Entity;
+import net.minecraft.text.Text;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -26,7 +29,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.stat.Stats;
 import net.minecraft.state.property.Property;
-import net.minecraft.text.LiteralText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -35,7 +37,10 @@ import net.minecraft.world.World;
 
 @Mixin(NoteBlock.class)
 @EligibleIf(anyConfigAvailable={"*.exact_note_block_tuning", "*.note_block_notes", "*.reverse_note_block_tuning"})
-public class MixinNoteBlock {
+public abstract class MixinNoteBlock {
+
+	@Shadow
+	protected abstract void playNote(@Nullable Entity entity, World world, BlockPos pos);
 
 	private static final String FABRICATION$NOTE_COLORS = "aa66cccccdd559999bbbaaaaa";
 	private static final ImmutableList<String> FABRICATION$NOTES = ImmutableList.of(
@@ -87,9 +92,6 @@ public class MixinNoteBlock {
 			.put(Instrument.HAT, -9) // starts at A rather than F#
 			.build();
 
-	@Shadow
-	private void playNote(World world, BlockPos pos) {}
-
 	@Inject(at=@At("HEAD"), method= "onUse(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;", cancellable=true)
 	public void onUseHead(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, CallbackInfoReturnable<ActionResult> ci) {
 		if (!world.isClient) {
@@ -109,7 +111,7 @@ public class MixinNoteBlock {
 						world.setBlockState(pos, state, 3);
 						player.increaseStat(Stats.TUNE_NOTEBLOCK, dist);
 					}
-					playNote(world, pos);
+					playNote(player, world, pos);
 					fabrication$informNote(player, state);
 					ci.setReturnValue(ActionResult.CONSUME);
 					return;
@@ -119,7 +121,7 @@ public class MixinNoteBlock {
 				if (player.isSneaking()) {
 					state = cycleBackward(state, NoteBlock.NOTE);
 					world.setBlockState(pos, state, 3);
-					playNote(world, pos);
+					playNote(player, world, pos);
 					player.incrementStat(Stats.TUNE_NOTEBLOCK);
 					fabrication$informNote(player, state);
 					ci.setReturnValue(ActionResult.CONSUME);
@@ -129,7 +131,7 @@ public class MixinNoteBlock {
 		}
 	}
 
-	@Inject(at=@At("RETURN"), method="onUse(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;", cancellable=true)
+	@Inject(at=@At("RETURN"), method="onUse(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;")
 	public void onUseReturn(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, CallbackInfoReturnable<ActionResult> ci) {
 		fabrication$informNote(player, world.getBlockState(pos));
 	}
@@ -161,9 +163,9 @@ public class MixinNoteBlock {
 			} else {
 				octaveStr = ((note/12)+baseOctave)+" ";
 			}
-			player.sendMessage(new LiteralText("§"+color+noteStr+octaveStr
-					+FABRICATION$INSTRUMENT_NAMES.get(instrument)
-					+" ("+state.get(NoteBlock.NOTE)+")"), true);
+			player.sendMessage(Text.literal("§" + color + noteStr + octaveStr
+					+ FABRICATION$INSTRUMENT_NAMES.get(instrument)
+					+ " (" + state.get(NoteBlock.NOTE) + ")"), true);
 		}
 	}
 

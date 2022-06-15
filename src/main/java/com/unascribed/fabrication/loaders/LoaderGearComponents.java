@@ -4,7 +4,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
@@ -26,7 +25,9 @@ import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryEntry;
 
 public class LoaderGearComponents implements ConfigLoader {
 
@@ -65,7 +66,7 @@ public class LoaderGearComponents implements ConfigLoader {
 	public static final Map<String, MaterialData> materials = Maps.newHashMap();
 	public static final Multimap<Resolvable<Item>, ItemMaterialValue> items = ArrayListMultimap.create();
 
-	private static final Random rand = new Random();
+	private static final Random rand = Random.create();
 
 	private static final Splitter SPACE_SPLITTER = Splitter.on(' ');
 	private static final Pattern MATERIAL_VALUE_PATTERN = Pattern.compile("^([0-9]+(?:\\.[0-9]+)?)(.*)$");
@@ -190,7 +191,7 @@ public class LoaderGearComponents implements ConfigLoader {
 	private static Supplier<Item> tagResolver(Identifier id) {
 		return () -> {
 			TagKey<Item> itemTag = TagKey.of(Registry.ITEM_KEY, id);
-			if (Registry.ITEM.containsTag(itemTag)) return Registry.ITEM.getEntryList(itemTag).flatMap(items -> items.getRandom(rand)).map(itemEntry -> itemEntry.value()).orElse(null);
+			if (Registry.ITEM.containsTag(itemTag)) return Registry.ITEM.getEntryList(itemTag).flatMap(items -> items.getRandom(rand)).map(RegistryEntry::value).orElse(null);
 			TagKey<Block> blockTag = TagKey.of(Registry.BLOCK_KEY, id);
 			if (Registry.BLOCK.containsTag(blockTag)) return Registry.BLOCK.getEntryList(blockTag).flatMap(blocks -> blocks.getRandom(rand)).map(blockEntry -> blockEntry.value().asItem()).orElse(null);
 			return null;
