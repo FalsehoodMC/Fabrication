@@ -62,15 +62,15 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	modImplementation include(fabricApi.module('fabric-api-base', project.fabric_version))
-	modImplementation include(fabricApi.module('fabric-resource-loader-v0', project.fabric_version))
-	modImplementation include(fabricApi.module('fabric-command-api-v1', project.fabric_version))
-	modImplementation include(fabricApi.module('fabric-item-api-v1', project.fabric_version))
-	modImplementation include(fabricApi.module('fabric-key-binding-api-v1', project.fabric_version))
-	modImplementation include(fabricApi.module('fabric-rendering-v1', project.fabric_version))
+	modImplementation fabricApi.module('fabric-api-base', project.fabric_version)
+	modImplementation fabricApi.module('fabric-resource-loader-v0', project.fabric_version)
+	modImplementation fabricApi.module('fabric-command-api-v1', project.fabric_version)
+	modImplementation fabricApi.module('fabric-item-api-v1', project.fabric_version)
+	modImplementation fabricApi.module('fabric-key-binding-api-v1', project.fabric_version)
+	modImplementation fabricApi.module('fabric-rendering-v1', project.fabric_version)
 	// TODO I would really like to not dep on these two
-	modImplementation include(fabricApi.module('fabric-registry-sync-v0', project.fabric_version))
-	modImplementation include(fabricApi.module('fabric-networking-api-v1', project.fabric_version))
+	modImplementation fabricApi.module('fabric-registry-sync-v0', project.fabric_version)
+	modImplementation fabricApi.module('fabric-networking-api-v1', project.fabric_version)
 	
 	modImplementation(include('io.github.queerbric:pridelib:1.1.0+1.17')) {
 		transitive = false
