@@ -3,6 +3,7 @@ package com.unascribed.fabrication.mixin.i_woina.more_explosion_particles;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -37,7 +38,7 @@ public class MixinExplosion {
 	private float power;
 
 	@Shadow @Final
-	private List<BlockPos> affectedBlocks;
+	private ObjectArrayList<BlockPos> affectedBlocks;
 
 	@Inject(method="affectWorld(Z)V", at=@At("HEAD"))
 	private void oldParticles(boolean particles, CallbackInfo ci) {
