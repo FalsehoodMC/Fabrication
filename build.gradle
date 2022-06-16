@@ -197,7 +197,10 @@ class FeatureConfigTransformer{
 			} else {
 				out.append(line.append('\r\n'))
 				line = new StringBuilder(lines[i]).append(' ')
-				if (++i>=lines.length) break
+				if (++i>=lines.length) {
+					out.append(line)
+					break
+				}
 			}
 		}
 		return out.toString()
@@ -334,9 +337,9 @@ class FeaturesFileParser{
 		ret.add("needs", new JsonArray())
 		ret.add("parent", JsonNull.INSTANCE)
 		ret.add("media", JsonNull.INSTANCE)
-		ret.addProperty("media_text", (String)(cur.has("media") ? (cur.media.getAsString().matches(".mp4\$") ? 'Demonstration video' : 'Demonstration image') : null))
+		ret.addProperty("media_text", (String)(cur.has("media") ? (cur.media.getAsString().trim().endsWith(".mp4") ? 'Demonstration video' : 'Demonstration image') : null))
 		ret.add("extra_media", JsonNull.INSTANCE)
-		ret.addProperty("extra_media_text", (String)(cur.has("extra_media") ? (cur.extra_media.getAsString().matches(".mp4\$") ? 'Demonstration video' : 'Demonstration image') : null))
+		ret.addProperty("extra_media_text", (String)(cur.has("extra_media") ? (cur.extra_media.getAsString().trim().endsWith(".mp4") ? 'Demonstration video' : 'Demonstration image') : null))
 		ret.add("link_url", JsonNull.INSTANCE)
 		ret.addProperty("link_text", (String)(cur.has("link_url") ? 'See also' : null))
 		String short_desc = null
