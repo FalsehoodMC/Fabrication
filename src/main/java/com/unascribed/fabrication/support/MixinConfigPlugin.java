@@ -300,7 +300,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	@Override
 	public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
 		if (FabConf.limitRuntimeConfigs()) finalizeIsEnabled(targetClass);
-		fakeMixinHack(targetClass, mixinClassName);
+		fakeMixinHack(targetClass);
 		FabInjector.apply(targetClass);
 		lithiumCompat(targetClass, mixinClassName);
 		if (targetClass.visibleAnnotations != null) {
@@ -308,13 +308,22 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		}
 	}
 
-	public static void fakeMixinHack(ClassNode targetClass, String mixinClassName){
-		try {
-			FakeMixinHack sih = Class.forName(mixinClassName, false, MixinConfigPlugin.class.getClassLoader()).getAnnotation(FakeMixinHack.class);
-			if (sih != null){
+	public static void fakeMixinHack(ClassNode targetClass) {
+		if (targetClass.visibleAnnotations == null) return;
+		for (AnnotationNode annotationNode : targetClass.visibleAnnotations) {
+			if ("Lcom/unascribed/fabrication/support/injection/FakeMixinHack;".equals(annotationNode.desc)) {
+				Object list = annotationNode.values.get(annotationNode.values.indexOf("value") + 1);
+				if (!(list instanceof List<?>) || ((List<?>) list).isEmpty() || !(((List<?>) list).get(0) instanceof String))
+					continue;
 				List<FabInjector.ToInject> toInject = new ArrayList<>();
-				for (Class<?> cl : sih.value()){
-					for (Method mthd : cl.getMethods()){
+				for (String className : (List<String>) list) {
+					Class<?> cl;
+					try {
+						cl = Class.forName(className);
+					}catch (Exception ignore){
+						continue;
+					}
+					for (Method mthd : cl.getMethods()) {
 						ModifyReturn mr = mthd.getAnnotation(ModifyReturn.class);
 						Hijack hi = mthd.getAnnotation(Hijack.class);
 						String[] method = null;
@@ -346,7 +355,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 				}
 				FabInjector.apply(targetClass, toInject);
 			}
-		} catch (Exception ignore) {}
+		}
 	}
 
 	public static void lithiumCompat(ClassNode targetClass, String mixinClassName){
