@@ -17,7 +17,7 @@ public class MixinPlayerEntity implements SetCrawling {
 
 	@ModifyReturn(method="updatePose()V", target="Lnet/minecraft/entity/player/PlayerEntity;isSwimming()Z")
 	public boolean fabrication$updateSwimming(boolean old) {
-		return !(FabConf.isEnabled("*.crawling") && !old) ? old : fabrication$crawling;
+		return old || !FabConf.isEnabled("*.crawling") ? old : fabrication$crawling;
 	}
 
 	@Override
