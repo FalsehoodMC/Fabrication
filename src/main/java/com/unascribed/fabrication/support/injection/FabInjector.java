@@ -89,7 +89,7 @@ public class FabInjector {
 					}
 				}
 			}
-			;
+
 			if (inject != null && mixin != null && injectIn == null) {
 				final String mix = mixin;
 				injects.add(new ToInject(

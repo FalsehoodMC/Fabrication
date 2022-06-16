@@ -10,5 +10,5 @@ import static java.lang.annotation.ElementType.TYPE;
 @Target(TYPE)
 public @interface FakeMixinHack {
 	//all classes specified must exclusively contain public static methods
-	Class<?>[] value();
+	String[] value();
 }
