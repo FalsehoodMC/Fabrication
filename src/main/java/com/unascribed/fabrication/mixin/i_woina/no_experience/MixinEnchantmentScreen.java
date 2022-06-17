@@ -4,12 +4,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.injection.FabModifyConst;
 import com.unascribed.fabrication.support.injection.Hijack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
@@ -77,7 +77,7 @@ public abstract class MixinEnchantmentScreen extends HandledScreen<EnchantmentSc
 		return orig;
 	}
 
-	@ModifyConstant(constant=@Constant(intValue=20, ordinal=0),
+	@FabModifyConst(constant=@Constant(intValue=20, ordinal=0),
 			method="drawBackground(Lnet/minecraft/client/util/math/MatrixStack;FII)V", require=0)
 	public int modifyPhraseOffset(int orig) {
 		if (FabConf.isEnabled("*.no_experience")) return 3;
