@@ -11,17 +11,16 @@ import com.google.common.reflect.ClassPath;
 import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.FabLog;
+import com.unascribed.fabrication.support.injection.FabModifyConstInjectionInfo;
 import com.unascribed.fabrication.support.injection.FabRefMap;
 import com.unascribed.fabrication.support.injection.FailsoftCallbackInjectionInfo;
 import com.unascribed.fabrication.support.injection.FailsoftModifyArgInjectionInfo;
 import com.unascribed.fabrication.support.injection.FailsoftModifyArgsInjectionInfo;
-import com.unascribed.fabrication.support.injection.FailsoftModifyConstantInjectionInfo;
 import com.unascribed.fabrication.support.injection.FailsoftModifyVariableInjectionInfo;
 import com.unascribed.fabrication.support.injection.FailsoftRedirectInjectionInfo;
 import com.unascribed.fabrication.support.injection.FabInjector;
 import com.unascribed.fabrication.support.injection.Hijack;
 import com.unascribed.fabrication.support.injection.ModifyReturn;
-import com.unascribed.fabrication.support.injection.FakeMixinHack;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
@@ -69,7 +68,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		InjectionInfo.register(FailsoftModifyArgsInjectionInfo.class);
 		InjectionInfo.register(FailsoftRedirectInjectionInfo.class);
 		InjectionInfo.register(FailsoftModifyVariableInjectionInfo.class);
-		InjectionInfo.register(FailsoftModifyConstantInjectionInfo.class);
+		InjectionInfo.register(FabModifyConstInjectionInfo.class);
 		FabLog.warn("Injection complete.");
 	}
 

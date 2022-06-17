@@ -549,6 +549,7 @@ jar {
 							int dot = mthd.indexOf('.')
 							if (col == -1 || dot < col && dot != -1) col = dot
 							int brc = mthd.indexOf('(')
+							if (brc == -1) continue
 							String desc = mthd.substring(brc)
 							String name = mthd.substring(col == -1 || brc<col ? 0 : col+1, brc)
 							if ((name.equals(clMethod.getName('named')) || name.equals(clMethod.getName('intermediary'))) && (desc.equals(clMethod.getDesc('named')) || desc.equals(clMethod.getDesc('intermediary')))) {
@@ -565,6 +566,7 @@ jar {
 					if (mapt.applicable.contains(clName.replace('/', '.'))){
 						classMap.put(clName, clNameRez)
 						int brc = target.indexOf('(')
+						if (brc == -1) continue
 						String desc = target.substring(brc)
 						String name = target.substring(col+1, brc)
 						for (def clMethod : cl.methods) {
@@ -607,7 +609,7 @@ jar {
 						break
 					}
 				}
-				if (missedMthd) {
+				if (missedMthd && !s.isBlank()) {
 					logger.log(LogLevel.ERROR, "Failed to map "+s+" for "+intr.key)
 				}
 			}
@@ -631,7 +633,7 @@ jar {
 					if (frst) frst = false;
 					else strbldr.append('\t')
 					strbldr.append(s).append(' ').append('L').append(classMap.get(s.substring(s.charAt(0) == 'L' as char ? 1 : 0, col))).append(';').append(ad)
-				} else {
+				} else if (!s.isBlank() && !s.startsWith("Ljava/lang/")) {
 					logger.log(LogLevel.ERROR, "Failed to map "+s+" for "+intr.key)
 				}
 			}

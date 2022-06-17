@@ -127,6 +127,7 @@ public class FabricationConfigScreen extends Screen {
 	private boolean configuringServer;
 	private boolean hasClonked = true;
 	private boolean isSingleplayer;
+	private boolean editingWorldPath;
 	private float serverAnimateTime;
 	private String whyCantConfigureServer = null;
 	private Set<String> serverKnownConfigKeys = Sets.newHashSet();
@@ -199,6 +200,9 @@ public class FabricationConfigScreen extends Screen {
 		super.init();
 		isSingleplayer = false;
 		if (client.world == null) {
+			if (!editingWorldPath) {
+				FabConf.setWorldPath(null);
+			}
 			//whyCantConfigureServer = "You're not connected to a server.";
 		} else if (client.getServer() != null) {
 			//whyCantConfigureServer = "The singleplayer server shares the client settings.";
@@ -437,7 +441,7 @@ public class FabricationConfigScreen extends Screen {
 			hasClonked = true;
 			client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_BONE_BLOCK_STEP, 1f, 0.5f));
 		}
-		if (configuringServer || FabConf.hasWorldPath()) {
+		if (configuringServer || editingWorldPath) {
 			a = 1-a;
 		}
 
@@ -588,9 +592,6 @@ public class FabricationConfigScreen extends Screen {
 		matrices.push();
 		matrices.scale((float)(1-(Math.abs(Math.sin(a*Math.PI))/2)), 1, 1);
 		fill(matrices, -60, -8, 0, 8, MathHelper.hsvToRgb(h, 0.9f, 0.9f)|0xFF000000);
-		if (isSingleplayer && !FabConf.hasWorldPath()) {
-			fill(matrices, 0, -8, 60, 8, MathHelper.hsvToRgb(0.833333f, 0.9f, 0.9f)|0xFF000000);
-		}
 		matrices.pop();
 		matrices.push();
 		matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(45));
@@ -609,7 +610,7 @@ public class FabricationConfigScreen extends Screen {
 		boolean darkMode = FabConf.isEnabled("general.dark_mode");
 
 		textRenderer.draw(matrices, "CLIENT", width-115, 4, 0xFF000000);
-		if (client.world == null || FabConf.hasWorldPath() || isSingleplayer) {
+		if (client.world == null || isSingleplayer) {
 			textRenderer.draw(matrices, "WORLD", width - 40, 4, 0xFF000000);
 		} else {
 			textRenderer.draw(matrices, "SERVER", width - 40, 4, whyCantConfigureServer == null ? 0xFF000000 : darkMode ? 0x44FFFFFF : 0x44000000);
@@ -697,7 +698,7 @@ public class FabricationConfigScreen extends Screen {
 			String msg;
 			if (whyCantConfigureServer != null) {
 				msg = ((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "§e")+whyCantConfigureServer;
-			} else if (FabConf.hasWorldPath()) {
+			} else if (editingWorldPath) {
 				msg = "Click to unselect world";
 			} else if (client.world == null || isSingleplayer) {
 				msg = "Click to select world";
@@ -1008,7 +1009,7 @@ public class FabricationConfigScreen extends Screen {
 		matrices.translate(134 + (prevX + ((curX - prevX) * a)), 0, 0);
 		int knobAlpha = ((int) ((noValue ? 1 - da : 1) * 255)) << 24;
 		fill(matrices, 0, 1, noUnset ? 22 : onlyBannable ? 30 : 15, 10, MathHelper.hsvToRgb(Math.floorMod((int) (prevHue + ((curHue - prevHue) * a)), 360) / 360f, 0.9f, (prevHSValue + ((curHSValue - prevHSValue) * a)) / 100f) | knobAlpha);
-		if (!noUnset && a >= 1 && (currentValue == ConfigValue.UNSET || FabConf.hasWorldPath()) && !onlyBannable) {
+		if (!noUnset && a >= 1 && (currentValue == ConfigValue.UNSET || editingWorldPath) && !onlyBannable) {
 			fill(matrices, keyEnabled ? 15 : -1, 1, keyEnabled ? 16 : 0, 10, MathHelper.hsvToRgb((keyEnabled ? 120 : 0) / 360f, 0.9f, 0.8f) | knobAlpha);
 		}
 		matrices.pop();
@@ -1067,7 +1068,7 @@ public class FabricationConfigScreen extends Screen {
 									newValue == ConfigValue.UNSET ? SoundEvents.BLOCK_NOTE_BLOCK_COW_BELL :
 										SoundEvents.BLOCK_NOTE_BLOCK_CHIME,
 										0.6f+pitch, 1f));
-					if (newValue != currentValue || (FabConf.hasWorldPath() && !FabConf.doesWorldContainValue(key))) {
+					if (newValue != currentValue || (editingWorldPath && !FabConf.doesWorldContainValue(key))) {
 						optionPreviousValues.put(key, currentValue);
 						optionAnimationTime.compute(key, (k, f) -> 5 - (f == null ? 0 : f));
 						setValue(key, newValue.toString().toLowerCase(Locale.ROOT));
@@ -1226,7 +1227,9 @@ public class FabricationConfigScreen extends Screen {
 
 	@Override
 	public void close() {
-		FabConf.resetWorldPath();
+		if (client.world == null) {
+			FabConf.setWorldPath(null);
+		}
 		if (!FabConf.isEnabled("*.reduced_motion") && !leaving) {
 			leaving = true;
 			client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_BARREL_CLOSE, 0.7f));
@@ -1279,40 +1282,38 @@ public class FabricationConfigScreen extends Screen {
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		if (button == 0) {
-			if (configuringServer) {
-				if (mouseX > (width-120) && mouseY < 16) {
-					hasClonked = false;
-					serverAnimateTime = 10-serverAnimateTime;
+			if (mouseX > (width - 120) && mouseY < 16) {
+				if (configuringServer) {
+					serverAnimateTime = 10 - serverAnimateTime;
 					configuringServer = false;
+					hasClonked = false;
 					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_XYLOPHONE, 0.8f, 1));
-				}
-			} else {
-				if (mouseX > (width-120) && mouseY < 16) {
-					if (client.world == null) {
-						client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_XYLOPHONE, 0.8f, 1));
-						if (FabConf.hasWorldPath()) {
-							FabConf.setWorldPath(null);
-						} else {
-							openWorldSelector();
-							return super.mouseClicked(mouseX, mouseY, button);
-						}
-					} else if (isSingleplayer) {
-						client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_XYLOPHONE, 0.8f, 1));
-						if (FabConf.hasWorldPath()) {
-							FabConf.setWorldPath(null);
-						} else {
-							FabConf.resetWorldPath();
-						}
-					} else if (whyCantConfigureServer == null) {
-						hasClonked = false;
-						serverAnimateTime = 10-serverAnimateTime;
-						configuringServer = true;
-						client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_XYLOPHONE, 1.2f, 1));
-					}  else {
-						playErrorFeedback();
+				} else if (client.world == null) {
+					hasClonked = false;
+					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_XYLOPHONE, 0.8f, 1));
+					serverAnimateTime = 10 - serverAnimateTime;
+					FabConf.setWorldPath(null);
+					if (editingWorldPath) {
+						editingWorldPath = false;
+					} else {
+						openWorldSelector();
+						return super.mouseClicked(mouseX, mouseY, button);
 					}
+				} else if (isSingleplayer) {
+					hasClonked = false;
+					serverAnimateTime = 10 - serverAnimateTime;
+					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_XYLOPHONE, 0.8f, 1));
+					editingWorldPath = !editingWorldPath;
+				} else if (whyCantConfigureServer == null) {
+					hasClonked = false;
+					serverAnimateTime = 10 - serverAnimateTime;
+					configuringServer = true;
+					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_XYLOPHONE, 1.2f, 1));
+				} else {
+					playErrorFeedback();
 				}
 			}
+
 			didClick = true;
 		}
 		if ("search".equals(selectedSection)) {
@@ -1396,6 +1397,7 @@ public class FabricationConfigScreen extends Screen {
 		}
 	}
 	public void setWorldMode(Object toFile) {
+		editingWorldPath = true;
 		FabConf.setWorldPath(((File)toFile).toPath());
 	}
 
@@ -1476,7 +1478,7 @@ public class FabricationConfigScreen extends Screen {
 		if (configuringServer) {
 			return ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerTrileanConfig().getOrDefault(key, ResolvedConfigValue.DEFAULT_FALSE);
 		} else {
-			return FabConf.getResolvedValue(key);
+			return FabConf.getResolvedValue(key, editingWorldPath);
 		}
 	}
 
@@ -1510,7 +1512,7 @@ public class FabricationConfigScreen extends Screen {
 		}
 		String oldValue = getRawValue(key);
 		//TODO count banned world values
-		if (!FabConf.isRuntimeConfigurable(key) && !(configuringServer && FeaturesFile.get(key).sides == Sides.CLIENT_ONLY) && !FabConf.hasWorldPath()) {
+		if (!FabConf.isRuntimeConfigurable(key) && !(configuringServer && FeaturesFile.get(key).sides == Sides.CLIENT_ONLY) && !editingWorldPath) {
 			if (value.equals("banned")) {
 				if (newlyUnbannedKeys.contains(key)) {
 					newlyUnbannedKeys.remove(key);
@@ -1531,7 +1533,7 @@ public class FabricationConfigScreen extends Screen {
 			data.writeString(key);
 			data.writeString(value);
 			client.getNetworkHandler().sendPacket(new CustomPayloadC2SPacket(new Identifier("fabrication", "config"), data));
-		} else if (FabConf.hasWorldPath()) {
+		} else if (editingWorldPath && FabConf.hasWorldPath()) {
 			FabConf.worldSet(key, value);
 			if (FabricationMod.isAvailableFeature(key)) {
 				FabricationMod.updateFeature(key);

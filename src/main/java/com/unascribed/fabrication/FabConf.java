@@ -76,7 +76,6 @@ public class FabConf {
 	private static boolean analyticsSafe = false;
 	private static ImmutableSet<String> defaults = ImmutableSet.of();
 	private static Path worldPath = null;
-	private static Path lastWorldPath = null;
 	public static boolean loadComplete = false;
 
 	private static class FeaturesIniTransformer implements IniTransformer {
@@ -204,10 +203,6 @@ public class FabConf {
 		return worldPath != null;
 	}
 
-	public static void resetWorldPath(){
-		setWorldPath(lastWorldPath, false);
-	}
-
 	public static void setWorldPath(Path path) {
 		setWorldPath(path, false);
 	}
@@ -217,8 +212,6 @@ public class FabConf {
 		if (path == null){
 			worldConfig.clear();
 			worldDefaults = ImmutableSet.of();
-		}else if (onLoad) {
-			lastWorldPath = path;
 		}
 		worldReload();
 	}
@@ -288,7 +281,7 @@ public class FabConf {
 			ConfigValue worldVal = worldConfig.get(configKey);
 			if (worldVal == ConfigValue.UNSET) {
 				if (worldDefaults.contains(configKey)) return true;
-			} else {
+			} else if (worldVal != null) {
 				return worldVal == ConfigValue.TRUE;
 			}
 		}
@@ -323,23 +316,25 @@ public class FabConf {
 		if (isFailed(configKey)) return ConfigValue.FALSE;
 		if (hasWorldPath()) {
 			ConfigValue worldVal = worldConfig.get(configKey);
-			if (worldVal != ConfigValue.UNSET) return worldVal;
+			if (worldVal != ConfigValue.UNSET && worldVal != null) return worldVal;
 		}
 		return config.getOrDefault(remap(configKey), ConfigValue.UNSET);
 	}
 
 	public static boolean doesWorldContainValue(String configKey){
-		return worldConfig.get(configKey) != ConfigValue.UNSET || worldDefaults.contains(configKey);
+		return worldConfig.containsKey(configKey) && worldConfig.get(configKey) != ConfigValue.UNSET || worldDefaults.contains(configKey);
 	}
 	public static boolean doesWorldContainValue(String configKey, String configVal){
 		if (!worldConfig.containsKey(configKey)) return false;
 		return worldConfig.get(configKey).toString().equals(configVal.toUpperCase(Locale.ROOT));
 	}
-
 	public static ResolvedConfigValue getResolvedValue(String configKey) {
+		return getResolvedValue(configKey, true);
+	}
+	public static ResolvedConfigValue getResolvedValue(String configKey, boolean includeWorld) {
 		if (isBanned(configKey)) return ResolvedConfigValue.BANNED;
 		if (isFailed(configKey)) return ResolvedConfigValue.FALSE;
-		if (hasWorldPath()) {
+		if (includeWorld && hasWorldPath()) {
 			ConfigValue cv = config.get(remap(configKey));
 			return worldConfig.getOrDefault(remap(configKey), ConfigValue.UNSET).resolveSemantically(
 					worldDefaults.contains(configKey) ||
@@ -506,12 +501,10 @@ public class FabConf {
 				defaults = getDefaults(s -> !rawConfig.get(s).map("true"::equals).orElse(false));
 				config = new HashMap<>();
 				for (String k : rawConfig.keySet()) {
-					try {
-						config.put(k, rawConfig.getEnum(k, ConfigValue.class).get());
-					} catch (BadValueException e) {
-						FabLog.warn(e.getMessage() + " - assuming unset");
-						config.put(k, ConfigValue.UNSET);
-					}
+					config.put(k, rawConfig.getEnum(k, ConfigValue.class).orElseGet(() -> {
+						FabLog.warn("Could not parse " + k + " = " + rawConfig.get(k).orElse("") + " - assuming unset");
+						return ConfigValue.UNSET;
+					}));
 				}
 			} catch (SyntaxErrorException e) {
 				FabLog.warn("Failed to load configuration file: "+e.getMessage()+"; will assume defaults");
@@ -552,12 +545,10 @@ public class FabConf {
 				worldDefaults = getDefaults(s -> !rawConfig.get(s).map("true"::equals).orElse(false));
 				worldConfig = new HashMap<>();
 				for (String k : rawConfig.keySet()) {
-					try {
-						worldConfig.put(k, rawConfig.getEnum(k, ConfigValue.class).get());
-					} catch (BadValueException e) {
-						FabLog.warn(e.getMessage() + " - assuming unset");
-						worldConfig.put(k, ConfigValue.UNSET);
-					}
+					worldConfig.put(k, rawConfig.getEnum(k, ConfigValue.class).orElseGet(() -> {
+						FabLog.warn("Could not parse " + k + " = " + rawConfig.get(k).orElse("") + " - assuming unset");
+						return ConfigValue.UNSET;
+					}));
 				}
 			} catch (SyntaxErrorException e) {
 				FabLog.warn("Failed to load configuration file: " + e.getMessage() + "; will assume defaults");
