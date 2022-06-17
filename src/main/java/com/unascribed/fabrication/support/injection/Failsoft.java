@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.throwables.InvalidInjectionExceptio
 import org.spongepowered.asm.mixin.transformer.MixinTargetContext;
 
 import com.unascribed.fabrication.FabLog;
-import com.unascribed.fabrication.support.MixinErrorHandler;
+import com.unascribed.fabrication.support.MixinErrorHandler_THIS_ERROR_HANDLER_IS_FOR_SOFT_FAILURE_IN_FABRICATION_ITSELF_AND_DOES_NOT_IMPLY_FABRICATION_IS_RESPONSIBLE_FOR_THE_BELOW_ERROR;
 
 public class Failsoft {
 
@@ -107,7 +107,7 @@ public class Failsoft {
 	}
 
 	private static <T extends Throwable> void handleApplyErrorProactively(String targetClassName, T th, IMixinInfo mixin, ErrorAction action) throws T {
-		action = MixinErrorHandler.INST.onApplyError(targetClassName, th, mixin, action);
+		action = MixinErrorHandler_THIS_ERROR_HANDLER_IS_FOR_SOFT_FAILURE_IN_FABRICATION_ITSELF_AND_DOES_NOT_IMPLY_FABRICATION_IS_RESPONSIBLE_FOR_THE_BELOW_ERROR.INST.onApplyError(targetClassName, th, mixin, action);
 		// don't throw the exception *at all* to avoid a stack-unwind causing other mixins to
 		// cascade-fail or for frame recomputation to not occur
 		if (action == ErrorAction.ERROR) {

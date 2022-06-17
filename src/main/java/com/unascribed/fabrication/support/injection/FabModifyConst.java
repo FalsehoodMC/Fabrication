@@ -44,7 +44,7 @@ public @interface FabModifyConst {
 
 	Constant[] constant() default {};
 
-	boolean remap() default true;
+	boolean remap() default false;
 
 	int require() default -1;
 
