@@ -21,7 +21,11 @@ import java.util.Map;
 import java.util.Set;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
-@SupportedAnnotationTypes({"com.unascribed.fabrication.support.injection.ModifyReturn", "com.unascribed.fabrication.support.injection.Hijack"})
+@SupportedAnnotationTypes({
+		"com.unascribed.fabrication.support.injection.ModifyReturn",
+		"com.unascribed.fabrication.support.injection.Hijack",
+		"com.unascribed.fabrication.support.injection.FabModifyConst"
+})
 public class AnnotationProcessor extends AbstractProcessor {
 
 	@Override

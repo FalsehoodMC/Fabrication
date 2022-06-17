@@ -63,14 +63,12 @@ public class MixinClientPlayNetworkHandler implements GetServerConfig {
 					for (int i = 0; i < trileanKeys; i++) {
 						String k = buf.readString(32767);
 						int v = buf.readUnsignedByte();
-						if (k.startsWith("general") && !k.startsWith("general.category.")) continue;
 						fabrication$serverTrileanConfig.put(k, ResolvedConfigValue.values()[v]);
 					}
 					int stringKeys = buf.readVarInt();
 					for (int i = 0; i < stringKeys; i++) {
 						String k = buf.readString(32767);
 						String v = buf.readString(32767);
-						if (k.startsWith("general") && !k.startsWith("general.category.")) continue;
 						fabrication$serverStringConfig.put(k, v);
 					}
 					if (buf.isReadable(8)) {
