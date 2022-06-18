@@ -488,7 +488,6 @@ public class FabConf {
 		load(ldr);
 		loaders.add(ldr);
 	}
-
 	public static void reload() {
 		FabLog.info("Reloading configs...");
 		Path dir = Agnos.getConfigDir().resolve("fabrication");
@@ -544,7 +543,7 @@ public class FabConf {
 			throw new RuntimeException("Failed to create fabrication world config directory", e1);
 		}
 		Path configFile = dir.resolve("features.ini");
-		checkForAndSaveDefaultsOrUpgrade(configFile, "default_features_config.ini", IniTransformer.simpleValueIniTransformer(((key, value) -> "general.profile".equals(key)? "green" : value)));
+		checkForAndSaveDefaultsOrUpgrade(configFile, "default_features_config.ini");
 		FabLog.timeAndCountWarnings("Loading of features.ini", () -> {
 			StringWriter sw = new StringWriter();
 			try {
