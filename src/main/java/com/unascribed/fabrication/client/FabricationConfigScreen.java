@@ -862,7 +862,6 @@ public class FabricationConfigScreen extends Screen {
 	private int drawConfigValues(MatrixStack matrices, int y, float mouseX, float mouseY, Predicate<FeatureEntry> pred, ConfigValueFlag... defaultFlags) {
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		for (Map.Entry<String, FeatureEntry> en : FeaturesFile.getAll().entrySet()) {
-			if ("general.profile".equals(en.getKey())) continue;
 			FeatureEntry fe = en.getValue();
 			if (fe.meta || fe.section) continue;
 			if (!pred.test(fe)) continue;
