@@ -51,7 +51,8 @@ public abstract class MixinClientWorld extends World {
 			if(this.isAir(mutablePos.set(x, y, z))) {
 				if(this.random.nextInt(8)+floor > y) {
 					//Source specified "depthsuspend" particle, which has been removed
-					this.client.particleManager.addParticle(new DepthSuspendParticle((ClientWorld)(Object)this, x + this.random.nextFloat(), y + this.random.nextFloat(), z + this.random.nextFloat()));
+					//Source used nextFloat, see #483
+					this.client.particleManager.addParticle(new DepthSuspendParticle((ClientWorld)(Object)this, x + this.random.nextDouble(), y + this.random.nextDouble(), z + this.random.nextDouble()));
 				}
 			}
 		}
