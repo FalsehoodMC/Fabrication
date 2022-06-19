@@ -43,11 +43,11 @@ public abstract class MixinItemStack {
 	public void use(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<TypedActionResult<ItemStack>> cir) {
 		if (!FabConf.isEnabled("*.swap_conflicting_enchants")) return;
 		List<Pair<String, Integer>> currentConflicts = new ArrayList<>();
+		if (nbt == null) return;
 		NbtCompound lTag = nbt.getCompound("fabrication#conflictingEnchants");
-		if (lTag != null && !lTag.isEmpty()) {
-			for (String key : lTag.getKeys()) {
-				currentConflicts.add(new Pair<>(key, lTag.getInt(key)));
-			}
+		if (lTag == null || lTag.isEmpty()) return;
+		for (String key : lTag.getKeys()) {
+			currentConflicts.add(new Pair<>(key, lTag.getInt(key)));
 		}
 		if (!currentConflicts.isEmpty() && user.isSneaky()) {
 			NbtCompound tag = new NbtCompound();
