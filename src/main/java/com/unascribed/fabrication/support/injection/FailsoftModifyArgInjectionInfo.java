@@ -2,6 +2,7 @@ package com.unascribed.fabrication.support.injection;
 
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.spongepowered.asm.mixin.extensibility.IMixinErrorHandler;
 import org.spongepowered.asm.mixin.injection.code.Injector;
 import org.spongepowered.asm.mixin.injection.struct.InjectionInfo.AnnotationType;
 import org.spongepowered.asm.mixin.injection.struct.InjectionInfo.HandlerPrefix;
@@ -18,14 +19,10 @@ public class FailsoftModifyArgInjectionInfo extends ModifyArgInjectionInfo {
 
 	@Override
 	public void postInject() {
-		if (Failsoft.postInject(this, mixin, getDescription(), getDynamicInfo() + getMessages())) {
-			try {
-				super.postInject();
-			} catch (Error e) {
-				throw Failsoft.hideOurselves(e);
-			} catch (RuntimeException e) {
-				throw Failsoft.hideOurselves(e);
-			}
+		try {
+			super.postInject();
+		} catch (Throwable e) {
+			FabMixinInjector.handleErrorProactively(mixin.getTargetClassInfo().getClassName(), e, mixin.getMixin(), IMixinErrorHandler.ErrorAction.ERROR);
 		}
 	}
 	@Override

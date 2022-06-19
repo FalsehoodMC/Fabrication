@@ -1,6 +1,10 @@
 package com.unascribed.fabrication.support.injection;
 
+import com.unascribed.fabrication.FabLog;
+import com.unascribed.fabrication.support.MixinErrorHandler;
 import org.objectweb.asm.tree.AnnotationNode;
+import org.spongepowered.asm.mixin.extensibility.IMixinErrorHandler;
+import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 import org.spongepowered.asm.mixin.injection.code.Injector;
 
 import java.lang.reflect.Field;
@@ -59,4 +63,14 @@ public class FabMixinInjector {
 		return injector;
 	}
 
+	public static void handleErrorProactively(String targetClassName, Throwable th, IMixinInfo mixin, IMixinErrorHandler.ErrorAction action) {
+		action = MixinErrorHandler.onError(th, mixin, action, "postApply");
+		// don't throw the exception *at all* to avoid a stack-unwind causing other mixins to
+		// cascade-fail or for frame recomputation to not occur
+		if (action == IMixinErrorHandler.ErrorAction.ERROR) {
+			throw new RuntimeException(th);
+		} else if (action == IMixinErrorHandler.ErrorAction.WARN) {
+			FabLog.warn("Mixin application failed", th);
+		}
+	}
 }

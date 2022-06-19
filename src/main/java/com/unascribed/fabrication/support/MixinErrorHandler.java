@@ -3,7 +3,6 @@ package com.unascribed.fabrication.support;
 import java.util.Set;
 
 import com.unascribed.fabrication.FabConf;
-import org.spongepowered.asm.mixin.extensibility.IMixinConfig;
 import org.spongepowered.asm.mixin.extensibility.IMixinErrorHandler;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
@@ -13,22 +12,11 @@ import com.unascribed.fabrication.FabLog;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 
-public class MixinErrorHandler implements IMixinErrorHandler {
+public class MixinErrorHandler {
 
-	public static final MixinErrorHandler INST = new MixinErrorHandler();
 	public static boolean actuallyItWasUs = false;
 
-	@Override
-	public ErrorAction onPrepareError(IMixinConfig config, Throwable th, IMixinInfo mixin, ErrorAction action) {
-		return onError(th, mixin, action, "prepare");
-	}
-
-	@Override
-	public ErrorAction onApplyError(String targetClassName, Throwable th, IMixinInfo mixin, ErrorAction action) {
-		return onError(th, mixin, action, "apply");
-	}
-
-	public ErrorAction onError(Throwable th, IMixinInfo mixin, ErrorAction action, String verb) {
+	public static IMixinErrorHandler.ErrorAction onError(Throwable th, IMixinInfo mixin, IMixinErrorHandler.ErrorAction action, String verb) {
 		if (mixin.getClassName().startsWith("com.unascribed.fabrication.")) {
 			String msg = th.getMessage();
 			String msg1 = msg.length() > 200 ? msg.substring(0, 200) : msg;
@@ -41,7 +29,7 @@ public class MixinErrorHandler implements IMixinErrorHandler {
 					"Message3", msg3,
 					"Mixin", mixin.getClassName()
 					));
-			if (action == ErrorAction.ERROR) {
+			if (action == IMixinErrorHandler.ErrorAction.ERROR) {
 				Set<String> keys = FabConf.getConfigKeysForDiscoveredClass(mixin.getClassName());
 				if (!keys.isEmpty()) {
 					FabLog.debug("Original Mixin error", th);
@@ -49,7 +37,7 @@ public class MixinErrorHandler implements IMixinErrorHandler {
 					for (String opt : keys) {
 						FabConf.addFailure(opt);
 					}
-					return ErrorAction.NONE;
+					return IMixinErrorHandler.ErrorAction.NONE;
 				} else {
 					actuallyItWasUs = true;
 				}

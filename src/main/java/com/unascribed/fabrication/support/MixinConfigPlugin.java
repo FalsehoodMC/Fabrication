@@ -60,7 +60,6 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	@Override
 	public void onLoad(String mixinPackage) {
 		FabConf.reload();
-		Mixins.registerErrorHandlerClass("com.unascribed.fabrication.support.MixinErrorHandler");
 		FabLog.warn("Fabrication is about to inject into Mixin to add support for redirect tracking.");
 		InjectionInfo.register(TrackingRedirectInjectionInfo.class);
 		InjectionInfo.register(FailsoftCallbackInjectionInfo.class);
