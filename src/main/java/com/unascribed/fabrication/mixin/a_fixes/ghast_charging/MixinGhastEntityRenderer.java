@@ -1,9 +1,9 @@
 package com.unascribed.fabrication.mixin.a_fixes.ghast_charging;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.interfaces.GhastAttackTime;
@@ -18,7 +18,7 @@ import net.minecraft.entity.mob.GhastEntity;
 @EligibleIf(configAvailable="*.ghast_charging", envMatches=Env.CLIENT)
 public class MixinGhastEntityRenderer {
 
-	@Inject(at=@At("HEAD"), method="scale(Lnet/minecraft/entity/mob/GhastEntity;Lnet/minecraft/client/util/math/MatrixStack;F)V", cancellable=true)
+	@FabInject(at=@At("HEAD"), method="scale(Lnet/minecraft/entity/mob/GhastEntity;Lnet/minecraft/client/util/math/MatrixStack;F)V", cancellable=true)
 	public void scale(GhastEntity ghast, MatrixStack matrices, float tickDelta, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.ghast_charging")) return;
 

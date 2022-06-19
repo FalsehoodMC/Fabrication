@@ -84,8 +84,8 @@ public class FabInjector {
 					inject = annotationNode;
 				} else if ("Lorg/spongepowered/asm/mixin/transformer/meta/MixinMerged;".equals(annotationNode.desc)) {
 					mixin = (String) annotationNode.values.get(annotationNode.values.indexOf("mixin") + 1);
-					if (FailsoftRedirectInjectionInfo.fabrication$allExistingRedirects.containsKey(methodNode.name)) {
-						redirects.add(new EntryMixinMerged(methodNode.name, methodNode.desc, mixin, FailsoftRedirectInjectionInfo.fabrication$allExistingRedirects.get(methodNode.name)));
+					if (TrackingRedirectInjectionInfo.fabrication$allExistingRedirects.containsKey(methodNode.name)) {
+						redirects.add(new EntryMixinMerged(methodNode.name, methodNode.desc, mixin, TrackingRedirectInjectionInfo.fabrication$allExistingRedirects.get(methodNode.name)));
 					}
 				}
 			}

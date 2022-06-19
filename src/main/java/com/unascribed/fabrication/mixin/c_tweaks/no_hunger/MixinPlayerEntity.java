@@ -4,7 +4,7 @@ import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.ConfigPredicates;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
@@ -30,7 +30,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 		super(entityType, world);
 	}
 
-	@Inject(at=@At("HEAD"), method="eatFood(Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;", cancellable=true)
+	@FabInject(at=@At("HEAD"), method="eatFood(Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;", cancellable=true)
 	public void eatFood(World world, ItemStack stack, CallbackInfoReturnable<ItemStack> ci) {
 		if (FabConf.isEnabled("*.no_hunger")) {
 			if (ConfigPredicates.shouldRun("*.no_hunger", (PlayerEntity)(Object)this)) {

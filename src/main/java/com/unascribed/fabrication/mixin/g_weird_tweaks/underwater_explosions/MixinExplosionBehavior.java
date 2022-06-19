@@ -5,7 +5,7 @@ import java.util.Optional;
 import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
@@ -21,7 +21,7 @@ import net.minecraft.world.explosion.ExplosionBehavior;
 @EligibleIf(configAvailable="*.underwater_explosions")
 public abstract class MixinExplosionBehavior {
 
-	@Inject(at=@At(value="HEAD"), method="getBlastResistance(Lnet/minecraft/world/explosion/Explosion;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/fluid/FluidState;)Ljava/util/Optional;", cancellable=true)
+	@FabInject(at=@At(value="HEAD"), method="getBlastResistance(Lnet/minecraft/world/explosion/Explosion;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/fluid/FluidState;)Ljava/util/Optional;", cancellable=true)
 	public void getBlastResistance(Explosion explosion, BlockView world, BlockPos pos, BlockState blockState, FluidState fluidState, CallbackInfoReturnable<Optional<Float>> ci) {
 		if (FabConf.isEnabled("*.underwater_explosions") && !fluidState.isEmpty()) {
 			ci.setReturnValue(Optional.empty());

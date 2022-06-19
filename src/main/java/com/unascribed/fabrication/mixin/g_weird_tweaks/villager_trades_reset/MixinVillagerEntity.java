@@ -4,7 +4,7 @@ import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.support.EligibleIf;
@@ -33,7 +33,7 @@ public abstract class MixinVillagerEntity extends MerchantEntity {
 
 	@Shadow public abstract VillagerData getVillagerData();
 
-	@Inject(method={"restock()V", "restockAndUpdateDemandBonus()V"}, at=@At("TAIL"))
+	@FabInject(method={"restock()V", "restockAndUpdateDemandBonus()V"}, at=@At("TAIL"))
 	public void resetTrades(CallbackInfo ci){
 		if(!FabConf.isEnabled("*.villager_trades_reset")) return;
 		TradeOfferList tradeOfferList = new TradeOfferList();

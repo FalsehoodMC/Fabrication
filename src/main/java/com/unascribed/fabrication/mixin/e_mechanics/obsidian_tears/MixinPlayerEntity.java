@@ -3,9 +3,9 @@ package com.unascribed.fabrication.mixin.e_mechanics.obsidian_tears;
 import java.util.Optional;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
@@ -24,7 +24,7 @@ import net.minecraft.util.math.Vec3d;
 @EligibleIf(configAvailable="*.obsidian_tears")
 public class MixinPlayerEntity {
 
-	@Inject(at=@At("HEAD"), method="findRespawnPosition(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;FZZ)Ljava/util/Optional;",
+	@FabInject(at=@At("HEAD"), method="findRespawnPosition(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;FZZ)Ljava/util/Optional;",
 			cancellable=true)
 	private static void findRespawnPosition(ServerWorld world, BlockPos pos, float f, boolean b, boolean b2, CallbackInfoReturnable<Optional<Vec3d>> ci) {
 		if (!FabConf.isEnabled("*.obsidian_tears")) return;

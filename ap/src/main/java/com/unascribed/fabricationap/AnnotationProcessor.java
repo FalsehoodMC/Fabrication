@@ -15,6 +15,7 @@ import javax.tools.Diagnostic;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,11 @@ import java.util.Set;
 @SupportedAnnotationTypes({
 		"com.unascribed.fabrication.support.injection.ModifyReturn",
 		"com.unascribed.fabrication.support.injection.Hijack",
-		"com.unascribed.fabrication.support.injection.FabModifyConst"
+		"com.unascribed.fabrication.support.injection.FabModifyConst",
+		"com.unascribed.fabrication.support.injection.FabInject",
+		"com.unascribed.fabrication.support.injection.FabModifyArg",
+		"com.unascribed.fabrication.support.injection.FabModifyArgs",
+		"com.unascribed.fabrication.support.injection.FabModifyVariable"
 })
 public class AnnotationProcessor extends AbstractProcessor {
 
@@ -47,14 +52,18 @@ public class AnnotationProcessor extends AbstractProcessor {
 					for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> ae : am.getElementValues().entrySet()){
 						Name key = ae.getKey().getSimpleName();
 						Object l = ae.getValue().getValue();
-						if (!((key.contentEquals("value") || key.contentEquals("targets")) && l instanceof List<?>)) continue;
+						boolean isTargets = key.contentEquals("targets");
+						if (!((key.contentEquals("value") || isTargets) && l instanceof List<?>)) continue;
 						for (Object o : (List<?>)l) {
 							String co = o.toString();
-							String ad = o instanceof String ? co : co.substring(0, co.length()-6);
+							String ad = isTargets || o instanceof String ? co : co.substring(0, co.length()-6);
+							if (ad.charAt(0) == '"') {
+								ad = ad.substring(1, ad.charAt(ad.length()-1) == '"' ? ad.length()-1 : ad.length());
+							}
+							if (ad.startsWith("com.mrcrayfish") || ad.startsWith("svenhjol")) continue;
 							mixin.add(ad);
 							try {
 								Class<?> cl = Class.forName(ad, false, this.getClass().getClassLoader());
-								//Loops quite a few too many times but eh it's a build only operation
 								while (cl != null) {
 									mixin.add(cl.getName());
 									for (Class<?> cla : cl.getInterfaces()) mixin.add(cla.getName());
@@ -71,13 +80,35 @@ public class AnnotationProcessor extends AbstractProcessor {
 				for (AnnotationMirror am : e.getAnnotationMirrors()) {
 					if (!getSupportedAnnotationTypes().contains(am.getAnnotationType().toString())) continue;
 					for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> ae : am.getElementValues().entrySet()) {
-						Name key = ae.getKey().getSimpleName();
+						String key = ae.getKey().getSimpleName().toString();
 						Object l = ae.getValue().getValue();
+						if (key.equals("at")) {
+							List<String> atTargets = new ArrayList<>();
+							if (l instanceof List<?>) {
+								for (Object o : (List<?>) l) {
+									if (!(o instanceof AnnotationMirror)) continue;
+									for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> aei : ((AnnotationMirror) o).getElementValues().entrySet()) {
+										if (aei.getKey().getSimpleName().contentEquals("target")) {
+											atTargets.add(aei.getValue().getValue().toString());
+										}
+									}
+								}
+							} else if (l instanceof AnnotationMirror) {
+								for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> aei : ((AnnotationMirror) l).getElementValues().entrySet()) {
+									if (aei.getKey().getSimpleName().contentEquals("target")) {
+										atTargets.add(aei.getValue().getValue().toString());
+									}
+								}
+							}
+							if (atTargets.isEmpty()) continue;
+							key = "target";
+							l = atTargets;
+						}
 						if (!(l instanceof List<?>)) continue;
 						for (Object o : (List<?>)l){
-							if (key.contentEquals("method")){
+							if (key.equals("method")){
 								methods.add(o.toString().replace("\"", ""));
-							} else if (key.contentEquals("target")) {
+							} else if (key.equals("target")) {
 								String ad = o.toString().replace("\"", "");
 								StringBuilder strb = new StringBuilder();
 								strb.append(ad);
@@ -87,7 +118,6 @@ public class AnnotationProcessor extends AbstractProcessor {
 								if (col == -1 || dot < col && dot != -1) col = dot;
 								try {
 									Class<?> cl = Class.forName(ad.substring(ad.charAt(0) == 'L' ? 1 : 0, col).replace('/', '.'), false, this.getClass().getClassLoader());
-									//Loops quite a few too many times but eh it's a build only operation
 									while (cl != null) {
 										add.add(cl.getName());
 										for (Class<?> cla : cl.getInterfaces()) add.add(cla.getName());
