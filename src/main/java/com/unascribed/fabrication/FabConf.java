@@ -15,7 +15,6 @@ import com.google.common.io.BaseEncoding;
 import com.google.common.io.MoreFiles;
 import com.google.common.io.Resources;
 import com.unascribed.fabrication.FeaturesFile.FeatureEntry;
-import com.unascribed.fabrication.QDIni.BadValueException;
 import com.unascribed.fabrication.QDIni.IniTransformer;
 import com.unascribed.fabrication.QDIni.SyntaxErrorException;
 import com.unascribed.fabrication.support.ConfigLoader;
@@ -483,7 +482,6 @@ public class FabConf {
 		load(ldr);
 		loaders.add(ldr);
 	}
-
 	public static void reload() {
 		FabLog.info("Reloading configs...");
 		Path dir = Agnos.getConfigDir().resolve("fabrication");
@@ -537,7 +535,7 @@ public class FabConf {
 			throw new RuntimeException("Failed to create fabrication world config directory", e1);
 		}
 		Path configFile = dir.resolve("features.ini");
-		checkForAndSaveDefaultsOrUpgrade(configFile, "default_features_config.ini", IniTransformer.simpleValueIniTransformer(((key, value) -> "general.profile".equals(key)? "green" : value)));
+		checkForAndSaveDefaultsOrUpgrade(configFile, "default_features_config.ini");
 		FabLog.timeAndCountWarnings("Loading of features.ini", () -> {
 			StringWriter sw = new StringWriter();
 			try {
@@ -572,9 +570,7 @@ public class FabConf {
 		checkForAndSaveDefaultsOrUpgrade(file, "default_"+name+"_config.ini");
 		FabLog.timeAndCountWarnings("Loading of "+name+".ini", () -> {
 			try {
-				QDIni qd = QDIni.load(file);
-				qd.setYapLog(FabLog::warn);
-				ldr.load(dir, qd, false);
+				ldr.load(dir, QDIni.load(file), false);
 			} catch (SyntaxErrorException e) {
 				FabLog.warn("Failed to load "+name+": "+e.getMessage());
 				ldr.load(dir, QDIni.load("<empty>", ""), true);
