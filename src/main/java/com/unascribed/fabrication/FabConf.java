@@ -15,7 +15,6 @@ import com.google.common.io.BaseEncoding;
 import com.google.common.io.MoreFiles;
 import com.google.common.io.Resources;
 import com.unascribed.fabrication.FeaturesFile.FeatureEntry;
-import com.unascribed.fabrication.QDIni.BadValueException;
 import com.unascribed.fabrication.QDIni.IniTransformer;
 import com.unascribed.fabrication.QDIni.SyntaxErrorException;
 import com.unascribed.fabrication.support.ConfigLoader;
@@ -47,6 +46,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -70,7 +70,7 @@ public class FabConf {
 	private static final Set<String> failuresReadOnly = Collections.unmodifiableSet(failures);
 	private static final SetMultimap<String, String> configKeysForDiscoveredClasses = HashMultimap.create();
 	private static Map<String, ConfigValue> worldConfig = new HashMap<>();
-	private static ImmutableSet<String> worldDefaults = ImmutableSet.of();
+	private static ImmutableMap<String, Boolean> worldDefaults = ImmutableMap.of();
 	private static QDIni rawConfig;
 	private static Map<String, ConfigValue> config = new HashMap<>();
 	private static boolean analyticsSafe = false;
@@ -211,7 +211,7 @@ public class FabConf {
 		worldPath = path;
 		if (path == null){
 			worldConfig.clear();
-			worldDefaults = ImmutableSet.of();
+			worldDefaults = ImmutableMap.of();
 		}
 		worldReload();
 	}
@@ -279,9 +279,10 @@ public class FabConf {
 		}
 		if (hasWorldPath()) {
 			ConfigValue worldVal = worldConfig.get(configKey);
-			if (worldVal == ConfigValue.UNSET) {
-				if (worldDefaults.contains(configKey)) return true;
-			} else if (worldVal != null) {
+			if (worldVal == ConfigValue.UNSET || worldVal == null) {
+				Boolean bl = worldDefaults.get(configKey);
+				if (bl != null) return bl;
+			} else {
 				return worldVal == ConfigValue.TRUE;
 			}
 		}
@@ -322,7 +323,7 @@ public class FabConf {
 	}
 
 	public static boolean doesWorldContainValue(String configKey){
-		return worldConfig.containsKey(configKey) && worldConfig.get(configKey) != ConfigValue.UNSET || worldDefaults.contains(configKey);
+		return worldConfig.containsKey(configKey) && worldConfig.get(configKey) != ConfigValue.UNSET || worldDefaults.containsKey(configKey);
 	}
 	public static boolean doesWorldContainValue(String configKey, String configVal){
 		if (!worldConfig.containsKey(configKey)) return false;
@@ -336,8 +337,9 @@ public class FabConf {
 		if (isFailed(configKey)) return ResolvedConfigValue.FALSE;
 		if (includeWorld && hasWorldPath()) {
 			ConfigValue cv = config.get(remap(configKey));
+			Boolean worldDef = worldDefaults.get(configKey);
 			return worldConfig.getOrDefault(remap(configKey), ConfigValue.UNSET).resolveSemantically(
-					worldDefaults.contains(configKey) ||
+					worldDef != null ? worldDef :
 					cv == ConfigValue.TRUE ||
 					cv == ConfigValue.UNSET && defaults.contains(configKey));
 		}
@@ -383,13 +385,17 @@ public class FabConf {
 	public static void addFailure(String configKey) {
 		failures.add(remap(configKey));
 	}
-
-	private static ImmutableSet<String> getDefaults(Predicate<String> shouldSkipSection) {
-		ImmutableSet.Builder<String> builder = ImmutableSet.builder();
+	private static void getDefaults(Predicate<String> shouldSkipSection, Consumer<String> add) {
 		for (Map.Entry<String, ImmutableSet<String>> entry : sectionFeatureKeyToFeatures.entrySet()) {
 			if (shouldSkipSection.test("general.category."+entry.getKey())) continue;
-			builder.addAll(entry.getValue());
+			for (String str : entry.getValue()){
+				add.accept(str);
+			}
 		}
+	}
+	private static ImmutableSet<String> getDefaults(Predicate<String> shouldSkipSection) {
+		ImmutableSet.Builder<String> builder = ImmutableSet.builder();
+		getDefaults(shouldSkipSection, builder::add);
 		return builder.build();
 	}
 	private static void set(String configKey, String newValue, Path path, boolean isWorld) {
@@ -404,7 +410,10 @@ public class FabConf {
 		(isWorld? worldConfig : config).put(configKey, ConfigValue.parseTrilean(newValue));
 		if (configKey.startsWith("general.category.")) {
 			if (isWorld) {
-				worldDefaults = getDefaults(s -> worldConfig.get(s) != ConfigValue.TRUE);
+				ImmutableMap.Builder<String, Boolean> bldr = ImmutableMap.builder();
+				getDefaults(s -> worldConfig.get(s) != ConfigValue.TRUE, e -> bldr.put(e, true));
+				getDefaults(s -> worldConfig.get(s) != ConfigValue.FALSE, e -> bldr.put(e, false));
+				worldDefaults = bldr.build();
 			} else {
 				defaults = getDefaults(s -> config.get(s) != ConfigValue.TRUE);
 			}
@@ -536,12 +545,15 @@ public class FabConf {
 			throw new RuntimeException("Failed to create fabrication world config directory", e1);
 		}
 		Path configFile = dir.resolve("features.ini");
-		checkForAndSaveDefaultsOrUpgrade(configFile, "default_features_config.ini");
+		checkForAndSaveDefaultsOrUpgrade(configFile, "default_features_config.ini", IniTransformer.simpleValueIniTransformer((k,v) -> "unset"));
 		FabLog.timeAndCountWarnings("Loading of features.ini", () -> {
 			StringWriter sw = new StringWriter();
 			try {
 				QDIni rawConfig = QDIni.loadAndTransform(configFile, featuresIniTransformer.reset(), sw);
-				worldDefaults = getDefaults(s -> !rawConfig.get(s).map("true"::equals).orElse(false));
+				ImmutableMap.Builder<String, Boolean> bldr = ImmutableMap.builder();
+				getDefaults(s -> !rawConfig.get(s).map("true"::equals).orElse(false), e -> bldr.put(e, true));
+				getDefaults(s -> !rawConfig.get(s).map("false"::equals).orElse(false), e -> bldr.put(e, false));
+				worldDefaults = bldr.build();
 				worldConfig = new HashMap<>();
 				for (String k : rawConfig.keySet()) {
 					worldConfig.put(k, rawConfig.getEnum(k, ConfigValue.class).orElseGet(() -> {
@@ -607,7 +619,7 @@ public class FabConf {
 				}
 			}
 			boolean loadedLegacy = false;
-			if (transformer == null && Files.exists(configFileOld)){
+			if (Files.exists(configFileOld)){
 				try {
 					QDIni currentValues = QDIni.load(configFileOld);
 					transformer = IniTransformer.simpleValueIniTransformer((key, value) -> currentValues.get(key).orElse(value));
