@@ -111,6 +111,7 @@ public class FabricationConfigScreen extends Screen {
 	private float sidebarHeight;
 
 	private boolean didClick;
+	private boolean mouseDragging;
 	private float selectTime;
 	private String selectedSection;
 	private String prevSelectedSection;
@@ -691,6 +692,7 @@ public class FabricationConfigScreen extends Screen {
 			close();
 		}
 		if (didClick) didClick = false;
+		if (mouseDragging) mouseDragging = false;
 
 		super.render(matrices, mouseX, mouseY, delta);
 
@@ -1041,7 +1043,7 @@ public class FabricationConfigScreen extends Screen {
 
 		RenderSystem.disableTexture();
 		int clickedIndex =(int)(mouseX - 134) / (noUnset ? 22 : onlyBannable ? 30 : 15);
-		if (didClick) {
+		if (didClick || mouseDragging) {
 			if (mouseX >= 134 && mouseX <= 134+trackSize && mouseY >= y+1 && mouseY <= y+10) {
 				float pitch = y*0.005f;
 				if (disabled) {
@@ -1426,6 +1428,8 @@ public class FabricationConfigScreen extends Screen {
 	public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
 		if ("search".equals(selectedSection)) {
 			searchField.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+		} else {
+			mouseDragging = true;
 		}
 		return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
 	}
