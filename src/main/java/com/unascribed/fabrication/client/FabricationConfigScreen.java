@@ -607,9 +607,7 @@ public class FabricationConfigScreen extends Screen {
 		matrices.scale(f, f, 1);
 		fill(matrices, -1, -1, 1, 1, 0xFFFFFFFF);
 		matrices.pop();
-		if (!isSingleplayer) {
-			fill(matrices, -6, -1, -2, 1, 0xFF000000);
-		}
+		fill(matrices, -6, -1, -2, 1, 0xFF000000);
 		matrices.pop();
 		fill(matrices, -2, -2, 2, 2, 0xFF000000);
 		matrices.pop();
