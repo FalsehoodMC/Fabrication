@@ -486,8 +486,9 @@ public class FabRefl {
 
 	private static UnreflResult unreflectGetter(String className, Supplier<Class<?>> clazz, String yarnName) {
 		String name = FabRefMap.absoluteMap(yarnName);
-		int col = name.indexOf(';');
-		if (col != -1) name = name.substring(col+1);
+		int scol = name.indexOf(';');
+		int col = name.lastIndexOf(':');
+		name = name.substring(scol == -1 ? 0 : scol+1, col == -1 ? name.length() : col);
 		String desc = "field "+className+"#"+name+" (deobf name "+yarnName+")";
 		try {
 			Field f = clazz.get().getDeclaredField(name);
@@ -500,8 +501,9 @@ public class FabRefl {
 
 	private static UnreflResult unreflectSetter(String className, Supplier<Class<?>> clazz, String yarnName) {
 		String name = FabRefMap.absoluteMap(yarnName);
-		int col = name.indexOf(';');
-		if (col != -1) name = name.substring(col+1);
+		int scol = name.indexOf(';');
+		int col = name.lastIndexOf(':');
+		name = name.substring(scol == -1 ? 0 : scol+1, col == -1 ? name.length() : col);
 		String desc = "field "+className+"#"+name+" (deobf name "+yarnName+")";
 		try {
 			Field f = clazz.get().getDeclaredField(name);

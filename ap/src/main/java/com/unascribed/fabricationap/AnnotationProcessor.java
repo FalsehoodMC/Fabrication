@@ -30,7 +30,8 @@ import java.util.Set;
 		"com.unascribed.fabrication.support.injection.FabInject",
 		"com.unascribed.fabrication.support.injection.FabModifyArg",
 		"com.unascribed.fabrication.support.injection.FabModifyArgs",
-		"com.unascribed.fabrication.support.injection.FabModifyVariable"
+		"com.unascribed.fabrication.support.injection.FabModifyVariable",
+		"com.unascribed.fabrication.support.injection.ModifyGetField"
 })
 public class AnnotationProcessor extends AbstractProcessor {
 

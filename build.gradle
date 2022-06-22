@@ -551,10 +551,11 @@ jar {
 						classMap.put(clName, clNameRez)
 						int brc = target.indexOf('(')
 						if (brc == -1) {
-							String name = target.substring(col+1)
+							int cindx = target.lastIndexOf(':')
+							String name = target.substring(col+1, cindx == -1 ? target.length() : cindx)
 							for (def clField : cl.fields) {
 								if (clField.getName('named').equals(name) || clField.getName('intermediary').equals(name)){
-									fieldMap.put(target, clField.getName('intermediary'))
+									fieldMap.put(target, clField.getName('intermediary')+":"+clField.getDesc('intermediary'))
 								}
 							}
 							continue
