@@ -3,6 +3,7 @@ package com.unascribed.fabrication.mixin.i_woina.more_explosion_particles;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
+import com.unascribed.fabrication.support.injection.FabInject;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -12,7 +13,6 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
@@ -39,7 +39,7 @@ public class MixinExplosion {
 	@Shadow @Final
 	private List<BlockPos> affectedBlocks;
 
-	@Inject(method="affectWorld(Z)V", at=@At("HEAD"))
+	@FabInject(method="affectWorld(Z)V", at=@At("HEAD"))
 	private void oldParticles(boolean particles, CallbackInfo ci) {
 		if (!(FabConf.isEnabled("*.more_explosion_particles") && particles)) return;
 		for (BlockPos blockPos : affectedBlocks) {

@@ -3,6 +3,7 @@ package com.unascribed.fabrication.mixin.c_tweaks.scares_creepers;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.injection.FabInject;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -11,7 +12,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
@@ -22,7 +22,7 @@ public abstract class MixinLivingEntity extends Entity {
 		super(entityType, world);
 	}
 
-	@Inject(at=@At("HEAD"), method="canTarget(Lnet/minecraft/entity/LivingEntity;)Z", cancellable=true)
+	@FabInject(at=@At("HEAD"), method="canTarget(Lnet/minecraft/entity/LivingEntity;)Z", cancellable=true)
 	public void canTarget(LivingEntity other, CallbackInfoReturnable<Boolean> ci) {
 		if (!(FabConf.isEnabled("*.scares_creepers") && other instanceof PlayerEntity)) return;
 		Object self = this;

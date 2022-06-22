@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.interfaces.WasShoved;
@@ -38,7 +38,7 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 	private boolean fabrication$wasShoved;
 	private boolean fabrication$wasJustShoved;
 
-	@Inject(at=@At("HEAD"), method="interact(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;")
+	@FabInject(at=@At("HEAD"), method="interact(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;")
 	public void interactHead(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> ci) {
 		if (!FabConf.isEnabled("*.furnace_minecart_pushing")) return;
 		ItemStack itemStack = player.getStackInHand(hand);
@@ -49,7 +49,7 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 		}
 	}
 
-	@Inject(at=@At("RETURN"), method="interact(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;")
+	@FabInject(at=@At("RETURN"), method="interact(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;")
 	public void interactReturn(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> ci) {
 		if (!FabConf.isEnabled("*.furnace_minecart_pushing")) return;
 		if (this.fuel > 0) {

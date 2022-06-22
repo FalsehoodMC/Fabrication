@@ -4,7 +4,7 @@ import com.unascribed.fabrication.support.ConfigPredicates;
 import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.FabRefl;
@@ -27,7 +27,7 @@ public abstract class MixinCreeperEntity extends HostileEntity {
 		super(entityType, world);
 	}
 
-	@Inject(at=@At("TAIL"), method="initGoals()V")
+	@FabInject(at=@At("TAIL"), method="initGoals()V")
 	protected void initGoals(CallbackInfo ci) {
 		FleeEntityGoal<ServerPlayerEntity> goal = new FleeEntityGoal<>(this, ServerPlayerEntity.class,
 				spe -> ConfigPredicates.shouldRun("*.scares_creepers", (PlayerEntity)spe), 8, 1, 2,

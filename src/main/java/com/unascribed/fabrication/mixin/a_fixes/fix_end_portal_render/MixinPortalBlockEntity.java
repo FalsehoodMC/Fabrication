@@ -12,7 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(EndPortalBlockEntity.class)
@@ -23,7 +23,7 @@ public abstract class MixinPortalBlockEntity extends BlockEntity {
 		super(type, pos, state);
 	}
 
-	@Inject(at=@At("HEAD"), method="shouldDrawSide(Lnet/minecraft/util/math/Direction;)Z", cancellable=true)
+	@FabInject(at=@At("HEAD"), method="shouldDrawSide(Lnet/minecraft/util/math/Direction;)Z", cancellable=true)
 	public void renderAllSides(Direction direction, CallbackInfoReturnable<Boolean> cir) {
 		if (FabConf.isEnabled("*.fix_end_portal_render"))
 			cir.setReturnValue(Block.shouldDrawSide(this.getCachedState(), this.world, this.getPos(), direction, this.getPos().offset(direction)));

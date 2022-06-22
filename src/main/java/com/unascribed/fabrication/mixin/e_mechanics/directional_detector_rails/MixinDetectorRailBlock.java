@@ -3,9 +3,9 @@ package com.unascribed.fabrication.mixin.e_mechanics.directional_detector_rails;
 import java.util.function.Predicate;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.injection.FabModifyArg;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 import com.unascribed.fabrication.support.EligibleIf;
 
@@ -22,7 +22,7 @@ import net.minecraft.world.World;
 @EligibleIf(configAvailable="*.directional_detector_rails")
 public class MixinDetectorRailBlock {
 
-	@ModifyArg(at=@At(value="INVOKE", target="net/minecraft/block/DetectorRailBlock.getCarts(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Ljava/lang/Class;Ljava/util/function/Predicate;)Ljava/util/List;"),
+	@FabModifyArg(at=@At(value="INVOKE", target="net/minecraft/block/DetectorRailBlock.getCarts(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Ljava/lang/Class;Ljava/util/function/Predicate;)Ljava/util/List;"),
 			method="updatePoweredStatus(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)V", index=3)
 	private Predicate<Entity> changePredicate(World world, BlockPos pos, Class<?> type, Predicate<Entity> orig) {
 		if (!FabConf.isEnabled("*.directional_detector_rails")) return orig;

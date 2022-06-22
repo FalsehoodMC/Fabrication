@@ -13,7 +13,7 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import com.unascribed.fabrication.support.injection.FabModifyVariable;
 
 import java.util.regex.Matcher;
 
@@ -21,7 +21,7 @@ import java.util.regex.Matcher;
 @EligibleIf(configAvailable="*.linkify_urls", envMatches=Env.CLIENT)
 public class MixinInGameHud {
 
-	@ModifyVariable(at=@At(value="HEAD"), method="addChatMessage(Lnet/minecraft/network/MessageType;Lnet/minecraft/text/Text;Ljava/util/UUID;)V", argsOnly=true)
+	@FabModifyVariable(at=@At(value="HEAD"), method="addChatMessage(Lnet/minecraft/network/MessageType;Lnet/minecraft/text/Text;Ljava/util/UUID;)V", argsOnly=true)
 	public Text consume(Text message) {
 		if (!FabConf.isEnabled("*.linkify_urls")) return message;
 		if (!(message instanceof TranslatableText && "chat.type.text".equals(((TranslatableText)message).getKey()))) return message;

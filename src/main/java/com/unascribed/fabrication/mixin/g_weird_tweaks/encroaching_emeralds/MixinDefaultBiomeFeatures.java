@@ -7,14 +7,14 @@ import net.minecraft.world.biome.GenerationSettings;
 import net.minecraft.world.gen.feature.DefaultBiomeFeatures;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(DefaultBiomeFeatures.class)
 @EligibleIf(configAvailable="*.encroaching_emeralds")
 public abstract class MixinDefaultBiomeFeatures {
 
-	@Inject(at=@At("HEAD"), method="addDefaultOres(Lnet/minecraft/world/biome/GenerationSettings$Builder;)V")
+	@FabInject(at=@At("HEAD"), method="addDefaultOres(Lnet/minecraft/world/biome/GenerationSettings$Builder;)V")
 	private static void addEmeralds(GenerationSettings.Builder builder, CallbackInfo ci){
 		if (!(FabConf.isEnabled("*.encroaching_emeralds") && builder instanceof GenerationSettingsAddEmeralds)) return;
 		((GenerationSettingsAddEmeralds)builder).fabrication$addEmeralds();

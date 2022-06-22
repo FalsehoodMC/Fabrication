@@ -3,7 +3,7 @@ package com.unascribed.fabrication.mixin.d_minor_mechanics.feather_falling_five;
 import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.ConfigPredicates;
@@ -18,7 +18,7 @@ import net.minecraft.item.ItemStack;
 @EligibleIf(configAvailable="*.feather_falling_five")
 public class MixinLivingEntity {
 
-	@Inject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", cancellable=true)
+	@FabInject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", cancellable=true)
 	public void damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
 		if (!FabConf.isEnabled("*.feather_falling_five")) return;
 		LivingEntity self = ((LivingEntity)(Object)this);

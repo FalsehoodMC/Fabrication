@@ -3,7 +3,7 @@ package com.unascribed.fabrication.mixin.i_woina.janky_arm;
 import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.support.EligibleIf;
@@ -19,7 +19,7 @@ import net.minecraft.util.math.Vec3f;
 @EligibleIf(configAvailable="*.janky_arm", envMatches=Env.CLIENT)
 public class MixinHeldItemRenderer {
 
-	@Inject(at=@At(value="CONSTANT", args="floatValue=-20"),
+	@FabInject(at=@At(value="CONSTANT", args="floatValue=-20"),
 			method="renderArmHoldingItem(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IFFLnet/minecraft/util/Arm;)V")
 	private void renderArmHoldingItem(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, float equipProgress, float swingProgress, Arm arm, CallbackInfo ci) {
 		float f = arm == Arm.LEFT ? -1 : 1;

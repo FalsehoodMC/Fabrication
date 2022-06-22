@@ -13,7 +13,7 @@ import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
@@ -31,7 +31,7 @@ public abstract class MixinAbstractPiglinEntity extends LivingEntity implements 
 		super(entityType, world);
 	}
 
-	@Inject(method="zombify(Lnet/minecraft/server/world/ServerWorld;)V", at=@At("TAIL"), locals=LocalCapture.CAPTURE_FAILHARD)
+	@FabInject(method="zombify(Lnet/minecraft/server/world/ServerWorld;)V", at=@At("TAIL"), locals=LocalCapture.CAPTURE_FAILHARD)
 	public void tagPiglin(ServerWorld world, CallbackInfo ci, ZombifiedPiglinEntity zombifiedPiglinEntity) {
 		if (zombifiedPiglinEntity instanceof SetPreZombified) {
 			((SetPreZombified)zombifiedPiglinEntity).fabrication$setPreZombifiedType((EntityType<? extends MobEntity>) this.getType());

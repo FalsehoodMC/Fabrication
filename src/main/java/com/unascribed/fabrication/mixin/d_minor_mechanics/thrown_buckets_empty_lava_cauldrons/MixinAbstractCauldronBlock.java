@@ -14,14 +14,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LavaCauldronBlock.class)
 @EligibleIf(configAvailable="*.thrown_buckets_empty_lava_cauldrons")
 public class MixinAbstractCauldronBlock {
 
-	@Inject(at=@At(value="INVOKE", target="Lnet/minecraft/entity/Entity;setOnFireFromLava()V", shift=At.Shift.BEFORE), cancellable=true, method="onEntityCollision(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/Entity;)V")
+	@FabInject(at=@At(value="INVOKE", target="Lnet/minecraft/entity/Entity;setOnFireFromLava()V", shift=At.Shift.BEFORE), cancellable=true, method="onEntityCollision(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/Entity;)V")
 	private void fuelFurnace(BlockState state, World world, BlockPos pos, Entity entity, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.thrown_buckets_empty_lava_cauldrons")) return;
 		if (entity instanceof ItemEntity && ((ItemEntity)entity).getStack().isOf(Items.BUCKET)) {

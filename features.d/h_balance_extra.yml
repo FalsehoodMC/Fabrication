@@ -137,6 +137,13 @@ balance.extra.brittle_shields:
 	desc:
 		Causes explosions to always break shields.
 
+balance.extra.faulty_shields:
+	name: Faulty Shields
+	since: 3.0.0
+	sides: server_only
+	desc:
+		Shields half non-projectile damage instead of blocking it.
+
 balance.extra.tools_in_bundles:
 	name: Tools in Bundles
 	since: 3.0.0

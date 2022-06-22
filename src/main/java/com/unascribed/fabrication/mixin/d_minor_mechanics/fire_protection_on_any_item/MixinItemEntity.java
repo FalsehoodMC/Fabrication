@@ -4,7 +4,7 @@ import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
@@ -21,7 +21,7 @@ public abstract class MixinItemEntity {
 	@Shadow
 	public abstract ItemStack getStack();
 
-	@Inject(at=@At("HEAD"), method="isFireImmune()Z", cancellable=true)
+	@FabInject(at=@At("HEAD"), method="isFireImmune()Z", cancellable=true)
 	public void isFireImmune(CallbackInfoReturnable<Boolean> cir) {
 		if (FabConf.isEnabled("*.fire_protection_on_any_item") && EnchantmentHelper.getLevel(Enchantments.FIRE_PROTECTION, getStack()) > 0) {
 			cir.setReturnValue(true);
