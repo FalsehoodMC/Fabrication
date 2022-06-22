@@ -11,12 +11,12 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 
-@Mixin(GenerationSettings.Builder.class)
+@Mixin(targets="net.minecraft.world.biome.GenerationSettings$Builder")
 @EligibleIf(configAvailable="*.encroaching_emeralds")
 public abstract class MixinGenerationSettingsBuilder implements GenerationSettingsAddEmeralds {
 	@Shadow @Final
@@ -29,7 +29,7 @@ public abstract class MixinGenerationSettingsBuilder implements GenerationSettin
 		fabrication$hasDefaultOres = true;
 	}
 
-	@Inject(at=@At("HEAD"), method="build()Lnet/minecraft/world/biome/GenerationSettings;")
+	@FabInject(at=@At("HEAD"), method="build()Lnet/minecraft/world/biome/GenerationSettings;")
 	public void build(CallbackInfoReturnable<GenerationSettings> cir) {
 		if (!fabrication$hasDefaultOres) return;
 		int step = GenerationStep.Feature.UNDERGROUND_ORES.ordinal();

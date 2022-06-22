@@ -3,7 +3,7 @@ package com.unascribed.fabrication.mixin.d_minor_mechanics.tridents_activate_lev
 import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.support.EligibleIf;
@@ -20,7 +20,7 @@ import net.minecraft.util.math.BlockPos;
 @EligibleIf(configAvailable="*.tridents_activate_levers")
 public abstract class MixinPersistentProjectileEntity {
 
-	@Inject(at=@At("HEAD"), method="onBlockHit(Lnet/minecraft/util/hit/BlockHitResult;)V")
+	@FabInject(at=@At("HEAD"), method="onBlockHit(Lnet/minecraft/util/hit/BlockHitResult;)V")
 	public void onBlockHit(BlockHitResult blockHitResult, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.tridents_activate_levers")) return;
 		Object self = this;

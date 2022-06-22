@@ -3,7 +3,7 @@ package com.unascribed.fabrication.mixin.c_tweaks.campfires_ignite_entities;
 import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.support.EligibleIf;
@@ -18,7 +18,7 @@ import net.minecraft.world.World;
 @EligibleIf(configAvailable="*.campfires_ignite_entities")
 public class MixinCampfireBlock {
 
-	@Inject(at=@At(value="INVOKE", target="Lnet/minecraft/entity/Entity;damage(Lnet/minecraft/entity/damage/DamageSource;F)Z"), method="onEntityCollision(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/Entity;)V")
+	@FabInject(at=@At(value="INVOKE", target="Lnet/minecraft/entity/Entity;damage(Lnet/minecraft/entity/damage/DamageSource;F)Z"), method="onEntityCollision(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/Entity;)V")
 	public void damage(BlockState state, World world, BlockPos pos, Entity entity, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.campfires_ignite_entities")) return;
 

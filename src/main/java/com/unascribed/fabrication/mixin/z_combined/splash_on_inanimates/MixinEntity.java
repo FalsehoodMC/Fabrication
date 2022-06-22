@@ -1,9 +1,9 @@
 package com.unascribed.fabrication.mixin.z_combined.splash_on_inanimates;
 
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -33,7 +33,7 @@ public abstract class MixinEntity implements SetInvisNoGravReversible {
 	@Shadow
 	public abstract void setNoGravity(boolean noGravity);
 
-	@Inject(at=@At("TAIL"), method="baseTick()V")
+	@FabInject(at=@At("TAIL"), method="baseTick()V")
 	public void baseTick(CallbackInfo ci) {
 		if (!world.isClient && isWet()) {
 			if (fabrication$invisibilityReversible) {
@@ -71,7 +71,7 @@ public abstract class MixinEntity implements SetInvisNoGravReversible {
 		fabrication$noGravityReversible = reversible;
 	}
 
-	@Inject(at=@At("TAIL"), method="writeNbt(Lnet/minecraft/nbt/NbtCompound;)Lnet/minecraft/nbt/NbtCompound;")
+	@FabInject(at=@At("TAIL"), method="writeNbt(Lnet/minecraft/nbt/NbtCompound;)Lnet/minecraft/nbt/NbtCompound;")
 	public void toTag(NbtCompound tag, CallbackInfoReturnable<NbtCompound> ci) {
 		if (fabrication$invisibilityReversible) {
 			tag.putBoolean("fabrication:InvisibilityReversible", fabrication$invisibilityReversible);
@@ -81,7 +81,7 @@ public abstract class MixinEntity implements SetInvisNoGravReversible {
 		}
 	}
 
-	@Inject(at=@At("TAIL"), method="readNbt(Lnet/minecraft/nbt/NbtCompound;)V")
+	@FabInject(at=@At("TAIL"), method="readNbt(Lnet/minecraft/nbt/NbtCompound;)V")
 	public void fromTag(NbtCompound tag, CallbackInfo ci) {
 		fabrication$invisibilityReversible = tag.getBoolean("fabrication:InvisibilityReversible");
 		fabrication$noGravityReversible = tag.getBoolean("fabrication:NoGravityReversible");

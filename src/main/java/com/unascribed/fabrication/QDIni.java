@@ -128,7 +128,7 @@ public class QDIni {
 	private final String prelude;
 	private final Map<String, List<BlameString>> data;
 
-	private Consumer<String> yapLog;
+	private Consumer<String> yapLog = FabLog::warn;
 
 	private QDIni(String prelude, Map<String, List<BlameString>> data) {
 		this.prelude = prelude;
@@ -136,7 +136,7 @@ public class QDIni {
 	}
 
 	/**
-	 * Enables "yap" mode for parse failures in this config, where rather than throwing a
+	 * Enables/Disables "yap" mode for parse failures in this config, where rather than throwing a
 	 * BadValueException a warning string will be sent to this Consumer and an empty Optional
 	 * returned to the caller of get*.
 	 * <p>
