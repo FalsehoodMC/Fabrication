@@ -439,7 +439,7 @@ public class FeatureFabricationCommand implements Feature {
 
 				String[] values;
 				if (s.startsWith("general.")) {
-					values = new String[]{"true", "false"};
+					values = new String[]{"unset", "true", "false"};
 				} else {
 					values = new String[]{"unset", "true", "false", "banned"};
 				}

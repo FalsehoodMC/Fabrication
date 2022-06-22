@@ -111,6 +111,7 @@ public class FabricationConfigScreen extends Screen {
 	private float sidebarHeight;
 
 	private boolean didClick;
+	private boolean mouseDragging;
 	private float selectTime;
 	private String selectedSection;
 	private String prevSelectedSection;
@@ -606,9 +607,7 @@ public class FabricationConfigScreen extends Screen {
 		matrices.scale(f, f, 1);
 		fill(matrices, -1, -1, 1, 1, 0xFFFFFFFF);
 		matrices.pop();
-		if (!isSingleplayer) {
-			fill(matrices, -6, -1, -2, 1, 0xFF000000);
-		}
+		fill(matrices, -6, -1, -2, 1, 0xFF000000);
 		matrices.pop();
 		fill(matrices, -2, -2, 2, 2, 0xFF000000);
 		matrices.pop();
@@ -691,6 +690,7 @@ public class FabricationConfigScreen extends Screen {
 			close();
 		}
 		if (didClick) didClick = false;
+		if (mouseDragging) mouseDragging = false;
 
 		super.render(matrices, mouseX, mouseY, delta);
 
@@ -974,13 +974,16 @@ public class FabricationConfigScreen extends Screen {
 		matrices.translate(0, y, 0);
 		float dia = sCurve5((5-becomeBanTime)/5f);
 		float scale = 1;
-		boolean noUnset = key.startsWith("general.");
+		boolean noBan = key.startsWith("general.");
+		boolean noUnset = noBan && !editingWorldPath;
 		ConfigValue currentValue = noUnset ? (isEnabled(key) ? ConfigValue.TRUE : ConfigValue.FALSE) : onlyBannable ? getValue(key) == ConfigValue.BANNED ? ConfigValue.BANNED : ConfigValue.UNSET : getValue(key);
 		boolean keyEnabled = getResolvedValue(key) == ResolvedConfigValue.DEFAULT_TRUE;
 		ConfigValue prevValue = animateDisabled ? currentValue : optionPreviousValues.getOrDefault(key, currentValue);
 		int[] xes;
 		if (noUnset) {
 			xes = new int[] { 0, 23, 0, 0 };
+		} else if (noBan) {
+			xes = new int[] { 15, 30, 0, 0 };
 		} else if (onlyBannable) {
 			xes = new int[] { 30, 30, 30, 0 };
 		} else {
@@ -999,23 +1002,24 @@ public class FabricationConfigScreen extends Screen {
 		if (!(disabled || failed)) {
 			da = 1-da;
 		}
-		int trackSize = (noUnset?45:60);
+		int trackSize = (noUnset||noBan?45:60);
 		if (clientOnly) {
 			fill(matrices, 133, 0, 134+trackSize+1, 11, 0xFFFFAA00);
 		} else {
 			fill(matrices, 133, 0, 134+trackSize+1, 11, 0xFFFFFFFF);
 		}
 		fill(matrices, 134, 1, 134+trackSize, 10, 0x66000000);
-		if (!noUnset && !onlyBannable) {
+		if (!noUnset && !onlyBannable && !noBan) {
 			fill(matrices, 134+15, 1, 134+15+15, 10, 0x33000000);
 			fill(matrices, 134+45, 1, 134+45+15, 10, 0x33000000);
 		}
 		matrices.push();
 		matrices.translate(134 + (prevX + ((curX - prevX) * a)), 0, 0);
 		int knobAlpha = ((int) ((noValue ? 1 - da : 1) * 255)) << 24;
-		fill(matrices, 0, 1, noUnset ? 22 : onlyBannable ? 30 : 15, 10, MathHelper.hsvToRgb(Math.floorMod((int) (prevHue + ((curHue - prevHue) * a)), 360) / 360f, 0.9f, (prevHSValue + ((curHSValue - prevHSValue) * a)) / 100f) | knobAlpha);
-		if (!noUnset && a >= 1 && (currentValue == ConfigValue.UNSET || editingWorldPath) && !onlyBannable) {
-			fill(matrices, keyEnabled ? 15 : -1, 1, keyEnabled ? 16 : 0, 10, MathHelper.hsvToRgb((keyEnabled ? 120 : 0) / 360f, 0.9f, 0.8f) | knobAlpha);
+		int selectedWidth = noUnset ? 22 : onlyBannable ? 30 : 15;
+		fill(matrices, 0, 1, selectedWidth, 10, MathHelper.hsvToRgb(Math.floorMod((int) (prevHue + ((curHue - prevHue) * a)), 360) / 360f, 0.9f, (prevHSValue + ((curHSValue - prevHSValue) * a)) / 100f) | knobAlpha);
+		if (!noUnset && a >= 1 && (currentValue == ConfigValue.UNSET || editingWorldPath) && !onlyBannable && !(noBan && currentValue != ConfigValue.UNSET)) {
+			fill(matrices, keyEnabled ? selectedWidth : -1, 1, keyEnabled ? selectedWidth+1 : 0, 10, MathHelper.hsvToRgb((keyEnabled ? 120 : 0) / 360f, 0.9f, 0.8f) | knobAlpha);
 		}
 		matrices.pop();
 		RenderSystem.enableBlend();
@@ -1026,26 +1030,39 @@ public class FabricationConfigScreen extends Screen {
 		if (noUnset) {
 			drawTexture(matrices, 134+3, 1, 15, 0, 15, 9, 60, 9);
 			drawTexture(matrices, 134+4+22, 1, 45, 0, 15, 9, 60, 9);
+		} else if (noBan) {
+			drawTexture(matrices, 134, 1, 15, 0, 45, 9, 60, 9);
+		}else if (onlyBannable) {
+			drawTexture(matrices, 134+7, 1, 0, 0, 15, 9, 60, 9);
+			drawTexture(matrices, 134+38, 1, 30, 0, 15, 9, 60, 9);
 		} else {
-			if (onlyBannable) {
-				drawTexture(matrices, 134+7, 1, 0, 0, 15, 9, 60, 9);
-				drawTexture(matrices, 134+38, 1, 30, 0, 15, 9, 60, 9);
-			} else {
-				drawTexture(matrices, 134, 1, 0, 0, 60, 9, 60, 9);
-			}
+			drawTexture(matrices, 134, 1, 0, 0, 60, 9, 60, 9);
 		}
 
 		RenderSystem.disableTexture();
-		if (didClick) {
+		int clickedIndex =(int)(mouseX - 134) / (noUnset ? 22 : onlyBannable ? 30 : 15);
+		if (didClick || mouseDragging) {
 			if (mouseX >= 134 && mouseX <= 134+trackSize && mouseY >= y+1 && mouseY <= y+10) {
 				float pitch = y*0.005f;
 				if (disabled) {
 					playErrorFeedback();
 				} else {
-					int clickedIndex = (int)((mouseX-134)/(noUnset ? 22 : onlyBannable ? 30 : 15));
 					ConfigValue newValue;
 					if (noUnset) {
 						newValue = clickedIndex == 0 ? ConfigValue.FALSE : ConfigValue.TRUE;
+					} else if (noBan) {
+						switch (clickedIndex) {
+							case 0:
+								newValue = ConfigValue.FALSE;
+								break;
+							case 2:
+								newValue = ConfigValue.TRUE;
+								break;
+							case 1:
+							default:
+								newValue = ConfigValue.UNSET;
+								break;
+						}
 					} else if (onlyBannable) {
 						newValue = clickedIndex == 0 ? ConfigValue.BANNED : ConfigValue.UNSET;
 					} else {
@@ -1083,7 +1100,7 @@ public class FabricationConfigScreen extends Screen {
 		}
 		int textAlpha = ((int)((0.7f+((1-da)*0.3f)) * 255))<<24;
 		int startY = y;
-		int startX = 136+(noUnset ? 45 : 60)+5;
+		int startX = 136+(noUnset||noBan ? 45 : 60)+5;
 		int startStartX = startX;
 		String section = null;
 		if (showSourceSection && key.contains(".")) {
@@ -1145,9 +1162,8 @@ public class FabricationConfigScreen extends Screen {
 				} else if (failed) {
 					renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"This feature failed to initialize"), (int)mouseX, (int)mouseY);
 				} else {
-					int index = (int)((mouseX-134)/(noUnset ? 22 : onlyBannable ? 30 : 15));
 					if (onlyBannable) {
-						if (index == 0) {
+						if (clickedIndex == 0) {
 							renderTooltip(matrices, Lists.newArrayList(
 									new LiteralText("§7Ban"),
 									new LiteralText("Disallow use by clients")
@@ -1159,9 +1175,9 @@ public class FabricationConfigScreen extends Screen {
 									), (int)mouseX, (int)mouseY);
 						}
 					} else {
-						if (index == (noUnset ? 0 : 1)) {
+						if (clickedIndex == (noUnset || noBan ? 0 : 1)) {
 							renderTooltip(matrices, new LiteralText("§cDisable"), (int)mouseX, (int)mouseY);
-						} else if (index == (noUnset ? -99 : 2)) {
+						} else if (clickedIndex == (noUnset ? -99 : noBan ? 1 : 2)) {
 							if (currentValue == ConfigValue.UNSET) {
 								renderTooltip(matrices, Lists.newArrayList(
 										new LiteralText("§eUse default value §f(see General > Profile)"),
@@ -1170,7 +1186,7 @@ public class FabricationConfigScreen extends Screen {
 							} else {
 								renderTooltip(matrices, new LiteralText("§eUse default value §f(see General > Profile)"), (int)mouseX, (int)mouseY);
 							}
-						} else if (index == 0) {
+						} else if (clickedIndex == 0) {
 							List<Text> li = Lists.newArrayList(
 									new LiteralText("§7Ban"),
 									new LiteralText("Prevent feature from loading entirely")
@@ -1410,6 +1426,8 @@ public class FabricationConfigScreen extends Screen {
 	public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
 		if ("search".equals(selectedSection)) {
 			searchField.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+		} else {
+			mouseDragging = true;
 		}
 		return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
 	}

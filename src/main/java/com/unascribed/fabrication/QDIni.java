@@ -52,6 +52,28 @@ public class QDIni {
 		public SyntaxErrorException(Throwable cause) { super(cause); }
 	}
 
+	public static class CompositeIniTransformer implements IniTransformer{
+		final IniTransformer first;
+		final IniTransformer second;
+		CompositeIniTransformer(IniTransformer first, IniTransformer second) {
+			this.first = first;
+			this.second = second;
+		}
+		@Override
+		public String transformLine(String path, String line) {
+			return second.transformLine(path, first.transformLine(path, line));
+		}
+
+		@Override
+		public String transformValueComment(String key, String value, String comment) {
+			return second.transformValueComment(key, value, first.transformValueComment(key, value, comment));
+		}
+
+		@Override
+		public String transformValue(String key, String value) {
+			return second.transformValue(key, first.transformValue(key, value));
+		}
+	}
 	public interface IniTransformer {
 		static IniTransformer simpleValueIniTransformer(ValueIniTransformer transformer){
 			return new IniTransformer() {
@@ -89,6 +111,9 @@ public class QDIni {
 					return value;
 				}
 			};
+		}
+		default IniTransformer andThen(IniTransformer other) {
+			return new CompositeIniTransformer(this, other);
 		}
 
 		String transformLine(String path, String line);
