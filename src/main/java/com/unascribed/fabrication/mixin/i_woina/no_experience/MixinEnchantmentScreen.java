@@ -5,14 +5,14 @@ import java.util.stream.Collectors;
 
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.injection.FabModifyConst;
+import com.unascribed.fabrication.support.injection.FabModifyVariable;
 import com.unascribed.fabrication.support.injection.Hijack;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.TranslatableTextContent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import com.unascribed.fabrication.support.injection.FabModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import com.unascribed.fabrication.support.EligibleIf;
@@ -45,7 +45,7 @@ public abstract class MixinEnchantmentScreen extends HandledScreen<EnchantmentSc
 		return subject.experienceLevel;
 	}
 
-	@ModifyArg(method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V", index=1,
+	@FabModifyArg(method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V", index=1,
 			at=@At(value="INVOKE", target="Lnet/minecraft/client/gui/screen/ingame/EnchantmentScreen;renderTooltip(Lnet/minecraft/client/util/math/MatrixStack;Ljava/util/List;II)V"))
 	public List<Text> removeLevelText(List<Text> original){
 		if (FabConf.isEnabled("*.no_experience")){
@@ -71,7 +71,7 @@ public abstract class MixinEnchantmentScreen extends HandledScreen<EnchantmentSc
 		return false;
 	}
 
-	@ModifyVariable(at=@At(value="INVOKE", target="net/minecraft/client/font/TextRenderer.getWidth(Ljava/lang/String;)I", ordinal=0),
+	@FabModifyVariable(at=@At(value="INVOKE", target="net/minecraft/client/font/TextRenderer.getWidth(Ljava/lang/String;)I", ordinal=0),
 			method="drawBackground(Lnet/minecraft/client/util/math/MatrixStack;FII)V", ordinal=0)
 	public String modifyLevelText(String orig) {
 		if (FabConf.isEnabled("*.no_experience")) return "";

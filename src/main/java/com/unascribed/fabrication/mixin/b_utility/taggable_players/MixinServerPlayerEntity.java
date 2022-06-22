@@ -6,7 +6,6 @@ import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.features.FeatureTaggablePlayers;
 import com.unascribed.fabrication.interfaces.TaggablePlayer;
-import com.unascribed.fabrication.loaders.LoaderTaggablePlayers;
 import com.unascribed.fabrication.support.EligibleIf;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -20,7 +19,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.HashSet;
@@ -61,13 +60,13 @@ public abstract class MixinServerPlayerEntity extends PlayerEntity implements Ta
 		return fabrication$tags.contains(tag);
 	}
 
-	@Inject(at=@At("HEAD"), method="copyFrom(Lnet/minecraft/server/network/ServerPlayerEntity;Z)V")
+	@FabInject(at=@At("HEAD"), method="copyFrom(Lnet/minecraft/server/network/ServerPlayerEntity;Z)V")
 	public void copyFrom(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
 		fabrication$tags.clear();
 		fabrication$tags.addAll(((TaggablePlayer)oldPlayer).fabrication$getTags());
 	}
 
-	@Inject(at=@At("TAIL"), method="writeCustomDataToNbt(Lnet/minecraft/nbt/NbtCompound;)V")
+	@FabInject(at=@At("TAIL"), method="writeCustomDataToNbt(Lnet/minecraft/nbt/NbtCompound;)V")
 	public void writeCustomDataToTag(NbtCompound tag, CallbackInfo ci) {
 		NbtList li = new NbtList();
 		for (String pt : fabrication$tags) {
@@ -78,7 +77,7 @@ public abstract class MixinServerPlayerEntity extends PlayerEntity implements Ta
 		}
 	}
 
-	@Inject(at=@At("TAIL"), method="readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V")
+	@FabInject(at=@At("TAIL"), method="readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V")
 	public void readCustomDataFromTag(NbtCompound tag, CallbackInfo ci) {
 		fabrication$tags.clear();
 		NbtList li = tag.getList("fabrication:Tags", NbtType.STRING);

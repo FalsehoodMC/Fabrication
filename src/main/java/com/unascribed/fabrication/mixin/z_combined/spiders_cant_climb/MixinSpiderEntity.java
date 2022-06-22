@@ -4,7 +4,7 @@ import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.FabricationMod;
@@ -31,7 +31,7 @@ public abstract class MixinSpiderEntity extends HostileEntity {
 	@Shadow
 	public abstract boolean isClimbingWall();
 
-	@Inject(at=@At("TAIL"), method="tick()V")
+	@FabInject(at=@At("TAIL"), method="tick()V")
 	public void tickTail(CallbackInfo ci) {
 		if (!world.isClient) {
 			if (isClimbingWall()) {

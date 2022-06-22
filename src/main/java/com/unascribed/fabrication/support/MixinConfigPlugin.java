@@ -17,7 +17,7 @@ import com.unascribed.fabrication.support.injection.FailsoftCallbackInjectionInf
 import com.unascribed.fabrication.support.injection.FailsoftModifyArgInjectionInfo;
 import com.unascribed.fabrication.support.injection.FailsoftModifyArgsInjectionInfo;
 import com.unascribed.fabrication.support.injection.FailsoftModifyVariableInjectionInfo;
-import com.unascribed.fabrication.support.injection.FailsoftRedirectInjectionInfo;
+import com.unascribed.fabrication.support.injection.TrackingRedirectInjectionInfo;
 import com.unascribed.fabrication.support.injection.FabInjector;
 import com.unascribed.fabrication.support.injection.Hijack;
 import com.unascribed.fabrication.support.injection.ModifyReturn;
@@ -60,16 +60,13 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	@Override
 	public void onLoad(String mixinPackage) {
 		FabConf.reload();
-		Mixins.registerErrorHandlerClass("com.unascribed.fabrication.support.MixinErrorHandler_THIS_ERROR_HANDLER_IS_FOR_SOFT_FAILURE_IN_FABRICATION_ITSELF_AND_DOES_NOT_IMPLY_FABRICATION_IS_RESPONSIBLE_FOR_THE_BELOW_ERROR");
-		FabLog.warn("Fabrication is about to inject into Mixin to add support for failsoft mixins.");
-		FabLog.warn("THE FOLLOWING WARNINGS ARE NOT AN ERROR AND DO NOT IMPLY FABRICATION IS RESPONSIBLE FOR A CRASH.");
+		FabLog.warn("Fabrication is about to inject into Mixin to add support for redirect tracking.");
+		InjectionInfo.register(TrackingRedirectInjectionInfo.class);
 		InjectionInfo.register(FailsoftCallbackInjectionInfo.class);
 		InjectionInfo.register(FailsoftModifyArgInjectionInfo.class);
 		InjectionInfo.register(FailsoftModifyArgsInjectionInfo.class);
-		InjectionInfo.register(FailsoftRedirectInjectionInfo.class);
 		InjectionInfo.register(FailsoftModifyVariableInjectionInfo.class);
 		InjectionInfo.register(FabModifyConstInjectionInfo.class);
-		FabLog.warn("Injection complete.");
 	}
 
 	@Override

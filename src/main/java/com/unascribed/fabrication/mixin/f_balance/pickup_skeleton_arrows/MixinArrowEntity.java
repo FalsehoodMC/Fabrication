@@ -11,7 +11,7 @@ import net.minecraft.potion.Potions;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -21,7 +21,7 @@ public abstract class MixinArrowEntity implements TagStrayArrow {
 
 	boolean fabrication$firedByStray = false;
 
-	@Inject(at=@At("RETURN"), method="asItemStack()Lnet/minecraft/item/ItemStack;")
+	@FabInject(at=@At("RETURN"), method="asItemStack()Lnet/minecraft/item/ItemStack;")
 	protected void asItemStack(CallbackInfoReturnable<ItemStack> cir) {
 		if (!(FabConf.isEnabled("*.pickup_skeleton_arrows") && fabrication$firedByStray)) return;
 		ItemStack arrow = cir.getReturnValue();
@@ -31,12 +31,12 @@ public abstract class MixinArrowEntity implements TagStrayArrow {
 			arrow.getOrCreateNbt().putInt("CustomPotionColor", PotionUtil.getColor(Potions.SLOWNESS));
 	}
 
-	@Inject(at=@At("HEAD"), method="writeCustomDataToNbt(Lnet/minecraft/nbt/NbtCompound;)V")
+	@FabInject(at=@At("HEAD"), method="writeCustomDataToNbt(Lnet/minecraft/nbt/NbtCompound;)V")
 	public void writeCustomDataToNbt(NbtCompound nbt, CallbackInfo ci) {
 		nbt.putBoolean("fabrication$firedByStray", fabrication$firedByStray);
 	}
 
-	@Inject(at=@At("HEAD"), method="readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V")
+	@FabInject(at=@At("HEAD"), method="readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V")
 	public void readCustomDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
 		fabrication$firedByStray = nbt.getBoolean("fabrication$firedByStray");
 	}

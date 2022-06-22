@@ -1,11 +1,11 @@
 package com.unascribed.fabrication.mixin.a_fixes.adventure_tags_in_survival;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
@@ -33,7 +33,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 	@Shadow @Final
 	private PlayerAbilities abilities;
 
-	@Inject(at=@At("HEAD"), method="isBlockBreakingRestricted(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/world/GameMode;)Z",
+	@FabInject(at=@At("HEAD"), method="isBlockBreakingRestricted(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/world/GameMode;)Z",
 			cancellable=true)
 	public void isBlockBreakingRestricted(World world, BlockPos pos, GameMode mode, CallbackInfoReturnable<Boolean> ci) {
 		if (!FabConf.isEnabled("*.adventure_tags_in_survival") || mode.isCreative() || mode.isBlockBreakingRestricted()) return;
@@ -45,7 +45,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 		}
 	}
 
-	@Inject(at=@At("HEAD"), method="canPlaceOn(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;Lnet/minecraft/item/ItemStack;)Z",
+	@FabInject(at=@At("HEAD"), method="canPlaceOn(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;Lnet/minecraft/item/ItemStack;)Z",
 			cancellable=true)
 	public void canPlaceOn(BlockPos pos, Direction dir, ItemStack stack, CallbackInfoReturnable<Boolean> ci) {
 		// note: this isn't called for block placement for some reason; that's hardcoded into ItemStack

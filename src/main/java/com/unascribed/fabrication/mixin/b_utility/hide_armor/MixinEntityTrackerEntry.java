@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
+import com.unascribed.fabrication.support.injection.FabModifyArg;
 
 import com.mojang.datafixers.util.Pair;
 import com.unascribed.fabrication.features.FeatureHideArmor;
@@ -24,7 +24,7 @@ public class MixinEntityTrackerEntry {
 	@Shadow @Final
 	private Entity entity;
 
-	@ModifyArg(at=@At(value="INVOKE", target="Lnet/minecraft/network/packet/s2c/play/EntityEquipmentUpdateS2CPacket;<init>(ILjava/util/List;)V"),
+	@FabModifyArg(at=@At(value="INVOKE", target="Lnet/minecraft/network/packet/s2c/play/EntityEquipmentUpdateS2CPacket;<init>(ILjava/util/List;)V"),
 			method="sendPackets(Ljava/util/function/Consumer;)V")
 	public List<Pair<EquipmentSlot, ItemStack>> constructUpdatePacket(List<Pair<EquipmentSlot, ItemStack>> equipmentList) {
 		return FeatureHideArmor.muddle(entity, equipmentList);

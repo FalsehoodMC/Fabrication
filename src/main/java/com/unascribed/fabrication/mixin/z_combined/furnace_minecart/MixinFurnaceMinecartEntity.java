@@ -3,7 +3,7 @@ package com.unascribed.fabrication.mixin.z_combined.furnace_minecart;
 import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import com.unascribed.fabrication.support.injection.FabModifyArgs;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 import com.unascribed.fabrication.interfaces.WasShoved;
@@ -15,7 +15,7 @@ import net.minecraft.entity.vehicle.FurnaceMinecartEntity;
 @EligibleIf(anyConfigAvailable={"*.hyperspeed_furnace_minecart", "*.furnace_minecart_pushing"})
 public abstract class MixinFurnaceMinecartEntity {
 
-	@ModifyArgs(at=@At(value="INVOKE", target="net/minecraft/util/math/Vec3d.add(DDD)Lnet/minecraft/util/math/Vec3d;"),
+	@FabModifyArgs(at=@At(value="INVOKE", target="net/minecraft/util/math/Vec3d.add(DDD)Lnet/minecraft/util/math/Vec3d;"),
 			method="applySlowdown()V")
 	public void modifyApplySlowdownVelocity(Args args) {
 		double speed = 1;

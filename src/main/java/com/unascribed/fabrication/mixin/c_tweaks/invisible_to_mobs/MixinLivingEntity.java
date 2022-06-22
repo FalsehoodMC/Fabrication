@@ -11,7 +11,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
@@ -22,7 +22,7 @@ public abstract class MixinLivingEntity extends Entity {
 		super(entityType, world);
 	}
 
-	@Inject(at=@At("HEAD"), method="canTarget(Lnet/minecraft/entity/LivingEntity;)Z", cancellable=true)
+	@FabInject(at=@At("HEAD"), method="canTarget(Lnet/minecraft/entity/LivingEntity;)Z", cancellable=true)
 	public void canTarget(LivingEntity other, CallbackInfoReturnable<Boolean> ci) {
 		if (!(other instanceof PlayerEntity)) return;
 		if (FabConf.isEnabled("*.no_phantoms") && ((Object)this) instanceof PhantomEntity) {

@@ -2,12 +2,11 @@ package com.unascribed.fabrication.mixin.g_weird_tweaks.repelling_void;
 
 import java.util.List;
 
+import com.unascribed.fabrication.support.injection.FabInject;
 import net.minecraft.block.BlockState;
-import net.minecraft.util.shape.VoxelShape;
 import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -43,7 +42,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 	private final List<Vec3d> fabrication$voidFallTrail = Lists.newArrayList();
 	private boolean fabrication$debted;
 
-	@Inject(at=@At("TAIL"), method="tick()V")
+	@FabInject(at=@At("TAIL"), method="tick()V")
 	public void tick(CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.repelling_void")) return;
 		if (onGround) {
@@ -60,7 +59,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 	}
 
 
-	@Inject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", cancellable=true)
+	@FabInject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", cancellable=true)
 	public void remove(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
 		if (FabConf.isEnabled("*.repelling_void") && !fabrication$debted && source == DamageSource.OUT_OF_WORLD && fabrication$lastLandingPos != null && this.getY() < this.world.getBottomY() -10) {
 			BlockPos bp = fabrication$lastLandingPos;
@@ -105,7 +104,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 		}
 	}
 
-	@Inject(at = @At("TAIL"), method = "writeCustomDataToNbt(Lnet/minecraft/nbt/NbtCompound;)V")
+	@FabInject(at = @At("TAIL"), method = "writeCustomDataToNbt(Lnet/minecraft/nbt/NbtCompound;)V")
 	public void writeCustomDataToTag(NbtCompound tag, CallbackInfo ci) {
 		if (fabrication$lastGroundPos != null) {
 			Vec3d pos = fabrication$lastGroundPos;
@@ -118,7 +117,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 		}
 	}
 
-	@Inject(at = @At("TAIL"), method = "readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V")
+	@FabInject(at = @At("TAIL"), method = "readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V")
 	public void readCustomDataFromTag(NbtCompound tag, CallbackInfo ci) {
 		if (tag.contains("fabrication:LastGroundPosX")) {
 			fabrication$lastGroundPos = new Vec3d(

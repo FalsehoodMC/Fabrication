@@ -3,7 +3,7 @@ package com.unascribed.fabrication.mixin.b_utility.despawning_items_blink;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.FabricationMod;
@@ -35,7 +35,7 @@ public abstract class MixinItemEntity extends Entity implements RenderingAgeAcce
 
 	private int fabrication$renderingAge = -1000000;
 
-	@Inject(at=@At("TAIL"), method="tick()V")
+	@FabInject(at=@At("TAIL"), method="tick()V")
 	public void tick(CallbackInfo ci) {
 		if (!world.isClient) {
 			if (age % 10 == 0) {

@@ -9,7 +9,7 @@ import net.minecraft.text.MutableText;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.interfaces.GetKillMessage;
@@ -30,7 +30,7 @@ public abstract class MixinEntityDamageSource {
 	@Unique
 	private static final Pattern fabrication$placeholderPattern = Pattern.compile("(?<!%)%(?:([123])\\$)?s");
 
-	@Inject(at=@At("HEAD"), method="getDeathMessage(Lnet/minecraft/entity/LivingEntity;)Lnet/minecraft/text/Text;", cancellable=true)
+	@FabInject(at=@At("HEAD"), method="getDeathMessage(Lnet/minecraft/entity/LivingEntity;)Lnet/minecraft/text/Text;", cancellable=true)
 	public void getDeathMessage(LivingEntity victim, CallbackInfoReturnable<Text> rtrn) {
 		if (!FabConf.isEnabled("*.killmessage")) return;
 		Entity attacker = ((EntityDamageSource)(Object)this).getAttacker();

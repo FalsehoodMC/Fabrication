@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -52,7 +52,7 @@ public abstract class MixinLivingEntity extends Entity implements DidJustAbsorp 
 	@Shadow
 	public abstract float getSoundPitch();
 
-	@Inject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z")
+	@FabInject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z")
 	public void damage(DamageSource ds, float amount, CallbackInfoReturnable<Boolean> cir) {
 		fabrication$absorptionAmountBeforeDamage = getAbsorptionAmount();
 	}
@@ -62,7 +62,7 @@ public abstract class MixinLivingEntity extends Entity implements DidJustAbsorp 
 		return getAbsorptionAmount() < fabrication$absorptionAmountBeforeDamage && fabrication$absorptionAmountBeforeDamage >= lastDamageTaken;
 	}
 
-	@Inject(at=@At("HEAD"), method="playHurtSound(Lnet/minecraft/entity/damage/DamageSource;)V",
+	@FabInject(at=@At("HEAD"), method="playHurtSound(Lnet/minecraft/entity/damage/DamageSource;)V",
 			cancellable=true)
 	public void playHurtSound(DamageSource src, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.alt_absorption_sound")) return;

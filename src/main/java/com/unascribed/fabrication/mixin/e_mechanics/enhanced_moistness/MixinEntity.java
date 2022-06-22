@@ -1,10 +1,10 @@
 package com.unascribed.fabrication.mixin.e_mechanics.enhanced_moistness;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -46,7 +46,7 @@ public abstract class MixinEntity implements MarkWet {
 	@Shadow
 	public abstract void playSound(SoundEvent se, float volume, float pitch);
 
-	@Inject(at=@At("TAIL"), method="baseTick()V")
+	@FabInject(at=@At("TAIL"), method="baseTick()V")
 	public void baseTick(CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.enhanced_moistness") || world.isClient) return;
 		if (isInLava()) {
@@ -75,7 +75,7 @@ public abstract class MixinEntity implements MarkWet {
 		}
 	}
 
-	@Inject(at=@At("HEAD"), method="isWet()Z", cancellable=true)
+	@FabInject(at=@At("HEAD"), method="isWet()Z", cancellable=true)
 	public void isWet(CallbackInfoReturnable<Boolean> ci) {
 		if (FabConf.isEnabled("*.enhanced_moistness")) {
 			if (fabrication$wetTimer > 0 && !fabrication$checkingOriginalWetness) {

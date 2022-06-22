@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.FabRefl;
@@ -45,12 +45,12 @@ public abstract class MixinLivingEntity extends Entity {
 		super(type, world);
 	}
 
-	@Inject(at=@At("HEAD"), method="sendEquipmentBreakStatus(Lnet/minecraft/entity/EquipmentSlot;)V")
+	@FabInject(at=@At("HEAD"), method="sendEquipmentBreakStatus(Lnet/minecraft/entity/EquipmentSlot;)V")
 	public void sendEquipmentBreakStatus(EquipmentSlot slot, CallbackInfo ci) {
 		shatter(slot, ((LivingEntity)(Object)this).getEquippedStack(slot));
 	}
 
-	@Inject(at=@At("HEAD"), method="sendToolBreakStatus(Lnet/minecraft/util/Hand;)V")
+	@FabInject(at=@At("HEAD"), method="sendToolBreakStatus(Lnet/minecraft/util/Hand;)V")
 	public void sendToolBreakStatus(Hand hand, CallbackInfo ci) {
 		shatter(hand == Hand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND, ((LivingEntity)(Object)this).getStackInHand(hand));
 	}

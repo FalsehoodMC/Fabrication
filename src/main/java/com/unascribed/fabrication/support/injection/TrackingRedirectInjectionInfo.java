@@ -13,26 +13,15 @@ import java.util.Map;
 
 @AnnotationType(Redirect.class)
 @HandlerPrefix("redirect")
-public class FailsoftRedirectInjectionInfo extends RedirectInjectionInfo {
+public class TrackingRedirectInjectionInfo extends RedirectInjectionInfo {
 
 	public static final Map<String, String> fabrication$allExistingRedirects = new HashMap<>();
 
-	public FailsoftRedirectInjectionInfo(MixinTargetContext mixin, MethodNode method, AnnotationNode annotation) {
+	public TrackingRedirectInjectionInfo(MixinTargetContext mixin, MethodNode method, AnnotationNode annotation) {
 		super(mixin, method, annotation);
 	}
 
-	@Override
-	public void postInject() {
-		if (Failsoft.postInject(this, mixin, getDescription(), getDynamicInfo() + getMessages())) {
-			try {
-				super.postInject();
-			} catch (Error e) {
-				throw Failsoft.hideOurselves(e);
-			} catch (RuntimeException e) {
-				throw Failsoft.hideOurselves(e);
-			}
-		}
-	}
+	//Was hoping to replace with Mixins.getMixinsForClass(targetClassName) but no luck getting it to work in postApply
 	@Override
 	public void prepare() {
 		int at = annotation.values.indexOf("at");

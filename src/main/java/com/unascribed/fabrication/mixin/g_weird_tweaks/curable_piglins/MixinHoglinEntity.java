@@ -7,7 +7,7 @@ import net.minecraft.entity.mob.HoglinEntity;
 import net.minecraft.nbt.NbtCompound;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -17,12 +17,12 @@ public class MixinHoglinEntity implements ZombImmunizableEntity {
 
 	public boolean fabrication$isImmuneToZombification = false;
 
-	@Inject(at=@At("TAIL"), method="writeCustomDataToNbt(Lnet/minecraft/nbt/NbtCompound;)V")
+	@FabInject(at=@At("TAIL"), method="writeCustomDataToNbt(Lnet/minecraft/nbt/NbtCompound;)V")
 	public void writeCustomDataToNbt(NbtCompound nbt, CallbackInfo ci) {
 		nbt.putBoolean("fabrication$isImmuneToZombification", fabrication$isImmuneToZombification);
 	}
 
-	@Inject(at=@At("HEAD"), method="readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V")
+	@FabInject(at=@At("HEAD"), method="readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V")
 	public void readCustomDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
 		fabrication$isImmuneToZombification = nbt.getBoolean("fabrication$isImmuneToZombification");
 	}
@@ -38,7 +38,7 @@ public class MixinHoglinEntity implements ZombImmunizableEntity {
 	}
 
 
-	@Inject(at=@At("HEAD"), method="isImmuneToZombification()Z", cancellable=true)
+	@FabInject(at=@At("HEAD"), method="isImmuneToZombification()Z", cancellable=true)
 	public void isImmuneToZombification(CallbackInfoReturnable<Boolean> cir) {
 		if (FabConf.isEnabled("*.curable_piglins") && fabrication$isImmuneToZombification) cir.setReturnValue(true);
 	}

@@ -1,11 +1,11 @@
 package com.unascribed.fabrication.mixin.e_mechanics.obsidian_tears;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -30,7 +30,7 @@ public abstract class MixinItemModels {
 	@Shadow
 	public abstract BakedModelManager getModelManager();
 
-	@Inject(at=@At("HEAD"), method="getModel(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/client/render/model/BakedModel;",
+	@FabInject(at=@At("HEAD"), method="getModel(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/client/render/model/BakedModel;",
 			cancellable=true, require=0)
 	public void getModel(ItemStack stack, CallbackInfoReturnable<BakedModel> ci) {
 		if (!FabConf.isEnabled("*.obsidian_tears")) return;
@@ -39,7 +39,7 @@ public abstract class MixinItemModels {
 		}
 	}
 
-	@Inject(at=@At("TAIL"), method="reloadModels()V", require=0)
+	@FabInject(at=@At("TAIL"), method="reloadModels()V", require=0)
 	public void reloadModels(CallbackInfo ci) {
 		fabrication$obsidianTearsModel = getModelManager().getModel(new ModelIdentifier(new Identifier("fabrication", "obsidian_tears"), "inventory"));
 	}

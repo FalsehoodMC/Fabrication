@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.mojang.authlib.GameProfile;
@@ -41,7 +41,7 @@ public class MixinServerQueryNetworkHandler {
 	@Shadow
 	private boolean responseSent;
 
-	@Inject(at=@At("HEAD"), method="onRequest(Lnet/minecraft/network/packet/c2s/query/QueryRequestC2SPacket;)V", cancellable=true)
+	@FabInject(at=@At("HEAD"), method="onRequest(Lnet/minecraft/network/packet/c2s/query/QueryRequestC2SPacket;)V", cancellable=true)
 	public void onRequest(QueryRequestC2SPacket p, CallbackInfo ci) {
 		if (FabConf.isEnabled("*.ping_privacy") && !responseSent) {
 			SocketAddress sa = connection.getAddress();

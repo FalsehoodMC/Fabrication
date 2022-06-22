@@ -1,11 +1,11 @@
 package com.unascribed.fabrication.mixin.a_fixes.multiline_sign_paste;
 
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -38,7 +38,7 @@ public abstract class MixinSignEditScreen extends Screen {
 	@Shadow
 	private int currentRow;
 
-	@Inject(at=@At("TAIL"), method="init()V")
+	@FabInject(at=@At("TAIL"), method="init()V")
 	public void init(CallbackInfo ci) {
 		this.selectionManager = new SelectionManager(() -> text[currentRow], pasted -> {
 			if (pasted.contains("\n")) {
@@ -68,7 +68,7 @@ public abstract class MixinSignEditScreen extends Screen {
 				});
 	}
 
-	@Inject(at=@At("HEAD"), method="keyPressed(III)Z", cancellable=true)
+	@FabInject(at=@At("HEAD"), method="keyPressed(III)Z", cancellable=true)
 	public void keyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> ci) {
 		if (keyCode == GLFW.GLFW_KEY_C && hasControlDown() && hasShiftDown() && !hasAltDown()) {
 			SelectionManager.setClipboard(client, Joiner.on(Platform.isWindows() ? "\r\n" : "\n").join(text));

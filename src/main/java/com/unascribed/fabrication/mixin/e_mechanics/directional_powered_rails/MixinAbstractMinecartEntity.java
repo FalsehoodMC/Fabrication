@@ -3,7 +3,7 @@ package com.unascribed.fabrication.mixin.e_mechanics.directional_powered_rails;
 import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.support.EligibleIf;
@@ -29,7 +29,7 @@ public abstract class MixinAbstractMinecartEntity extends Entity {
 		super(type, world);
 	}
 
-	@Inject(at=@At("TAIL"), method="moveOnRail(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)V")
+	@FabInject(at=@At("TAIL"), method="moveOnRail(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)V")
 	protected void moveOnRail(BlockPos pos, BlockState state, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.directional_powered_rails")) return;
 		if (state.isOf(Blocks.POWERED_RAIL)) {

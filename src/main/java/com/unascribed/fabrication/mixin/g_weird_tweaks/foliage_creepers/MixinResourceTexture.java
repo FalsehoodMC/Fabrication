@@ -10,7 +10,7 @@ import net.minecraft.resource.Resource;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Optional;
@@ -19,7 +19,7 @@ import java.util.Optional;
 @EligibleIf(configAvailable="*.foliage_creepers", envMatches= Env.CLIENT)
 public abstract class MixinResourceTexture {
 
-	@Inject(at=@At("RETURN"), method="getResource(Lnet/minecraft/util/Identifier;)Ljava/util/Optional;")
+	@FabInject(at=@At("RETURN"), method="getResource(Lnet/minecraft/util/Identifier;)Ljava/util/Optional;")
 	public void generateGrayscale(Identifier id, CallbackInfoReturnable<Optional<Resource>> cir){
 		if (!(FabConf.isEnabled("*.foliage_creepers") && "fabrication_grayscale".equals(id.getNamespace()))) return;
 		Optional<Resource> ret = cir.getReturnValue();

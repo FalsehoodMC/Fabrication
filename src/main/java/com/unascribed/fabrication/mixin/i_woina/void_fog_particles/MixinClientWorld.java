@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.function.Supplier;
@@ -37,7 +37,7 @@ public abstract class MixinClientWorld extends World {
 	//Ported from 1.7.10
 	//note that the source did not render the particles in flat worlds, however this is client-side so that can't be checked
 	//also note that i'm trash at locating mappings so any of the fairly many assumptions made could be wrong
-	@Inject(at=@At("HEAD"), method="doRandomBlockDisplayTicks(III)V")
+	@FabInject(at=@At("HEAD"), method="doRandomBlockDisplayTicks(III)V")
 	public void voidParticles(int centerX, int centerY, int centerZ, CallbackInfo ci){
 		if (!FabConf.isEnabled("*.void_fog_particles") || this.getDimension().hasCeiling()) return;
 		int floor = this.getDimension().minY();

@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
@@ -40,7 +40,7 @@ public class MixinExplosion {
 	@Shadow @Final
 	private ObjectArrayList<BlockPos> affectedBlocks;
 
-	@Inject(method="affectWorld(Z)V", at=@At("HEAD"))
+	@FabInject(method="affectWorld(Z)V", at=@At("HEAD"))
 	private void oldParticles(boolean particles, CallbackInfo ci) {
 		if (!(FabConf.isEnabled("*.more_explosion_particles") && particles)) return;
 		for (BlockPos blockPos : affectedBlocks) {
