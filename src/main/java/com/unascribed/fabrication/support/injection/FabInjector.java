@@ -84,8 +84,8 @@ public class FabInjector {
 					inject = annotationNode;
 				} else if ("Lorg/spongepowered/asm/mixin/transformer/meta/MixinMerged;".equals(annotationNode.desc)) {
 					mixin = (String) annotationNode.values.get(annotationNode.values.indexOf("mixin") + 1);
-					if (FailsoftRedirectInjectionInfo.fabrication$allExistingRedirects.containsKey(methodNode.name)) {
-						redirects.add(new EntryMixinMerged(methodNode.name, methodNode.desc, mixin, FailsoftRedirectInjectionInfo.fabrication$allExistingRedirects.get(methodNode.name)));
+					if (TrackingRedirectInjectionInfo.fabrication$allExistingRedirects.containsKey(methodNode.name)) {
+						redirects.add(new EntryMixinMerged(methodNode.name, methodNode.desc, mixin, TrackingRedirectInjectionInfo.fabrication$allExistingRedirects.get(methodNode.name)));
 					}
 				}
 			}
@@ -93,8 +93,8 @@ public class FabInjector {
 			if (inject != null && mixin != null && injectIn == null) {
 				final String mix = mixin;
 				injects.add(new ToInject(
-						((List<String>) inject.values.get(inject.values.indexOf("method") + 1)).stream().map(s -> FabRefMap.methodMap(mix, s)).collect(Collectors.toList()),
-						((List<String>) inject.values.get(inject.values.indexOf("target") + 1)).stream().map(s -> FabRefMap.targetMap(mix, s)).collect(Collectors.toList()),
+						((List<String>) inject.values.get(inject.values.indexOf("method") + 1)).stream().map(s -> FabRefMap.relativeMap(mix, s)).collect(Collectors.toList()),
+						((List<String>) inject.values.get(inject.values.indexOf("target") + 1)).stream().map(FabRefMap::absoluteMap).collect(Collectors.toList()),
 						targetClass.name,
 						methodNode.name,
 						methodNode.desc,
@@ -109,7 +109,7 @@ public class FabInjector {
 	public static void apply(ClassNode targetClass, List<ToInject> injects, List<EntryMixinMerged> redirects){
 		injects.forEach(toInject -> redirects.forEach(redirect -> {
 			//TODO target should probably match other formats?
-			if (toInject.target.contains(FabRefMap.targetMap(toInject.mixin, redirect.target))) {
+			if (toInject.target.contains(FabRefMap.absoluteMap(redirect.target))) {
 				toInject.potentiallyRedirected.add(redirect.name+redirect.desc);
 				FabLog.warn("FabInjector found a Redirect from "+redirect.mixin+";"+redirect.name+";"+" which has been added to "+toInject.owner+";"+toInject.name);
 			}

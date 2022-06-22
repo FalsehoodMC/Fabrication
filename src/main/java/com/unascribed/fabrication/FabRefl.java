@@ -485,7 +485,7 @@ public class FabRefl {
 	}
 
 	private static UnreflResult unreflectGetter(String className, Supplier<Class<?>> clazz, String yarnName) {
-		String name = FabRefMap.methodMap("FabRefl", yarnName);
+		String name = FabRefMap.absoluteMap(yarnName);
 		int col = name.indexOf(';');
 		if (col != -1) name = name.substring(col+1);
 		String desc = "field "+className+"#"+name+" (deobf name "+yarnName+")";
@@ -499,7 +499,7 @@ public class FabRefl {
 	}
 
 	private static UnreflResult unreflectSetter(String className, Supplier<Class<?>> clazz, String yarnName) {
-		String name = FabRefMap.methodMap("FabRefl", yarnName);
+		String name = FabRefMap.absoluteMap(yarnName);
 		int col = name.indexOf(';');
 		if (col != -1) name = name.substring(col+1);
 		String desc = "field "+className+"#"+name+" (deobf name "+yarnName+")";
@@ -513,7 +513,7 @@ public class FabRefl {
 	}
 
 	private static UnreflResult unreflectMethod(String className, Supplier<Class<?>> clazz, String yarnName, Class<?> returnType, Class<?>... args) {
-		String name = FabRefMap.targetMap("FabRefl", yarnName);
+		String name = FabRefMap.absoluteMap(yarnName);
 		name = name.substring(name.indexOf(';')+1, name.indexOf('('));
 		String desc = "method "+className+"."+name+signatureToString(args)+" (deobf name "+yarnName+")";
 		try {

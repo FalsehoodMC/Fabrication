@@ -14,6 +14,7 @@ import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -44,6 +45,7 @@ public class AnnotationProcessor extends AbstractProcessor {
 				Set<String> mixin = new HashSet<>();
 				Set<String> methods = new HashSet<>();
 				Set<String> targets = new HashSet<>();
+				Set<String> fields = new HashSet<>();
 				for (AnnotationMirror am : source.getAnnotationMirrors()) {
 					if (!(
 							"org.spongepowered.asm.mixin.Mixin".equals(am.getAnnotationType().toString())
@@ -121,6 +123,7 @@ public class AnnotationProcessor extends AbstractProcessor {
 									while (cl != null) {
 										add.add(cl.getName());
 										for (Class<?> cla : cl.getInterfaces()) add.add(cla.getName());
+										for (Field f : cl.getFields()) add.add(f.getDeclaringClass().getName());
 										for (Method m : cl.getMethods()) add.add(m.getDeclaringClass().getName());
 										cl = cl.getSuperclass();
 									}
