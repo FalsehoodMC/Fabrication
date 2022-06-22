@@ -17,7 +17,7 @@ import com.unascribed.fabrication.support.injection.FailsoftCallbackInjectionInf
 import com.unascribed.fabrication.support.injection.FailsoftModifyArgInjectionInfo;
 import com.unascribed.fabrication.support.injection.FailsoftModifyArgsInjectionInfo;
 import com.unascribed.fabrication.support.injection.FailsoftModifyVariableInjectionInfo;
-import com.unascribed.fabrication.support.injection.TrackingRedirectInjectionInfo;
+import com.unascribed.fabrication.support.injection.FailsoftRedirectInjectionInfo;
 import com.unascribed.fabrication.support.injection.FabInjector;
 import com.unascribed.fabrication.support.injection.Hijack;
 import com.unascribed.fabrication.support.injection.ModifyReturn;
@@ -34,7 +34,6 @@ import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
-import org.spongepowered.asm.mixin.Mixins;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 import org.spongepowered.asm.mixin.injection.struct.InjectionInfo;
@@ -61,7 +60,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	public void onLoad(String mixinPackage) {
 		FabConf.reload();
 		FabLog.warn("Fabrication is about to inject into Mixin to add support for redirect tracking.");
-		InjectionInfo.register(TrackingRedirectInjectionInfo.class);
+		InjectionInfo.register(FailsoftRedirectInjectionInfo.class);
 		InjectionInfo.register(FailsoftCallbackInjectionInfo.class);
 		InjectionInfo.register(FailsoftModifyArgInjectionInfo.class);
 		InjectionInfo.register(FailsoftModifyArgsInjectionInfo.class);
