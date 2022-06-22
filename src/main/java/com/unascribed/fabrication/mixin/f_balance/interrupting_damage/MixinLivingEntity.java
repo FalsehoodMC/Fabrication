@@ -22,12 +22,19 @@ public abstract class MixinLivingEntity {
 
 	@Shadow
 	public abstract void stopUsingItem();
+  
+	@Shadow
+	public abstract boolean blockedByShield(DamageSource source);
 
 	@FabInject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z")
 	public void interruptUsage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-		if (!(FabConf.isEnabled("*.interrupting_damage") && amount >= 2 && ConfigPredicates.shouldRun("*.interrupting_damage", ImmutableList.of(this, source)))) return;
-		if (this instanceof InterruptableRangedMob) ((InterruptableRangedMob)this).fabrication$interruptRangedMob();
-		if (isUsingItem()) stopUsingItem();
+		if (!FabConf.isEnabled("*.interrupting_damage")) return;
+		if (blockedByShield(source)) return;
+		if (amount >= 2 && ConfigPredicates.shouldRun("*.interrupting_damage", ImmutableList.of(this, source))) {
+			if (this instanceof InterruptableRangedMob)
+				((InterruptableRangedMob) this).fabrication$interruptRangedMob();
+			if (isUsingItem()) stopUsingItem();
+		}
 	}
 
 }
