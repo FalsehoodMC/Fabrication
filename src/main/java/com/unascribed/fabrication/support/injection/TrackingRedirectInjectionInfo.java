@@ -2,7 +2,6 @@ package com.unascribed.fabrication.support.injection;
 
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.MethodNode;
-import org.spongepowered.asm.mixin.extensibility.IMixinErrorHandler;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.struct.InjectionInfo.AnnotationType;
 import org.spongepowered.asm.mixin.injection.struct.InjectionInfo.HandlerPrefix;
@@ -14,21 +13,12 @@ import java.util.Map;
 
 @AnnotationType(Redirect.class)
 @HandlerPrefix("redirect")
-public class FailsoftRedirectInjectionInfo extends RedirectInjectionInfo {
+public class TrackingRedirectInjectionInfo extends RedirectInjectionInfo {
 
 	public static final Map<String, String> fabrication$allExistingRedirects = new HashMap<>();
 
-	public FailsoftRedirectInjectionInfo(MixinTargetContext mixin, MethodNode method, AnnotationNode annotation) {
+	public TrackingRedirectInjectionInfo(MixinTargetContext mixin, MethodNode method, AnnotationNode annotation) {
 		super(mixin, method, annotation);
-	}
-
-	@Override
-	public void postInject() {
-		try {
-			super.postInject();
-		} catch (Throwable e) {
-			FabMixinInjector.handleErrorProactively(mixin.getTargetClassInfo().getClassName(), e, mixin.getMixin(), IMixinErrorHandler.ErrorAction.ERROR);
-		}
 	}
 
 	//Was hoping to replace with Mixins.getMixinsForClass(targetClassName) but no luck getting it to work in postApply

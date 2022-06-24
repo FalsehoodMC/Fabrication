@@ -7,18 +7,17 @@ import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.injection.FabModifyConst;
 import com.unascribed.fabrication.support.injection.FabModifyVariable;
 import com.unascribed.fabrication.support.injection.Hijack;
+import com.unascribed.fabrication.support.injection.ModifyGetField;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
 import com.unascribed.fabrication.support.injection.FabModifyArg;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 
 import net.minecraft.client.gui.screen.ingame.EnchantmentScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.EnchantmentScreenHandler;
@@ -34,14 +33,14 @@ public abstract class MixinEnchantmentScreen extends HandledScreen<EnchantmentSc
 		super(handler, inventory, title);
 	}
 
-	@Redirect(at=@At(value="FIELD", target="net/minecraft/client/network/ClientPlayerEntity.experienceLevel:I"),
+	@ModifyGetField(target="net/minecraft/client/network/ClientPlayerEntity.experienceLevel:I",
 			method={
 					"drawBackground(Lnet/minecraft/client/util/math/MatrixStack;FII)V",
 					"render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V"
 	})
-	public int amendExperienceLevel(ClientPlayerEntity subject) {
+	private static int fabrication$amendExperienceLevel(int old) {
 		if (FabConf.isEnabled("*.no_experience")) return 65535;
-		return subject.experienceLevel;
+		return old;
 	}
 
 	@FabModifyArg(method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V", index=1,

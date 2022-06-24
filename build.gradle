@@ -500,50 +500,33 @@ jar {
 		def lge = project.getExtensions().getByType(net.fabricmc.loom.api.LoomGradleExtensionAPI.class)
 		def mappings = lge.getMappingsProvider().getMappings()
 		Map<String, Mapp> toInter = new HashMap<>()
-		Map<String, Map<String, String>> fabReflFields = new HashMap<>()
-		List<Map.Entry<String, String>> fabReflBldr = new ArrayList<>()
 		List<String> fabRefl = Files.readAllLines(file('build/tmp/fabReflToMap').toPath())
-		if (fabRefl.size() > 0) {
-			for (String fog : fabRefl.get(0).split('\t')){
-				String f = (fog.charAt(0) == 'L' as char? fog.substring(1) : fog).replace('.', '/')
-				int col = f.indexOf(';')
-				String fKey = f.substring(0, col);
-				if (!fabReflFields.containsKey(fKey)) fabReflFields.put(fKey, new HashMap<String, String>())
-				fabReflFields.get(fKey).put(f.substring(col+1), fog)
-			}
-			if (fabRefl.size() > 1) {
-				for (String f : fabRefl.get(1).split('\t')){
-					if (toInter.containsKey('FabRefl')) toInter.get('FabRefl').add(new Mapp.Target[]{new Mapp.Target(f)})
-					else toInter.put('FabRefl', new Mapp(new String[]{}, new String[]{}, new Mapp.Target[]{new Mapp.Target(f)}))
-				}
-			}
+
+		for (String f : fabRefl) {
+			if (f == null) continue
+			Mapp.Target toTarget = new Mapp.Target(f)
+			if (toInter.containsKey('FabRefl')) toInter.get('FabRefl').target.add(toTarget)
+			else toInter.put('FabRefl', new Mapp(new String[]{}, new String[]{}, new Mapp.Target[]{toTarget}))
+
 		}
+
 		List<String> toParse = Files.readAllLines(file('build/tmp/fabToRefMap').toPath())
 		for (int i=0; i+3<toParse.size(); i++){
 			String toInterKey = toParse.get(i)
-			if (toInter.containsKey(toInterKey)) toInter.get(toInterKey).add(toParse.get(++i).split('\t'), toParse.get(++i).split('\t'), toParse.get(++i).split('\t'))
-			else toInter.put(toInterKey, new Mapp(toParse.get(++i).split('\t'), toParse.get(++i).split('\t'), toParse.get(++i).split('\t')))
+			Mapp toAdd = new Mapp(toParse.get(++i).split('\t'), toParse.get(++i).split('\t'), toParse.get(++i).split('\t'))
+			if (toInter.containsKey(toInterKey)) toInter.get(toInterKey).add(toAdd)
+			else toInter.put(toInterKey, toAdd)
 		}
+		Map<String, String> fieldMap = new HashMap<>()
 		Map<String, String> targetMap = new HashMap<>()
 		Map<String, String> methodMap = new HashMap<>()
 		Map<String, String> classMap = new HashMap<>()
 		for (def cl : mappings.classes){
 			String clName = cl.getName('named')
 			String clNameRez = cl.getName('intermediary')
-			if (fabReflFields.containsKey(clName)){
-				Map<String, String> inmap = fabReflFields.get(clName)
-				for (Map.Entry<String, String> entry : inmap) {
-					String toFind = entry.getKey()
-					for (def fld : cl.fields) {
-						if (toFind.equals(fld.getName('named'))) {
-							fabReflBldr.add(new AbstractMap.SimpleEntry<String, String>(entry.getValue(), fld.getName('intermediary')))
-							break
-						}
-					}
-				}
-			}
+			def dottedClName = clName.replace('/', '.')
 			for (def map : toInter.values()){
-				if (map.mixin.contains(clName.replace('/', '.'))) {
+				if (map.mixin.contains(dottedClName)) {
 					for (def clMethod : cl.methods) {
 						for (String mthd : map.method) {
 							int col = mthd.indexOf(';')
@@ -564,10 +547,19 @@ jar {
 					int col = target.indexOf(';')
 					int dot = target.indexOf('.')
 					if (col == -1 || dot < col && dot != -1) col = dot
-					if (mapt.applicable.contains(clName.replace('/', '.'))){
+					if (mapt.applicable.contains(dottedClName)){
 						classMap.put(clName, clNameRez)
 						int brc = target.indexOf('(')
-						if (brc == -1) continue
+						if (brc == -1) {
+							int cindx = target.lastIndexOf(':')
+							String name = target.substring(col+1, cindx == -1 ? target.length() : cindx)
+							for (def clField : cl.fields) {
+								if (clField.getName('named').equals(name) || clField.getName('intermediary').equals(name)){
+									fieldMap.put(target, clField.getName('intermediary')+":"+clField.getDesc('intermediary'))
+								}
+							}
+							continue
+						}
 						String desc = target.substring(brc)
 						String name = target.substring(col+1, brc)
 						for (def clMethod : cl.methods) {
@@ -579,33 +571,32 @@ jar {
 				}
 			}
 		}
-		for (Map<String, String> inmap : fabReflFields.values()) {
-			for (String s : inmap.values()) {
-				boolean missing = true
-				for (Map.Entry<String, String> entry : fabReflBldr) {
-					if (entry.getKey().equals(s)){
-						missing = false
-						break
-					}
-				}
-				if (missing) {
-					logger.log(LogLevel.ERROR, "Failed to map "+s+" for FabReflField")
+		StringBuilder bldrRel = new StringBuilder()
+		Map<String, String> bldrAbs = new HashMap<>()
+		for (Map.Entry<String, Mapp> intr : toInter){
+			for (Mapp.Target tar : intr.value.target){
+				String s = tar.self
+				String ad = targetMap.get(s)
+				if (ad == null) ad = fieldMap.get(s)
+				if (ad != null) {
+					int col = s.indexOf(';')
+					int dot = s.indexOf('.')
+					if (col == -1 || dot < col && dot != -1) col = dot
+					bldrAbs.put(s, 'L'+classMap.get(s.substring(s.charAt(0) == 'L' as char ? 1 : 0, col))+';'+ad)
+				} else if (!s.isBlank() && !s.startsWith("Ljava/lang/")) {
+					logger.log(LogLevel.ERROR, "Failed to map "+s+" for "+intr.key)
 				}
 			}
-		}
-		StringBuilder strbldr = new StringBuilder()
-		for (def intr : toInter){
-			strbldr.append(intr.key)
-			strbldr.append('\n')
 			boolean frst = true
+			StringBuilder bldrRelIntern = new StringBuilder()
 			for (String s : intr.value.method) {
 				boolean missedMthd = true
 				for (String c : intr.value.mixin) {
 					String set = methodMap.get(c.replace('.', '/')+';'+s)
 					if (set != null){
 						if (frst) frst = false;
-						else strbldr.append('\t')
-						strbldr.append(s).append(' ').append(set)
+						else bldrRelIntern.append('\t')
+						bldrRelIntern.append(s).append(' ').append(set)
 						missedMthd = false
 						break
 					}
@@ -614,38 +605,25 @@ jar {
 					logger.log(LogLevel.ERROR, "Failed to map "+s+" for "+intr.key)
 				}
 			}
-			if ('FabRefl'.equals(intr.getKey())){
-				StringBuilder fabReflStrbldr = new StringBuilder();
-				for (Map.Entry<String, String> entry : fabReflBldr) {
-					if (!fabReflStrbldr.isEmpty()) fabReflStrbldr.append('\t')
-					fabReflStrbldr.append(entry.getKey()).append(' ').append(entry.getValue())
-				}
-				strbldr.append(fabReflStrbldr)
+			if (!bldrRelIntern.isEmpty()) {
+				if (!bldrRel.isEmpty()) bldrRel.append('\n')
+				bldrRel.append(intr.key)
+				bldrRel.append('\n')
+				bldrRel.append(bldrRelIntern)
 			}
-			strbldr.append('\n')
-			frst = true
-			for (Mapp.Target tar : intr.value.target){
-				String s = tar.self
-				String ad = targetMap.get(s);
-				if (ad != null) {
-					int col = s.indexOf(';')
-					int dot = s.indexOf('.')
-					if (col == -1 || dot < col && dot != -1) col = dot
-					if (frst) frst = false;
-					else strbldr.append('\t')
-					strbldr.append(s).append(' ').append('L').append(classMap.get(s.substring(s.charAt(0) == 'L' as char ? 1 : 0, col))).append(';').append(ad)
-				} else if (!s.isBlank() && !s.startsWith("Ljava/lang/")) {
-					logger.log(LogLevel.ERROR, "Failed to map "+s+" for "+intr.key)
-				}
-			}
-			strbldr.append('\n')
 		}
-		file('build/tmp/fabRefMap.txt').text = strbldr.toString()
+		file('build/tmp/fabRelRefMap.txt').text = bldrRel.toString()
+		bldrRel = new StringBuilder()
+		for (Map.Entry<String, String> entry : bldrAbs) {
+			bldrRel.append(entry.key).append(' ').append(entry.value).append('\n')
+		}
+		file('build/tmp/fabAbsRefMap.txt').text = bldrRel.toString()
 	}
 
 	from 'LICENSE'
 	from 'build/tmp/classes.txt'
-	from 'build/tmp/fabRefMap.txt'
+	from 'build/tmp/fabRelRefMap.txt'
+	from 'build/tmp/fabAbsRefMap.txt'
 }
 
 class Mapp{
@@ -662,6 +640,11 @@ class Mapp{
 		}
 		public String self
 		public List<String> applicable
+	}
+	void add(Mapp map){
+		this.mixin.addAll(map.mixin)
+		this.method.addAll(map.method)
+		this.target.addAll(map.target)
 	}
 	void add(String[] mixin, String[] method, String[] target){
 		for (String s : mixin) this.mixin.add(s)
