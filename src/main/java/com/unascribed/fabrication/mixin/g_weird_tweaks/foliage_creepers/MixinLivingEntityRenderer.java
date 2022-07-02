@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.mixin.g_weird_tweaks.foliage_creepers;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.interfaces.Grayscalable;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.injection.FabInject;
@@ -42,8 +43,11 @@ public abstract class MixinLivingEntityRenderer {
 
 	@FabModifyVariable(at=@At("STORE"), method="getRenderLayer(Lnet/minecraft/entity/LivingEntity;ZZZ)Lnet/minecraft/client/render/RenderLayer;")
 	public Identifier transformCreeperIdentifier(Identifier id){
-		if (!(FabConf.isEnabled("*.foliage_creepers") && ((Object)this) instanceof CreeperEntityRenderer && Identifier.DEFAULT_NAMESPACE.equals(id.getNamespace()))) return id;
-		return new Identifier("fabrication_grayscale", id.getPath());
+		if (!FabConf.isEnabled("*.foliage_creepers")) return id;
+		if (((Object)this) instanceof CreeperEntityRenderer && Identifier.DEFAULT_NAMESPACE.equals(id.getNamespace()) && id instanceof Grayscalable) {
+			((Grayscalable)id).fabrication$markGrayscale();
+		}
+		return id;
 	}
 
 }
