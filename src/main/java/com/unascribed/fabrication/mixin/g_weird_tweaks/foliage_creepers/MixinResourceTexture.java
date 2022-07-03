@@ -2,6 +2,7 @@ package com.unascribed.fabrication.mixin.g_weird_tweaks.foliage_creepers;
 
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.interfaces.FilterableResource;
+import com.unascribed.fabrication.interfaces.Grayscalable;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.util.Grayscale;
@@ -21,7 +22,8 @@ public abstract class MixinResourceTexture {
 
 	@FabInject(at=@At("RETURN"), method="getResource(Lnet/minecraft/util/Identifier;)Ljava/util/Optional;")
 	public void generateGrayscale(Identifier id, CallbackInfoReturnable<Optional<Resource>> cir){
-		if (!(FabConf.isEnabled("*.foliage_creepers") && "fabrication_grayscale".equals(id.getNamespace()))) return;
+		if (!(FabConf.isEnabled("*.foliage_creepers") && id instanceof Grayscalable)) return;
+		if (!((Grayscalable) id).fabrication$hasGrayscale()) return;
 		Optional<Resource> ret = cir.getReturnValue();
 		if (ret.isPresent() && ret.get() instanceof FilterableResource) {
 			((FilterableResource)ret.get()).fabrication$applyFilter(Grayscale::new);
