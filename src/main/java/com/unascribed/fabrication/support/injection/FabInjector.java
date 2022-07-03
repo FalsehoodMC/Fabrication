@@ -9,6 +9,7 @@ import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.MethodInsnNode;
@@ -78,14 +79,15 @@ public class FabInjector {
 			for (AnnotationNode annotationNode : methodNode.visibleAnnotations) {
 				if ((
 						"Lcom/unascribed/fabrication/support/injection/ModifyReturn;".equals(annotationNode.desc)
-								|| "Lcom/unascribed/fabrication/support/injection/Hijack;".equals(annotationNode.desc)
+							|| "Lcom/unascribed/fabrication/support/injection/Hijack;".equals(annotationNode.desc)
+							|| "Lcom/unascribed/fabrication/support/injection/ModifyGetField;".equals(annotationNode.desc)
 				) && dejavu.add(targetClass.name + methodNode.name + methodNode.desc)
 				) {
 					inject = annotationNode;
 				} else if ("Lorg/spongepowered/asm/mixin/transformer/meta/MixinMerged;".equals(annotationNode.desc)) {
 					mixin = (String) annotationNode.values.get(annotationNode.values.indexOf("mixin") + 1);
-					if (FailsoftRedirectInjectionInfo.fabrication$allExistingRedirects.containsKey(methodNode.name)) {
-						redirects.add(new EntryMixinMerged(methodNode.name, methodNode.desc, mixin, FailsoftRedirectInjectionInfo.fabrication$allExistingRedirects.get(methodNode.name)));
+					if (TrackingRedirectInjectionInfo.fabrication$allExistingRedirects.containsKey(methodNode.name)) {
+						redirects.add(new EntryMixinMerged(methodNode.name, methodNode.desc, mixin, TrackingRedirectInjectionInfo.fabrication$allExistingRedirects.get(methodNode.name)));
 					}
 				}
 			}
@@ -93,8 +95,8 @@ public class FabInjector {
 			if (inject != null && mixin != null && injectIn == null) {
 				final String mix = mixin;
 				injects.add(new ToInject(
-						((List<String>) inject.values.get(inject.values.indexOf("method") + 1)).stream().map(s -> FabRefMap.methodMap(mix, s)).collect(Collectors.toList()),
-						((List<String>) inject.values.get(inject.values.indexOf("target") + 1)).stream().map(s -> FabRefMap.targetMap(mix, s)).collect(Collectors.toList()),
+						((List<String>) inject.values.get(inject.values.indexOf("method") + 1)).stream().map(s -> FabRefMap.relativeMap(mix, s)).collect(Collectors.toList()),
+						((List<String>) inject.values.get(inject.values.indexOf("target") + 1)).stream().map(FabRefMap::absoluteMap).collect(Collectors.toList()),
 						targetClass.name,
 						methodNode.name,
 						methodNode.desc,
@@ -109,7 +111,7 @@ public class FabInjector {
 	public static void apply(ClassNode targetClass, List<ToInject> injects, List<EntryMixinMerged> redirects){
 		injects.forEach(toInject -> redirects.forEach(redirect -> {
 			//TODO target should probably match other formats?
-			if (toInject.target.contains(FabRefMap.targetMap(toInject.mixin, redirect.target))) {
+			if (toInject.target.contains(FabRefMap.absoluteMap(redirect.target))) {
 				toInject.potentiallyRedirected.add(redirect.name+redirect.desc);
 				FabLog.warn("FabInjector found a Redirect from "+redirect.mixin+";"+redirect.name+";"+" which has been added to "+toInject.owner+";"+toInject.name);
 			}
@@ -118,15 +120,28 @@ public class FabInjector {
 			for (String m : toInject.method){
 				if (!m.equals(methodNode.name+methodNode.desc)) continue;
 				for (AbstractInsnNode insnNode : methodNode.instructions){
+					String insnOwner = null;
+					String insnName = null;
+					String insnDesc = null;
 					if (insnNode instanceof MethodInsnNode) {
 						MethodInsnNode insn = (MethodInsnNode) insnNode;
+						insnOwner = insn.owner;
+						insnName = insn.name;
+						insnDesc = insn.desc;
+					} else if (insnNode instanceof FieldInsnNode) {
+						FieldInsnNode insn = (FieldInsnNode) insnNode;
+						insnOwner = insn.owner;
+						insnName = insn.name;
+						insnDesc = ":"+insn.desc;
+					}
+					if (insnOwner != null && insnName != null && insnDesc != null) {
 						for (String target : toInject.target) {
 							String unchangedTarget = target;
 							if (target.charAt(0) == 'L') target = target.substring(1);
-							if (target.startsWith(insn.owner)) {
-								char d = target.charAt(insn.owner.length());
-								if ((d == '.' || d == ';') && target.substring(insn.owner.length() + 1).equals(insn.name + insn.desc)) {
-									if (performInjection(methodNode, insn, toInject, target)) {
+							if (target.startsWith(insnOwner)) {
+								char d = target.charAt(insnOwner.length());
+								if ((d == '.' || d == ';') && target.substring(insnOwner.length() + 1).equals(insnName + insnDesc)) {
+									if (performInjection(methodNode, insnNode, toInject, target, false)) {
 										toInject.done.put(m, unchangedTarget);
 										String type = toInject.annotation.substring(toInject.annotation.lastIndexOf('/'), toInject.annotation.length()-1);
 										FabLog.debug("Completed "+type+" Injection : " + toInject.owner + ";" + m + "\t" + unchangedTarget);
@@ -134,10 +149,10 @@ public class FabInjector {
 								}
 							}
 						}
-						if (toInject.owner.equals(insn.owner)) {
+						if (toInject.owner.equals(insnOwner)) {
 							for (String target : toInject.potentiallyRedirected) {
-								if (target.equals(insn.name + insn.desc)) {
-									if (performInjection(methodNode, insn, toInject, target)) {
+								if (target.equals(insnName + insnDesc)) {
+									if (performInjection(methodNode, insnNode, toInject, target, true)) {
 										String type = toInject.annotation.substring(toInject.annotation.lastIndexOf('/'), toInject.annotation.length() - 1);
 										FabLog.debug("Completed " + type + " Injection over existing Redirect : " + toInject.owner + ";" + m + "\t" + target);
 									}
@@ -153,22 +168,46 @@ public class FabInjector {
 		})));
 	}
 
-	public static boolean performInjection(MethodNode methodNode, MethodInsnNode insn, ToInject toInject, String target) {
+	public static boolean performInjection(MethodNode methodNode, AbstractInsnNode insn, ToInject toInject, String target, boolean isRedirect) {
 		boolean toInjectIsStatic = (toInject.access & Opcodes.ACC_STATIC) != 0;
 		InsnList mod = new InsnList();
 		List<Type> argTypes = new ArrayList<>();
-		if (insn.getOpcode() != Opcodes.INVOKESTATIC)
+		if (insn.getOpcode() != Opcodes.INVOKESTATIC && insn.getOpcode() != Opcodes.GETFIELD && insn.getOpcode() != Opcodes.GETSTATIC)
 			argTypes.add(Type.VOID_TYPE);
-		Type targetType = Type.getMethodType(target.substring(target.indexOf('(')));
-		argTypes.addAll(Arrays.asList(targetType.getArgumentTypes()));
+		int brac = target.indexOf('(');
+		Type targetType = Type.getMethodType(target.substring(brac == -1 ? target.lastIndexOf(':')+1 : brac));
+		if (brac != -1)
+			argTypes.addAll(Arrays.asList(targetType.getArgumentTypes()));
 		Type toInjectType = Type.getMethodType(toInject.desc);
 		Type[] toInjectArgTypes = toInjectType.getArgumentTypes();
 		int countDesc = toInjectArgTypes.length;
 		int max = methodNode.maxLocals;
 		InsnList oldVars = new InsnList();
 		InsnList newVars = new InsnList();
-		//TODO probably never. continue the variable trace after the first method to further reduce allocation
-		if ("Lcom/unascribed/fabrication/support/injection/ModifyReturn;".equals(toInject.annotation)) {
+		if ("Lcom/unascribed/fabrication/support/injection/ModifyGetField;".equals(toInject.annotation)) {
+			if (!toInjectIsStatic) {
+				mod.add(new VarInsnNode(getStoreOpcode(targetType.getReturnType().getSort()), max));
+				mod.add(new VarInsnNode(Opcodes.ALOAD, 0));
+				mod.add(new VarInsnNode(getLoadOpcode(targetType.getReturnType().getSort()), max++));
+			}
+			if (--countDesc > 0) {
+				String clazz = ((FieldInsnNode)insn).owner;
+				int type = Type.getType(clazz.startsWith("L") ? clazz : "L"+clazz).getSort();
+				methodNode.instructions.insertBefore(insn, new VarInsnNode(getStoreOpcode(type), max));
+				methodNode.instructions.insertBefore(insn, new VarInsnNode(getLoadOpcode(type), max));
+				mod.add(new VarInsnNode(getLoadOpcode(type), max++));
+				countDesc-=1;
+			}
+			methodNode.maxLocals = max;
+			for (int c = toInjectIsStatic ? 0 : 1; c < countDesc; c++) {
+				mod.add(new VarInsnNode(getLoadOpcode(toInjectArgTypes[toInjectArgTypes.length-countDesc+c].getSort()), c));
+			}
+
+			mod.add(new MethodInsnNode(toInjectIsStatic ? Opcodes.INVOKESTATIC : Opcodes.INVOKEVIRTUAL, toInject.owner, toInject.name, toInject.desc, (toInject.access & Opcodes.ACC_INTERFACE) != 0));
+			methodNode.instructions.insert(insn, mod);
+			return true;
+		}else if ("Lcom/unascribed/fabrication/support/injection/ModifyReturn;".equals(toInject.annotation)) {
+			//TODO probably never. continue the variable trace after the first method to further reduce allocation
 			if (--countDesc > 0) {
 				AbstractInsnNode varTrace = insn.getPrevious();
 				boolean isSeqVar = varTrace != null && isVariableLoader(varTrace.getOpcode());
@@ -237,10 +276,11 @@ public class FabInjector {
 				methodNode.maxLocals=max;
 			}
 			if (!toInjectIsStatic) methodNode.instructions.insertBefore(insn, new VarInsnNode(Opcodes.ALOAD, 0));
-			for (Type argType : argTypes) {
+			for (int i=0; i<argTypes.size();i++) {
+				Type argType = argTypes.get(i);
 				int opcode = getLoadOpcode(argType.getSort());
 				mod.add(new VarInsnNode(opcode, --max));
-				if (countDesc-->0)
+				if (!(i==0 && isRedirect && !toInjectIsStatic) && countDesc-->0)
 					methodNode.instructions.insertBefore(insn, new VarInsnNode(opcode, max));
 			}
 			for (int c = toInjectIsStatic ? 0 : 1; c < countDesc; c++) {

@@ -60,7 +60,7 @@ public class MixinTitleScreen extends Screen {
 
 	// the mixture of deobf and obf classes here confuses MixinGradle, so we have to spell it out
 
-	@FabModifyArg(at=@At(value="INVOKE", target="com/mojang/blaze3d/systems/RenderSystem.setShaderTexture(ILnet/minecraft/util/Identifier;)V", ordinal=2),
+	@FabModifyArg(at=@At(value="INVOKE", target="com/mojang/blaze3d/systems/RenderSystem.setShaderTexture(ILnet/minecraft/class_2960;)V", ordinal=2),
 			method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V", require=0)
 	public Identifier setShaderTextureDev(Identifier id) {
 		if (FabConf.isEnabled("*.block_logo") && id == EDITION_TITLE_TEXTURE) {

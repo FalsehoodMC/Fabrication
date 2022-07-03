@@ -21,7 +21,7 @@ public class FabMixinInjector {
 				for (int i = 0; i<ann_i; i++) {
 					Object val = ((List<?>) list).get(i);
 					if (val instanceof String) {
-						((List) list).set(i, FabRefMap.methodMap(mixinOrigin, (String) val));
+						((List) list).set(i, FabRefMap.relativeMap(mixinOrigin, (String) val));
 					}
 				}
 			}
@@ -34,20 +34,20 @@ public class FabMixinInjector {
 				for (int i = 0; i<ann_i; i++) {
 					Object val = ((List<?>) maybeList).get(i);
 					if (val instanceof AnnotationNode) {
-						remapAt(mixinOrigin, (AnnotationNode)val);
+						remapAt((AnnotationNode)val);
 					}
 				}
 			} else if (maybeList instanceof AnnotationNode) {
-				remapAt(mixinOrigin, (AnnotationNode)maybeList);
+				remapAt((AnnotationNode)maybeList);
 			}
 		}
 	}
-	private static void remapAt(String mixinOrigin, AnnotationNode annotation) {
+	private static void remapAt(AnnotationNode annotation) {
 		int ann_i = annotation.values.indexOf("target");
 		if (ann_i++ != -1) {
 			Object val = annotation.values.get(ann_i);
 			if (val instanceof String) {
-				annotation.values.set(ann_i, FabRefMap.targetMap(mixinOrigin, (String) val));
+				annotation.values.set(ann_i, FabRefMap.absoluteMap((String) val));
 			}
 		}
 	}
