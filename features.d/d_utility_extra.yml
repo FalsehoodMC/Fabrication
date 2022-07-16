@@ -71,6 +71,7 @@ utility.extra.chat_markdown:
 	name: Chat Markdown
 	since: 2.3.0
 	sides: server_only
+	media: https://unascribed.com/fabrication/chat_markdown.mp4
 	desc:
 		Adds bold, strikethrough, underscore and italic markdown to chat.
 

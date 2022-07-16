@@ -189,6 +189,7 @@ fixes.fix_end_portal_render:
 	name: Fix End Portal Render
 	since: 2.3.0
 	sides: client_only
+	media: https://unascribed.com/fabrication/fix_end_portal_render.mp4
 	desc:
 		End portal block will render from all sides.
 
