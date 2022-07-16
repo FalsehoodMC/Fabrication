@@ -1,0 +1,272 @@
+Fabrication is a gigantic collection of vanilla tweaks and small features, most of which work server-side-only. Look ma, no Polymer!
+
+Everything can be configured. Some of the things Fabrication modifies are tridents, note blocks, observers, furnace minecarts, ...
+
+It also contains a facsimile of Apathetic Mobs and Hunger Strike.
+
+<sub>~~90~~</sub> <sub>~~102~~</sub> <sub>~~107~~</sub> <sub>~~115~~</sub> <sub>~~116~~</sub> <sub>~~125~~</sub> <sub>~~133~~</sub> <sub>~~136~~</sub> <sub>~~141~~</sub> <sub>~~182~~</sub> <sub>~~185~~</sub> <sub>~~202~~</sub> <sub>~~205~~</sub> <sub>~~215~~</sub> <sub>~~256~~</sub>  **256** features and counting.
+
+# Features
+
+## *General* - Broad features and global settings
+- [Balance](https://unascribed.com/fabrication/#general.category.balance) - Changes to vanilla balance
+- [Experiments](https://unascribed.com/fabrication/#general.category.experiments) - Bad ideas given form
+- [Fixes](https://unascribed.com/fabrication/#general.category.fixes) - Fixes for bugs and weird behavior
+- [Mechanics](https://unascribed.com/fabrication/#general.category.mechanics) - New mechanics and powerful additions
+- [Minor Mechanics](https://unascribed.com/fabrication/#general.category.minor_mechanics) - Small additions to vanilla mechanics
+- [Pedantry](https://unascribed.com/fabrication/#general.category.pedantry) - Fixes for non-problems
+- [Tweaks](https://unascribed.com/fabrication/#general.category.tweaks) - Minor changes that fit with vanilla
+- [Unsafe](https://unascribed.com/fabrication/#general.category.unsafe) - QoL changes that make cheating easier
+- [Utility](https://unascribed.com/fabrication/#general.category.utility) - Useful tidbits that don&#x27;t modify gameplay
+- [Weird Tweaks](https://unascribed.com/fabrication/#general.category.weird_tweaks) - Opinionated changes
+- [What&#x27;s Old Is New Again](https://unascribed.com/fabrication/#general.category.woina) - Forward ports of forgotten tidbits
+- [Dark Mode](https://unascribed.com/fabrication/#general.dark_mode) - Makes the config screen darker
+- [Data Upload](https://unascribed.com/fabrication/#general.data_upload) - Enables submitting anonymous data to a self-hosted privacy-respecting Matomo instance run by unascribed
+- [Limit Runtime Configs](https://unascribed.com/fabrication/#general.limit_runtime_configs) - **New in v3.0.0** Makes the game a teensy bit faster, but requires a restart to change features
+- [Reduced Motion](https://unascribed.com/fabrication/#general.reduced_motion) - Disables high-motion animations in the Fabrication config screen
+## *Fixes* - Fixes for bugs and weird behavior
+- [Adventure Tags In Survival](https://unascribed.com/fabrication/#fixes.adventure_tags_in_survival) - Makes CanDestroy/CanPlaceOn work in Survival
+- [Better Pause Freezing](https://unascribed.com/fabrication/#fixes.better_pause_freezing) - Makes textures not tick while the game is paused
+- [Boundless Levels](https://unascribed.com/fabrication/#fixes.boundless_levels) - Fixes enchantment.level.27
+- [Colored Crack Particles](https://unascribed.com/fabrication/#fixes.colored_crack_particles) - Makes &quot;crack&quot; particles honor item coloration, such as leather armor dye
+- [Bubble Column Pop](https://unascribed.com/fabrication/#fixes.extra.bubble_column_pop) - Re-adds bubble columns having a bubble pop particle and sound at the top
+- [Fix Charm Amethyst Dupe](https://unascribed.com/fabrication/#fixes.fix_charm_amethyst_dupe) - Fixes a bug in Charm caused by bad assumptions that allows generating amethyst shards.
+- [Fix End Portal Render](https://unascribed.com/fabrication/#fixes.fix_end_portal_render) - End portal block will render from all sides
+- [Fix Nether Portal Nausea](https://unascribed.com/fabrication/#fixes.fix_nether_portal_nausea) - **New in v3.0.0** Render the nether portal UI texture even if player has nausea
+- [Furnace Minecart Pushing](https://unascribed.com/fabrication/#fixes.furnace_minecart_pushing) - Right-clicking a furnace minecart pushes it; silently removed around 17w46a
+- [Ghast Charging](https://unascribed.com/fabrication/#fixes.ghast_charging) - Brings back the ghast &quot;charging&quot; animation that broke in 1.3
+- [Inanimates Can Be Invisible](https://unascribed.com/fabrication/#fixes.inanimates_can_be_invisible) - Makes inanimate entities honor the &quot;invisible&quot; tag sent by the server
+- [Melee Mobs Keep Attacking](https://unascribed.com/fabrication/#fixes.melee_mobs_keep_attacking) - **New in v3.0.0** Through some mystical mojank reasoning mobs would normally stop looking for the player after reaching the players last known location, this fixes that
+- [Multiline Sign Paste](https://unascribed.com/fabrication/#fixes.multiline_sign_paste) - Allows pasting multiple lines of text into a sign
+- [No Night Vision Flashing](https://unascribed.com/fabrication/#fixes.no_night_vision_flash) - Disables the flashing effect when Night Vision is about to run out
+- [Omniscent Player](https://unascribed.com/fabrication/#fixes.omniscent_player) - The player render in the inventory always follows your cursor
+- [Open Inventories in Nether Portals](https://unascribed.com/fabrication/#fixes.open_inventories_in_nether_portal) - Allows players to open inventories while in a nether portal
+- [Silverfish Step](https://unascribed.com/fabrication/#fixes.silverfish_step) - Fixes an oversight that prevents silverfish from playing their step sound
+- [Stable Cacti](https://unascribed.com/fabrication/#fixes.stable_cacti) - Makes cacti less afraid
+- [Sync Attacker Yaw](https://unascribed.com/fabrication/#fixes.sync_attacker_yaw) - Correctly sync the last attacker yaw for damage tilt; fixes MC-26678
+- [Uncap Menu FPS](https://unascribed.com/fabrication/#fixes.uncap_menu_fps) - Removes the hardcoded 60 FPS cap in menu screens
+- [Use Player List Name In Tag](https://unascribed.com/fabrication/#fixes.use_player_list_name_in_tag) - Changes player name tags to match names in the player list
+## *Utility* - Useful tidbits that don&#x27;t modify gameplay
+- [Books Show Enchants](https://unascribed.com/fabrication/#utility.books_show_enchants) - Enchanted books show the first letter of their enchant
+- [CanHit](https://unascribed.com/fabrication/#utility.canhit) - A CanHit tag for weapons in the same vein as CanDestroy/CanPlaceOn
+- [Despawning Items Blink](https://unascribed.com/fabrication/#utility.despawning_items_blink) - Makes items that are about to despawn blink
+- [All Damage Is Fatal](https://unascribed.com/fabrication/#utility.extra.all_damage_is_fatal) - Any amount of damage done to an entity is unconditionally fatal
+- [Chat Markdown](https://unascribed.com/fabrication/#utility.extra.chat_markdown) - Adds bold, strikethrough, underscore and italic markdown to chat
+- [Disable Bees](https://unascribed.com/fabrication/#utility.extra.disable_bees) - Disables bee nest generation and all bee sounds
+- [Disable Villagers](https://unascribed.com/fabrication/#utility.extra.disable_villagers) - Prevents villages from generating and zombie villagers from spawning
+- [Enter Selects Highlighted Suggestion](https://unascribed.com/fabrication/#utility.extra.enter_selects_highlighted_suggestion) - Pressing enter selects the highlighted suggestion
+- [Item Frames Don&#x27;t Display Name Tags](https://unascribed.com/fabrication/#utility.extra.item_frame_no_name_display) - Item frames will not display the names of the item inside them
+- [No Guardian Jumpscare](https://unascribed.com/fabrication/#utility.extra.no_guardian_jumpscare) - **New in v3.0.0** Disables the elder guardian appearance effect upon being inflicted with Mining Fatigue
+- [Show Bee Count on Items](https://unascribed.com/fabrication/#utility.extra.show_bee_count_on_item) - Makes bee hive items show amount of contained bees
+- [Weapons Accept Silk](https://unascribed.com/fabrication/#utility.extra.weapons_accept_silk) - Weapons can be enchanted with Silk Touch, and Silk Touch becomes incompatible with Looting
+- [Extract Furnace Experience](https://unascribed.com/fabrication/#utility.extract_furnace_xp) - Allows clicking on the empty output slot of a furnace to extract the experience, instead of needing to break it
+- [Hide Armor](https://unascribed.com/fabrication/#utility.hide_armor) - Adds /hidearmor and /showarmor commands to hide and show your armor
+- [/i And More](https://unascribed.com/fabrication/#utility.i_and_more) - Adds /i, /item, /more, and /fenchant commands
+- [Item Despawn Control](https://unascribed.com/fabrication/#utility.item_despawn) - Allows fine-grained control over item despawn times
+- [KillMessage](https://unascribed.com/fabrication/#utility.killmessage) - Allows customizing kill messages for summoned entities and spawned items
+- [Legacy Command Syntax](https://unascribed.com/fabrication/#utility.legacy_command_syntax) - Brings back various kinds of old command syntax; old habits die hard
+- [Lenient Command Suggestions](https://unascribed.com/fabrication/#utility.lenient_command_suggestions) - **New in v3.0.0** Command suggestions for modded ids will still appear even if the id namespace is not explicitly specified
+- [Linkify Urls](https://unascribed.com/fabrication/#utility.linkify_urls) - **New in v3.0.0** Links in chat are clickable
+- [Mob IDs](https://unascribed.com/fabrication/#utility.mob_ids) - Makes entities show their entity ID as a nametag in Creative when F3 is up
+- [/mods Command](https://unascribed.com/fabrication/#utility.mods_command) - Adds a /mods command in the same vein as Bukkit&#x27;s /plugins
+- [Ping Privacy](https://unascribed.com/fabrication/#utility.ping_privacy) - Sends no ping data to IPs that have not successfully logged in in the last 7 days
+- [RMB Clears Text Fields](https://unascribed.com/fabrication/#utility.rmb_clears_text_fields) - **New in v3.0.0** Right Mouse Button will clear text fields
+- [Show Bee Count in Tooltip](https://unascribed.com/fabrication/#utility.show_bee_count_tooltip) - Makes bee hive tooltips show amount of contained bees
+- [Show Map ID](https://unascribed.com/fabrication/#utility.show_map_id) - Makes filled maps show their ID
+- [Taggable Players](https://unascribed.com/fabrication/#utility.taggable_players) - Allows assigning various &quot;tags&quot; to players, such as no_hunger or invisible_to_mobs
+- [Toggle Sprint](https://unascribed.com/fabrication/#utility.toggle_sprint) - Adds a &quot;Toggle/Hold Sprint&quot; keybind
+- [Toggle Stance](https://unascribed.com/fabrication/#utility.toggle_stance) - Adds a &quot;Toggle Stance&quot; keybind to switch between standing and sneaking
+- [Tools Show Important Enchant](https://unascribed.com/fabrication/#utility.tools_show_important_enchant) - Tools show the first letter of their &quot;important&quot; enchant
+- [Yeet Recipes](https://unascribed.com/fabrication/#utility.yeet_recipes) - Adds a yeet_recipes.ini that can be used to completely remove any recipe
+## *Tweaks* - Minor changes that fit with vanilla
+- [Alt Absorption Sound](https://unascribed.com/fabrication/#tweaks.alt_absorption_sound) - Taking damage that is completely absorbed by Absorption plays a different (custom) sound
+- [Arrows Work In Water](https://unascribed.com/fabrication/#tweaks.arrows_work_in_water) - Reduces arrow drag in water by a fair bit to make bows useful underwater
+- [Bush Walk Doesn&#x27;t Hurt](https://unascribed.com/fabrication/#tweaks.bush_walk_doesnt_hurt) - Makes walking through berry bushes not deal damage
+- [Bush Walk Doesn&#x27;t Hurt When Sneaking](https://unascribed.com/fabrication/#tweaks.bush_walk_doesnt_hurt_when_sneaking) - Makes walking through berry bushes when sneaking not deal damage
+- [Bush Walk Doesn&#x27;t Hurt With Armor](https://unascribed.com/fabrication/#tweaks.bush_walk_doesnt_hurt_with_armor) - Walking through berry bushes with both legging and boots equipped doesn&#x27;t hurt
+- [Cactus Brush Doesn&#x27;t Hurt With Chest](https://unascribed.com/fabrication/#tweaks.cactus_brush_doesnt_hurt_with_chest) - Touching the side of a cactus with a chestplate on doesn&#x27;t hurt
+- [Cactus Walk Doesn&#x27;t Hurt With Boots](https://unascribed.com/fabrication/#tweaks.cactus_walk_doesnt_hurt_with_boots) - Walking on top of a cactus with boots on doesn&#x27;t hurt
+- [Campfires Cook Entities](https://unascribed.com/fabrication/#tweaks.campfires_cook_entities) - Campfires will cook entities without setting them on fire
+- [Campfires Ignite Entities](https://unascribed.com/fabrication/#tweaks.campfires_ignite_entities) - Campfires will set fire to mobs standing on them, therefore also cooking them
+- [Campfires Place Unlit](https://unascribed.com/fabrication/#tweaks.campfires_place_unlit) - Campfires are unlit when placed and must be lit with a Flint and Steel
+- [Cracking Spawn Eggs](https://unascribed.com/fabrication/#tweaks.cracking_spawn_eggs) - Spawn eggs spawn cracking particles and play a sound when used
+- [Ender Pearl Sound](https://unascribed.com/fabrication/#tweaks.ender_pearl_sound) - **New in v3.0.0** Ender pearls play enderman teleport sound when breaking
+- [Can Breathe Water](https://unascribed.com/fabrication/#tweaks.extra.can_breathe_water) - **New in v3.0.0** Players will not lose air while underwater
+- [Fireproof](https://unascribed.com/fabrication/#tweaks.extra.fireproof) - **New in v3.0.0** Players cannot take fire damage
+- [Invisible To Mobs](https://unascribed.com/fabrication/#tweaks.extra.invisible_to_mobs) - **New in v3.0.0** Players cannot be targeted by mobs at all
+- [No Hunger](https://unascribed.com/fabrication/#tweaks.extra.no_hunger) - **New in v3.0.0** Players never lose food, and when they eat food it instead heals them directly
+- [No Phantoms](https://unascribed.com/fabrication/#tweaks.extra.no_phantoms) - **New in v3.0.0** Prevents phantoms from spawning
+- [No Wandering Trader](https://unascribed.com/fabrication/#tweaks.extra.no_wandering_trader) - **New in v3.0.0** Prevents wandering traders from spawning
+- [Permanent Conduit Power](https://unascribed.com/fabrication/#tweaks.extra.permanent_conduit_power) - **New in v3.0.0** Players always have Conduit Power
+- [Permanent Dolphins Grace](https://unascribed.com/fabrication/#tweaks.extra.permanent_dolphins_grace) - **New in v3.0.0** Players always have Dolphins Grace
+- [Scares Creepers](https://unascribed.com/fabrication/#tweaks.extra.scares_creepers) - **New in v3.0.0** Players will scare creepers
+- [Feather Falling No Trample](https://unascribed.com/fabrication/#tweaks.feather_falling_no_trample) - Farmland will not get trampled when wearing feather falling
+- [Flammable Cobwebs](https://unascribed.com/fabrication/#tweaks.flammable_cobwebs) - Cobwebs can burn
+- [Fullres Banner Shields](https://unascribed.com/fabrication/#tweaks.fullres_banner_shields) - Makes shields use the full-res banner patterns instead of weird smaller versions
+- [Ghast Panic](https://unascribed.com/fabrication/#tweaks.ghast_panic) - Makes ghasts randomly play the unused &quot;scream&quot; sound when outside of the Nether
+- [Legible Signs](https://unascribed.com/fabrication/#tweaks.legible_signs) - Adjusts sign text colors to be less garbage
+- [Less Annoying Fire](https://unascribed.com/fabrication/#tweaks.less_annoying_fire) - Shortens the fire overlay and hides it when you have Fire Resistance
+- [Less Restrictive Note Blocks](https://unascribed.com/fabrication/#tweaks.less_restrictive_note_blocks) - Makes note blocks work with blocks above them
+- [Long Level Up Sound At 30](https://unascribed.com/fabrication/#tweaks.long_levelup_sound_at_30) - Plays the old longer level up sound when you reach level 30
+- [Nether Cauldron](https://unascribed.com/fabrication/#tweaks.nether_cauldron) - Water evaporates when being placed inside a cauldron in the nether
+- [No Dinnerlava](https://unascribed.com/fabrication/#tweaks.no_dinnerlava) - Disables the generation of 1 block hidden lava pockets in the Nether
+- [No Heavy Minecarts](https://unascribed.com/fabrication/#tweaks.no_heavy_minecarts) - Chest and hopper minecarts will not be slowed down proportionally to the number of items in them
+- [No Sneak Bypass](https://unascribed.com/fabrication/#tweaks.no_sneak_bypass) - Blocks which would normally not affect players when sneaking will
+- [No Trample](https://unascribed.com/fabrication/#tweaks.no_trample) - Farmland will not get trampled
+- [Normal Fog With Night Vision](https://unascribed.com/fabrication/#tweaks.normal_fog_with_night_vision) - Disables the fog brightening effect with Night Vision
+- [Play Note Blocks In Creative](https://unascribed.com/fabrication/#tweaks.play_note_blocks_in_creative) - Allows sneaking when punching note blocks to play them in Creative mode
+- [Rainbow Experience](https://unascribed.com/fabrication/#tweaks.rainbow_experience) - Makes experience random colors instead of just lime green
+- [Recipe Book Auto Craft](https://unascribed.com/fabrication/#tweaks.recipe_book_auto_craft) - Recipe book crafts items instead of moving them to the crafting area
+- [Reverse Note Block Tuning](https://unascribed.com/fabrication/#tweaks.reverse_note_block_tuning) - Sneaking while tuning a note block reduces its pitch rather than increases
+- [See Held Items While Riding](https://unascribed.com/fabrication/#tweaks.see_items_while_riding) - Allows players to see held items while riding entities like boats
+- [Shulker Bullets Despawn On Death](https://unascribed.com/fabrication/#tweaks.shulker_bullets_despawn_on_death) - Makes shulker bullets despawn when the shulker that shot them is killed
+- [Silent Minecarts](https://unascribed.com/fabrication/#tweaks.silent_minecarts) - Makes minecarts silent
+- [Tridents In Void Return](https://unascribed.com/fabrication/#tweaks.tridents_in_void_return) - Loyalty tridents return when falling into the Void
+## *Minor Mechanics* - Small additions to vanilla mechanics
+- [Cactus Punching Hurts](https://unascribed.com/fabrication/#minor_mechanics.cactus_punching_hurts) - Breaking cactus with your hand will damage you the same as hugging it
+- [Channeling Two](https://unascribed.com/fabrication/#minor_mechanics.channeling_two) - **New in v3.0.0** Makes Channeling II a valid enchant that works while raining as well
+- [Crawling](https://unascribed.com/fabrication/#minor_mechanics.crawling) - Adds a key to explicitly enter the &quot;crawling&quot; stance
+- [Exact Note Block Tuning](https://unascribed.com/fabrication/#minor_mechanics.exact_note_block_tuning) - Right-clicking a note block with a stack of sticks sets its pitch to the size of the stack minus one
+- [Collision Based Landing Pos](https://unascribed.com/fabrication/#minor_mechanics.extra.collision_based_landing_pos) - More accurately determines what the player is standing on
+- [Launching Pistons](https://unascribed.com/fabrication/#minor_mechanics.extra.launching_pistons) - **New in v3.0.0** Pistons launch players up as if they were pushing slime blocks
+- [Observers See Entities](https://unascribed.com/fabrication/#minor_mechanics.extra.observers_see_entities) - Observers detect when entities move in front of them if they have no block in front of them
+- [Observers See Entities - Living Only](https://unascribed.com/fabrication/#minor_mechanics.extra.observers_see_entities_living_only) - Observers only detect living entities, and not e.g. item entities
+- [Spiders Can&#x27;t Climb While Wet](https://unascribed.com/fabrication/#minor_mechanics.extra.spiders_cant_climb_while_wet) - Makes spiders unable to climb while wet
+- [Water Fills On Break Strict](https://unascribed.com/fabrication/#minor_mechanics.extra.water_fills_on_break_strict) - **New in v3.0.0** Requires water_fills_on_break to have at least 2 water sources
+- [Feather Falling V](https://unascribed.com/fabrication/#minor_mechanics.feather_falling_five) - Makes Feather Falling V a valid enchant that completely negates fall damage
+- [Feather Falling V Damages Boots](https://unascribed.com/fabrication/#minor_mechanics.feather_falling_five_damages_boots) - Makes absorbing fall damage with Feather Falling V cause damage to the boots
+- [Fire Aspect Is Flint And Steel](https://unascribed.com/fabrication/#minor_mechanics.fire_aspect_is_flint_and_steel) - Makes Fire Aspect tools act like Flint and Steel
+- [Fire Protection On Any Item](https://unascribed.com/fabrication/#minor_mechanics.fire_protection_on_any_item) - Fire Protection can be applied to any enchantable item, and makes the item immune to fire and lava damage
+- [Furnace Minecart Accepts Any Fuel](https://unascribed.com/fabrication/#minor_mechanics.furnace_minecart_any_fuel) - Allows furnace minecarts to accept any furnace fuel, rather than just coal and charcoal
+- [Gradual Block Breaking](https://unascribed.com/fabrication/#minor_mechanics.gradual_block_breaking) - **New in v3.0.0** Snow layers and slabs will be mined a layer at a time
+- [InfiBows](https://unascribed.com/fabrication/#minor_mechanics.infibows) - Makes Infinity bows not require an arrow in your inventory to fire
+- [Invisibility Splash On Inanimates](https://unascribed.com/fabrication/#minor_mechanics.invisibility_splash_on_inanimates) - Invisibility splash potions affect inanimates (minecarts, arrows, etc) making them invisible
+- [Mechanism Muffling](https://unascribed.com/fabrication/#minor_mechanics.mechanism_muffling) - Placing a block of wool adjacent to a dispenser, dropper, or piston makes it silent
+- [Note Block Notes](https://unascribed.com/fabrication/#minor_mechanics.note_block_notes) - Tells you the note the note block has been tuned to when tuning it or playing it manually above your hotbar
+- [Note Blocks Play On Landing](https://unascribed.com/fabrication/#minor_mechanics.note_blocks_play_on_landing) - Makes note blocks play when landed on
+- [Protection On Any Item](https://unascribed.com/fabrication/#minor_mechanics.protection_on_any_item) - Protection can be applied to any enchantable item
+- [Spiders Can&#x27;t Climb Glazed Terracotta](https://unascribed.com/fabrication/#minor_mechanics.spiders_cant_climb_glazed_terracotta) - Makes spiders unable to climb glazed terracotta
+- [Spreadable Moss](https://unascribed.com/fabrication/#minor_mechanics.spreadable_moss) - **New in v3.0.0** Using bone meal on a stone block with a moss block nearby grows moss to that block, to make it a bit easier to work with for building
+- [Tridents Activate Levers](https://unascribed.com/fabrication/#minor_mechanics.tridents_activate_levers) - When a trident hits a lever it will toggle it
+- [Unsaddle Creatures](https://unascribed.com/fabrication/#minor_mechanics.unsaddle_creatures) - Shift right click with an empty hand to retrieve a saddle from a pig/strider
+- [Water Fills On Break](https://unascribed.com/fabrication/#minor_mechanics.water_fills_on_break) - Water source blocks fill in broken blocks instead of air under some conditions
+## *Mechanics* - New mechanics and powerful additions
+- [Anvil Repair](https://unascribed.com/fabrication/#mechanics.anvil_repair) - Allows right-clicking on an anvil with a Block of Iron to repair it one stage
+- [Bottled Air](https://unascribed.com/fabrication/#mechanics.bottled_air) - Filling a glass bottle underwater refills 1 air bubble
+- [Broken Gear Drops Components](https://unascribed.com/fabrication/#mechanics.broken_tools_drop_components) - Makes gear drop its consituent items when broken
+- [Detecting Powered Rails](https://unascribed.com/fabrication/#mechanics.detecting_powered_rails) - Allows using a comparator on a powered rail just like a detector rail
+- [Directional Detector Rails](https://unascribed.com/fabrication/#mechanics.directional_detector_rails) - Placing magenta glazed terracotta under a detector rail makes it only detect minecarts moving in the direction of the arrow
+- [Directional Powered Rails](https://unascribed.com/fabrication/#mechanics.directional_powered_rails) - Placing magenta glazed terracotta under a powered rail makes it push minecarts in the direction of the arrow, even from a stop
+- [Enhanced Moistness](https://unascribed.com/fabrication/#mechanics.enhanced_moistness) - Entities are considered &quot;wet&quot; for 5 seconds after leaving a source of wetness
+- [Colorful Redstone](https://unascribed.com/fabrication/#mechanics.extra.colorful_redstone) - Redstone on top of wool will not connect to redstone on top of a different color of wool
+- [Swap Conflicting Enchants](https://unascribed.com/fabrication/#mechanics.extra.swap_conflicting_enchants) - **New in v3.0.0** When adding enchants that would normally not be compatible it will instead get added in an inactive state
+- [Weaponized Pearls](https://unascribed.com/fabrication/#mechanics.extra.weaponized_pearls) - **New in v3.0.0** Pearls will teleport entities they hit and pull nearby ones
+- [Grindstone Disenchanting](https://unascribed.com/fabrication/#mechanics.grindstone_disenchanting) - Placing a book in the bottom slot of a Grindstone when disenchanting an item will transfer the enchantments onto the book
+- [Obsidian Tears](https://unascribed.com/fabrication/#mechanics.obsidian_tears) - Lets you set your spawn at a Crying Obsidian block; automatable
+- [Pursurvers](https://unascribed.com/fabrication/#mechanics.pursurvers) - Adds &quot;Pursurvers&quot;, observers with a Purpur block next to them, that can detect left-clicks on their watched block
+- [Slow Fall Splash On Inanimates](https://unascribed.com/fabrication/#mechanics.slowfall_splash_on_inanimates) - Slow fall splash potions affect inanimates (minecarts, arrows, etc) making them unaffected by gravity
+- [Toggleable Furnace Carts](https://unascribed.com/fabrication/#mechanics.toggleable_furnace_carts) - Powered rails stop furnace carts when appropriate and conserve their fuel
+- [Wool Protected Sheep](https://unascribed.com/fabrication/#mechanics.wool_protected_sheep) - **New in v3.0.0** Sheep wool slightly reduces some types of damage
+## *Balance* - Changes to vanilla balance
+- [Anvil No Level Limit](https://unascribed.com/fabrication/#balance.anvil_no_level_limit) - **New in v3.0.0** Anvils don&#x27;t become &quot;Too Expensive&quot;
+- [Anvil Rename Always Costs One](https://unascribed.com/fabrication/#balance.anvil_rename_always_costs_one) - Makes renaming an item on an anvil always cost one level
+- [Bedrock-Like Impaling](https://unascribed.com/fabrication/#balance.bedrock_impaling) - Makes the Impaling enchantment act like it does in Bedrock Edition and Combat Test 4
+- [Disable Prior Work Penalty](https://unascribed.com/fabrication/#balance.disable_prior_work_penalty) - Disables the anvil prior work penalty when an item has been worked multiple times
+- [Drop More Experience On Death](https://unascribed.com/fabrication/#balance.drop_more_exp_on_death) - Players drop 80% of their experience when dying instead of basically nothing
+- [Environmentally Friendly Creepers](https://unascribed.com/fabrication/#balance.environmentally_friendly_creepers) - Creeper explosions deal entity damage, but not block damage, even if mobGriefing is true
+- [Anvils Take Damage Only When Falling](https://unascribed.com/fabrication/#balance.extra.anvil_damage_only_on_fall) - Anvils only take damage when falling from a height rather than randomly after being used
+- [Anvil Fully Repairs](https://unascribed.com/fabrication/#balance.extra.anvil_full_repair) - Any item repair in the anvil will restore item durability
+- [Anvil No Xp Cost](https://unascribed.com/fabrication/#balance.extra.anvil_no_xp_cost) - **New in v3.0.0** Anvils don&#x27;t cost any xp
+- [Brittle Shields](https://unascribed.com/fabrication/#balance.extra.brittle_shields) - Causes explosions to always break shields
+- [Disable Elytra](https://unascribed.com/fabrication/#balance.extra.disable_elytra) - Prevents using Elytra
+- [Disable Elytra Boost](https://unascribed.com/fabrication/#balance.extra.disable_elytra_boost) - Prevent Elytra boosting using firework rockets
+- [Disable Mending](https://unascribed.com/fabrication/#balance.extra.disable_mending) - Stops the mending enchantment from working
+- [Disable Mending Trade](https://unascribed.com/fabrication/#balance.extra.disable_mending_trade) - Stops new villagers from offering mending
+- [Disable Storing Thrown Ender Pearls](https://unascribed.com/fabrication/#balance.extra.disable_pearl_stasis) - Ender pearls forget who threw them when being unloaded
+- [Ender Dragon Always Spawns Dragon Egg](https://unascribed.com/fabrication/#balance.extra.ender_dragon_always_spawn_egg) - Ender dragon always spawn a dragon egg when killed
+- [Full Ender Dragon XP](https://unascribed.com/fabrication/#balance.extra.ender_dragon_full_xp) - Ender dragon always gives the same xp amount as it would the first time
+- [Faulty Shields](https://unascribed.com/fabrication/#balance.extra.faulty_shields) - **New in v3.0.0** Shields half non-projectile damage instead of blocking it
+- [Food Always Edible](https://unascribed.com/fabrication/#balance.extra.food_always_edible) - Allows players to eat unconditionally
+- [Infinity &amp; Mending](https://unascribed.com/fabrication/#balance.extra.infinity_mending) - Makes Mending and Infinity compatible enchantments
+- [Interrupting Damage](https://unascribed.com/fabrication/#balance.extra.interrupting_damage) - **New in v3.0.0** Taking more then a heart of damage interrupts the current action of any mob / player
+- [ChunkLoading Furnace Minecart](https://unascribed.com/fabrication/#balance.extra.loading_furnace_minecart) - Makes furnace minecarts load chunks if they have fuel
+- [Mobs Drop Less Metal](https://unascribed.com/fabrication/#balance.extra.mobs_dont_drop_ingots) - All ingot mob drops are converted to nuggets where possible, otherwise voided
+- [Pickup Skeleton Arrows](https://unascribed.com/fabrication/#balance.extra.pickup_skeleton_arrows) - Arrows shot by skeletons can be picked up
+- [Player Free Spawners](https://unascribed.com/fabrication/#balance.extra.player_free_spawners) - Mob spawners don&#x27;t require a player nearby to spawn
+- [Static Dragon Egg](https://unascribed.com/fabrication/#balance.extra.static_dragon_egg) - Prevents dragon egg from teleporting
+- [Tools in Bundles](https://unascribed.com/fabrication/#balance.extra.tools_in_bundles) - **New in v3.0.0** Allows storing up to 8 nonstackable items in a bundle, as long as nothing else is stored
+- [Faster Obsidian](https://unascribed.com/fabrication/#balance.faster_obsidian) - Makes obsidian and obsidian-related blocks break 3× faster
+- [Hyperspeed Furnace Minecart](https://unascribed.com/fabrication/#balance.hyperspeed_furnace_minecart) - Makes furnace minecarts very fast and burn fuel more quickly
+- [Infinity Crossbows](https://unascribed.com/fabrication/#balance.infinity_crossbows) - Allow putting Infinity on crossbows
+- [Soul Speed Doesn&#x27;t Damage Boots](https://unascribed.com/fabrication/#balance.soul_speed_doesnt_damage_boots) - Makes running on soul blocks with Soul Speed not deal damage to your boots
+- [Spawners Always Tick](https://unascribed.com/fabrication/#balance.spawners_always_tick) - Spawners always count down their spawn timers, even if no player is nearby
+- [Tridents Accept Power](https://unascribed.com/fabrication/#balance.tridents_accept_power) - Allows tridents to accept the Power enchantment, increasing their ranged damage
+- [Tridents Accept Sharpness](https://unascribed.com/fabrication/#balance.tridents_accept_sharpness) - Allows tridents to accept the Sharpness enchantment, increasing their melee damage
+## *Weird Tweaks* - Opinionated changes
+- [Blaze Powder Grows Nether Wart](https://unascribed.com/fabrication/#weird_tweaks.blaze_fertilizer) - Blaze powder behaves as bone meal for nether wart
+- [Chaining Creepers](https://unascribed.com/fabrication/#weird_tweaks.chaining_creepers) - Creepers explode after taking explosion damage
+- [Dimensional Tools](https://unascribed.com/fabrication/#weird_tweaks.dimensional_tools) - Completely configurable dimensional tool bonuses/penalties
+- [Disable Equip Sound](https://unascribed.com/fabrication/#weird_tweaks.disable_equip_sound) - Disables the unnecessary &quot;Gear equips&quot; sound that plays when your hands change, and is often glitchily played every tick
+- [Disable Nether Fog](https://unascribed.com/fabrication/#weird_tweaks.disable_nether_fog) - Removes thick nether fog
+- [Drop Experience With keepInventory](https://unascribed.com/fabrication/#weird_tweaks.drop_exp_with_keep_inventory) - If keepInventory is enabled, players still drop their experience when dying, but do so losslessly
+- [Endermen Don&#x27;t Grief](https://unascribed.com/fabrication/#weird_tweaks.endermen_dont_grief) - Endermen no longer place or pickup blocks
+- [Endermen Don&#x27;t Squeal](https://unascribed.com/fabrication/#weird_tweaks.endermen_dont_squeal) - Makes Endermen not make their growling or screeching sounds when angry
+- [Creepers Explode When On Fire](https://unascribed.com/fabrication/#weird_tweaks.extra.creepers_explode_when_on_fire) - Causes creepers to light their fuses when lit on fire
+- [Curable Piglins](https://unascribed.com/fabrication/#weird_tweaks.extra.curable_piglins) - **New in v3.0.0** Piglins and hoglins can be made immune with a golden apple or cured if they also have weakness
+- [Disable Lightning Fire](https://unascribed.com/fabrication/#weird_tweaks.extra.disable_lightning_fire) - Prevents lightning from creating fire
+- [Disable Night Skip](https://unascribed.com/fabrication/#weird_tweaks.extra.disable_night_skip) - Prevents beds from skipping the night
+- [Encroaching Emeralds](https://unascribed.com/fabrication/#weird_tweaks.extra.encroaching_emeralds) - Emeralds spawn in all biomes which have ores
+- [Flimsy Tripwire](https://unascribed.com/fabrication/#weird_tweaks.extra.flimsy_tripwire) - **New in v3.0.0** Tripwire breaks after being activated
+- [Foliage Creepers](https://unascribed.com/fabrication/#weird_tweaks.extra.foliage_creepers) - Creepers will take on the foliage color of the biome they&#x27;re in
+- [No Dolphin Theft](https://unascribed.com/fabrication/#weird_tweaks.extra.no_dolphin_theft) - Prevents dolphins from picking up items
+- [Photoallergic Creepers](https://unascribed.com/fabrication/#weird_tweaks.extra.photoallergic_creepers) - Creepers burn in sunlight
+- [Photoresistant Mobs](https://unascribed.com/fabrication/#weird_tweaks.extra.photoresistant_mobs) - Mobs don&#x27;t burn in sunlight
+- [Source Dependent Invulnerability Frames](https://unascribed.com/fabrication/#weird_tweaks.extra.source_dependent_iframes) - Allows entities to take damage multiple times if it&#x27;s from multiple sources
+- [Thrown Buckets Empty Lava Cauldrons](https://unascribed.com/fabrication/#weird_tweaks.extra.thrown_buckets_empty_lava_cauldrons) - Throwing an bucket at a lava cauldron will pickup the lava
+- [Underwater Explosions](https://unascribed.com/fabrication/#weird_tweaks.extra.underwater_explosions) - TNT and other explosives do block damage even underwater
+- [Villager Trades Reset](https://unascribed.com/fabrication/#weird_tweaks.extra.villager_trades_reset) - Instead of restocking villagers will completely reset their trades
+- [Villagers Follow Emerald Blocks](https://unascribed.com/fabrication/#weird_tweaks.extra.villagers_follow_emerald_blocks) - Villagers will follow players holding emerald blocks
+- [Instant Pickup](https://unascribed.com/fabrication/#weird_tweaks.instant_pickup) - Drops from blocks and entities are instantly placed in your inventory if there&#x27;s room
+- [Item Safe Cactus](https://unascribed.com/fabrication/#weird_tweaks.item_safe_cactus) - Items don&#x27;t get destroyed by cactus blocks
+- [Leaves Grow Grass](https://unascribed.com/fabrication/#weird_tweaks.leaves_grow_grass) - Grass and tall grass can be placed on leaves
+- [Déjà Void](https://unascribed.com/fabrication/#weird_tweaks.repelling_void) - Players falling into the void teleports them back to the last place they were on the ground and deals 6 hearts of unblockable void damage
+- [Use Items While Riding](https://unascribed.com/fabrication/#weird_tweaks.use_items_while_riding) - Allows players to use items and attack while riding entities like boats
+## *What&#x27;s Old Is New Again* - Forward ports of forgotten tidbits
+- [Blinking Drops](https://unascribed.com/fabrication/#woina.blinking_drops) - Drops blink white like they did in Survival Test
+- [Block Logo](https://unascribed.com/fabrication/#woina.block_logo) - Resurrects the Beta 1.2-era animated falling block logo
+- [Classic Block Drops](https://unascribed.com/fabrication/#woina.classic_block_drops) - Draws block drops with a mipmapped or small portion of the texture
+- [Dropped Items Don&#x27;t Stack](https://unascribed.com/fabrication/#woina.dropped_items_dont_stack) - When dropping items of the same type they don&#x27;t merge into a bigger stack
+- [Billboard Drops](https://unascribed.com/fabrication/#woina.extra.billboard_drops) - Brings back billboarded flat item drops like on Fast graphics prior to 1.8 or like always prior to 1.4
+- [Dirt Screen](https://unascribed.com/fabrication/#woina.extra.dirt_screen) - Replaces the panorama background of the title screen with the old dirt one
+- [Flat Items](https://unascribed.com/fabrication/#woina.extra.flat_items) - Brings back Indev flat first-person item models
+- [Full Enchanting Cost](https://unascribed.com/fabrication/#woina.extra.full_enchanting_cost) - Enchanting consumes all of the xp required for an enchant
+- [Instant Bow](https://unascribed.com/fabrication/#woina.extra.instant_bow) - Bow fires arrows instantly upon clicking
+- [Instant Eat](https://unascribed.com/fabrication/#woina.extra.instant_eat) - Eating food is instant
+- [Janky Arm](https://unascribed.com/fabrication/#woina.extra.janky_arm) - Brings back Survival Test arm rotation
+- [No Experience](https://unascribed.com/fabrication/#woina.extra.no_experience) - Removes experience
+- [No Hand Sway](https://unascribed.com/fabrication/#woina.extra.no_hand_sway) - Prevents first-person hands from gradually transitioning from the last camera position
+- [No Player Death Animation](https://unascribed.com/fabrication/#woina.extra.no_player_death_animation) - Players stay upright when killed
+- [No Sprint](https://unascribed.com/fabrication/#woina.extra.no_sprint) - Disable sprinting
+- [No Stance Transition](https://unascribed.com/fabrication/#woina.extra.no_stance_transition) - **New in v3.0.0** Removes the gradual crouch / crawl camera transition
+- [No Swim](https://unascribed.com/fabrication/#woina.extra.no_swim) - **New in v3.0.0** Disable swimming
+- [Old Sheep Shear](https://unascribed.com/fabrication/#woina.extra.old_sheep_shear) - Sheep drop wool when punched
+- [Old Tooltip](https://unascribed.com/fabrication/#woina.extra.old_tooltip) - Ressurects the old inventory tooltip from the beta days
+- [Oof](https://unascribed.com/fabrication/#woina.extra.oof) - Brings back the old &quot;Oof&quot; hurt sound
+- [More Explosion Particles](https://unascribed.com/fabrication/#woina.more_explosion_particles) - **New in v3.0.0** Adds smoke and poof particles to explosions
+- [Old Armor](https://unascribed.com/fabrication/#woina.old_armor) - **New in v3.0.0** All armor has the same protection
+- [Old Armor Scale](https://unascribed.com/fabrication/#woina.old_armor_scale) - **New in v3.0.0** Armor value is reduced with durability
+- [Old Background Shade](https://unascribed.com/fabrication/#woina.old_background_shade) - **New in v3.0.0** Inventories, pause and other menus will have a blue gradient
+- [Old Lava](https://unascribed.com/fabrication/#woina.old_lava) - Resurrects the old procedural lava texture from 1.4
+- [Void Fog Particles](https://unascribed.com/fabrication/#woina.void_fog_particles) - **New in v3.0.0** Returns void fog particles from pre 1.8
+- [Yellow Button Hover](https://unascribed.com/fabrication/#woina.yellow_button_hover) - Hovered buttons will have yellow text
+## *Unsafe* - QoL changes that make cheating easier
+- [Disable Breaking Check](https://unascribed.com/fabrication/#unsafe.disable_breaking_speed_check) - Server will not check if the client is cheating, when breaking blocks faster then expected
+- [Disable Moved Too Quickly](https://unascribed.com/fabrication/#unsafe.disable_moved_too_quickly) - Server will not check if the client is cheating, when traveling faster then expected
+## *Pedantry* - Fixes for non-problems
+- [Creepers Can&#x27;t climb](https://unascribed.com/fabrication/#pedantry.creepers_cant_climb) - **New in v3.0.0** Creepers can no longer climb climbable blocks
+- [Entities Can&#x27;t Climb](https://unascribed.com/fabrication/#pedantry.entities_cant_climb) - **New in v3.0.0** Entities can no longer climb climbable blocks (mostly applies to ladders)
+- [Oak Is Apple](https://unascribed.com/fabrication/#pedantry.oak_is_apple) - Oak trees become apple trees
+- [TNT Is Dynamite](https://unascribed.com/fabrication/#pedantry.tnt_is_dynamite) - TNT is renamed to Dynamite and doesn&#x27;t say TNT on it
+## *Experiments* - Bad ideas given form
+- [No Set Window Pos](https://unascribed.com/fabrication/#experiments.no_set_window_pos) - Prevents the game from manually modifying the window position
+- [Packed Atlases](https://unascribed.com/fabrication/#experiments.packed_atlases) - Disables rounding of atlases to the next power-of-two
