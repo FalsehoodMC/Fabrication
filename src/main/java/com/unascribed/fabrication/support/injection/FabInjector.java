@@ -1,6 +1,9 @@
 package com.unascribed.fabrication.support.injection;
 
+import com.google.common.base.Joiner;
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.FabLog;
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -9,7 +12,6 @@ import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.MethodInsnNode;
@@ -32,6 +34,7 @@ public class FabInjector {
 	public static class ToInject{
 		public final List<String> potentiallyRedirected = new ArrayList<>();
 		public Map<String, String> done = new HashMap<>();
+		public Map<String, String> redirect_fixed = new HashMap<>();
 		public List<String> method;
 		public List<String> target;
 		public String owner;
@@ -109,10 +112,14 @@ public class FabInjector {
 		apply(targetClass, injectIn != null ? injectIn : injects, redirects);
 	}
 	public static void apply(ClassNode targetClass, List<ToInject> injects, List<EntryMixinMerged> redirects){
+		Map<String, String> redirectMap = new HashMap<>();
 		injects.forEach(toInject -> redirects.forEach(redirect -> {
 			//TODO target should probably match other formats?
-			if (toInject.target.contains(FabRefMap.absoluteMap(redirect.target))) {
-				toInject.potentiallyRedirected.add(redirect.name+redirect.desc);
+			String mapped = FabRefMap.absoluteMap(redirect.target);
+			if (toInject.target.contains(mapped)) {
+				String r = redirect.name+redirect.desc;
+				toInject.potentiallyRedirected.add(r);
+				redirectMap.put(r, mapped);
 				FabLog.warn("FabInjector found a Redirect from "+redirect.mixin+";"+redirect.name+";"+" which has been added to "+toInject.owner+";"+toInject.name);
 			}
 		}));
@@ -153,6 +160,7 @@ public class FabInjector {
 							for (String target : toInject.potentiallyRedirected) {
 								if (target.equals(insnName + insnDesc)) {
 									if (performInjection(methodNode, insnNode, toInject, target)) {
+										toInject.redirect_fixed.put(m, redirectMap.get(target));
 										String type = toInject.annotation.substring(toInject.annotation.lastIndexOf('/'), toInject.annotation.length() - 1);
 										FabLog.debug("Completed " + type + " Injection over existing Redirect : " + toInject.owner + ";" + m + "\t" + target);
 									}
@@ -164,7 +172,20 @@ public class FabInjector {
 			}
 		}));
 		injects.forEach(ti -> ti.method.forEach(m -> ti.target.forEach(t ->{
-			if (!t.equals(ti.done.get(m))) FabLog.error("FabInjector failed to find injection point for "+ti.owner+";"+m+"\t"+t);
+			if (!t.equals(ti.done.get(m))) {
+				if (t.equals(ti.redirect_fixed.get(m))) {
+					FabLog.warn("FabInjector failed to find injection point for "+ti.owner+";"+m+"\t"+t+"\n may have been caused by another mods Redirect, assuming fixed");
+				} else {
+					FabLog.error("FabInjector failed to find injection point for "+ti.owner+";"+m+"\t"+t);
+					Set<String> keys = MixinConfigPlugin.getConfigKeysForDiscoveredClass(ti.owner.replace('/', '.'));
+					if (!keys.isEmpty()) {
+						FabLog.warn("! Force-disabling " + Joiner.on(", ").join(keys));
+						for (String opt : keys) {
+							FabConf.addFailure(opt);
+						}
+					}
+				}
+			}
 		})));
 	}
 
