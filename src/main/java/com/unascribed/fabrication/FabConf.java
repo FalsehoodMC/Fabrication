@@ -68,7 +68,6 @@ public class FabConf {
 	private static final Set<SpecialEligibility> metSpecialEligibility = EnumSet.noneOf(SpecialEligibility.class);
 	private static final Set<String> failures = Sets.newHashSet();
 	private static final Set<String> failuresReadOnly = Collections.unmodifiableSet(failures);
-	private static final SetMultimap<String, String> configKeysForDiscoveredClasses = HashMultimap.create();
 	private static Map<String, ConfigValue> worldConfig = new HashMap<>();
 	private static ImmutableMap<String, Boolean> worldDefaults = ImmutableMap.of();
 	private static QDIni rawConfig;
@@ -239,10 +238,6 @@ public class FabConf {
 
 	public static ImmutableSet<String> getEquivalent(String configKey) {
 		return equivalanceMap.getOrDefault(remap(configKey), ImmutableSet.of());
-	}
-
-	public static Set<String> getConfigKeysForDiscoveredClass(String clazz) {
-		return Collections.unmodifiableSet(configKeysForDiscoveredClasses.get(clazz.replace('/', '.')));
 	}
 
 	public static RuntimeException devError(String msg) {
