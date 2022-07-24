@@ -36,6 +36,7 @@ minor_mechanics.extra.collision_based_landing_pos:
 	name: Collision Based Landing Pos
 	since: 2.3.0
 	sides: server_only
+	media: https://unascribed.com/fabrication/collision_based_landing_pos.mp4
 	desc:
 		More accurately determines what the player is standing on.
 		e.g. with this you can't take fall damage on a slime block

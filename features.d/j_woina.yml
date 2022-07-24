@@ -69,6 +69,7 @@ woina.dropped_items_dont_stack:
 	name: Dropped Items Don't Stack
 	since: 1.4.0
 	sides: server_only
+	media: https://unascribed.com/fabrication/dropped_items_dont_stack.mp4
 	desc:
 		When dropping items of the same type they don't merge into a bigger stack.
 
@@ -76,6 +77,7 @@ woina.yellow_button_hover:
 	name: Yellow Button Hover
 	since: 2.1.0
 	sides: client_only
+	media: https://unascribed.com/fabrication/yellow_button_hover.mp4
 	desc:
 		Hovered buttons will have yellow text.
 
@@ -90,6 +92,7 @@ woina.more_explosion_particles:
 	name: More Explosion Particles
 	since: 3.0.0
 	sides: client_only
+	media: https://unascribed.com/fabrication/more_explosion_particles.mp4
 	desc:
 		Adds smoke and poof particles to explosions.
 
@@ -113,6 +116,7 @@ woina.void_fog_particles:
 	name: Void Fog Particles
 	since: 3.0.0
 	sides: client_only
+	media: https://unascribed.com/fabrication/void_fog_particles.mp4
 	desc:
 		Returns void fog particles from pre 1.8.
 

@@ -148,7 +148,7 @@ public class FabInjector {
 							if (target.startsWith(insnOwner)) {
 								char d = target.charAt(insnOwner.length());
 								if ((d == '.' || d == ';') && target.substring(insnOwner.length() + 1).equals(insnName + insnDesc)) {
-									if (performInjection(methodNode, insnNode, toInject, target)) {
+									if (performInjection(methodNode, insnNode, toInject, target, false)) {
 										toInject.done.put(m, unchangedTarget);
 										String type = toInject.annotation.substring(toInject.annotation.lastIndexOf('/'), toInject.annotation.length()-1);
 										FabLog.debug("Completed "+type+" Injection : " + toInject.owner + ";" + m + "\t" + unchangedTarget);
@@ -159,7 +159,7 @@ public class FabInjector {
 						if (toInject.owner.equals(insnOwner)) {
 							for (String target : toInject.potentiallyRedirected) {
 								if (target.equals(insnName + insnDesc)) {
-									if (performInjection(methodNode, insnNode, toInject, target)) {
+									if (performInjection(methodNode, insnNode, toInject, target, true)) {
 										toInject.redirect_fixed.put(m, redirectMap.get(target));
 										String type = toInject.annotation.substring(toInject.annotation.lastIndexOf('/'), toInject.annotation.length() - 1);
 										FabLog.debug("Completed " + type + " Injection over existing Redirect : " + toInject.owner + ";" + m + "\t" + target);
@@ -189,10 +189,7 @@ public class FabInjector {
 		})));
 	}
 
-	public static boolean performInjection(MethodNode methodNode, AbstractInsnNode insn, ToInject toInject, String target) {
-		if (target.contains(":")){
-			int test=0;
-		}
+	public static boolean performInjection(MethodNode methodNode, AbstractInsnNode insn, ToInject toInject, String target, boolean isRedirect) {
 		boolean toInjectIsStatic = (toInject.access & Opcodes.ACC_STATIC) != 0;
 		InsnList mod = new InsnList();
 		List<Type> argTypes = new ArrayList<>();
@@ -300,10 +297,11 @@ public class FabInjector {
 				methodNode.maxLocals=max;
 			}
 			if (!toInjectIsStatic) methodNode.instructions.insertBefore(insn, new VarInsnNode(Opcodes.ALOAD, 0));
-			for (Type argType : argTypes) {
+			for (int i=0; i<argTypes.size();i++) {
+				Type argType = argTypes.get(i);
 				int opcode = getLoadOpcode(argType.getSort());
 				mod.add(new VarInsnNode(opcode, --max));
-				if (countDesc-->0)
+				if (!(i==0 && isRedirect && !toInjectIsStatic) && countDesc-->0)
 					methodNode.instructions.insertBefore(insn, new VarInsnNode(opcode, max));
 			}
 			for (int c = toInjectIsStatic ? 0 : 1; c < countDesc; c++) {

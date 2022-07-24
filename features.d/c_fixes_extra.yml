@@ -5,6 +5,7 @@ fixes.extra.bubble_column_pop:
 	name: Bubble Column Pop
 	since: 2.1.0
 	sides: client_only
+	media: https://unascribed.com/fabrication/bubble_column_pop.mp4
 	desc:
 		Re-adds bubble columns having a bubble pop particle and sound at the top.
 
