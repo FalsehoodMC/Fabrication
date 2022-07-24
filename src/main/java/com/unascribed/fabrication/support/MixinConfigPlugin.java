@@ -46,6 +46,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -112,6 +113,17 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 				List<String> eligibilitySuccesses = Lists.newArrayList();
 				boolean anyRestrictions = false;
 				if (cn.visibleAnnotations != null) {
+					List<String> fakeMixin = null;
+					for (AnnotationNode an : cn.visibleAnnotations) {
+						if (an.desc.equals("Lcom/unascribed/fabrication/support/injection/FakeMixinHack;")){
+							if (an.values == null) continue;
+							for (int i = 0; i < an.values.size(); i += 2) {
+								if ("value".equals(an.values.get(i))) {
+									fakeMixin = (List<String>) an.values.get(i+1);
+								}
+							}
+						}
+					}
 					for (AnnotationNode an : cn.visibleAnnotations) {
 						if (an.desc.equals("Lcom/unascribed/fabrication/support/EligibleIf;")) {
 							if (an.values == null) continue;
@@ -133,6 +145,11 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 										eligibilitySuccesses.add("Required config key "+ FabConf.remap((String)v)+" is not banned");
 									}
 									configKeysForDiscoveredClasses.put(ci.getName(), (String)v);
+									if (fakeMixin != null) {
+										for (String fm : fakeMixin) {
+											configKeysForDiscoveredClasses.put(fm, (String) v);
+										}
+									}
 								} else if (k.equals("envMatches")) {
 									String[] arr = (String[])v;
 									if (arr[0].equals("Lcom/unascribed/fabrication/support/Env;")) {
@@ -197,6 +214,11 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 											eligibilitySuccesses.add("Relevant config setting "+s+" is not banned");
 										}
 										configKeysForDiscoveredClasses.put(ci.getName(), s);
+										if (fakeMixin != null) {
+											for (String fm : fakeMixin) {
+												configKeysForDiscoveredClasses.put(fm, s);
+											}
+										}
 									}
 									if (runtimeCheck)
 										eligible = false;
@@ -403,6 +425,10 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 						}
 					}
 		});
+	}
+
+	public static Set<String> getConfigKeysForDiscoveredClass(String clazz) {
+		return Collections.unmodifiableSet(configKeysForDiscoveredClasses.get(clazz.replace('/', '.')));
 	}
 
 	private interface ClassInfo {

@@ -30,7 +30,7 @@ public class MixinErrorHandler {
 					"Mixin", mixin.getClassName()
 					));
 			if (action == IMixinErrorHandler.ErrorAction.ERROR) {
-				Set<String> keys = FabConf.getConfigKeysForDiscoveredClass(mixin.getClassName());
+				Set<String> keys = MixinConfigPlugin.getConfigKeysForDiscoveredClass(mixin.getClassName());
 				if (!keys.isEmpty()) {
 					FabLog.debug("Original Mixin error", th);
 					FabLog.warn("Mixin "+mixin.getClassName()+" failed to "+verb+"! Force-disabling "+Joiner.on(", ").join(keys));
