@@ -1,7 +1,6 @@
 package com.unascribed.fabrication.mixin.f_balance.infinity_crossbows;
 
 import com.unascribed.fabrication.FabConf;
-import net.minecraft.item.ArrowItem;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabInject;
