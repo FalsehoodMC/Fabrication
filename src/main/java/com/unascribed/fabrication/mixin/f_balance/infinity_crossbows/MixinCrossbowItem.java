@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.mixin.f_balance.infinity_crossbows;
 
 import com.unascribed.fabrication.FabConf;
+import net.minecraft.item.ArrowItem;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabInject;
@@ -28,8 +29,8 @@ public class MixinCrossbowItem {
 
 	@FabModifyVariable(at=@At("HEAD"), method="loadProjectile(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemStack;ZZ)Z",
 			argsOnly=true, index=4)
-	private static boolean modifyCreativeModeLoadProjectile(boolean creative, LivingEntity shooter, ItemStack crossbow) {
-		if (FabConf.isEnabled("*.infinity_crossbows") && EnchantmentHelper.getLevel(Enchantments.INFINITY, crossbow) > 0) {
+	private static boolean modifyCreativeModeLoadProjectile(boolean creative, LivingEntity shooter, ItemStack crossbow, ItemStack projectile) {
+		if (FabConf.isEnabled("*.infinity_crossbows") && EnchantmentHelper.getLevel(Enchantments.INFINITY, crossbow) > 0 && projectile.getItem() == Items.ARROW) {
 			return true;
 		}
 		return creative;
