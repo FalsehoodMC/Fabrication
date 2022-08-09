@@ -126,7 +126,7 @@ woina.end_portal_parallax:
 	sides: client_only
 	desc:
 		Old end portal texture, may not be entierly accurate.
-		Only 25% buggy when used with fixes.fix_esd_portal_renderer, what a deal!.
+		Only 25% buggy when used with fixes.fix_end_portal_render, what a deal!.
 
 # kate: space-indent off
 # vim: noai:noet
