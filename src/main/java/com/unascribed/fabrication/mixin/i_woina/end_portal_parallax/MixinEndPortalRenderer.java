@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.injection.FabInject;
 import net.minecraft.block.entity.EndPortalBlockEntity;
 import net.minecraft.client.MinecraftClient;
@@ -29,7 +30,7 @@ import java.nio.IntBuffer;
 import java.util.Random;
 
 @Mixin(EndPortalBlockEntityRenderer.class)
-@EligibleIf(configAvailable="*.end_portal_parallax", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.end_portal_parallax", envMatches=Env.CLIENT, specialConditions=SpecialEligibility.NOT_MACOS)
 public abstract class MixinEndPortalRenderer {
 
 	@Shadow

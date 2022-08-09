@@ -24,6 +24,7 @@ import com.unascribed.fabrication.support.ResolvedConfigValue;
 import com.unascribed.fabrication.support.SpecialEligibility;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import org.lwjgl.system.Platform;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -146,6 +147,9 @@ public class FabConf {
 			Class.forName("optifine.Installer", false, FabConf.class.getClassLoader());
 		} catch (Throwable t) {
 			setMet(SpecialEligibility.NO_OPTIFINE, true);
+		}
+		if (Platform.get() != Platform.MACOSX) {
+			setMet(SpecialEligibility.NOT_MACOS, true);
 		}
 		if (FabConf.class.getClassLoader().getResource("default_features_config.ini") == null) {
 			throw devError("You must run build-features.sh before running the game.");
