@@ -120,5 +120,13 @@ woina.void_fog_particles:
 	desc:
 		Returns void fog particles from pre 1.8.
 
+woina.end_portal_parallax:
+	name: End Portal Parallax
+	since: 3.0.1
+	sides: client_only
+	desc:
+		Old end portal texture, may not be entierly accurate.
+		Only 25% buggy when used with fixes.fix_esd_portal_renderer, what a deal!.
+
 # kate: space-indent off
 # vim: noai:noet
