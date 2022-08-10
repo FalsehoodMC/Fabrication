@@ -24,7 +24,6 @@ import com.unascribed.fabrication.support.ResolvedConfigValue;
 import com.unascribed.fabrication.support.SpecialEligibility;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import org.lwjgl.system.Platform;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
