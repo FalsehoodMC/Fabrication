@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.Iterator;
 
 @Mixin(CactusBlock.class)
-@EligibleIf(configAvailable="*.stable_cacti")
+@EligibleIf(anyConfigAvailable={"*.stable_cacti", "*.stable_cacti_break_vanilla_compat"})
 public class MixinCactusBlock extends Block {
 
 	public MixinCactusBlock(Settings settings) {
