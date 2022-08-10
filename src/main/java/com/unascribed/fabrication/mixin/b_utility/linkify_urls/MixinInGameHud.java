@@ -3,6 +3,7 @@ package com.unascribed.fabrication.mixin.b_utility.linkify_urls;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.util.Regex;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.text.ClickEvent;
@@ -18,7 +19,7 @@ import com.unascribed.fabrication.support.injection.FabModifyVariable;
 import java.util.regex.Matcher;
 
 @Mixin(InGameHud.class)
-@EligibleIf(configAvailable="*.linkify_urls", envMatches=Env.CLIENT)
+@EligibleIf(configAvailable="*.linkify_urls", envMatches=Env.CLIENT, specialConditions=SpecialEligibility.NOT_1191)
 public class MixinInGameHud {
 
 	@FabModifyVariable(at=@At(value="HEAD"), method="onChatMessage(Lnet/minecraft/network/message/MessageType;Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSender;)V", argsOnly=true)

@@ -7,11 +7,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.SpecialEligibility;
 
 import io.netty.channel.Channel;
 
 @Mixin(targets="net.minecraft.server.ServerNetworkIo$1")
-@EligibleIf(configAvailable="*.ping_privacy")
+@EligibleIf(configAvailable="*.ping_privacy", specialConditions=SpecialEligibility.NOT_1191)
 public class MixinServerChannelHandler {
 
 	@FabInject(at=@At(value="INVOKE", target="net/minecraft/server/MinecraftServer.getRateLimit()I"),

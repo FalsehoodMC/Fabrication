@@ -82,5 +82,20 @@ utility.extra.no_guardian_jumpscare:
 	desc:
 		Disables the elder guardian appearance effect upon being inflicted with Mining Fatigue.
 
+utility.extra.ping_privacy:
+	name: Ping Privacy
+	since: 1.4.0
+	sides: server_only
+	media: https://unascribed.com/fabrication/ping_privacy.png
+	desc:
+		Sends no ping data to IPs that have not successfully logged in in the last 7 days.
+
+		Prevents scraping. There exist services that constantly ping servers they know about and
+		track their uptime and who's connected, which will then turn around and store the name
+		history of discovered users permanently and make their cape publicly searchable, among
+		other things.
+		
+		Does not work on 1.19.1.
+
 # kate: space-indent off
 # vim: noai:noet

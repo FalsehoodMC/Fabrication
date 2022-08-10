@@ -205,19 +205,6 @@ utility.show_map_id:
 	desc:
 		Makes filled maps show their ID.
 
-utility.ping_privacy:
-	name: Ping Privacy
-	since: 1.4.0
-	sides: server_only
-	media: https://unascribed.com/fabrication/ping_privacy.png
-	desc:
-		Sends no ping data to IPs that have not successfully logged in in the last 7 days.
-
-		Prevents scraping. There exist services that constantly ping servers they know about and
-		track their uptime and who's connected, which will then turn around and store the name
-		history of discovered users permanently and make their cape publicly searchable, among
-		other things.
-
 utility.show_bee_count_tooltip:
 	name: Show Bee Count in Tooltip
 	since: 1.4.0
@@ -245,7 +232,7 @@ utility.linkify_urls:
 	since: 3.0.0
 	sides: client_only
 	desc:
-		Links in chat are clickable.
+		Links in chat are clickable. Does not work on 1.19.1.
 
 utility.rmb_clears_text_fields:
 	name: RMB Clears Text Fields

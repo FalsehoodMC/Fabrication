@@ -22,7 +22,7 @@ import com.unascribed.fabrication.support.ResolvedConfigValue;
 import com.unascribed.fabrication.support.SpecialEligibility;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-
+import net.fabricmc.loader.api.FabricLoader;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -148,6 +148,7 @@ public class FabConf {
 			setMet(SpecialEligibility.NO_OPTIFINE, true);
 		}
 		setMet(SpecialEligibility.NOT_MACOS, Platform.get() != Platform.MACOSX);
+		setMet(SpecialEligibility.NOT_1191, FabricLoader.getInstance().getModContainer("minecraft").get().getMetadata().getVersion().toString().equals("1.19"));
 		if (FabConf.class.getClassLoader().getResource("default_features_config.ini") == null) {
 			throw devError("You must run build-features.sh before running the game.");
 		}

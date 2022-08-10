@@ -19,6 +19,7 @@ import com.mojang.authlib.GameProfile;
 import com.unascribed.fabrication.logic.PingPrivacy;
 import com.unascribed.fabrication.logic.PingPrivacyPersistentState;
 import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.SpecialEligibility;
 
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.packet.c2s.query.QueryRequestC2SPacket;
@@ -31,7 +32,7 @@ import net.minecraft.server.network.ServerQueryNetworkHandler;
 import net.minecraft.util.Formatting;
 
 @Mixin(ServerQueryNetworkHandler.class)
-@EligibleIf(configAvailable="*.ping_privacy")
+@EligibleIf(configAvailable="*.ping_privacy", specialConditions=SpecialEligibility.NOT_1191)
 public class MixinServerQueryNetworkHandler {
 
 	@Shadow @Final

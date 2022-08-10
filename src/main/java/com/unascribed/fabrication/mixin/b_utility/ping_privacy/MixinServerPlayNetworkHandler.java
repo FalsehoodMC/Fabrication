@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.logic.PingPrivacyPersistentState;
 import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.SpecialEligibility;
 
 import io.netty.util.concurrent.GenericFutureListener;
 import net.minecraft.network.ClientConnection;
@@ -22,7 +23,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 
 @Mixin(ServerPlayNetworkHandler.class)
-@EligibleIf(configAvailable="*.ping_privacy")
+@EligibleIf(configAvailable="*.ping_privacy", specialConditions=SpecialEligibility.NOT_1191)
 public class MixinServerPlayNetworkHandler {
 
 	@Shadow @Final

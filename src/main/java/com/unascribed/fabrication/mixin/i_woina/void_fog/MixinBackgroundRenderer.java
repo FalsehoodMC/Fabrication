@@ -40,7 +40,7 @@ public abstract class MixinBackgroundRenderer {
 		Entity entity = client.cameraEntity;
 		if (entity == null || world.isAir(entity.getBlockPos().withY(world.getBottomY()))) return;
 		float fog = world.getLightLevel(LightType.SKY, entity.getBlockPos()) / 14f;
-		float dist = Math.abs((float) entity.getY()-world.getDimension().getMinimumY());
+		float dist = Math.abs((float) entity.getY()-world.getBottomY());
 		if (dist > 16f) fog += (dist - 16f)/10f;
 		if (fog < 1f) {
 			fabrication$voidFog = MathHelper.lerp(.05f, fabrication$voidFog, fog);
@@ -52,8 +52,8 @@ public abstract class MixinBackgroundRenderer {
 			fabrication$voidFog = MathHelper.lerp(.1f, fabrication$voidFog, 1);
 		}
 	}
-	@FabInject(method="applyFog(Lnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/BackgroundRenderer$FogType;FZ)V", at=@At("TAIL"))
-	private static void fabrication$voidFogColor(Camera camera, BackgroundRenderer.FogType fogType, float viewDistance, boolean thickFog, CallbackInfo ci) {
+	@FabInject(method="applyFog(Lnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/BackgroundRenderer$FogType;FZF)V", at=@At("TAIL"))
+	private static void fabrication$voidFogDistance(Camera camera, BackgroundRenderer.FogType fogType, float viewDistance, boolean thickFog, float tickDelta, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.void_fog")) return;
 		if (fogType != BackgroundRenderer.FogType.FOG_TERRAIN) return;;
 		float fog = fabrication$voidFog;
