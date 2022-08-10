@@ -5,7 +5,6 @@ import com.unascribed.fabrication.support.injection.ModifyReturn;
 import org.spongepowered.asm.mixin.Mixin;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.google.common.collect.ImmutableMap;
 
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
@@ -36,7 +35,8 @@ public class MixinTridentEntity {
 		if (FabConf.isEnabled("*.tridents_accept_power")) {
 			int power = EnchantmentHelper.getLevel(Enchantments.POWER, stack);
 			if (power > 0) {
-				damage *= 1 + (0.25f * (power + 1));
+				float powerMul = 1 + (0.25f * (power + 1));
+				damage += damage*powerMul + 8f*powerMul;
 			}
 		}
 		return damage;
