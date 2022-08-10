@@ -5,7 +5,7 @@ public enum SpecialEligibility {
 	NOT_FORGE("Running under Fabric"),
 	FORGE("Running under Forge"),
 	NO_OPTIFINE("OptiFine is not present"),
-	NOT_MACOS("Feature unavailable on macOS")
+	NOT_MACOS("Running under an OS other then macOS")
 	;
 	public final String displayName;
 
