@@ -3,6 +3,8 @@ package com.unascribed.fabrication.mixin.f_balance.tools_in_bundles;
 import java.util.stream.Stream;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.util.ItemNbtScanner;
+import net.minecraft.nbt.scanner.NbtScanner;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -50,10 +52,15 @@ public class MixinBundleItem {
 	}
 
 	private static boolean fabrication$isCompatible(ItemStack bundle, ItemStack stack) {
+		boolean isTool = stack.getMaxCount() == 1;
+		if (isTool && stack.hasNbt()) {
+			if (stack.getNbt().doAccept(new ItemNbtScanner()) == NbtScanner.Result.HALT) {
+				return false;
+			}
+		}
 		boolean empty = getBundledStacks(bundle).findFirst().isEmpty();
 		if (empty) return true;
 		boolean containsTool = getBundledStacks(bundle).anyMatch(is -> is.getMaxCount() == 1);
-		boolean isTool = stack.getMaxCount() == 1;
 		return containsTool == isTool;
 	}
 
