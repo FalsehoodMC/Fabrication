@@ -37,7 +37,7 @@ public class MixinCactusBlock extends Block {
 
 	@FabInject(at=@At("HEAD"), method="getStateForNeighborUpdate(Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/Direction;Lnet/minecraft/block/BlockState;Lnet/minecraft/world/WorldAccess;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;")
 	public void getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom, CallbackInfoReturnable<BlockState> ci) {
-		if (!FabConf.isEnabled("*.stable_cacti")) return;
+		if (!FabConf.isAnyEnabled("*.stable_cacti")) return;
 		if (direction == Direction.UP &&
 				state.getBlock() == this && state.get(CactusBlock.AGE) > 0 &&
 				newState.getBlock() == this && newState.get(CactusBlock.AGE) == 0) {
