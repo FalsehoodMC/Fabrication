@@ -3,6 +3,7 @@ package com.unascribed.fabrication.mixin.i_woina.end_portal_parallax;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
+import com.unascribed.fabrication.support.FabConst;
 import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.injection.FabInject;
 import net.minecraft.client.WindowEventHandler;
@@ -22,6 +23,7 @@ public class MixinWindow {
 			method="<init>")
 	private void Gl11support(WindowEventHandler eventHandler, MonitorTracker monitorTracker, WindowSettings settings, String videoMode, String title, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.end_portal_parallax")) return;
+		FabConst.LEGACY_GL = true;
 		GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_ANY_PROFILE);
 		GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_FORWARD_COMPAT, GLFW.GLFW_FALSE);
 		GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 1);

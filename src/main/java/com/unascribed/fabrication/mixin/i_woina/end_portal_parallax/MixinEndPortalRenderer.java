@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
+import com.unascribed.fabrication.support.FabConst;
 import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.injection.FabInject;
 import net.minecraft.block.entity.EndPortalBlockEntity;
@@ -86,6 +87,7 @@ public abstract class MixinEndPortalRenderer {
 
 	@FabInject(at=@At("HEAD"), method= "renderSide(Lnet/minecraft/block/entity/EndPortalBlockEntity;Lnet/minecraft/util/math/Matrix4f;Lnet/minecraft/client/render/VertexConsumer;FFFFFFFFLnet/minecraft/util/math/Direction;)V", cancellable=true)
 	public void oldRender(EndPortalBlockEntity be, Matrix4f model, VertexConsumer vertices, float x1, float x2, float y1, float y2, float z1, float z2, float z3, float z4, Direction side, CallbackInfo ci) {
+		if (!FabConst.LEGACY_GL) return;
 		if (!FabConf.isEnabled("*.end_portal_parallax")) return;
 		ci.cancel();
 		if (!be.shouldDrawSide(side)) return;
