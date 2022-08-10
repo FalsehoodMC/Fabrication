@@ -5,7 +5,6 @@ import com.unascribed.fabrication.FabLog;
 public class FabConst {
 	public static final boolean DEV;
 	public static final boolean FORGE;
-	public static boolean LEGACY_GL = false;
 	static {
 		boolean devTmp;
 		boolean forgeTmp;

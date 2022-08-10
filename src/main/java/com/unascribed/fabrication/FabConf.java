@@ -148,9 +148,6 @@ public class FabConf {
 		} catch (Throwable t) {
 			setMet(SpecialEligibility.NO_OPTIFINE, true);
 		}
-		if (Platform.get() != Platform.MACOSX) {
-			setMet(SpecialEligibility.NOT_MACOS, true);
-		}
 		if (FabConf.class.getClassLoader().getResource("default_features_config.ini") == null) {
 			throw devError("You must run build-features.sh before running the game.");
 		}
