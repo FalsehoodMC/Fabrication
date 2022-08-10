@@ -31,7 +31,7 @@ public class MixinCactusBlock extends Block {
 	@FabModifyVariable(at=@At("STORE"),
 			method="canPlaceAt(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/WorldView;Lnet/minecraft/util/math/BlockPos;)Z")
 	public Iterator<Direction> returnEmptyIter(Iterator<Direction> old) {
-		if (FabConf.isEnabled("*.stable_cacti")) return Collections.emptyIterator();
+		if (FabConf.isAnyEnabled("*.stable_cacti")) return Collections.emptyIterator();
 		return old;
 	}
 
