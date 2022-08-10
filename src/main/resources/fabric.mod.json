@@ -22,7 +22,8 @@
     "main": ["com.unascribed.fabrication.FabricationMod"],
     "client": ["com.unascribed.fabrication.FabricationModClient"],
     "modmenu": ["com.unascribed.fabrication.ModMenuInitializer"],
-    "fscript": ["com.unascribed.fabrication.FScriptInitializer"]
+    "fscript": ["com.unascribed.fabrication.FScriptInitializer"],
+    "lib39:gl_compat_voter": ["com.unascribed.fabrication.client.FabricationGLCompatVoter"]
   },
   "mixins": ["fabrication.mixins.json"],
   "accessWidener": "fabrication.accesswidener",
@@ -30,12 +31,13 @@
 
   "depends": {
     "fabricloader": ">=0.12.0",
-    "minecraft": ">=1.18",
+    "minecraft": "^1.18.2",
     "fabric-resource-loader-v0": "*",
     "fabric-command-api-v2": "*",
     "fabric-key-binding-api-v1": "*",
     "fabric-rendering-v1": "*",
-    "fabric-registry-sync-v0": "*"
+    "fabric-registry-sync-v0": "*",
+    "lib39-deferral": ">=1.1.1"
   },
   "suggests": {
   },

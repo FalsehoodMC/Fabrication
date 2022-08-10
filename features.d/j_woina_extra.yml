@@ -134,5 +134,12 @@ woina.extra.no_swim:
 	desc:
 		Disable swimming.
 
+woina.extra.void_fog:
+	name: Void Fog
+	since: 3.0.1
+	sides: client_only
+	desc:
+		Returns void fog from pre 1.8.
+
 # kate: space-indent off
 # vim: noai:noet

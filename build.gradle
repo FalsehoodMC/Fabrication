@@ -82,6 +82,7 @@ dependencies {
 	modImplementation('tf.ssf.sfort:fscript:3.1.3') {
 		transitive = false
 	}
+	modImplementation(include('com.unascribed:lib39-deferral:1.1.1'))
 	modRuntimeOnly fabricApi.module('fabric-screen-api-v1', project.fabric_version)
 
 	annotationProcessor project(':ap')

@@ -4,12 +4,10 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import com.google.common.io.BaseEncoding;
 import com.google.common.io.MoreFiles;
@@ -29,6 +27,9 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.plaf.metal.MetalLookAndFeel;
+
+import org.lwjgl.system.Platform;
+
 import java.awt.Toolkit;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -146,6 +147,7 @@ public class FabConf {
 		} catch (Throwable t) {
 			setMet(SpecialEligibility.NO_OPTIFINE, true);
 		}
+		setMet(SpecialEligibility.NOT_MACOS, Platform.get() != Platform.MACOSX);
 		if (FabConf.class.getClassLoader().getResource("default_features_config.ini") == null) {
 			throw devError("You must run build-features.sh before running the game.");
 		}
