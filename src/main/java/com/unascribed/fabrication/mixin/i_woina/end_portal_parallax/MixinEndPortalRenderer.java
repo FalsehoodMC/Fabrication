@@ -116,7 +116,6 @@ public abstract class MixinEndPortalRenderer {
 		glDepthFunc(GL_LEQUAL);
 		glDisable(GL_LIGHTING);
 		fabrication$random.setSeed(31100L);
-
 		for (int i = 0; i < 16; ++i) {
 			glPushMatrix();
 			float ri = 16 - i;
@@ -158,6 +157,16 @@ public abstract class MixinEndPortalRenderer {
 			glPushMatrix();
 			glLoadIdentity();
 			glTranslatef(0.0F, Util.getEpochTimeMs() % 700000L / 700000.0F, 0.0F);
+			switch (side) {
+				case WEST:
+					glRotatef(90, 0, 270, 0);
+					glScalef(2, 4, 2);
+					break;
+				case NORTH:
+					glRotatef(270, 0, 270, 90);
+					glScalef(1, 2, 1);
+					break;
+			}
 			glScalef(scale, scale, scale);
 			glTranslatef(0.5F, 0.5F, 0.0F);
 			glRotatef((i * i * 4321 + i * 9) * 2.0F, 0.0F, 0.0F, 1.0F);
@@ -182,7 +191,6 @@ public abstract class MixinEndPortalRenderer {
 			glPopMatrix();
 			glMatrixMode(GL_MODELVIEW);
 		}
-
 		glDisable(GL_BLEND);
 		glDisable(GL_TEXTURE_GEN_S);
 		glDisable(GL_TEXTURE_GEN_T);
