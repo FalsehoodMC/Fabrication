@@ -1,28 +1,23 @@
 package com.unascribed.fabrication.mixin.a_fixes.stable_cacti;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Random;
-
 import com.unascribed.fabrication.FabConf;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
+import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.injection.FabInject;
 import com.unascribed.fabrication.support.injection.FabModifyVariable;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import com.unascribed.fabrication.support.EligibleIf;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CactusBlock;
 import net.minecraft.block.Material;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.FluidTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.WorldAccess;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.Collections;
+import java.util.Iterator;
 
 @Mixin(CactusBlock.class)
 @EligibleIf(configAvailable="*.stable_cacti")
@@ -57,17 +52,10 @@ public class MixinCactusBlock extends Block {
 					break;
 				}
 			}
-			if (shouldBreak) {
-				world.createAndScheduleBlockTick(posFrom, this, 1);
+			if (shouldBreak && !FabConf.isEnabled("*.stable_cacti_break_vanilla_compat")) {
+				world.breakBlock(posFrom, true);
 			}
 		}
-	}
-
-	@FabInject(at=@At("HEAD"), method="scheduledTick(Lnet/minecraft/block/BlockState;Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;Ljava/util/Random;)V", cancellable=true)
-	public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random, CallbackInfo ci) {
-		if (!FabConf.isEnabled("*.stable_cacti")) return;
-		world.breakBlock(pos, true);
-		ci.cancel();
 	}
 
 }
