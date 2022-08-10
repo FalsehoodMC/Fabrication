@@ -120,5 +120,13 @@ woina.void_fog_particles:
 	desc:
 		Returns void fog particles from pre 1.8.
 
+woina.end_portal_parallax:
+	name: End Portal Parallax
+	since: 3.0.1
+	sides: client_only
+	desc:
+		Old end portal texture, may not be entirely accurate.
+		Will not work unless the game is restarted, requires legacy GL and may not work on some systems.
+
 # kate: space-indent off
 # vim: noai:noet
