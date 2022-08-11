@@ -5,6 +5,7 @@ buildscript {
 	dependencies {
 		classpath 'com.modrinth.minotaur:Minotaur:2.4.3'
 		classpath 'gradle.plugin.com.matthewprenger:CurseGradle:1.4.0'
+		classpath "com.github.breadmoirai:github-release:2.4.1"
 	}
 }
 
@@ -30,6 +31,9 @@ if (System.getenv("MODRINTH_TOKEN")) {
 }
 if (System.getenv("CURSE_TOKEN")) {
 	apply plugin: "com.matthewprenger.cursegradle"
+}
+if (System.getenv("GITHUB_TOKEN")) {
+	apply plugin: "com.github.breadmoirai.github-release"
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -700,7 +704,6 @@ if (System.getenv("MODRINTH_TOKEN")) {
 		gameVersions = ['1.18.2']
 		loaders = ['fabric', 'quilt']
 		detectLoaders = false
-		syncBodyFrom = file('modrinth.md').text
 	}
 }
 
@@ -725,4 +728,20 @@ if (System.getenv("CURSE_TOKEN")) {
 			javaVersionAutoDetect = false
 		}
 	}
+}
+
+if (System.getenv("GITHUB_TOKEN")) {
+	githubRelease {
+		token System.getenv("GITHUB_TOKEN")
+		owner "unascribed"
+		repo "Fabrication"
+		tagName 'v'+origVersion
+		releaseName 'v'+origVersion
+		targetCommitish "3.0/1.18"
+		draft false
+		prerelease false
+		releaseAssets remapJar.archivePath
+		allowUploadToExisting true
+	}
+	tasks.githubRelease.dependsOn remapJar
 }
