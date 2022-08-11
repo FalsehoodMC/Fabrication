@@ -123,7 +123,7 @@ public class BlockLogoScreen extends Screen{
 					if (y >= startY) {
 						textRenderer.drawWithShadow(matrices, clr.toString(), 5, y, -1);
 					}
-					if (didClick && mouseX >= 0 && mouseX <= width / 2 && mouseY > y && mouseY < y + 12) {
+					if (didClick && mouseX >= 0 && mouseX <= width / 2 && mouseY > y && mouseY < y + 12 && y > startY) {
 						client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON, 1.2f, 1f));
 						List<String> l = LoaderBlockLogo.fullColorToState.get(selectedColor);
 						l.add(clr.toString());
@@ -150,7 +150,7 @@ public class BlockLogoScreen extends Screen{
 				if (!(y<startY)) {
 					textRenderer.drawWithShadow(matrices, clr, width/2f+5, y, -1);
 				}
-				if (didRClick && mouseX >= 0 && mouseX > width/2 && mouseY > y && mouseY < y+12) {
+				if (didRClick && mouseX >= 0 && mouseX > width/2 && mouseY > y && mouseY < y+12 && y > startY) {
 					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON, 1.2f, 1f));
 					blocks.remove(clr);
 					if (blocks.size() < 1) {
@@ -173,7 +173,7 @@ public class BlockLogoScreen extends Screen{
 				y += 12;
 				if (y>height) break;
 			}
-			rightBar.displayHeight = blocks.size()*12+8;
+			rightBar.height = blocks.size()*12+8;
 		}
 		blockLogo.drawLogo(false, 0, delta);
 		if (didClick) didClick = false;

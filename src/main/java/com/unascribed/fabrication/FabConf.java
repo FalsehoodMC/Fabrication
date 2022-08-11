@@ -147,7 +147,9 @@ public class FabConf {
 		} catch (Throwable t) {
 			setMet(SpecialEligibility.NO_OPTIFINE, true);
 		}
-		setMet(SpecialEligibility.NOT_MACOS, Platform.get() != Platform.MACOSX);
+		if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+			determineClientEligibility();
+		}
 		setMet(SpecialEligibility.NOT_1191, FabricLoader.getInstance().getModContainer("minecraft").get().getMetadata().getVersion().toString().equals("1.19"));
 		if (FabConf.class.getClassLoader().getResource("default_features_config.ini") == null) {
 			throw devError("You must run build-features.sh before running the game.");
@@ -203,6 +205,11 @@ public class FabConf {
 
 	public static boolean hasWorldPath(){
 		return worldPath != null;
+	}
+
+	@Environment(EnvType.CLIENT)
+	private static void determineClientEligibility() {
+		setMet(SpecialEligibility.NOT_MACOS, Platform.get() != Platform.MACOSX);
 	}
 
 	public static void setWorldPath(Path path) {

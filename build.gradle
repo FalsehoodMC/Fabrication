@@ -1,3 +1,13 @@
+buildscript {
+	repositories {
+		gradlePluginPortal()
+	}
+	dependencies {
+		classpath 'com.modrinth.minotaur:Minotaur:2.4.3'
+		classpath 'gradle.plugin.com.matthewprenger:CurseGradle:1.4.0'
+	}
+}
+
 import com.google.common.collect.ImmutableList
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
@@ -15,10 +25,18 @@ plugins {
 	id 'maven-publish'
 }
 
+if (System.getenv("MODRINTH_TOKEN")) {
+	apply plugin: "com.modrinth.minotaur"
+}
+if (System.getenv("CURSE_TOKEN")) {
+	apply plugin: "com.matthewprenger.cursegradle"
+}
+
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
 archivesBaseName = project.archives_base_name
+def origVersion = project.version
 version = project.version+"+1.19"
 group = project.maven_group
 
@@ -668,4 +686,44 @@ class Mapp{
 	public List<String> mixin
 	public List<String> method
 	public List<Target> target
+}
+
+if (System.getenv("MODRINTH_TOKEN")) {
+	modrinth {
+		token = System.getenv("MODRINTH_TOKEN")
+		projectId = 'fabrication'
+		versionNumber = project.version
+		versionName = 'v'+origVersion
+		versionType = 'release'
+		uploadFile = remapJar
+		gameVersions = ['1.19', '1.19.1', '1.19.2']
+		loaders = ['fabric', 'quilt']
+		detectLoaders = false
+		syncBodyFrom = file('modrinth.md').text
+	}
+}
+
+if (System.getenv("CURSE_TOKEN")) {
+	curseforge {
+		apiKey = System.getenv("CURSE_TOKEN")
+		project {
+			id = '414445'
+			releaseType = 'release'
+
+			addGameVersion '1.19'
+			addGameVersion '1.19.1'
+			addGameVersion '1.19.2'
+			addGameVersion 'Fabric'
+			addGameVersion 'Quilt'
+
+			mainArtifact(remapJar) {
+				displayName = '['+project.minecraft_version+'] v'+origVersion
+			}
+		}
+		options {
+			javaIntegration = false
+			forgeGradleIntegration = false
+			javaVersionAutoDetect = false
+		}
+	}
 }

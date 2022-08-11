@@ -1,22 +1,24 @@
 package com.unascribed.fabrication.mixin.i_woina.end_portal_parallax;
 
+import com.unascribed.fabrication.support.injection.FabInject;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.entity.EndGatewayBlockEntity;
 import net.minecraft.block.entity.EndPortalBlockEntity;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.block.entity.EndPortalBlockEntityRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Matrix4f;
 import org.lwjgl.system.MemoryStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -25,6 +27,8 @@ import com.unascribed.fabrication.client.GLUPort;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.SpecialEligibility;
 
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.Random;
 import static com.unascribed.lib39.deferral.api.RenderBridge.*;
 
@@ -40,42 +44,33 @@ public abstract class MixinEndPortalBlockEntityRenderer {
 	@Final
 	public static Identifier SKY_TEXTURE;
 
-
-	@Shadow
-	protected abstract float getTopYOffset();
-	@Shadow
-	protected abstract float getBottomYOffset();
-	
 	@Unique
 	private static final Random RANDOM = new Random(31100L);
 
-	@Inject(at = @At("HEAD"), method = "render", cancellable = true)
-	public void fabrication$render(EndPortalBlockEntity be, float tickDelta, MatrixStack poseStack, VertexConsumerProvider multiBufferSource, int light, int overlay, CallbackInfo ci) {
-		if (canUseCompatFunctions() && FabConf.isEnabled("*.end_portal_parallax")) {
+	@FabInject(at=@At("HEAD"), method="renderSide(Lnet/minecraft/block/entity/EndPortalBlockEntity;Lnet/minecraft/util/math/Matrix4f;Lnet/minecraft/client/render/VertexConsumer;FFFFFFFFLnet/minecraft/util/math/Direction;)V", cancellable=true)
+	public void fabrication$render(EndPortalBlockEntity be, Matrix4f model, VertexConsumer vertices, float x1, float x2, float y1, float y2, float z1, float z2, float z3, float z4, Direction side, CallbackInfo ci) {
+		if (canUseCompatFunctions() && FabConf.isEnabled("*.end_portal_parallax") && be.shouldDrawSide(side)) {
 			// YOU try to make it work with the gateway, I DARE YOU
 			if (be instanceof EndGatewayBlockEntity) return;
-			
 			ci.cancel();
+			if (side.getHorizontal() != -1) return;
 			// ABANDON  ALL HOPE
 			// YE WHO ENTER HERE
 			MinecraftClient mc = MinecraftClient.getInstance();
-			try (var stack = MemoryStack.stackPush()) {
-				var pos = be.getPos();
-				float blockX = 0;
-				float blockY = 0;
-				float blockZ = 0;
-				
-				var viewportBuffer = stack.mallocInt(4);
-				var scratchBuffer = stack.mallocFloat(16);
-				var crosshairsPos = stack.mallocFloat(3);
-				var projBuffer = stack.mallocFloat(16);
+			try (MemoryStack stack = MemoryStack.stackPush()) {
+				BlockPos pos = be.getPos();
+
+				IntBuffer viewportBuffer = stack.mallocInt(4);
+				FloatBuffer scratchBuffer = stack.mallocFloat(16);
+				FloatBuffer crosshairsPos = stack.mallocFloat(3);
+				FloatBuffer projBuffer = stack.mallocFloat(16);
 
 				glGetIntegerv(GL_VIEWPORT, viewportBuffer);
-				float viewportCX = (viewportBuffer.get(0) + viewportBuffer.get(2)) / 2;
-				float viewportCY = (viewportBuffer.get(1) + viewportBuffer.get(3)) / 2;
-				var scratchMat = RenderSystem.getModelViewMatrix().copy();
-				var projMatrix = RenderSystem.getProjectionMatrix().copy();
-				scratchMat.multiply(poseStack.peek().getPositionMatrix());
+				float viewportCX = (viewportBuffer.get(0) + viewportBuffer.get(2)) / 2f;
+				float viewportCY = (viewportBuffer.get(1) + viewportBuffer.get(3)) / 2f;
+				Matrix4f scratchMat = RenderSystem.getModelViewMatrix().copy();
+				Matrix4f projMatrix = RenderSystem.getProjectionMatrix().copy();
+				scratchMat.multiply(model);
 				projMatrix.writeColumnMajor(projBuffer);
 				scratchMat.writeColumnMajor(scratchBuffer);
 
@@ -91,19 +86,17 @@ public abstract class MixinEndPortalBlockEntityRenderer {
 				float crosshairsX = crosshairsPos.get(0);
 				float crosshairsY = crosshairsPos.get(1);
 				float crosshairsZ = crosshairsPos.get(2);
-				
+
 				float baseTexTransX = pos.getX();
 				float baseTexTransY = pos.getY();
 				float baseTexTransZ = pos.getZ();
-				glPushMCMatrix(poseStack);
+				glPushMCMatrix();
+				glMultMatrixf(model);
 				glEnable(GL_TEXTURE_2D);
 				glEnable(GL_DEPTH_TEST);
 				glDepthFunc(GL_LEQUAL);
 				glDisable(GL_LIGHTING);
-				
-				float topY = getTopYOffset();
-				float bottomY = getBottomYOffset();
-				
+
 				RANDOM.setSeed(31100L);
 				for (int i = 0; i < 16; ++i) {
 					glPushMatrix();
@@ -125,14 +118,19 @@ public abstract class MixinEndPortalBlockEntityRenderer {
 						glBlendFunc(GL_ONE, GL_ONE);
 						scale = 0.5f;
 					}
-
-					float crosshairs = crosshairsY;
-					float surface = topY;
-					float projRelSurf = surface + crosshairs; // projection relative surface
-					float layerY = surface + ri + crosshairs;
-					float texTransY = projRelSurf / layerY;
-					texTransY += blockY + topY;
-					glTranslatef(baseTexTransX, texTransY, baseTexTransZ);
+					float projRelSurf = 1;
+					float texTrans = baseTexTransY;
+					switch (side) {
+						case UP:
+							projRelSurf = y1 + crosshairsY;
+							texTrans = (projRelSurf / (ri + projRelSurf)) + y1;
+							break;
+						case DOWN:
+							projRelSurf = y1 - crosshairsY+1;
+							texTrans = (projRelSurf / (ri + projRelSurf)) + y1;
+							break;
+					}
+					glTranslatef(baseTexTransX, texTrans, baseTexTransZ);
 					glPushMatrix();
 						glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
 						glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
@@ -154,8 +152,7 @@ public abstract class MixinEndPortalBlockEntityRenderer {
 					glRotatef((i * i * 4321 + i * 9) * 2, 0, 0, 1);
 					glTranslatef(-0.5f, -0.5f, 0);
 					glTranslatef(-baseTexTransX, -baseTexTransZ, -baseTexTransY);
-					projRelSurf = surface + crosshairsY;
-					glTranslatef(crosshairsX * ri / projRelSurf, crosshairsZ * ri / projRelSurf, -baseTexTransY);
+					glTranslatef(crosshairsX * ri / projRelSurf, crosshairsZ * ri / projRelSurf, crosshairsY *ri / projRelSurf);
 					float r = RANDOM.nextFloat() * 0.5f + 0.1f;
 					float g = RANDOM.nextFloat() * 0.5f + 0.4f;
 					float b = RANDOM.nextFloat() * 0.5f + 0.5f;
@@ -165,10 +162,10 @@ public abstract class MixinEndPortalBlockEntityRenderer {
 
 					glColor4f(r * brightness, g * brightness, b * brightness, 1);
 					glBegin(GL_QUADS);
-						glVertex3d(blockX  , blockY + topY, blockZ  );
-						glVertex3d(blockX  , blockY + topY, blockZ+1);
-						glVertex3d(blockX+1, blockY + topY, blockZ+1);
-						glVertex3d(blockX+1, blockY + topY, blockZ  );
+						glVertex3d(x1, y1, z1);
+						glVertex3d(x2, y1, z2);
+						glVertex3d(x2, y2, z3);
+						glVertex3d(x1, y2, z4);
 					glEnd();
 					glPopMatrix();
 					glMatrixMode(GL_MODELVIEW);
