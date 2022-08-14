@@ -127,7 +127,7 @@ public abstract class MixinEndPortalBlockEntityRenderer {
 							break;
 						case DOWN:
 							projRelSurf = y1 - crosshairsY+1;
-							texTransY = (projRelSurf / (ri + projRelSurf - y1)) + y1;
+							texTransY = (projRelSurf / (ri + projRelSurf)) + y1;
 							break;
 					}
 					glTranslatef(baseTexTransX, texTransY, baseTexTransZ);
