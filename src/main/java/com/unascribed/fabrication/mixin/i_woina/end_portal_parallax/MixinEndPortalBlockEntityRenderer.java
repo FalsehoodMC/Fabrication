@@ -97,7 +97,6 @@ public abstract class MixinEndPortalBlockEntityRenderer {
 				glDepthFunc(GL_LEQUAL);
 				glDisable(GL_LIGHTING);
 				RANDOM.setSeed(31100L);
-				float yOffset = 0.75F;
 
 				for (int i = 0; i < 16; ++i) {
 					glPushMatrix();
@@ -119,22 +118,17 @@ public abstract class MixinEndPortalBlockEntityRenderer {
 						glBlendFunc(GL_ONE, GL_ONE);
 						scale = 0.5F;
 					}
-					float surfaceY;
 					float projRelSurf = 1;
-					float layerY;
-					float texTransY = 1;
+					float texTransY = baseTexTransY;
 					switch (side) {
 						case UP:
-							surfaceY = (float) (-(0 + (double) yOffset));
-							projRelSurf = surfaceY + crosshairsY; // projection relative surface
-							layerY = surfaceY + ri + crosshairsY;
-							texTransY = projRelSurf / layerY;
-							texTransY += 0 + yOffset;
+							projRelSurf = crosshairsY - y1;
+							texTransY = (projRelSurf / (ri + crosshairsY - y1)) + y1;
 							break;
 						case DOWN:
 							projRelSurf = y1 - crosshairsY+1;
-							texTransY = (projRelSurf / (ri + projRelSurf)) + y1;  // SOMEONE else can fix this, but lets be honest nobody will notice
-							break;                                                // on that note, i hope markus persson breaks all of his limbs
+							texTransY = (projRelSurf / (ri + projRelSurf - y1)) + y1;
+							break;
 					}
 					glTranslatef(baseTexTransX, texTransY, baseTexTransZ);
 					glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
