@@ -123,12 +123,30 @@ public abstract class MixinEndPortalBlockEntityRenderer {
 					switch (side) {
 						case UP:
 							projRelSurf = crosshairsY - y1;
-							texTransY = (projRelSurf / (ri + crosshairsY - y1)) + y1;
+							texTransY = (projRelSurf / (ri + projRelSurf)) + y1;
 							break;
 						case DOWN:
 							projRelSurf = y1 - crosshairsY+1;
 							texTransY = (projRelSurf / (ri + projRelSurf)) + y1;
 							break;
+						/*
+						case WEST:
+							projRelSurf = x1 - crosshairsX+1;
+							texTransY = 0;
+							break;
+						case EAST:
+							projRelSurf = crosshairsX - x1;
+							texTransY = 0;
+							break;
+						case NORTH:
+							projRelSurf = z1 - crosshairsZ+1;
+							texTransY = 0;
+							break;
+						case SOUTH:
+							projRelSurf = crosshairsZ - z1;
+							texTransY = 0;
+							break;
+						*/
 					}
 					glTranslatef(baseTexTransX, texTransY, baseTexTransZ);
 					glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
@@ -148,12 +166,40 @@ public abstract class MixinEndPortalBlockEntityRenderer {
 					glPushMatrix();
 					glLoadIdentity();
 					glTranslatef(0.0F, Util.getMeasuringTimeMs() % 700000L / 700000.0F, 0.0F);
+					/*
+					switch (side) {
+						case WEST:
+							glRotatef(90, 0, 90, 0);
+							glScalef(2, 4, 2);
+							break;
+						case NORTH:
+							glRotatef(90, 90, 270, 90);
+							glScalef(1, 2, 1);
+							break;
+					}
+					*/
 					glScalef(scale, scale, scale);
 					glTranslatef(0.5F, 0.5F, 0.0F);
 					glRotatef((i * i * 4321 + i * 9) * 2.0F, 0.0F, 0.0F, 1.0F);
 					glTranslatef(-0.5F, -0.5F, 0.0F);
 					glTranslatef(-baseTexTransX, -baseTexTransZ, -baseTexTransY);
 					glTranslatef(crosshairsX * ri / projRelSurf, crosshairsZ * ri / projRelSurf, -baseTexTransY);
+					/*
+					switch (side) {
+						case UP:
+						case DOWN:
+							glTranslatef(crosshairsX * ri / projRelSurf, crosshairsZ * ri / projRelSurf, -baseTexTransY);
+							break;
+						case WEST:
+						case EAST:
+							glTranslatef(crosshairsX * ri / projRelSurf, crosshairsZ * ri / projRelSurf, -baseTexTransX);
+							break;
+						case NORTH:
+						case SOUTH:
+							glTranslatef(crosshairsX * ri / projRelSurf, crosshairsZ * ri / projRelSurf, -baseTexTransZ);
+							break;
+					}
+					*/
 					float r = RANDOM.nextFloat() * 0.5F + 0.1F;
 					float g = RANDOM.nextFloat() * 0.5F + 0.4F;
 					float b = RANDOM.nextFloat() * 0.5F + 0.5F;
