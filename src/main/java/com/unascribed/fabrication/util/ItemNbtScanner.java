@@ -1,13 +1,26 @@
 package com.unascribed.fabrication.util;
 
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtString;
 import net.minecraft.nbt.NbtType;
 import net.minecraft.nbt.scanner.NbtScanner;
+import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 //searches nbt for an item identifier returns CONTINUE on fail, HALT on success
 public class ItemNbtScanner implements NbtScanner {
-	Result ret = Result.CONTINUE;
+	public static final ItemNbtScanner INSTANCE = new ItemNbtScanner();
+	public static final TagKey<Item> EXCEPTIONS = TagKey.of(Registry.ITEM_KEY, new Identifier("fabrication", "exclude_from_item_inventory_check"));
+	public static boolean hasItemInvNBT(ItemStack stack) {
+		if (stack.isIn(EXCEPTIONS)) return false;
+		NbtCompound tag = stack.getNbt();
+		return tag != null && tag.doAccept(INSTANCE.reset()) == Result.HALT;
+	}
+	public Result ret = Result.CONTINUE;
 	@Override
 	public Result visitEnd() {
 		return ret;
@@ -74,7 +87,8 @@ public class ItemNbtScanner implements NbtScanner {
 
 	@Override
 	public NestedResult visitSubNbtType(NbtType<?> type) {
-		return NestedResult.ENTER;
+		if (type == NbtList.TYPE || type == NbtString.TYPE || type == NbtCompound.TYPE) return NestedResult.ENTER;
+		return NestedResult.SKIP;
 	}
 
 	@Override
@@ -95,5 +109,10 @@ public class ItemNbtScanner implements NbtScanner {
 	@Override
 	public Result start(NbtType<?> rootType) {
 		return Result.CONTINUE;
+	}
+
+	public ItemNbtScanner reset() {
+		ret = Result.CONTINUE;
+		return this;
 	}
 }
