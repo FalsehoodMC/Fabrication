@@ -124,15 +124,11 @@ public class FabInjector {
 		return discoveredRedirects;
 	}
 	public static Map<String, String> transformRedirectsToOriginalNames(Map<String, String> redirects, ClassNode targetClass) {
-		Map<String, String> methodMap = new HashMap<>();
+		Map<String, String> ret = new HashMap<>();
 		for (MethodNode mth : targetClass.methods) {
 			if (!(mth instanceof MethodNodeEx)) continue;
-			methodMap.put(((MethodNodeEx) mth).getOriginalName(), mth.name);
-		}
-		Map<String, String> ret = new HashMap<>();
-		for (Map.Entry<String, String> entry : redirects.entrySet()) {
-			String mapped = methodMap.get(entry.getKey());
-			ret.put(mapped != null ? mapped : entry.getKey(), entry.getValue());
+			String val = redirects.get(((MethodNodeEx) mth).getOriginalName());
+			if (val != null) ret.put(mth.name, val);
 		}
 		return ret;
 	}
