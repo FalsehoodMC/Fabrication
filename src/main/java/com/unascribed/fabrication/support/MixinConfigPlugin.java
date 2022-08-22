@@ -17,7 +17,6 @@ import com.unascribed.fabrication.support.injection.FailsoftCallbackInjectionInf
 import com.unascribed.fabrication.support.injection.FailsoftModifyArgInjectionInfo;
 import com.unascribed.fabrication.support.injection.FailsoftModifyArgsInjectionInfo;
 import com.unascribed.fabrication.support.injection.FailsoftModifyVariableInjectionInfo;
-import com.unascribed.fabrication.support.injection.TrackingRedirectInjectionInfo;
 import com.unascribed.fabrication.support.injection.FabInjector;
 import com.unascribed.fabrication.support.injection.Hijack;
 import com.unascribed.fabrication.support.injection.ModifyReturn;
@@ -60,8 +59,6 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	@Override
 	public void onLoad(String mixinPackage) {
 		FabConf.reload();
-		FabLog.warn("Fabrication is about to inject into Mixin to add support for redirect tracking.");
-		InjectionInfo.register(TrackingRedirectInjectionInfo.class);
 		InjectionInfo.register(FailsoftCallbackInjectionInfo.class);
 		InjectionInfo.register(FailsoftModifyArgInjectionInfo.class);
 		InjectionInfo.register(FailsoftModifyArgsInjectionInfo.class);
