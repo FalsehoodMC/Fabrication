@@ -35,7 +35,7 @@ public abstract class MixinEntityDamageSource {
 		if (!FabConf.isEnabled("*.killmessage")) return;
 		Entity attacker = ((EntityDamageSource)(Object)this).getAttacker();
 		if (attacker instanceof GetKillMessage) {
-			Iterator<ItemStack> iter = attacker.getItemsHand().iterator();
+			Iterator<ItemStack> iter = attacker.getHandItems().iterator();
 			ItemStack held;
 			if (iter.hasNext()) {
 				held = iter.next();

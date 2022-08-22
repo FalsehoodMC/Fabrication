@@ -97,7 +97,9 @@ dependencies {
 	modImplementation(include('io.github.queerbric:pridelib:1.1.2+1.19')) {
 		transitive = false
 	}
-	modImplementation('com.terraformersmc:modmenu:4.0.0') {
+	//ModMenu dep
+	modImplementation fabricApi.module('fabric-lifecycle-events-v1', project.fabric_version)
+	modImplementation('com.terraformersmc:modmenu:4.0.6') {
 		transitive = false
 	}
 	modImplementation 'com.unascribed:ears-api:1.4.5'

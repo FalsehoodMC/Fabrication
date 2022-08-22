@@ -4,34 +4,27 @@ import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 
-import com.unascribed.fabrication.support.injection.FabInject;
-import net.minecraft.client.gui.screen.CommandSuggestor;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_KP_ENTER;
 
+import com.unascribed.fabrication.support.injection.Hijack;
+import com.unascribed.fabrication.support.injection.HijackReturn;
+import net.minecraft.client.gui.screen.ChatInputSuggestor;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(targets="net.minecraft.client.gui.screen.CommandSuggestor$SuggestionWindow")
+@Mixin(ChatInputSuggestor.class)
 @EligibleIf(configAvailable="*.enter_selects_highlighted_suggestion", envMatches=Env.CLIENT)
 public abstract class MixinSuggestionWindow {
 
-	@Shadow
-	public abstract void complete();
-
-	@Shadow
-	private boolean completed;
-
-	@FabInject(at=@At(value="HEAD"), method="keyPressed(III)Z", cancellable=true)
-	public void onStoppedUsing(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
-		if (!FabConf.isEnabled("*.enter_selects_highlighted_suggestion")) return;
-		if ((keyCode == GLFW_KEY_ENTER || keyCode == GLFW_KEY_KP_ENTER) && !this.completed){
-			this.complete();
-			cir.setReturnValue(true);
+	@Hijack(method="keyPressed(III)Z", target="Lnet/minecraft/client/gui/screen/ChatInputSuggestor$SuggestionWindow;keyPressed(III)Z")
+	private static HijackReturn fabrication$enterAcceptsSuggestion(ChatInputSuggestor.SuggestionWindow window, int keyCode, int scanCode, int modifiers) {
+		if (!FabConf.isEnabled("*.enter_selects_highlighted_suggestion")) return null;
+		if ((keyCode == GLFW_KEY_ENTER || keyCode == GLFW_KEY_KP_ENTER) && window instanceof AccessorSuggestionWindow && !((AccessorSuggestionWindow) window).fabrication$getCompleated()){
+			window.complete();
+			return HijackReturn.FALSE;
 		}
+		return null;
 	}
 
 

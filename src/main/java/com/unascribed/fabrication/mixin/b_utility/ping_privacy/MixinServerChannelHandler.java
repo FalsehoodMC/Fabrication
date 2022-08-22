@@ -12,7 +12,7 @@ import com.unascribed.fabrication.support.SpecialEligibility;
 import io.netty.channel.Channel;
 
 @Mixin(targets="net.minecraft.server.ServerNetworkIo$1")
-@EligibleIf(configAvailable="*.ping_privacy", specialConditions=SpecialEligibility.NOT_1191)
+@EligibleIf(configAvailable="*.ping_privacy")
 public class MixinServerChannelHandler {
 
 	@FabInject(at=@At(value="INVOKE", target="net/minecraft/server/MinecraftServer.getRateLimit()I"),
