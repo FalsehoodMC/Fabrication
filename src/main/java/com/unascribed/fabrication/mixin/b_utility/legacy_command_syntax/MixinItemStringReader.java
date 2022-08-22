@@ -66,7 +66,7 @@ public class MixinItemStringReader {
 					i = LegacyIDs.lookup(numIdI, 0);
 					metaAsDamage = true;
 					if (i == null) {
-						return new HijackReturn(Optional.empty());
+						return HijackReturn.OPTIONAL_EMPTY;
 					}
 				}
 				if (i.isDamageable() && metaAsDamage) {
