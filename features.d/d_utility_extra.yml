@@ -70,7 +70,7 @@ utility.extra.enter_selects_highlighted_suggestion:
 utility.extra.chat_markdown:
 	name: Chat Markdown
 	since: 2.3.0
-	sides: server_only
+	sides: client_only
 	media: https://unascribed.com/fabrication/chat_markdown.mp4
 	desc:
 		Adds bold, strikethrough, underscore and italic markdown to chat.
@@ -94,7 +94,7 @@ utility.extra.ping_privacy:
 		track their uptime and who's connected, which will then turn around and store the name
 		history of discovered users permanently and make their cape publicly searchable, among
 		other things.
-		
+
 		Does not work on 1.19.1.
 
 # kate: space-indent off

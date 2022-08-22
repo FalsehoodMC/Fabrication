@@ -3,9 +3,8 @@ package com.unascribed.fabrication.mixin.b_utility.linkify_urls;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.util.Regex;
-import net.minecraft.client.gui.hud.InGameHud;
+import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
@@ -18,20 +17,20 @@ import com.unascribed.fabrication.support.injection.FabModifyVariable;
 
 import java.util.regex.Matcher;
 
-@Mixin(InGameHud.class)
-@EligibleIf(configAvailable="*.linkify_urls", envMatches=Env.CLIENT, specialConditions=SpecialEligibility.NOT_1191)
-public class MixinInGameHud {
+@Mixin(ChatHud.class)
+@EligibleIf(configAvailable="*.linkify_urls", envMatches=Env.CLIENT)
+public class MixinChatHud {
 
-	@FabModifyVariable(at=@At(value="HEAD"), method="onChatMessage(Lnet/minecraft/network/message/MessageType;Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSender;)V", argsOnly=true)
+	@FabModifyVariable(at=@At(value="HEAD"), method="addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;ILnet/minecraft/client/gui/hud/MessageIndicator;Z)V", argsOnly=true)
 	public Text consume(Text message) {
 		if (!FabConf.isEnabled("*.linkify_urls")) return message;
 		if (!(message instanceof MutableText && message.getContent() instanceof TranslatableTextContent && "chat.type.text".equals(((TranslatableTextContent)message.getContent()).getKey()))) return message;
 		Object[] args = ((TranslatableTextContent)message.getContent()).getArgs();
 		boolean anyMatch = false;
 		for (int i=0; i<args.length; i++) {
-			if (args[i] instanceof String && !((String)args[i]).isEmpty()) {
+			if (args[i] instanceof MutableText) {
 				MutableText newLine = null;
-				String astr = (String) args[i];
+				String astr = ((MutableText) args[i]).getString();
 				Matcher matcher = Regex.webUrl.matcher(astr);
 				int last = 0;
 				while (matcher.find()) {

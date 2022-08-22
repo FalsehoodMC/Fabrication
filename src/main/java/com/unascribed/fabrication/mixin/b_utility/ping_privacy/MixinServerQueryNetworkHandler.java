@@ -32,7 +32,7 @@ import net.minecraft.server.network.ServerQueryNetworkHandler;
 import net.minecraft.util.Formatting;
 
 @Mixin(ServerQueryNetworkHandler.class)
-@EligibleIf(configAvailable="*.ping_privacy", specialConditions=SpecialEligibility.NOT_1191)
+@EligibleIf(configAvailable="*.ping_privacy")
 public class MixinServerQueryNetworkHandler {
 
 	@Shadow @Final
