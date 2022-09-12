@@ -97,7 +97,6 @@ public abstract class MixinEndPortalBlockEntityRenderer {
 				glDepthFunc(GL_LEQUAL);
 				glDisable(GL_LIGHTING);
 				RANDOM.setSeed(31100L);
-				float yOffset = 0.75F;
 
 				for (int i = 0; i < 16; ++i) {
 					glPushMatrix();
@@ -119,22 +118,35 @@ public abstract class MixinEndPortalBlockEntityRenderer {
 						glBlendFunc(GL_ONE, GL_ONE);
 						scale = 0.5F;
 					}
-					float surfaceY;
 					float projRelSurf = 1;
-					float layerY;
-					float texTransY = 1;
+					float texTransY = baseTexTransY;
 					switch (side) {
 						case UP:
-							surfaceY = (float) (-(0 + (double) yOffset));
-							projRelSurf = surfaceY + crosshairsY; // projection relative surface
-							layerY = surfaceY + ri + crosshairsY;
-							texTransY = projRelSurf / layerY;
-							texTransY += 0 + yOffset;
+							projRelSurf = crosshairsY - y1;
+							texTransY = (projRelSurf / (ri + projRelSurf)) + y1;
 							break;
 						case DOWN:
 							projRelSurf = y1 - crosshairsY+1;
-							texTransY = (projRelSurf / (ri + projRelSurf)) + y1;  // SOMEONE else can fix this, but lets be honest nobody will notice
-							break;                                                // on that note, i hope markus persson breaks all of his limbs
+							texTransY = (projRelSurf / (ri + projRelSurf)) + y1;
+							break;
+						/*
+						case WEST:
+							projRelSurf = x1 - crosshairsX+1;
+							texTransY = 0;
+							break;
+						case EAST:
+							projRelSurf = crosshairsX - x1;
+							texTransY = 0;
+							break;
+						case NORTH:
+							projRelSurf = z1 - crosshairsZ+1;
+							texTransY = 0;
+							break;
+						case SOUTH:
+							projRelSurf = crosshairsZ - z1;
+							texTransY = 0;
+							break;
+						*/
 					}
 					glTranslatef(baseTexTransX, texTransY, baseTexTransZ);
 					glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
@@ -154,12 +166,40 @@ public abstract class MixinEndPortalBlockEntityRenderer {
 					glPushMatrix();
 					glLoadIdentity();
 					glTranslatef(0.0F, Util.getMeasuringTimeMs() % 700000L / 700000.0F, 0.0F);
+					/*
+					switch (side) {
+						case WEST:
+							glRotatef(90, 0, 90, 0);
+							glScalef(2, 4, 2);
+							break;
+						case NORTH:
+							glRotatef(90, 90, 270, 90);
+							glScalef(1, 2, 1);
+							break;
+					}
+					*/
 					glScalef(scale, scale, scale);
 					glTranslatef(0.5F, 0.5F, 0.0F);
 					glRotatef((i * i * 4321 + i * 9) * 2.0F, 0.0F, 0.0F, 1.0F);
 					glTranslatef(-0.5F, -0.5F, 0.0F);
 					glTranslatef(-baseTexTransX, -baseTexTransZ, -baseTexTransY);
 					glTranslatef(crosshairsX * ri / projRelSurf, crosshairsZ * ri / projRelSurf, -baseTexTransY);
+					/*
+					switch (side) {
+						case UP:
+						case DOWN:
+							glTranslatef(crosshairsX * ri / projRelSurf, crosshairsZ * ri / projRelSurf, -baseTexTransY);
+							break;
+						case WEST:
+						case EAST:
+							glTranslatef(crosshairsX * ri / projRelSurf, crosshairsZ * ri / projRelSurf, -baseTexTransX);
+							break;
+						case NORTH:
+						case SOUTH:
+							glTranslatef(crosshairsX * ri / projRelSurf, crosshairsZ * ri / projRelSurf, -baseTexTransZ);
+							break;
+					}
+					*/
 					float r = RANDOM.nextFloat() * 0.5F + 0.1F;
 					float g = RANDOM.nextFloat() * 0.5F + 0.4F;
 					float b = RANDOM.nextFloat() * 0.5F + 0.5F;
