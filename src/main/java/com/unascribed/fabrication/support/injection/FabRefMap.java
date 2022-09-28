@@ -34,7 +34,7 @@ public class FabRefMap {
 				line++;
 				int i = l.indexOf(' ');
 				if (i == -1) {
-					FabLog.error("Bad relative key on line "+line);
+					FabLog.error("Bad abs key on line "+line);
 					continue;
 				}
 				targetMap.put(l.substring(0, i), l.substring(i + 1));
