@@ -15,7 +15,6 @@ import com.unascribed.fabrication.support.injection.FabModifyConstInjectionInfo;
 import com.unascribed.fabrication.support.injection.FabRefMap;
 import com.unascribed.fabrication.support.injection.FailsoftCallbackInjectionInfo;
 import com.unascribed.fabrication.support.injection.FailsoftModifyArgInjectionInfo;
-import com.unascribed.fabrication.support.injection.FailsoftModifyArgsInjectionInfo;
 import com.unascribed.fabrication.support.injection.FailsoftModifyVariableInjectionInfo;
 import com.unascribed.fabrication.support.injection.TrackingRedirectInjectionInfo;
 import com.unascribed.fabrication.support.injection.FabInjector;
@@ -64,7 +63,6 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		InjectionInfo.register(TrackingRedirectInjectionInfo.class);
 		InjectionInfo.register(FailsoftCallbackInjectionInfo.class);
 		InjectionInfo.register(FailsoftModifyArgInjectionInfo.class);
-		InjectionInfo.register(FailsoftModifyArgsInjectionInfo.class);
 		InjectionInfo.register(FailsoftModifyVariableInjectionInfo.class);
 		InjectionInfo.register(FabModifyConstInjectionInfo.class);
 	}
