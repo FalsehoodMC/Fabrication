@@ -21,13 +21,13 @@ sourceCompatibility = compileJava.sourceCompatibility = '8'
 targetCompatibility = compileJava.targetCompatibility = '17'
 
 minecraft {
-    mappings channel: 'official', version: '1.18.1'
+    mappings channel: 'official', version: '1.18.2'
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.18.1-39.0.6'
+    minecraft 'net.minecraftforge:forge:1.18.2-40.1.0'
 }
 
 jar.finalizedBy('reobfJar') 
