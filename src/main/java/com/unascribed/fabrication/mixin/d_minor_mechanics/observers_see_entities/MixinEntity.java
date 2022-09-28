@@ -27,14 +27,7 @@ import net.minecraft.world.World;
 public abstract class MixinEntity {
 
 	@Shadow
-	public Vec3d pos;
-	@Shadow
 	public World world;
-
-	@Shadow
-	public abstract BlockPos getBlockPos();
-	@Shadow
-	public abstract Box getBoundingBox();
 
 	@FabInject(at=@At("TAIL"), method="move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V")
 	public void move(MovementType type, Vec3d movement, CallbackInfo ci) {
