@@ -24,6 +24,7 @@ balance.disable_prior_work_penalty:
 	name: Disable Prior Work Penalty
 	since: 1.0
 	sides: server_only_with_client_helper
+	fscript: item_stack
 	media: https://unascribed.com/fabrication/disable_prior_work_penalty.mp4
 	desc:
 		Disables the anvil prior work penalty when an item has been worked multiple times. Makes

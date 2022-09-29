@@ -22,6 +22,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -32,9 +33,6 @@ public abstract class MixinItemStack {
 
 	@Shadow
 	public abstract boolean hasEnchantments();
-
-	@Shadow
-	public abstract void addEnchantment(Enchantment enchantment, int level);
 
 	@Shadow
 	private NbtCompound nbt;
@@ -58,30 +56,29 @@ public abstract class MixinItemStack {
 				currentConflicts.remove(rmi);
 			}
 			Enchantment toAddEnchant = Registry.ENCHANTMENT.get(new Identifier(toAdd.getLeft()));
-			Map<Enchantment, Integer> currentEnchantments = null;
+			Map<Enchantment, Integer> currentEnchantments = new HashMap<>();
+			currentEnchantments.put(toAddEnchant, toAdd.getRight());
 			if (this.hasEnchantments()) {
-				currentEnchantments = EnchantmentHelper.get((ItemStack)(Object)this)
-						.entrySet().stream().filter(entry -> {
-							if (!entry.getKey().canCombine(toAddEnchant)) {
-								tag.putInt(String.valueOf(Registry.ENCHANTMENT.getId(entry.getKey())), entry.getValue());
-								return false;
-							}
-							return true;
-						}).collect(Collectors.toMap(Map.Entry::getKey,Map.Entry::getValue));
-				EnchantmentHelper.set(currentEnchantments, (ItemStack)(Object)this);
+				for (Map.Entry<Enchantment, Integer> entry : EnchantmentHelper.get((ItemStack)(Object)this).entrySet()) {
+					if (entry.getKey().canCombine(toAddEnchant)) {
+						currentEnchantments.put(entry.getKey(), entry.getValue());
+					} else {
+						tag.putInt(String.valueOf(Registry.ENCHANTMENT.getId(entry.getKey())), entry.getValue());
+					}
+				}
 			}
 			for (Pair<String, Integer> entry : currentConflicts) {
 				Enchantment enchant = Registry.ENCHANTMENT.get(new Identifier(entry.getLeft()));
-				if (currentEnchantments != null && currentEnchantments.keySet().stream().anyMatch(e->!e.canCombine(enchant))) {
+				if (currentEnchantments.keySet().stream().anyMatch(e->!e.canCombine(enchant))) {
 					tag.putInt(entry.getLeft(), entry.getRight());
-				} else {
-					addEnchantment(enchant, entry.getRight());
+					continue;
 				}
+				currentEnchantments.put(enchant, entry.getRight());
 			}
+			EnchantmentHelper.set(currentEnchantments, (ItemStack)(Object)this);
 			if (!tag.isEmpty()) {
 				nbt.put("fabrication#conflictingEnchants", tag);
 			}
-			addEnchantment(toAddEnchant, toAdd.getRight());
 			world.playSound(null, user.getBlockPos(), SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1, 1);
 			cir.setReturnValue(TypedActionResult.consume((ItemStack)(Object)this));
 		}

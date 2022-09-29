@@ -92,25 +92,25 @@ public class FeatureFabricationCommand implements Feature {
 					for (String key : FeatureTaggablePlayers.validTags.keySet()) {
 						{
 							LiteralArgumentBuilder<ServerCommandSource> literalKey = CommandManager.literal(key);
+							RequiredArgumentBuilder<ServerCommandSource, EntitySelector> playerParameter = CommandManager.argument("players", EntityArgumentType.players()).executes(c -> {
+								return addTag(c, EntityArgumentType.getPlayers(c, "players"), key);
+							});
 							literalKey.executes(c -> {
 										return addTag(c, Collections.singleton(c.getSource().getPlayerOrThrow()), key);
-									})
-									.then(CommandManager.argument("players", EntityArgumentType.players()).executes(c -> {
-										return addTag(c, EntityArgumentType.getPlayers(c, "players"), key);
-									}));
+									}).then(playerParameter);
 							add.then(literalKey);
-							setAltKeys(key, alt -> add.then(LiteralArgumentBuilder.<ServerCommandSource>literal(alt).executes(literalKey.getCommand())));
+							setAltKeys(key, alt -> add.then(LiteralArgumentBuilder.<ServerCommandSource>literal(alt).executes(literalKey.getCommand()).then(playerParameter)));
 						}
 						{
 							LiteralArgumentBuilder<ServerCommandSource> literalKey = CommandManager.literal(key);
+							RequiredArgumentBuilder<ServerCommandSource, EntitySelector> playerParameter = CommandManager.argument("players", EntityArgumentType.players()).executes(c -> {
+								return removeTag(c, EntityArgumentType.getPlayers(c, "players"), key);
+							});
 							literalKey.executes(c -> {
 										return removeTag(c, Collections.singleton(c.getSource().getPlayerOrThrow()), key);
-									})
-									.then(CommandManager.argument("players", EntityArgumentType.players()).executes(c -> {
-										return removeTag(c, EntityArgumentType.getPlayers(c, "players"), key);
-									}));
+									}).then(playerParameter);
 							remove.then(literalKey);
-							setAltKeys(key, alt -> remove.then(LiteralArgumentBuilder.<ServerCommandSource>literal(alt).executes(literalKey.getCommand())));
+							setAltKeys(key, alt -> remove.then(LiteralArgumentBuilder.<ServerCommandSource>literal(alt).executes(literalKey.getCommand()).then(playerParameter)));
 						}
 						{
 							{
