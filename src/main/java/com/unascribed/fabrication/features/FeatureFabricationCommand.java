@@ -43,6 +43,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
+import net.minecraft.command.EntitySelector;
 import net.minecraft.command.argument.DimensionArgumentType;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
@@ -89,25 +90,25 @@ public class FeatureFabricationCommand implements Feature {
 					for (String key : FeatureTaggablePlayers.validTags.keySet()) {
 						{
 							LiteralArgumentBuilder<ServerCommandSource> literalKey = CommandManager.literal(key);
+							RequiredArgumentBuilder<ServerCommandSource, EntitySelector> playerParameter = CommandManager.argument("players", EntityArgumentType.players()).executes(c -> {
+								return addTag(c, EntityArgumentType.getPlayers(c, "players"), key);
+							});
 							literalKey.executes(c -> {
 										return addTag(c, Collections.singleton(c.getSource().getPlayer()), key);
-									})
-									.then(CommandManager.argument("players", EntityArgumentType.players()).executes(c -> {
-										return addTag(c, EntityArgumentType.getPlayers(c, "players"), key);
-									}));
+									}).then(playerParameter);
 							add.then(literalKey);
-							setAltKeys(key, alt -> add.then(LiteralArgumentBuilder.<ServerCommandSource>literal(alt).executes(literalKey.getCommand())));
+							setAltKeys(key, alt -> add.then(LiteralArgumentBuilder.<ServerCommandSource>literal(alt).executes(literalKey.getCommand()).then(playerParameter)));
 						}
 						{
 							LiteralArgumentBuilder<ServerCommandSource> literalKey = CommandManager.literal(key);
+							RequiredArgumentBuilder<ServerCommandSource, EntitySelector> playerParameter = CommandManager.argument("players", EntityArgumentType.players()).executes(c -> {
+								return removeTag(c, EntityArgumentType.getPlayers(c, "players"), key);
+							});
 							literalKey.executes(c -> {
 										return removeTag(c, Collections.singleton(c.getSource().getPlayer()), key);
-									})
-									.then(CommandManager.argument("players", EntityArgumentType.players()).executes(c -> {
-										return removeTag(c, EntityArgumentType.getPlayers(c, "players"), key);
-									}));
+									}).then(playerParameter);
 							remove.then(literalKey);
-							setAltKeys(key, alt -> remove.then(LiteralArgumentBuilder.<ServerCommandSource>literal(alt).executes(literalKey.getCommand())));
+							setAltKeys(key, alt -> remove.then(LiteralArgumentBuilder.<ServerCommandSource>literal(alt).executes(literalKey.getCommand()).then(playerParameter)));
 						}
 						{
 							{
