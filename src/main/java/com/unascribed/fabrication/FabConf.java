@@ -22,7 +22,6 @@ import com.unascribed.fabrication.support.ResolvedConfigValue;
 import com.unascribed.fabrication.support.SpecialEligibility;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.loader.api.FabricLoader;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -148,7 +147,7 @@ public class FabConf {
 		} catch (Throwable t) {
 			setMet(SpecialEligibility.NO_OPTIFINE, true);
 		}
-		if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+		if (Agnos.getCurrentEnv() == Env.CLIENT) {
 			determineClientEligibility();
 		}
 		if (FabConf.class.getClassLoader().getResource("default_features_config.ini") == null) {

@@ -14,7 +14,7 @@ import net.minecraft.screen.AnvilScreenHandler;
 @EligibleIf(configAvailable="*.anvil_damage_only_on_fall", specialConditions=SpecialEligibility.NOT_FORGE)
 public class MixinAnvilScreenHandler {
 
-	@FabModifyConst(constant=@Constant(floatValue=0.12f), method="method_24922")
+	@FabModifyConst(constant=@Constant(floatValue=0.12f), method="onTakeOutput(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/item/ItemStack;)V")
 	private static float modifyDamageChance(float chance) {
 		return FabConf.isEnabled("*.anvil_damage_only_on_fall") ? 0 : chance;
 	}

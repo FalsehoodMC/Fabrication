@@ -15,7 +15,6 @@ import com.unascribed.fabrication.support.injection.FabModifyConstInjectionInfo;
 import com.unascribed.fabrication.support.injection.FabRefMap;
 import com.unascribed.fabrication.support.injection.FailsoftCallbackInjectionInfo;
 import com.unascribed.fabrication.support.injection.FailsoftModifyArgInjectionInfo;
-import com.unascribed.fabrication.support.injection.FailsoftModifyArgsInjectionInfo;
 import com.unascribed.fabrication.support.injection.FailsoftModifyVariableInjectionInfo;
 import com.unascribed.fabrication.support.injection.FabInjector;
 import com.unascribed.fabrication.support.injection.Hijack;
@@ -54,14 +53,44 @@ import java.util.stream.Collectors;
 public class MixinConfigPlugin implements IMixinConfigPlugin {
 
 	private static final SetMultimap<String, String> configKeysForDiscoveredClasses = HashMultimap.create();
+	private static final Set<String> brokenInForge = Set.of(
+			"*.inanimates_can_be_invisible",
+			"*.books_show_enchants",
+			"*.show_bee_count_on_item",
+			"*.hide_armor",
+			"*.legacy_command_syntax",
+			"*.show_map_id",
+			"*.tools_show_important_enchant",
+			"*.rainbow_experience",
+			"*.gradual_block_breaking",
+			"*.launching_pistons",
+			"*.invisibility_splash_on_inanimates",
+			"*.swap_conflicting_enchants",
+			"*.colorful_redstone",
+			"*.grindstone_disenchanting",
+			"*.pursurvers",
+			"*.environmentally_friendly_creepers",
+			"*.interrupting_damage",
+			"*.mobs_dont_drop_ingots",
+			"*.tools_in_bundles",
+			"*.dimensional_tools",
+			"*.photoallergic_creepers",
+			"*.end_portal_parallax",
+			"*.flat_items",
+			"*.classic_block_drops"
+	);
 	public static boolean loadComplete = false;
 
 	@Override
 	public void onLoad(String mixinPackage) {
 		FabConf.reload();
+		if (FabConf.isMet(SpecialEligibility.FORGE)) {
+			for (String s : brokenInForge) {
+				FabConf.addFailure(s);
+			}
+		}
 		InjectionInfo.register(FailsoftCallbackInjectionInfo.class);
 		InjectionInfo.register(FailsoftModifyArgInjectionInfo.class);
-		InjectionInfo.register(FailsoftModifyArgsInjectionInfo.class);
 		InjectionInfo.register(FailsoftModifyVariableInjectionInfo.class);
 		InjectionInfo.register(FabModifyConstInjectionInfo.class);
 	}
