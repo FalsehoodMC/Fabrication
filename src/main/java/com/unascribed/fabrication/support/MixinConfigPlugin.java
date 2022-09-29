@@ -77,7 +77,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			"*.photoallergic_creepers",
 			"*.end_portal_parallax",
 			"*.flat_items",
-			"*.classic_block_drops"
+			"*.classic_block_drops",
+			"*.dropped_items_dont_stack"
 	);
 	public static boolean loadComplete = false;
 
@@ -162,9 +163,13 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 										FabLog.debug("🙈 Dev error! Exploding.");
 										throw FabConf.devError(cn.name.substring(pkg.length()+1).replace('/', '.')+" references an unknown config key "+v+"\n\nDid you forget to add it to features.txt and run build-features.sh?");
 									}
-									if (FabConf.limitRuntimeConfigs() && !FabConf.isEnabled((String) v))
+									if (FabConf.isFailed((String) v)) {
+										eligibilityFailures.add("Required config setting "+ FabConf.remap((String)v)+" has failed injects");
 										eligible = false;
-									if (FabConf.isBanned((String)v)) {
+									} if (FabConf.limitRuntimeConfigs() && !FabConf.isEnabled((String) v)) {
+										eligibilityFailures.add("Required config setting "+ FabConf.remap((String)v)+" is not enabled and limit_runtime_configs is on");
+										eligible = false;
+									} else if (FabConf.isBanned((String)v)) {
 										eligibilityFailures.add("Required config setting "+ FabConf.remap((String)v)+" is banned");
 										eligible = false;
 									} else {
@@ -229,8 +234,14 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 								} else if (k.equals("anyConfigAvailable")) {
 									boolean allBanned = true;
 									boolean runtimeCheck = FabConf.limitRuntimeConfigs();
+									boolean allFailed = true;
 									for (String s : (List<String>)v) {
 										s = FabConf.remap(s);
+										if (FabConf.isFailed(s)) {
+											eligibilityFailures.add("Required config setting "+s+" has failed injects");
+										} else {
+											allFailed = false;
+										}
 										if (runtimeCheck && FabConf.isEnabled(s))
 											runtimeCheck = false;
 										if (FabConf.isBanned(s)) {
@@ -246,9 +257,13 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 											}
 										}
 									}
-									if (runtimeCheck)
+									if (allFailed) {
+										eligibilityFailures.add("All of the relevant config settings failed to inject");
 										eligible = false;
-									if (allBanned) {
+									} else if (runtimeCheck) {
+										eligibilityFailures.add("All of the relevant config settings are off while limit_runtime_configs is on");
+										eligible = false;
+									} else if (allBanned) {
 										eligibilityFailures.add("All of the relevant config settings are banned");
 										eligible = false;
 									}
