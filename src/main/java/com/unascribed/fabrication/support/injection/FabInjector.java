@@ -15,18 +15,24 @@ import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
+import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
+import org.spongepowered.asm.mixin.transformer.ClassInfo;
 import org.spongepowered.asm.util.asm.MethodNodeEx;
 
+import java.lang.reflect.Field;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -55,6 +61,25 @@ public class FabInjector {
 			this.mixin = mixin;
 		}
 	}
+
+	public static Function<ClassInfo, Set<IMixinInfo>> getMixinInfoFromClassInfo = i -> Collections.emptySet();
+	static {
+		try {
+			Field f_mixins = ClassInfo.class.getDeclaredField("mixins");
+			f_mixins.setAccessible(true);
+			getMixinInfoFromClassInfo = info -> {
+				try {
+					return (Set<IMixinInfo>) f_mixins.get(info);
+				} catch (Exception e) {
+					FabLog.error("FabInjector failed to reflect mixin: "+ info.getClassName(), e);
+					return Collections.emptySet();
+				}
+			};
+		} catch (Throwable e) {
+			FabLog.error("FabInjector failed to reflect mixin fields, redirect fixer has been disabled", e);
+		}
+	}
+
 	public static final Set<String> dejavu = new HashSet<>();
 
 	public static class EntryMixinMerged {
@@ -69,10 +94,49 @@ public class FabInjector {
 			this.target = target;
 		}
 	}
+
+	public static Map<String, String> getMixinRedirects(String className) {
+		ClassInfo ci = ClassInfo.fromCache(className);
+		if (ci == null) return Collections.emptyMap();
+		Map<String, String> discoveredRedirects = new HashMap<>();
+		for (IMixinInfo inf : getMixinInfoFromClassInfo.apply(ci)) {
+			ClassNode cn = inf.getClassNode(0);
+			if (cn.methods == null) continue;
+			for (MethodNode mth : cn.methods) {
+				if (mth.visibleAnnotations == null) continue;
+				for (AnnotationNode annotation : mth.visibleAnnotations) {
+					if (!"Lorg/spongepowered/asm/mixin/injection/Redirect;".equals(annotation.desc)) continue;
+					int at = annotation.values.indexOf("at");
+					if (at != -1 && at < annotation.values.size()){
+						Object atNode = annotation.values.get(at+1);
+						if (atNode instanceof AnnotationNode) {
+							AnnotationNode an = (AnnotationNode)atNode;
+							int ani = an.values.indexOf("target");
+							if (ani != -1 && ani < an.values.size()){
+								Object target = an.values.get(ani+1);
+								if (target instanceof String) discoveredRedirects.put(mth.name, (String) target);
+							}
+						}
+					}
+				}
+			}
+		}
+		return discoveredRedirects;
+	}
+	public static Map<String, String> transformRedirectsToOriginalNames(Map<String, String> redirects, ClassNode targetClass) {
+		Map<String, String> ret = new HashMap<>();
+		for (MethodNode mth : targetClass.methods) {
+			if (!(mth instanceof MethodNodeEx)) continue;
+			String val = redirects.get(((MethodNodeEx) mth).getOriginalName());
+			if (val != null) ret.put(mth.name, val);
+		}
+		return ret;
+	}
 	public static void apply(ClassNode targetClass) {
 		apply(targetClass, null);
 	}
 	public static void apply(ClassNode targetClass, List<ToInject> injectIn) {
+		Map<String, String> existingRedirects = transformRedirectsToOriginalNames(getMixinRedirects(targetClass.name), targetClass);
 		List<ToInject> injects = new ArrayList<>();
 		List<EntryMixinMerged> redirects = new ArrayList<>();
 		targetClass.methods.forEach(methodNode -> {
@@ -89,8 +153,8 @@ public class FabInjector {
 					inject = annotationNode;
 				} else if ("Lorg/spongepowered/asm/mixin/transformer/meta/MixinMerged;".equals(annotationNode.desc)) {
 					mixin = (String) annotationNode.values.get(annotationNode.values.indexOf("mixin") + 1);
-					if (TrackingRedirectInjectionInfo.fabrication$allExistingRedirects.containsKey(methodNode.name)) {
-						redirects.add(new EntryMixinMerged(methodNode.name, methodNode.desc, mixin, TrackingRedirectInjectionInfo.fabrication$allExistingRedirects.get(methodNode.name)));
+					if (existingRedirects.containsKey(methodNode.name)) {
+						redirects.add(new EntryMixinMerged(methodNode.name, methodNode.desc, mixin, existingRedirects.get(methodNode.name)));
 					}
 				}
 			}
