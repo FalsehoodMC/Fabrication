@@ -96,18 +96,18 @@ public abstract class MixinEndPortalBlockEntityRenderer {
 				glEnable(GL_DEPTH_TEST);
 				glDepthFunc(GL_LEQUAL);
 				glDisable(GL_LIGHTING);
-
 				RANDOM.setSeed(31100L);
+
 				for (int i = 0; i < 16; ++i) {
 					glPushMatrix();
 					float ri = 16 - i;
-					float scale = 0.0625f;
-					float brightness = 1 / (ri + 1f);
+					float scale = 0.0625F;
+					float brightness = 1.0F / (ri + 1.0F);
 					if (i == 0) {
 						mc.getTextureManager().bindTexture(SKY_TEXTURE);
-						brightness = 0.1f;
-						ri = 65;
-						scale = 0.125f;
+						brightness = 0.1F;
+						ri = 65.0F;
+						scale = 0.125F;
 						glEnable(GL_BLEND);
 						glDefaultBlendFunc();
 					}
@@ -116,56 +116,105 @@ public abstract class MixinEndPortalBlockEntityRenderer {
 						mc.getTextureManager().bindTexture(PORTAL_TEXTURE);
 						glEnable(GL_BLEND);
 						glBlendFunc(GL_ONE, GL_ONE);
-						scale = 0.5f;
+						scale = 0.5F;
 					}
 					float projRelSurf = 1;
-					float texTrans = baseTexTransY;
+					float texTransY = baseTexTransY;
 					switch (side) {
 						case UP:
-							projRelSurf = y1 + crosshairsY;
-							texTrans = (projRelSurf / (ri + projRelSurf)) + y1;
+							projRelSurf = crosshairsY - y1;
+							texTransY = (projRelSurf / (ri + projRelSurf)) + y1;
 							break;
 						case DOWN:
 							projRelSurf = y1 - crosshairsY+1;
-							texTrans = (projRelSurf / (ri + projRelSurf)) + y1;
+							texTransY = (projRelSurf / (ri + projRelSurf)) + y1;
 							break;
+						/*
+						case WEST:
+							projRelSurf = x1 - crosshairsX+1;
+							texTransY = 0;
+							break;
+						case EAST:
+							projRelSurf = crosshairsX - x1;
+							texTransY = 0;
+							break;
+						case NORTH:
+							projRelSurf = z1 - crosshairsZ+1;
+							texTransY = 0;
+							break;
+						case SOUTH:
+							projRelSurf = crosshairsZ - z1;
+							texTransY = 0;
+							break;
+						*/
 					}
-					glTranslatef(baseTexTransX, texTrans, baseTexTransZ);
-					glPushMatrix();
-						glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
-						glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
-						glTexGeni(GL_Q, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
-						glTexGenfv(GL_S, GL_OBJECT_PLANE, new float[] {1, 0, 0, 1});
-						glTexGenfv(GL_T, GL_OBJECT_PLANE, new float[] {0, 0, 1, 1});
-						glTexGenfv(GL_Q, GL_EYE_PLANE,    new float[] {0, 1, 0, 0});
-					glPopMatrix();
+					glTranslatef(baseTexTransX, texTransY, baseTexTransZ);
+					glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+					glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+					glTexGeni(GL_R, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+					glTexGeni(GL_Q, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
+					glTexGenfv(GL_S, GL_OBJECT_PLANE, new float[] {1.0F, 0.0F, 0.0F, 0.0F});
+					glTexGenfv(GL_T, GL_OBJECT_PLANE, new float[] {0.0F, 0.0F, 1.0F, 0.0F});
+					glTexGenfv(GL_R, GL_OBJECT_PLANE, new float[] {0.0F, 0.0F, 0.0F, 1.0F});
+					glTexGenfv(GL_Q, GL_EYE_PLANE, new float[] {0.0F, 1.0F, 0.0F, 0.0F});
 					glEnable(GL_TEXTURE_GEN_S);
 					glEnable(GL_TEXTURE_GEN_T);
+					glEnable(GL_TEXTURE_GEN_R);
 					glEnable(GL_TEXTURE_GEN_Q);
 					glPopMatrix();
 					glMatrixMode(GL_TEXTURE);
 					glPushMatrix();
 					glLoadIdentity();
-					glTranslatef(0F, Util.getMeasuringTimeMs() % 700000 / 700000f, 0);
+					glTranslatef(0.0F, Util.getMeasuringTimeMs() % 700000L / 700000.0F, 0.0F);
+					/*
+					switch (side) {
+						case WEST:
+							glRotatef(90, 0, 90, 0);
+							glScalef(2, 4, 2);
+							break;
+						case NORTH:
+							glRotatef(90, 90, 270, 90);
+							glScalef(1, 2, 1);
+							break;
+					}
+					*/
 					glScalef(scale, scale, scale);
-					glTranslatef(0.5f, 0.5f, 0);
-					glRotatef((i * i * 4321 + i * 9) * 2, 0, 0, 1);
-					glTranslatef(-0.5f, -0.5f, 0);
+					glTranslatef(0.5F, 0.5F, 0.0F);
+					glRotatef((i * i * 4321 + i * 9) * 2.0F, 0.0F, 0.0F, 1.0F);
+					glTranslatef(-0.5F, -0.5F, 0.0F);
 					glTranslatef(-baseTexTransX, -baseTexTransZ, -baseTexTransY);
-					glTranslatef(crosshairsX * ri / projRelSurf, crosshairsZ * ri / projRelSurf, crosshairsY *ri / projRelSurf);
-					float r = RANDOM.nextFloat() * 0.5f + 0.1f;
-					float g = RANDOM.nextFloat() * 0.5f + 0.4f;
-					float b = RANDOM.nextFloat() * 0.5f + 0.5f;
+					glTranslatef(crosshairsX * ri / projRelSurf, crosshairsZ * ri / projRelSurf, -baseTexTransY);
+					/*
+					switch (side) {
+						case UP:
+						case DOWN:
+							glTranslatef(crosshairsX * ri / projRelSurf, crosshairsZ * ri / projRelSurf, -baseTexTransY);
+							break;
+						case WEST:
+						case EAST:
+							glTranslatef(crosshairsX * ri / projRelSurf, crosshairsZ * ri / projRelSurf, -baseTexTransX);
+							break;
+						case NORTH:
+						case SOUTH:
+							glTranslatef(crosshairsX * ri / projRelSurf, crosshairsZ * ri / projRelSurf, -baseTexTransZ);
+							break;
+					}
+					*/
+					float r = RANDOM.nextFloat() * 0.5F + 0.1F;
+					float g = RANDOM.nextFloat() * 0.5F + 0.4F;
+					float b = RANDOM.nextFloat() * 0.5F + 0.5F;
 					if (i == 0) {
-						r = g = b = 1;
+						b = 1.0F;
+						g = 1.0F;
+						r = 1.0F;
 					}
 
 					glColor4f(r * brightness, g * brightness, b * brightness, 1);
 					glBegin(GL_QUADS);
-						glVertex3d(x1, y1, z1);
-						glVertex3d(x2, y1, z2);
-						glVertex3d(x2, y2, z3);
-						glVertex3d(x1, y2, z4);
+					glVertex3d(x1, y1, z1);
+					glVertex3d(x2, y1, z2);
+					glVertex3d(x2, y2, z3);
+					glVertex3d(x1, y2, z4);
 					glEnd();
 					glPopMatrix();
 					glMatrixMode(GL_MODELVIEW);
