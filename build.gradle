@@ -520,7 +520,15 @@ jar {
 			}
 		})
 		file('build/tmp/classes.txt').text = bldr.toString();
-
+		Set<String> expectedFailThatFailsAutoFilter = Set.of(
+				'lambda$static$12com.unascribed.fabrication.mixin.f_balance.disable_elytra.MixinModelPredicateProviderRegistry',
+				'handleAttackEntity(Lnet/minecraft/class_1657;Lnet/minecraft/class_1937;Lnet/minecraft/class_1268;Lnet/minecraft/class_1297;Lnet/minecraft/class_3966;)Lnet/minecraft/class_1269;com.unascribed.fabrication.mixin.a_fixes.fix_charm_amethyst_dupe.MixinClearItemFrames',
+				'handleUseEntity(Lnet/minecraft/class_1657;Lnet/minecraft/class_1937;Lnet/minecraft/class_1268;Lnet/minecraft/class_1297;Lnet/minecraft/class_3966;)Lnet/minecraft/class_1269;com.unascribed.fabrication.mixin.a_fixes.fix_charm_amethyst_dupe.MixinClearItemFrames',
+				'processLoading;com.unascribed.fabrication.mixin.e_mechanics.obsidian_tears.MixinModelLoaderForge',
+				'fireRenderEntityItemcom.unascribed.fabrication.mixin.i_woina.drops.MixinItemEntityRendererObfuscate',
+				'processLoadingcom.unascribed.fabrication.mixin.e_mechanics.obsidian_tears.MixinModelLoaderForge',
+				'method_27884com.unascribed.fabrication.mixin.f_balance.disable_elytra.MixinModelPredicateProviderRegistry'
+		)
 		def lge = project.getExtensions().getByType(net.fabricmc.loom.api.LoomGradleExtensionAPI.class)
 		def mappings = lge.getMappingsProvider().getMappings()
 		Map<String, Mapp> toInter = new HashMap<>()
@@ -607,7 +615,9 @@ jar {
 					int dot = s.indexOf('.')
 					if (col == -1 || dot < col && dot != -1) col = dot
 					bldrAbs.put(s, 'L'+classMap.get(s.substring(s.charAt(0) == 'L' as char ? 1 : 0, col))+';'+ad)
-				} else if (!s.isBlank() && !s.startsWith("Ljava/lang/")) {
+				} else if (!s.isBlank() && !expectedFailThatFailsAutoFilter.contains(s+intr.key)
+					&& !s.startsWith("Ljava/lang/") && !s.startsWith("com/mojang/blaze3d/")
+				) {
 					logger.log(LogLevel.ERROR, "Failed to map "+s+" for "+intr.key)
 				}
 			}
@@ -625,7 +635,7 @@ jar {
 						break
 					}
 				}
-				if (missedMthd && !s.isBlank()) {
+				if (missedMthd && !s.isBlank() && !expectedFailThatFailsAutoFilter.contains(s+intr.key) && !s.equals("<init>")) {
 					logger.log(LogLevel.ERROR, "Failed to map "+s+" for "+intr.key)
 				}
 			}

@@ -29,7 +29,11 @@ public class FailsoftCallbackInjectionInfo extends CallbackInjectionInfo {
 		if (this.annotation != null) {
 			FabMixinInjector.remap(mixin.getMixin().getClassName(), this.annotation);
 		}
-		super.readAnnotation();
+		try {
+			super.readAnnotation();
+		} catch (Throwable e) {
+			FabMixinInjector.handleErrorProactively(mixin.getTargetClassInfo().getClassName(), e, mixin.getMixin(), IMixinErrorHandler.ErrorAction.ERROR);
+		}
 	}
 
 	@Override

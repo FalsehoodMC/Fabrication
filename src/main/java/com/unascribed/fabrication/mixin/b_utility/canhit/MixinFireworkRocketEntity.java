@@ -22,7 +22,7 @@ public class MixinFireworkRocketEntity {
 		if (FabConf.isEnabled("*.canhit") && self instanceof SetCanHitList) {
 			SetCanHitList schl = (SetCanHitList)self;
 			if (!CanHitUtil.canHit(schl.fabrication$getCanHitList(), subject) || !CanHitUtil.canHit(schl.fabrication$getCanHitList2(), subject)) {
-				return new HijackReturn(false);
+				return HijackReturn.FALSE;
 			}
 		}
 		return null;

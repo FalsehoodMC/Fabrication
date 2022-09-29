@@ -15,7 +15,7 @@ public class MixinCreeperEntity {
 	@Hijack(target="Lnet/minecraft/world/GameRules;getBoolean(Lnet/minecraft/world/GameRules$Key;)Z",
 			method="explode()V")
 	private static HijackReturn fabrication$nonMobGriefingDestructionType(GameRules rules, GameRules.Key<GameRules.BooleanRule> gamerule) {
-		return FabConf.isEnabled("*.environmentally_friendly_creepers") && gamerule == GameRules.DO_MOB_GRIEFING ? new HijackReturn(false) : null;
+		return FabConf.isEnabled("*.environmentally_friendly_creepers") && gamerule == GameRules.DO_MOB_GRIEFING ? HijackReturn.FALSE : null;
 	}
 
 }
