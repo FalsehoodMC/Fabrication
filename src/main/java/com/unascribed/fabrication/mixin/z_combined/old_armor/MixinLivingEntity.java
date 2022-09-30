@@ -5,6 +5,7 @@ import com.google.common.collect.Multimap;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.injection.FabInject;
 import com.unascribed.fabrication.support.injection.ModifyReturn;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -22,7 +23,6 @@ import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -38,16 +38,16 @@ public abstract class MixinLivingEntity extends Entity {
 	}
 
 	@Shadow
-	protected abstract ItemStack getArmorInSlot(EquipmentSlot slot);
+	protected abstract ItemStack getEquippedStack(EquipmentSlot slot);
 
 	@Shadow
 	public abstract AttributeContainer getAttributes();
 
-	@Inject(at=@At("HEAD"), method="applyArmorToDamage(Lnet/minecraft/entity/damage/DamageSource;F)F")
+	@FabInject(at=@At("HEAD"), method="applyArmorToDamage(Lnet/minecraft/entity/damage/DamageSource;F)F")
 	public void refreshArmor(DamageSource source, float amount, CallbackInfoReturnable<Float> cir){
 		for(EquipmentSlot slot : EquipmentSlot.values()) {
 			if (slot.getType() != EquipmentSlot.Type.ARMOR) continue;
-			ItemStack itemStack3 = this.getArmorInSlot(slot);
+			ItemStack itemStack3 = this.getEquippedStack(slot);
 				if (!itemStack3.isEmpty()) {
 					this.getAttributes().removeModifiers(fabrication$oldArmor(itemStack3.getAttributeModifiers(slot), itemStack3, slot, (LivingEntity)(Object)this));
 					this.getAttributes().addTemporaryModifiers(fabrication$oldArmor(itemStack3.getAttributeModifiers(slot), itemStack3, slot, (LivingEntity)(Object)this));
@@ -56,7 +56,7 @@ public abstract class MixinLivingEntity extends Entity {
 	}
 
 	//Purely for visuals
-	@Inject(at=@At("HEAD"), method="tick()V")
+	@FabInject(at=@At("HEAD"), method="tick()V")
 	public void tickArmor(CallbackInfo ci){
 		if ((this.age & 16) == 0) refreshArmor(null, 0, null);
 	}

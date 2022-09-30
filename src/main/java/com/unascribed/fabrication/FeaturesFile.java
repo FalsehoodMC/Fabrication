@@ -42,7 +42,6 @@ public final class FeaturesFile {
 		public final int sinceCode;
 		public final Sides sides;
 		public final ImmutableSet<String> needs;
-		public final String def;
 		public final String parent;
 		public final String media;
 		public final String mediaText;
@@ -67,7 +66,6 @@ public final class FeaturesFile {
 			sinceCode = get(obj, "since_code", JsonElement::getAsInt, -1);
 			sides = Sides.valueOf(get(obj, "sides", JsonElement::getAsString, "irrelevant").toUpperCase(Locale.ROOT));
 			needs = ImmutableSet.copyOf(get(obj, "needs", FeatureEntry::getAsStringSet, Collections.emptySet()));
-			def = get(obj, "default", JsonElement::getAsString, "inherit");
 			parent = get(obj, "parent", JsonElement::getAsString, null);
 			media = get(obj, "media", JsonElement::getAsString, null);
 			mediaText = get(obj, "media_text", JsonElement::getAsString, null);
@@ -104,7 +102,7 @@ public final class FeaturesFile {
 					+ ", shortName=" + shortName + ", meta=" + meta
 					+ ", section=" + section + ", extra=" + extra + ", since="
 					+ since + ", sinceCode=" + sinceCode + ", sides=" + sides
-					+ ", needs=" + needs + ", def=" + def + ", parent=" + parent
+					+ ", needs=" + needs + ", parent=" + parent
 					+ ", media=" + media + ", mediaText=" + mediaText
 					+ ", extraMedia=" + extraMedia + ", extraMediaText="
 					+ extraMediaText + ", linkUrl=" + linkUrl + ", linkText="

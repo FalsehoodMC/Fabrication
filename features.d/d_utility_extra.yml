@@ -7,7 +7,6 @@ utility.extra.all_damage_is_fatal:
 	sides: server_only
 	fscript: living_entity
 	extra_fscript: damage_source+~damage_source:DAMAGE_SOURCE+Damage Source
-	default: never
 	media: https://unascribed.com/fabrication/all_damage_is_fatal.mp4
 	desc:
 		Any amount of damage done to an entity is unconditionally fatal.
@@ -16,32 +15,29 @@ utility.extra.weapons_accept_silk:
 	name: Weapons Accept Silk
 	since: 1.1.2
 	sides: server_only
-	default: never
 	media: https://unascribed.com/fabrication/weapons_accept_silk.mp4
 	desc:
 		Weapons can be enchanted with Silk Touch, and Silk Touch becomes incompatible with Looting.
-		
+
 		Can be used with datapacks and loot tables (or so I'm told).
 
 utility.extra.disable_bees:
 	name: Disable Bees
 	since: 1.3.4
 	sides: either
-	default: never
 	short_desc: Disables bee nest generation and all bee sounds
 	desc:
 		Prevents bee nests generating. Also disables all bee sounds.
-		
+
 		Useful if you have a bee phobia. Makes honey inaccessible; you may want a datapack to make
 		it accessible again, and/or to make empty bee nests craftable for decor.
-		
+
 		Does not delete existing bee nests or bee entities; only fully effective in a new world.
 
 utility.extra.show_bee_count_on_item:
 	name: Show Bee Count on Items
 	since: 1.4.0
 	sides: client_only
-	default: burnt
 	desc:
 		Makes bee hive items show amount of contained bees.
 
@@ -49,19 +45,17 @@ utility.extra.disable_villagers:
 	name: Disable Villagers
 	since: 1.4.0
 	sides: either
-	default: never
 	desc:
 		Prevents villages from generating and zombie villagers from spawning.
-		
+
 		Villagers completely break game balance, among other issues.
-		
+
 		Will not fully take effect unless the game is restarted.
 
 utility.extra.item_frame_no_name_display:
 	name: Item Frames Don't Display Name Tags
 	since: 1.4.0
 	sides: client_only
-	default: never
 	media: https://unascribed.com/fabrication/item_frame_no_name_display.mp4
 	desc:
 		Item frames will not display the names of the item inside them.
@@ -70,7 +64,6 @@ utility.extra.enter_selects_highlighted_suggestion:
 	name: Enter Selects Highlighted Suggestion
 	since: 2.3.0
 	sides: client_only
-	default: burnt
 	desc:
 		Pressing enter selects the highlighted suggestion.
 
@@ -78,15 +71,14 @@ utility.extra.chat_markdown:
 	name: Chat Markdown
 	since: 2.3.0
 	sides: server_only
-	default: burnt
+	media: https://unascribed.com/fabrication/chat_markdown.mp4
 	desc:
 		Adds bold, strikethrough, underscore and italic markdown to chat.
 
 utility.extra.no_guardian_jumpscare:
 	name: No Guardian Jumpscare
-	since: 2.3.1
+	since: 3.0.0
 	sides: client_only
-	default: burnt
 	desc:
 		Disables the elder guardian appearance effect upon being inflicted with Mining Fatigue.
 

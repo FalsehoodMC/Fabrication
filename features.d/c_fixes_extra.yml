@@ -1,0 +1,25 @@
+# This is not actually a YAML file; it's only .yml for syntax highlighting.
+# Tab indentation *must* be used.
+
+fixes.extra.bubble_column_pop:
+	name: Bubble Column Pop
+	since: 2.1.0
+	sides: client_only
+	media: https://unascribed.com/fabrication/bubble_column_pop.mp4
+	desc:
+		Re-adds bubble columns having a bubble pop particle and sound at the top.
+
+		Was present in 18w07a, got removed before 1.13 release.
+
+fixes.extra.stable_cacti_break_vanilla_compat:
+	name: Stable Cacti Break Vanilla Compat
+	since: 3.0.1
+	sides: server_only
+	extend: *.stable_cacti
+	desc:
+		Stable cacti but it will break some existing vanilla farms.
+		As cactus will no longer break when growing next to an adjacent block.
+		Using this also fixes naturally spawning cactus farms.
+
+# kate: space-indent off
+# vim: noai:noet

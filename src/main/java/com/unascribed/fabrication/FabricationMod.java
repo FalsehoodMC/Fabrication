@@ -16,6 +16,7 @@ import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.OptionalFScript;
 import com.unascribed.fabrication.support.ResolvedConfigValue;
+import com.unascribed.fabrication.support.SpecialEligibility;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -45,6 +46,10 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 public class FabricationMod implements ModInitializer {
+
+	public static final String MOD_NAME = FabConf.isMet(SpecialEligibility.FORGE) ? "Forgery" : "Fabrication";
+	// NOT the modid. We keep the mod id as "fabrication" even on Forge to keep things from getting too nutty.
+	public static final String MOD_NAME_LOWER = FabConf.isMet(SpecialEligibility.FORGE) ? "forgery" : "fabrication";
 
 	private static final Map<String, Feature> features = Maps.newHashMap();
 	private static final List<Feature> unconfigurableFeatures = Lists.newArrayList();
@@ -93,13 +98,13 @@ public class FabricationMod implements ModInitializer {
 		}
 		if (Agnos.eventsAvailable() && Agnos.getCurrentEnv() == Env.CLIENT) {
 			if (FabConf.getValue("*.long_levelup_sound_at_30") != ConfigValue.FALSE) {
-				LEVELUP_LONG = Agnos.registerSoundEvent(new Identifier("fabrication", "levelup_long"), new SoundEvent(new Identifier("fabrication", "levelup_long")));
+				LEVELUP_LONG = new SoundEvent(new Identifier("fabrication", "levelup_long"));
 			}
 			if (FabConf.getValue("*.oof") != ConfigValue.FALSE) {
-				OOF = Agnos.registerSoundEvent(new Identifier("fabrication", "oof"), new SoundEvent(new Identifier("fabrication", "oof")));
+				OOF = new SoundEvent(new Identifier("fabrication", "oof"));
 			}
 			if (FabConf.getValue("*.alt_absorption_sound") != ConfigValue.FALSE) {
-				ABSORPTION_HURT = Agnos.registerSoundEvent(new Identifier("fabrication", "absorption_hurt"), new SoundEvent(new Identifier("fabrication", "absorption_hurt")));
+				ABSORPTION_HURT = new SoundEvent(new Identifier("fabrication", "absorption_hurt"));
 			}
 		}
 		FabConf.submitConfigAnalytics();
@@ -193,17 +198,13 @@ public class FabricationMod implements ModInitializer {
 	private static final Identifier CONFIG = new Identifier("fabrication", "config");
 
 	public static void sendConfigUpdate(MinecraftServer server, String key, ServerPlayerEntity spe) {
-		if ("general.profile".equals(key)) key = null;
+		if (key != null && key.startsWith("general.category")) key = null;
 		PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
 		if (key == null) {
 			Map<String, ResolvedConfigValue> trileans = Maps.newHashMap();
 			Map<String, String> strings = Maps.newHashMap();
 			for (String k : FabConf.getAllKeys()) {
-				if (FabConf.isStandardValue(k)) {
-					trileans.put(k, FabConf.getResolvedValue(k));
-				} else {
-					strings.put(k, FabConf.getRawValue(k));
-				}
+				trileans.put(k, FabConf.getResolvedValue(k));
 			}
 			data.writeVarInt(trileans.size());
 			trileans.entrySet().forEach(en -> data.writeString(en.getKey()).writeByte(en.getValue().ordinal()));
@@ -211,19 +212,11 @@ public class FabricationMod implements ModInitializer {
 			strings.entrySet().forEach(en -> data.writeString(en.getKey()).writeString(en.getValue()));
 			data.writeLong(LAUNCH_ID);
 		} else {
-			if (FabConf.isStandardValue(key)) {
-				data.writeVarInt(1);
-				data.writeString(key);
-				data.writeByte(FabConf.getResolvedValue(key).ordinal());
-				data.writeVarInt(0);
-				data.writeLong(LAUNCH_ID);
-			} else {
-				data.writeVarInt(0);
-				data.writeVarInt(1);
-				data.writeString(key);
-				data.writeString(FabConf.getRawValue(key));
-				data.writeLong(LAUNCH_ID);
-			}
+			data.writeVarInt(1);
+			data.writeString(key);
+			data.writeByte(FabConf.getResolvedValue(key).ordinal());
+			data.writeVarInt(0);
+			data.writeLong(LAUNCH_ID);
 		}
 		data.writeString(Agnos.getModVersion());
 		data.writeVarInt(FabConf.getAllFailures().size());

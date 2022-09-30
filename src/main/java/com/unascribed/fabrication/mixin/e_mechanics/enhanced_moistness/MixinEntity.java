@@ -1,10 +1,10 @@
 package com.unascribed.fabrication.mixin.e_mechanics.enhanced_moistness;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -16,7 +16,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
@@ -39,14 +38,7 @@ public abstract class MixinEntity implements MarkWet {
 	@Shadow
 	public abstract boolean isInLava();
 
-	@Shadow
-	public abstract SoundCategory getSoundCategory();
-	@Shadow
-	public abstract Box getBoundingBox();
-	@Shadow
-	public abstract void playSound(SoundEvent se, float volume, float pitch);
-
-	@Inject(at=@At("TAIL"), method="baseTick()V")
+	@FabInject(at=@At("TAIL"), method="baseTick()V")
 	public void baseTick(CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.enhanced_moistness") || world.isClient) return;
 		if (isInLava()) {
@@ -61,10 +53,10 @@ public abstract class MixinEntity implements MarkWet {
 					Object self = this;
 					if (self instanceof LivingEntity) {
 						if (world.random.nextInt(20) == 0) {
-							world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_DROWNED_SWIM, getSoundCategory(), 0.1f, 2f);
+							world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_DROWNED_SWIM, ((LivingEntity) self).getSoundCategory(), 0.1f, 2f);
 						}
 						if (fabrication$wetTimer%4 == 0) {
-							Box box = getBoundingBox();
+							Box box = ((LivingEntity) self).getBoundingBox();
 							((ServerWorld)world).spawnParticles(ParticleTypes.RAIN, pos.x, pos.y+(box.getYLength()/2), pos.z, 1, box.getXLength()/3, box.getYLength()/4, box.getZLength()/3, 0);
 						}
 					}
@@ -75,7 +67,7 @@ public abstract class MixinEntity implements MarkWet {
 		}
 	}
 
-	@Inject(at=@At("HEAD"), method="isWet()Z", cancellable=true)
+	@FabInject(at=@At("HEAD"), method="isWet()Z", cancellable=true)
 	public void isWet(CallbackInfoReturnable<Boolean> ci) {
 		if (FabConf.isEnabled("*.enhanced_moistness")) {
 			if (fabrication$wetTimer > 0 && !fabrication$checkingOriginalWetness) {

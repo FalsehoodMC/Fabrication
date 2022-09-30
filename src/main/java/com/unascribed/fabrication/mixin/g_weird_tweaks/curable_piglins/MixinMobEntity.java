@@ -4,6 +4,7 @@ import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.interfaces.GetPreZombified;
 import com.unascribed.fabrication.interfaces.ZombImmunizableEntity;
 import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.injection.FabInject;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffects;
@@ -19,7 +20,6 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(MobEntity.class)
@@ -34,7 +34,7 @@ public abstract class MixinMobEntity extends LivingEntity {
 		super(entityType, world);
 	}
 
-	@Inject(method="interactMob(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;", at=@At("HEAD"), cancellable=true)
+	@FabInject(method="interactMob(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;", at=@At("HEAD"), cancellable=true)
 	public void immunizePiglin(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
 		if (!FabConf.isEnabled("*.curable_piglins")) return;
 		Object self = this;

@@ -1,14 +1,27 @@
 plugins {
-    id 'java'
-    id 'fabric-loom'
+	id 'java'
+	// Loom 0.11 throws an absolute fit when compiling this, so use the dumbest
+	// possible gradle plugin just to give us the fucking remapped jar with no
+	// bullshit (we can't just use Loom 0.8 as that conflicts with the root
+	// project. thanks, gradle)
+	id 'com.unascribed.nilgradle' version '1.3.5'
 }
+
+repositories {
+	maven {
+		url 'https://maven.fabricmc.net'
+	}
+}
+
 sourceCompatibility = JavaVersion.VERSION_16
 targetCompatibility = JavaVersion.VERSION_16
-//Required to tell if a virtual method is overwritten, which is needed since overwrites don't have mapping entries
+
+// Required to tell if a virtual method is overwritten, which is needed since overwrites don't have mapping entries
 dependencies {
-    minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
-    mappings "net.fabricmc:yarn:${rootProject.yarn_mappings}:v2"
-    modImplementation "net.fabricmc:fabric-loader:${rootProject.loader_version}"
+	game nil.minecraft(rootProject.minecraft_version, 'client')
+	implementation "net.fabricmc:fabric-loader:${rootProject.loader_version}"
 }
-group 'com.unascribed'
-version '2.2.1'
+
+mappings {
+	work "net.fabricmc:yarn:${rootProject.yarn_mappings}:v2"
+}

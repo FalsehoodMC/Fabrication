@@ -14,6 +14,6 @@ public class MixinEntity {
 
 	@Hijack(method="updateSwimming()V", target="Lnet/minecraft/entity/Entity;isSprinting()Z")
 	private static HijackReturn fabrication$disableSwimming(Entity self) {
-		return (FabConf.isEnabled("*.no_swim") && ConfigPredicates.shouldRun("*.no_swim", self)) ? new HijackReturn(false) : null;
+		return (FabConf.isEnabled("*.no_swim") && ConfigPredicates.shouldRun("*.no_swim", self)) ? HijackReturn.FALSE : null;
 	}
 }

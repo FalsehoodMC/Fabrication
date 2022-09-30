@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
+import com.unascribed.fabrication.support.injection.FabModifyArg;
 
 import com.unascribed.fabrication.support.EligibleIf;
 
@@ -20,7 +20,7 @@ import net.minecraft.util.registry.Registry;
 @EligibleIf(configAvailable="*.mobs_dont_drop_ingots")
 public class MixinLivingEntity {
 
-	@ModifyArg(method="dropLoot(Lnet/minecraft/entity/damage/DamageSource;Z)V", at=@At(value="INVOKE", target="Lnet/minecraft/loot/LootTable;generateLoot(Lnet/minecraft/loot/context/LootContext;Ljava/util/function/Consumer;)V"))
+	@FabModifyArg(method="dropLoot(Lnet/minecraft/entity/damage/DamageSource;Z)V", at=@At(value="INVOKE", target="Lnet/minecraft/loot/LootTable;generateLoot(Lnet/minecraft/loot/context/LootContext;Ljava/util/function/Consumer;)V"))
 	public Consumer<ItemStack> generateLoot(Consumer<ItemStack> lootConsumer) {
 		if(!FabConf.isEnabled("*.mobs_dont_drop_ingots")) return lootConsumer;
 		return (stack)-> {

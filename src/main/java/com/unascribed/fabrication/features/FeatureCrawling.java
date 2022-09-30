@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.features;
 
 import com.unascribed.fabrication.Agnos;
+import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.interfaces.SetCrawling;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
@@ -22,7 +23,7 @@ public class FeatureCrawling implements Feature {
 
 	@Override
 	public void apply() {
-		keybind = new KeyBinding("[Fabrication] Crawl", InputUtil.UNKNOWN_KEY.getCode(), "key.categories.movement") {
+		keybind = new KeyBinding("["+FabricationMod.MOD_NAME+"] Crawl", InputUtil.UNKNOWN_KEY.getCode(), "key.categories.movement") {
 			@Override
 			public void setPressed(boolean pressed) {
 				boolean send = !forced && isPressed() != pressed && MinecraftClient.getInstance().getNetworkHandler() != null;

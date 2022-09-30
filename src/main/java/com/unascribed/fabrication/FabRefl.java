@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.throwables.MixinError;
 import org.spongepowered.asm.mixin.throwables.MixinException;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.unascribed.fabrication.support.MixinErrorHandler_THIS_ERROR_HANDLER_IS_FOR_SOFT_FAILURE_IN_FABRICATION_ITSELF_AND_DOES_NOT_IMPLY_FABRICATION_IS_RESPONSIBLE_FOR_THE_BELOW_ERROR;
+import com.unascribed.fabrication.support.MixinErrorHandler;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
@@ -485,9 +485,10 @@ public class FabRefl {
 	}
 
 	private static UnreflResult unreflectGetter(String className, Supplier<Class<?>> clazz, String yarnName) {
-		String name = FabRefMap.methodMap("FabRefl", yarnName);
-		int col = name.indexOf(';');
-		if (col != -1) name = name.substring(col+1);
+		String name = FabRefMap.absoluteMap(yarnName);
+		int scol = name.indexOf(';');
+		int col = name.lastIndexOf(':');
+		name = name.substring(scol == -1 ? 0 : scol+1, col == -1 ? name.length() : col);
 		String desc = "field "+className+"#"+name+" (deobf name "+yarnName+")";
 		try {
 			Field f = clazz.get().getDeclaredField(name);
@@ -499,9 +500,10 @@ public class FabRefl {
 	}
 
 	private static UnreflResult unreflectSetter(String className, Supplier<Class<?>> clazz, String yarnName) {
-		String name = FabRefMap.methodMap("FabRefl", yarnName);
-		int col = name.indexOf(';');
-		if (col != -1) name = name.substring(col+1);
+		String name = FabRefMap.absoluteMap(yarnName);
+		int scol = name.indexOf(';');
+		int col = name.lastIndexOf(':');
+		name = name.substring(scol == -1 ? 0 : scol+1, col == -1 ? name.length() : col);
 		String desc = "field "+className+"#"+name+" (deobf name "+yarnName+")";
 		try {
 			Field f = clazz.get().getDeclaredField(name);
@@ -513,7 +515,7 @@ public class FabRefl {
 	}
 
 	private static UnreflResult unreflectMethod(String className, Supplier<Class<?>> clazz, String yarnName, Class<?> returnType, Class<?>... args) {
-		String name = FabRefMap.targetMap("FabRefl", yarnName);
+		String name = FabRefMap.absoluteMap(yarnName);
 		name = name.substring(name.indexOf(';')+1, name.indexOf('('));
 		String desc = "method "+className+"."+name+signatureToString(args)+" (deobf name "+yarnName+")";
 		try {
@@ -544,7 +546,7 @@ public class FabRefl {
 	}
 
 	private static RuntimeException rethrow(Throwable t) {
-		if (!MixinErrorHandler_THIS_ERROR_HANDLER_IS_FOR_SOFT_FAILURE_IN_FABRICATION_ITSELF_AND_DOES_NOT_IMPLY_FABRICATION_IS_RESPONSIBLE_FOR_THE_BELOW_ERROR.actuallyItWasUs && (t instanceof MixinError || t instanceof MixinException)) {
+		if (!MixinErrorHandler.actuallyItWasUs && (t instanceof MixinError || t instanceof MixinException)) {
 			throw new RuntimeException("DO NOT REPORT THIS ERROR TO FABRICATION.\n"
 					+ "This is caused by ANOTHER MOD'S MIXIN FAILURE that was initiated by Fabrication initializing reflection.\n"
 					+ "Errors like these show up attributed to whoever was the first person to load the class with the broken mixin.\n"

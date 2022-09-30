@@ -28,12 +28,12 @@ import com.google.common.collect.Lists;
 public class AtlasViewerScreen extends Screen {
 
 	private static final Identifier CHECKER = new Identifier("fabrication", "textures/checker.png");
-	
+
 	private final Identifier atlas;
 	private float panX = 100;
 	private float panY = 100;
 	private int level = 0;
-	
+
 	public AtlasViewerScreen(Identifier atlas) {
 		super(new LiteralText("Atlas viewer"));
 		this.atlas = atlas;
@@ -43,12 +43,12 @@ public class AtlasViewerScreen extends Screen {
 	protected void init() {
 		client.skipGameRender = true;
 	}
-	
+
 	@Override
 	public void removed() {
 		client.skipGameRender = false;
 	}
-	
+
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		matrices.push();
@@ -73,15 +73,15 @@ public class AtlasViewerScreen extends Screen {
 			bb.vertex(mat, 0, height, 0).texture(0, height/8).next();
 		bb.end();
 		BufferRenderer.draw(bb);
-		
+
 		client.getTextureManager().bindTexture(atlas);
-		
+
 		matrices.translate(panX, panY, 0);
-		
+
 		int atlasWidth = glGetTexLevelParameteri(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH);
 		int atlasHeight = glGetTexLevelParameteri(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT);
 		int atlasMaxLevel = glGetTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL);
-		
+
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		RenderSystem.disableTexture();
 		RenderSystem.enableBlend();
@@ -95,9 +95,9 @@ public class AtlasViewerScreen extends Screen {
 			bb.vertex(mat, 0, atlasHeight, 0).next();
 		bb.end();
 		BufferRenderer.draw(bb);
-		
+
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, level);
-		
+
 		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		RenderSystem.enableTexture();
 		RenderSystem.setShaderTexture(0, atlas);
@@ -110,14 +110,14 @@ public class AtlasViewerScreen extends Screen {
 			bb.vertex(mat, 0, atlasHeight, 0).texture(0, 1).next();
 		bb.end();
 		BufferRenderer.draw(bb);
-		
+
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 		matrices.pop();
-		
+
 		mouseX -= panX;
 		mouseY -= panY;
-		
-		
+
+
 		SpriteAtlasTexture sat = getAtlas();
 		renderTooltip(matrices, Lists.<Text>newArrayList(
 				new LiteralText(atlas.toString()),
@@ -211,7 +211,7 @@ public class AtlasViewerScreen extends Screen {
 			renderTooltip(matrices, li, (int)(mouseX+panX), (int)(mouseY+panY));
 		}
 	}
-	
+
 	@Override
 	public void renderTooltip(MatrixStack matrices, List<Text> lines, int x, int y) {
 		List<OrderedText> ordered = Lists.newArrayList();
@@ -220,7 +220,7 @@ public class AtlasViewerScreen extends Screen {
 		}
 		renderOrderedTooltip(matrices, ordered, x, y);
 	}
-	
+
 	private SpriteAtlasTexture getAtlas() {
 		for (SpriteAtlasTexture cand : AtlasTracking.allAtlases) {
 			if (cand.getId().equals(this.atlas)) return cand;
@@ -232,7 +232,7 @@ public class AtlasViewerScreen extends Screen {
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		return super.keyPressed(keyCode, scanCode, modifiers);
 	}
-	
+
 	@Override
 	public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
 		if (button == 0) {
@@ -241,7 +241,7 @@ public class AtlasViewerScreen extends Screen {
 		}
 		return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
 	}
-	
+
 	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
 		int oldBind = glGetInteger(GL_TEXTURE_BINDING_2D);

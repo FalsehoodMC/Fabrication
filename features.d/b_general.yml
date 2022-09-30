@@ -25,81 +25,21 @@ general.dark_mode:
 general.data_upload:
 	name: Data Upload
 	since: 1.3.2
-	default: never
 	desc:
 		Enables submitting anonymous data to a self-hosted privacy-respecting Matomo instance run by
 		unascribed. The following data is submitted: Fabrication version, Minecraft version,
 		Forge/Fabric version, Java version, approximate window aspect ratio, OpenGL version,
-		selected language, operating system name (no version), your selected profile, current
-		status of all features, and any mixin failures.
+		selected language, operating system name (no version), currentstatus of all features,
+		and any mixin failures.
 
 		Please enable this to give me insight into what features people use, what features conflict,
 		and to help inform development decisions based on version information.
 
 general.limit_runtime_configs:
 	name: Limit Runtime Configs
-	since: 2.3.1
+	since: 3.0.0
 	desc:
 		Makes the game a teensy bit faster, but requires a restart to change features.
-
-general.profile:
-	name: Profile
-	since: 1.0
-	desc:
-		To help with Fabrication's overwhelming number of options, Profiles let you pick what kinds
-		of features you want to be enabled by default. When a config value is set to 'unset', it is
-		up to the profile whether it's enabled or disabled.
-
-		I don't even like coffee.
-
-general.profile.green:
-	name: Green
-	meta: true
-	parent: general.profile
-	desc:
-		Enables nothing by default. Build your own.
-
-general.profile.blonde:
-	name: Blonde
-	meta: true
-	parent: general.profile
-	desc:
-		Fixes and utilities only. Keeps things vanilla-y.
-
-general.profile.light:
-	name: Light
-	meta: true
-	parent: general.profile
-	desc:
-		Blonde + tweaks. No major gameplay changes. Default.
-
-general.profile.medium:
-	name: Medium
-	meta: true
-	parent: general.profile
-	desc:
-		Light + gameplay and mechanic additions. Recommended; gives you most of Fabrication's features.
-
-general.profile.dark:
-	name: Dark
-	meta: true
-	parent: general.profile
-	desc:
-		Medium + major mechanic additions.
-
-general.profile.vienna:
-	name: Vienna
-	meta: true
-	parent: general.profile
-	desc:
-		Everything but "extra" features. Author's choice.
-
-general.profile.burnt:
-	name: Burnt
-	meta: true
-	parent: general.profile
-	desc:
-		Vienna + all "extra" features.
 
 # kate: space-indent off
 # vim: noai:noet

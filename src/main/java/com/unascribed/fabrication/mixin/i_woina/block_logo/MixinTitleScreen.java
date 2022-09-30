@@ -1,14 +1,14 @@
 package com.unascribed.fabrication.mixin.i_woina.block_logo;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.injection.FabInject;
 import com.unascribed.fabrication.support.injection.Hijack;
 import com.unascribed.fabrication.util.BlockLogoRenderer;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
+import com.unascribed.fabrication.support.injection.FabModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.loaders.LoaderBlockLogo;
@@ -60,7 +60,7 @@ public class MixinTitleScreen extends Screen {
 
 	// the mixture of deobf and obf classes here confuses MixinGradle, so we have to spell it out
 
-	@ModifyArg(at=@At(value="INVOKE", target="com/mojang/blaze3d/systems/RenderSystem.setShaderTexture(ILnet/minecraft/util/Identifier;)V", ordinal=2),
+	@FabModifyArg(at=@At(value="INVOKE", target="com/mojang/blaze3d/systems/RenderSystem.setShaderTexture(ILnet/minecraft/class_2960;)V", ordinal=2),
 			method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V", require=0)
 	public Identifier setShaderTextureDev(Identifier id) {
 		if (FabConf.isEnabled("*.block_logo") && id == EDITION_TITLE_TEXTURE) {
@@ -69,7 +69,7 @@ public class MixinTitleScreen extends Screen {
 		return id;
 	}
 
-	@ModifyArg(at=@At(value="INVOKE", target="com/mojang/blaze3d/systems/RenderSystem.setShaderTexture(ILnet/minecraft/class_2960;)V", ordinal=2),
+	@FabModifyArg(at=@At(value="INVOKE", target="com/mojang/blaze3d/systems/RenderSystem.setShaderTexture(ILnet/minecraft/class_2960;)V", ordinal=2),
 			method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V", require=0)
 	public Identifier setShaderTextureObf(Identifier id) {
 		if (FabConf.isEnabled("*.block_logo") && id == EDITION_TITLE_TEXTURE) {
@@ -78,21 +78,21 @@ public class MixinTitleScreen extends Screen {
 		return id;
 	}
 
-	@Inject(at=@At("HEAD"), method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
+	@FabInject(at=@At("HEAD"), method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
 	public void renderHead(MatrixStack matrices, int mouseX, int mouseY, float tickDelta, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.block_logo")) return;
 		fabrication$splashText = splashText;
 		splashText = null;
 	}
 
-	@Inject(at=@At("RETURN"), method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
+	@FabInject(at=@At("RETURN"), method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
 	public void renderReturn(MatrixStack matrices, int mouseX, int mouseY, float tickDelta, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.block_logo")) return;
 		splashText = fabrication$splashText;
 		fabrication$splashText = null;
 	}
 
-	@Inject(at=@At("TAIL"), method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
+	@FabInject(at=@At("TAIL"), method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
 	public void renderTail(MatrixStack matrices, int mouseX, int mouseY, float tickDelta, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.block_logo")) return;
 		if (splashText != null) {
@@ -111,7 +111,7 @@ public class MixinTitleScreen extends Screen {
 	}
 
 
-	@Inject(at=@At("TAIL"), method="tick()V")
+	@FabInject(at=@At("TAIL"), method="tick()V")
 	public void tick(CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.block_logo")) return;
 		fabrication$blockLogo.tick();

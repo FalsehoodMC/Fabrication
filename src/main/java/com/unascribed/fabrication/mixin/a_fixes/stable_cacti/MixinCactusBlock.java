@@ -1,32 +1,26 @@
 package com.unascribed.fabrication.mixin.a_fixes.stable_cacti;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Random;
-
 import com.unascribed.fabrication.FabConf;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
 import com.unascribed.fabrication.support.EligibleIf;
-
+import com.unascribed.fabrication.support.injection.FabInject;
+import com.unascribed.fabrication.support.injection.FabModifyVariable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CactusBlock;
 import net.minecraft.block.Material;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.FluidTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.WorldAccess;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.Collections;
+import java.util.Iterator;
 
 @Mixin(CactusBlock.class)
-@EligibleIf(configAvailable="*.stable_cacti")
+@EligibleIf(anyConfigAvailable={"*.stable_cacti", "*.stable_cacti_break_vanilla_compat"})
 public class MixinCactusBlock extends Block {
 
 	public MixinCactusBlock(Settings settings) {
@@ -34,16 +28,16 @@ public class MixinCactusBlock extends Block {
 	}
 
 
-	@ModifyVariable(at=@At("STORE"),
+	@FabModifyVariable(at=@At("STORE"),
 			method="canPlaceAt(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/WorldView;Lnet/minecraft/util/math/BlockPos;)Z")
 	public Iterator<Direction> returnEmptyIter(Iterator<Direction> old) {
-		if (FabConf.isEnabled("*.stable_cacti")) return Collections.emptyIterator();
+		if (FabConf.isAnyEnabled("*.stable_cacti")) return Collections.emptyIterator();
 		return old;
 	}
 
-	@Inject(at=@At("HEAD"), method="getStateForNeighborUpdate(Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/Direction;Lnet/minecraft/block/BlockState;Lnet/minecraft/world/WorldAccess;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;")
+	@FabInject(at=@At("HEAD"), method="getStateForNeighborUpdate(Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/Direction;Lnet/minecraft/block/BlockState;Lnet/minecraft/world/WorldAccess;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;")
 	public void getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom, CallbackInfoReturnable<BlockState> ci) {
-		if (!FabConf.isEnabled("*.stable_cacti")) return;
+		if (!FabConf.isAnyEnabled("*.stable_cacti")) return;
 		if (direction == Direction.UP &&
 				state.getBlock() == this && state.get(CactusBlock.AGE) > 0 &&
 				newState.getBlock() == this && newState.get(CactusBlock.AGE) == 0) {
@@ -58,17 +52,10 @@ public class MixinCactusBlock extends Block {
 					break;
 				}
 			}
-			if (shouldBreak) {
-				world.getBlockTickScheduler().schedule(posFrom, this, 1);
+			if (shouldBreak && !FabConf.isEnabled("*.stable_cacti_break_vanilla_compat")) {
+				world.breakBlock(posFrom, true);
 			}
 		}
-	}
-
-	@Inject(at=@At("HEAD"), method="scheduledTick(Lnet/minecraft/block/BlockState;Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;Ljava/util/Random;)V", cancellable=true)
-	public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random, CallbackInfo ci) {
-		if (!FabConf.isEnabled("*.stable_cacti")) return;
-		world.breakBlock(pos, true);
-		ci.cancel();
 	}
 
 }

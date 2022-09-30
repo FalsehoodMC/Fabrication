@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.mixin.f_balance.infinity_crossbows;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.injection.ModifyGetField;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -17,9 +18,9 @@ import net.minecraft.item.ItemStack;
 @EligibleIf(configAvailable="*.infinity_crossbows")
 public class MixinPlayerEntity {
 
-	@Redirect(at=@At(value="FIELD", target="net/minecraft/entity/player/PlayerAbilities.creativeMode:Z"),
+	@ModifyGetField(target="net/minecraft/entity/player/PlayerAbilities.creativeMode:Z",
 			method="getArrowType(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;")
-	public boolean redirectIsCreativeMode(PlayerAbilities subject, ItemStack crossbow) {
+	private static boolean fabrication$redirectIsCreativeMode(boolean old, PlayerAbilities subject, PlayerEntity pe, ItemStack crossbow) {
 		if (FabConf.isEnabled("*.infinity_crossbows") && FabConf.isEnabled("*.infibows")
 				&& EnchantmentHelper.getLevel(Enchantments.INFINITY, crossbow) > 0) {
 			return true;

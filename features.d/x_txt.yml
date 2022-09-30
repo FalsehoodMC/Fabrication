@@ -1,6 +1,0 @@
-utility.rmb_clears_text_fields:
-	name: RMB Clears Text Fields
-	since: 2.3.1
-	sides: client_only
-	desc:
-		Right Mouse Button will clear text fields.

@@ -3,7 +3,7 @@ const path = require('path');
 const hbs = require('handlebars');
 const md = require('markdown-it')();
 
-let data = JSON.parse(fs.readFileSync(process.argv[2] || 'features.json').toString('utf8'));
+let data = JSON.parse(fs.readFileSync(process.argv[2] || 'src/main/resources/features.json').toString('utf8'));
 let metaSection = {name: 'Meta', key: 'meta', features: [], features_incl_meta: []};
 let ctx = {feature_count:0,sections:[],sections_incl_meta:[metaSection]};
 let buildingSection = null;
@@ -74,5 +74,6 @@ let me = path.resolve(process.argv[1], '..');
 let render = hbs.compile(fs.readFileSync(path.resolve(me, 'curse.html.hbs')).toString('utf8'));
 fs.writeFileSync('curse-fabrication.html', render({...ctx, fabrication: true}));
 fs.writeFileSync('curse-forgery.html', render({...ctx, fabrication: false}));
+fs.writeFileSync('modrinth.md', hbs.compile(fs.readFileSync(path.resolve(me, 'modrinth.md.hbs')).toString('utf8'))(ctx));
 fs.writeFileSync('wiki.html', hbs.compile(fs.readFileSync(path.resolve(me, 'wiki.html.hbs')).toString('utf8'))(ctx));
 fs.writeFileSync('changelog.md', hbs.compile(fs.readFileSync(path.resolve(me, 'changelog.md.hbs')).toString('utf8'))(ctx));

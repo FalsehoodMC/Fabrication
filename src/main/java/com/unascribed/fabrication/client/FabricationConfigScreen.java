@@ -3,7 +3,6 @@ package com.unascribed.fabrication.client;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -13,7 +12,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.brigadier.CommandDispatcher;
 import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.FabConf;
-import com.unascribed.fabrication.FabConf.Profile;
 import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.FabricationModClient;
@@ -63,6 +61,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -84,18 +83,6 @@ public class FabricationConfigScreen extends Screen {
 	}
 
 	private final Map<String, String> SECTION_DESCRIPTIONS = Maps.newHashMap();
-	private final Map<Profile, String> PROFILE_DESCRIPTIONS = Maps.newHashMap();
-
-	private static final ImmutableMap<Profile, Integer> PROFILE_COLORS = ImmutableMap.<Profile, Integer>builder()
-			.put(Profile.GREEN, 0xFF8BC34A)
-			.put(Profile.BLONDE, 0xFFFFCC80)
-			.put(Profile.LIGHT, 0xFFA1887F)
-			.put(Profile.MEDIUM, 0xFF6D4C41)
-			.put(Profile.DARK, 0xFF4E342E)
-			.put(Profile.VIENNA, 0xFF2B1B18)
-			.put(Profile.BURNT, 0xFF12181B)
-			.build();
-
 	private static final Identifier BG = new Identifier("fabrication", "bg.png");
 	private static final Identifier BG_DARK = new Identifier("fabrication", "bg-dark.png");
 	private static final Identifier BG_GRAD = new Identifier("fabrication", "bg-grad.png");
@@ -124,6 +111,7 @@ public class FabricationConfigScreen extends Screen {
 	private float sidebarHeight;
 
 	private boolean didClick;
+	private boolean mouseDragging;
 	private float selectTime;
 	private String selectedSection;
 	private String prevSelectedSection;
@@ -141,6 +129,7 @@ public class FabricationConfigScreen extends Screen {
 	private boolean configuringServer;
 	private boolean hasClonked = true;
 	private boolean isSingleplayer;
+	private boolean editingWorldPath;
 	private float serverAnimateTime;
 	private String whyCantConfigureServer = null;
 	private Set<String> serverKnownConfigKeys = Sets.newHashSet();
@@ -174,9 +163,6 @@ public class FabricationConfigScreen extends Screen {
 		prideFlag = PrideFlags.isPrideMonth() ? PrideFlags.getRandomFlag() : null;
 		for (String sec : FabConf.getAllSections()) {
 			SECTION_DESCRIPTIONS.put(sec, FeaturesFile.get(sec).desc);
-		}
-		for (Profile prof : Profile.values()) {
-			PROFILE_DESCRIPTIONS.put(prof, FeaturesFile.get("general.profile." + prof.name().toLowerCase(Locale.ROOT)).desc);
 		}
 		for (String key : FabConf.getAllKeys()) {
 			int dot = key.indexOf('.');
@@ -216,6 +202,9 @@ public class FabricationConfigScreen extends Screen {
 		super.init();
 		isSingleplayer = false;
 		if (client.world == null) {
+			if (!editingWorldPath) {
+				FabConf.setWorldPath(null);
+			}
 			//whyCantConfigureServer = "You're not connected to a server.";
 		} else if (client.getServer() != null) {
 			//whyCantConfigureServer = "The singleplayer server shares the client settings.";
@@ -458,7 +447,7 @@ public class FabricationConfigScreen extends Screen {
 			hasClonked = true;
 			client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_BONE_BLOCK_STEP, 1f, 0.5f));
 		}
-		if (configuringServer || FabConf.hasWorldPath()) {
+		if (configuringServer || editingWorldPath) {
 			a = 1-a;
 		}
 
@@ -610,9 +599,6 @@ public class FabricationConfigScreen extends Screen {
 		matrices.push();
 		matrices.scale((float)(1-(Math.abs(Math.sin(a*Math.PI))/2)), 1, 1);
 		fill(matrices, -60, -8, 0, 8, MathHelper.hsvToRgb(h, 0.9f, 0.9f)|0xFF000000);
-		if (isSingleplayer && !FabConf.hasWorldPath()) {
-			fill(matrices, 0, -8, 60, 8, MathHelper.hsvToRgb(0.833333f, 0.9f, 0.9f)|0xFF000000);
-		}
 		matrices.pop();
 		matrices.push();
 		matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(45));
@@ -621,9 +607,7 @@ public class FabricationConfigScreen extends Screen {
 		matrices.scale(f, f, 1);
 		fill(matrices, -1, -1, 1, 1, 0xFFFFFFFF);
 		matrices.pop();
-		if (!isSingleplayer) {
-			fill(matrices, -6, -1, -2, 1, 0xFF000000);
-		}
+		fill(matrices, -6, -1, -2, 1, 0xFF000000);
 		matrices.pop();
 		fill(matrices, -2, -2, 2, 2, 0xFF000000);
 		matrices.pop();
@@ -631,7 +615,7 @@ public class FabricationConfigScreen extends Screen {
 		boolean darkMode = FabConf.isEnabled("general.dark_mode");
 
 		textRenderer.draw(matrices, "CLIENT", width-115, 4, 0xFF000000);
-		if (client.world == null || FabConf.hasWorldPath() || isSingleplayer) {
+		if (client.world == null || isSingleplayer) {
 			textRenderer.draw(matrices, "WORLD", width - 40, 4, 0xFF000000);
 		} else {
 			textRenderer.draw(matrices, "SERVER", width - 40, 4, whyCantConfigureServer == null ? 0xFF000000 : darkMode ? 0x44FFFFFF : 0x44000000);
@@ -706,6 +690,7 @@ public class FabricationConfigScreen extends Screen {
 			onClose();
 		}
 		if (didClick) didClick = false;
+		if (mouseDragging) mouseDragging = false;
 
 		super.render(matrices, mouseX, mouseY, delta);
 
@@ -719,7 +704,7 @@ public class FabricationConfigScreen extends Screen {
 			String msg;
 			if (whyCantConfigureServer != null) {
 				msg = ((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "§e")+whyCantConfigureServer;
-			} else if (FabConf.hasWorldPath()) {
+			} else if (editingWorldPath) {
 				msg = "Click to unselect world";
 			} else if (client.world == null || isSingleplayer) {
 				msg = "Click to select world";
@@ -817,46 +802,20 @@ public class FabricationConfigScreen extends Screen {
 				if (y > 0) {
 					textRenderer.draw(matrices, "§lGeneral", 135, y-12, -1);
 				}
-				RenderSystem.enableBlend();
-				RenderSystem.defaultBlendFunc();
-				RenderSystem.setShaderTexture(0, new Identifier("fabrication", "coffee_bean.png"));
-				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-				int x = 0;
-				Profile hovered = null;
-				for (Profile p : Profile.values()) {
-					boolean profSel = FabConf.hasWorldPath() ? p.equals(FabConf.getWorldProfile()) : getRawValue("general.profile").toUpperCase(Locale.ROOT).equals(p.name());
-					if (mouseX >= 134+x && mouseX <= 134+x+16 && mouseY >= 28 && mouseY <= 28+16) {
-						hovered = p;
-						if (didClick) {
-							if (p == Profile.BURNT) {
-								client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_CHIME, 1.8f, 1f));
-								client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.ITEM_FLINTANDSTEEL_USE, 1f));
-								client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_FIRE_AMBIENT, 1f, 1f));
-							} else if (p == Profile.GREEN) {
-								client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_BASS, 0.5f, 1f));
-							} else {
-								client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_COW_BELL, 0.707107f+(p.ordinal()*0.22f), 1f));
-							}
-							setValue("general.profile", p.name().toLowerCase(Locale.ROOT));
-						}
-					}
-
-					color(PROFILE_COLORS.get(p), profSel ? 1f : (hovered == p ? 0.6f : 0.3f) * (FabConf.isEnabled("general.dark_mode") ? 0.5f : 1));
-					drawTexture(matrices, 134+x, 28, 0, 0, 0, 16, 16, 16, 16);
-					x += 18;
+				y = drawConfigValues(matrices, y, mouseX, mouseY, (en) -> !en.key.startsWith("general.category.") && en.key.startsWith("general."));
+				y += 25;
+				textRenderer.draw(matrices, "§lCategory Defaults", 135, y-12, -1);
+				RenderSystem.setShaderColor(1, 1, 1, 1);
+				List<Map.Entry<String, FeatureEntry>> categories = FeaturesFile.getAll().entrySet().stream()
+						.filter((en) -> en.getKey().startsWith("general.category."))
+						.sorted(Comparator.comparing(e -> {
+							int i = tabs.indexOf(e.getKey().substring(17));
+							return i == -1 ? Integer.MAX_VALUE : i;
+						})).toList();
+				for (Map.Entry<String, FeatureEntry> en : categories) {
+					FeatureEntry fe = en.getValue();
+					y = drawConfigValue(matrices, en.getKey(), fe.name, fe.desc, y, mouseX, mouseY);
 				}
-				FeatureEntry profile = FeaturesFile.get("general.profile");
-				int textRight = textRenderer.draw(matrices, profile.name, 135, 16, -1);
-				if (mouseX >= 136 && mouseX <= textRight && mouseY >= 6 && mouseY <= 18) {
-					renderWrappedTooltip(matrices, profile.desc, mouseX, mouseY);
-				}
-				if (hovered != null) {
-					FeatureEntry hoveredEntry = FeaturesFile.get("general.profile."+hovered.name().toLowerCase(Locale.ROOT));
-					renderWrappedTooltip(matrices, "§l"+hoveredEntry.name+"\n§f"+hoveredEntry.desc, mouseX, mouseY);
-				}
-				y = 50;
-				y = drawConfigValues(matrices, y, mouseX, mouseY, (en) -> en.key.startsWith("general."));
 			} else if ("search".equals(section)) {
 				y += 4;
 				Predicate<FeatureEntry> pen;
@@ -903,7 +862,6 @@ public class FabricationConfigScreen extends Screen {
 	private int drawConfigValues(MatrixStack matrices, int y, float mouseX, float mouseY, Predicate<FeatureEntry> pred, ConfigValueFlag... defaultFlags) {
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		for (Map.Entry<String, FeatureEntry> en : FeaturesFile.getAll().entrySet()) {
-			if ("general.profile".equals(en.getKey())) continue;
 			FeatureEntry fe = en.getValue();
 			if (fe.meta || fe.section) continue;
 			if (!pred.test(fe)) continue;
@@ -1016,13 +974,16 @@ public class FabricationConfigScreen extends Screen {
 		matrices.translate(0, y, 0);
 		float dia = sCurve5((5-becomeBanTime)/5f);
 		float scale = 1;
-		boolean noUnset = key.startsWith("general.");
+		boolean noBan = key.startsWith("general.");
+		boolean noUnset = noBan && !editingWorldPath;
 		ConfigValue currentValue = noUnset ? (isEnabled(key) ? ConfigValue.TRUE : ConfigValue.FALSE) : onlyBannable ? getValue(key) == ConfigValue.BANNED ? ConfigValue.BANNED : ConfigValue.UNSET : getValue(key);
 		boolean keyEnabled = getResolvedValue(key) == ResolvedConfigValue.DEFAULT_TRUE;
 		ConfigValue prevValue = animateDisabled ? currentValue : optionPreviousValues.getOrDefault(key, currentValue);
 		int[] xes;
 		if (noUnset) {
 			xes = new int[] { 0, 23, 0, 0 };
+		} else if (noBan) {
+			xes = new int[] { 15, 30, 0, 0 };
 		} else if (onlyBannable) {
 			xes = new int[] { 30, 30, 30, 0 };
 		} else {
@@ -1041,23 +1002,24 @@ public class FabricationConfigScreen extends Screen {
 		if (!(disabled || failed)) {
 			da = 1-da;
 		}
-		int trackSize = (noUnset?45:60);
+		int trackSize = (noUnset||noBan?45:60);
 		if (clientOnly) {
 			fill(matrices, 133, 0, 134+trackSize+1, 11, 0xFFFFAA00);
 		} else {
 			fill(matrices, 133, 0, 134+trackSize+1, 11, 0xFFFFFFFF);
 		}
 		fill(matrices, 134, 1, 134+trackSize, 10, 0x66000000);
-		if (!noUnset && !onlyBannable) {
+		if (!noUnset && !onlyBannable && !noBan) {
 			fill(matrices, 134+15, 1, 134+15+15, 10, 0x33000000);
 			fill(matrices, 134+45, 1, 134+45+15, 10, 0x33000000);
 		}
 		matrices.push();
 		matrices.translate(134 + (prevX + ((curX - prevX) * a)), 0, 0);
 		int knobAlpha = ((int) ((noValue ? 1 - da : 1) * 255)) << 24;
-		fill(matrices, 0, 1, noUnset ? 22 : onlyBannable ? 30 : 15, 10, MathHelper.hsvToRgb(Math.floorMod((int) (prevHue + ((curHue - prevHue) * a)), 360) / 360f, 0.9f, (prevHSValue + ((curHSValue - prevHSValue) * a)) / 100f) | knobAlpha);
-		if (!noUnset && a >= 1 && (currentValue == ConfigValue.UNSET || FabConf.hasWorldPath()) && !onlyBannable) {
-			fill(matrices, keyEnabled ? 15 : -1, 1, keyEnabled ? 16 : 0, 10, MathHelper.hsvToRgb((keyEnabled ? 120 : 0) / 360f, 0.9f, 0.8f) | knobAlpha);
+		int selectedWidth = noUnset ? 22 : onlyBannable ? 30 : 15;
+		fill(matrices, 0, 1, selectedWidth, 10, MathHelper.hsvToRgb(Math.floorMod((int) (prevHue + ((curHue - prevHue) * a)), 360) / 360f, 0.9f, (prevHSValue + ((curHSValue - prevHSValue) * a)) / 100f) | knobAlpha);
+		if (!noUnset && a >= 1 && (currentValue == ConfigValue.UNSET || editingWorldPath) && !onlyBannable && !(noBan && currentValue != ConfigValue.UNSET)) {
+			fill(matrices, keyEnabled ? selectedWidth : -1, 1, keyEnabled ? selectedWidth+1 : 0, 10, MathHelper.hsvToRgb((keyEnabled ? 120 : 0) / 360f, 0.9f, 0.8f) | knobAlpha);
 		}
 		matrices.pop();
 		RenderSystem.enableBlend();
@@ -1068,26 +1030,39 @@ public class FabricationConfigScreen extends Screen {
 		if (noUnset) {
 			drawTexture(matrices, 134+3, 1, 15, 0, 15, 9, 60, 9);
 			drawTexture(matrices, 134+4+22, 1, 45, 0, 15, 9, 60, 9);
+		} else if (noBan) {
+			drawTexture(matrices, 134, 1, 15, 0, 45, 9, 60, 9);
+		}else if (onlyBannable) {
+			drawTexture(matrices, 134+7, 1, 0, 0, 15, 9, 60, 9);
+			drawTexture(matrices, 134+38, 1, 30, 0, 15, 9, 60, 9);
 		} else {
-			if (onlyBannable) {
-				drawTexture(matrices, 134+7, 1, 0, 0, 15, 9, 60, 9);
-				drawTexture(matrices, 134+38, 1, 30, 0, 15, 9, 60, 9);
-			} else {
-				drawTexture(matrices, 134, 1, 0, 0, 60, 9, 60, 9);
-			}
+			drawTexture(matrices, 134, 1, 0, 0, 60, 9, 60, 9);
 		}
 
 		RenderSystem.disableTexture();
-		if (didClick) {
+		int clickedIndex =(int)(mouseX - 134) / (noUnset ? 22 : onlyBannable ? 30 : 15);
+		if (didClick || mouseDragging) {
 			if (mouseX >= 134 && mouseX <= 134+trackSize && mouseY >= y+1 && mouseY <= y+10) {
 				float pitch = y*0.005f;
 				if (disabled) {
 					playErrorFeedback();
 				} else {
-					int clickedIndex = (int)((mouseX-134)/(noUnset ? 22 : onlyBannable ? 30 : 15));
 					ConfigValue newValue;
 					if (noUnset) {
 						newValue = clickedIndex == 0 ? ConfigValue.FALSE : ConfigValue.TRUE;
+					} else if (noBan) {
+						switch (clickedIndex) {
+							case 0:
+								newValue = ConfigValue.FALSE;
+								break;
+							case 2:
+								newValue = ConfigValue.TRUE;
+								break;
+							case 1:
+							default:
+								newValue = ConfigValue.UNSET;
+								break;
+						}
 					} else if (onlyBannable) {
 						newValue = clickedIndex == 0 ? ConfigValue.BANNED : ConfigValue.UNSET;
 					} else {
@@ -1115,7 +1090,7 @@ public class FabricationConfigScreen extends Screen {
 									newValue == ConfigValue.UNSET ? SoundEvents.BLOCK_NOTE_BLOCK_COW_BELL :
 										SoundEvents.BLOCK_NOTE_BLOCK_CHIME,
 										0.6f+pitch, 1f));
-					if (newValue != currentValue || (FabConf.hasWorldPath() && !FabConf.doesWorldContainValue(key))) {
+					if (newValue != currentValue || (editingWorldPath && !FabConf.doesWorldContainValue(key))) {
 						optionPreviousValues.put(key, currentValue);
 						optionAnimationTime.compute(key, (k, f) -> 5 - (f == null ? 0 : f));
 						setValue(key, newValue.toString().toLowerCase(Locale.ROOT));
@@ -1125,7 +1100,7 @@ public class FabricationConfigScreen extends Screen {
 		}
 		int textAlpha = ((int)((0.7f+((1-da)*0.3f)) * 255))<<24;
 		int startY = y;
-		int startX = 136+(noUnset ? 45 : 60)+5;
+		int startX = 136+(noUnset||noBan ? 45 : 60)+5;
 		int startStartX = startX;
 		String section = null;
 		if (showSourceSection && key.contains(".")) {
@@ -1187,9 +1162,8 @@ public class FabricationConfigScreen extends Screen {
 				} else if (failed) {
 					renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"This feature failed to initialize"), (int)mouseX, (int)mouseY);
 				} else {
-					int index = (int)((mouseX-134)/(noUnset ? 22 : onlyBannable ? 30 : 15));
 					if (onlyBannable) {
-						if (index == 0) {
+						if (clickedIndex == 0) {
 							renderTooltip(matrices, Lists.newArrayList(
 									new LiteralText("§7Ban"),
 									new LiteralText("Disallow use by clients")
@@ -1201,9 +1175,9 @@ public class FabricationConfigScreen extends Screen {
 									), (int)mouseX, (int)mouseY);
 						}
 					} else {
-						if (index == (noUnset ? 0 : 1)) {
+						if (clickedIndex == (noUnset || noBan ? 0 : 1)) {
 							renderTooltip(matrices, new LiteralText("§cDisable"), (int)mouseX, (int)mouseY);
-						} else if (index == (noUnset ? -99 : 2)) {
+						} else if (clickedIndex == (noUnset ? -99 : noBan ? 1 : 2)) {
 							if (currentValue == ConfigValue.UNSET) {
 								renderTooltip(matrices, Lists.newArrayList(
 										new LiteralText("§eUse default value §f(see General > Profile)"),
@@ -1212,7 +1186,7 @@ public class FabricationConfigScreen extends Screen {
 							} else {
 								renderTooltip(matrices, new LiteralText("§eUse default value §f(see General > Profile)"), (int)mouseX, (int)mouseY);
 							}
-						} else if (index == 0) {
+						} else if (clickedIndex == 0) {
 							List<Text> li = Lists.newArrayList(
 									new LiteralText("§7Ban"),
 									new LiteralText("Prevent feature from loading entirely")
@@ -1274,7 +1248,9 @@ public class FabricationConfigScreen extends Screen {
 
 	@Override
 	public void onClose() {
-		FabConf.resetWorldPath();
+		if (client.world == null) {
+			FabConf.setWorldPath(null);
+		}
 		if (!FabConf.isEnabled("*.reduced_motion") && !leaving) {
 			leaving = true;
 			client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_BARREL_CLOSE, 0.7f));
@@ -1327,40 +1303,38 @@ public class FabricationConfigScreen extends Screen {
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		if (button == 0) {
-			if (configuringServer) {
-				if (mouseX > (width-120) && mouseY < 16) {
-					hasClonked = false;
-					serverAnimateTime = 10-serverAnimateTime;
+			if (mouseX > (width - 120) && mouseY < 16) {
+				if (configuringServer) {
+					serverAnimateTime = 10 - serverAnimateTime;
 					configuringServer = false;
+					hasClonked = false;
 					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_XYLOPHONE, 0.8f, 1));
-				}
-			} else {
-				if (mouseX > (width-120) && mouseY < 16) {
-					if (client.world == null) {
-						client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_XYLOPHONE, 0.8f, 1));
-						if (FabConf.hasWorldPath()) {
-							FabConf.setWorldPath(null);
-						} else {
-							openWorldSelector();
-							return super.mouseClicked(mouseX, mouseY, button);
-						}
-					} else if (isSingleplayer) {
-						client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_XYLOPHONE, 0.8f, 1));
-						if (FabConf.hasWorldPath()) {
-							FabConf.setWorldPath(null);
-						} else {
-							FabConf.resetWorldPath();
-						}
-					} else if (whyCantConfigureServer == null) {
-						hasClonked = false;
-						serverAnimateTime = 10-serverAnimateTime;
-						configuringServer = true;
-						client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_XYLOPHONE, 1.2f, 1));
-					}  else {
-						playErrorFeedback();
+				} else if (client.world == null) {
+					hasClonked = false;
+					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_XYLOPHONE, 0.8f, 1));
+					serverAnimateTime = 10 - serverAnimateTime;
+					FabConf.setWorldPath(null);
+					if (editingWorldPath) {
+						editingWorldPath = false;
+					} else {
+						openWorldSelector();
+						return super.mouseClicked(mouseX, mouseY, button);
 					}
+				} else if (isSingleplayer) {
+					hasClonked = false;
+					serverAnimateTime = 10 - serverAnimateTime;
+					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_XYLOPHONE, 0.8f, 1));
+					editingWorldPath = !editingWorldPath;
+				} else if (whyCantConfigureServer == null) {
+					hasClonked = false;
+					serverAnimateTime = 10 - serverAnimateTime;
+					configuringServer = true;
+					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_XYLOPHONE, 1.2f, 1));
+				} else {
+					playErrorFeedback();
 				}
 			}
+
 			didClick = true;
 		}
 		if ("search".equals(selectedSection)) {
@@ -1422,7 +1396,7 @@ public class FabricationConfigScreen extends Screen {
 			return file;
 		}
 	}
-	
+
 	public void openWorldSelector() {
 		try {
 			Path savesDir = client.getLevelStorage().getSavesDirectory();
@@ -1444,6 +1418,7 @@ public class FabricationConfigScreen extends Screen {
 		}
 	}
 	public void setWorldMode(Object toFile) {
+		editingWorldPath = true;
 		FabConf.setWorldPath(((File)toFile).toPath());
 	}
 
@@ -1451,6 +1426,8 @@ public class FabricationConfigScreen extends Screen {
 	public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
 		if ("search".equals(selectedSection)) {
 			searchField.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+		} else {
+			mouseDragging = true;
 		}
 		return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
 	}
@@ -1520,19 +1497,11 @@ public class FabricationConfigScreen extends Screen {
 		}
 	}
 
-	private boolean isTrilean(String key) {
-		if (configuringServer) {
-			return ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerTrileanConfig().containsKey(key);
-		} else {
-			return FabConf.isStandardValue(key);
-		}
-	}
-
 	private ResolvedConfigValue getResolvedValue(String key) {
 		if (configuringServer) {
 			return ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerTrileanConfig().getOrDefault(key, ResolvedConfigValue.DEFAULT_FALSE);
 		} else {
-			return FabConf.getResolvedValue(key);
+			return FabConf.getResolvedValue(key, editingWorldPath);
 		}
 	}
 
@@ -1546,11 +1515,7 @@ public class FabricationConfigScreen extends Screen {
 
 	private String getRawValue(String key) {
 		if (configuringServer) {
-			if (isTrilean(key)) {
-				return getValue(key).toString().toLowerCase(Locale.ROOT);
-			} else {
-				return ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerStringConfig().get(key);
-			}
+			return getValue(key).toString().toLowerCase(Locale.ROOT);
 		} else {
 			return FabConf.getRawValue(key);
 		}
@@ -1570,7 +1535,7 @@ public class FabricationConfigScreen extends Screen {
 		}
 		String oldValue = getRawValue(key);
 		//TODO count banned world values
-		if (!FabConf.isRuntimeConfigurable(key) && !(configuringServer && FeaturesFile.get(key).sides == Sides.CLIENT_ONLY) && !FabConf.hasWorldPath()) {
+		if (!FabConf.isRuntimeConfigurable(key) && !(configuringServer && FeaturesFile.get(key).sides == Sides.CLIENT_ONLY) && !editingWorldPath) {
 			if (value.equals("banned")) {
 				if (newlyUnbannedKeys.contains(key)) {
 					newlyUnbannedKeys.remove(key);
@@ -1591,7 +1556,7 @@ public class FabricationConfigScreen extends Screen {
 			data.writeString(key);
 			data.writeString(value);
 			client.getNetworkHandler().sendPacket(new CustomPayloadC2SPacket(new Identifier("fabrication", "config"), data));
-		} else if (FabConf.hasWorldPath()) {
+		} else if (editingWorldPath && FabConf.hasWorldPath()) {
 			FabConf.worldSet(key, value);
 			if (FabricationMod.isAvailableFeature(key)) {
 				FabricationMod.updateFeature(key);

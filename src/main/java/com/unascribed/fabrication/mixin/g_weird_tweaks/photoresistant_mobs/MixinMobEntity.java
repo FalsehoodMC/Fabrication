@@ -1,9 +1,9 @@
 package com.unascribed.fabrication.mixin.g_weird_tweaks.photoresistant_mobs;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
@@ -17,7 +17,7 @@ import net.minecraft.entity.mob.PhantomEntity;
 @EligibleIf(configAvailable="*.photoresistant_mobs")
 public abstract class MixinMobEntity {
 
-	@Inject(at=@At("HEAD"), method="isAffectedByDaylight()Z", cancellable=true)
+	@FabInject(at=@At("HEAD"), method="isAffectedByDaylight()Z", cancellable=true)
 	public void isAffectedByDaylight(CallbackInfoReturnable<Boolean> ci) {
 		if (FabConf.isEnabled("*.photoresistant_mobs")) {
 			Object self = this;

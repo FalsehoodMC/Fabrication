@@ -43,6 +43,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
+import net.minecraft.command.EntitySelector;
 import net.minecraft.command.argument.DimensionArgumentType;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
@@ -63,6 +64,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.ChunkStatus;
+import net.minecraft.world.gen.chunk.ChunkGenerator;
 
 public class FeatureFabricationCommand implements Feature {
 
@@ -70,7 +72,7 @@ public class FeatureFabricationCommand implements Feature {
 	public void apply() {
 		Agnos.runForCommandRegistration((dispatcher, dedi) -> {
 			try {
-				LiteralArgumentBuilder<ServerCommandSource> root = LiteralArgumentBuilder.<ServerCommandSource>literal("fabrication");
+				LiteralArgumentBuilder<ServerCommandSource> root = LiteralArgumentBuilder.<ServerCommandSource>literal(FabricationMod.MOD_NAME_LOWER);
 				addConfig(root, dedi);
 				if (Agnos.isModLoaded("fscript")) addFScript(root, dedi);
 
@@ -88,25 +90,25 @@ public class FeatureFabricationCommand implements Feature {
 					for (String key : FeatureTaggablePlayers.validTags.keySet()) {
 						{
 							LiteralArgumentBuilder<ServerCommandSource> literalKey = CommandManager.literal(key);
+							RequiredArgumentBuilder<ServerCommandSource, EntitySelector> playerParameter = CommandManager.argument("players", EntityArgumentType.players()).executes(c -> {
+								return addTag(c, EntityArgumentType.getPlayers(c, "players"), key);
+							});
 							literalKey.executes(c -> {
 										return addTag(c, Collections.singleton(c.getSource().getPlayer()), key);
-									})
-									.then(CommandManager.argument("players", EntityArgumentType.players()).executes(c -> {
-										return addTag(c, EntityArgumentType.getPlayers(c, "players"), key);
-									}));
+									}).then(playerParameter);
 							add.then(literalKey);
-							setAltKeys(key, alt -> add.then(LiteralArgumentBuilder.<ServerCommandSource>literal(alt).executes(literalKey.getCommand())));
+							setAltKeys(key, alt -> add.then(LiteralArgumentBuilder.<ServerCommandSource>literal(alt).executes(literalKey.getCommand()).then(playerParameter)));
 						}
 						{
 							LiteralArgumentBuilder<ServerCommandSource> literalKey = CommandManager.literal(key);
+							RequiredArgumentBuilder<ServerCommandSource, EntitySelector> playerParameter = CommandManager.argument("players", EntityArgumentType.players()).executes(c -> {
+								return removeTag(c, EntityArgumentType.getPlayers(c, "players"), key);
+							});
 							literalKey.executes(c -> {
 										return removeTag(c, Collections.singleton(c.getSource().getPlayer()), key);
-									})
-									.then(CommandManager.argument("players", EntityArgumentType.players()).executes(c -> {
-										return removeTag(c, EntityArgumentType.getPlayers(c, "players"), key);
-									}));
+									}).then(playerParameter);
 							remove.then(literalKey);
-							setAltKeys(key, alt -> remove.then(LiteralArgumentBuilder.<ServerCommandSource>literal(alt).executes(literalKey.getCommand())));
+							setAltKeys(key, alt -> remove.then(LiteralArgumentBuilder.<ServerCommandSource>literal(alt).executes(literalKey.getCommand()).then(playerParameter)));
 						}
 						{
 							{
@@ -237,7 +239,7 @@ public class FeatureFabricationCommand implements Feature {
 		} else {
 			biomes = null;
 		}
-		String name = "fabrication_block_distribution_"+System.currentTimeMillis()+".tsv";
+		String name = FabricationMod.MOD_NAME_LOWER+"_block_distribution_"+System.currentTimeMillis()+".tsv";
 		c.getSource().sendFeedback(new LiteralText("Starting background block distribution analysis"), false);
 		c.getSource().sendFeedback(new LiteralText("This could take a while, but the server should remain usable"), false);
 		c.getSource().sendFeedback(new LiteralText("Once complete a file named "+name+" will appear in the server directory"), false);
@@ -324,7 +326,7 @@ public class FeatureFabricationCommand implements Feature {
 				i++;
 			}
 			FabLog.info("Scanned "+scanned+"/"+goal+" blocks (skipped "+skipped+"), 100% done. Writing file");
-			FabLog.info("NOTE: Fabrication block distribution analysis is NOT A BENCHMARK. Chunk generation speed is intentionally limited to keep servers responsive and not crashing.");
+			FabLog.info("NOTE: "+FabricationMod.MOD_NAME+" block distribution analysis is NOT A BENCHMARK. Chunk generation speed is intentionally limited to keep servers responsive and not crashing.");
 			List<Map.Entry<BlockState, MutableLong>> sorted = Lists.newArrayList(counts.entrySet());
 			sorted.sort((a, b) -> Long.compare(b.getValue().value, a.getValue().value));
 			try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(new File(name)), Charsets.UTF_8)) {
@@ -356,7 +358,7 @@ public class FeatureFabricationCommand implements Feature {
 			} catch (IOException e) {
 				FabLog.error("Failed to save block distribution data", e);
 			}
-		}, "Fabrication block analysis").start();
+		}, FabricationMod.MOD_NAME+" block analysis").start();
 		return 1;
 	}
 
@@ -385,11 +387,10 @@ public class FeatureFabricationCommand implements Feature {
 				LiteralArgumentBuilder<T> key = LiteralArgumentBuilder.<T>literal(s);
 				key.executes((c) -> {
 					String value = FabConf.getRawValue(s);
-					boolean tri = FabConf.isStandardValue(s);
-					if (value.isEmpty() && tri) value = "unset";
+					if (value.isEmpty()) value = "unset";
 					boolean def = FabConf.getDefault(s);
-					LiteralText txt = new LiteralText(s+" = "+value+(tri ? " (default "+def+")" : ""));
-					if (tri && !FabConf.isEnabled(s)) {
+					LiteralText txt = new LiteralText(s+" = "+value+(" (default "+def+")"));
+					if (!FabConf.isEnabled(s)) {
 						// so that command blocks report failure
 						throw new CommandException(txt.formatted(Formatting.WHITE));
 					} else {
@@ -407,10 +408,8 @@ public class FeatureFabricationCommand implements Feature {
 				LiteralArgumentBuilder<T> key = LiteralArgumentBuilder.<T>literal(s);
 
 				String[] values;
-				if (s.equals("general.reduced_motion") || s.equals("general.data_upload")) {
+				if (s.startsWith("general.")) {
 					values = new String[]{"true", "false"};
-				} else if (s.equals("general.profile")) {
-					values = FabConf.Profile.stringValues();
 				} else {
 					values = new String[]{"unset", "true", "false", "banned"};
 				}
@@ -439,10 +438,8 @@ public class FeatureFabricationCommand implements Feature {
 				LiteralArgumentBuilder<T> key = LiteralArgumentBuilder.<T>literal(s);
 
 				String[] values;
-				if (s.equals("general.reduced_motion") || s.equals("general.data_upload")) {
-					values = new String[]{"true", "false"};
-				} else if (s.equals("general.profile")) {
-					values = FabConf.Profile.stringValues();
+				if (s.startsWith("general.")) {
+					values = new String[]{"unset", "true", "false"};
 				} else {
 					values = new String[]{"unset", "true", "false", "banned"};
 				}
@@ -470,7 +467,7 @@ public class FeatureFabricationCommand implements Feature {
 						if (c.getSource() instanceof ServerCommandSource) {
 							FabricationMod.sendConfigUpdate(((ServerCommandSource)c.getSource()).getServer(), null);
 						}
-						sendFeedback(c, new LiteralText("Fabrication configuration reloaded"), true);
+						sendFeedback(c, new LiteralText(FabricationMod.MOD_NAME+" configuration reloaded"), true);
 						sendFeedback(c, new LiteralText("§eYou may need to restart the game for the changes to take effect."), false);
 						return 1;
 					})
@@ -594,16 +591,15 @@ public class FeatureFabricationCommand implements Feature {
 	private static void setKeyWithFeedback(CommandContext<? extends CommandSource> c, String key, String value, boolean local) {
 		String oldValue = FabConf.getRawValue(key);
 		boolean def = FabConf.getDefault(key);
-		boolean tri = FabConf.isStandardValue(key);
 		if (!local && value.equals(oldValue) || local && FabConf.doesWorldContainValue(key, value)) {
-			sendFeedback(c, new LiteralText(key+" is already set to "+value+(tri ? " (default "+def+")" : "")), false);
+			sendFeedback(c, new LiteralText(key+" is already set to "+value+(" (default "+def+")")), false);
 		} else {
 			if (local) FabConf.worldSet(key, value);
 			else FabConf.set(key, value);
 			if (c.getSource() instanceof ServerCommandSource) {
 				FabricationMod.sendConfigUpdate(((ServerCommandSource)c.getSource()).getServer(), key);
 			}
-			sendFeedback(c, new LiteralText(key+" is now set to "+value+(tri ? " (default "+def+")" : "")+(local ? " for this world" : "")), true);
+			sendFeedback(c, new LiteralText(key+" is now set to "+value+(" (default "+def+")")+(local ? " for this world" : "")), true);
 			if (FabricationMod.isAvailableFeature(key)) {
 				if (FabricationMod.updateFeature(key)) {
 					return;

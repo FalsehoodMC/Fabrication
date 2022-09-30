@@ -76,7 +76,7 @@ public class MixinServerPlayerInteractionManager {
 		if (fabrication$gradualBreakState != null) {
 			world.setBlockState(pos, fabrication$gradualBreakState);
 			fabrication$gradualBreakState = null;
-			return new HijackReturn(true);
+			return HijackReturn.TRUE;
 		}
 		return null;
 	}

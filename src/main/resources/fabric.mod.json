@@ -10,7 +10,7 @@
     "SFort"
   ],
   "contact": {
-    "homepage": "https://www.curseforge.com/minecraft/mc-mods/fabrication",
+    "homepage": "https://unascribed.com/fabrication",
     "source": "https://github.com/unascribed/Fabrication",
     "issues": "https://github.com/unascribed/Fabrication/issues"
   },
@@ -22,7 +22,8 @@
     "main": ["com.unascribed.fabrication.FabricationMod"],
     "client": ["com.unascribed.fabrication.FabricationModClient"],
     "modmenu": ["com.unascribed.fabrication.ModMenuInitializer"],
-    "fscript": ["com.unascribed.fabrication.FScriptInitializer"]
+    "fscript": ["com.unascribed.fabrication.FScriptInitializer"],
+    "lib39:gl_compat_voter": ["com.unascribed.fabrication.client.FabricationGLCompatVoter"]
   },
   "mixins": ["fabrication.mixins.json"],
   "accessWidener": "fabrication.accesswidener",
@@ -34,7 +35,9 @@
     "fabric-resource-loader-v0": "*",
     "fabric-command-api-v1": "*",
     "fabric-key-binding-api-v1": "*",
-    "fabric-rendering-v1": "*"
+    "fabric-rendering-v1": "*",
+    "fabric-registry-sync-v0": "*",
+    "lib39-deferral": ">=1.1.1"
   },
   "suggests": {
   },

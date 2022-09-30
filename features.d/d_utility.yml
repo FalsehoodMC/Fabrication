@@ -5,7 +5,6 @@ utility:
 	name: Utility
 	section: true
 	since: 1.0
-	default: blonde
 	desc:
 		Useful tidbits that don't modify gameplay.
 
@@ -233,6 +232,27 @@ utility.extract_furnace_xp:
 	desc:
 		Allows clicking on the empty output slot of a furnace to extract the experience, instead of
 		needing to break it.
+
+utility.lenient_command_suggestions:
+	name: Lenient Command Suggestions
+	since: 3.0.0
+	sides: server_only
+	desc:
+		Command suggestions for modded ids will still appear even if the id namespace is not explicitly specified.
+
+utility.linkify_urls:
+	name: Linkify Urls
+	since: 3.0.0
+	sides: client_only
+	desc:
+		Links in chat are clickable.
+
+utility.rmb_clears_text_fields:
+	name: RMB Clears Text Fields
+	since: 3.0.0
+	sides: client_only
+	desc:
+		Right Mouse Button will clear text fields.
 
 # kate: space-indent off
 # vim: noai:noet

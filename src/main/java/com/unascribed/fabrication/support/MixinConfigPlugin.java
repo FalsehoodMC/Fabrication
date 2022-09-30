@@ -2,24 +2,23 @@ package com.unascribed.fabrication.support;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.SetMultimap;
+import com.google.common.io.ByteSource;
+import com.google.common.io.Resources;
 import com.google.common.reflect.ClassPath;
-import com.google.common.reflect.ClassPath.ClassInfo;
 import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.FabLog;
+import com.unascribed.fabrication.support.injection.FabModifyConstInjectionInfo;
 import com.unascribed.fabrication.support.injection.FabRefMap;
 import com.unascribed.fabrication.support.injection.FailsoftCallbackInjectionInfo;
 import com.unascribed.fabrication.support.injection.FailsoftModifyArgInjectionInfo;
-import com.unascribed.fabrication.support.injection.FailsoftModifyArgsInjectionInfo;
-import com.unascribed.fabrication.support.injection.FailsoftModifyConstantInjectionInfo;
 import com.unascribed.fabrication.support.injection.FailsoftModifyVariableInjectionInfo;
-import com.unascribed.fabrication.support.injection.FailsoftRedirectInjectionInfo;
 import com.unascribed.fabrication.support.injection.FabInjector;
 import com.unascribed.fabrication.support.injection.Hijack;
 import com.unascribed.fabrication.support.injection.ModifyReturn;
-import com.unascribed.fabrication.support.injection.FakeMixinHack;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
@@ -33,7 +32,6 @@ import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
-import org.spongepowered.asm.mixin.Mixins;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 import org.spongepowered.asm.mixin.injection.struct.InjectionInfo;
@@ -43,10 +41,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -55,21 +53,47 @@ import java.util.stream.Collectors;
 public class MixinConfigPlugin implements IMixinConfigPlugin {
 
 	private static final SetMultimap<String, String> configKeysForDiscoveredClasses = HashMultimap.create();
+	private static final Set<String> brokenInForge = Set.of(
+			"*.inanimates_can_be_invisible",
+			"*.books_show_enchants",
+			"*.show_bee_count_on_item",
+			"*.hide_armor",
+			"*.legacy_command_syntax",
+			"*.show_map_id",
+			"*.tools_show_important_enchant",
+			"*.rainbow_experience",
+			"*.gradual_block_breaking",
+			"*.launching_pistons",
+			"*.invisibility_splash_on_inanimates",
+			"*.swap_conflicting_enchants",
+			"*.colorful_redstone",
+			"*.grindstone_disenchanting",
+			"*.pursurvers",
+			"*.environmentally_friendly_creepers",
+			"*.interrupting_damage",
+			"*.mobs_dont_drop_ingots",
+			"*.tools_in_bundles",
+			"*.dimensional_tools",
+			"*.photoallergic_creepers",
+			"*.end_portal_parallax",
+			"*.flat_items",
+			"*.classic_block_drops",
+			"*.dropped_items_dont_stack"
+	);
 	public static boolean loadComplete = false;
 
 	@Override
 	public void onLoad(String mixinPackage) {
 		FabConf.reload();
-		Mixins.registerErrorHandlerClass("com.unascribed.fabrication.support.MixinErrorHandler_THIS_ERROR_HANDLER_IS_FOR_SOFT_FAILURE_IN_FABRICATION_ITSELF_AND_DOES_NOT_IMPLY_FABRICATION_IS_RESPONSIBLE_FOR_THE_BELOW_ERROR");
-		FabLog.warn("Fabrication is about to inject into Mixin to add support for failsoft mixins.");
-		FabLog.warn("THE FOLLOWING WARNINGS ARE NOT AN ERROR AND DO NOT IMPLY FABRICATION IS RESPONSIBLE FOR A CRASH.");
+		if (FabConf.isMet(SpecialEligibility.FORGE)) {
+			for (String s : brokenInForge) {
+				FabConf.addFailure(s);
+			}
+		}
 		InjectionInfo.register(FailsoftCallbackInjectionInfo.class);
 		InjectionInfo.register(FailsoftModifyArgInjectionInfo.class);
-		InjectionInfo.register(FailsoftModifyArgsInjectionInfo.class);
-		InjectionInfo.register(FailsoftRedirectInjectionInfo.class);
 		InjectionInfo.register(FailsoftModifyVariableInjectionInfo.class);
-		InjectionInfo.register(FailsoftModifyConstantInjectionInfo.class);
-		FabLog.warn("Injection complete.");
+		InjectionInfo.register(FabModifyConstInjectionInfo.class);
 	}
 
 	@Override
@@ -89,7 +113,6 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 
 	@Override
 	public List<String> getMixins() {
-		FabLog.debug("☕ Profile: "+FabConf.getProfileName().toLowerCase(Locale.ROOT));
 		return discoverClassesInPackage("com.unascribed.fabrication.mixin", true);
 	}
 
@@ -117,6 +140,17 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 				List<String> eligibilitySuccesses = Lists.newArrayList();
 				boolean anyRestrictions = false;
 				if (cn.visibleAnnotations != null) {
+					List<String> fakeMixin = null;
+					for (AnnotationNode an : cn.visibleAnnotations) {
+						if (an.desc.equals("Lcom/unascribed/fabrication/support/injection/FakeMixinHack;")){
+							if (an.values == null) continue;
+							for (int i = 0; i < an.values.size(); i += 2) {
+								if ("value".equals(an.values.get(i))) {
+									fakeMixin = (List<String>) an.values.get(i+1);
+								}
+							}
+						}
+					}
 					for (AnnotationNode an : cn.visibleAnnotations) {
 						if (an.desc.equals("Lcom/unascribed/fabrication/support/EligibleIf;")) {
 							if (an.values == null) continue;
@@ -125,19 +159,28 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 								String k = (String)an.values.get(i);
 								Object v = an.values.get(i+1);
 								if (k.equals("configAvailable")) {
-									if (!FabConf.defaultContains((String)v)) {
+									if (!FabConf.isValid((String)v)) {
 										FabLog.debug("🙈 Dev error! Exploding.");
 										throw FabConf.devError(cn.name.substring(pkg.length()+1).replace('/', '.')+" references an unknown config key "+v+"\n\nDid you forget to add it to features.txt and run build-features.sh?");
 									}
-									if (FabConf.limitRuntimeConfigs() && !FabConf.isEnabled((String) v))
+									if (FabConf.isFailed((String) v)) {
+										eligibilityFailures.add("Required config setting "+ FabConf.remap((String)v)+" has failed injects");
 										eligible = false;
-									if (FabConf.isBanned((String)v)) {
+									} if (FabConf.limitRuntimeConfigs() && !FabConf.isEnabled((String) v)) {
+										eligibilityFailures.add("Required config setting "+ FabConf.remap((String)v)+" is not enabled and limit_runtime_configs is on");
+										eligible = false;
+									} else if (FabConf.isBanned((String)v)) {
 										eligibilityFailures.add("Required config setting "+ FabConf.remap((String)v)+" is banned");
 										eligible = false;
 									} else {
 										eligibilitySuccesses.add("Required config key "+ FabConf.remap((String)v)+" is not banned");
 									}
 									configKeysForDiscoveredClasses.put(ci.getName(), (String)v);
+									if (fakeMixin != null) {
+										for (String fm : fakeMixin) {
+											configKeysForDiscoveredClasses.put(fm, (String) v);
+										}
+									}
 								} else if (k.equals("envMatches")) {
 									String[] arr = (String[])v;
 									if (arr[0].equals("Lcom/unascribed/fabrication/support/Env;")) {
@@ -191,8 +234,14 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 								} else if (k.equals("anyConfigAvailable")) {
 									boolean allBanned = true;
 									boolean runtimeCheck = FabConf.limitRuntimeConfigs();
+									boolean allFailed = true;
 									for (String s : (List<String>)v) {
 										s = FabConf.remap(s);
+										if (FabConf.isFailed(s)) {
+											eligibilityFailures.add("Required config setting "+s+" has failed injects");
+										} else {
+											allFailed = false;
+										}
 										if (runtimeCheck && FabConf.isEnabled(s))
 											runtimeCheck = false;
 										if (FabConf.isBanned(s)) {
@@ -202,10 +251,19 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 											eligibilitySuccesses.add("Relevant config setting "+s+" is not banned");
 										}
 										configKeysForDiscoveredClasses.put(ci.getName(), s);
+										if (fakeMixin != null) {
+											for (String fm : fakeMixin) {
+												configKeysForDiscoveredClasses.put(fm, s);
+											}
+										}
 									}
-									if (runtimeCheck)
+									if (allFailed) {
+										eligibilityFailures.add("All of the relevant config settings failed to inject");
 										eligible = false;
-									if (allBanned) {
+									} else if (runtimeCheck) {
+										eligibilityFailures.add("All of the relevant config settings are off while limit_runtime_configs is on");
+										eligible = false;
+									} else if (allBanned) {
 										eligibilityFailures.add("All of the relevant config settings are banned");
 										eligible = false;
 									}
@@ -271,8 +329,6 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	private static Iterable<ClassInfo> getClassesInPackage(String pkg) {
 		try (InputStream is = MixinConfigPlugin.class.getClassLoader().getResourceAsStream("classes.txt")) {
 			if (is != null) {
-				Constructor<ClassInfo> cons = ClassInfo.class.getDeclaredConstructor(String.class, ClassLoader.class);
-				cons.setAccessible(true);
 				List<ClassInfo> rtrn = Lists.newArrayList();
 				BufferedReader br = new BufferedReader(new InputStreamReader(is, Charsets.UTF_8));
 				String prefix = pkg.replace('.', '/')+"/";
@@ -280,7 +336,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 					String line = br.readLine();
 					if (line == null) break;
 					if (line.startsWith(prefix)) {
-						rtrn.add(cons.newInstance(line, MixinConfigPlugin.class.getClassLoader()));
+						rtrn.add(new BareClassInfo(line, MixinConfigPlugin.class.getClassLoader()));
 					}
 				}
 				return rtrn;
@@ -289,7 +345,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			e.printStackTrace();
 		}
 		try {
-			return ClassPath.from(MixinConfigPlugin.class.getClassLoader()).getTopLevelClassesRecursive(pkg);
+			return Iterables.transform(ClassPath.from(MixinConfigPlugin.class.getClassLoader()).getTopLevelClassesRecursive(pkg), GuavaClassInfo::new);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -302,7 +358,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	@Override
 	public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
 		if (FabConf.limitRuntimeConfigs()) finalizeIsEnabled(targetClass);
-		fakeMixinHack(targetClass, mixinClassName);
+		fakeMixinHack(targetClass);
 		FabInjector.apply(targetClass);
 		lithiumCompat(targetClass, mixinClassName);
 		if (targetClass.visibleAnnotations != null) {
@@ -310,13 +366,22 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 		}
 	}
 
-	public static void fakeMixinHack(ClassNode targetClass, String mixinClassName){
-		try {
-			FakeMixinHack sih = Class.forName(mixinClassName, false, MixinConfigPlugin.class.getClassLoader()).getAnnotation(FakeMixinHack.class);
-			if (sih != null){
+	public static void fakeMixinHack(ClassNode targetClass) {
+		if (targetClass.visibleAnnotations == null) return;
+		for (AnnotationNode annotationNode : targetClass.visibleAnnotations) {
+			if ("Lcom/unascribed/fabrication/support/injection/FakeMixinHack;".equals(annotationNode.desc)) {
+				Object list = annotationNode.values.get(annotationNode.values.indexOf("value") + 1);
+				if (!(list instanceof List<?>) || ((List<?>) list).isEmpty() || !(((List<?>) list).get(0) instanceof String))
+					continue;
 				List<FabInjector.ToInject> toInject = new ArrayList<>();
-				for (Class<?> cl : sih.value()){
-					for (Method mthd : cl.getMethods()){
+				for (String className : (List<String>) list) {
+					Class<?> cl;
+					try {
+						cl = Class.forName(className);
+					}catch (Exception ignore){
+						continue;
+					}
+					for (Method mthd : cl.getMethods()) {
 						ModifyReturn mr = mthd.getAnnotation(ModifyReturn.class);
 						Hijack hi = mthd.getAnnotation(Hijack.class);
 						String[] method = null;
@@ -333,8 +398,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 						}
 						if (target != null && method != null && desc != null) {
 							toInject.add(new FabInjector.ToInject(
-									Arrays.stream(method).map(s -> FabRefMap.methodMap(cl.getName(), s)).collect(Collectors.toList()),
-									Arrays.stream(target).map(s -> FabRefMap.targetMap(cl.getName(), s)).collect(Collectors.toList()),
+									Arrays.stream(method).map(s -> FabRefMap.relativeMap(cl.getName(), s)).collect(Collectors.toList()),
+									Arrays.stream(target).map(FabRefMap::absoluteMap).collect(Collectors.toList()),
 									cl.getName().replace('.', '/'),
 									mthd.getName(),
 									Type.getMethodDescriptor(mthd),
@@ -348,7 +413,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 				}
 				FabInjector.apply(targetClass, toInject);
 			}
-		} catch (Exception ignore) {}
+		}
 	}
 
 	public static void lithiumCompat(ClassNode targetClass, String mixinClassName){
@@ -401,6 +466,59 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 						}
 					}
 		});
+	}
+
+	public static Set<String> getConfigKeysForDiscoveredClass(String clazz) {
+		return Collections.unmodifiableSet(configKeysForDiscoveredClasses.get(clazz.replace('/', '.')));
+	}
+
+	private interface ClassInfo {
+
+		String getName();
+		ByteSource asByteSource();
+
+	}
+
+	private static class BareClassInfo implements ClassInfo {
+
+		private final String name;
+		private final ClassLoader loader;
+
+		public BareClassInfo(String name, ClassLoader loader) {
+			this.name = name;
+			this.loader = loader;
+		}
+
+		@Override
+		public String getName() {
+			return name.replace('/', '.').replace(".class", "");
+		}
+
+		@Override
+		public ByteSource asByteSource() {
+			return Resources.asByteSource(loader.getResource(name));
+		}
+
+	}
+
+	private static class GuavaClassInfo implements ClassInfo {
+
+		private final ClassPath.ClassInfo delegate;
+
+		public GuavaClassInfo(ClassPath.ClassInfo delegate) {
+			this.delegate = delegate;
+		}
+
+		@Override
+		public String getName() {
+			return delegate.getName();
+		}
+
+		@Override
+		public ByteSource asByteSource() {
+			return delegate.asByteSource();
+		}
+
 	}
 
 }

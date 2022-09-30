@@ -99,7 +99,6 @@ public class Analytics {
 				extra.put("Minecraft Version", SharedConstants.getGameVersion().getName());
 				extra.put("Loader", (FabConst.FORGE ? "Forge" : "Fabric")+" "+Agnos.getLoaderVersion());
 				extra.put("Environment", Agnos.getCurrentEnv().name());
-				extra.put("Profile", FabConf.getRawValue("general.profile"));
 				if (Agnos.getCurrentEnv() == Env.CLIENT) {
 					addClientData(extra);
 				}

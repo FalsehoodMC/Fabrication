@@ -13,7 +13,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientPlayerEntity.class)
@@ -27,7 +27,7 @@ public abstract class MixinClientPlayerEntity extends PlayerEntity implements Po
 	private float fabrication$lastClientPortalTicks = 0;
 	private float fabrication$nextClientPortalTicks = 0;
 
-	@Inject(method="tickMovement()V", at=@At("HEAD"))
+	@FabInject(method="tickMovement()V", at=@At("HEAD"))
 	private void fixPortalNausea(CallbackInfo ci){
 		if (!FabConf.isEnabled("*.fix_nether_portal_nausea")) return;
 		fabrication$lastClientPortalTicks = fabrication$nextClientPortalTicks;

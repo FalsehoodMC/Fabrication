@@ -20,21 +20,18 @@ public class FabReflAnnotationProcessor extends AbstractProcessor {
 
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-		Set<String> fields = new HashSet<>();
-		Set<String> methods = new HashSet<>();
-		for (TypeElement te: annotations) {
-			for (VariableElement e : ElementFilter.fieldsIn(roundEnv.getElementsAnnotatedWith(te))) {
-				String str = e.getConstantValue().toString();
-				if (str.contains("(")) methods.add(str+" "+(str.substring(str.charAt(0)=='L'?1:0, str.indexOf(';')).replace('/', '.')));
-				else fields.add(str);
-			}
-		}
-		if (!fields.isEmpty() || !methods.isEmpty()) {
+		if (!annotations.isEmpty()) {
 			try {
 				FileWriter fw = new FileWriter("build/tmp/fabReflToMap");
-				if (!fields.isEmpty()) fw.append(String.join("\t", fields));
-				fw.append('\n');
-				if (!fields.isEmpty()) fw.append(String.join("\t", methods));
+				for (TypeElement te: annotations) {
+					for (VariableElement e : ElementFilter.fieldsIn(roundEnv.getElementsAnnotatedWith(te))) {
+						String str = e.getConstantValue().toString();
+						fw.append(str)
+								.append(' ')
+								.append(str.substring(str.charAt(0)=='L'?1:0, str.indexOf(';')).replace('/', '.'))
+								.append('\n');
+					}
+				}
 				fw.close();
 			} catch (IOException e) {
 				processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "failed to write fabReflToMap\n" + e);

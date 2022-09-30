@@ -9,13 +9,14 @@ import net.minecraft.world.gen.PhantomSpawner;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(PhantomSpawner.class)
-@EligibleIf(anyConfigAvailable="*.invisible_to_mobs")
+@EligibleIf(anyConfigAvailable={"*.no_phantoms", "invisible_to_mobs"})
 public class MixinPhantomSpawner {
 
 	@ModifyReturn(method="spawn(Lnet/minecraft/server/world/ServerWorld;ZZ)I", target="Lnet/minecraft/entity/player/PlayerEntity;isSpectator()Z")
-	private static boolean fabrication$taggablePlayersIsSpectator(boolean original, PlayerEntity subject) {
-		if (!FabConf.isEnabled("*.invisible_to_mobs")) return original;
-		return ConfigPredicates.shouldRun("*.invisible_to_mobs", subject) || original;
+	private static boolean fabrication$InvisTaggablePlayersIsSpectator(boolean original, PlayerEntity subject) {
+		if (FabConf.isEnabled("*.invisible_to_mobs") && ConfigPredicates.shouldRun("*.invisible_to_mobs", subject)) return true;
+		if (FabConf.isEnabled("*.no_phantoms") && ConfigPredicates.shouldRun("*.no_phantoms", subject)) return true;
+		return original;
 	}
 
 }

@@ -6,7 +6,7 @@ import net.minecraft.entity.effect.StatusEffects;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.interfaces.SetSaturation;
@@ -22,7 +22,7 @@ public abstract class MixinHungerManager implements SetSaturation {
 	@Shadow
 	private float foodSaturationLevel;
 
-	@Inject(at=@At("HEAD"), method="update(Lnet/minecraft/entity/player/PlayerEntity;)V", cancellable=true)
+	@FabInject(at=@At("HEAD"), method="update(Lnet/minecraft/entity/player/PlayerEntity;)V", cancellable=true)
 	public void update(PlayerEntity pe, CallbackInfo ci) {
 		if (FabConf.isEnabled("*.no_hunger")) {
 			if (ConfigPredicates.shouldRun("*.no_hunger", pe) && !pe.hasStatusEffect(StatusEffects.HUNGER)) {

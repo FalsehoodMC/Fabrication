@@ -1,9 +1,9 @@
 package com.unascribed.fabrication.mixin.i_woina.dirt_screen;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.support.EligibleIf;
@@ -21,7 +21,7 @@ public class MixinTitleScreen extends Screen {
 		super(title);
 	}
 
-	@Inject(method = "render", at = @At(value="INVOKE", target="Lnet/minecraft/client/gui/RotatingCubeMapRenderer;render(FF)V", shift = At.Shift.AFTER))
+	@FabInject(method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V", at=@At(value="INVOKE", target="Lnet/minecraft/client/gui/RotatingCubeMapRenderer;render(FF)V", shift=At.Shift.AFTER))
 	public void drawDirt(CallbackInfo ci) {
 		if (FabConf.isEnabled("*.dirt_screen")) {
 			renderBackgroundTexture(0);

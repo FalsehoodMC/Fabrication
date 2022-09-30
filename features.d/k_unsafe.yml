@@ -5,7 +5,6 @@ unsafe:
 	name: Unsafe
 	section: true
 	since: 2.1.0
-	default: never
 	desc:
 		QoL changes that make cheating easier.
 
@@ -15,7 +14,7 @@ unsafe.disable_breaking_speed_check:
 	sides: server_only
 	desc:
 		Server will not check if the client is cheating, when breaking blocks faster then expected.
-		
+
 		Helpful with block breaking lag when you trust the players.
 
 unsafe.disable_moved_too_quickly:
@@ -24,8 +23,8 @@ unsafe.disable_moved_too_quickly:
 	sides: server_only
 	desc:
 		Server will not check if the client is cheating, when traveling faster then expected.
-		
+
 		Helpful with rubber banding when you trust the players.
-		
+
 # kate: space-indent off
 # vim: noai:noet

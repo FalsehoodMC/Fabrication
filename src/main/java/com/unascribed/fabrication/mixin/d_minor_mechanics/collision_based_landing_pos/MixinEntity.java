@@ -7,10 +7,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
@@ -24,7 +25,7 @@ public abstract class MixinEntity {
 	@Shadow public abstract double getZ();
 	@Shadow public abstract Vec3d getPos();
 
-	@Inject(method="getLandingPos()Lnet/minecraft/util/math/BlockPos;", at=@At(value="HEAD"), cancellable=true)
+	@FabInject(method="getLandingPos()Lnet/minecraft/util/math/BlockPos;", at=@At(value="HEAD"), cancellable=true)
 	public void getLandingPos(CallbackInfoReturnable<BlockPos> cir) {
 		if (!FabConf.isEnabled("*.collision_based_landing_pos")) return;
 		world.getBlockCollisions((Entity)(Object)this, this.entityBounds.offset(0, -0.20000000298023224D, 0), (state, pos) -> pos.getY() <= this.getY()).findFirst().ifPresent(

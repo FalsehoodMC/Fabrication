@@ -3,9 +3,9 @@ package com.unascribed.fabrication.mixin.z_combined.splash_on_inanimates;
 import java.util.List;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
@@ -31,7 +31,7 @@ public abstract class MixinPotionEntity extends ThrownItemEntity {
 		super(entityType, d, e, f, world);
 	}
 
-	@Inject(at=@At("TAIL"), method= "applySplashPotion(Ljava/util/List;Lnet/minecraft/entity/Entity;)V", locals=LocalCapture.CAPTURE_FAILHARD)
+	@FabInject(at=@At("TAIL"), method= "applySplashPotion(Ljava/util/List;Lnet/minecraft/entity/Entity;)V", locals=LocalCapture.CAPTURE_FAILHARD)
 	public void applySplashPotion(List<StatusEffectInstance> effects, Entity hit, CallbackInfo ci, Box box) {
 		if (!(FabConf.isEnabled("*.invisibility_splash_on_inanimates") || FabConf.isEnabled("*.slowfall_splash_on_inanimates")) || world.isClient) return;
 		boolean invis = false;

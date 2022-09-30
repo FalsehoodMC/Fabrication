@@ -2,6 +2,7 @@ package com.unascribed.fabrication.mixin.e_mechanics.swap_conflicting_enchants;
 
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.injection.FabInject;
 import com.unascribed.fabrication.support.injection.ModifyReturn;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -14,10 +15,8 @@ import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Map;
@@ -26,7 +25,8 @@ import java.util.Map;
 @EligibleIf(configAvailable="*.swap_conflicting_enchants")
 public abstract class MixinAnvilScreenHandler extends ForgingScreenHandler {
 
-	public MixinAnvilScreenHandler(@Nullable ScreenHandlerType<?> type, int syncId, PlayerInventory playerInventory, ScreenHandlerContext context) {
+
+	public MixinAnvilScreenHandler(ScreenHandlerType<?> type, int syncId, PlayerInventory playerInventory, ScreenHandlerContext context) {
 		super(type, syncId, playerInventory, context);
 	}
 
@@ -48,7 +48,7 @@ public abstract class MixinAnvilScreenHandler extends ForgingScreenHandler {
 		return old;
 	}
 
-	@Inject(at=@At("TAIL"), method="updateResult()V")
+	@FabInject(at=@At("TAIL"), method="updateResult()V")
 	public void allowCombiningIncompatibleEnchants(CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.swap_conflicting_enchants")) return;
 		ItemStack stack = output.getStack(0);

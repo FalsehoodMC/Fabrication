@@ -8,7 +8,7 @@ import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Locale;
@@ -17,7 +17,7 @@ import java.util.Locale;
 @EligibleIf(configAvailable="*.legacy_command_syntax")
 public class MixinEntitySummonArgumentType {
 
-	@Inject(at=@At("HEAD"), method="parse(Lcom/mojang/brigadier/StringReader;)Lnet/minecraft/util/Identifier;", cancellable=true)
+	@FabInject(at=@At("HEAD"), method="parse(Lcom/mojang/brigadier/StringReader;)Lnet/minecraft/util/Identifier;", cancellable=true)
 	public void legacyCommandInput(StringReader sr, CallbackInfoReturnable<Identifier> cir) {
 		if (!FabConf.isEnabled("*.legacy_command_syntax")) return;
 		char peek = sr.peek();

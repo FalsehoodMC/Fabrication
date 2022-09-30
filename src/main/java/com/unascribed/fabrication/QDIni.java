@@ -52,6 +52,28 @@ public class QDIni {
 		public SyntaxErrorException(Throwable cause) { super(cause); }
 	}
 
+	public static class CompositeIniTransformer implements IniTransformer{
+		final IniTransformer first;
+		final IniTransformer second;
+		CompositeIniTransformer(IniTransformer first, IniTransformer second) {
+			this.first = first;
+			this.second = second;
+		}
+		@Override
+		public String transformLine(String path, String line) {
+			return second.transformLine(path, first.transformLine(path, line));
+		}
+
+		@Override
+		public String transformValueComment(String key, String value, String comment) {
+			return second.transformValueComment(key, value, first.transformValueComment(key, value, comment));
+		}
+
+		@Override
+		public String transformValue(String key, String value) {
+			return second.transformValue(key, first.transformValue(key, value));
+		}
+	}
 	public interface IniTransformer {
 		static IniTransformer simpleValueIniTransformer(ValueIniTransformer transformer){
 			return new IniTransformer() {
@@ -89,6 +111,9 @@ public class QDIni {
 					return value;
 				}
 			};
+		}
+		default IniTransformer andThen(IniTransformer other) {
+			return new CompositeIniTransformer(this, other);
 		}
 
 		String transformLine(String path, String line);
@@ -128,7 +153,7 @@ public class QDIni {
 	private final String prelude;
 	private final Map<String, List<BlameString>> data;
 
-	private Consumer<String> yapLog;
+	private Consumer<String> yapLog = FabLog::warn;
 
 	private QDIni(String prelude, Map<String, List<BlameString>> data) {
 		this.prelude = prelude;
@@ -136,7 +161,7 @@ public class QDIni {
 	}
 
 	/**
-	 * Enables "yap" mode for parse failures in this config, where rather than throwing a
+	 * Enables/Disables "yap" mode for parse failures in this config, where rather than throwing a
 	 * BadValueException a warning string will be sent to this Consumer and an empty Optional
 	 * returned to the caller of get*.
 	 * <p>

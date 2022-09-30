@@ -4,21 +4,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.injection.FabModifyConst;
+import com.unascribed.fabrication.support.injection.FabModifyVariable;
 import com.unascribed.fabrication.support.injection.Hijack;
+import com.unascribed.fabrication.support.injection.ModifyGetField;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import com.unascribed.fabrication.support.injection.FabModifyArg;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 
 import net.minecraft.client.gui.screen.ingame.EnchantmentScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.EnchantmentScreenHandler;
@@ -34,17 +33,17 @@ public abstract class MixinEnchantmentScreen extends HandledScreen<EnchantmentSc
 		super(handler, inventory, title);
 	}
 
-	@Redirect(at=@At(value="FIELD", target="net/minecraft/client/network/ClientPlayerEntity.experienceLevel:I"),
+	@ModifyGetField(target="net/minecraft/client/network/ClientPlayerEntity.experienceLevel:I",
 			method={
 					"drawBackground(Lnet/minecraft/client/util/math/MatrixStack;FII)V",
 					"render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V"
 	})
-	public int amendExperienceLevel(ClientPlayerEntity subject) {
+	private static int fabrication$amendExperienceLevel(int old) {
 		if (FabConf.isEnabled("*.no_experience")) return 65535;
-		return subject.experienceLevel;
+		return old;
 	}
 
-	@ModifyArg(method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V", index=1,
+	@FabModifyArg(method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V", index=1,
 			at=@At(value="INVOKE", target="Lnet/minecraft/client/gui/screen/ingame/EnchantmentScreen;renderTooltip(Lnet/minecraft/client/util/math/MatrixStack;Ljava/util/List;II)V"))
 	public List<Text> removeLevelText(List<Text> original){
 		if (FabConf.isEnabled("*.no_experience")){
@@ -70,14 +69,14 @@ public abstract class MixinEnchantmentScreen extends HandledScreen<EnchantmentSc
 		return false;
 	}
 
-	@ModifyVariable(at=@At(value="INVOKE", target="net/minecraft/client/font/TextRenderer.getWidth(Ljava/lang/String;)I", ordinal=0),
+	@FabModifyVariable(at=@At(value="INVOKE", target="net/minecraft/client/font/TextRenderer.getWidth(Ljava/lang/String;)I", ordinal=0),
 			method="drawBackground(Lnet/minecraft/client/util/math/MatrixStack;FII)V", ordinal=0)
 	public String modifyLevelText(String orig) {
 		if (FabConf.isEnabled("*.no_experience")) return "";
 		return orig;
 	}
 
-	@ModifyConstant(constant=@Constant(intValue=20, ordinal=0),
+	@FabModifyConst(constant=@Constant(intValue=20, ordinal=0),
 			method="drawBackground(Lnet/minecraft/client/util/math/MatrixStack;FII)V", require=0)
 	public int modifyPhraseOffset(int orig) {
 		if (FabConf.isEnabled("*.no_experience")) return 3;
