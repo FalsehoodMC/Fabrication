@@ -712,7 +712,7 @@ if (System.getenv("MODRINTH_TOKEN")) {
 		versionName = 'v'+origVersion
 		versionType = 'release'
 		uploadFile = remapJar
-		gameVersions = ['1.19', '1.19.1', '1.19.2']
+		gameVersions = ['1.19.1', '1.19.2']
 		loaders = ['fabric', 'quilt']
 		detectLoaders = false
 	}
@@ -725,7 +725,6 @@ if (System.getenv("CURSE_TOKEN")) {
 			id = '414445'
 			releaseType = 'release'
 
-			addGameVersion '1.19'
 			addGameVersion '1.19.1'
 			addGameVersion '1.19.2'
 			addGameVersion 'Fabric'
