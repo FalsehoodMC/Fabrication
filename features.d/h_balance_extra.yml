@@ -169,7 +169,7 @@ balance.extra.interrupting_damage:
 	desc:
 		Taking more then a heart of damage interrupts the current action of any mob / player.
 
-balance.no_filled_inventories_in_shulkers:
+balance.extra.no_filled_inventories_in_shulkers:
 	name: No Filled Inventories In Shulkers
 	since: 3.0.3
 	sides: server_only
@@ -178,6 +178,13 @@ balance.no_filled_inventories_in_shulkers:
 		this also allows empty shulker boxes to be stored inside a shulker box.
 
 		exceptions can be added via fabrication:exclude_from_item_inventory_check item tag.
+
+balance.extra.lava_causes_fall_damage:
+	name: Lava Causes Fall Damage
+	since: 3.0.3
+	sides: server_only
+	desc:
+		Lava halves fall damage instead of removing it.
 
 # kate: space-indent off
 # vim: noai:noet
