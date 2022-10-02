@@ -31,10 +31,10 @@ public class FeatureOldLava implements Feature {
 				Identifier flow = new Identifier("block/lava_flow");
 				originalLava = atlas.getSprite(still);
 				originalLavaFlow = atlas.getSprite(flow);
-				SpriteLava newLava = new SpriteLava(atlas, new Info(still, 16, 16, AnimationResourceMetadata.EMPTY), FabRefl.Client.getMaxLevel(data),
-						FabRefl.Client.getWidth(data), FabRefl.Client.getHeight(data), FabRefl.Client.getX(originalLava), FabRefl.Client.getY(originalLava));
-				SpriteLavaFlow newLavaFlow = new SpriteLavaFlow(atlas, new Info(flow, 32, 32, AnimationResourceMetadata.EMPTY), FabRefl.Client.getMaxLevel(data),
-						FabRefl.Client.getWidth(data), FabRefl.Client.getHeight(data), FabRefl.Client.getX(originalLavaFlow), FabRefl.Client.getY(originalLavaFlow));
+				SpriteLava newLava = new SpriteLava(atlas, new Info(still, originalLava.getWidth(), originalLava.getHeight(), AnimationResourceMetadata.EMPTY), FabRefl.Client.getMaxLevel(data),
+						FabRefl.Client.getWidth(data), FabRefl.Client.getHeight(data), FabRefl.Client.getX(originalLava), FabRefl.Client.getY(originalLava), new NativeImage(originalLava.getWidth(), originalLava.getHeight(), false));
+				SpriteLavaFlow newLavaFlow = new SpriteLavaFlow(atlas, new Info(flow, originalLavaFlow.getWidth(), originalLavaFlow.getHeight(), AnimationResourceMetadata.EMPTY), FabRefl.Client.getMaxLevel(data),
+						FabRefl.Client.getWidth(data), FabRefl.Client.getHeight(data), FabRefl.Client.getX(originalLavaFlow), FabRefl.Client.getY(originalLavaFlow), new NativeImage(originalLavaFlow.getWidth(), originalLavaFlow.getHeight(), false));
 				FabRefl.Client.getSprites(atlas).put(still, newLava);
 				FabRefl.Client.getSprites(atlas).put(flow, newLavaFlow);
 				int origIdx = FabRefl.Client.getAnimatedSprites(atlas).indexOf(originalLava);
