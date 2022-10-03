@@ -1,69 +1,56 @@
 package com.unascribed.fabrication;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.nio.file.Path;
-import java.security.CodeSource;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.Function;
-
-import org.apache.logging.log4j.LogManager;
-
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.brigadier.CommandDispatcher;
 import com.unascribed.fabrication.support.Env;
-
+import cpw.mods.cl.ModuleClassLoader;
 import cpw.mods.modlauncher.TransformingClassLoader;
-import net.minecraft.block.Block;
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands.EnvironmentType;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tags.ITag;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands.CommandSelection;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
-import net.minecraftforge.common.ForgeTagHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.FMLPaths;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.fmlclient.registry.ClientRegistry;
 import net.minecraftforge.versions.forge.ForgeVersion;
+import org.apache.logging.log4j.LogManager;
+
+import java.lang.reflect.Method;
+import java.nio.file.Path;
+import java.util.List;
 
 // Forge implementation of Agnos. For linguistic and philosophical waffling, see the Fabric version.
 public final class Agnos {
 
 	public interface CommandRegistrationCallback {
-		void register(CommandDispatcher<CommandSource> dispatcher, boolean dedicated);
+		void register(CommandDispatcher<CommandSourceStack> commandDispatcher, boolean dedicated);
 	}
 
 	public interface TooltipRenderCallback {
-		void render(ItemStack stack, List<ITextComponent> lines);
+		void render(ItemStack stack, List<Component> lines);
 	}
 
 	public interface HudRenderCallback {
-		void render(MatrixStack matrixStack, float tickDelta);
+		void render(PoseStack matrixStack, float tickDelta);
 	}
 
 	public static void runForCommandRegistration(CommandRegistrationCallback r) {
 		MinecraftForge.EVENT_BUS.addListener((RegisterCommandsEvent e) -> {
-			r.register(e.getDispatcher(), e.getEnvironment() == EnvironmentType.DEDICATED);
+			r.register(e.getDispatcher(), e.getEnvironment() == CommandSelection.DEDICATED);
 		});
 	}
 
@@ -90,17 +77,9 @@ public final class Agnos {
 		});
 		return soundEvent;
 	}
-	
-	public static ITag<Block> registerBlockTag(ResourceLocation id) {
-		return ForgeTagHandler.createOptionalTag(ForgeRegistries.BLOCKS, id);
-	}
 
-	public static ITag<Item> registerItemTag(ResourceLocation id) {
-		return ForgeTagHandler.createOptionalTag(ForgeRegistries.ITEMS, id);
-	}
-	
 	@OnlyIn(Dist.CLIENT)
-	public static KeyBinding registerKeyBinding(KeyBinding kb) {
+	public static KeyMapping registerKeyBinding(KeyMapping kb) {
 		ClientRegistry.registerKeyBinding(kb);
 		return kb;
 	}
@@ -131,18 +110,11 @@ public final class Agnos {
 	public static byte[] getClassBytes(Class<?> clazz) {
 		try {
 			// Forge why are you like this
-			TransformingClassLoader tcl = FMLLoader.getLaunchClassLoader();
-			Field finderF = TransformingClassLoader.class.getDeclaredField("resourceFinder");
-			finderF.setAccessible(true);
-			Function<String,Enumeration<URL>> finder = (Function<String, Enumeration<URL>>)finderF.get(tcl);
-			Field dclF = TransformingClassLoader.class.getDeclaredField("delegatedClassLoader");
-			dclF.setAccessible(true);
-			Object dcl = dclF.get(tcl);
-			Method m = dcl.getClass().getDeclaredMethod("findClass", String.class, Function.class, String.class);
+			TransformingClassLoader tcl = (TransformingClassLoader)Thread.currentThread().getContextClassLoader();
+			Method m = ModuleClassLoader.class.getDeclaredMethod("getMaybeTransformedClassBytes", String.class, String.class);
 			m.setAccessible(true);
-			Map.Entry<byte[], CodeSource> en = (Entry<byte[], CodeSource>)m.invoke(dcl, clazz.getName(), finder, "Forgery class lookup");
-			if (en == null) return null;
-			return en.getKey();
+			byte[] bys = (byte[]) m.invoke(tcl, clazz.getCanonicalName(), "Forgery class lookup");
+			return bys;
 		} catch (Throwable t) {
 			LogManager.getLogger("Forgery").warn("Failed to look up "+clazz, t);
 			return null;

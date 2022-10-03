@@ -3,18 +3,18 @@ package com.unascribed.fabrication.compat;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
-import net.minecraft.profiler.IProfiler;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.resources.IResourceManagerReloadListener;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.minecraft.util.profiling.ProfilerFiller;
 
 // stolen from Fabric and ported to MCP to make PrideLib work
-public interface SimpleResourceReloadListener<T> extends IResourceManagerReloadListener {
+public interface SimpleResourceReloadListener<T> extends ResourceManagerReloadListener {
 	@Override
-	default CompletableFuture<Void> reload(IStage stage,
-			IResourceManager resourceManager, IProfiler preparationsProfiler,
-			IProfiler reloadProfiler, Executor backgroundExecutor,
+	default CompletableFuture<Void> reload(PreparationBarrier stage,
+			ResourceManager resourceManager, ProfilerFiller preparationsProfiler,
+			ProfilerFiller reloadProfiler, Executor backgroundExecutor,
 			Executor gameExecutor) {
-		return load(resourceManager, preparationsProfiler, backgroundExecutor).thenCompose(stage::markCompleteAwaitingOthers).thenCompose(
+		return load(resourceManager, preparationsProfiler, backgroundExecutor).thenCompose(stage::wait).thenCompose(
 				(o) -> apply(o, resourceManager, reloadProfiler, gameExecutor)
 			);
 	}
@@ -28,7 +28,7 @@ public interface SimpleResourceReloadListener<T> extends IResourceManagerReloadL
 	 * @param executor The executor which should be used for this stage.
 	 * @return A CompletableFuture representing the "data loading" stage.
 	 */
-	CompletableFuture<T> load(IResourceManager manager, IProfiler profiler, Executor executor);
+	CompletableFuture<T> load(ResourceManager manager, ProfilerFiller profiler, Executor executor);
 
 	/**
 	 * Synchronously apply loaded data to the game state.
@@ -38,5 +38,5 @@ public interface SimpleResourceReloadListener<T> extends IResourceManagerReloadL
 	 * @param executor The executor which should be used for this stage.
 	 * @return A CompletableFuture representing the "data applying" stage.
 	 */
-	CompletableFuture<Void> apply(T data, IResourceManager manager, IProfiler profiler, Executor executor);
+	CompletableFuture<Void> apply(T data, ResourceManager manager, ProfilerFiller profiler, Executor executor);
 }

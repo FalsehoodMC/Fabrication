@@ -1,7 +1,7 @@
 package com.unascribed.fabrication;
 
-import net.minecraftforge.fml.ExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fmlclient.ConfigGuiHandler;
 
 public abstract class ConvertedModInitializer {
 
@@ -9,14 +9,14 @@ public abstract class ConvertedModInitializer {
 		onInitialize();
 		try {
 			ModMenuAdapter mma = (ModMenuAdapter) Class.forName("com.unascribed.fabrication.ModMenuInitializer").getConstructor().newInstance();
-			ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.CONFIGGUIFACTORY, () -> (mc, parent) -> {
+			ModLoadingContext.get().registerExtensionPoint(ConfigGuiHandler.ConfigGuiFactory.class, () -> new ConfigGuiHandler.ConfigGuiFactory((mc, parent) -> {
 				return mma.getModConfigScreenFactory().create(parent);
-			});
+			}));
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
 	}
-	
+
 	public abstract void onInitialize();
-	
+
 }
