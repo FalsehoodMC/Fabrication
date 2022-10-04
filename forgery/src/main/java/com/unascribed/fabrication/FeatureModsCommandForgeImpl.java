@@ -10,10 +10,10 @@ import com.unascribed.fabrication.support.Feature;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.moddiscovery.ModInfo;
 import net.minecraftforge.forgespi.language.IModInfo;
@@ -22,13 +22,13 @@ public class FeatureModsCommandForgeImpl implements Feature {
 
 	private boolean registered = false;
 	private boolean applied = false;
-	
+
 	@Override
 	public void apply() {
 		applied = true;
 		if (!registered) {
 			registered = true;
-			Agnos.runForCommandRegistration((dispatcher, dedi) -> {
+			Agnos.runForCommandRegistration((dispatcher, centext, dedi) -> {
 				dispatcher.register(LiteralArgumentBuilder.<CommandSourceStack>literal("mods")
 						.requires(s -> applied)
 						.then(LiteralArgumentBuilder.<CommandSourceStack>literal("all")
@@ -46,14 +46,14 @@ public class FeatureModsCommandForgeImpl implements Feature {
 				} catch (Throwable t) {
 					dispatcher.register(LiteralArgumentBuilder.<CommandSourceStack>literal("plugins")
 							.executes((c) -> {
-								c.getSource().sendSuccess(new TextComponent("§cThis ain't no Bukkit!\nTry /mods"), false);
+								c.getSource().sendSuccess(Component.literal("§cThis ain't no Bukkit!\nTry /mods"), false);
 								return 1;
 							}));
 				}
 			});
 		}
 	}
-	
+
 	@Override
 	public boolean undo() {
 		applied = false;
@@ -62,12 +62,12 @@ public class FeatureModsCommandForgeImpl implements Feature {
 
 	private void sendMods(CommandContext<CommandSourceStack> c, boolean all) {
 		try {
-			MutableComponent mt = new TextComponent("Mods: ");
+			MutableComponent mt = Component.literal("Mods: ");
 			boolean first = true;
 			for (IModInfo mi : ModList.get().getMods()) {
 				if (mi.getModId().equals("minecraft")) continue;
 				if (!first) {
-					mt.append(new TextComponent(", ").withStyle(Style.EMPTY.applyFormat(ChatFormatting.RESET)));
+					mt.append(Component.literal(", ").withStyle(Style.EMPTY.applyFormat(ChatFormatting.RESET)));
 				} else {
 					first = false;
 				}
@@ -95,9 +95,9 @@ public class FeatureModsCommandForgeImpl implements Feature {
 				}
 				desc.append("ID: ");
 				desc.append(mi.getModId());
-				MutableComponent lt = new TextComponent(mi.getDisplayName());
+				MutableComponent lt = Component.literal(mi.getDisplayName());
 				Style s = Style.EMPTY.applyFormat(ChatFormatting.GREEN)
-						.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent(desc.toString())));
+						.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(desc.toString())));
 				Optional<String> displayUrlOpt = mi instanceof ModInfo ? ((ModInfo)mi).getConfigElement("displayURL") : Optional.empty();
 				if (displayUrlOpt.isPresent()) {
 					s = s.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, displayUrlOpt.get()));

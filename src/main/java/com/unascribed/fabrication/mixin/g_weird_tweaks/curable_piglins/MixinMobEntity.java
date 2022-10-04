@@ -16,7 +16,6 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -27,7 +26,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MixinMobEntity extends LivingEntity {
 
 	@Shadow
-	@Nullable
 	public abstract <T extends MobEntity> T convertTo(EntityType<T> entityType, boolean keepEquipment);
 
 	protected MixinMobEntity(EntityType<? extends LivingEntity> entityType, World world) {

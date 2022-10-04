@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(ChatInputSuggestor.SuggestionWindow.class)
-@EligibleIf(configAvailable="*.old_sheep_shear")
+@EligibleIf(configAvailable="*.enter_selects_highlighted_suggestion")
 public interface AccessorSuggestionWindow {
 
 	@Accessor("completed")

@@ -64,10 +64,6 @@ public final class Agnos {
 		net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback.EVENT.register(r::render);
 	}
 
-	public static SoundEvent registerSoundEvent(Identifier id, SoundEvent soundEvent) {
-		return Registry.register(Registry.SOUND_EVENT, id, soundEvent);
-	}
-
 	@Environment(EnvType.CLIENT)
 	public static KeyBinding registerKeyBinding(KeyBinding kb) {
 		KeyBindingHelper.registerKeyBinding(kb);

@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.unascribed.fabrication.FabConf;
 import net.minecraft.client.render.item.ItemRenderer;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,7 +33,7 @@ public abstract class MixinScreen extends AbstractParentElement implements Drawa
 	@Shadow
 	public int height;
 
-	@Shadow @Nullable protected MinecraftClient client;
+	@Shadow protected MinecraftClient client;
 
 	@Shadow
 	protected ItemRenderer itemRenderer;

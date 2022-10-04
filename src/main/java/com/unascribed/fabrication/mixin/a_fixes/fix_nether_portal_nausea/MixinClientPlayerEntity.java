@@ -12,7 +12,6 @@ import net.minecraft.network.encryption.PlayerPublicKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabInject;
@@ -25,7 +24,7 @@ public abstract class MixinClientPlayerEntity extends PlayerEntity implements Po
 	private float fabrication$lastClientPortalTicks = 0;
 	private float fabrication$nextClientPortalTicks = 0;
 
-	public MixinClientPlayerEntity(World world, BlockPos pos, float yaw, GameProfile gameProfile, @Nullable PlayerPublicKey publicKey) {
+	public MixinClientPlayerEntity(World world, BlockPos pos, float yaw, GameProfile gameProfile, PlayerPublicKey publicKey) {
 		super(world, pos, yaw, gameProfile, publicKey);
 	}
 
