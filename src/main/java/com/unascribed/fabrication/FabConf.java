@@ -73,7 +73,6 @@ public class FabConf {
 	private static ImmutableMap<String, Boolean> worldDefaults = ImmutableMap.of();
 	private static QDIni rawConfig;
 	private static Map<String, ConfigValue> config = new HashMap<>();
-	private static boolean analyticsSafe = false;
 	private static ImmutableSet<String> defaults = ImmutableSet.of();
 	private static Path worldPath = null;
 	public static boolean loadComplete = false;
@@ -234,11 +233,6 @@ public class FabConf {
 
 	public static boolean isMet(SpecialEligibility se) {
 		return metSpecialEligibility.contains(se);
-	}
-
-	public static void submitConfigAnalytics() {
-		Analytics.submitConfig();
-		analyticsSafe = true;
 	}
 
 	public static String remap(String configKey) {
@@ -422,14 +416,6 @@ public class FabConf {
 				defaults = getDefaults(s -> config.get(s) != ConfigValue.TRUE);
 			}
 		}
-		if ("general.data_upload".equals(configKey)) {
-			if ("true".equals(newValue)) {
-				Analytics.submit("enable_analytics");
-				submitConfigAnalytics();
-			} else {
-				Analytics.deleteId();
-			}
-		}
 		write(configKey, newValue, path);
 	}
 
@@ -532,9 +518,6 @@ public class FabConf {
 			}
 		});
 		worldReload();
-		if (analyticsSafe) {
-			submitConfigAnalytics();
-		}
 		for (ConfigLoader ldr : loaders) {
 			load(ldr);
 		}

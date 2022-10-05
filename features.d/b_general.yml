@@ -22,19 +22,6 @@ general.dark_mode:
 	desc:
 		Makes the config screen darker.
 
-general.data_upload:
-	name: Data Upload
-	since: 1.3.2
-	desc:
-		Enables submitting anonymous data to a self-hosted privacy-respecting Matomo instance run by
-		unascribed. The following data is submitted: Fabrication version, Minecraft version,
-		Forge/Fabric version, Java version, approximate window aspect ratio, OpenGL version,
-		selected language, operating system name (no version), currentstatus of all features,
-		and any mixin failures.
-
-		Please enable this to give me insight into what features people use, what features conflict,
-		and to help inform development decisions based on version information.
-
 general.limit_runtime_configs:
 	name: Limit Runtime Configs
 	since: 3.0.0
