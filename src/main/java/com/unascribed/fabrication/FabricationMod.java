@@ -107,8 +107,6 @@ public class FabricationMod implements ModInitializer {
 				ABSORPTION_HURT = new SoundEvent(new Identifier("fabrication", "absorption_hurt"));
 			}
 		}
-		FabConf.submitConfigAnalytics();
-		Analytics.submit("game_launch");
 		if (FabConst.FORGE && Agnos.getCurrentEnv() == Env.CLIENT) {
 			initPrideLib();
 		}
