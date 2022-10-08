@@ -7,6 +7,8 @@ import com.unascribed.fabrication.util.ItemNbtScanner;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BundleItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.ClickType;
 import org.spongepowered.asm.mixin.Mixin;
@@ -14,6 +16,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Mixin(BundleItem.class)
@@ -46,6 +49,13 @@ public class MixinBundleItem {
 			if (!fabrication$isCompatible(bundle, stack)) {
 				ci.setReturnValue(0);
 			}
+		}
+	}
+
+	@FabInject(at=@At("HEAD"), method="canMergeStack(Lnet/minecraft/item/ItemStack;Lnet/minecraft/nbt/NbtList;)Ljava/util/Optional;", cancellable=true)
+	private static void canMerge(ItemStack stack, NbtList items, CallbackInfoReturnable<Optional<NbtCompound>> cir) {
+		if (FabConf.isEnabled("*.tools_in_bundles") && stack.getMaxCount() == 1) {
+			cir.setReturnValue(Optional.empty());
 		}
 	}
 
