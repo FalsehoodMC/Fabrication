@@ -15,6 +15,7 @@ import java.util.function.Supplier;
 
 import com.unascribed.fabrication.support.FabReflField;
 import com.unascribed.fabrication.support.injection.FabRefMap;
+import net.minecraft.client.util.SelectionManager;
 import org.spongepowered.asm.mixin.throwables.MixinError;
 import org.spongepowered.asm.mixin.throwables.MixinException;
 
@@ -438,7 +439,26 @@ public class FabRefl {
 				throw rethrow(t);
 			}
 		}
-
+		@FabReflField
+		private static final String s_clipboardGetter_field = "Lnet/minecraft/client/util/SelectionManager;clipboardGetter:Ljava/util/function/Supplier;";
+		private static final MethodHandle get_clipboardGetter = unreflectGetter("SelectionManager", () -> SelectionManager.class, s_clipboardGetter_field)
+				.requiredBy("*.multiline_sign_paste").get();
+		public static Supplier<String> getClipboardGetter(SelectionManager subject) {
+			try {
+				return (Supplier<String>)checkHandle(get_clipboardGetter).invokeExact(subject);
+			} catch (Throwable t) {
+				throw rethrow(t);
+			}
+		}
+		private static final MethodHandle set_clipboardGetter = unreflectSetter("SelectionManager", () -> SelectionManager.class, s_clipboardGetter_field)
+				.requiredBy("*.multiline_sign_paste").get();
+		public static void setClipboardGetter(SelectionManager subject, Supplier<String> arg) {
+			try {
+				checkHandle(set_clipboardGetter).invokeExact(subject, arg);
+			} catch (Throwable t) {
+				throw rethrow(t);
+			}
+		}
 	}
 
 	private static MethodHandle checkHandle(MethodHandle handle) {
