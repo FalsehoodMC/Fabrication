@@ -37,5 +37,7 @@
 	"block.minecraft.potted_oak_sapling": "Potted Applewood Sapling",
 	"block.minecraft.potted_dark_oak_sapling": "Potted Dark Applewood Sapling",
 	"item.minecraft.oak_boat": "Applewood Boat",
-	"item.minecraft.dark_oak_boat": "Dark Applewood Boat"
+	"item.minecraft.dark_oak_boat": "Dark Applewood Boat",
+	"item.minecraft.oak_chest_boat": "Applewood Boat with Chest",
+	"item.minecraft.dark_oak_chest_boat": "Dark Applewood Boat with Chest"
 }
