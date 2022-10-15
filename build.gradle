@@ -757,3 +757,11 @@ if (System.getenv("GITHUB_TOKEN")) {
 	}
 	tasks.githubRelease.dependsOn remapJar
 }
+
+if (System.getenv("MCMODCN_COOKIE")) {
+	task mcmodcn(type: Exec) {
+		dependsOn remapJar
+
+		commandLine './mcmodcn-upload.sh', '3548', '1.19.2', '2,11', '', remapJar.archivePath.getPath()
+	}
+}
