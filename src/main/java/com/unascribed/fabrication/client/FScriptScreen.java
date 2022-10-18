@@ -42,13 +42,17 @@ public class FScriptScreen extends ScriptingScreen {
 		this.fabrication$prideFlag = prideFlag;
 		this.fabrication$key = configKey;
 		this.renderTips = true;
+
+	}
+	@Override
+	public void init(){
+		super.init();
 		if (this.client !=null && client.player != null) {
 			CommandNode<CommandSource> cmd = client.player.networkHandler.getCommandDispatcher().getRoot().getChild("fabrication");
 			if (!(cmd == null || cmd.getChild("fscript") == null || cmd.getChild("fscript").getChild("set") == null))
 				fabrication$writeLocal = false;
 		}
 	}
-
 	@Override
 	protected void drawOptionButtons(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		if (drawButton(matrices, width - 83, 1, 35, 10, fabrication$writeLocal ? "Client" : "Server", "Toggle where scripts are saved/loaded", mouseX, mouseY)) {
