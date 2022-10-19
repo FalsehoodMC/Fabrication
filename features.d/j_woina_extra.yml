@@ -141,5 +141,14 @@ woina.extra.void_fog:
 	desc:
 		Returns void fog from pre 1.8.
 
+woina.extra.billboard_drops_2d:
+	name: Billboard Drops 2D
+	since: 3.0.4
+	sides: client_only
+	desc:
+		Brings back billboarded flat item drops like on Fast graphics prior to 1.8 or like always
+		prior to 1.4.
+		Actually renders them in 2D which may create issues, but has a performance benefit.
+
 # kate: space-indent off
 # vim: noai:noet
