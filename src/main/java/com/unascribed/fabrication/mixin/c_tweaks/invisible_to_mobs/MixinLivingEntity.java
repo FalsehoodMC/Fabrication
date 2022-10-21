@@ -15,7 +15,7 @@ import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
-@EligibleIf(anyConfigAvailable={"*.no_phantoms", "invisible_to_mobs"})
+@EligibleIf(anyConfigAvailable={"*.no_phantoms", "*.invisible_to_mobs"})
 public abstract class MixinLivingEntity extends Entity {
 
 	protected MixinLivingEntity(EntityType<? extends Entity> entityType, World world) {

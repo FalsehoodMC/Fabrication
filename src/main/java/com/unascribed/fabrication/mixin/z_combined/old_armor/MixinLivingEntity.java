@@ -30,7 +30,7 @@ import java.util.AbstractMap;
 import java.util.stream.Collector;
 
 @Mixin(LivingEntity.class)
-@EligibleIf(anyConfigAvailable={"*.old_armor_scale", "old_armor"})
+@EligibleIf(anyConfigAvailable={"*.old_armor_scale", "*.old_armor"})
 public abstract class MixinLivingEntity extends Entity {
 
 	public MixinLivingEntity(EntityType<?> type, World world) {
