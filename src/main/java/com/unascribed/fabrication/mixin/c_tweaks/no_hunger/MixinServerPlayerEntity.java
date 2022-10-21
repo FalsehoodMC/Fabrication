@@ -16,6 +16,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.function.Predicate;
+
 @Mixin(ServerPlayerEntity.class)
 @EligibleIf(configAvailable="*.no_hunger")
 public abstract class MixinServerPlayerEntity extends PlayerEntity {
@@ -24,9 +26,11 @@ public abstract class MixinServerPlayerEntity extends PlayerEntity {
 		super(world, pos, yaw, gameProfile, publicKey);
 	}
 
+	private static final Predicate<PlayerEntity> fabrication$noHungerPredicate = ConfigPredicates.getFinalPredicate("*.no_hunger");
+
 	@FabInject(at=@At("TAIL"), method="tick()V")
 	public void tick(CallbackInfo ci) {
-		if (FabConf.isEnabled("*.no_hunger") && ConfigPredicates.shouldRun("*.no_hunger", (PlayerEntity)this)) {
+		if (FabConf.isEnabled("*.no_hunger") && fabrication$noHungerPredicate.test(this)) {
 			getHungerManager().setFoodLevel(hasStatusEffect(StatusEffects.HUNGER) ? 0 : getHealth() >= getMaxHealth() ? 20 : 17);
 			// prevent the hunger bar from jiggling
 			((SetSaturation)getHungerManager()).fabrication$setSaturation(10);

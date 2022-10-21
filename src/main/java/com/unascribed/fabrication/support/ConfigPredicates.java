@@ -3,10 +3,12 @@ package com.unascribed.fabrication.support;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableMap;
+import com.unascribed.fabrication.FabLog;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EquipmentSlot;
@@ -18,24 +20,29 @@ import static com.unascribed.fabrication.FabConf.remap;
 
 public class ConfigPredicates {
 
-	private static Map<String, Object> active;
-	private static Map<String, Feature> idle = new HashMap<>();
-	public static final ImmutableMap<String, Object> defaults;
+	private static final Map<String, AtomicReference<Predicate<?>>> active;
+	private static final Map<String, Feature> idle = new HashMap<>();
+	public static final ImmutableMap<String, Predicate<?>> defaults;
 
-	public static<T> boolean shouldRun(String configKey, T test) {
-		return shouldRun(configKey, test, true);
-	}
-
-	public static<T> boolean shouldRun(String configKey, T test, boolean defaultValue) {
+	public static<T> Predicate<T> getFinalPredicate(String configKey) {
 		configKey = remap(configKey);
-		Predicate<T> predicate;
-		try{
-			predicate = (Predicate<T>) active.get(configKey);
-			if (predicate == null) return defaultValue;
-		}catch (Exception e){
-			return defaultValue;
-		}
-		return predicate.test(test);
+		AtomicReference<Predicate<?>> ref = getOrCreateActive(configKey);
+		return test -> {
+			Predicate<?> p = ref.get();
+			if (p == null) return true;
+			try {
+				return ((Predicate<T>)p).test(test);
+			} catch (Exception e) {
+				FabLog.error("ConfigPredicates failed to cast predicate", e);
+			}
+			return true;
+		};
+	}
+	public synchronized static AtomicReference<Predicate<?>> getOrCreateActive(String configKey) {
+		AtomicReference<Predicate<?>> ret = active.get(configKey);
+		if (ret != null) return ret;
+		active.put(configKey, ret = new AtomicReference<>());
+		return ret;
 	}
 
 	public static void put(String configKey, Predicate<?> predicate){
@@ -48,7 +55,7 @@ public class ConfigPredicates {
 			idle.put(configKey, new Feature());
 		}
 		if(idle.get(configKey).add(predicate, level)) {
-			active.put(configKey, predicate);
+			getOrCreateActive(configKey).set(predicate);
 		}
 	}
 	public static void remove(String configKey){
@@ -57,13 +64,14 @@ public class ConfigPredicates {
 	public static void remove(String configKey, int level){
 		configKey = remap(configKey);
 		if (idle.containsKey(configKey)){
-			Object rtrn = idle.get(configKey).remove(level, active);
-			active.put(configKey, rtrn == null ? defaults.get(configKey) : rtrn);
+			AtomicReference<Predicate<?>> ref = getOrCreateActive(configKey);
+			Predicate<?> rtrn = idle.get(configKey).remove(level, ref.get());
+			ref.set(rtrn == null ? defaults.get(configKey) : rtrn);
 		}
 	}
 
 	static{
-		Map<String, Object> defaultsMap = new HashMap<>();
+		Map<String, Predicate<?>> defaultsMap = new HashMap<>();
 		defaultsMap.put(remap("*.cactus_walk_doesnt_hurt_with_boots"),
 				(Predicate<LivingEntity>) livingEntity ->
 		!livingEntity.getEquippedStack(EquipmentSlot.FEET).isEmpty()
@@ -89,12 +97,12 @@ public class ConfigPredicates {
 		EnchantmentHelper.getLevel(Enchantments.FEATHER_FALLING, livingEntity.getEquippedStack(EquipmentSlot.FEET)) >= 5
 				);
 		defaults = ImmutableMap.copyOf(defaultsMap);
-		active = defaults.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+		active = defaults.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> (new AtomicReference<>(e.getValue()))));
 	}
 
 	private static class Feature {
 		Integer i = Integer.MIN_VALUE;
-		Map<Integer, Object> map = new HashMap<>();
+		Map<Integer, Predicate<?>> map = new HashMap<>();
 
 		public boolean add(Predicate<?> predicate, int level){
 			map.put(level, predicate);
@@ -104,7 +112,7 @@ public class ConfigPredicates {
 			}
 			return false;
 		}
-		public Object remove(int level, Object defaultVal){
+		public Predicate<?> remove(int level, Predicate<?> defaultVal){
 			map.remove(level);
 			if (map.isEmpty()) {
 				i = Integer.MIN_VALUE;

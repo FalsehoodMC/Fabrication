@@ -18,10 +18,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.function.Predicate;
+
 @Mixin(ServerPlayerEntity.class)
 @EligibleIf(configAvailable="*.permanent_conduit_power")
 public abstract class MixinServerPlayerEntity extends PlayerEntity {
 	private boolean fabrication$permConduitPower = false;
+	private static final Predicate<PlayerEntity> fabrication$permanentConduitPowerPredicate = ConfigPredicates.getFinalPredicate("*.permanent_conduit_power");
 
 	public MixinServerPlayerEntity(World world, BlockPos pos, float yaw, GameProfile gameProfile, PlayerPublicKey publicKey) {
 		super(world, pos, yaw, gameProfile, publicKey);
@@ -29,7 +32,7 @@ public abstract class MixinServerPlayerEntity extends PlayerEntity {
 
 	@FabInject(at=@At("TAIL"), method="tick()V")
 	public void tick(CallbackInfo ci) {
-		if (FabConf.isEnabled("*.permanent_conduit_power") && ConfigPredicates.shouldRun("*.permanent_conduit_power", (PlayerEntity)this)) {
+		if (FabConf.isEnabled("*.permanent_conduit_power") && fabrication$permanentConduitPowerPredicate.test(this)) {
 			if (!fabrication$permConduitPower) fabrication$permConduitPower = true;
 			if (EffectNeedsReplacing.needsReplacing(this, StatusEffects.CONDUIT_POWER)) {
 				addStatusEffect(new StatusEffectInstance(StatusEffects.CONDUIT_POWER, Integer.MAX_VALUE, 0, true, false));

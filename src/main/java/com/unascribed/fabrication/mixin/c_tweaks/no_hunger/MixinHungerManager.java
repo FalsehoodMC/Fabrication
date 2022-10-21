@@ -15,17 +15,20 @@ import com.unascribed.fabrication.support.EligibleIf;
 import net.minecraft.entity.player.HungerManager;
 import net.minecraft.entity.player.PlayerEntity;
 
+import java.util.function.Predicate;
+
 @Mixin(HungerManager.class)
 @EligibleIf(configAvailable="*.no_hunger")
 public abstract class MixinHungerManager implements SetSaturation {
 
 	@Shadow
 	private float saturationLevel;
+	private static final Predicate<PlayerEntity> fabrication$noHungerPredicate = ConfigPredicates.getFinalPredicate("*.no_hunger");
 
 	@FabInject(at=@At("HEAD"), method="update(Lnet/minecraft/entity/player/PlayerEntity;)V", cancellable=true)
 	public void update(PlayerEntity pe, CallbackInfo ci) {
 		if (FabConf.isEnabled("*.no_hunger")) {
-			if (ConfigPredicates.shouldRun("*.no_hunger", pe) && !pe.hasStatusEffect(StatusEffects.HUNGER)) {
+			if (fabrication$noHungerPredicate.test(pe) && !pe.hasStatusEffect(StatusEffects.HUNGER)) {
 				ci.cancel();
 			}
 		}

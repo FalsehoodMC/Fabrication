@@ -18,10 +18,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.function.Predicate;
+
 @Mixin(ServerPlayerEntity.class)
 @EligibleIf(configAvailable="*.permanent_dolphins_grace")
 public abstract class MixinServerPlayerEntity extends PlayerEntity {
 	private boolean fabrication$permDolphinsGrace = false;
+	private static final Predicate<PlayerEntity> fabrication$permDolphinsGracePredicate = ConfigPredicates.getFinalPredicate("*.permanent_dolphins_grace");
 
 	public MixinServerPlayerEntity(World world, BlockPos pos, float yaw, GameProfile gameProfile, PlayerPublicKey publicKey) {
 		super(world, pos, yaw, gameProfile, publicKey);
@@ -29,7 +32,7 @@ public abstract class MixinServerPlayerEntity extends PlayerEntity {
 
 	@FabInject(at=@At("TAIL"), method="tick()V")
 	public void tick(CallbackInfo ci) {
-		if (FabConf.isEnabled("*.permanent_dolphins_grace") && ConfigPredicates.shouldRun("*.permanent_dolphins_grace", (PlayerEntity)this)) {
+		if (FabConf.isEnabled("*.permanent_dolphins_grace") && fabrication$permDolphinsGracePredicate.test(this)) {
 			if (!fabrication$permDolphinsGrace) fabrication$permDolphinsGrace = true;
 			if (EffectNeedsReplacing.needsReplacing(this, StatusEffects.DOLPHINS_GRACE)) {
 				addStatusEffect(new StatusEffectInstance(StatusEffects.DOLPHINS_GRACE, Integer.MAX_VALUE, 0, true, false));

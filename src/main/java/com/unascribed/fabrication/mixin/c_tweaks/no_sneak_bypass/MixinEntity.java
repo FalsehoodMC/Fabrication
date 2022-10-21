@@ -11,11 +11,15 @@ import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.function.Predicate;
+
 @Mixin(Entity.class)
 @EligibleIf(configAvailable="*.no_sneak_bypass")
 public abstract class MixinEntity implements SetActualBypassState {
 
 	private boolean fabrication$getActualBypassSteppingEffects = false;
+
+	private static final Predicate<Entity> fabrication$noSneakBypassPredicate = ConfigPredicates.getFinalPredicate("*.no_sneak_bypass");
 
 	public void fabrication$setActualBypassesStepOn() {
 		fabrication$getActualBypassSteppingEffects = true;
@@ -27,7 +31,7 @@ public abstract class MixinEntity implements SetActualBypassState {
 			fabrication$getActualBypassSteppingEffects = false;
 			return;
 		}
-		if (FabConf.isEnabled("*.no_sneak_bypass") && ConfigPredicates.shouldRun("*.no_sneak_bypass", (Entity)(Object)this))
+		if (FabConf.isEnabled("*.no_sneak_bypass") && fabrication$noSneakBypassPredicate.test((Entity)(Object)this))
 			cir.setReturnValue(false);
 	}
 }

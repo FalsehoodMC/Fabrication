@@ -1,6 +1,6 @@
 package com.unascribed.fabrication.mixin.g_weird_tweaks.source_dependent_iframes;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableList;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.interfaces.TickSourceIFrames;
 import com.unascribed.fabrication.support.ConfigPredicates;
@@ -19,6 +19,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.function.Predicate;
 
 @Mixin(LivingEntity.class)
 @EligibleIf(configAvailable="*.source_dependent_iframes")
@@ -30,10 +32,11 @@ public abstract class MixinLivingEntity extends Entity implements TickSourceIFra
 
 	private final LinkedHashMap<String, Integer> fabrication$iframeTracker = new LinkedHashMap<>();
 	private int fabrication$timeUntilRegen = 0;
+	private static final Predicate<List<?>> fabrication$sourceDependentIframesPredicate = ConfigPredicates.getFinalPredicate("*.source_dependent_iframes");
 
 	@FabInject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z")
 	private void checkDependentIFrames(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-		if (!(FabConf.isEnabled("*.source_dependent_iframes") && ConfigPredicates.shouldRun("*.source_dependent_iframes", ImmutableMap.of(this, source)))) return;
+		if (!(FabConf.isEnabled("*.source_dependent_iframes") && fabrication$sourceDependentIframesPredicate.test(ImmutableList.of(this, source)))) return;
 		String origin = source.getName() + (source.getAttacker() == null || source.getAttacker().getUuid() == null ? ":direct" :  source.getAttacker().getUuid().toString());
 		if (fabrication$iframeTracker.containsKey(origin)) {
 			this.timeUntilRegen = 20;
@@ -44,7 +47,7 @@ public abstract class MixinLivingEntity extends Entity implements TickSourceIFra
 	}
 	@FabInject(at=@At(value="INVOKE", target="Lnet/minecraft/entity/LivingEntity;applyDamage(Lnet/minecraft/entity/damage/DamageSource;F)V"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z")
 	private void setSourceDependentIFrames(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-		if (!(FabConf.isEnabled("*.source_dependent_iframes") && ConfigPredicates.shouldRun("*.source_dependent_iframes", ImmutableMap.of(this, source)))) return;
+		if (!(FabConf.isEnabled("*.source_dependent_iframes") && fabrication$sourceDependentIframesPredicate.test(ImmutableList.of(this, source)))) return;
 		if (fabrication$timeUntilRegen == 0){
 			fabrication$timeUntilRegen = 10;
 		}

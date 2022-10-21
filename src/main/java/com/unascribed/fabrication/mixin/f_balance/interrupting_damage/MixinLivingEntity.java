@@ -13,6 +13,9 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.List;
+import java.util.function.Predicate;
+
 @Mixin(LivingEntity.class)
 @EligibleIf(configAvailable="*.interrupting_damage")
 public abstract class MixinLivingEntity {
@@ -22,15 +25,16 @@ public abstract class MixinLivingEntity {
 
 	@Shadow
 	public abstract void stopUsingItem();
-  
+
 	@Shadow
 	public abstract boolean blockedByShield(DamageSource source);
 
+	private static final Predicate<List<?>> fabrication$interruptingDamagePredicate = ConfigPredicates.getFinalPredicate("*.interrupting_damage");
 	@FabInject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z")
 	public void interruptUsage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
 		if (!FabConf.isEnabled("*.interrupting_damage")) return;
 		if (blockedByShield(source)) return;
-		if (amount >= 2 && ConfigPredicates.shouldRun("*.interrupting_damage", ImmutableList.of(this, source))) {
+		if (amount >= 2 && fabrication$interruptingDamagePredicate.test(ImmutableList.of(this, source))) {
 			if (this instanceof InterruptableRangedMob)
 				((InterruptableRangedMob) this).fabrication$interruptRangedMob();
 			if (isUsingItem()) stopUsingItem();
