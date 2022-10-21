@@ -19,6 +19,8 @@ import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
 
+import java.util.function.Predicate;
+
 @Mixin(CreeperEntity.class)
 @EligibleIf(configAvailable="*.scares_creepers")
 public abstract class MixinCreeperEntity extends HostileEntity {
@@ -27,10 +29,11 @@ public abstract class MixinCreeperEntity extends HostileEntity {
 		super(entityType, world);
 	}
 
+	private static final Predicate<PlayerEntity> fabrication$scaresCreepersPredicate = ConfigPredicates.getFinalPredicate("*.scares_creepers");
 	@FabInject(at=@At("TAIL"), method="initGoals()V")
 	protected void initGoals(CallbackInfo ci) {
 		FleeEntityGoal<ServerPlayerEntity> goal = new FleeEntityGoal<>(this, ServerPlayerEntity.class,
-				spe -> ConfigPredicates.shouldRun("*.scares_creepers", (PlayerEntity)spe), 8, 1, 2,
+				spe -> fabrication$scaresCreepersPredicate.test((PlayerEntity)spe), 8, 1, 2,
 				EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR::test);
 		TargetPredicate withinRangePredicate = FabRefl.getWithinRangePredicate(goal);
 		withinRangePredicate.ignoreVisibility();

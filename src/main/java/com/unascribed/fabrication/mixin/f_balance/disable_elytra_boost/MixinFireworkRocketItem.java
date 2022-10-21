@@ -17,14 +17,17 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 
+import java.util.function.Predicate;
+
 @Mixin(FireworkRocketItem.class)
 @EligibleIf(configAvailable="*.disable_elytra_boost")
 public abstract class MixinFireworkRocketItem {
 
+	private static final Predicate<PlayerEntity> fabrication$disableElytraBoostPredicate = ConfigPredicates.getFinalPredicate("*.disable_elytra_boost");
 	@FabInject(at=@At(value="INVOKE", target="Lnet/minecraft/world/World;spawnEntity(Lnet/minecraft/entity/Entity;)Z"),
 			method="use(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/TypedActionResult;", cancellable=true)
 	private void use(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<TypedActionResult<ItemStack>> cir) {
-		if (FabConf.isEnabled("*.disable_elytra_boost") && ConfigPredicates.shouldRun("*.disable_elytra_boost", user)) cir.setReturnValue(TypedActionResult.pass(user.getStackInHand(hand)));
+		if (FabConf.isEnabled("*.disable_elytra_boost") && fabrication$disableElytraBoostPredicate.test(user)) cir.setReturnValue(TypedActionResult.pass(user.getStackInHand(hand)));
 	}
 
 }

@@ -13,6 +13,8 @@ import net.minecraft.entity.mob.CreeperEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.world.World;
 
+import java.util.function.Predicate;
+
 @Mixin(CreeperEntity.class)
 @EligibleIf(configAvailable="*.creepers_explode_when_on_fire")
 public abstract class MixinCreeperEntity extends HostileEntity {
@@ -21,11 +23,12 @@ public abstract class MixinCreeperEntity extends HostileEntity {
 		super(entityType, world);
 	}
 
+	private static final Predicate<LivingEntity> fabrication$creepersExplodeWhenOnFirePredicate = ConfigPredicates.getFinalPredicate("*.creepers_explode_when_on_fire");
 	@Override
 	public void setFireTicks(int ticks) {
 		super.setFireTicks(ticks);
 		if (FabConf.isEnabled("*.creepers_explode_when_on_fire") && !world.isClient &&
-				ConfigPredicates.shouldRun("*.creepers_explode_when_on_fire", (LivingEntity)this)) {
+				fabrication$creepersExplodeWhenOnFirePredicate.test(this)) {
 			ignite();
 		}
 	}

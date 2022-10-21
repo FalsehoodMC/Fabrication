@@ -13,6 +13,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.function.Predicate;
+
 @Mixin(ServerPlayerEntity.class)
 @EligibleIf(configAvailable="*.can_breathe_water")
 public abstract class MixinServerPlayerEntity extends PlayerEntity {
@@ -21,9 +23,10 @@ public abstract class MixinServerPlayerEntity extends PlayerEntity {
 		super(world, pos, yaw, profile);
 	}
 
+	private static final Predicate<PlayerEntity> fabrication$canBreatheWaterPredicate = ConfigPredicates.getFinalPredicate("*.can_breathe_water");
 	@FabInject(at=@At("TAIL"), method="tick()V")
 	public void tick(CallbackInfo ci) {
-		if (FabConf.isEnabled("*.can_breathe_water") && ConfigPredicates.shouldRun("*.can_breathe_water", (PlayerEntity)this)) {
+		if (FabConf.isEnabled("*.can_breathe_water") && fabrication$canBreatheWaterPredicate.test(this)) {
 			setAir(getMaxAir());
 		}
 	}
