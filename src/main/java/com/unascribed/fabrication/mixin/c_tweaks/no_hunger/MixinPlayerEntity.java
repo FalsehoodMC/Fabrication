@@ -22,6 +22,8 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
 import net.minecraft.world.World;
 
+import java.util.function.Predicate;
+
 @Mixin(PlayerEntity.class)
 @EligibleIf(configAvailable="*.no_hunger")
 public abstract class MixinPlayerEntity extends LivingEntity {
@@ -30,10 +32,12 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 		super(entityType, world);
 	}
 
+	private static final Predicate<PlayerEntity> fabrication$noHungerPredicate = ConfigPredicates.getFinalPredicate("*.no_hunger");
+
 	@FabInject(at=@At("HEAD"), method="eatFood(Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;", cancellable=true)
 	public void eatFood(World world, ItemStack stack, CallbackInfoReturnable<ItemStack> ci) {
 		if (FabConf.isEnabled("*.no_hunger")) {
-			if (ConfigPredicates.shouldRun("*.no_hunger", (PlayerEntity)(Object)this)) {
+			if (fabrication$noHungerPredicate.test((PlayerEntity)(Object)this)) {
 				Object self = this;
 				Item item = stack.getItem();
 				if (item.isFood()) {

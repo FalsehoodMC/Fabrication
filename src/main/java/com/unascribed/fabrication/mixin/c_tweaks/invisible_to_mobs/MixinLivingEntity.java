@@ -14,6 +14,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.function.Predicate;
+
 @Mixin(LivingEntity.class)
 @EligibleIf(anyConfigAvailable={"*.no_phantoms", "*.invisible_to_mobs"})
 public abstract class MixinLivingEntity extends Entity {
@@ -22,15 +24,18 @@ public abstract class MixinLivingEntity extends Entity {
 		super(entityType, world);
 	}
 
+	private static final Predicate<PlayerEntity> fabrication$noPhantomsPredicate = ConfigPredicates.getFinalPredicate("*.no_phantoms");
+	private static final Predicate<PlayerEntity> fabrication$invisMobsPredicate = ConfigPredicates.getFinalPredicate("*.invisible_to_mobs");
+
 	@FabInject(at=@At("HEAD"), method="canTarget(Lnet/minecraft/entity/LivingEntity;)Z", cancellable=true)
 	public void canTarget(LivingEntity other, CallbackInfoReturnable<Boolean> ci) {
 		if (!(other instanceof PlayerEntity)) return;
 		if (FabConf.isEnabled("*.no_phantoms") && ((Object)this) instanceof PhantomEntity) {
-			if (ConfigPredicates.shouldRun("*.no_phantoms", (PlayerEntity)other)) {
+			if (fabrication$noPhantomsPredicate.test((PlayerEntity)other)) {
 				ci.setReturnValue(false);
 			}
 		}
-		if (FabConf.isEnabled("*.invisible_to_mobs") && ConfigPredicates.shouldRun("*.invisible_to_mobs", (PlayerEntity)other)) {
+		if (FabConf.isEnabled("*.invisible_to_mobs") && fabrication$invisMobsPredicate.test((PlayerEntity)other)) {
 			ci.setReturnValue(false);
 		}
 

@@ -17,8 +17,9 @@ public class FeatureInvisibleToMobs implements Feature {
 	@Override
 	public void apply() {
 		originalUntargetablePredicate = EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR;
+		Predicate<PlayerEntity> predicate = ConfigPredicates.getFinalPredicate("*.invisible_to_mobs");
 		amendUntargetablePredicate(e -> {
-			if (e instanceof PlayerEntity && ConfigPredicates.shouldRun("*.invisible_to_mobs", (PlayerEntity)e)) return false;
+			if (e instanceof PlayerEntity && predicate.test((PlayerEntity)e)) return false;
 			return originalUntargetablePredicate.test(e);
 		});
 	}

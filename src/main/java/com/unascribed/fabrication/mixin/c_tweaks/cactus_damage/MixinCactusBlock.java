@@ -16,9 +16,14 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import java.util.function.Predicate;
+
 @Mixin(CactusBlock.class)
 @EligibleIf(anyConfigAvailable={"*.cactus_walk_doesnt_hurt_with_boots", "*.cactus_brush_doesnt_hurt_with_chest"})
 public class MixinCactusBlock {
+
+	private static final Predicate<LivingEntity> fabrication$cactusWalkWithBoots = ConfigPredicates.getFinalPredicate("*.cactus_walk_doesnt_hurt_with_boots");
+	private static final Predicate<LivingEntity> fabrication$cactusWalkWithChest = ConfigPredicates.getFinalPredicate("*.cactus_brush_doesnt_hurt_with_chest");
 
 	@FabInject(at=@At("HEAD"), method="onEntityCollision(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/Entity;)V", cancellable=true)
 	public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity, CallbackInfo ci) {
@@ -27,13 +32,13 @@ public class MixinCactusBlock {
 		boolean touchedTop = (int)(entity.getPos().y+0.075) > pos.getY();
 		if (touchedTop) {
 			if (FabConf.isEnabled("*.cactus_walk_doesnt_hurt_with_boots")) {
-				if (ConfigPredicates.shouldRun("*.cactus_walk_doesnt_hurt_with_boots", le)) {
+				if (fabrication$cactusWalkWithBoots.test(le)) {
 					ci.cancel();
 				}
 			}
 		} else {
 			if (FabConf.isEnabled("*.cactus_brush_doesnt_hurt_with_chest")) {
-				if (ConfigPredicates.shouldRun("*.cactus_brush_doesnt_hurt_with_chest", le)) {
+				if (fabrication$cactusWalkWithChest.test(le)) {
 					ci.cancel();
 				}
 			}

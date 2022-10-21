@@ -69,7 +69,8 @@ public class FeatureTaggablePlayers implements Feature {
 			Predicate tmp = p;
 			p = o -> tmp.test(((List<Object>)o).get(0));
 		}
-		ConfigPredicates.put(key, ConfigPredicates.defaults.containsKey(key) ? p.and((Predicate)ConfigPredicates.defaults.get(key)) : p, 1);
+		Predicate<?> defPredicate = ConfigPredicates.defaults.get(key);
+		ConfigPredicates.put(key, defPredicate != null ? p.and(defPredicate) : p, 1);
 	}
 
 	public static void add(String key, int type) {

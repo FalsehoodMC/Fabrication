@@ -22,6 +22,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 import java.util.Optional;
+import java.util.function.Predicate;
 
 @Mixin(ServerPlayerInteractionManager.class)
 @EligibleIf(configAvailable="*.gradual_block_breaking")
@@ -35,12 +36,13 @@ public class MixinServerPlayerInteractionManager {
 	protected ServerWorld world;
 
 	private BlockState fabrication$gradualBreakState = null;
+	private static final Predicate<PlayerEntity> fabrication$gradualBlockBreakingPredicate = ConfigPredicates.getFinalPredicate("*.gradual_block_breaking");
 
 	@ModifyReturn(target="Lnet/minecraft/server/world/ServerWorld;getBlockState(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;",
 			method="tryBreakBlock(Lnet/minecraft/util/math/BlockPos;)Z")
 	public BlockState fabrication$gradualBreak(BlockState state, ServerWorld world, BlockPos pos) {
 		if (!FabConf.isEnabled("*.gradual_block_breaking")) return state;
-		if (player == null || !ConfigPredicates.shouldRun("*.gradual_block_breaking", (PlayerEntity)player)) return state;
+		if (player == null || !fabrication$gradualBlockBreakingPredicate.test(player)) return state;
 		if (state.contains(SlabBlock.TYPE)) {
 			if (state.get(SlabBlock.TYPE) == SlabType.DOUBLE) {
 				Box box = state.getCollisionShape(world, pos).getBoundingBox().offset(pos);

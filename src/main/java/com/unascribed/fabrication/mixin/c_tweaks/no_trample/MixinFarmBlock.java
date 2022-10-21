@@ -17,6 +17,8 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import java.util.function.Predicate;
+
 @Mixin(FarmlandBlock.class)
 @EligibleIf(anyConfigAvailable={"*.feather_falling_no_trample", "*.no_trample"})
 public abstract class MixinFarmBlock extends Block {
@@ -25,11 +27,12 @@ public abstract class MixinFarmBlock extends Block {
 		super(settings);
 	}
 
+	private static final Predicate<LivingEntity> fabrication$noTramplePredicate = ConfigPredicates.getFinalPredicate("*.no_trample");
 	@FabInject(method="onLandedUpon(Lnet/minecraft/world/World;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/Entity;F)V",
 			at=@At("HEAD"), cancellable=true)
 	public void onLandedUpon(World world, BlockState state, BlockPos pos, Entity entity, float fallDistance, CallbackInfo ci) {
 		if (!FabConf.isAnyEnabled("*.no_trample")) return;
-		if (entity instanceof LivingEntity && ConfigPredicates.shouldRun("*.no_trample", (LivingEntity)entity)) {
+		if (entity instanceof LivingEntity && fabrication$noTramplePredicate.test((LivingEntity)entity)) {
 			super.onLandedUpon(world, state, pos, entity, fallDistance);
 			ci.cancel();
 		}

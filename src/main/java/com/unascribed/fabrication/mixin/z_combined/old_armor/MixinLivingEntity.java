@@ -27,6 +27,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.AbstractMap;
+import java.util.function.Predicate;
 import java.util.stream.Collector;
 
 @Mixin(LivingEntity.class)
@@ -61,11 +62,13 @@ public abstract class MixinLivingEntity extends Entity {
 		if ((this.age & 16) == 0) refreshArmor(null, 0, null);
 	}
 
+	private static final Predicate<LivingEntity> fabrication$oldArmorScalePredicate = ConfigPredicates.getFinalPredicate("*.old_armor_scale");
+	private static final Predicate<LivingEntity> fabrication$oldArmorPredicate = ConfigPredicates.getFinalPredicate("*.old_armor");
 	@ModifyReturn(target="Lnet/minecraft/item/ItemStack;getAttributeModifiers(Lnet/minecraft/entity/EquipmentSlot;)Lcom/google/common/collect/Multimap;",
 			method="getEquipmentChanges()Ljava/util/Map;")
 	private static Multimap<EntityAttribute, EntityAttributeModifier> fabrication$oldArmor(Multimap<EntityAttribute, EntityAttributeModifier> map, ItemStack stack, EquipmentSlot slot, LivingEntity self) {
-		final boolean scale = FabConf.isEnabled("*.old_armor_scale") && ConfigPredicates.shouldRun("*.old_armor_scale", self);
-		final boolean old = FabConf.isEnabled("*.old_armor") && ConfigPredicates.shouldRun("*.old_armor", self);
+		final boolean scale = FabConf.isEnabled("*.old_armor_scale") && fabrication$oldArmorScalePredicate.test(self);
+		final boolean old = FabConf.isEnabled("*.old_armor") && fabrication$oldArmorPredicate.test(self);
 		if (!(((scale && stack.isDamageable()) || old) && stack.getItem() instanceof ArmorItem && ((ArmorItem)stack.getItem()).getSlotType() == slot)) return map;
 		return map.entries().stream().map(
 				entry ->
