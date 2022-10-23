@@ -72,10 +72,10 @@ public class MixinItemEntityRenderer {
 		RenderSystem.setShaderTexture(0, sprite.getAtlas().getId());
 		VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(TexturedRenderLayers.getEntityTranslucentCull());
 		Matrix4f mat = matrices.peek().getModel();;
-		vertexConsumer.vertex(mat, vec3fs[0].getX(), vec3fs[0].getY(), vec3fs[0].getZ()).color(255, 255, 255, 255).texture(m, o).overlay(OverlayTexture.DEFAULT_UV).light(i).normal(0, 0, 0).next();
-		vertexConsumer.vertex(mat, vec3fs[1].getX(), vec3fs[1].getY(), vec3fs[1].getZ()).color(255, 255, 255, 255).texture(m, n).overlay(OverlayTexture.DEFAULT_UV).light(i).normal(0, 0, 0).next();
-		vertexConsumer.vertex(mat, vec3fs[2].getX(), vec3fs[2].getY(), vec3fs[2].getZ()).color(255, 255, 255, 255).texture(l, n).overlay(OverlayTexture.DEFAULT_UV).light(i).normal(0, 0, 0).next();
-		vertexConsumer.vertex(mat, vec3fs[3].getX(), vec3fs[3].getY(), vec3fs[3].getZ()).color(255, 255, 255, 255).texture(l, o).overlay(OverlayTexture.DEFAULT_UV).light(i).normal(0, 0, 0).next();
+		vertexConsumer.vertex(mat, vec3fs[0].getX(), vec3fs[0].getY(), vec3fs[0].getZ()).color(255, 255, 255, 255).texture(m, o).overlay(OverlayTexture.DEFAULT_UV).light(i).normal(1, 1, 1).next();
+		vertexConsumer.vertex(mat, vec3fs[1].getX(), vec3fs[1].getY(), vec3fs[1].getZ()).color(255, 255, 255, 255).texture(m, n).overlay(OverlayTexture.DEFAULT_UV).light(i).normal(1, 1, 1).next();
+		vertexConsumer.vertex(mat, vec3fs[2].getX(), vec3fs[2].getY(), vec3fs[2].getZ()).color(255, 255, 255, 255).texture(l, n).overlay(OverlayTexture.DEFAULT_UV).light(i).normal(1, 1, 1).next();
+		vertexConsumer.vertex(mat, vec3fs[3].getX(), vec3fs[3].getY(), vec3fs[3].getZ()).color(255, 255, 255, 255).texture(l, o).overlay(OverlayTexture.DEFAULT_UV).light(i).normal(1, 1, 1).next();
 		matrices.pop();
 		ci.cancel();
 	}
