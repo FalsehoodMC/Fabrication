@@ -95,20 +95,6 @@ public final class Agnos {
 		return ModList.get().getModContainerById("fabrication").get().getModInfo().getVersion().toString();
 	}
 
-	public static byte[] getClassBytes(Class<?> clazz) {
-		try {
-			// Forge why are you like this
-			TransformingClassLoader tcl = (TransformingClassLoader)Thread.currentThread().getContextClassLoader();
-			Method m = ModuleClassLoader.class.getDeclaredMethod("getMaybeTransformedClassBytes", String.class, String.class);
-			m.setAccessible(true);
-			byte[] bys = (byte[]) m.invoke(tcl, clazz.getCanonicalName(), "Forgery class lookup");
-			return bys;
-		} catch (Throwable t) {
-			LogManager.getLogger("Forgery").warn("Failed to look up "+clazz, t);
-			return null;
-		}
-	}
-
 	public static String getLoaderVersion() {
 		return ForgeVersion.getVersion();
 	}
