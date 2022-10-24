@@ -240,7 +240,7 @@ public class FabInjector {
 				if (t.equals(ti.redirect_fixed.get(m))) {
 					FabLog.warn("FabInjector failed to find injection point for "+ti.owner+";"+m+"\t"+t+"\n may have been caused by another mods Redirect, assuming fixed");
 				} else {
-					FabLog.error("FabInjector failed to find injection point for "+ti.owner+";"+m+"\t"+t+"\n located in"+ti.mixin);
+					FabLog.error("FabInjector failed to find injection point for "+ti.owner+";"+m+"\t"+t+"\n located in "+ti.mixin);
 					Set<String> keys = MixinConfigPlugin.getConfigKeysForDiscoveredClass(ti.mixin);
 					if (!keys.isEmpty()) {
 						FabLog.warn("! Force-disabling " + Joiner.on(", ").join(keys));
