@@ -51,6 +51,7 @@ public abstract class MixinEndPortalBlockEntityRenderer {
 	public void fabrication$render(EndPortalBlockEntity be, Matrix4f model, VertexConsumer vertices, float x1, float x2, float y1, float y2, float z1, float z2, float z3, float z4, Direction side, CallbackInfo ci) {
 		if (FabConf.isEnabled("*.end_portal_parallax") && be.shouldDrawSide(side)) {
 			FabConf.addFailure("*.end_portal_parallax");
+			/*
 			// YOU try to make it work with the gateway, I DARE YOU
 			if (be instanceof EndGatewayBlockEntity) return;
 			ci.cancel();
@@ -185,6 +186,7 @@ public abstract class MixinEndPortalBlockEntityRenderer {
 				glEnable(GL_LIGHTING);
 				glPopMCMatrix();
 			}
+			*/
 		}
 	}
 }
