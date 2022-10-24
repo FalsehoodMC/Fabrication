@@ -52,7 +52,7 @@ public class FabRefMap {
 				String key = read.readLine();
 				line++;
 				if (key == null) break;
-				if (key.isBlank()) {
+				if (key.isEmpty()) {
 					FabLog.warn("FabRefMap bad value on line "+line);
 					continue;
 				}

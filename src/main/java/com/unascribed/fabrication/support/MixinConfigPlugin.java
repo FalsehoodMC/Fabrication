@@ -2,6 +2,7 @@ package com.unascribed.fabrication.support;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.SetMultimap;
@@ -53,7 +54,7 @@ import java.util.stream.Collectors;
 public class MixinConfigPlugin implements IMixinConfigPlugin {
 
 	private static final SetMultimap<String, String> configKeysForDiscoveredClasses = HashMultimap.create();
-	private static final Set<String> brokenInForge = Set.of(
+	private static final Set<String> brokenInForge = ImmutableSet.of(
 			"*.inanimates_can_be_invisible",
 			"*.books_show_enchants",
 			"*.show_bee_count_on_item",
