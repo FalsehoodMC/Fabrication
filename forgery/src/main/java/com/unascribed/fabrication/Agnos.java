@@ -95,7 +95,7 @@ public final class Agnos {
 		});
 		return soundEvent;
 	}
-	
+
 	public static ITag<Block> registerBlockTag(ResourceLocation id) {
 		return ForgeTagHandler.createOptionalTag(ForgeRegistries.BLOCKS, id);
 	}
@@ -103,7 +103,7 @@ public final class Agnos {
 	public static ITag<Item> registerItemTag(ResourceLocation id) {
 		return ForgeTagHandler.createOptionalTag(ForgeRegistries.ITEMS, id);
 	}
-	
+
 	@OnlyIn(Dist.CLIENT)
 	public static KeyBinding registerKeyBinding(KeyBinding kb) {
 		ClientRegistry.registerKeyBinding(kb);
@@ -131,27 +131,6 @@ public final class Agnos {
 
 	public static String getModVersion() {
 		return ModList.get().getModContainerById("fabrication").get().getModInfo().getVersion().toString();
-	}
-
-	public static byte[] getClassBytes(Class<?> clazz) {
-		try {
-			// Forge why are you like this
-			TransformingClassLoader tcl = FMLLoader.getLaunchClassLoader();
-			Field finderF = TransformingClassLoader.class.getDeclaredField("resourceFinder");
-			finderF.setAccessible(true);
-			Function<String,Enumeration<URL>> finder = (Function<String, Enumeration<URL>>)finderF.get(tcl);
-			Field dclF = TransformingClassLoader.class.getDeclaredField("delegatedClassLoader");
-			dclF.setAccessible(true);
-			Object dcl = dclF.get(tcl);
-			Method m = dcl.getClass().getDeclaredMethod("findClass", String.class, Function.class, String.class);
-			m.setAccessible(true);
-			Map.Entry<byte[], CodeSource> en = (Entry<byte[], CodeSource>)m.invoke(dcl, clazz.getName(), finder, "Forgery class lookup");
-			if (en == null) return null;
-			return en.getKey();
-		} catch (Throwable t) {
-			LogManager.getLogger("Forgery").warn("Failed to look up "+clazz, t);
-			return null;
-		}
 	}
 
 	public static String getLoaderVersion() {
