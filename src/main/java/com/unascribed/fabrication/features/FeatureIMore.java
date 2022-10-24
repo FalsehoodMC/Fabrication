@@ -8,10 +8,10 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.unascribed.fabrication.Agnos;
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Feature;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.command.CommandException;
@@ -45,7 +45,7 @@ public class FeatureIMore implements Feature {
 		if (!registered) {
 			registered = true;
 			Agnos.runForCommandRegistration((dispatcher, dedi) -> {
-				Predicate<ServerCommandSource> requirement = s -> s.hasPermissionLevel(2) && MixinConfigPlugin.isEnabled("*.i_and_more") && applied;
+				Predicate<ServerCommandSource> requirement = s -> s.hasPermissionLevel(2) && FabConf.isEnabled("*.i_and_more") && applied;
 				// I tried redirect(). It doesn't work.
 				String[] itemCommandNames = { "item", "i" };
 				for (String name : itemCommandNames) {

@@ -5,12 +5,11 @@ minor_mechanics.extra.spiders_cant_climb_while_wet:
 	name: Spiders Can't Climb While Wet
 	since: 1.2.3
 	sides: server_only
-	default: burnt
 	media: https://unascribed.com/fabrication/spiders_cant_climb_while_wet.mp4
 	desc:
 		Makes spiders unable to climb while wet. Basically a more overpowered version of Spiders
 		Can't Climb Glazed Terracotta. May break vanilla spider farms.
-		
+
 		Interacts with Enhanced Moistness, and the demo video uses it for the water splash to work
 		like it does.
 
@@ -19,7 +18,6 @@ minor_mechanics.extra.observers_see_entities:
 	since: 1.0
 	sides: server_only
 	media: https://unascribed.com/fabrication/observers_see_entities.mp4
-	default: never
 	desc:
 		Observers detect when entities move in front of them if they have no block in front of them.
 
@@ -29,22 +27,28 @@ minor_mechanics.extra.observers_see_entities_living_only:
 	sides: server_only
 	parent: minor_mechanics.observers_see_entities
 	short_desc: Observers only detect living entities, and not e.g. item entities
-	default: never
 	desc:
 		Observers only detect living entities, and not e.g. item entities.
-		
+
 		Safety option to prevent breaking a variety of vanilla contraptions.
 
 minor_mechanics.extra.collision_based_landing_pos:
 	name: Collision Based Landing Pos
 	since: 2.3.0
-	default: burnt
 	sides: server_only
+	media: https://unascribed.com/fabrication/collision_based_landing_pos.mp4
 	desc:
 		More accurately determines what the player is standing on.
 		e.g. with this you can't take fall damage on a slime block
 		while landing on an edge with air next to it.
 
+minor_mechanics.extra.water_fills_on_break_strict:
+	name: Water Fills On Break Strict
+	since: 3.0.0
+	sides: server_only
+	extend: *.water_fills_on_break
+	desc:
+		Requires water_fills_on_break to have at least 2 water sources.
 
 # kate: space-indent off
 # vim: noai:noet

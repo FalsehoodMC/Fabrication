@@ -3,13 +3,15 @@ package com.unascribed.fabrication.mixin.b_utility.disable_bees;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.BiConsumer;
+
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
@@ -20,10 +22,10 @@ import net.minecraft.world.gen.treedecorator.BeehiveTreeDecorator;
 @EligibleIf(configAvailable="*.disable_bees")
 public class MixinBeehiveTreeDecorator {
 
-	@Inject(at=@At("HEAD"), method= "generate(Lnet/minecraft/world/StructureWorldAccess;Ljava/util/Random;Ljava/util/List;Ljava/util/List;Ljava/util/Set;Lnet/minecraft/util/math/BlockBox;)V",
+	@FabInject(at=@At("HEAD"), method= "generate(Lnet/minecraft/world/StructureWorldAccess;Ljava/util/Random;Ljava/util/List;Ljava/util/List;Ljava/util/Set;Lnet/minecraft/util/math/BlockBox;)V",
 			cancellable=true)
 	public void generate(StructureWorldAccess world, Random random, List<BlockPos> logPositions, List<BlockPos> leavesPositions, Set<BlockPos> placedStates, BlockBox box, CallbackInfo ci) {
-		if (MixinConfigPlugin.isEnabled("*.disable_bees")) {
+		if (FabConf.isEnabled("*.disable_bees")) {
 			ci.cancel();
 		}
 	}

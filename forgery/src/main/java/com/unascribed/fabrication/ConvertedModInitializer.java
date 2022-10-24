@@ -2,6 +2,7 @@ package com.unascribed.fabrication;
 
 import net.minecraftforge.fml.ExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fmlclient.ConfigGuiHandler;
 
 public abstract class ConvertedModInitializer {
 
@@ -16,7 +17,7 @@ public abstract class ConvertedModInitializer {
 			t.printStackTrace();
 		}
 	}
-	
+
 	public abstract void onInitialize();
-	
+
 }

@@ -1,13 +1,13 @@
 package com.unascribed.fabrication.mixin.c_tweaks.play_note_blocks_in_creative;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -19,9 +19,9 @@ import net.minecraft.util.math.BlockPos;
 @EligibleIf(configAvailable="*.play_note_blocks_in_creative", envMatches=Env.CLIENT)
 public class MixinClientPlayerInteractionManager {
 
-	@Inject(at=@At("HEAD"), method="breakBlock(Lnet/minecraft/util/math/BlockPos;)Z", cancellable=true)
+	@FabInject(at=@At("HEAD"), method="breakBlock(Lnet/minecraft/util/math/BlockPos;)Z", cancellable=true)
 	public void breakBlock(BlockPos pos, CallbackInfoReturnable<Boolean> ci) {
-		if (!MixinConfigPlugin.isEnabled("*.play_note_blocks_in_creative")) return;
+		if (!FabConf.isEnabled("*.play_note_blocks_in_creative")) return;
 		BlockState bs = MinecraftClient.getInstance().world.getBlockState(pos);
 		if (bs.getBlock() == Blocks.NOTE_BLOCK) {
 			if (MinecraftClient.getInstance().player.isSneaky()) {

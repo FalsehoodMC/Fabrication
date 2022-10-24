@@ -1,12 +1,12 @@
 package com.unascribed.fabrication.mixin.g_weird_tweaks.leaves_grow_grass;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Fertilizable;
@@ -24,9 +24,9 @@ import net.minecraft.world.World;
 @EligibleIf(configAvailable="*.leaves_grow_grass")
 public abstract class MixinBoneMealItem {
 
-	@Inject(at=@At("HEAD"), method="useOnBlock(Lnet/minecraft/item/ItemUsageContext;)Lnet/minecraft/util/ActionResult;", cancellable=true)
+	@FabInject(at=@At("HEAD"), method="useOnBlock(Lnet/minecraft/item/ItemUsageContext;)Lnet/minecraft/util/ActionResult;", cancellable=true)
 	private void useOnBlock(ItemUsageContext context, CallbackInfoReturnable<ActionResult> cir) {
-		if (!MixinConfigPlugin.isEnabled("*.leaves_grow_grass")) return;
+		if (!FabConf.isEnabled("*.leaves_grow_grass")) return;
 
 		World world = context.getWorld();
 		BlockPos blockPos = context.getBlockPos().up();

@@ -5,7 +5,6 @@ weird_tweaks:
 	name: Weird Tweaks
 	section: true
 	since: 1.0
-	default: vienna
 	desc:
 		Opinionated changes.
 
@@ -15,10 +14,10 @@ weird_tweaks.endermen_dont_squeal:
 	sides: either
 	desc:
 		Makes Endermen not make their growling or screeching sounds when angry.
-		
+
 		On client, mutes the sounds for just you. This means angry endermen don't make ambient
 		sounds.
-		
+
 		On server, replaces the angry ambient sound with the normal ambient sound for everyone. The
 		stare sound is client-sided, unfortunately.
 
@@ -30,9 +29,9 @@ weird_tweaks.disable_equip_sound:
 		Disables the unnecessary "Gear equips" sound that plays when your hands change, and is often
 		glitchily played every tick. Armor equip sounds and other custom equip sounds remain
 		unchanged. You won't even notice it's gone.
-		
+
 		On client, mutes it just for you.
-		
+
 		On server, prevents the sound from playing at all for everyone.
 
 weird_tweaks.repelling_void:
@@ -68,9 +67,9 @@ weird_tweaks.dimensional_tools:
 		"Fungal" tools, and stone tools crafted with blackstone into "Blackstone" tools, which also
 		get the 1/50th damage bonus. Completely configurable; see
 		config/fabrication/dimensional_tools.ini.
-		
+
 		On client, adjusts tooltips to show fractional damage.
-		
+
 		Inspired by a joke video.
 
 weird_tweaks.instant_pickup:

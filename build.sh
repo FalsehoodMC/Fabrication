@@ -2,15 +2,17 @@
 if [ -f ~/ForgeryTools.jar ]; then
 	canforgery=1
 else
-	echo "Forgery tools not found. As of the time of writing, the Forgery tooling is not public."
+	echo "Forgery tools not found."
+	echo "Performing a Fabric build only."
+	echo
+	canforgery=0
 fi
 ./build-features.sh
 rm -rf build/libs
 echo Building Fabrication...
-./gradlew clean build
-rm build/libs/*-dev.jar
+./gradlew clean build -x ap:clean
+rm -f build/libs/*-dev.jar
 fabrication=$(echo build/libs/fabrication*.jar)
-zip -d "$fabrication" com/mrcrayfish/* svenhjol/charm/*
 if [ "$canforgery" == "1" ]; then
 	forgery=$(echo "$fabrication" | sed "s/fabrication/forgery/")
 	tmp=$(mktemp -d)

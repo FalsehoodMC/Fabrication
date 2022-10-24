@@ -5,7 +5,6 @@ utility:
 	name: Utility
 	section: true
 	since: 1.0
-	default: blonde
 	desc:
 		Useful tidbits that don't modify gameplay.
 
@@ -19,7 +18,7 @@ utility.mods_command:
 	desc:
 		Adds a /mods command listing all mods on the server. Hovering over the mods shows their
 		descriptions, clicking on them takes you to their homepage if they have one.
-		
+
 		If Bukkit is not present, also adds a /plugins command suggesting people use /mods instead.
 
 utility.taggable_players:
@@ -31,18 +30,11 @@ utility.taggable_players:
 	short_desc: Allows assigning various "tags" to players, such as no_hunger or invisible_to_mobs
 	desc:
 		Allows you to assign or unassign various "tags" from players via /fabrication tag.
-		
-		Valid tags:  
-		* invisible_to_mobs - The player cannot be targeted by mobs at all. Sorta like Apathetic Mobs.  
-		* no_hunger - The player never loses food, and when they eat food it instead heals them directly. Sorta like Hunger Strike.  
-		* fireproof - The player cannot take fire damage.  
-		* can_breathe_water - The player does not lose air while underwater.  
-		* permanent_dolphins_grace - The player always has Dolphin's Grace.  
-		* permanent_conduit_power - The player always has Conduit Power.  
-		* scares_creepers - (Since 1.1) The player scares creepers.  
-		* no_phantoms - (Since 1.1) The player cannot have phantoms spawn on them.
-		* no_wandering_trader - (Since 2.1.0) The player cannot have wandering traders spawn on them.
-		
+		Valid tags consist of feature keys which are living_entity scriptable.
+		The following features are set taggable by default:
+		can_breathe_water, no_wandering_trader, no_phantoms, scares_creepers,
+		permanent_dolphins_grace, permanent_conduit_power, fireproof, no_hunger, invisible_to_mobs.
+
 utility.legacy_command_syntax:
 	name: Legacy Command Syntax
 	since: 1.0
@@ -54,7 +46,7 @@ utility.legacy_command_syntax:
 		Allows numeric arguments to /gamemode and /difficulty, re-adds /toggledownfall, allows
 		TitleCase arguments to /summon, allows numeric arguments to commands that accept items
 		like /give, and re-adds shorthand to /xp.
-		
+
 		Old habits die hard.
 
 utility.books_show_enchants:
@@ -76,7 +68,7 @@ utility.tools_show_important_enchant:
 	desc:
 		Makes tools enchanted with Silk Touch, Fortune, or Riptide show the first letter of that
 		enchant in the top left.
-		
+
 		Never break an Ender Chest with the wrong tool again.
 
 utility.despawning_items_blink:
@@ -99,15 +91,15 @@ utility.canhit:
 		Adds a new CanHit tag that affects melee attacks, bows, crossbows, and tridents. Also works
 		on arrows and fireworks, in which case the restrictions will be AND'd with the restrictions
 		of the bow or crossbow doing the firing.
-		
+
 		The tag must be a list of strings, which may contain UUIDs that match a specific entity or
 		an entity type ID optionally prefixed with a ! to invert the match.
-		
+
 		If installed on the client, adds hit information to the tooltip. You can hide this
 		information by creating an NBT byte set to 1 called "HideCanHit".
-		
+
 		For example, a sword that can only hit spiders: /give @p diamond_sword{CanHit:["spider"]}
-		
+
 		A sword that can hit anything but creepers: /give @p diamond_sword{CanHit:["!creeper"]}
 
 utility.item_despawn:
@@ -122,7 +114,7 @@ utility.item_despawn:
 		all forms of damage including the void. You can filter by the item ID, whether the item was
 		dropped by a player, if the item was dropped by a player dying, what enchantments are on the
 		item, if the item is cursed, arbitrary NBT booleans, and block or item tags.
-		
+
 		Configured in config/fabrication/item_despawn.ini.
 
 utility.i_and_more:
@@ -133,7 +125,7 @@ utility.i_and_more:
 	media: https://unascribed.com/fabrication/i_and_more.mp4
 	desc:
 		Adds /i, /item, /more, and /fenchant commands.
-		
+
 		/i and /item are shorthand for /give to yourself, and /more increases the size of your held
 		item's stack. /fenchant is like /enchant but it ignores all restrictions.
 
@@ -147,7 +139,7 @@ utility.killmessage:
 		message when they kill a player. You can use placeholders to show the name of the killed
 		entity, the name of the killing entity, or the name of the killing entity's held item, in
 		that order.
-		
+
 		For example, "%s found a %s" would show e.g. "unascribed found a Skeleton". You could also
 		write this as "%1$s found a %2$s" for the same result, or, say "A %2$s found %1$s" to show
 		them in the opposite order, e.g. "A Skeleton found unascribed". The third %s or a %3$s will
@@ -163,7 +155,7 @@ utility.toggle_stance:
 		Adds a "Toggle Stance" keybind to switch between standing and sneaking. Vanilla has an
 		accessibility option to make the existing Sneak key work as a toggle, but it can be useful
 		to have a hold-to-sneak and toggle-sneak button at the same time.
-		
+
 		Interacts with Minor Mechanics > Crawling; if they are both enabled, the Toggle Stance key
 		will cycle between standing, sneaking, and crawling.
 
@@ -220,7 +212,7 @@ utility.ping_privacy:
 	media: https://unascribed.com/fabrication/ping_privacy.png
 	desc:
 		Sends no ping data to IPs that have not successfully logged in in the last 7 days.
-		
+
 		Prevents scraping. There exist services that constantly ping servers they know about and
 		track their uptime and who's connected, which will then turn around and store the name
 		history of discovered users permanently and make their cape publicly searchable, among
@@ -240,6 +232,27 @@ utility.extract_furnace_xp:
 	desc:
 		Allows clicking on the empty output slot of a furnace to extract the experience, instead of
 		needing to break it.
-		
+
+utility.lenient_command_suggestions:
+	name: Lenient Command Suggestions
+	since: 3.0.0
+	sides: server_only
+	desc:
+		Command suggestions for modded ids will still appear even if the id namespace is not explicitly specified.
+
+utility.linkify_urls:
+	name: Linkify Urls
+	since: 3.0.0
+	sides: client_only
+	desc:
+		Links in chat are clickable.
+
+utility.rmb_clears_text_fields:
+	name: RMB Clears Text Fields
+	since: 3.0.0
+	sides: client_only
+	desc:
+		Right Mouse Button will clear text fields.
+
 # kate: space-indent off
 # vim: noai:noet

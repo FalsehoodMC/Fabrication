@@ -1,9 +1,9 @@
 package com.unascribed.fabrication.mixin.e_mechanics.obsidian_tears;
 
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.support.EligibleIf;
@@ -20,7 +20,7 @@ public class MixinModelLoader {
 	@Shadow
 	private void addModel(ModelIdentifier modelId) {}
 
-	@Inject(at=@At(value="CONSTANT", args="stringValue=special"), method="<init>", require=0)
+	@FabInject(at=@At(value="CONSTANT", args="stringValue=special"), method="<init>", require=0)
 	public void construct(CallbackInfo ci) {
 		addModel(new ModelIdentifier(new Identifier("fabrication", "obsidian_tears"), "inventory"));
 	}

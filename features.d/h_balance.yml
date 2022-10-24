@@ -5,7 +5,6 @@ balance:
 	name: Balance
 	section: true
 	since: 1.0
-	default: vienna
 	desc:
 		Changes to vanilla balance.
 
@@ -17,7 +16,7 @@ balance.faster_obsidian:
 	desc:
 		Makes obsidian and obsidian-related blocks break 3× faster. Needed on both sides to work
 		properly.
-		
+
 		Does not break vanilla clients when on the server, but when on the client, vanilla servers
 		will think you're cheating. (And they won't be wrong.)
 
@@ -25,12 +24,13 @@ balance.disable_prior_work_penalty:
 	name: Disable Prior Work Penalty
 	since: 1.0
 	sides: server_only_with_client_helper
+	fscript: item_stack
 	media: https://unascribed.com/fabrication/disable_prior_work_penalty.mp4
 	desc:
 		Disables the anvil prior work penalty when an item has been worked multiple times. Makes
 		non-Mending tools relevant by allowing you to repair them indefinitely, and makes putting
 		books on tools easier.
-		
+
 		If only on the server and not the client, the wrong level cost will briefly be displayed
 		before being corrected.
 
@@ -48,10 +48,10 @@ balance.hyperspeed_furnace_minecart:
 	media: https://unascribed.com/fabrication/hyperspeed_furnace_minecart.mp4
 	desc:
 		Makes furnace minecarts very fast and burn fuel more quickly.
-		
+
 		An attempt to make rail transport relevant again, as well as furnace carts, in a world with
 		ice roads, swimming, elytra, etc.
-		
+
 		Warning: These carts are so fast that they sometimes fall off of track corners. Make sure to
 		surround track corners with blocks.
 
@@ -66,7 +66,7 @@ balance.tridents_accept_power:
 		improved at all other than via Impaling, which is exclusive to aquatic mobs; notably,
 		Drowned do not count as aquatic mobs. Only the harmless squids, salmon, cod, tropical fish,
 		and the less harmless pufferfish and guardians count as "aquatic".
-		
+
 		Power is considered incompatible with Sharpness and Impaling.
 
 balance.tridents_accept_sharpness:
@@ -78,7 +78,7 @@ balance.tridents_accept_sharpness:
 		Allows tridents to accept the Sharpness enchantment, increasing their melee damage. See
 		above for justification. Tridents deal 1 more damage than a Netherite Sword, but this tweak
 		*only* allows them to accept Sharpness; no Smite, no Looting, etc.
-		
+
 		Sharpness is considered incompatible with Power and Impaling.
 
 balance.bedrock_impaling:
@@ -90,7 +90,7 @@ balance.bedrock_impaling:
 		Makes the Impaling enchantment act like it does in Bedrock Edition and Combat Test 4.
 		Namely, it deals bonus damage to anything that is in water or rain (i.e. is wet), instead
 		of only aquatic mobs.
-		
+
 		Interacts with Enhanced Moistness.
 
 balance.environmentally_friendly_creepers:
@@ -116,7 +116,7 @@ balance.infinity_crossbows:
 	media: https://unascribed.com/fabrication/infinity_crossbows.mp4
 	desc:
 		Allow putting Infinity on crossbows. Only works for plain arrows.
-		
+
 		Honors InfiBows.
 
 balance.anvil_rename_always_costs_one:
@@ -137,6 +137,13 @@ balance.spawners_always_tick:
 		Allows shuttling a player between spawners with a minecart or water stream to efficiently
 		make use of spawners that are close together, but not quite close enough to all be activated
 		at the same time.
+
+balance.anvil_no_level_limit:
+	name: Anvil No Level Limit
+	since: 3.0.0
+	sides: server_only
+	desc:
+		Anvils don't become "Too Expensive".
 
 # kate: space-indent off
 # vim: noai:noet

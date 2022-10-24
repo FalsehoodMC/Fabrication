@@ -3,16 +3,16 @@ package com.unascribed.fabrication.mixin.i_woina.old_tooltip;
 import java.util.Iterator;
 import java.util.List;
 
+import com.unascribed.fabrication.FabConf;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.AbstractParentElement;
@@ -34,9 +34,9 @@ public abstract class MixinScreen extends AbstractParentElement implements Ticka
 
 	@Shadow @Nullable protected MinecraftClient client;
 
-	@Inject(method = "renderOrderedTooltip", at = @At(value = "HEAD"), cancellable = true)
+	@FabInject(method = "renderOrderedTooltip", at = @At(value = "HEAD"), cancellable = true)
 	private void drawOldTooltip(MatrixStack matrices, List<? extends OrderedText> lines, int x, int y, CallbackInfo ci) {
-		if (MixinConfigPlugin.isEnabled("*.old_tooltip")) {
+		if (FabConf.isEnabled("*.old_tooltip")) {
 			// Ported from MCP beta 1.7.3
 			// Slightly altered in order to get item attributes to properly list in the tooltip
 			if (!lines.isEmpty()) {

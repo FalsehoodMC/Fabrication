@@ -3,6 +3,7 @@ package com.unascribed.fabrication;
 import java.nio.file.Path;
 import java.util.List;
 
+import com.unascribed.fabrication.support.FabConst;
 import org.spongepowered.asm.mixin.MixinEnvironment;
 import org.spongepowered.asm.mixin.transformer.IMixinTransformer;
 
@@ -90,7 +91,7 @@ public final class Agnos {
 	}
 
 	public static String getModVersion() {
-		if (FabRefl.DEV) return "DEV";
+		if (FabConst.DEV) return "DEV";
 		return FabricLoader.getInstance().getModContainer("fabrication").get().getMetadata().getVersion().getFriendlyString();
 	}
 

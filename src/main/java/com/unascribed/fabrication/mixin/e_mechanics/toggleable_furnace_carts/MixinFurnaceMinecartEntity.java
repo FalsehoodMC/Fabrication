@@ -1,7 +1,7 @@
 package com.unascribed.fabrication.mixin.e_mechanics.toggleable_furnace_carts;
 
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.PoweredRailBlock;
@@ -15,7 +15,7 @@ import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(FurnaceMinecartEntity.class)
@@ -35,9 +35,9 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 		super(type, world);
 	}
 
-	@Inject(at=@At("HEAD"), method="moveOnRail(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)V")
+	@FabInject(at=@At("HEAD"), method="moveOnRail(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)V")
 	protected void toggleOnUnpoweredPoweredRail(BlockPos pos, BlockState state, CallbackInfo ci) {
-		if (!MixinConfigPlugin.isEnabled("*.toggleable_furnace_carts")) return;
+		if (!FabConf.isEnabled("*.toggleable_furnace_carts")) return;
 		if (state.isOf(Blocks.POWERED_RAIL) && !state.get(PoweredRailBlock.POWERED)) {
 			if (fuel > 0) {
 				fabrication$pauseFuel += fuel;
@@ -54,13 +54,13 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 		}
 	}
 
-	@Inject(at=@At("TAIL"), method="writeCustomDataToNbt(Lnet/minecraft/nbt/NbtCompound;)V")
+	@FabInject(at=@At("TAIL"), method="writeCustomDataToNbt(Lnet/minecraft/nbt/NbtCompound;)V")
 	protected void writeCustomDataToTag(NbtCompound nbt, CallbackInfo ci) {
 		super.writeCustomDataToNbt(nbt);
 		nbt.putInt("fabrication:PauseFuel", fabrication$pauseFuel);
 	}
 
-	@Inject(at=@At("TAIL"), method="readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V")
+	@FabInject(at=@At("TAIL"), method="readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V")
 	protected void readCustomDataFromTag(NbtCompound nbt, CallbackInfo ci) {
 		fabrication$pauseFuel = nbt.getInt("fabrication:PauseFuel");
 	}

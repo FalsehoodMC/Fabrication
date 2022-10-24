@@ -1,12 +1,12 @@
 package com.unascribed.fabrication.mixin.g_weird_tweaks.villagers_follow_emerald_blocks;
 
+import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.passive.MerchantEntity;
@@ -20,9 +20,9 @@ import net.minecraft.world.World;
 public abstract class MixinVillagerEntity extends MerchantEntity  {
 	private PlayerEntity fabrication$player = null;
 
-	@Inject(method="mobTick()V", at=@At("TAIL"))
+	@FabInject(method="mobTick()V", at=@At("TAIL"))
 	public void mobTick(CallbackInfo ci){
-		if(MixinConfigPlugin.isEnabled("*.villagers_follow_emerald_blocks") && !isAiDisabled()){
+		if(FabConf.isEnabled("*.villagers_follow_emerald_blocks") && !isAiDisabled()){
 			if (world.getTime()%40 == 0)
 				fabrication$player = world.getClosestPlayer(getX(), getY(), getZ(), 10, (player) -> player instanceof PlayerEntity && !player.isSpectator() && ((PlayerEntity)player).isHolding(Items.EMERALD_BLOCK));
 			if (fabrication$player != null) {

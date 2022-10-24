@@ -1,14 +1,13 @@
 package com.unascribed.fabrication.mixin.i_woina.dropped_items_dont_stack;
 
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.SpecialEligibility;
-
+import com.unascribed.fabrication.support.injection.FabModifyArg;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 import java.util.function.Consumer;
 
@@ -16,10 +15,9 @@ import java.util.function.Consumer;
 @EligibleIf(configAvailable="*.dropped_items_dont_stack", specialConditions=SpecialEligibility.NOT_FORGE)
 public abstract class MixinLivingEntity {
 
-	@ModifyArg(method="dropLoot(Lnet/minecraft/entity/damage/DamageSource;Z)V",
-			at=@At(value="INVOKE", target="net/minecraft/loot/LootTable.generateLoot(Lnet/minecraft/loot/context/LootContext;Ljava/util/function/Consumer;)V"))
+	@FabModifyArg(method="dropLoot(Lnet/minecraft/entity/damage/DamageSource;Z)V", at=@At(value="INVOKE", target="Lnet/minecraft/loot/LootTable;generateLoot(Lnet/minecraft/loot/context/LootContext;Ljava/util/function/Consumer;)V"))
 	public Consumer<ItemStack> splitLoot(Consumer<ItemStack> lootConsumer) {
-		if(!MixinConfigPlugin.isEnabled("*.dropped_items_dont_stack")) return lootConsumer;
+		if(!FabConf.isEnabled("*.dropped_items_dont_stack")) return lootConsumer;
 		return stack ->{
 			ItemStack single = stack.copy();
 			single.setCount(1);

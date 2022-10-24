@@ -1,12 +1,12 @@
 package com.unascribed.fabrication.mixin.z_combined.exp_drop;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -22,12 +22,12 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 		super(entityType, world);
 	}
 
-	@Inject(at=@At("HEAD"), method= "getXpToDrop(Lnet/minecraft/entity/player/PlayerEntity;)I", cancellable=true)
+	@FabInject(at=@At("HEAD"), method= "getXpToDrop(Lnet/minecraft/entity/player/PlayerEntity;)I", cancellable=true)
 	public void getCurrentExperience(PlayerEntity attacker, CallbackInfoReturnable<Integer> ci) {
 		boolean keepInv = world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY);
-		boolean keepInvDrop = MixinConfigPlugin.isEnabled("*.drop_exp_with_keep_inventory") && keepInv;
+		boolean keepInvDrop = FabConf.isEnabled("*.drop_exp_with_keep_inventory") && keepInv;
 		if (keepInv && !keepInvDrop) return;
-		if (MixinConfigPlugin.isEnabled("*.drop_more_exp_on_death") || keepInvDrop) {
+		if (FabConf.isEnabled("*.drop_more_exp_on_death") || keepInvDrop) {
 			PlayerEntity self = ((PlayerEntity)(Object)this);
 			int level = self.experienceLevel;
 			int points = 0;

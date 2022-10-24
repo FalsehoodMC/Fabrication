@@ -1,31 +1,80 @@
+buildscript {
+	repositories {
+		gradlePluginPortal()
+	}
+	dependencies {
+		classpath 'com.modrinth.minotaur:Minotaur:2.4.3'
+		classpath 'gradle.plugin.com.matthewprenger:CurseGradle:1.4.0'
+		classpath "com.github.breadmoirai:github-release:2.4.1"
+	}
+}
+
+import com.google.common.collect.ImmutableList
+import com.google.gson.JsonArray
+import com.google.gson.JsonElement
+import com.google.gson.JsonNull
+import com.google.gson.JsonObject
+import com.google.gson.JsonPrimitive
+
+import java.nio.file.Files
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
 plugins {
-	id 'fabric-loom' version '0.7-SNAPSHOT'
+	id 'fabric-loom' version '0.11-SNAPSHOT'
+	id 'io.github.juuxel.loom-quiltflower' version '1.6.0'
 	id 'maven-publish'
+}
+
+if (System.getenv("MODRINTH_TOKEN")) {
+	apply plugin: "com.modrinth.minotaur"
+}
+if (System.getenv("CURSE_TOKEN")) {
+	apply plugin: "com.matthewprenger.cursegradle"
+}
+if (System.getenv("GITHUB_TOKEN")) {
+	apply plugin: "com.github.breadmoirai.github-release"
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 archivesBaseName = project.archives_base_name
-version = project.version
+def origVersion = project.version
+version = project.version+"+1.16"
 group = project.maven_group
 
 repositories {
 	maven {
-		url = "https://repo.unascribed.com"
+		url 'https://repo.sleeping.town'
+		content {
+			includeGroup 'com.unascribed'
+		}
+	}
+	maven {
+		url 'https://maven.terraformersmc.com/releases'
+		content {
+			includeGroup 'com.terraformersmc'
+		}
+	}
+	maven {
+		url 'https://maven.ssf.tf/'
+		content {
+			includeGroup 'tf.ssf.sfort'
+		}
 	}
 	maven {
 		name = "JitPack"
 		url = "https://jitpack.io"
-	}
-	maven {
-		name = "TerraformersMC"
-		url = "https://maven.terraformersmc.com/releases"
-	}
-	maven {
-		url = 'https://maven.ssf.tf/'
 		content {
-			includeGroup "tf.ssf.sfort"
+			includeGroup 'com.github.Queerbric'
+		}
+	}
+	maven {
+		url 'https://repo.fabricmc.net'
+		content {
+			includeGroup 'net.fabricmc'
+			includeGroup 'net.fabricmc.api'
 		}
 	}
 }
@@ -36,35 +85,419 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	modImplementation include(fabricApi.module("fabric-api-base", "${project.fabric_version}"))
-	modImplementation include(fabricApi.module("fabric-resource-loader-v0", "${project.fabric_version}"))
-	modImplementation include(fabricApi.module("fabric-command-api-v1", "${project.fabric_version}"))
-	modImplementation include(fabricApi.module("fabric-item-api-v1", "${project.fabric_version}"))
-	modImplementation include(fabricApi.module("fabric-key-binding-api-v1", "${project.fabric_version}"))
-	modImplementation include(fabricApi.module("fabric-rendering-v1", "${project.fabric_version}"))
-	
-	modImplementation(include("com.github.Queerbric:pridelib:87d9cb94cb")) {
+	modImplementation fabricApi.module('fabric-api-base', project.fabric_version)
+	modImplementation fabricApi.module('fabric-resource-loader-v0', project.fabric_version)
+	modImplementation fabricApi.module('fabric-command-api-v1', project.fabric_version)
+	modImplementation fabricApi.module('fabric-item-api-v1', project.fabric_version)
+	modImplementation fabricApi.module('fabric-key-binding-api-v1', project.fabric_version)
+	modImplementation fabricApi.module('fabric-rendering-v1', project.fabric_version)
+	// TODO I would really like to not dep on these two
+	modImplementation fabricApi.module('fabric-registry-sync-v0', project.fabric_version)
+	modImplementation fabricApi.module('fabric-networking-api-v1', project.fabric_version)
+
+
+	modImplementation(include('com.github.Queerbric:pridelib:87d9cb94cb')) {
 		transitive = false
 	}
 	modImplementation("com.terraformersmc:modmenu:1.16.22") {
 		transitive = false
 	}
-	modImplementation "com.unascribed:ears-api:1.4.1"
-	modImplementation("tf.ssf.sfort:fscript:1.1.5-1.16") {
+	modImplementation 'com.unascribed:ears-api:1.4.5'
+	modImplementation('tf.ssf.sfort:fscript:3.1.2-1.16.5') {
 		transitive = false
 	}
-	modRuntime fabricApi.module("fabric-screen-api-v1", "${project.fabric_version}")
+	modRuntimeOnly fabricApi.module('fabric-screen-api-v1', project.fabric_version)
+
+	annotationProcessor project(':ap')
+	implementation 'com.google.code.gson:gson:2.8.9'
 }
 
-minecraft {
-	accessWidener "src/main/resources/fabrication.accesswidener"
+loom.accessWidenerPath = file('src/main/resources/fabrication.accesswidener')
+
+task fabGenFeatures {
+	JsonObject json = new FeaturesFileParser(project.version, logger, Arrays.asList(file('features.yml').text.split('\\r?\\n')), 'features.yml').toJson()
+	file('src/main/resources/features.json').text = json.toString()
+	file('src/main/resources/default_features_config.ini').text = FeatureConfigTransformer.transform(Arrays.asList(file('src/main/resources/default_features_config.ini.tmpl').text.split('\\r?\\n')), json)
+}
+class FeatureConfigTransformer{
+	static String transform(List<String> lines, JsonObject data){
+		StringBuilder out = new StringBuilder()
+		int lineNum = 0
+		for (String line : lines) {
+			lineNum++
+			String trim = line.trim()
+			if (trim == ';!!;') {
+				for(Map.Entry<String, JsonElement> entry : data.entrySet()){
+					String k = entry.getKey()
+					JsonObject datum = entry.getValue().asJsonObject
+					int leadingTabs = 0
+					if (k.indexOf('.') != -1) {
+						leadingTabs = 1
+						if (!datum.parent.isJsonNull()) {
+							leadingTabs++
+							if (datum.meta.getAsBoolean()) {
+								continue
+							}
+						}
+					} else if (datum.meta.getAsBoolean()) {
+						continue
+					}
+					String val = "unset"
+					String desc = datum.desc.getAsString()
+					String sides_friendly = null
+					switch (datum.sides.getAsString()) {
+						case "irrelevant": break
+						case "either": sides_friendly = "Server or Client"; break
+						case "client_only": sides_friendly = "Client Only"; break
+						case "server_only": sides_friendly = "Server Only"; break
+						case "server_only_with_client_helper": sides_friendly = "Server & Client (Client Optional)"; break
+						case "server_and_client": sides_friendly = "Server & Client"; break
+					}
+					if (sides_friendly != null) {
+						desc = sides_friendly+"\n\n"+desc
+					}
+					if (k.startsWith('general.category.')) {
+						if (k == "general.category.fixes") {
+							val = "true"
+						} else if (k == "general.category.utility") {
+							val = "true"
+						} else if (k == "general.category.tweaks") {
+							val = "true"
+						} else {
+							val = "false"
+						}
+					} else if (k == "general.runtime_checks") {
+						val = "true"
+					} else if (k == "general.reduced_motion") {
+						val = "false"
+					} else if (k == "general.data_upload") {
+						val = "false"
+					}
+					desc = foldLine(desc, 78-(leadingTabs*8))
+					if (datum != null){
+						if (!datum.media.isJsonNull() || !datum.extra_media.isJsonNull() || !datum.link_url.isJsonNull()) desc += '\n'
+						if (!datum.media.isJsonNull()) {
+							desc += '\n'+datum.media_text.getAsString()+': '+datum.media.getAsString()
+						}
+						if (!datum.extra_media.isJsonNull()) {
+							desc += '\n'+datum.extra_media_text.getAsString()+': '+datum.extra_media.getAsString()
+						}
+						if (!datum.link_url.isJsonNull()) {
+							desc += '\n'+datum.link_text.getAsString()+': '+datum.link_url.getAsString()
+						}
+					}
+					String tabs = ""
+					for (int i=0; i<leadingTabs; i++) {
+						tabs += '\t'
+					}
+					desc = tabs+'; '+desc
+					out.append(desc.replaceAll('\\r?\\n', '\r\n'+tabs+'; ')).append('\r\n')
+					if (k.indexOf('.') !== -1) {
+						out.append(tabs).append(k.substring(k.indexOf('.')+1)).append("=").append(val).append("\r\n\r\n")
+					} else {
+						out.append(tabs).append("[").append(k).append("]\r\n")
+					}
+				}
+			} else {
+				out.append(line)
+				out.append('\r\n')
+			}
+		}
+		return out.toString()
+	}
+	static String foldLine(String input, int length){
+		String[] lines = input.split(" ")
+		if (input.length() < length || lines.length == 0) return input + '\r\n'
+		StringBuilder out = new StringBuilder()
+		StringBuilder line = new StringBuilder(lines[0]).append(' ')
+		int i = 1;
+		while(true) {
+			if (line.length() + lines[i].length() < length) {
+				line.append(lines[i]).append(' ')
+				if (++i>=lines.length) {
+					out.append(line.append('\r\n'))
+					break
+				}
+			} else {
+				out.append(line.append('\r\n'))
+				line = new StringBuilder(lines[i]).append(' ')
+				if (++i>=lines.length) {
+					out.append(line)
+					break
+				}
+			}
+		}
+		return out.toString()
+	}
+}
+class FeaturesFileParser{
+	String curKey = null
+	JsonObject cur = new JsonObject()
+	int lineNum = 0
+	String multilineKey = null
+	String multilineBuf = ""
+	List<JsonObject> data = new LinkedList<>()
+	String projectVersion
+
+	FeaturesFileParser(String projectVersion, Logger logger, List<String> text, String file) {
+		this.projectVersion = projectVersion
+		for (String line : text){
+			lineNum++
+			if (line.indexOf('@') == 0) {
+				String[] split = line.split(" ")
+				switch (split[0]) {
+					case "@include":
+						File f = new File(split[1])
+						if (f.isFile()) {
+							data.addAll(new FeaturesFileParser(projectVersion, logger, Files.readAllLines(f.toPath()), split[1]).data)
+						} else if (f.isDirectory()) {
+							for (File fi : f.listFiles()) {
+								data.addAll(new FeaturesFileParser(projectVersion, logger, Files.readAllLines(fi.toPath()), fi.toString()).data)
+							}
+						}
+						break
+					default:
+						logger.log(LogLevel.ERROR, "At line "+lineNum+" in "+file+": Unknown at-directive "+split[0]+". Ignoring")
+				}
+				continue
+			}
+			String trim = line.trim()
+			if (trim.startsWith('#')) continue
+			int leadingTabs = 0
+			for (int i = 0; i < line.length(); i++) {
+				if (line.charAt(i) == '\t' as char) {
+					leadingTabs++
+				} else {
+					break
+				}
+			}
+			if (leadingTabs == 0) {
+				if (trim.length() > 0) {
+					if (curKey != null) {
+						commit()
+					}
+					if (trim.lastIndexOf(":") == trim.length()-1) {
+						// yaml syntax compatibility
+						trim = trim.substring(0, trim.length()-1)
+					}
+					curKey = trim
+				} else {
+					if (multilineKey !== null) {
+						multilineBuf += "\n"
+					}
+				}
+			} else if (curKey == null) {
+				logger.log(LogLevel.ERROR, "At line "+lineNum+" in "+file+": Got an indented line before a key definition. Ignoring")
+				continue
+			} else {
+				if (leadingTabs == 1) {
+					if (multilineKey !== null) {
+						commitMultiline()
+					}
+					int colonIdx = trim.indexOf(':')
+					if (colonIdx == -1) {
+						logger.log(LogLevel.ERROR, "At line "+lineNum+" in "+file+": Got a single-indented line with no colon. Ignoring")
+						continue
+					}
+					String k = trim.substring(0, colonIdx).trim()
+					if (!defaults(curKey, new JsonObject()).has(k)) {
+						logger.log(LogLevel.ERROR, "At line "+lineNum+" in "+file+": Got an unknown key "+k+". Ignoring")
+						continue
+					}
+					String  v = trim.substring(colonIdx+1).trim()
+					if (v == '') {
+						multilineKey = k
+					} else {
+						switch (k) {
+							case 'needs':
+								String[] sArr = v.split(' ')
+								JsonArray arr = new JsonArray(sArr.length)
+								for (String str : sArr) arr.add(str)
+								cur.add(k, arr)
+								break
+							case 'endorsed': case 'hidden': case 'section': case 'meta':
+								cur.addProperty(k, v == 'true')
+								break
+							default:
+								cur.addProperty(k, v)
+								break
+						}
+					}
+				} else if (leadingTabs >= 2) {
+					if (multilineKey != null) {
+						if (trim.length() == 0) {
+							// paragraph separator
+							multilineBuf += "\n\n"
+						} else {
+							multilineBuf += line.substring(2)+" "
+							if (line.matches("  \$")) multilineBuf += "\n"
+						}
+					}
+				}
+			}
+		}
+		if (curKey != null) commit()
+	}
+
+	void commitMultiline() {
+		if (multilineKey != null) {
+			cur.add(multilineKey, new JsonPrimitive(multilineBuf.trim().replaceAll(' +\\n','\n')))
+		}
+		multilineKey = null
+		multilineBuf = ""
+	}
+
+	JsonObject defaults(String curKey, JsonObject cur){
+		JsonObject ret = new JsonObject()
+		ret.addProperty("name", curKey)
+		ret.add("short_name", cur.name)
+		ret.addProperty("meta", false)
+		ret.addProperty("section", false)
+		ret.addProperty("hidden", false)
+		ret.addProperty("extra", false)
+		ret.add("since", JsonNull.INSTANCE)
+		ret.addProperty("since_code", 0)
+		ret.addProperty("sides", "irrelevant")
+		ret.add("needs", new JsonArray())
+		ret.add("parent", JsonNull.INSTANCE)
+		ret.add("media", JsonNull.INSTANCE)
+		ret.addProperty("media_text", (String)(cur.has("media") ? (cur.media.getAsString().trim().endsWith(".mp4") ? 'Demonstration video' : 'Demonstration image') : null))
+		ret.add("extra_media", JsonNull.INSTANCE)
+		ret.addProperty("extra_media_text", (String)(cur.has("extra_media") ? (cur.extra_media.getAsString().trim().endsWith(".mp4") ? 'Demonstration video' : 'Demonstration image') : null))
+		ret.add("link_url", JsonNull.INSTANCE)
+		ret.addProperty("link_text", (String)(cur.has("link_url") ? 'See also' : null))
+		String short_desc = null
+		if (cur.has("desc")){
+			Matcher matcher = Pattern.compile("\\.( |\\n|\$)").matcher(cur.desc.getAsString())
+			if (matcher.find()) {
+				short_desc = cur.desc.getAsString().substring(0, matcher.start())
+			} else {
+				short_desc =  cur.desc.getAsString()
+			}
+		}
+		ret.addProperty("short_desc", (String)short_desc)
+		ret.add("desc", JsonNull.INSTANCE)
+		ret.addProperty("brand_new", cur.has("since") && projectVersion == cur.since.getAsString())
+		ret.add("fscript", JsonNull.INSTANCE)
+		ret.add("fscript_default", JsonNull.INSTANCE)
+		ret.add("extra_fscript", JsonNull.INSTANCE)
+		ret.add("extend", JsonNull.INSTANCE)
+		ret.addProperty("new", false)
+
+		for(Map.Entry<String, JsonElement> entry : cur.entrySet()) {
+			ret.add(entry.getKey(), entry.getValue())
+		}
+
+		return ret
+	}
+	void commit() {
+		commitMultiline()
+		cur = defaults(curKey, cur)
+		cur.addProperty("key", curKey)
+		if (curKey.indexOf(".extra.") > -1) {
+			cur.addProperty("extra", true)
+		}
+		if (cur.has("section") && cur.section.getAsBoolean()) {
+			createCategory()
+		}
+		data.add(cur)
+		curKey = null
+		cur = new JsonObject()
+	}
+
+	void createCategory() {
+		if (cur.has("key") && "general" == cur.key.getAsString()) return
+		JsonObject curDupe = cur.deepCopy()
+		curDupe.addProperty("key", 'general.category.' + cur.key.getAsString())
+		curDupe.addProperty("desc", 'Enable all features in ' + cur.name.getAsString() + "\n" + (cur.has("desc") && !cur.desc.isJsonNull() ? cur.desc.getAsString() : ""))
+		curDupe.addProperty("section", false)
+		data.add(curDupe)
+	}
+
+	JsonObject toJson(){
+		ImmutableList<String> sections = ImmutableList.copyOf(["general", "fixes", "utility", "tweaks", "minor_mechanics", "mechanics", "balance", "weird_tweaks", "woina", "unsafe", "pedantry", "experiments"])
+		data.sort((a, b) -> {
+			String sectionA = a.key.getAsString().indexOf('.') == -1 ? a.key.getAsString() : a.key.getAsString().substring(0, a.key.getAsString().indexOf('.'))
+			String sectionB = b.key.getAsString().indexOf('.') == -1 ? b.key.getAsString() : b.key.getAsString().substring(0, b.key.getAsString().indexOf('.'))
+			if (sectionA == sectionB && sectionA == a.key.getAsString()) return -1
+			if (sectionA == sectionB && sectionB == b.key.getAsString()) return 1
+			if (sectionA != sectionB) return sections.indexOf(sectionA) - sections.indexOf(sectionB)
+			if (a.meta.getAsBoolean() != b.meta.getAsBoolean()) return a.meta.getAsBoolean() ? -1 : 1;
+			return a.key.getAsString().compareTo(b.key.getAsString())
+		})
+		Set<String> _allVersions = new HashSet<>()
+		for (JsonObject d : data) {
+			if (d.since.isJsonNull()) continue
+			_allVersions.add(d.since.getAsString())
+		}
+		List<String> allVersions = new LinkedList<>(_allVersions)
+		allVersions.sort((v1, v2) -> {
+			List<Integer> longer = dismantleVersion(v1)
+			List<Integer> shorter = dismantleVersion(v2)
+			boolean firstLonger = longer.size() > shorter.size()
+			if (!firstLonger) {
+				List<Integer> l2 = shorter
+				shorter = longer
+				longer = l2
+			}
+			int i = 0
+			for (; i<shorter.size(); i++){
+				int comp = Integer.compare(longer.get(i), shorter.get(i))
+				if (comp != 0) return firstLonger ? comp : -comp
+			}
+			for (; i<longer.size(); i++){
+				if (longer.get(i)>0) return firstLonger ? 1 : -1
+			}
+			return 0
+		})
+
+		for (JsonObject d : data) {
+			if (d.since.isJsonNull()) continue
+			int i = allVersions.indexOf(d.since.getAsString())
+			d.addProperty("since_code", i)
+			d.addProperty("new", i+1>=allVersions.size())
+		}
+
+		JsonObject dataObj = new JsonObject()
+		for (JsonObject d : data) {
+			String key = d.key.getAsString()
+			d.remove("key")
+			if (d != null) {
+				dataObj.add(key, d)
+			}
+		}
+
+		return dataObj
+	}
+	static List<Integer> dismantleVersion(String version){
+		List<Integer> out = new LinkedList<>()
+		out.add(0)
+		for (char chr : version.chars()) {
+			if (chr >= '0' as char && chr <= '9' as char) {
+				out.set(out.size()-1, out.get(out.size()-1)*10 + (chr-('0' as char)))
+			} else if (out.get(out.size()-1) > 0) {
+				out.add(0)
+			}
+		}
+		return out
+	}
 }
 
 processResources {
-	inputs.property "version", project.version
+	inputs.property 'version', project.version
 
-	filesMatching("fabric.mod.json") {
-		expand "version": project.version
+	filesMatching('fabric.mod.json') {
+		expand 'version': project.version
+	}
+	dependsOn(fabGenFeatures)
+}
+
+sourceSets {
+	dummy {
+		compileClasspath += configurations.compileClasspath
+	}
+	main {
+		compileClasspath += dummy.output
 	}
 }
 
@@ -72,7 +505,7 @@ processResources {
 // this fixes some edge cases with special characters not displaying correctly
 // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
 tasks.withType(JavaCompile) {
-	options.encoding = "UTF-8"
+	options.encoding = 'UTF-8'
 }
 
 jar {
@@ -80,13 +513,253 @@ jar {
 		StringBuilder bldr = new StringBuilder();
 		File dir = file('build/classes/java/main');
 		dir.eachFileRecurse(groovy.io.FileType.FILES, {
-			if (it.name.endsWith(".class")) {
+			if (it.name.endsWith('.class')) {
 				bldr.append(it.getAbsolutePath().substring(dir.getAbsolutePath().length()+1))
-				bldr.append("\n")
+				bldr.append('\n')
 			}
 		})
 		file('build/tmp/classes.txt').text = bldr.toString();
+		Set<String> expectedFailThatFailsAutoFilter = Set.of(
+				'lambda$static$12com.unascribed.fabrication.mixin.f_balance.disable_elytra.MixinModelPredicateProviderRegistry',
+				'handleAttackEntity(Lnet/minecraft/class_1657;Lnet/minecraft/class_1937;Lnet/minecraft/class_1268;Lnet/minecraft/class_1297;Lnet/minecraft/class_3966;)Lnet/minecraft/class_1269;com.unascribed.fabrication.mixin.a_fixes.fix_charm_amethyst_dupe.MixinClearItemFrames',
+				'handleUseEntity(Lnet/minecraft/class_1657;Lnet/minecraft/class_1937;Lnet/minecraft/class_1268;Lnet/minecraft/class_1297;Lnet/minecraft/class_3966;)Lnet/minecraft/class_1269;com.unascribed.fabrication.mixin.a_fixes.fix_charm_amethyst_dupe.MixinClearItemFrames',
+				'processLoading;com.unascribed.fabrication.mixin.e_mechanics.obsidian_tears.MixinModelLoaderForge',
+				'fireRenderEntityItemcom.unascribed.fabrication.mixin.i_woina.drops.MixinItemEntityRendererObfuscate',
+				'processLoadingcom.unascribed.fabrication.mixin.e_mechanics.obsidian_tears.MixinModelLoaderForge',
+				'method_27884com.unascribed.fabrication.mixin.f_balance.disable_elytra.MixinModelPredicateProviderRegistry'
+		)
+		def lge = project.getExtensions().getByType(net.fabricmc.loom.api.LoomGradleExtensionAPI.class)
+		def mappings = lge.getMappingsProvider().getMappings()
+		Map<String, Mapp> toInter = new HashMap<>()
+		List<String> fabRefl = Files.readAllLines(file('build/tmp/fabReflToMap').toPath())
+
+		for (String f : fabRefl) {
+			if (f == null) continue
+			Mapp.Target toTarget = new Mapp.Target(f)
+			if (toInter.containsKey('FabRefl')) toInter.get('FabRefl').target.add(toTarget)
+			else toInter.put('FabRefl', new Mapp(new String[]{}, new String[]{}, new Mapp.Target[]{toTarget}))
+
+		}
+
+		List<String> toParse = Files.readAllLines(file('build/tmp/fabToRefMap').toPath())
+		for (int i=0; i+3<toParse.size(); i++){
+			String toInterKey = toParse.get(i)
+			Mapp toAdd = new Mapp(toParse.get(++i).split('\t'), toParse.get(++i).split('\t'), toParse.get(++i).split('\t'))
+			if (toInter.containsKey(toInterKey)) toInter.get(toInterKey).add(toAdd)
+			else toInter.put(toInterKey, toAdd)
+		}
+		Map<String, String> fieldMap = new HashMap<>()
+		Map<String, String> targetMap = new HashMap<>()
+		Map<String, String> methodMap = new HashMap<>()
+		Map<String, String> classMap = new HashMap<>()
+		for (def cl : mappings.classes){
+			String clName = cl.getName('named')
+			String clNameRez = cl.getName('intermediary')
+			def dottedClName = clName.replace('/', '.')
+			for (def map : toInter.values()){
+				if (map.mixin.contains(dottedClName)) {
+					for (def clMethod : cl.methods) {
+						for (String mthd : map.method) {
+							int col = mthd.indexOf(';')
+							int dot = mthd.indexOf('.')
+							if (col == -1 || dot < col && dot != -1) col = dot
+							int brc = mthd.indexOf('(')
+							if (brc == -1) continue
+							String desc = mthd.substring(brc)
+							String name = mthd.substring(col == -1 || brc<col ? 0 : col+1, brc)
+							if ((name.equals(clMethod.getName('named')) || name.equals(clMethod.getName('intermediary'))) && (desc.equals(clMethod.getDesc('named')) || desc.equals(clMethod.getDesc('intermediary')))) {
+								methodMap.put(clName+';'+name+desc, clMethod.getName('intermediary') + clMethod.getDesc('intermediary'))
+							}
+						}
+					}
+				}
+				for (Mapp.Target mapt : map.target) {
+					String target = mapt.self
+					int col = target.indexOf(';')
+					int dot = target.indexOf('.')
+					if (col == -1 || dot < col && dot != -1) col = dot
+					if (mapt.applicable.contains(dottedClName)){
+						classMap.put(clName, clNameRez)
+						int brc = target.indexOf('(')
+						if (brc == -1) {
+							int cindx = target.lastIndexOf(':')
+							String name = target.substring(col+1, cindx == -1 ? target.length() : cindx)
+							for (def clField : cl.fields) {
+								if (clField.getName('named').equals(name) || clField.getName('intermediary').equals(name)){
+									fieldMap.put(target, clField.getName('intermediary')+":"+clField.getDesc('intermediary'))
+								}
+							}
+							continue
+						}
+						String desc = target.substring(brc)
+						String name = target.substring(col+1, brc)
+						for (def clMethod : cl.methods) {
+							if ((clMethod.getName('named').equals(name) || clMethod.getName('intermediary').equals(name)) && (clMethod.getDesc('named').equals(desc) || clMethod.getDesc('intermediary').equals(desc))){
+								targetMap.put(target, clMethod.getName('intermediary')+clMethod.getDesc('intermediary'))
+							}
+						}
+					}
+				}
+			}
+		}
+		StringBuilder bldrRel = new StringBuilder()
+		Map<String, String> bldrAbs = new HashMap<>()
+		for (Map.Entry<String, Mapp> intr : toInter){
+			for (Mapp.Target tar : intr.value.target){
+				String s = tar.self
+				String ad = targetMap.get(s)
+				if (ad == null) ad = fieldMap.get(s)
+				if (ad != null) {
+					int col = s.indexOf(';')
+					int dot = s.indexOf('.')
+					if (col == -1 || dot < col && dot != -1) col = dot
+					bldrAbs.put(s, 'L'+classMap.get(s.substring(s.charAt(0) == 'L' as char ? 1 : 0, col))+';'+ad)
+				} else if (!s.isBlank() && !expectedFailThatFailsAutoFilter.contains(s+intr.key)
+					&& !s.startsWith("Ljava/lang/") && !s.startsWith("com/mojang/blaze3d/")
+				) {
+					logger.log(LogLevel.ERROR, "Failed to map "+s+" for "+intr.key)
+				}
+			}
+			boolean frst = true
+			StringBuilder bldrRelIntern = new StringBuilder()
+			for (String s : intr.value.method) {
+				boolean missedMthd = true
+				for (String c : intr.value.mixin) {
+					String set = methodMap.get(c.replace('.', '/')+';'+s)
+					if (set != null){
+						if (frst) frst = false;
+						else bldrRelIntern.append('\t')
+						bldrRelIntern.append(s).append(' ').append(set)
+						missedMthd = false
+						break
+					}
+				}
+				if (missedMthd && !s.isBlank() && !expectedFailThatFailsAutoFilter.contains(s+intr.key) && !s.equals("<init>")) {
+					logger.log(LogLevel.ERROR, "Failed to map "+s+" for "+intr.key)
+				}
+			}
+			if (!bldrRelIntern.isEmpty()) {
+				if (!bldrRel.isEmpty()) bldrRel.append('\n')
+				bldrRel.append(intr.key)
+				bldrRel.append('\n')
+				bldrRel.append(bldrRelIntern)
+			}
+		}
+		file('build/tmp/fabRelRefMap.txt').text = bldrRel.toString()
+		bldrRel = new StringBuilder()
+		for (Map.Entry<String, String> entry : bldrAbs) {
+			bldrRel.append(entry.key).append(' ').append(entry.value).append('\n')
+		}
+		file('build/tmp/fabAbsRefMap.txt').text = bldrRel.toString()
 	}
-	from "LICENSE"
-	from "build/tmp/classes.txt"
+
+	from 'LICENSE'
+	from 'build/tmp/classes.txt'
+	from 'build/tmp/fabRelRefMap.txt'
+	from 'build/tmp/fabAbsRefMap.txt'
+}
+
+class Mapp{
+	static class Target{
+		Target(String target){
+			int i = target.indexOf(' ');
+			if (i == -1){
+				this.self = target
+				this.applicable = new ArrayList<>()
+			} else {
+				this.self = target.substring(0, i)
+				this.applicable = target.substring(i).split(' ')
+			}
+		}
+		public String self
+		public List<String> applicable
+	}
+	void add(Mapp map){
+		this.mixin.addAll(map.mixin)
+		this.method.addAll(map.method)
+		this.target.addAll(map.target)
+	}
+	void add(String[] mixin, String[] method, String[] target){
+		for (String s : mixin) this.mixin.add(s)
+		for (String s : method) this.method.add(s)
+		for (String s : target) this.target.add(new Target(s))
+	}
+	void add(Target[] target){
+		for (Target s : target) this.target.add(s)
+	}
+	Mapp(String[] mixin, String[] method, String[] target){
+		this.mixin = mixin
+		this.method = method
+		this.target = new ArrayList<>()
+		for (String s : target) this.target.add(new Target(s))
+	}
+	Mapp(String[] mixin, String[] method, Target[] target){
+		this.mixin = mixin;
+		this.method = method;
+		this.target = target;
+	}
+	public List<String> mixin
+	public List<String> method
+	public List<Target> target
+}
+
+if (System.getenv("MODRINTH_TOKEN")) {
+	modrinth {
+		token = System.getenv("MODRINTH_TOKEN")
+		projectId = 'fabrication'
+		versionNumber = project.version
+		versionName = 'v'+origVersion
+		versionType = 'release'
+		uploadFile = remapJar
+		gameVersions = ['1.18.2']
+		loaders = ['fabric', 'quilt']
+		detectLoaders = false
+	}
+}
+
+if (System.getenv("CURSE_TOKEN")) {
+	curseforge {
+		apiKey = System.getenv("CURSE_TOKEN")
+		project {
+			id = '414445'
+			releaseType = 'release'
+
+			addGameVersion '1.18.2'
+			addGameVersion 'Fabric'
+			addGameVersion 'Quilt'
+
+			mainArtifact(remapJar) {
+				displayName = '['+project.minecraft_version+'] v'+origVersion
+			}
+		}
+		options {
+			javaIntegration = false
+			forgeGradleIntegration = false
+			javaVersionAutoDetect = false
+		}
+	}
+}
+
+if (System.getenv("GITHUB_TOKEN")) {
+	githubRelease {
+		token System.getenv("GITHUB_TOKEN")
+		owner "unascribed"
+		repo "Fabrication"
+		tagName 'v'+origVersion
+		releaseName 'v'+origVersion
+		targetCommitish "3.0/1.18"
+		draft false
+		prerelease false
+		releaseAssets remapJar.archivePath
+		allowUploadToExisting true
+	}
+	tasks.githubRelease.dependsOn remapJar
+}
+
+if (System.getenv("MCMODCN_COOKIE")) {
+	task mcmodcn(type: Exec) {
+		dependsOn remapJar
+
+		commandLine './mcmodcn-upload.sh', '3548', '1.18.2', '2,11', '', remapJar.archivePath.getPath()
+	}
 }

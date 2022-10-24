@@ -1,55 +1,41 @@
 package com.unascribed.fabrication.mixin.c_tweaks.legible_signs;
 
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import com.unascribed.fabrication.FabRefl;
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
-
-import net.minecraft.block.entity.SignBlockEntity;
-import net.minecraft.client.render.VertexConsumerProvider;
+import com.unascribed.fabrication.support.injection.Hijack;
+import com.unascribed.fabrication.support.injection.HijackReturn;
 import net.minecraft.client.render.block.entity.SignBlockEntityRenderer;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.DyeColor;
+import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(SignBlockEntityRenderer.class)
 @EligibleIf(configAvailable="*.legible_signs", envMatches=Env.CLIENT)
 public class MixinSignBlockEntityRenderer {
 
-	@Unique
-	private static final String RENDER = "render(Lnet/minecraft/block/entity/SignBlockEntity;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;II)V";
-
-	@Unique
-	private SignBlockEntity fabrication$currentEntity;
-
-	@Inject(at=@At("HEAD"), method=RENDER)
-	public void renderHead(SignBlockEntity sbe, float f, MatrixStack matrices, VertexConsumerProvider vcp, int i, int j, CallbackInfo ci) {
-		fabrication$currentEntity = sbe;
-	}
-
-	@Inject(at=@At("TAIL"), method=RENDER)
-	public void renderTail(SignBlockEntity sbe, float f, MatrixStack matrices, VertexConsumerProvider vcp, int i, int j, CallbackInfo ci) {
-		fabrication$currentEntity = null;
-	}
-
-	@Redirect(at=@At(value="INVOKE", target="net/minecraft/client/texture/NativeImage.getAbgrColor(IIII)I"),
-			method=RENDER)
-	public int modifySignTextColor(int a, int r, int g, int b) {
-		if (!MixinConfigPlugin.isEnabled("*.legible_signs")) return NativeImage.getAbgrColor(a, r, g, b);
-		DyeColor dc = fabrication$currentEntity.getTextColor();
-		switch (dc) {
-			case BLACK: return 0x000000;
-			case GRAY: return 0x333333;
-			case BROWN: return dc.getSignColor();
-			default: return FabRefl.getColor(dc);
+	@Hijack(method="render(Lnet/minecraft/block/entity/SignBlockEntity;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;II)V",
+			target="Lnet/minecraft/util/DyeColor;getSignColor()I")
+	private HijackReturn modifySignTextColor(DyeColor dc) {
+		if (FabConf.isEnabled("*.legible_signs")){
+			int res;
+			switch (dc) {
+				case BLACK:
+					res = 0x000000;
+					break;
+				case GRAY:
+					res = 0x333333;
+					break;
+				case BROWN:
+					res = dc.getSignColor();
+					break;
+				default: {
+					float[] bgr = dc.getColorComponents();
+					res = Math.round(bgr[0]*255.0F) << 16 | Math.round(bgr[1]*255.0F) << 8 | Math.round(bgr[2]*255);
+				}
+			}
+			return new HijackReturn(res);
 		}
+		return null;
 	}
 
 }

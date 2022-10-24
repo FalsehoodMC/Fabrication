@@ -3,21 +3,20 @@ package com.unascribed.fabrication;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.SpecialEligibility;
 
 import com.google.common.base.Stopwatch;
 
 public class FabLog {
 
-	private static final Logger log = LogManager.getLogger(MixinConfigPlugin.isMet(SpecialEligibility.FORGE) ? "Forgery" : "Fabrication");
+	private static final Logger log = LogManager.getLogger(FabConf.isMet(SpecialEligibility.FORGE) ? "Forgery" : "Fabrication");
 
 	// Fabric uses vanilla's log config, which doesn't print log tags, so we need to add our own prefix
 	// Forge modifies the log config to include log tags among other things, so the prefix is redundant there
-	private static final boolean PREFIX = MixinConfigPlugin.isMet(SpecialEligibility.NOT_FORGE);
+	private static final boolean PREFIX = FabConf.isMet(SpecialEligibility.NOT_FORGE);
 	// Forge has a debug log that includes, well, debug-level messages
 	// Fabric uses vanilla's log config which simply ignores debug messages
-	private static final boolean FAKE_DEBUG = Boolean.getBoolean("fabrication.debug") && MixinConfigPlugin.isMet(SpecialEligibility.NOT_FORGE);
+	private static final boolean FAKE_DEBUG = Boolean.getBoolean("fabrication.debug") && FabConf.isMet(SpecialEligibility.NOT_FORGE);
 
 	// for (limited, one-level) reentrancy
 	private static int warningsOld = -1;

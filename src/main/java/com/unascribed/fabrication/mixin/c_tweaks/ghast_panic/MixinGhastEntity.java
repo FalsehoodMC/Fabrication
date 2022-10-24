@@ -1,12 +1,12 @@
 package com.unascribed.fabrication.mixin.c_tweaks.ghast_panic;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.FlyingEntity;
@@ -23,9 +23,9 @@ public abstract class MixinGhastEntity extends FlyingEntity {
 		super(arg, arg2);
 	}
 
-	@Inject(at=@At("HEAD"), method="getAmbientSound()Lnet/minecraft/sound/SoundEvent;", cancellable=true)
+	@FabInject(at=@At("HEAD"), method="getAmbientSound()Lnet/minecraft/sound/SoundEvent;", cancellable=true)
 	public void getAmbientSound(CallbackInfoReturnable<SoundEvent> ci) {
-		if (!MixinConfigPlugin.isEnabled("*.ghast_panic")) return;
+		if (!FabConf.isEnabled("*.ghast_panic")) return;
 		if (!world.getDimension().isUltrawarm() && world.random.nextInt(8) == 0) {
 			ci.setReturnValue(SoundEvents.ENTITY_GHAST_SCREAM);
 		}

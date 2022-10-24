@@ -1,8 +1,11 @@
 package com.unascribed.fabrication.mixin.g_weird_tweaks.source_dependent_iframes;
 
+import com.google.common.collect.ImmutableList;
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.interfaces.TickSourceIFrames;
+import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
+import com.unascribed.fabrication.support.injection.FabInject;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -11,12 +14,13 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.function.Predicate;
 
 @Mixin(LivingEntity.class)
 @EligibleIf(configAvailable="*.source_dependent_iframes")
@@ -26,28 +30,31 @@ public abstract class MixinLivingEntity extends Entity implements TickSourceIFra
 		super(type, world);
 	}
 
-	Set<String> fabrication$iframeTracker = new HashSet<>();
-	int fabrication$timeUntilRegen = 0;
+	private final LinkedHashMap<String, Integer> fabrication$iframeTracker = new LinkedHashMap<>();
+	private int fabrication$timeUntilRegen = 0;
+	private static final Predicate<List<?>> fabrication$sourceDependentIframesPredicate = ConfigPredicates.getFinalPredicate("*.source_dependent_iframes");
 
-	@Inject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z")
+	@FabInject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z")
 	private void checkDependentIFrames(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-		if (!MixinConfigPlugin.isEnabled("*.source_dependent_iframes")) return;
-		if (fabrication$iframeTracker.add(source.getName() + (source.getAttacker() == null || source.getAttacker().getUuid() == null ? ":direct" :  source.getAttacker().getUuid().toString()))) {
-			this.timeUntilRegen = 0;
-		}else {
+		if (!(FabConf.isEnabled("*.source_dependent_iframes") && fabrication$sourceDependentIframesPredicate.test(ImmutableList.of(this, source)))) return;
+		String origin = source.getName() + (source.getAttacker() == null || source.getAttacker().getUuid() == null ? ":direct" :  source.getAttacker().getUuid().toString());
+		if (fabrication$iframeTracker.containsKey(origin)) {
 			this.timeUntilRegen = 20;
+		} else {
+			fabrication$iframeTracker.put(origin, age+9);
+			this.timeUntilRegen = 0;
 		}
 	}
-	@Inject(at=@At(value="INVOKE", target="Lnet/minecraft/entity/LivingEntity;applyDamage(Lnet/minecraft/entity/damage/DamageSource;F)V"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z")
+	@FabInject(at=@At(value="INVOKE", target="Lnet/minecraft/entity/LivingEntity;applyDamage(Lnet/minecraft/entity/damage/DamageSource;F)V"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z")
 	private void setSourceDependentIFrames(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-		if (!MixinConfigPlugin.isEnabled("*.source_dependent_iframes")) return;
+		if (!(FabConf.isEnabled("*.source_dependent_iframes") && fabrication$sourceDependentIframesPredicate.test(ImmutableList.of(this, source)))) return;
 		if (fabrication$timeUntilRegen == 0){
 			fabrication$timeUntilRegen = 10;
 		}
 	}
-	@Inject(at=@At("HEAD"), method="baseTick()V")
+	@FabInject(at=@At("HEAD"), method="baseTick()V")
 	private void tickSourceDependentIFrames(CallbackInfo ci) {
-		if (!MixinConfigPlugin.isEnabled("*.source_dependent_iframes") || ((Object)this) instanceof ServerPlayerEntity) return;
+		if (!FabConf.isEnabled("*.source_dependent_iframes") || ((Object)this) instanceof ServerPlayerEntity) return;
 		fabrication$tickSourceDependentIFrames();
 	}
 	@Override
@@ -55,8 +62,18 @@ public abstract class MixinLivingEntity extends Entity implements TickSourceIFra
 		if (fabrication$timeUntilRegen>0) {
 			fabrication$timeUntilRegen--;
 		}else if (!fabrication$iframeTracker.isEmpty()){
-			fabrication$iframeTracker.clear();
+			Iterator<Integer> iter = fabrication$iframeTracker.values().iterator();
+			iter.next();
+			iter.remove();
+			while (iter.hasNext()) {
+				int t = iter.next()-age;
+				if (t > 0) {
+					fabrication$timeUntilRegen = t;
+				} else {
+					iter.remove();
+				}
+			}
 		}
 	}
-	
+
 }

@@ -3,9 +3,12 @@
   "minVersion": "0.8",
   "package": "com.unascribed.fabrication.mixin",
   "plugin": "com.unascribed.fabrication.support.MixinConfigPlugin",
-  "refmap": "fabrication-1.16-refmap.json",
+  "refmap": "fabrication-refmap.json",
   "compatibilityLevel": "JAVA_8",
   "injectors": {
     "defaultRequire": 1
+  },
+  "overwrites": {
+    "conformVisibility": true
   }
 }

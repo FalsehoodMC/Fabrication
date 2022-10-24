@@ -1,12 +1,12 @@
 package com.unascribed.fabrication.mixin.g_weird_tweaks.leaves_grow_grass;
 
+import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -19,9 +19,9 @@ import net.minecraft.world.BlockView;
 @EligibleIf(configAvailable="*.leaves_grow_grass")
 public abstract class MixinPlantBlock {
 
-	@Inject(at=@At("HEAD"), method="canPlantOnTop(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)Z", cancellable=true)
+	@FabInject(at=@At("HEAD"), method="canPlantOnTop(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)Z", cancellable=true)
 	private void canPlantOnTop(BlockState floor, BlockView world, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-		if (!MixinConfigPlugin.isEnabled("*.leaves_grow_grass")) return;
+		if (!FabConf.isEnabled("*.leaves_grow_grass")) return;
 		if (floor.isIn(BlockTags.LEAVES) && (((Object)this) == Blocks.GRASS || ((Object)this) == Blocks.TALL_GRASS)){
 			cir.setReturnValue(true);
 		}

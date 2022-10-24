@@ -1,12 +1,12 @@
 package com.unascribed.fabrication.mixin.g_weird_tweaks.photoallergic_creepers;
 
+import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
@@ -23,9 +23,9 @@ public abstract class MixinCreeperEntity extends HostileEntity {
 		super(entityType, world);
 	}
 
-	@Inject(at=@At("HEAD"), method="tick()V")
+	@FabInject(at=@At("HEAD"), method="tick()V")
 	public void onTick(CallbackInfo ci) {
-		if (MixinConfigPlugin.isEnabled("*.photoallergic_creepers")) {
+		if (FabConf.isEnabled("*.photoallergic_creepers")) {
 			if (isAffectedByDaylight()) {
 				ItemStack helmet = this.getEquippedStack(EquipmentSlot.HEAD);
 				if (!helmet.isEmpty()) {

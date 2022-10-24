@@ -3,16 +3,16 @@ package com.unascribed.fabrication.mixin.z_combined.note_block_tuning;
 import java.util.Collection;
 import java.util.Iterator;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -90,10 +90,10 @@ public class MixinNoteBlock {
 	@Shadow
 	private void playNote(World world, BlockPos pos) {}
 
-	@Inject(at=@At("HEAD"), method= "onUse(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;", cancellable=true)
+	@FabInject(at=@At("HEAD"), method= "onUse(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;", cancellable=true)
 	public void onUseHead(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, CallbackInfoReturnable<ActionResult> ci) {
 		if (!world.isClient) {
-			if (MixinConfigPlugin.isEnabled("*.exact_note_block_tuning")) {
+			if (FabConf.isEnabled("*.exact_note_block_tuning")) {
 				ItemStack stack = player.getStackInHand(hand);
 				if (stack.getItem() == Items.STICK) {
 					int cur = state.get(NoteBlock.NOTE);
@@ -115,7 +115,7 @@ public class MixinNoteBlock {
 					return;
 				}
 			}
-			if (MixinConfigPlugin.isEnabled("*.reverse_note_block_tuning")) {
+			if (FabConf.isEnabled("*.reverse_note_block_tuning")) {
 				if (player.isSneaking()) {
 					state = cycleBackward(state, NoteBlock.NOTE);
 					world.setBlockState(pos, state, 3);
@@ -129,18 +129,18 @@ public class MixinNoteBlock {
 		}
 	}
 
-	@Inject(at=@At("RETURN"), method="onUse(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;", cancellable=true)
+	@FabInject(at=@At("RETURN"), method="onUse(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;", cancellable=true)
 	public void onUseReturn(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, CallbackInfoReturnable<ActionResult> ci) {
 		fabrication$informNote(player, world.getBlockState(pos));
 	}
 
-	@Inject(at=@At("HEAD"), method="onBlockBreakStart(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/player/PlayerEntity;)V")
+	@FabInject(at=@At("HEAD"), method="onBlockBreakStart(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/player/PlayerEntity;)V")
 	public void onBlockBreakStart(BlockState state, World world, BlockPos pos, PlayerEntity player, CallbackInfo ci) {
 		fabrication$informNote(player, state);
 	}
 
 	private void fabrication$informNote(PlayerEntity player, BlockState state) {
-		if (!player.world.isClient && MixinConfigPlugin.isEnabled("*.note_block_notes")) {
+		if (!player.world.isClient && FabConf.isEnabled("*.note_block_notes")) {
 			int note = state.get(NoteBlock.NOTE);
 			Instrument instrument = state.get(NoteBlock.INSTRUMENT);
 			char color = FABRICATION$NOTE_COLORS.charAt(note);

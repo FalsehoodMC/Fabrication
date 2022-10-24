@@ -2,18 +2,18 @@ package com.unascribed.fabrication.mixin.g_weird_tweaks.repelling_void;
 
 import java.util.List;
 
+import com.unascribed.fabrication.support.injection.FabInject;
+import net.minecraft.block.BlockState;
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import com.google.common.collect.Lists;
 
-import net.minecraft.block.SideShapeType;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -26,7 +26,6 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -39,14 +38,16 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 	}
 
 	private Vec3d fabrication$lastGroundPos;
+	private BlockPos fabrication$lastLandingPos;
 	private final List<Vec3d> fabrication$voidFallTrail = Lists.newArrayList();
 	private boolean fabrication$debted;
 
-	@Inject(at=@At("TAIL"), method="tick()V")
+	@FabInject(at=@At("TAIL"), method="tick()V")
 	public void tick(CallbackInfo ci) {
-		if (!MixinConfigPlugin.isEnabled("*.repelling_void")) return;
+		if (!FabConf.isEnabled("*.repelling_void")) return;
 		if (onGround) {
 			fabrication$lastGroundPos = getPos();
+			fabrication$lastLandingPos = getLandingPos();
 			fabrication$voidFallTrail.clear();
 		} else if (fabrication$voidFallTrail.size() < 20) {
 			fabrication$voidFallTrail.add(getPos());
@@ -58,30 +59,31 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 	}
 
 
-	@Inject(at=@At("HEAD"), method= "damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", cancellable=true)
+	@FabInject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", cancellable=true)
 	public void remove(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-		Vec3d pos = fabrication$lastGroundPos;
-		if (MixinConfigPlugin.isEnabled("*.repelling_void") && !fabrication$debted && source == DamageSource.OUT_OF_WORLD && pos != null && this.getY() < -10) {
-			BlockPos bp = new BlockPos(pos).down();
-			if (!world.getBlockState(bp).isSideSolid(world, bp, Direction.UP, SideShapeType.CENTER)) {
-				boolean foundOne = false;
+		if (FabConf.isEnabled("*.repelling_void") && !fabrication$debted && source == DamageSource.OUT_OF_WORLD && fabrication$lastLandingPos != null && this.getY() < -10) {
+			BlockPos bp = fabrication$lastLandingPos;
+			Vec3d pos = fabrication$lastGroundPos;
+			BlockState state = world.getBlockState(bp);
+			if (!state.getCollisionShape(world, bp).isEmpty()) {
+				Box bounds = state.getCollisionShape(world, bp).getBoundingBox();
+				pos = new Vec3d(bp.getX()+bounds.minX+(bounds.maxX-bounds.minX)/2, bp.getY()+bounds.maxY+0.1, bp.getZ()+bounds.minZ+(bounds.maxZ-bounds.minZ)/2);
+			} else {
 				out: for (int d = 1; d <= 3; d++) {
 					for (int x = -d; x <= d; x++) {
 						for (int z = -d; z <= d; z++) {
-							bp = new BlockPos(pos).add(x, -1, z);
-							if (world.getBlockState(bp).isSideSolid(world, bp, Direction.UP, SideShapeType.CENTER)) {
-								foundOne = true;
+							bp = fabrication$lastLandingPos.add(x, 0, z);
+							state = world.getBlockState(bp);
+							if (!state.getCollisionShape(world, bp).isEmpty()) {
+								Box bounds = state.getCollisionShape(world, bp).getBoundingBox();
+								pos = new Vec3d(bp.getX()+bounds.minX+(bounds.maxX-bounds.minX)/2, bp.getY()+bounds.maxY+0.1, bp.getZ()+bounds.minZ+(bounds.maxZ-bounds.minZ)/2);
 								break out;
 							}
 						}
 					}
 				}
-				if (!foundOne) {
-					// sorry, we tried...
-					bp = new BlockPos(pos).down();
-				}
 			}
-			teleport(bp.getX()+0.5, bp.getY()+1, bp.getZ()+0.5);
+			teleport(pos.x, pos.y, pos.z);
 			fallDistance = 0;
 			world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1, 0.5f);
 			world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.BLOCK_SHROOMLIGHT_PLACE, SoundCategory.PLAYERS, 1, 0.5f);
@@ -102,7 +104,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 		}
 	}
 
-	@Inject(at = @At("TAIL"), method = "writeCustomDataToNbt(Lnet/minecraft/nbt/NbtCompound;)V")
+	@FabInject(at = @At("TAIL"), method = "writeCustomDataToNbt(Lnet/minecraft/nbt/NbtCompound;)V")
 	public void writeCustomDataToTag(NbtCompound tag, CallbackInfo ci) {
 		if (fabrication$lastGroundPos != null) {
 			Vec3d pos = fabrication$lastGroundPos;
@@ -115,7 +117,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 		}
 	}
 
-	@Inject(at = @At("TAIL"), method = "readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V")
+	@FabInject(at = @At("TAIL"), method = "readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V")
 	public void readCustomDataFromTag(NbtCompound tag, CallbackInfo ci) {
 		if (tag.contains("fabrication:LastGroundPosX")) {
 			fabrication$lastGroundPos = new Vec3d(

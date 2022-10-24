@@ -1,10 +1,10 @@
 package com.unascribed.fabrication.mixin.d_minor_mechanics.note_blocks_play_on_landing;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -33,7 +33,7 @@ public abstract class MixinNoteBlock extends Block {
 	@Override
 	public void onLandedUpon(World world, BlockPos pos, Entity entity, float distance) {
 		super.onLandedUpon(world, pos, entity, distance);
-		if (!world.isClient && MixinConfigPlugin.isEnabled("*.note_blocks_play_on_landing")) {
+		if (!world.isClient && FabConf.isEnabled("*.note_blocks_play_on_landing")) {
 			for (int i = 0; i < Math.min(8, Math.ceil(distance/2)); i++) {
 				playNote(world, pos);
 			}

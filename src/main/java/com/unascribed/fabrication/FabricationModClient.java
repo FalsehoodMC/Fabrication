@@ -5,7 +5,6 @@ import java.util.concurrent.Executor;
 
 import com.unascribed.fabrication.interfaces.GetServerConfig;
 import com.unascribed.fabrication.logic.WoinaDrops;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
@@ -22,7 +21,7 @@ public class FabricationModClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		FabricationClientCommands.registerCommands(ClientCommandManager.DISPATCHER);
 
-		if (!MixinConfigPlugin.isBanned("*.classic_block_drops")) {
+		if (!FabConf.isBanned("*.classic_block_drops")) {
 			MinecraftClient.getInstance().send(() -> {
 				((ReloadableResourceManager)MinecraftClient.getInstance().getResourceManager()).registerReloader(new ResourceReloader() {
 					@Override
@@ -40,7 +39,7 @@ public class FabricationModClient implements ClientModInitializer {
 	public static boolean isBannedByServer(String configKey) {
 		if (MinecraftClient.getInstance() == null) return false;
 		ClientPlayNetworkHandler net = MinecraftClient.getInstance().getNetworkHandler();
-		if (net != null && net instanceof GetServerConfig) {
+		if (net instanceof GetServerConfig) {
 			return ((GetServerConfig)net).fabrication$getServerBanned().contains(configKey);
 		}
 		return false;

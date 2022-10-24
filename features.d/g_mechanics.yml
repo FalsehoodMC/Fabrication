@@ -5,7 +5,6 @@ mechanics:
 	name: Mechanics
 	section: true
 	since: 1.0
-	default: dark
 	desc:
 		New mechanics and powerful additions.
 
@@ -18,7 +17,7 @@ mechanics.enhanced_moistness:
 		Entities are considered "wet" for 5 seconds after leaving a source of wetness. Additionally,
 		lingering or splash water bottles inflict wetness. Also makes wet entities drip to show
 		they're wet. Affects various vanilla mechanics including fire and undead burning.
-		
+
 		Touching lava instantly removes wetness, meaning lava blades still work.
 
 mechanics.slowfall_splash_on_inanimates:
@@ -29,7 +28,7 @@ mechanics.slowfall_splash_on_inanimates:
 	desc:
 		Slow fall splash potions affect inanimates (minecarts, arrows, etc) making them unaffected
 		by gravity. They will become normally affected again if they become wet.
-		
+
 		This is kind of overpowered.
 
 mechanics.broken_tools_drop_components:
@@ -42,7 +41,7 @@ mechanics.broken_tools_drop_components:
 	desc:
 		Makes gear drop its consituent items when broken. This is completely configurable in
 		config/fabrication/gear_components.ini.
-		
+
 		Also works with nonplayer entities, where it is affected by their drop chance table.
 
 mechanics.obsidian_tears:
@@ -55,10 +54,10 @@ mechanics.obsidian_tears:
 		Empty bottles can be used to collect "Obsidian Tears" from Crying Obsidian. When quaffed by
 		or dispensed onto a player, it updates their spawn to the location of the block the
 		tears are from. Dispensers can also be used to fill empty bottles with tears.
-		
+
 		Crying Obsidian respawn works in any dimension and doesn't need to be recharged, but you
 		spawn with half health, no saturation, less than full food, and Weakness.
-		
+
 		On client, just gives the bottle a custom appearance instead of a potion item.
 
 mechanics.grindstone_disenchanting:
@@ -69,7 +68,7 @@ mechanics.grindstone_disenchanting:
 	desc:
 		Placing a book in the bottom slot of a Grindstone when disenchanting an item will transfer
 		the enchantments onto the book.
-		
+
 		Doesn't work properly if the client doesn't also have it, but it will not break vanilla
 		clients.
 
@@ -114,7 +113,7 @@ mechanics.directional_powered_rails:
 		Placing magenta glazed terracotta under a powered rail makes it push minecarts in the
 		direction of the arrow, even from a stop. They also work as hard stops for carts going the
 		wrong direction.
-		
+
 		Works similar to a Railcraft Boarding Track.
 
 mechanics.directional_detector_rails:
@@ -132,6 +131,12 @@ mechanics.toggleable_furnace_carts:
 	desc:
 		Powered rails stop furnace carts when appropriate and conserve their fuel.
 
+mechanics.wool_protected_sheep:
+	name: Wool Protected Sheep
+	since: 3.0.0
+	sides: server_only
+	desc:
+		Sheep wool slightly reduces some types of damage.
 
 # kate: space-indent off
 # vim: noai:noet

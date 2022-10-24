@@ -1,13 +1,13 @@
 package com.unascribed.fabrication.mixin.a_fixes.use_player_list_name_in_tag;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
@@ -26,9 +26,9 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 		super(entityType, world);
 	}
 
-	@Inject(at=@At("RETURN"), method="getDisplayName()Lnet/minecraft/text/Text;", cancellable=true)
+	@FabInject(at=@At("RETURN"), method="getDisplayName()Lnet/minecraft/text/Text;", cancellable=true)
 	public void getDisplayName(CallbackInfoReturnable<Text> ci) {
-		if (!MixinConfigPlugin.isEnabled("*.use_player_list_name_in_tag")) return;
+		if (!FabConf.isEnabled("*.use_player_list_name_in_tag")) return;
 		Object self = this;
 		if (self instanceof AbstractClientPlayerEntity) {
 			PlayerListEntry ple = MinecraftClient.getInstance().getNetworkHandler().getPlayerListEntry(getUuid());

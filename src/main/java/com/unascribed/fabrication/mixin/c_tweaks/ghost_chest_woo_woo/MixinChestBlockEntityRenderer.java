@@ -1,16 +1,16 @@
 package com.unascribed.fabrication.mixin.c_tweaks.ghost_chest_woo_woo;
 
+import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -34,9 +34,9 @@ public class MixinChestBlockEntityRenderer {
 	@Shadow
 	private boolean christmas;
 
-	@Inject(at=@At("HEAD"), method="render(Lnet/minecraft/block/entity/BlockEntity;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;II)V")
+	@FabInject(at=@At("HEAD"), method="render(Lnet/minecraft/block/entity/BlockEntity;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;II)V")
 	public void renderHead(BlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, CallbackInfo ci) {
-		if (!MixinConfigPlugin.isEnabled("*.ghost_chest_woo_woo")) return;
+		if (!FabConf.isEnabled("*.ghost_chest_woo_woo")) return;
 		if (entity.hashCode()%20 == 5 && vertexConsumers instanceof Immediate) {
 			((Immediate)vertexConsumers).draw(getRenderLayer(entity));
 			GL11.glEnable(GL11.GL_BLEND);
@@ -44,9 +44,9 @@ public class MixinChestBlockEntityRenderer {
 		}
 	}
 
-	@Inject(at=@At("TAIL"), method="render(Lnet/minecraft/block/entity/BlockEntity;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;II)V")
+	@FabInject(at=@At("TAIL"), method="render(Lnet/minecraft/block/entity/BlockEntity;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;II)V")
 	public void renderTail(BlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, CallbackInfo ci) {
-		if (!MixinConfigPlugin.isEnabled("*.ghost_chest_woo_woo")) return;
+		if (!FabConf.isEnabled("*.ghost_chest_woo_woo")) return;
 		if (entity.hashCode()%20 == 5 && vertexConsumers instanceof Immediate) {
 			((Immediate)vertexConsumers).draw(getRenderLayer(entity));
 			GL11.glDisable(GL11.GL_BLEND);

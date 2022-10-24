@@ -45,6 +45,11 @@ import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.versions.forge.ForgeVersion;
+import org.apache.logging.log4j.LogManager;
+
+import java.lang.reflect.Method;
+import java.nio.file.Path;
+import java.util.List;
 
 // Forge implementation of Agnos. For linguistic and philosophical waffling, see the Fabric version.
 public final class Agnos {
@@ -52,28 +57,28 @@ public final class Agnos {
 	public interface CommandRegistrationCallback {
 		void register(CommandDispatcher<CommandSource> dispatcher, boolean dedicated);
 	}
-	
+
 	public interface TooltipRenderCallback {
 		void render(ItemStack stack, List<ITextComponent> lines);
 	}
-	
+
 	public interface HudRenderCallback {
 		void render(MatrixStack matrixStack, float tickDelta);
 	}
-	
+
 	public static void runForCommandRegistration(CommandRegistrationCallback r) {
 		MinecraftForge.EVENT_BUS.addListener((RegisterCommandsEvent e) -> {
 			r.register(e.getDispatcher(), e.getEnvironment() == EnvironmentType.DEDICATED);
 		});
 	}
-	
+
 	@OnlyIn(Dist.CLIENT)
 	public static void runForTooltipRender(TooltipRenderCallback r) {
 		MinecraftForge.EVENT_BUS.addListener((ItemTooltipEvent e) -> {
 			r.render(e.getItemStack(), e.getToolTip());
 		});
 	}
-	
+
 	@OnlyIn(Dist.CLIENT)
 	public static void runForHudRender(HudRenderCallback r) {
 		MinecraftForge.EVENT_BUS.addListener((RenderGameOverlayEvent.Post e) -> {
@@ -82,7 +87,7 @@ public final class Agnos {
 			}
 		});
 	}
-	
+
 	public static SoundEvent registerSoundEvent(ResourceLocation id, SoundEvent soundEvent) {
 		FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(SoundEvent.class, (RegistryEvent.Register<SoundEvent> e) -> {
 			soundEvent.setRegistryName(id);
@@ -123,11 +128,11 @@ public final class Agnos {
 		if (ModList.get() != null) return ModList.get().isLoaded(modid);
 		return FMLLoader.getLoadingModList().getModFileById(modid) != null;
 	}
-	
+
 	public static String getModVersion() {
 		return ModList.get().getModContainerById("fabrication").get().getModInfo().getVersion().toString();
 	}
-	
+
 	public static byte[] getClassBytes(Class<?> clazz) {
 		try {
 			// Forge why are you like this
@@ -148,7 +153,7 @@ public final class Agnos {
 			return null;
 		}
 	}
-	
+
 	public static String getLoaderVersion() {
 		return ForgeVersion.getVersion();
 	}

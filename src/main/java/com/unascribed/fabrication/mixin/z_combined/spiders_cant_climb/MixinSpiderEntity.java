@@ -1,14 +1,14 @@
 package com.unascribed.fabrication.mixin.z_combined.spiders_cant_climb;
 
+import com.unascribed.fabrication.FabConf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.GlazedTerracottaBlock;
@@ -31,13 +31,13 @@ public abstract class MixinSpiderEntity extends HostileEntity {
 	@Shadow
 	public abstract boolean isClimbingWall();
 
-	@Inject(at=@At("TAIL"), method="tick()V")
+	@FabInject(at=@At("TAIL"), method="tick()V")
 	public void tickTail(CallbackInfo ci) {
 		if (!world.isClient) {
 			if (isClimbingWall()) {
-				if (MixinConfigPlugin.isEnabled("*.spiders_cant_climb_while_wet") && isWet()) {
+				if (FabConf.isEnabled("*.spiders_cant_climb_while_wet") && isWet()) {
 					setClimbingWall(false);
-				} else if (MixinConfigPlugin.isEnabled("*.spiders_cant_climb_glazed_terracotta")) {
+				} else if (FabConf.isEnabled("*.spiders_cant_climb_glazed_terracotta")) {
 					// :(
 					// this used to be done by shrinking the terracotta hitbox and using
 					// onEntityCollision, but that makes spiders get caught on things...

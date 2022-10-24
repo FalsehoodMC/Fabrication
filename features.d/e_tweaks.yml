@@ -5,7 +5,6 @@ tweaks:
 	name: Tweaks
 	section: true
 	since: 1.0
-	default: light
 	desc:
 		Minor changes that fit with vanilla.
 
@@ -187,15 +186,6 @@ tweaks.cracking_spawn_eggs:
 	desc:
 		Spawn eggs spawn cracking particles and play a sound when used.
 
-tweaks.ghost_chest_woo_woo:
-	name: Ghost Chest Woo Woo
-	hidden: true
-	default: never
-	since: 1.0
-	sides: client_only
-	desc:
-		?
-
 tweaks.feather_falling_no_trample:
 	name: Feather Falling No Trample
 	since: 1.3.0
@@ -236,6 +226,8 @@ tweaks.no_dinnerlava:
 		"Dinnerlava" refers to the fact this was part of a series of changes all made by Dinnerbone
 		in a short span of time in the 1.5 era mostly on provocation from Vechs of Super Hostile
 		fame.
+
+		Will not take effect unless the world is reloaded.
 
 tweaks.silent_minecarts:
 	name: Silent Minecarts
@@ -285,6 +277,7 @@ tweaks.recipe_book_auto_craft:
 	name: Recipe Book Auto Craft
 	since: 1.4.0
 	sides: client_only
+	media: https://unascribed.com/fabrication/recipe_book_auto_craft.mp4
 	desc:
 		Recipe book crafts items instead of moving them to the crafting area.
 
@@ -319,6 +312,13 @@ tweaks.bush_walk_doesnt_hurt_when_sneaking:
 	fscript_default: sneaky
 	desc:
 		Makes walking through berry bushes when sneaking not deal damage.
+
+tweaks.ender_pearl_sound:
+	name: Ender Pearl Sound
+	since: 3.0.0
+	sides: server_only
+	desc:
+		Ender pearls play enderman teleport sound when breaking.
 
 # kate: space-indent off
 # vim: noai:noet

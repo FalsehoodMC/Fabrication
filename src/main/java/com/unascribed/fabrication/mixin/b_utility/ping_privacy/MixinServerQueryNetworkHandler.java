@@ -6,18 +6,18 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
+import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.mojang.authlib.GameProfile;
 import com.unascribed.fabrication.logic.PingPrivacy;
 import com.unascribed.fabrication.logic.PingPrivacyPersistentState;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.packet.c2s.query.QueryRequestC2SPacket;
@@ -41,9 +41,9 @@ public class MixinServerQueryNetworkHandler {
 	@Shadow
 	private boolean responseSent;
 
-	@Inject(at=@At("HEAD"), method="onRequest(Lnet/minecraft/network/packet/c2s/query/QueryRequestC2SPacket;)V", cancellable=true)
+	@FabInject(at=@At("HEAD"), method="onRequest(Lnet/minecraft/network/packet/c2s/query/QueryRequestC2SPacket;)V", cancellable=true)
 	public void onRequest(QueryRequestC2SPacket p, CallbackInfo ci) {
-		if (MixinConfigPlugin.isEnabled("*.ping_privacy") && !responseSent) {
+		if (FabConf.isEnabled("*.ping_privacy") && !responseSent) {
 			SocketAddress sa = connection.getAddress();
 			if (sa instanceof InetSocketAddress) {
 				InetSocketAddress isa = (InetSocketAddress)sa;

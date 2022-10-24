@@ -2,10 +2,10 @@ package com.unascribed.fabrication.features;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Feature;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.SpecialEligibility;
 
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
@@ -33,7 +33,7 @@ public class FeatureModsCommandFabric implements Feature {
 		CommandRegistrationCallback.EVENT.register((dispatcher, dedi) -> {
 			try {
 				dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("mods")
-						.requires(s -> MixinConfigPlugin.isEnabled("*.mods_command"))
+						.requires(s -> FabConf.isEnabled("*.mods_command"))
 						.then(LiteralArgumentBuilder.<ServerCommandSource>literal("all")
 								.executes((c) -> {
 									sendMods(c, true);
