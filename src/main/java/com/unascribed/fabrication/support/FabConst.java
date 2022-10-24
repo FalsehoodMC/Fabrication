@@ -24,6 +24,6 @@ public class FabConst {
 		DEV = devTmp;
 		FORGE = forgeTmp;
 		FabLog.debug("Detected runtime: "+(DEV ? "Fabric Dev" : FORGE ? "Forge" : "Fabric"));
-
 	}
+
 }
