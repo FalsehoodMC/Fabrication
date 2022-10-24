@@ -54,7 +54,6 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 
 	private static final SetMultimap<String, String> configKeysForDiscoveredClasses = HashMultimap.create();
 	private static final Set<String> brokenInForge = Set.of(
-			"*.inanimates_can_be_invisible",
 			"*.books_show_enchants",
 			"*.show_bee_count_on_item",
 			"*.hide_armor",
@@ -64,7 +63,6 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			"*.rainbow_experience",
 			"*.gradual_block_breaking",
 			"*.launching_pistons",
-			"*.invisibility_splash_on_inanimates",
 			"*.swap_conflicting_enchants",
 			"*.colorful_redstone",
 			"*.grindstone_disenchanting",

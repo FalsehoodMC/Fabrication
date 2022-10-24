@@ -95,17 +95,6 @@ public final class Agnos {
 		return FabricLoader.getInstance().getModContainer("fabrication").get().getMetadata().getVersion().getFriendlyString();
 	}
 
-	public static byte[] getClassBytes(Class<?> clazz) {
-		try {
-			byte[] bys = FabricLauncherBase.getLauncher().getClassByteArray(clazz.getName(), true);
-			((IMixinTransformer)MixinEnvironment.getCurrentEnvironment().getActiveTransformer()).transformClassBytes(clazz.getName(), clazz.getName(), bys);
-			return bys;
-		} catch (Throwable e) {
-			FabLog.warn("Failed to look up "+clazz, e);
-			return null;
-		}
-	}
-
 	public static String getLoaderVersion() {
 		return FabricLoader.getInstance().getModContainer("fabricloader").get().getMetadata().getVersion().getFriendlyString();
 	}
