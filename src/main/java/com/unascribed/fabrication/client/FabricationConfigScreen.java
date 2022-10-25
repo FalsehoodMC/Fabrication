@@ -20,6 +20,7 @@ import com.unascribed.fabrication.FeaturesFile.FeatureEntry;
 import com.unascribed.fabrication.FeaturesFile.Sides;
 import com.unascribed.fabrication.interfaces.GetServerConfig;
 import com.unascribed.fabrication.support.ConfigValue;
+import com.unascribed.fabrication.support.FabConst;
 import com.unascribed.fabrication.support.ResolvedConfigValue;
 import io.github.queerbric.pride.PrideFlag;
 import io.github.queerbric.pride.PrideFlags;
@@ -32,8 +33,10 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.VertexFormat.DrawMode;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.texture.NativeImage;
@@ -212,7 +215,7 @@ public class FabricationConfigScreen extends Screen {
 			isSingleplayer = true;
 		} else {
 			CommandDispatcher<?> disp = client.player.networkHandler.getCommandDispatcher();
-			if (disp.getRoot().getChild("fabrication") == null) {
+			if (disp.getRoot().getChild(FabConst.FORGE ? "forgery" : "fabrication") == null) {
 				whyCantConfigureServer = "This server doesn't have "+FabricationMod.MOD_NAME+".";
 			} else {
 				ClientPlayNetworkHandler cpnh = client.getNetworkHandler();
@@ -221,7 +224,7 @@ public class FabricationConfigScreen extends Screen {
 					if (!gsc.fabrication$hasHandshook()) {
 						whyCantConfigureServer = "This server's version of "+FabricationMod.MOD_NAME+" is too old.";
 					} else {
-						serverReadOnly = (disp.getRoot().getChild(FabricationMod.MOD_NAME_LOWER).getChild("config") == null);
+						serverReadOnly = (disp.getRoot().getChild(FabConst.FORGE ? "forgery" : "fabrication").getChild("config") == null);
 						serverKnownConfigKeys.clear();
 						serverKnownConfigKeys.addAll(gsc.fabrication$getServerTrileanConfig().keySet());
 						serverKnownConfigKeys.addAll(gsc.fabrication$getServerStringConfig().keySet());
