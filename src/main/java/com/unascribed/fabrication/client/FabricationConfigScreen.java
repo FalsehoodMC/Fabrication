@@ -20,6 +20,7 @@ import com.unascribed.fabrication.FeaturesFile.FeatureEntry;
 import com.unascribed.fabrication.FeaturesFile.Sides;
 import com.unascribed.fabrication.interfaces.GetServerConfig;
 import com.unascribed.fabrication.support.ConfigValue;
+import com.unascribed.fabrication.support.FabConst;
 import com.unascribed.fabrication.support.ResolvedConfigValue;
 import io.github.queerbric.pride.PrideFlag;
 import io.github.queerbric.pride.PrideFlags;
@@ -210,7 +211,7 @@ public class FabricationConfigScreen extends Screen {
 			isSingleplayer = true;
 		} else {
 			CommandDispatcher<?> disp = client.player.networkHandler.getCommandDispatcher();
-			if (disp.getRoot().getChild("fabrication") == null) {
+			if (disp.getRoot().getChild(FabConst.FORGE ? "forgery" : "fabrication") == null) {
 				whyCantConfigureServer = "This server doesn't have Fabrication.";
 			} else {
 				ClientPlayNetworkHandler cpnh = client.getNetworkHandler();
@@ -219,7 +220,7 @@ public class FabricationConfigScreen extends Screen {
 					if (!gsc.fabrication$hasHandshook()) {
 						whyCantConfigureServer = "This server's version of Fabrication is too old.";
 					} else {
-						serverReadOnly = (disp.getRoot().getChild("fabrication").getChild("config") == null);
+						serverReadOnly = (disp.getRoot().getChild(FabConst.FORGE ? "forgery" : "fabrication").getChild("config") == null);
 						serverKnownConfigKeys.clear();
 						serverKnownConfigKeys.addAll(gsc.fabrication$getServerTrileanConfig().keySet());
 						serverKnownConfigKeys.addAll(gsc.fabrication$getServerStringConfig().keySet());
