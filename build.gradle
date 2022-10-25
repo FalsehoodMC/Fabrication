@@ -703,16 +703,44 @@ class Mapp{
 	public List<Target> target
 }
 
+def mcVersions = [ '1.16.3', '1.16.4', '1.16.5' ]
+
+def stability = 'release'
+
+def mrLoaders = [ 'fabric' ]
+
+def curseLoaders = [ 'Fabric' ]
+def curseProject = '414445'
+
+def mcmodcnClassID = '3548'
+def mcmodcnLoaders = '2'
+
+def artifact = remapJar.archivePath
+
+if (System.getenv("PUBLISH_FORGERY")) {
+	stability = 'beta'
+
+	mrLoaders = [ 'forge' ]
+
+	curseProject = '434087'
+	curseLoaders = [ 'Forge' ]
+
+	mcmodcnClassID = '3547'
+	mcmodcnLoaders = '1'
+
+	artifact = file(remapJar.archivePath.getPath().reverse().replaceFirst("fabrication".reverse(), "forgery".reverse()).reverse())
+}
+
 if (System.getenv("MODRINTH_TOKEN")) {
 	modrinth {
 		token = System.getenv("MODRINTH_TOKEN")
 		projectId = 'fabrication'
 		versionNumber = project.version
 		versionName = 'v'+origVersion
-		versionType = 'release'
-		uploadFile = remapJar
-		gameVersions = ['1.18.2']
-		loaders = ['fabric', 'quilt']
+		versionType = stability
+		uploadFile = artifact
+		gameVersions = mcVersions
+		loaders = mrLoaders
 		detectLoaders = false
 	}
 }
@@ -721,14 +749,13 @@ if (System.getenv("CURSE_TOKEN")) {
 	curseforge {
 		apiKey = System.getenv("CURSE_TOKEN")
 		project {
-			id = '414445'
-			releaseType = 'release'
+			id = curseProject
+			releaseType = stability
 
-			addGameVersion '1.18.2'
-			addGameVersion 'Fabric'
-			addGameVersion 'Quilt'
+			for (def s : mcVersions) addGameVersion s
+			for (def s : curseLoaders) addGameVersion s
 
-			mainArtifact(remapJar) {
+			mainArtifact(artifact) {
 				displayName = '['+project.minecraft_version+'] v'+origVersion
 			}
 		}
@@ -750,7 +777,7 @@ if (System.getenv("GITHUB_TOKEN")) {
 		targetCommitish "3.0/1.18"
 		draft false
 		prerelease false
-		releaseAssets remapJar.archivePath
+		releaseAssets artifact
 		allowUploadToExisting true
 	}
 	tasks.githubRelease.dependsOn remapJar
@@ -760,6 +787,6 @@ if (System.getenv("MCMODCN_COOKIE")) {
 	task mcmodcn(type: Exec) {
 		dependsOn remapJar
 
-		commandLine './mcmodcn-upload.sh', '3548', '1.18.2', '2,11', '', remapJar.archivePath.getPath()
+		commandLine './mcmodcn-upload.sh', mcmodcnClassID, mcVersions[mcVersions.size()-1], mcmodcnLoaders, '', artifact.getPath()
 	}
 }
