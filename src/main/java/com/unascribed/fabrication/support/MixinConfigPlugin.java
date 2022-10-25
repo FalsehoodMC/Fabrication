@@ -42,6 +42,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -82,6 +84,15 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 
 	@Override
 	public void onLoad(String mixinPackage) {
+		{
+			Path target = Agnos.getConfigDir().resolve(FabConst.FORGE ? "forgery" : "fabrication");
+			Path source = Agnos.getConfigDir().resolve(FabConst.FORGE ? "fabrication" : "forgery");
+			if (!Files.exists(target) && Files.exists(source)) {
+				try {
+					Files.move(source, target);
+				} catch (IOException ignore) {}
+			}
+		}
 		FabConf.reload();
 		if (FabConf.isMet(SpecialEligibility.FORGE)) {
 			for (String s : brokenInForge) {
