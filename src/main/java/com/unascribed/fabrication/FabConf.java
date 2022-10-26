@@ -9,7 +9,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.common.io.BaseEncoding;
 import com.google.common.io.MoreFiles;
 import com.google.common.io.Resources;
 import com.unascribed.fabrication.FeaturesFile.FeatureEntry;
@@ -18,7 +17,6 @@ import com.unascribed.fabrication.QDIni.SyntaxErrorException;
 import com.unascribed.fabrication.support.ConfigLoader;
 import com.unascribed.fabrication.support.ConfigValue;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.FabConst;
 import com.unascribed.fabrication.support.ResolvedConfigValue;
 import com.unascribed.fabrication.support.SpecialEligibility;
 import net.fabricmc.api.EnvType;
@@ -134,20 +132,17 @@ public class FabConf {
 	private static final FeaturesIniTransformer featuresIniTransformer = new FeaturesIniTransformer();
 
 	static {
-		try {
-			// net.fabricmc.loader.api.FabricLoader
-			// base64-encoded so that Shadow doesn't pick up on it and mess up the check
-			Class.forName(new String(BaseEncoding.base64().decode("bmV0LmZhYnJpY21jLmxvYWRlci5hcGkuRmFicmljTG9hZGVy"), Charsets.UTF_8));
-			setMet(SpecialEligibility.NOT_FORGE, true);
-		} catch (Throwable t) {
+		if (EarlyAgnos.isForge()) {
 			setMet(SpecialEligibility.FORGE, true);
+		} else {
+			setMet(SpecialEligibility.NOT_FORGE, true);
 		}
 		try {
 			Class.forName("optifine.Installer", false, FabConf.class.getClassLoader());
 		} catch (Throwable t) {
 			setMet(SpecialEligibility.NO_OPTIFINE, true);
 		}
-		if (Agnos.getCurrentEnv() == Env.CLIENT) {
+		if (EarlyAgnos.getCurrentEnv() == Env.CLIENT) {
 			determineClientEligibility();
 		}
 		if (FabConf.class.getClassLoader().getResource("default_features_config.ini") == null) {
@@ -221,8 +216,8 @@ public class FabConf {
 			worldConfig.clear();
 			worldDefaults = ImmutableMap.of();
 		} else if (onLoad) {
-			Path target = path.resolve(FabConst.FORGE ? "forgery" : "fabrication");
-			Path source = path.resolve(FabConst.FORGE ? "fabrication" : "forgery");
+			Path target = path.resolve(FabricationMod.MOD_NAME_LOWER);
+			Path source = path.resolve(EarlyAgnos.isForge() ? "fabrication" : "forgery");
 			if (!Files.exists(target) && Files.exists(source)) {
 				try {
 					Files.move(source, target);
@@ -300,7 +295,7 @@ public class FabConf {
 
 	public static boolean isBanned(String configKey) {
 		String k = remap(configKey);
-		if (Agnos.getCurrentEnv() == Env.CLIENT && loadComplete) {
+		if (EarlyAgnos.getCurrentEnv() == Env.CLIENT && loadComplete) {
 			if (clientCheckBanned(k)) {
 				return true;
 			}
@@ -433,11 +428,11 @@ public class FabConf {
 			FabLog.error("worldSet was called while path was null");
 			return;
 		}
-		set(configKey, newValue, worldPath.resolve(FabConst.FORGE ? "forgery" : "fabrication").resolve("features.ini"), true);
+		set(configKey, newValue, worldPath.resolve(FabricationMod.MOD_NAME_LOWER).resolve("features.ini"), true);
 	}
 
 	public static void set(String configKey, String newValue) {
-		set(configKey, newValue, Agnos.getConfigDir().resolve(FabConst.FORGE ? "forgery" : "fabrication").resolve("features.ini"), false);
+		set(configKey, newValue, EarlyAgnos.getConfigDir().resolve(FabricationMod.MOD_NAME_LOWER).resolve("features.ini"), false);
 	}
 
 	private static void write(String configKey, String newValue, Path configFile){
@@ -493,7 +488,7 @@ public class FabConf {
 	}
 	public static void reload() {
 		FabLog.info("Reloading configs...");
-		Path dir = Agnos.getConfigDir().resolve(FabConst.FORGE ? "forgery" : "fabrication");
+		Path dir = EarlyAgnos.getConfigDir().resolve(FabricationMod.MOD_NAME_LOWER);
 		try {
 			Files.createDirectories(dir);
 		} catch (IOException e1) {
@@ -534,7 +529,7 @@ public class FabConf {
 
 	public static void worldReload() {
 		if (worldPath == null) return;
-		Path dir = worldPath.resolve(FabConst.FORGE ? "forgery" : "fabrication");
+		Path dir = worldPath.resolve(FabricationMod.MOD_NAME_LOWER);
 		try {
 			Files.createDirectories(dir);
 		} catch (IOException e1) {
@@ -574,7 +569,7 @@ public class FabConf {
 
 	private static void load(ConfigLoader ldr) {
 		String name = ldr.getConfigName();
-		Path dir = Agnos.getConfigDir().resolve(FabConst.FORGE ? "forgery" : "fabrication");
+		Path dir = EarlyAgnos.getConfigDir().resolve(FabricationMod.MOD_NAME_LOWER);
 		Path file = dir.resolve(name+".ini");
 		checkForAndSaveDefaultsOrUpgrade(file, "default_"+name+"_config.ini");
 		FabLog.timeAndCountWarnings("Loading of "+name+".ini", () -> {

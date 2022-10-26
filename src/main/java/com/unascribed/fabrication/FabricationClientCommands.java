@@ -59,7 +59,7 @@ public class FabricationClientCommands {
 
 	public static void registerCommands(CommandDispatcher<FabricClientCommandSource> dispatcher) {
 		LiteralArgumentBuilder<FabricClientCommandSource> root = LiteralArgumentBuilder.<FabricClientCommandSource>literal("fabrication:client");
-		if (Agnos.isModLoaded("fscript")) addFScript(root);
+		if (EarlyAgnos.isModLoaded("fscript")) addFScript(root);
 		FeatureFabricationCommand.addConfig(root, false);
 		root.then(LiteralArgumentBuilder.<FabricClientCommandSource>literal("ui")
 				.executes((c) -> {

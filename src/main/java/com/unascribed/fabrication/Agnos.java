@@ -1,21 +1,13 @@
 package com.unascribed.fabrication;
 
-import java.nio.file.Path;
 import java.util.List;
 
-import com.unascribed.fabrication.support.FabConst;
-import org.spongepowered.asm.mixin.MixinEnvironment;
-import org.spongepowered.asm.mixin.transformer.IMixinTransformer;
-
 import com.mojang.brigadier.CommandDispatcher;
-import com.unascribed.fabrication.support.Env;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.launch.common.FabricLauncherBase;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
@@ -70,33 +62,6 @@ public final class Agnos {
 	public static KeyBinding registerKeyBinding(KeyBinding kb) {
 		KeyBindingHelper.registerKeyBinding(kb);
 		return kb;
-	}
-
-	public static boolean eventsAvailable() {
-		return true;
-	}
-
-	public static Path getConfigDir() {
-		return FabricLoader.getInstance().getConfigDir();
-	}
-
-	public static Env getCurrentEnv() {
-		return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT ? Env.CLIENT : Env.SERVER;
-	}
-
-	public static boolean isModLoaded(String modid) {
-		if (modid.startsWith("forge:")) return false;
-		if (modid.startsWith("fabric:")) modid = modid.substring(7);
-		return FabricLoader.getInstance().isModLoaded(modid);
-	}
-
-	public static String getModVersion() {
-		if (FabConst.DEV) return "DEV";
-		return FabricLoader.getInstance().getModContainer("fabrication").get().getMetadata().getVersion().getFriendlyString();
-	}
-
-	public static String getLoaderVersion() {
-		return FabricLoader.getInstance().getModContainer("fabricloader").get().getMetadata().getVersion().getFriendlyString();
 	}
 
 }
