@@ -66,7 +66,13 @@ public class AnnotationProcessor extends AbstractProcessor {
 							if (ad.startsWith("com.mrcrayfish") || ad.startsWith("svenhjol")) continue;
 							mixin.add(ad);
 							try {
-								Class<?> cl = Class.forName(ad, false, this.getClass().getClassLoader());
+								Class<?> cl;
+								try {
+									cl = Class.forName(ad, false, this.getClass().getClassLoader());
+								} catch (ClassNotFoundException ignore) {
+									int dot = ad.lastIndexOf('.');
+									cl = Class.forName(ad.substring(0, dot)+"$"+ad.substring(dot+1), false, this.getClass().getClassLoader());
+								}
 								while (cl != null) {
 									mixin.add(cl.getName());
 									for (Class<?> cla : cl.getInterfaces()) mixin.add(cla.getName());

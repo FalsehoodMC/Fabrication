@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.mixin.e_mechanics.obsidian_tears;
 
 import com.unascribed.fabrication.FabConf;
+import net.minecraft.block.AbstractBlock;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabInject;
@@ -22,7 +23,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.world.World;
 
-@Mixin(targets="net.minecraft.block.AbstractBlock$AbstractBlockState")
+@Mixin(AbstractBlock.AbstractBlockState.class)
 @EligibleIf(configAvailable="*.obsidian_tears")
 public class MixinAbstractBlockState {
 
