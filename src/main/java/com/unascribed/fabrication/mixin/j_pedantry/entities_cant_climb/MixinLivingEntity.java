@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import java.util.function.Predicate;
 
 @Mixin(LivingEntity.class)
-@EligibleIf(configAvailable="*.entities_cant_climb")
+@EligibleIf(anyConfigAvailable={"*.entities_cant_climb", "*.creepers_cant_climb"})
 public class MixinLivingEntity {
 
 	private static final Predicate<LivingEntity> fabrication$entitiesCantClimbPredicate = ConfigPredicates.getFinalPredicate("*.entities_cant_climb");
