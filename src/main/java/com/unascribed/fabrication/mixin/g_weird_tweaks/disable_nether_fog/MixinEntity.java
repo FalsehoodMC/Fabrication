@@ -3,13 +3,14 @@ package com.unascribed.fabrication.mixin.g_weird_tweaks.disable_nether_fog;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.injection.FabInject;
+import net.minecraft.client.render.SkyProperties;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
 
-@Mixin(targets="net.minecraft.client.render.SkyProperties$Nether")
+@Mixin(SkyProperties.Nether.class)
 @EligibleIf(configAvailable="*.disable_nether_fog", envMatches=Env.CLIENT)
 public class MixinEntity {
 
