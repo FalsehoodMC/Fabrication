@@ -24,5 +24,3 @@ if [ "$3" != "-" ]; then
 fi
 
 gw $tasks
-PUBLISH_FORGERY=1 gw $tasks
-

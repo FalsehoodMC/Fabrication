@@ -713,7 +713,7 @@ def curseLoaders = [ 'Fabric' ]
 def curseProject = '414445'
 
 def mcmodcnClassID = '3548'
-def mcmodcnLoaders = '2,11'
+def mcmodcnLoaders = '2'
 
 def artifact = remapJar.archivePath
 
