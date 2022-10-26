@@ -23,6 +23,9 @@ if [ "$3" != "-" ]; then
 	tasks="$tasks mcmodcn"
 fi
 
+echo Changelog:
+cat > changelog.md
+
 gw $tasks
 PUBLISH_FORGERY=1 gw $tasks
 

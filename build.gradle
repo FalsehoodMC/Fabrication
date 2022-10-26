@@ -739,6 +739,7 @@ if (System.getenv("MODRINTH_TOKEN")) {
 		versionNumber = project.version
 		versionName = 'v'+origVersion
 		versionType = stability
+		changelog = file('changelog.md').text
 		uploadFile = artifact
 		gameVersions = mcVersions
 		loaders = mrLoaders
@@ -752,6 +753,9 @@ if (System.getenv("CURSE_TOKEN")) {
 		project {
 			id = curseProject
 			releaseType = stability
+
+			changelog = file('changelog.md')
+			changelogType = 'markdown'
 
 			for (def s : mcVersions) addGameVersion s
 			for (def s : curseLoaders) addGameVersion s
@@ -776,6 +780,7 @@ if (System.getenv("GITHUB_TOKEN")) {
 		tagName 'v'+origVersion
 		releaseName 'v'+origVersion
 		targetCommitish "3.0/1.18"
+		body file('changelog.md').text
 		draft false
 		prerelease false
 		releaseAssets artifact

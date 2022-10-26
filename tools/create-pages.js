@@ -76,4 +76,4 @@ fs.writeFileSync('curse-fabrication.html', render({...ctx, fabrication: true}));
 fs.writeFileSync('curse-forgery.html', render({...ctx, fabrication: false}));
 fs.writeFileSync('modrinth.md', hbs.compile(fs.readFileSync(path.resolve(me, 'modrinth.md.hbs')).toString('utf8'))(ctx));
 fs.writeFileSync('wiki.html', hbs.compile(fs.readFileSync(path.resolve(me, 'wiki.html.hbs')).toString('utf8'))(ctx));
-fs.writeFileSync('changelog.md', hbs.compile(fs.readFileSync(path.resolve(me, 'changelog.md.hbs')).toString('utf8'))(ctx));
+//fs.writeFileSync('changelog.md', hbs.compile(fs.readFileSync(path.resolve(me, 'changelog.md.hbs')).toString('utf8'))(ctx));
