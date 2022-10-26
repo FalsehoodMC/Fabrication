@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(targets="net.minecraft.client.gui.screen.CommandSuggestor$SuggestionWindow")
+@Mixin(CommandSuggestor.SuggestionWindow.class)
 @EligibleIf(configAvailable="*.enter_selects_highlighted_suggestion", envMatches=Env.CLIENT)
 public abstract class MixinSuggestionWindow {
 
