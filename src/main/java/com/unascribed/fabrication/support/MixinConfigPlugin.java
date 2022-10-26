@@ -8,9 +8,10 @@ import com.google.common.collect.SetMultimap;
 import com.google.common.io.ByteSource;
 import com.google.common.io.Resources;
 import com.google.common.reflect.ClassPath;
-import com.unascribed.fabrication.Agnos;
+import com.unascribed.fabrication.EarlyAgnos;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.FabLog;
+import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.support.injection.FabModifyConstInjectionInfo;
 import com.unascribed.fabrication.support.injection.FabRefMap;
 import com.unascribed.fabrication.support.injection.FailsoftCallbackInjectionInfo;
@@ -60,8 +61,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	@Override
 	public void onLoad(String mixinPackage) {
 		{
-			Path target = Agnos.getConfigDir().resolve(FabConst.FORGE ? "forgery" : "fabrication");
-			Path source = Agnos.getConfigDir().resolve(FabConst.FORGE ? "fabrication" : "forgery");
+			Path target = EarlyAgnos.getConfigDir().resolve(FabricationMod.MOD_NAME_LOWER);
+			Path source = EarlyAgnos.getConfigDir().resolve(EarlyAgnos.isForge() ? "fabrication" : "forgery");
 			if (!Files.exists(target) && Files.exists(source)) {
 				try {
 					Files.move(source, target);
@@ -164,7 +165,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 									String[] arr = (String[])v;
 									if (arr[0].equals("Lcom/unascribed/fabrication/support/Env;")) {
 										Env e = Env.valueOf(arr[1]);
-										Env curEnv = Agnos.getCurrentEnv();
+										Env curEnv = EarlyAgnos.getCurrentEnv();
 										if (!curEnv.matches(e)) {
 											eligibilityFailures.add("Environment is incorrect (want "+e.name().toLowerCase(Locale.ROOT)+", got "+curEnv.name().toLowerCase(Locale.ROOT)+")");
 											eligible = false;
@@ -174,7 +175,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 									}
 								} else if (k.equals("modLoaded")) {
 									for (String s : (List<String>)v) {
-										if (!Agnos.isModLoaded(s)) {
+										if (!EarlyAgnos.isModLoaded(s)) {
 											eligibilityFailures.add("Required mod "+s+" is not loaded");
 											eligible = false;
 										} else {
@@ -183,7 +184,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 									}
 								} else if (k.equals("modNotLoaded")) {
 									for (String s : (List<String>)v) {
-										if (Agnos.isModLoaded(s)) {
+										if (EarlyAgnos.isModLoaded(s)) {
 											eligibilityFailures.add("Conflicting mod "+s+" is loaded");
 											eligible = false;
 										} else {
@@ -396,7 +397,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	}
 
 	public static void lithiumCompat(ClassNode targetClass, String mixinClassName){
-		if(Agnos.isModLoaded("lithium") && "com.unascribed.fabrication.mixin.e_mechanics.colorful_redstone.MixinRedstoneWireBlock".equals(mixinClassName)) {
+		if(EarlyAgnos.isModLoaded("lithium") && "com.unascribed.fabrication.mixin.e_mechanics.colorful_redstone.MixinRedstoneWireBlock".equals(mixinClassName)) {
 			targetClass.methods.forEach(methodNode -> {
 				if (methodNode instanceof MethodNodeEx && "getReceivedPowerFaster".equals(((MethodNodeEx) methodNode).getOriginalName())){
 					methodNode.visibleAnnotations.forEach(annotationNode -> {

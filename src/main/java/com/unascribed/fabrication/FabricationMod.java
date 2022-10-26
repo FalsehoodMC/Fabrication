@@ -11,12 +11,10 @@ import com.unascribed.fabrication.interfaces.SetFabricationConfigAware;
 import com.unascribed.fabrication.support.ConfigLoader;
 import com.unascribed.fabrication.support.ConfigValue;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.FabConst;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.OptionalFScript;
 import com.unascribed.fabrication.support.ResolvedConfigValue;
-import com.unascribed.fabrication.support.SpecialEligibility;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -46,9 +44,9 @@ import net.minecraft.world.World;
 
 public class FabricationMod implements ModInitializer {
 
-	public static final String MOD_NAME = FabConf.isMet(SpecialEligibility.FORGE) ? "Forgery" : "Fabrication";
+	public static final String MOD_NAME = EarlyAgnos.isForge() ? "Forgery" : "Fabrication";
 	// NOT the modid. We keep the mod id as "fabrication" even on Forge to keep things from getting too nutty.
-	public static final String MOD_NAME_LOWER = FabConf.isMet(SpecialEligibility.FORGE) ? "forgery" : "fabrication";
+	public static final String MOD_NAME_LOWER = EarlyAgnos.isForge() ? "forgery" : "fabrication";
 
 	private static final Map<String, Feature> features = Maps.newHashMap();
 	private static final List<Feature> unconfigurableFeatures = Lists.newArrayList();
@@ -70,7 +68,7 @@ public class FabricationMod implements ModInitializer {
 				throw new RuntimeException(e);
 			}
 		}
-		if (Agnos.isModLoaded("fscript")) OptionalFScript.reload();
+		if (EarlyAgnos.isModLoaded("fscript")) OptionalFScript.reload();
 		for (String s : MixinConfigPlugin.discoverClassesInPackage("com.unascribed.fabrication.features", false)) {
 			try {
 				Feature r = (Feature)Class.forName(s).newInstance();
@@ -95,7 +93,7 @@ public class FabricationMod implements ModInitializer {
 				throw new RuntimeException("Failed to initialize feature "+s, e);
 			}
 		}
-		if (Agnos.eventsAvailable() && Agnos.getCurrentEnv() == Env.CLIENT) {
+		if (EarlyAgnos.eventsAvailable() && EarlyAgnos.getCurrentEnv() == Env.CLIENT) {
 			if (FabConf.getValue("*.long_levelup_sound_at_30") != ConfigValue.FALSE) {
 				LEVELUP_LONG = new SoundEvent(new Identifier("fabrication", "levelup_long"));
 			}
@@ -106,7 +104,7 @@ public class FabricationMod implements ModInitializer {
 				ABSORPTION_HURT = new SoundEvent(new Identifier("fabrication", "absorption_hurt"));
 			}
 		}
-		if (FabConst.FORGE && Agnos.getCurrentEnv() == Env.CLIENT) {
+		if (EarlyAgnos.isForge() && EarlyAgnos.getCurrentEnv() == Env.CLIENT) {
 			initPrideLib();
 		}
 	}
@@ -214,7 +212,7 @@ public class FabricationMod implements ModInitializer {
 			data.writeVarInt(0);
 			data.writeLong(LAUNCH_ID);
 		}
-		data.writeString(Agnos.getModVersion());
+		data.writeString(EarlyAgnos.getModVersion());
 		data.writeVarInt(FabConf.getAllFailures().size());
 		for (String k : FabConf.getAllFailures()) {
 			data.writeString(k);

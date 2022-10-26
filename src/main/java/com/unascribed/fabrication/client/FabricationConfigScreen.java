@@ -10,7 +10,7 @@ import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.brigadier.CommandDispatcher;
-import com.unascribed.fabrication.Agnos;
+import com.unascribed.fabrication.EarlyAgnos;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.FabricationMod;
@@ -20,7 +20,6 @@ import com.unascribed.fabrication.FeaturesFile.FeatureEntry;
 import com.unascribed.fabrication.FeaturesFile.Sides;
 import com.unascribed.fabrication.interfaces.GetServerConfig;
 import com.unascribed.fabrication.support.ConfigValue;
-import com.unascribed.fabrication.support.FabConst;
 import com.unascribed.fabrication.support.ResolvedConfigValue;
 import io.github.queerbric.pride.PrideFlag;
 import io.github.queerbric.pride.PrideFlags;
@@ -97,7 +96,7 @@ public class FabricationConfigScreen extends Screen {
 	private static final Set<String> newlyUnbannedKeysClient = Sets.newHashSet();
 	private static final Set<String> newlyUnbannedKeysServer = Sets.newHashSet();
 
-	private static boolean isFScriptLoaded = Agnos.isModLoaded("fscript");
+	private static boolean isFScriptLoaded = EarlyAgnos.isModLoaded("fscript");
 
 	private final Screen parent;
 
@@ -212,7 +211,7 @@ public class FabricationConfigScreen extends Screen {
 			isSingleplayer = true;
 		} else {
 			CommandDispatcher<?> disp = client.player.networkHandler.getCommandDispatcher();
-			if (disp.getRoot().getChild(FabConst.FORGE ? "forgery" : "fabrication") == null) {
+			if (disp.getRoot().getChild(FabricationMod.MOD_NAME_LOWER) == null) {
 				whyCantConfigureServer = "This server doesn't have "+FabricationMod.MOD_NAME+".";
 			} else {
 				ClientPlayNetworkHandler cpnh = client.getNetworkHandler();
@@ -221,7 +220,7 @@ public class FabricationConfigScreen extends Screen {
 					if (!gsc.fabrication$hasHandshook()) {
 						whyCantConfigureServer = "This server's version of "+FabricationMod.MOD_NAME+" is too old.";
 					} else {
-						serverReadOnly = (disp.getRoot().getChild(FabConst.FORGE ? "forgery" : "fabrication").getChild("config") == null);
+						serverReadOnly = (disp.getRoot().getChild(FabricationMod.MOD_NAME_LOWER).getChild("config") == null);
 						serverKnownConfigKeys.clear();
 						serverKnownConfigKeys.addAll(gsc.fabrication$getServerTrileanConfig().keySet());
 						serverKnownConfigKeys.addAll(gsc.fabrication$getServerStringConfig().keySet());
@@ -770,7 +769,7 @@ public class FabricationConfigScreen extends Screen {
 		int y = startY;
 		if (section == null) {
 			String v = getVersion();
-			String blurb = "§l"+FabricationMod.MOD_NAME+" v"+v+" §rby unascribed and SFort\n"+(configuringServer ? "(Local version: v"+Agnos.getModVersion()+")" : "")
+			String blurb = "§l"+FabricationMod.MOD_NAME+" v"+v+" §rby unascribed and SFort\n"+(configuringServer ? "(Local version: v"+EarlyAgnos.getModVersion()+")" : "")
 					+ "\nClick a category on the left to change settings.";
 			int height = drawWrappedText(matrices, 140, 20, blurb, width-130, -1, false);
 			if (!configuringServer && drawButton(matrices, 140, 20+height+32, 120, 20, "Reload files", mouseX, mouseY)) {
@@ -1468,7 +1467,7 @@ public class FabricationConfigScreen extends Screen {
 		if (configuringServer) {
 			return ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerVersion();
 		} else {
-			return Agnos.getModVersion();
+			return EarlyAgnos.getModVersion();
 		}
 	}
 

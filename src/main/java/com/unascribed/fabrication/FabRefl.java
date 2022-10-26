@@ -13,7 +13,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import com.unascribed.fabrication.support.FabConst;
 import com.unascribed.fabrication.support.FabReflField;
 import com.unascribed.fabrication.support.injection.FabRefMap;
 import net.minecraft.client.util.SelectionManager;
@@ -568,7 +567,7 @@ public class FabRefl {
 	private static RuntimeException rethrow(Throwable t) {
 		if (!MixinErrorHandler.actuallyItWasUs && (t instanceof MixinError || t instanceof MixinException)) {
 			throw new RuntimeException("DO NOT REPORT THIS ERROR TO FABRICATION.\n"
-					+ "This is caused by ANOTHER MOD'S MIXIN FAILURE that was initiated by "+(FabConst.FORGE ? "Forgery" : "Fabrication")+" initializing reflection.\n"
+					+ "This is caused by ANOTHER MOD'S MIXIN FAILURE that was initiated by "+(FabricationMod.MOD_NAME)+" initializing reflection.\n"
 					+ "Errors like these show up attributed to whoever was the first person to load the class with the broken mixin.\n"
 					+ "!!!!! DO NOT REPORT THIS ERROR TO FABRICATION !!!!!");
 		}

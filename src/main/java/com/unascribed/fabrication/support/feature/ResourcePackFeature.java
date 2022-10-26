@@ -4,7 +4,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import com.unascribed.fabrication.Agnos;
+import com.unascribed.fabrication.EarlyAgnos;
 import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.FabricationMod;
@@ -39,7 +39,7 @@ public abstract class ResourcePackFeature implements Feature, ResourcePackProvid
 	public ResourcePackFeature(String path) {
 		this.configKey = "*."+path;
 		this.path = path;
-		if (Agnos.getCurrentEnv() == Env.CLIENT) {
+		if (EarlyAgnos.getCurrentEnv() == Env.CLIENT) {
 			initClient();
 		}
 	}
@@ -69,7 +69,7 @@ public abstract class ResourcePackFeature implements Feature, ResourcePackProvid
 	@Override
 	public void apply() {
 		active = true;
-		if (Agnos.getCurrentEnv() == Env.CLIENT) {
+		if (EarlyAgnos.getCurrentEnv() == Env.CLIENT) {
 			reloadClient();
 		}
 	}
@@ -84,7 +84,7 @@ public abstract class ResourcePackFeature implements Feature, ResourcePackProvid
 	@Override
 	public boolean undo() {
 		active = false;
-		if (Agnos.getCurrentEnv() == Env.CLIENT) {
+		if (EarlyAgnos.getCurrentEnv() == Env.CLIENT) {
 			reloadClient();
 		}
 		return true;
