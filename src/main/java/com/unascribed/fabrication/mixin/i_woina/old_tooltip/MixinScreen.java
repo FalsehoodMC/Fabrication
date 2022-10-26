@@ -66,6 +66,8 @@ public abstract class MixinScreen extends AbstractParentElement implements Drawa
 					l = this.height - backgroundHeight - 6;
 				}
 				matrices.push();
+				float f = this.itemRenderer.zOffset;
+				this.itemRenderer.zOffset = 400.0F;
 				matrices.translate(0.0D, 0.0D, 400.0D);
 				Matrix4f matrix4f = matrices.peek().getModel();
 				VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
@@ -84,6 +86,7 @@ public abstract class MixinScreen extends AbstractParentElement implements Drawa
 					component.drawItems(client.textRenderer, k, l, matrices, this.itemRenderer, 400, client.getTextureManager());
 					l += component.getHeight() + (s == 0 ? 2 : 0);
 				}
+				this.itemRenderer.zOffset = f;
 				ci.cancel();
 			}
 		}
