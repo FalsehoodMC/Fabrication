@@ -4,6 +4,7 @@ import java.text.NumberFormat;
 import java.util.Set;
 
 import com.unascribed.fabrication.Agnos;
+import com.unascribed.fabrication.EarlyAgnos;
 import com.unascribed.fabrication.loaders.LoaderDimensionalTools;
 import com.unascribed.fabrication.loaders.LoaderDimensionalTools.MohsIdentifier;
 import com.unascribed.fabrication.loaders.LoaderDimensionalTools.NameSubstitution;
@@ -43,7 +44,7 @@ public class FeatureDimensionalTools implements Feature {
 		active = true;
 		if (!applied) {
 			applied = true;
-			if (Agnos.getCurrentEnv() == Env.CLIENT) {
+			if (EarlyAgnos.getCurrentEnv() == Env.CLIENT) {
 				applyClient();
 			}
 		}

@@ -21,6 +21,7 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.CommandNode;
 import com.unascribed.fabrication.Agnos;
+import com.unascribed.fabrication.EarlyAgnos;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.FabricationClientCommands;
@@ -77,7 +78,7 @@ public class FeatureFabricationCommand implements Feature {
 			try {
 				LiteralArgumentBuilder<ServerCommandSource> root = LiteralArgumentBuilder.<ServerCommandSource>literal(FabricationMod.MOD_NAME_LOWER);
 				addConfig(root, dedi);
-				if (Agnos.isModLoaded("fscript")) addFScript(root, dedi);
+				if (EarlyAgnos.isModLoaded("fscript")) addFScript(root, dedi);
 
 				LiteralArgumentBuilder<ServerCommandSource> tag = LiteralArgumentBuilder.<ServerCommandSource>literal("tag");
 				tag.requires(scs -> FabConf.isEnabled("*.taggable_players") && scs.hasPermissionLevel(2));

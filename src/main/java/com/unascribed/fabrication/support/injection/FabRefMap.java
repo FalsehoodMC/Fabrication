@@ -1,7 +1,6 @@
 package com.unascribed.fabrication.support.injection;
 
 import com.unascribed.fabrication.FabLog;
-import com.unascribed.fabrication.support.FabConst;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -40,9 +39,7 @@ public class FabRefMap {
 				targetMap.put(l.substring(0, i), l.substring(i + 1));
 			}
 		} catch (Exception e) {
-			if (!FabConst.DEV) {
-				FabLog.error("Failed to parse fabAbsRefMap", e);
-			}
+			FabLog.error("Failed to parse fabAbsRefMap");
 		}
 		try {
 			InputStream is = FabRefMap.class.getResourceAsStream("/fabRelRefMap.txt");
@@ -70,9 +67,7 @@ public class FabRefMap {
 				}
 			}
 		} catch (Exception e) {
-			if (!FabConst.DEV) {
-				FabLog.error("Failed to parse fabRelRefMap", e);
-			}
+			FabLog.error("Failed to parse fabRelRefMap");
 		}
 	}
 }

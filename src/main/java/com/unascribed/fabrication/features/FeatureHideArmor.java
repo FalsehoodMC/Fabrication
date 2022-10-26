@@ -11,6 +11,7 @@ import com.unascribed.ears.api.EarsStateType;
 import com.unascribed.ears.api.OverrideResult;
 import com.unascribed.ears.api.registry.EarsStateOverriderRegistry;
 import com.unascribed.fabrication.Agnos;
+import com.unascribed.fabrication.EarlyAgnos;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.interfaces.GetSuppressedSlots;
 import com.unascribed.fabrication.interfaces.SetFabricationConfigAware;
@@ -51,7 +52,7 @@ public class FeatureHideArmor implements Feature {
 				dispatcher.register(buildCommand("hidearmor", true));
 				dispatcher.register(buildCommand("showarmor", false));
 			});
-			if (Agnos.getCurrentEnv() == Env.CLIENT && Agnos.isModLoaded("ears")) {
+			if (EarlyAgnos.getCurrentEnv() == Env.CLIENT && EarlyAgnos.isModLoaded("ears")) {
 				try {
 					EarsCompat.init();
 				} catch (Throwable t) {}
