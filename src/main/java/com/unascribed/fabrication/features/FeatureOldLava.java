@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.features;
 
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.client.SpriteLava;
@@ -16,25 +17,30 @@ import net.minecraft.client.texture.Sprite.Info;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.util.Identifier;
 
-@EligibleIf(configAvailable="*.old_lava", envMatches=Env.CLIENT)
+@EligibleIf(anyConfigAvailable={"*.old_lava", "*.old_lava_scaling"}, envMatches=Env.CLIENT)
 public class FeatureOldLava implements Feature {
-
-	private static Sprite originalLava;
-	private static Sprite originalLavaFlow;
-
-	private static boolean applied = false;
 
 	public static void onLoaded(SpriteAtlasTexture atlas, SpriteAtlasTexture.Data data) {
 		try {
-			if (applied && atlas.getId().toString().equals("minecraft:textures/atlas/blocks.png")) {
+			if (FabConf.isAnyEnabled("*.old_lava") && atlas.getId().toString().equals("minecraft:textures/atlas/blocks.png")) {
 				Identifier still = new Identifier("block/lava_still");
 				Identifier flow = new Identifier("block/lava_flow");
-				originalLava = atlas.getSprite(still);
-				originalLavaFlow = atlas.getSprite(flow);
-				SpriteLava newLava = new SpriteLava(atlas, new Info(still, 16, 16, AnimationResourceMetadata.EMPTY), FabRefl.Client.getMaxLevel(data),
-						FabRefl.Client.getWidth(data), FabRefl.Client.getHeight(data), FabRefl.Client.getX(originalLava), FabRefl.Client.getY(originalLava));
-				SpriteLavaFlow newLavaFlow = new SpriteLavaFlow(atlas, new Info(flow, 32, 32, AnimationResourceMetadata.EMPTY), FabRefl.Client.getMaxLevel(data),
-						FabRefl.Client.getWidth(data), FabRefl.Client.getHeight(data), FabRefl.Client.getX(originalLavaFlow), FabRefl.Client.getY(originalLavaFlow));
+				Sprite originalLava = atlas.getSprite(still);
+				Sprite originalLavaFlow = atlas.getSprite(flow);
+				int lavaWidth, lavaHeight, lavaFlowWidth,  lavaFlowHeight;
+				if (FabConf.isEnabled("*.old_lava_scaling")) {
+					lavaWidth = originalLava.getWidth();
+					lavaHeight = originalLava.getHeight();
+					lavaFlowWidth = originalLavaFlow.getWidth();
+					lavaFlowHeight = originalLavaFlow.getHeight();
+				} else {
+					lavaWidth = lavaHeight = 16;
+					lavaFlowWidth = lavaFlowHeight = 32;
+				}
+				SpriteLava newLava = new SpriteLava(atlas, new Info(still, lavaWidth, lavaHeight, AnimationResourceMetadata.EMPTY), FabRefl.Client.getMaxLevel(data),
+						FabRefl.Client.getWidth(data), FabRefl.Client.getHeight(data), FabRefl.Client.getX(originalLava), FabRefl.Client.getY(originalLava), new NativeImage(lavaWidth, lavaHeight, false));
+				SpriteLavaFlow newLavaFlow = new SpriteLavaFlow(atlas, new Info(flow, lavaFlowWidth, lavaFlowHeight, AnimationResourceMetadata.EMPTY), FabRefl.Client.getMaxLevel(data),
+						FabRefl.Client.getWidth(data), FabRefl.Client.getHeight(data), FabRefl.Client.getX(originalLavaFlow), FabRefl.Client.getY(originalLavaFlow), new NativeImage(lavaFlowWidth, lavaFlowHeight, false));
 				FabRefl.Client.getSprites(atlas).put(still, newLava);
 				FabRefl.Client.getSprites(atlas).put(flow, newLavaFlow);
 				int origIdx = FabRefl.Client.getAnimatedSprites(atlas).indexOf(originalLava);
@@ -59,31 +65,20 @@ public class FeatureOldLava implements Feature {
 				newLavaFlow.tickAnimation();
 			}
 		} catch (Throwable t) {
-			applied = false;
 			FabricationMod.featureError(FeatureOldLava.class, "*.old_lava", t);
 		}
 	}
 
 	@Override
 	public void apply() {
-		applied = true;
-		if (originalLava == null) {
-			if (MinecraftClient.getInstance().getResourceManager() != null) {
-				MinecraftClient.getInstance().reloadResources();
-			}
+		if (MinecraftClient.getInstance().getResourceManager() != null) {
+			MinecraftClient.getInstance().reloadResources();
 		}
 	}
 
 	@Override
 	public boolean undo() {
-		applied = false;
-		if (originalLava != null) {
-			if (MinecraftClient.getInstance().getResourceManager() != null) {
-				MinecraftClient.getInstance().reloadResources();
-			}
-			originalLava = null;
-			originalLavaFlow = null;
-		}
+		apply();
 		return true;
 	}
 
