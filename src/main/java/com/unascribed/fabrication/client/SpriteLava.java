@@ -19,8 +19,8 @@ public class SpriteLava extends Sprite implements TextureTickListener {
 
 	public SpriteLava(SpriteAtlasTexture spriteAtlasTexture,
 			Info info, int maxLevel, int atlasWidth, int atlasHeight, int x,
-			int y) {
-		super(spriteAtlasTexture, info, maxLevel, atlasWidth, atlasHeight, x, y, new NativeImage(info.getWidth(), info.getHeight(), false));
+			int y, NativeImage image) {
+		super(spriteAtlasTexture, info, maxLevel, atlasWidth, atlasHeight, x, y, image);
 		SPRITE_SIZE = info.getWidth();
 		SPRITE_SIZEMINUSONE = SPRITE_SIZE - 1;
 		SPRITE_SIZESQUARED = SPRITE_SIZE * SPRITE_SIZE;
