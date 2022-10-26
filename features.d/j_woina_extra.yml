@@ -150,22 +150,14 @@ woina.extra.billboard_drops_2d:
 		prior to 1.4.
 		Actually renders them in 2D which may create issues, but has a performance benefit.
 
-woina.extra.old_lava_x32:
-	name: Old Lava x32
+woina.extra.old_lava_scaling:
+	name: Old Lava Scaling
 	since: 3.1.2
 	sides: client_only
 	extend: *.old_lava
 	desc:
-		Old Lava with a 32x32 texture. May cause a performance hit.
-
-woina.extra.old_lava_x64:
-	name: Old Lava x64
-	since: 3.1.2
-	sides: client_only
-	extend: *.old_lava
-	desc:
-		Old Lava with a 64x64 texture. May cause a performance hit.
-
+		Resurrects the old procedural lava texture from 1.4.
+		Scales with resource pack resolutions. Will have a performance impact on higher resolutions.
 
 # kate: space-indent off
 # vim: noai:noet

@@ -17,7 +17,7 @@ import net.minecraft.client.texture.Sprite.Info;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.util.Identifier;
 
-@EligibleIf(anyConfigAvailable={"*.old_lava", "*.old_lava_x32", "*.old_lava_x64"}, envMatches=Env.CLIENT)
+@EligibleIf(anyConfigAvailable={"*.old_lava", "*.old_lava_scaling"}, envMatches=Env.CLIENT)
 public class FeatureOldLava implements Feature {
 
 	public static void onLoaded(SpriteAtlasTexture atlas, SpriteAtlasTexture.Data data) {
@@ -27,11 +27,20 @@ public class FeatureOldLava implements Feature {
 				Identifier flow = new Identifier("block/lava_flow");
 				Sprite originalLava = atlas.getSprite(still);
 				Sprite originalLavaFlow = atlas.getSprite(flow);
-				int oldLavaSize = FabConf.isEnabled("*.old_lava_x64") ? 64 : FabConf.isEnabled("*.old_lava_x32") ? 32 : 16;
-				SpriteLava newLava = new SpriteLava(atlas, new Info(still, oldLavaSize, oldLavaSize, AnimationResourceMetadata.EMPTY), FabRefl.Client.getMaxLevel(data),
-						FabRefl.Client.getWidth(data), FabRefl.Client.getHeight(data), FabRefl.Client.getX(originalLava), FabRefl.Client.getY(originalLava));
-				SpriteLavaFlow newLavaFlow = new SpriteLavaFlow(atlas, new Info(flow, oldLavaSize*2, oldLavaSize*2, AnimationResourceMetadata.EMPTY), FabRefl.Client.getMaxLevel(data),
-						FabRefl.Client.getWidth(data), FabRefl.Client.getHeight(data), FabRefl.Client.getX(originalLavaFlow), FabRefl.Client.getY(originalLavaFlow));
+				int lavaWidth, lavaHeight, lavaFlowWidth,  lavaFlowHeight;
+				if (FabConf.isEnabled("*.old_lava_scaling")) {
+					lavaWidth = originalLava.getWidth();
+					lavaHeight = originalLava.getHeight();
+					lavaFlowWidth = originalLavaFlow.getWidth();
+					lavaFlowHeight = originalLavaFlow.getHeight();
+				} else {
+					lavaWidth = lavaHeight = 16;
+					lavaFlowWidth = lavaFlowHeight = 32;
+				}
+				SpriteLava newLava = new SpriteLava(atlas, new Info(still, lavaWidth, lavaHeight, AnimationResourceMetadata.EMPTY), FabRefl.Client.getMaxLevel(data),
+						FabRefl.Client.getWidth(data), FabRefl.Client.getHeight(data), FabRefl.Client.getX(originalLava), FabRefl.Client.getY(originalLava), new NativeImage(lavaWidth, lavaHeight, false));
+				SpriteLavaFlow newLavaFlow = new SpriteLavaFlow(atlas, new Info(flow, lavaFlowWidth, lavaFlowHeight, AnimationResourceMetadata.EMPTY), FabRefl.Client.getMaxLevel(data),
+						FabRefl.Client.getWidth(data), FabRefl.Client.getHeight(data), FabRefl.Client.getX(originalLavaFlow), FabRefl.Client.getY(originalLavaFlow), new NativeImage(lavaFlowWidth, lavaFlowHeight, false));
 				FabRefl.Client.getSprites(atlas).put(still, newLava);
 				FabRefl.Client.getSprites(atlas).put(flow, newLavaFlow);
 				int origIdx = FabRefl.Client.getAnimatedSprites(atlas).indexOf(originalLava);
