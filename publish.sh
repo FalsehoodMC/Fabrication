@@ -23,4 +23,7 @@ if [ "$3" != "-" ]; then
 	tasks="$tasks mcmodcn"
 fi
 
+echo Changelog:
+cat > changelog.md
+
 gw $tasks
