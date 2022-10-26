@@ -18,7 +18,7 @@ public class MixinMobSpawnerLogic {
 	@Shadow
 	private int spawnDelay;
 
-	@FabInject(method="isPlayerInRange(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)Z", at=@At("RETURN"))
+	@FabInject(method="isPlayerInRange()Z", at=@At("RETURN"))
 	public void isPlayerInRange(CallbackInfoReturnable<Boolean> cir) {
 		// this is called in the mob spawner's update routine only once, so it makes a convenient
 		// injection point that doesn't require messing with redirects, weird @Ats, or var capture

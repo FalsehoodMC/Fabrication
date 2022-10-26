@@ -34,7 +34,7 @@ public abstract class MixinScreen extends AbstractParentElement implements Ticka
 
 	@Shadow @Nullable protected MinecraftClient client;
 
-	@FabInject(method = "renderOrderedTooltip", at = @At(value = "HEAD"), cancellable = true)
+	@FabInject(method="renderOrderedTooltip(Lnet/minecraft/client/util/math/MatrixStack;Ljava/util/List;II)V", at=@At(value = "HEAD"), cancellable=true)
 	private void drawOldTooltip(MatrixStack matrices, List<? extends OrderedText> lines, int x, int y, CallbackInfo ci) {
 		if (FabConf.isEnabled("*.old_tooltip")) {
 			// Ported from MCP beta 1.7.3
