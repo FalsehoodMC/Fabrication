@@ -191,8 +191,6 @@ public class FabricationMod implements ModInitializer {
 		}
 	}
 
-	private static final Identifier CONFIG = new Identifier("fabrication", "config");
-
 	public static void sendConfigUpdate(MinecraftServer server, String key, ServerPlayerEntity spe) {
 		if (key != null && key.startsWith("general.category")) key = null;
 		PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
@@ -223,7 +221,7 @@ public class FabricationMod implements ModInitializer {
 		for (String k : FabConf.getAllBanned()) {
 			data.writeString(k);
 		}
-		CustomPayloadS2CPacket pkt = new CustomPayloadS2CPacket(CONFIG, data);
+		CustomPayloadS2CPacket pkt = new CustomPayloadS2CPacket(new Identifier("fabrication", "config"), data);
 		spe.networkHandler.sendPacket(pkt);
 	}
 
