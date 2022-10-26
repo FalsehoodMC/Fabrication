@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Stopwatch;
-import com.unascribed.fabrication.Agnos;
+import com.unascribed.fabrication.EarlyAgnos;
 import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.QDIni;
 
@@ -22,7 +22,7 @@ public interface ConfigLoader {
 	default void remove(String key) {
 		Stopwatch watch = Stopwatch.createStarted();
 		StringWriter sw = new StringWriter();
-		Path configFile = Agnos.getConfigDir().resolve("fabrication").resolve(getConfigName()+".ini");
+		Path configFile = EarlyAgnos.getConfigDir().resolve("fabrication").resolve(getConfigName()+".ini");
 		try {
 			QDIni.loadAndTransform(configFile, QDIni.IniTransformer.simpleLineIniTransformer(((path, line) -> {
 				if (line == null) return null;
@@ -42,7 +42,7 @@ public interface ConfigLoader {
 	default void set(String key, String val) {
 		Stopwatch watch = Stopwatch.createStarted();
 		StringWriter sw = new StringWriter();
-		Path configFile = Agnos.getConfigDir().resolve("fabrication").resolve(getConfigName()+".ini");
+		Path configFile = EarlyAgnos.getConfigDir().resolve("fabrication").resolve(getConfigName()+".ini");
 		try {
 			AtomicBoolean found = new AtomicBoolean(false);
 			QDIni.loadAndTransform(configFile, QDIni.IniTransformer.simpleValueIniTransformer(((key1, value) -> {

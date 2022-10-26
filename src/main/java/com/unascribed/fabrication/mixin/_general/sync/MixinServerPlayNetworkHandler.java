@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin._general.sync;
 
+import com.unascribed.fabrication.EarlyAgnos;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.Mixin;
@@ -7,7 +8,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.FeaturesFile;
@@ -90,7 +90,7 @@ public class MixinServerPlayNetworkHandler {
 						String key = FabConf.remap(recvdData.readString(32767));
 						if (FabConf.isValid(key) && FeaturesFile.get(key).fscript != null) {
 							String value = recvdData.readString(32767);
-							if (Agnos.isModLoaded("fscript") && OptionalFScript.set(key, value, player)) {
+							if (EarlyAgnos.isModLoaded("fscript") && OptionalFScript.set(key, value, player)) {
 								fabrication$sendCommandFeedback(
 										new TranslatableText("chat.type.admin", player.getDisplayName(), new LiteralText(key + " script is now set to " + value))
 										.formatted(Formatting.GRAY, Formatting.ITALIC));
@@ -101,7 +101,7 @@ public class MixinServerPlayNetworkHandler {
 					// unset
 					if (player.hasPermissionLevel(2)) {
 						String key = FabConf.remap(recvdData.readString(32767));
-						if (FabConf.isValid(key) && FeaturesFile.get(key).fscript != null && Agnos.isModLoaded("fscript")) {
+						if (FabConf.isValid(key) && FeaturesFile.get(key).fscript != null && EarlyAgnos.isModLoaded("fscript")) {
 							OptionalFScript.restoreDefault(key);
 							fabrication$sendCommandFeedback(
 									new TranslatableText("chat.type.admin", player.getDisplayName(), new LiteralText(key + " script has been unset"))
@@ -113,7 +113,7 @@ public class MixinServerPlayNetworkHandler {
 					// reload
 					if (player.hasPermissionLevel(2)) {
 						LoaderFScript.reload();
-						if (Agnos.isModLoaded("fscript")) OptionalFScript.reload();
+						if (EarlyAgnos.isModLoaded("fscript")) OptionalFScript.reload();
 						fabrication$sendCommandFeedback(
 								new TranslatableText("chat.type.admin", player.getDisplayName(), new LiteralText(" scripts have been reloaded"))
 								.formatted(Formatting.GRAY, Formatting.ITALIC));

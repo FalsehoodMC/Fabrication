@@ -2,9 +2,6 @@ package com.unascribed.fabrication;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.brigadier.CommandDispatcher;
-import com.unascribed.fabrication.support.Env;
-import cpw.mods.cl.ModuleClassLoader;
-import cpw.mods.modlauncher.TransformingClassLoader;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands.CommandSelection;
@@ -21,16 +18,8 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.fml.loading.FMLLoader;
-import net.minecraftforge.fml.loading.FMLPaths;
-import net.minecraftforge.versions.forge.ForgeVersion;
-import org.apache.logging.log4j.LogManager;
 
-import java.lang.reflect.Method;
-import java.nio.file.Path;
 import java.util.List;
 
 // Forge implementation of Agnos. For linguistic and philosophical waffling, see the Fabric version.
@@ -83,32 +72,4 @@ public final class Agnos {
 		ClientRegistry.registerKeyBinding(kb);
 		return kb;
 	}
-
-	public static boolean eventsAvailable() {
-		return true;
-	}
-
-	public static Path getConfigDir() {
-		return FMLPaths.CONFIGDIR.get();
-	}
-
-	public static Env getCurrentEnv() {
-		return FMLEnvironment.dist == Dist.CLIENT ? Env.CLIENT : Env.SERVER;
-	}
-
-	public static boolean isModLoaded(String modid) {
-		if (modid.startsWith("fabric:")) return false;
-		if (modid.startsWith("forge:")) modid = modid.substring(6);
-		if (ModList.get() != null) return ModList.get().isLoaded(modid);
-		return FMLLoader.getLoadingModList().getModFileById(modid) != null;
-	}
-
-	public static String getModVersion() {
-		return ModList.get().getModContainerById("fabrication").get().getModInfo().getVersion().toString();
-	}
-
-	public static String getLoaderVersion() {
-		return ForgeVersion.getVersion();
-	}
-
 }
