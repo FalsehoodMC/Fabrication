@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 
-@Mixin(targets="net.minecraft.world.biome.GenerationSettings$Builder")
+@Mixin(GenerationSettings.Builder.class)
 @EligibleIf(configAvailable="*.encroaching_emeralds")
 public abstract class MixinGenerationSettingsBuilder implements GenerationSettingsAddEmeralds {
 	@Shadow @Final
