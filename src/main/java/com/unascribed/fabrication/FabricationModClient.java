@@ -7,7 +7,6 @@ import com.unascribed.fabrication.interfaces.GetServerConfig;
 import com.unascribed.fabrication.logic.WoinaDrops;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.resource.ReloadableResourceManagerImpl;
@@ -19,7 +18,6 @@ import net.minecraft.util.profiler.Profiler;
 public class FabricationModClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
-		FabricationClientCommands.registerCommands(ClientCommandManager.DISPATCHER);
 
 		if (!FabConf.isBanned("*.classic_block_drops")) {
 			MinecraftClient.getInstance().send(() -> {

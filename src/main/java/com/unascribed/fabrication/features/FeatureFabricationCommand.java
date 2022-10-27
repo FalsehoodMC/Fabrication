@@ -544,7 +544,7 @@ public class FeatureFabricationCommand implements Feature {
 	}
 
 	private static void sendFeedbackClient(CommandContext<? extends CommandSource> c, LiteralText text) {
-		FabricationClientCommands.sendFeedback(c, text);
+		FabricationClientCommands.sendFeedback(text);
 	}
 
 	private int clearTags(CommandContext<ServerCommandSource> c, Collection<ServerPlayerEntity> players) {

@@ -59,17 +59,8 @@ public final class Agnos {
 		});
 	}
 
-	public static SoundEvent registerSoundEvent(ResourceLocation id, SoundEvent soundEvent) {
-		FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(SoundEvent.class, (RegistryEvent.Register<SoundEvent> e) -> {
-			soundEvent.setRegistryName(id);
-			e.getRegistry().register(soundEvent);
-		});
-		return soundEvent;
-	}
-
 	@OnlyIn(Dist.CLIENT)
-	public static KeyMapping registerKeyBinding(KeyMapping kb) {
+	public static void registerKeyBinding(KeyMapping kb) {
 		ClientRegistry.registerKeyBinding(kb);
-		return kb;
 	}
 }
