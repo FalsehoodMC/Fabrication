@@ -32,11 +32,6 @@
   "depends": {
     "fabricloader": ">=0.12.0",
     "minecraft": ">=1.17",
-    "fabric-resource-loader-v0": "*",
-    "fabric-command-api-v1": "*",
-    "fabric-key-binding-api-v1": "*",
-    "fabric-rendering-v1": "*",
-    "fabric-registry-sync-v0": "*",
     "lib39-deferral": ">=1.1.1"
   },
   "suggests": {

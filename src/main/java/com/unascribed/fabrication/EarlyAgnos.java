@@ -29,10 +29,6 @@ public class EarlyAgnos {
 		return FabricLoader.getInstance().getModContainer("fabricloader").get().getMetadata().getVersion().getFriendlyString();
 	}
 
-	public static boolean eventsAvailable() {
-		return true;
-	}
-
 	public static Path getConfigDir() {
 		return FabricLoader.getInstance().getConfigDir();
 	}

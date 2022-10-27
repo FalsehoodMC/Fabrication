@@ -33,9 +33,6 @@ public abstract class ResourcePackFeature implements Feature, ResourcePackProvid
 
 	private boolean active = false;
 
-	@Environment(EnvType.CLIENT)
-	private ResourcePack pack;
-
 	public ResourcePackFeature(String path) {
 		this.configKey = "*."+path;
 		this.path = path;
