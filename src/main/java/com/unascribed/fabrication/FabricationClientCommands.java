@@ -23,6 +23,7 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.network.MessageType;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 
@@ -66,6 +67,7 @@ public class FabricationClientCommands {
 		try {
 			dispatcher.execute(command.substring(1), MinecraftClient.getInstance().getNetworkHandler().getCommandSource());
 		} catch (CommandException ignore) {
+			sendFeedback(ignore.getTextMessage());
 		} catch (Exception e) {
 			FabLog.error("Failed to execute client command: "+command, e);
 			sendFeedback(new LiteralText("§c"+e));
@@ -118,7 +120,7 @@ public class FabricationClientCommands {
 		}
 		root.then(script);
 	}
-	public static void sendFeedback(LiteralText text) {
+	public static void sendFeedback(Text text) {
 		MinecraftClient.getInstance().inGameHud.addChatMessage(MessageType.SYSTEM, new LiteralText("§b[CLIENT]§r ").append(text), Util.NIL_UUID);
 	}
 
