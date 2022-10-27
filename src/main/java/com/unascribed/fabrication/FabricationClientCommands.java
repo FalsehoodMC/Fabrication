@@ -65,6 +65,7 @@ public class FabricationClientCommands {
 		try {
 			dispatcher.execute(command, MinecraftClient.getInstance().getNetworkHandler().getCommandSource());
 		} catch (CommandException ignore) {
+			sendFeedback(ignore.getTextMessage());
 		} catch (Exception e) {
 			FabLog.error("Failed to execute client command: "+command, e);
 			sendFeedback(Text.literal("§c"+e));
@@ -117,7 +118,7 @@ public class FabricationClientCommands {
 		}
 		root.then(script);
 	}
-	public static void sendFeedback(MutableText text) {
+	public static void sendFeedback(Text text) {
 		MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.literal("§b[CLIENT]§r ").append(text));
 	}
 
