@@ -21,10 +21,9 @@ import com.unascribed.fabrication.FeaturesFile.Sides;
 import com.unascribed.fabrication.interfaces.GetServerConfig;
 import com.unascribed.fabrication.support.ConfigValue;
 import com.unascribed.fabrication.support.ResolvedConfigValue;
-import io.github.queerbric.pride.PrideFlag;
-import io.github.queerbric.pride.PrideFlags;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -100,7 +99,7 @@ public class FabricationConfigScreen extends Screen {
 
 	private final Screen parent;
 
-	private final PrideFlag prideFlag;
+	private final PrideFlagRenderer prideFlag;
 
 	private float timeExisted;
 	private boolean leaving = false;
@@ -160,7 +159,7 @@ public class FabricationConfigScreen extends Screen {
 	public FabricationConfigScreen(Screen parent) {
 		super(new LiteralText(FabricationMod.MOD_NAME+" configuration"));
 		this.parent = parent;
-		prideFlag = PrideFlags.isPrideMonth() ? PrideFlags.getRandomFlag() : null;
+		prideFlag = OptionalPrideFlag.get();
 		for (String sec : FabConf.getAllSections()) {
 			SECTION_DESCRIPTIONS.put(sec, FeaturesFile.get(sec).desc);
 		}
@@ -307,7 +306,7 @@ public class FabricationConfigScreen extends Screen {
 		drawBackground(height, width, client, prideFlag, selectedSection == null ? 10-selectTime : prevSelectedSection == null ? selectTime : 0, matrices, mouseX, mouseY, delta, cutoffX, cutoffY);
 	}
 
-	public static void drawBackground(int height, int width, MinecraftClient client, PrideFlag prideFlag, float time, MatrixStack matrices, int mouseX, int mouseY, float delta, int cutoffX, int cutoffY) {
+	public static void drawBackground(int height, int width, MinecraftClient client, PrideFlagRenderer prideFlag, float time, MatrixStack matrices, int mouseX, int mouseY, float delta, int cutoffX, int cutoffY) {
 		float cutoffV = cutoffY/(float)height;
 		Identifier bg = FabConf.isEnabled("general.dark_mode") ? BG_DARK : BG;
 		Identifier bgGrad = FabConf.isEnabled("general.dark_mode") ? BG_GRAD_DARK : BG_GRAD;
@@ -701,7 +700,7 @@ public class FabricationConfigScreen extends Screen {
 			} else {
 				int srv = serverKnownConfigKeys.size();
 				int cli = FabConf.getAllKeys().size();
-				msg = "§dServer has Fabrication and is recognized.";
+				msg = "§dServer has "+FabricationMod.MOD_NAME+" and is recognized.";
 				if (srv != cli) {
 					msg += "\n§oMismatch: Server has "+srv+" options. Client has "+cli+".";
 					if (srv > cli) {
@@ -769,7 +768,7 @@ public class FabricationConfigScreen extends Screen {
 		int y = startY;
 		if (section == null) {
 			String v = getVersion();
-			String blurb = "§l"+FabricationMod.MOD_NAME+" v"+v+" §rby unascribed and SFort\n"+(configuringServer ? "(Local version: v"+EarlyAgnos.getModVersion()+")" : "")
+			String blurb = "§l"+FabricationMod.MOD_NAME+" v"+v+" §rby unascribed and SFort\nRunning under Minecraft "+SharedConstants.getGameVersion().getName()+"\n"+(configuringServer ? "(Local version: v"+ EarlyAgnos.getModVersion()+")" : "")
 					+ "\nClick a category on the left to change settings.";
 			int height = drawWrappedText(matrices, 140, 20, blurb, width-130, -1, false);
 			if (!configuringServer && drawButton(matrices, 140, 20+height+32, 120, 20, "Reload files", mouseX, mouseY)) {
@@ -1625,6 +1624,6 @@ public class FabricationConfigScreen extends Screen {
 
 	@FunctionalInterface
 	public interface FeatureSubmenu {
-		Screen construct(Screen parent, PrideFlag prideFlag, String title, String configKey);
+		Screen construct(Screen parent, PrideFlagRenderer prideFlag, String title, String configKey);
 	}
 }

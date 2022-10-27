@@ -11,6 +11,7 @@ import com.unascribed.fabrication.interfaces.SetFabricationConfigAware;
 import com.unascribed.fabrication.support.ConfigLoader;
 import com.unascribed.fabrication.support.ConfigValue;
 import com.unascribed.fabrication.support.Env;
+import com.unascribed.fabrication.support.FabricationDefaultResources;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.OptionalFScript;
@@ -20,11 +21,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import io.github.queerbric.pride.PrideClient;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketByteBuf;
@@ -93,7 +91,8 @@ public class FabricationMod implements ModInitializer {
 				throw new RuntimeException("Failed to initialize feature "+s, e);
 			}
 		}
-		if (EarlyAgnos.eventsAvailable() && EarlyAgnos.getCurrentEnv() == Env.CLIENT) {
+		if (EarlyAgnos.getCurrentEnv() == Env.CLIENT) {
+			FabricationClientCommands.registerCommands();
 			if (FabConf.getValue("*.long_levelup_sound_at_30") != ConfigValue.FALSE) {
 				LEVELUP_LONG = new SoundEvent(new Identifier("fabrication", "levelup_long"));
 			}
@@ -103,15 +102,9 @@ public class FabricationMod implements ModInitializer {
 			if (FabConf.getValue("*.alt_absorption_sound") != ConfigValue.FALSE) {
 				ABSORPTION_HURT = new SoundEvent(new Identifier("fabrication", "absorption_hurt"));
 			}
+			FabricationDefaultResources.apply();
 		}
-		if (EarlyAgnos.isForge() && EarlyAgnos.getCurrentEnv() == Env.CLIENT) {
-			initPrideLib();
-		}
-	}
 
-	@Environment(EnvType.CLIENT)
-	private void initPrideLib() {
-		new PrideClient().onInitializeClient();
 	}
 
 	public static void featureError(Feature f, Throwable t) {

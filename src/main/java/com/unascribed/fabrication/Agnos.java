@@ -1,21 +1,17 @@
 package com.unascribed.fabrication;
 
-import java.util.List;
-
 import com.mojang.brigadier.CommandDispatcher;
-
+import com.unascribed.fabrication.support.FabricationEvents;
+import com.unascribed.fabrication.support.FabricationEventsClient;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
+
+import java.util.List;
 
 /**
  * "Agnos" can mean many things. It's a given name, a shortening of "agnostic", Aromanian for "disgust",
@@ -41,27 +37,22 @@ public final class Agnos {
 	}
 
 	public static void runForCommandRegistration(CommandRegistrationCallback r) {
-		net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback.EVENT.register(r::register);
+		FabricationEvents.addCommand(r);
 	}
 
 	@Environment(EnvType.CLIENT)
 	public static void runForTooltipRender(TooltipRenderCallback r) {
-		ItemTooltipCallback.EVENT.register((stack, ctx, lines) -> r.render(stack, lines));
+		FabricationEventsClient.addTooltip(r);
 	}
 
 	@Environment(EnvType.CLIENT)
 	public static void runForHudRender(HudRenderCallback r) {
-		net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback.EVENT.register((ms, d) -> r.render(ms, d));
-	}
-
-	public static SoundEvent registerSoundEvent(Identifier id, SoundEvent soundEvent) {
-		return Registry.register(Registry.SOUND_EVENT, id, soundEvent);
+		FabricationEventsClient.addHud(r);
 	}
 
 	@Environment(EnvType.CLIENT)
-	public static KeyBinding registerKeyBinding(KeyBinding kb) {
-		KeyBindingHelper.registerKeyBinding(kb);
-		return kb;
+	public static void registerKeyBinding(KeyBinding kb) {
+		FabricationEventsClient.addKeybind(kb);
 	}
 
 }

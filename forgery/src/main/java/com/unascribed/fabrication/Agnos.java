@@ -2,28 +2,19 @@ package com.unascribed.fabrication;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.brigadier.CommandDispatcher;
-import net.minecraft.block.Block;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands.EnvironmentType;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tags.ITag;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
-import net.minecraftforge.common.ForgeTagHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
 
@@ -64,25 +55,8 @@ public final class Agnos {
 		});
 	}
 
-	public static SoundEvent registerSoundEvent(ResourceLocation id, SoundEvent soundEvent) {
-		FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(SoundEvent.class, (RegistryEvent.Register<SoundEvent> e) -> {
-			soundEvent.setRegistryName(id);
-			e.getRegistry().register(soundEvent);
-		});
-		return soundEvent;
-	}
-
-	public static ITag<Block> registerBlockTag(ResourceLocation id) {
-		return ForgeTagHandler.createOptionalTag(ForgeRegistries.BLOCKS, id);
-	}
-
-	public static ITag<Item> registerItemTag(ResourceLocation id) {
-		return ForgeTagHandler.createOptionalTag(ForgeRegistries.ITEMS, id);
-	}
-
 	@OnlyIn(Dist.CLIENT)
-	public static KeyBinding registerKeyBinding(KeyBinding kb) {
+	public static void registerKeyBinding(KeyBinding kb) {
 		ClientRegistry.registerKeyBinding(kb);
-		return kb;
 	}
 }

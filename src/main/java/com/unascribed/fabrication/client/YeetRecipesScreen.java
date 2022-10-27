@@ -2,7 +2,6 @@ package com.unascribed.fabrication.client;
 
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.loaders.LoaderYeetRecipes;
-import io.github.queerbric.pride.PrideFlag;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -27,12 +26,12 @@ public class YeetRecipesScreen extends Screen{
 	private TextFieldWidget searchField;
 	Pattern filter = Pattern.compile("");
 	Screen parent;
-	PrideFlag prideFlag;
+	PrideFlagRenderer prideFlag;
 	boolean didClick;
 	boolean didRClick;
 
 
-	public YeetRecipesScreen(Screen parent, PrideFlag prideFlag, String title, String configKey) {
+	public YeetRecipesScreen(Screen parent, PrideFlagRenderer prideFlag, String title, String configKey) {
 		super(new LiteralText("Fabrication Yeet Recipes"));
 		this.parent = parent;
 		this.prideFlag = prideFlag;

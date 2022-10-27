@@ -30,11 +30,7 @@
 
   "depends": {
     "fabricloader": ">=0.12.0",
-    "minecraft": ">=1.16",
-    "fabric-resource-loader-v0": "*",
-    "fabric-command-api-v1": "*",
-    "fabric-key-binding-api-v1": "*",
-    "fabric-rendering-v1": "*"
+    "minecraft": ">=1.16"
   },
   "suggests": {
   }

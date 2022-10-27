@@ -17,18 +17,19 @@ import com.unascribed.fabrication.client.AtlasTracking;
 import com.unascribed.fabrication.client.AtlasViewerScreen;
 import com.unascribed.fabrication.client.FabricationConfigScreen;
 import com.unascribed.fabrication.client.OptionalFScriptScreen;
+import com.unascribed.fabrication.client.OptionalPrideFlag;
 import com.unascribed.fabrication.features.FeatureFabricationCommand;
 import com.unascribed.fabrication.support.OptionalFScript;
-
-import io.github.queerbric.pride.PrideFlags;
-import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
+import net.minecraft.network.MessageType;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
 
 public class FabricationClientCommands {
 
@@ -56,12 +57,31 @@ public class FabricationClientCommands {
 			return Collections.singleton(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE.toString());
 		}
 	}
-
-	public static void registerCommands(CommandDispatcher<FabricClientCommandSource> dispatcher) {
-		LiteralArgumentBuilder<FabricClientCommandSource> root = LiteralArgumentBuilder.<FabricClientCommandSource>literal("fabrication:client");
+	private static final CommandDispatcher<CommandSource> dispatcher = new CommandDispatcher<>();
+	public static String rootCommand = "/"+FabricationMod.MOD_NAME_LOWER+":client";
+	public static void registerCommands() {
+		registerCommands(dispatcher);
+	}
+	public static boolean runCommand(String command) {
+		if (command.isEmpty() || !command.startsWith(rootCommand)) return false;
+		try {
+			dispatcher.execute(command.substring(1), MinecraftClient.getInstance().getNetworkHandler().getCommandSource());
+		} catch (CommandException ignore) {
+			sendFeedback(ignore.getTextMessage());
+		} catch (Exception e) {
+			FabLog.error("Failed to execute client command: "+command, e);
+			sendFeedback(new LiteralText("§c"+e));
+		}
+		return true;
+	}
+	public static<T extends CommandSource> void addSuggestions(CommandDispatcher<T> dispatcher) {
+		registerCommands(dispatcher);
+	}
+	private static<T extends CommandSource> void registerCommands(CommandDispatcher<T> dispatcher) {
+		LiteralArgumentBuilder<T> root = LiteralArgumentBuilder.<T>literal(rootCommand.substring(1));
 		if (EarlyAgnos.isModLoaded("fscript")) addFScript(root);
 		FeatureFabricationCommand.addConfig(root, false);
-		root.then(LiteralArgumentBuilder.<FabricClientCommandSource>literal("ui")
+		root.then(LiteralArgumentBuilder.<T>literal("ui")
 				.executes((c) -> {
 					MinecraftClient.getInstance().send(() -> {
 						MinecraftClient.getInstance().openScreen(new FabricationConfigScreen(null));
@@ -69,9 +89,9 @@ public class FabricationClientCommands {
 					return 1;
 				}));
 		if (!FabConf.isFailed("atlas_viewer")) {
-			root.then(LiteralArgumentBuilder.<FabricClientCommandSource>literal("atlas")
-					.then(LiteralArgumentBuilder.<FabricClientCommandSource>literal("view")
-							.then(RequiredArgumentBuilder.<FabricClientCommandSource, Identifier>argument("atlas", new AtlasArgumentType())
+			root.then(LiteralArgumentBuilder.<T>literal("atlas")
+					.then(LiteralArgumentBuilder.<T>literal("view")
+							.then(RequiredArgumentBuilder.<T, Identifier>argument("atlas", new AtlasArgumentType())
 									.executes((c) -> {
 										MinecraftClient.getInstance().send(() -> {
 											MinecraftClient.getInstance().openScreen(new AtlasViewerScreen(c.getArgument("atlas", Identifier.class)));
@@ -81,14 +101,14 @@ public class FabricationClientCommands {
 		}
 		dispatcher.register(root);
 	}
-	public static <T extends FabricClientCommandSource> void addFScript(LiteralArgumentBuilder<T> root) {
+	public static <T extends CommandSource> void addFScript(LiteralArgumentBuilder<T> root) {
 		LiteralArgumentBuilder<T> script = LiteralArgumentBuilder.<T>literal("fscript");
 		{
 			LiteralArgumentBuilder<T> ui = LiteralArgumentBuilder.<T>literal("ui");
 			for (String s : OptionalFScript.predicateProviders.keySet()) {
 				LiteralArgumentBuilder<T> key = LiteralArgumentBuilder.<T>literal(s).executes((c) -> {
 					MinecraftClient.getInstance().send(() -> {
-						MinecraftClient.getInstance().openScreen(OptionalFScriptScreen.construct(null, PrideFlags.isPrideMonth() ? PrideFlags.getRandomFlag() : null, FeaturesFile.get(s).name, s));
+						MinecraftClient.getInstance().openScreen(OptionalFScriptScreen.construct(null, OptionalPrideFlag.get(), FeaturesFile.get(s).name, s));
 					});
 					return 1;
 				});
@@ -100,8 +120,8 @@ public class FabricationClientCommands {
 		}
 		root.then(script);
 	}
-	public static void sendFeedback(CommandContext<? extends CommandSource> c, LiteralText text) {
-		((FabricClientCommandSource)c.getSource()).sendFeedback(new LiteralText("§b[CLIENT]§r ").append(text));
+	public static void sendFeedback(Text text) {
+		MinecraftClient.getInstance().inGameHud.addChatMessage(MessageType.SYSTEM, new LiteralText("§b[CLIENT]§r ").append(text), Util.NIL_UUID);
 	}
 
 }

@@ -2,7 +2,6 @@ package com.unascribed.fabrication.client;
 
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.features.FeatureTaggablePlayers;
-import io.github.queerbric.pride.PrideFlag;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -24,11 +23,11 @@ public class TaggablePlayersScreen extends Screen{
 	private TextFieldWidget searchField;
 	Pattern filter = Pattern.compile("");
 	Screen parent;
-	PrideFlag prideFlag;
+	PrideFlagRenderer prideFlag;
 	boolean didClick;
 
 
-	public TaggablePlayersScreen(Screen parent, PrideFlag prideFlag, String title, String configKey) {
+	public TaggablePlayersScreen(Screen parent, PrideFlagRenderer prideFlag, String title, String configKey) {
 		super(new LiteralText("Fabrication Taggable Players"));
 		this.parent = parent;
 		this.prideFlag = prideFlag;
