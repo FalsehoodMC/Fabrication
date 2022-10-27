@@ -13,10 +13,6 @@ import java.nio.file.Path;
 // Forge implementation of Agnos. For linguistic and philosophical waffling, see the Fabric version.
 public final class EarlyAgnos {
 
-	public static boolean eventsAvailable() {
-		return true;
-	}
-
 	public static Path getConfigDir() {
 		return FMLPaths.CONFIGDIR.get();
 	}
@@ -43,5 +39,4 @@ public final class EarlyAgnos {
 	public static String getLoaderVersion() {
 		return ForgeVersion.getVersion();
 	}
-
 }

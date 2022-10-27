@@ -1,15 +1,14 @@
 package com.unascribed.fabrication;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.unascribed.fabrication.support.FabricationEvents;
+import com.unascribed.fabrication.support.FabricationEventsClient;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
@@ -39,23 +38,22 @@ public final class Agnos {
 	}
 
 	public static void runForCommandRegistration(CommandRegistrationCallback r) {
-		net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback.EVENT.register((d, reg, side) -> r.register(d, reg, side == CommandManager.RegistrationEnvironment.DEDICATED));
+		FabricationEvents.addCommand(r);
 	}
 
 	@Environment(EnvType.CLIENT)
 	public static void runForTooltipRender(TooltipRenderCallback r) {
-		ItemTooltipCallback.EVENT.register((stack, ctx, lines) -> r.render(stack, lines));
+		FabricationEventsClient.addTooltip(r);
 	}
 
 	@Environment(EnvType.CLIENT)
 	public static void runForHudRender(HudRenderCallback r) {
-		net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback.EVENT.register(r::render);
+		FabricationEventsClient.addHud(r);
 	}
 
 	@Environment(EnvType.CLIENT)
-	public static KeyBinding registerKeyBinding(KeyBinding kb) {
-		KeyBindingHelper.registerKeyBinding(kb);
-		return kb;
+	public static void registerKeyBinding(KeyBinding kb) {
+		FabricationEventsClient.addKeybind(kb);
 	}
 
 }

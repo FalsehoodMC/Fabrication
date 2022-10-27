@@ -1,7 +1,6 @@
 package com.unascribed.fabrication.client;
 
 import com.unascribed.fabrication.loaders.LoaderClassicBlockDrops;
-import io.github.queerbric.pride.PrideFlag;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -29,12 +28,12 @@ public class ClassicBlockDropsScreen extends Screen{
 	private TextFieldWidget searchField;
 	Pattern filter = Pattern.compile("");
 	Screen parent;
-	PrideFlag prideFlag;
+	PrideFlagRenderer prideFlag;
 	boolean didClick;
 	boolean didRClick;
 
 
-	public ClassicBlockDropsScreen(Screen parent, PrideFlag prideFlag, String title, String configKey) {
+	public ClassicBlockDropsScreen(Screen parent, PrideFlagRenderer prideFlag, String title, String configKey) {
 		super(Text.literal("Fabrication Yeet Recipes"));
 		this.parent = parent;
 		this.prideFlag = prideFlag;

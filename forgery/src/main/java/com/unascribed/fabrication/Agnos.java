@@ -53,10 +53,9 @@ public final class Agnos {
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public static KeyMapping registerKeyBinding(KeyMapping kb) {
+	public static void registerKeyBinding(KeyMapping kb) {
 		MinecraftForge.EVENT_BUS.addListener((RegisterKeyMappingsEvent event) -> {
 			event.register(kb);
 		});
-		return kb;
 	}
 }

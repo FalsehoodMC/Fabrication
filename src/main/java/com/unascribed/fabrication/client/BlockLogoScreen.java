@@ -6,7 +6,6 @@ import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.loaders.LoaderBlockLogo;
 import com.unascribed.fabrication.util.BlockLogoRenderer;
-import io.github.queerbric.pride.PrideFlag;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.Blocks;
@@ -42,12 +41,12 @@ public class BlockLogoScreen extends Screen{
 	Pattern filter = Pattern.compile("");
 	boolean canFilter = false;
 	Screen parent;
-	PrideFlag prideFlag;
+	PrideFlagRenderer prideFlag;
 	boolean didClick;
 	boolean didRClick;
 
 
-	public BlockLogoScreen(Screen parent, PrideFlag prideFlag, String title, String configKey) {
+	public BlockLogoScreen(Screen parent, PrideFlagRenderer prideFlag, String title, String configKey) {
 		super(Text.literal("Fabrication Block Logo"));
 		this.parent = parent;
 		this.prideFlag = prideFlag;

@@ -5,7 +5,6 @@ import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.loaders.LoaderFScript;
 import com.unascribed.fabrication.support.OptionalFScript;
-import io.github.queerbric.pride.PrideFlag;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.sound.PositionedSoundInstance;
@@ -27,11 +26,11 @@ public class FScriptScreen extends ScriptingScreen {
 	String fabrication$key;
 	String fabrication$err;
 	int fabrication$errBlink = 0;
-	PrideFlag fabrication$prideFlag;
+	PrideFlagRenderer fabrication$prideFlag;
 	boolean fabrication$writeLocal = true;
 	boolean fabrication$requestedScript = false;
 
-	public FScriptScreen(Screen parent, PrideFlag prideFlag, String title, String configKey) {
+	public FScriptScreen(Screen parent, PrideFlagRenderer prideFlag, String title, String configKey) {
 		super(Text.literal("Fabrication Scripting"), parent, new Script(
 				"§bFabrication - " + title,
 				OptionalFScript.predicateProviders.get(configKey) instanceof Help ? (Help)OptionalFScript.predicateProviders.get(configKey) : default_embed.get(FeaturesFile.get(configKey).fscript),

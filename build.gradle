@@ -85,20 +85,15 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	modImplementation fabricApi.module('fabric-api-base', project.fabric_version)
+
+	//Required by pridelib/modmenu
 	modImplementation fabricApi.module('fabric-resource-loader-v0', project.fabric_version)
-	modImplementation fabricApi.module('fabric-command-api-v2', project.fabric_version)
-	modImplementation fabricApi.module('fabric-item-api-v1', project.fabric_version)
-	modImplementation fabricApi.module('fabric-key-binding-api-v1', project.fabric_version)
-	modImplementation fabricApi.module('fabric-rendering-v1', project.fabric_version)
-	// TODO I would really like to not dep on these two
-	modImplementation fabricApi.module('fabric-registry-sync-v0', project.fabric_version)
-	modImplementation fabricApi.module('fabric-networking-api-v1', project.fabric_version)
-	
-	modImplementation(include('io.github.queerbric:pridelib:1.1.2+1.19')) {
+	modImplementation('io.github.queerbric:pridelib:1.1.2+1.19') {
 		transitive = false
 	}
 	//ModMenu dep
 	modImplementation fabricApi.module('fabric-lifecycle-events-v1', project.fabric_version)
+	modImplementation fabricApi.module('fabric-key-binding-api-v1', project.fabric_version)
 	modImplementation('com.terraformersmc:modmenu:4.0.6') {
 		transitive = false
 	}
