@@ -319,6 +319,13 @@ public class FabInjector {
 					mod.add(new VarInsnNode(getLoadOpcode(targetType.getReturnType().getSort()), methodNode.maxLocals));
 					methodNode.maxLocals += 1;
 				}
+				if (isRedirect && !argTypes.isEmpty() && argTypes.get(0) == Type.VOID_TYPE) {
+					if (newVars.size() > 0) {
+						newVars.remove(newVars.getFirst());
+					} else if (oldVars.size() > 0) {
+						oldVars.remove(oldVars.getFirst());
+					}
+				}
 				for (AbstractInsnNode a : newVars) {
 					if (countDesc-->0) mod.add(a.clone(new HashMap<>()));
 				}
@@ -365,7 +372,7 @@ public class FabInjector {
 				Type argType = argTypes.get(i);
 				int opcode = getLoadOpcode(argType.getSort());
 				mod.add(new VarInsnNode(opcode, --max));
-				if (!(i==0 && isRedirect && !toInjectIsStatic) && countDesc-->0)
+				if (!(i==0 && argTypes.get(0) == Type.VOID_TYPE && isRedirect) && countDesc-->0)
 					methodNode.instructions.insertBefore(insn, new VarInsnNode(opcode, max));
 			}
 			for (int c = toInjectIsStatic ? 0 : 1; c < countDesc; c++) {
