@@ -111,7 +111,7 @@ dependencies {
 loom.accessWidenerPath = file('src/main/resources/fabrication.accesswidener')
 
 task fabGenFeatures {
-	JsonObject json = new FeaturesFileParser(project.version, logger, Arrays.asList(file('features.yml').text.split('\\r?\\n')), 'features.yml').toJson()
+	JsonObject json = new FeaturesFileParser(project, logger, Arrays.asList(file('features.yml').text.split('\\r?\\n')), 'features.yml').toJson()
 	file('src/main/resources/features.json').text = json.toString()
 	file('src/main/resources/default_features_config.ini').text = FeatureConfigTransformer.transform(Arrays.asList(file('src/main/resources/default_features_config.ini.tmpl').text.split('\\r?\\n')), json)
 }
@@ -235,20 +235,20 @@ class FeaturesFileParser{
 	List<JsonObject> data = new LinkedList<>()
 	String projectVersion
 
-	FeaturesFileParser(String projectVersion, Logger logger, List<String> text, String file) {
-		this.projectVersion = projectVersion
+	FeaturesFileParser(Project project, Logger logger, List<String> text, String file) {
+		this.projectVersion = project.version
 		for (String line : text){
 			lineNum++
 			if (line.indexOf('@') == 0) {
 				String[] split = line.split(" ")
 				switch (split[0]) {
 					case "@include":
-						File f = new File(split[1])
+						File f = project.file(split[1])
 						if (f.isFile()) {
-							data.addAll(new FeaturesFileParser(projectVersion, logger, Files.readAllLines(f.toPath()), split[1]).data)
+							data.addAll(new FeaturesFileParser(project, logger, Files.readAllLines(f.toPath()), split[1]).data)
 						} else if (f.isDirectory()) {
 							for (File fi : f.listFiles()) {
-								data.addAll(new FeaturesFileParser(projectVersion, logger, Files.readAllLines(fi.toPath()), fi.toString()).data)
+								data.addAll(new FeaturesFileParser(project, logger, Files.readAllLines(fi.toPath()), fi.toString()).data)
 							}
 						}
 						break
