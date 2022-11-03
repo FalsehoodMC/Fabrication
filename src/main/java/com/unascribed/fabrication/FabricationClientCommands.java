@@ -15,6 +15,7 @@ import com.unascribed.fabrication.client.FabricationConfigScreen;
 import com.unascribed.fabrication.client.OptionalFScriptScreen;
 import com.unascribed.fabrication.client.OptionalPrideFlag;
 import com.unascribed.fabrication.features.FeatureFabricationCommand;
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.OptionalFScript;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.SpriteAtlasTexture;
@@ -58,7 +59,7 @@ public class FabricationClientCommands {
 		}
 	}
 	private static final CommandDispatcher<CommandSource> dispatcher = new CommandDispatcher<>();
-	public static String rootCommand = "/"+FabricationMod.MOD_NAME_LOWER+":client";
+	public static String rootCommand = "/"+ MixinConfigPlugin.MOD_NAME_LOWER+":client";
 	public static void registerCommands() {
 		registerCommands(dispatcher);
 	}
