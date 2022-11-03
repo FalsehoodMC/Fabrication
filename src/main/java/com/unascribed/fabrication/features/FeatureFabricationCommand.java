@@ -31,6 +31,7 @@ import com.unascribed.fabrication.FeaturesFile.Sides;
 import com.unascribed.fabrication.interfaces.TaggablePlayer;
 import com.unascribed.fabrication.loaders.LoaderFScript;
 import com.unascribed.fabrication.support.Feature;
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.OptionalFScript;
 import com.unascribed.fabrication.util.Cardinal;
 
@@ -76,7 +77,7 @@ public class FeatureFabricationCommand implements Feature {
 	public void apply() {
 		Agnos.runForCommandRegistration((dispatcher, registryAccess, dedi) -> {
 			try {
-				LiteralArgumentBuilder<ServerCommandSource> root = LiteralArgumentBuilder.<ServerCommandSource>literal(FabricationMod.MOD_NAME_LOWER);
+				LiteralArgumentBuilder<ServerCommandSource> root = LiteralArgumentBuilder.<ServerCommandSource>literal(MixinConfigPlugin.MOD_NAME_LOWER);
 				addConfig(root, dedi);
 				if (EarlyAgnos.isModLoaded("fscript")) addFScript(root, dedi);
 
@@ -243,7 +244,7 @@ public class FeatureFabricationCommand implements Feature {
 		} else {
 			biomes = null;
 		}
-		String name = FabricationMod.MOD_NAME_LOWER+"_block_distribution_"+System.currentTimeMillis()+".tsv";
+		String name = MixinConfigPlugin.MOD_NAME_LOWER+"_block_distribution_"+System.currentTimeMillis()+".tsv";
 		c.getSource().sendFeedback(Text.literal("Starting background block distribution analysis"), false);
 		c.getSource().sendFeedback(Text.literal("This could take a while, but the server should remain usable"), false);
 		c.getSource().sendFeedback(Text.literal("Once complete a file named "+name+" will appear in the server directory"), false);
@@ -332,7 +333,7 @@ public class FeatureFabricationCommand implements Feature {
 				i++;
 			}
 			FabLog.info("Scanned "+scanned+"/"+goal+" blocks (skipped "+skipped+"), 100% done. Writing file");
-			FabLog.info("NOTE: "+FabricationMod.MOD_NAME+" block distribution analysis is NOT A BENCHMARK. Chunk generation speed is intentionally limited to keep servers responsive and not crashing.");
+			FabLog.info("NOTE: "+ MixinConfigPlugin.MOD_NAME+" block distribution analysis is NOT A BENCHMARK. Chunk generation speed is intentionally limited to keep servers responsive and not crashing.");
 			List<Map.Entry<BlockState, MutableLong>> sorted = Lists.newArrayList(counts.entrySet());
 			sorted.sort((a, b) -> Long.compare(b.getValue().value, a.getValue().value));
 			try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(new File(name)), Charsets.UTF_8)) {
@@ -364,7 +365,7 @@ public class FeatureFabricationCommand implements Feature {
 			} catch (IOException e) {
 				FabLog.error("Failed to save block distribution data", e);
 			}
-		}, FabricationMod.MOD_NAME+" block analysis").start();
+		}, MixinConfigPlugin.MOD_NAME+" block analysis").start();
 		return 1;
 	}
 
@@ -473,7 +474,7 @@ public class FeatureFabricationCommand implements Feature {
 						if (c.getSource() instanceof ServerCommandSource) {
 							FabricationMod.sendConfigUpdate(((ServerCommandSource)c.getSource()).getServer(), null);
 						}
-						sendFeedback(c, Text.literal(FabricationMod.MOD_NAME+" configuration reloaded"), true);
+						sendFeedback(c, Text.literal(MixinConfigPlugin.MOD_NAME+" configuration reloaded"), true);
 						sendFeedback(c, Text.literal("§eYou may need to restart the game for the changes to take effect."), false);
 						return 1;
 					})

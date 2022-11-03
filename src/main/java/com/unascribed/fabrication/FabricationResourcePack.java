@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.io.Resources;
 
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.resource.ResourcePack;
@@ -96,7 +97,7 @@ public class FabricationResourcePack implements ResourcePack {
 
 	@Override
 	public String getName() {
-		return FabricationMod.MOD_NAME;
+		return MixinConfigPlugin.MOD_NAME;
 	}
 
 	@Override
