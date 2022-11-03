@@ -11,7 +11,6 @@ import com.google.common.reflect.ClassPath;
 import com.unascribed.fabrication.EarlyAgnos;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.FabLog;
-import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.support.injection.FabModifyConstInjectionInfo;
 import com.unascribed.fabrication.support.injection.FabRefMap;
 import com.unascribed.fabrication.support.injection.FailsoftCallbackInjectionInfo;
@@ -55,6 +54,9 @@ import java.util.stream.Collectors;
 
 public class MixinConfigPlugin implements IMixinConfigPlugin {
 
+	public static final String MOD_NAME = EarlyAgnos.isForge() ? "Forgery" : "Fabrication";
+	// NOT the modid. We keep the mod id as "fabrication" even on Forge to keep things from getting too nutty.
+	public static final String MOD_NAME_LOWER = EarlyAgnos.isForge() ? "forgery" : "fabrication";
 	private static final SetMultimap<String, String> configKeysForDiscoveredClasses = HashMultimap.create();
 	private static final Set<String> brokenInForge = Set.of(
 			"*.books_show_enchants",
@@ -86,7 +88,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	@Override
 	public void onLoad(String mixinPackage) {
 		{
-			Path target = EarlyAgnos.getConfigDir().resolve(FabricationMod.MOD_NAME_LOWER);
+			Path target = EarlyAgnos.getConfigDir().resolve(MOD_NAME_LOWER);
 			Path source = EarlyAgnos.getConfigDir().resolve(EarlyAgnos.isForge() ? "fabrication" : "forgery");
 			if (!Files.exists(target) && Files.exists(source)) {
 				try {

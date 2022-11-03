@@ -7,13 +7,13 @@ import java.util.function.Supplier;
 import com.unascribed.fabrication.EarlyAgnos;
 import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.FabRefl;
-import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.FabricationResourcePack;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Feature;
 
 import com.google.common.collect.Sets;
 
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -57,8 +57,8 @@ public abstract class ResourcePackFeature implements Feature, ResourcePackProvid
 	public void register(Consumer<ResourcePackProfile> consumer, Factory factory) {
 		if (active) {
 			Supplier<ResourcePack> f = () -> new FabricationResourcePack(path);
-			consumer.accept(factory.create(FabricationMod.MOD_NAME+" "+path, new LiteralText("Internal "+FabricationMod.MOD_NAME+" resources"),true, f,
-					new PackResourceMetadata(new LiteralText("Internal "+FabricationMod.MOD_NAME+" resources"), 7),
+			consumer.accept(factory.create(MixinConfigPlugin.MOD_NAME+" "+path, new LiteralText("Internal "+ MixinConfigPlugin.MOD_NAME+" resources"),true, f,
+					new PackResourceMetadata(new LiteralText("Internal "+ MixinConfigPlugin.MOD_NAME+" resources"), 7),
 					InsertionPosition.TOP, ResourcePackSource.PACK_SOURCE_BUILTIN));
 		}
 	}

@@ -17,6 +17,7 @@ import com.unascribed.fabrication.QDIni.SyntaxErrorException;
 import com.unascribed.fabrication.support.ConfigLoader;
 import com.unascribed.fabrication.support.ConfigValue;
 import com.unascribed.fabrication.support.Env;
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.ResolvedConfigValue;
 import com.unascribed.fabrication.support.SpecialEligibility;
 import net.fabricmc.api.EnvType;
@@ -216,7 +217,7 @@ public class FabConf {
 			worldConfig.clear();
 			worldDefaults = ImmutableMap.of();
 		} else if (onLoad) {
-			Path target = path.resolve(FabricationMod.MOD_NAME_LOWER);
+			Path target = path.resolve(MixinConfigPlugin.MOD_NAME_LOWER);
 			Path source = path.resolve(EarlyAgnos.isForge() ? "fabrication" : "forgery");
 			if (!Files.exists(target) && Files.exists(source)) {
 				try {
@@ -428,11 +429,11 @@ public class FabConf {
 			FabLog.error("worldSet was called while path was null");
 			return;
 		}
-		set(configKey, newValue, worldPath.resolve(FabricationMod.MOD_NAME_LOWER).resolve("features.ini"), true);
+		set(configKey, newValue, worldPath.resolve(MixinConfigPlugin.MOD_NAME_LOWER).resolve("features.ini"), true);
 	}
 
 	public static void set(String configKey, String newValue) {
-		set(configKey, newValue, EarlyAgnos.getConfigDir().resolve(FabricationMod.MOD_NAME_LOWER).resolve("features.ini"), false);
+		set(configKey, newValue, EarlyAgnos.getConfigDir().resolve(MixinConfigPlugin.MOD_NAME_LOWER).resolve("features.ini"), false);
 	}
 
 	private static void write(String configKey, String newValue, Path configFile){
@@ -488,7 +489,7 @@ public class FabConf {
 	}
 	public static void reload() {
 		FabLog.info("Reloading configs...");
-		Path dir = EarlyAgnos.getConfigDir().resolve(FabricationMod.MOD_NAME_LOWER);
+		Path dir = EarlyAgnos.getConfigDir().resolve(MixinConfigPlugin.MOD_NAME_LOWER);
 		try {
 			Files.createDirectories(dir);
 		} catch (IOException e1) {
@@ -529,7 +530,7 @@ public class FabConf {
 
 	public static void worldReload() {
 		if (worldPath == null) return;
-		Path dir = worldPath.resolve(FabricationMod.MOD_NAME_LOWER);
+		Path dir = worldPath.resolve(MixinConfigPlugin.MOD_NAME_LOWER);
 		try {
 			Files.createDirectories(dir);
 		} catch (IOException e1) {
@@ -569,7 +570,7 @@ public class FabConf {
 
 	private static void load(ConfigLoader ldr) {
 		String name = ldr.getConfigName();
-		Path dir = EarlyAgnos.getConfigDir().resolve(FabricationMod.MOD_NAME_LOWER);
+		Path dir = EarlyAgnos.getConfigDir().resolve(MixinConfigPlugin.MOD_NAME_LOWER);
 		Path file = dir.resolve(name+".ini");
 		checkForAndSaveDefaultsOrUpgrade(file, "default_"+name+"_config.ini");
 		FabLog.timeAndCountWarnings("Loading of "+name+".ini", () -> {

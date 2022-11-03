@@ -20,6 +20,7 @@ import com.unascribed.fabrication.FeaturesFile.FeatureEntry;
 import com.unascribed.fabrication.FeaturesFile.Sides;
 import com.unascribed.fabrication.interfaces.GetServerConfig;
 import com.unascribed.fabrication.support.ConfigValue;
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.ResolvedConfigValue;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.loader.api.FabricLoader;
@@ -156,7 +157,7 @@ public class FabricationConfigScreen extends Screen {
 
 
 	public FabricationConfigScreen(Screen parent) {
-		super(new LiteralText(FabricationMod.MOD_NAME+" configuration"));
+		super(new LiteralText(MixinConfigPlugin.MOD_NAME+" configuration"));
 		this.parent = parent;
 		prideFlag = OptionalPrideFlag.get();
 		for (String sec : FabConf.getAllSections()) {
@@ -209,16 +210,16 @@ public class FabricationConfigScreen extends Screen {
 			isSingleplayer = true;
 		} else {
 			CommandDispatcher<?> disp = client.player.networkHandler.getCommandDispatcher();
-			if (disp.getRoot().getChild(FabricationMod.MOD_NAME_LOWER) == null) {
-				whyCantConfigureServer = "This server doesn't have "+FabricationMod.MOD_NAME+".";
+			if (disp.getRoot().getChild(MixinConfigPlugin.MOD_NAME_LOWER) == null) {
+				whyCantConfigureServer = "This server doesn't have "+ MixinConfigPlugin.MOD_NAME+".";
 			} else {
 				ClientPlayNetworkHandler cpnh = client.getNetworkHandler();
 				if (cpnh instanceof GetServerConfig) {
 					GetServerConfig gsc = (GetServerConfig) cpnh;
 					if (!gsc.fabrication$hasHandshook()) {
-						whyCantConfigureServer = "This server's version of "+FabricationMod.MOD_NAME+" is too old.";
+						whyCantConfigureServer = "This server's version of "+ MixinConfigPlugin.MOD_NAME+" is too old.";
 					} else {
-						serverReadOnly = (disp.getRoot().getChild(FabricationMod.MOD_NAME_LOWER).getChild("config") == null);
+						serverReadOnly = (disp.getRoot().getChild(MixinConfigPlugin.MOD_NAME_LOWER).getChild("config") == null);
 						serverKnownConfigKeys.clear();
 						serverKnownConfigKeys.addAll(gsc.fabrication$getServerTrileanConfig().keySet());
 						serverKnownConfigKeys.addAll(gsc.fabrication$getServerStringConfig().keySet());
@@ -709,7 +710,7 @@ public class FabricationConfigScreen extends Screen {
 			} else {
 				int srv = serverKnownConfigKeys.size();
 				int cli = FabConf.getAllKeys().size();
-				msg = "§dServer has "+FabricationMod.MOD_NAME+" and is recognized.";
+				msg = "§dServer has "+ MixinConfigPlugin.MOD_NAME+" and is recognized.";
 				if (srv != cli) {
 					msg += "\n§oMismatch: Server has "+srv+" options. Client has "+cli+".";
 					if (srv > cli) {
@@ -777,7 +778,7 @@ public class FabricationConfigScreen extends Screen {
 		int y = startY;
 		if (section == null) {
 			String v = getVersion();
-			String blurb = "§l"+FabricationMod.MOD_NAME+" v"+v+" §rby unascribed and SFort\nRunning under Minecraft "+SharedConstants.getGameVersion().getName()+"\n"+(configuringServer ? "(Local version: v"+ EarlyAgnos.getModVersion()+")" : "")
+			String blurb = "§l"+ MixinConfigPlugin.MOD_NAME+" v"+v+" §rby unascribed and SFort\nRunning under Minecraft "+SharedConstants.getGameVersion().getName()+"\n"+(configuringServer ? "(Local version: v"+ EarlyAgnos.getModVersion()+")" : "")
 					+ "\nClick a category on the left to change settings.";
 			int height = drawWrappedText(matrices, 140, 20, blurb, width-130, -1, false);
 			if (!configuringServer && drawButton(matrices, 140, 20+height+32, 120, 20, "Reload files", mouseX, mouseY)) {
