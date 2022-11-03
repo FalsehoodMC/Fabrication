@@ -42,10 +42,6 @@ import net.minecraft.world.World;
 
 public class FabricationMod implements ModInitializer {
 
-	public static final String MOD_NAME = EarlyAgnos.isForge() ? "Forgery" : "Fabrication";
-	// NOT the modid. We keep the mod id as "fabrication" even on Forge to keep things from getting too nutty.
-	public static final String MOD_NAME_LOWER = EarlyAgnos.isForge() ? "forgery" : "fabrication";
-
 	private static final Map<String, Feature> features = Maps.newHashMap();
 	private static final List<Feature> unconfigurableFeatures = Lists.newArrayList();
 	private static final Set<String> enabledFeatures = Sets.newHashSet();

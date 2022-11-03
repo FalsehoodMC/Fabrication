@@ -3,7 +3,6 @@ package com.unascribed.fabrication.support;
 import com.google.common.collect.Sets;
 import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.FabRefl;
-import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.FabricationResourcePack;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.resource.ResourcePack;
@@ -34,8 +33,8 @@ public class FabricationDefaultResources implements ResourcePackProvider {
 	@Override
 	public void register(Consumer<ResourcePackProfile> consumer, Factory factory) {
 		Supplier<ResourcePack> f = () -> new FabricationResourcePack("default");
-		consumer.accept(factory.create(FabricationMod.MOD_NAME, true, f, f.get(),
-				new PackResourceMetadata(new LiteralText("Internal "+FabricationMod.MOD_NAME+" resources"), 6),
+		consumer.accept(factory.create(MixinConfigPlugin.MOD_NAME, true, f, f.get(),
+				new PackResourceMetadata(new LiteralText("Internal "+MixinConfigPlugin.MOD_NAME+" resources"), 6),
 				InsertionPosition.TOP, ResourcePackSource.PACK_SOURCE_BUILTIN));
 	}
 
