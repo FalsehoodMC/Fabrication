@@ -89,15 +89,9 @@ public class FabricationMod implements ModInitializer {
 		}
 		if (EarlyAgnos.getCurrentEnv() == Env.CLIENT) {
 			FabricationClientCommands.registerCommands();
-			if (FabConf.getValue("*.long_levelup_sound_at_30") != ConfigValue.FALSE) {
-				LEVELUP_LONG = new SoundEvent(new Identifier("fabrication", "levelup_long"));
-			}
-			if (FabConf.getValue("*.oof") != ConfigValue.FALSE) {
-				OOF = new SoundEvent(new Identifier("fabrication", "oof"));
-			}
-			if (FabConf.getValue("*.alt_absorption_sound") != ConfigValue.FALSE) {
-				ABSORPTION_HURT = new SoundEvent(new Identifier("fabrication", "absorption_hurt"));
-			}
+			LEVELUP_LONG = new SoundEvent(new Identifier("fabrication", "levelup_long"));
+			OOF = new SoundEvent(new Identifier("fabrication", "oof"));
+			ABSORPTION_HURT = new SoundEvent(new Identifier("fabrication", "absorption_hurt"));
 			FabricationDefaultResources.apply();
 		}
 
