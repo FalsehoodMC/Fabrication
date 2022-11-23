@@ -36,7 +36,7 @@ public abstract class MixinCreeperEntity extends HostileEntity {
 				spe -> fabrication$scaresCreepersPredicate.test((PlayerEntity)spe), 8, 1, 2,
 				EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR::test);
 		TargetPredicate withinRangePredicate = FabRefl.getWithinRangePredicate(goal);
-		withinRangePredicate.includeHidden();
+		withinRangePredicate.ignoreEntityTargetRules();
 		goalSelector.add(3, goal);
 	}
 
