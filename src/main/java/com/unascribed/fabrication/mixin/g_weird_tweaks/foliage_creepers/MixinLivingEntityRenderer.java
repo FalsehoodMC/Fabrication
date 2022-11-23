@@ -1,7 +1,6 @@
 package com.unascribed.fabrication.mixin.g_weird_tweaks.foliage_creepers;
 
 import com.unascribed.fabrication.FabConf;
-import com.unascribed.fabrication.interfaces.Grayscalable;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.injection.FabInject;
@@ -23,6 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @EligibleIf(configAvailable="*.foliage_creepers", envMatches=Env.CLIENT)
 public abstract class MixinLivingEntityRenderer extends EntityRenderer<LivingEntity> {
 
+	private static final Identifier fabrication$creeperTexture = new Identifier("textures/entity/creeper/creeper.png");
 	int fabrication$colorFoliageCreeper = -1;
 
 	protected MixinLivingEntityRenderer(EntityRendererFactory.Context ctx) {
@@ -31,7 +31,7 @@ public abstract class MixinLivingEntityRenderer extends EntityRenderer<LivingEnt
 
 	@FabInject(at=@At("HEAD"), method="render(Lnet/minecraft/entity/LivingEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")
 	public void captureEntity(LivingEntity livingEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci){
-		if (FabConf.isEnabled("*.foliage_creepers") && this.getTexture(livingEntity) instanceof Grayscalable) {
+		if (FabConf.isEnabled("*.foliage_creepers") && fabrication$creeperTexture.equals(this.getTexture(livingEntity))) {
 			fabrication$colorFoliageCreeper = livingEntity.world.getColor(livingEntity.getBlockPos(), BiomeColors.FOLIAGE_COLOR);
 		} else if (fabrication$colorFoliageCreeper != -1) {
 			fabrication$colorFoliageCreeper = -1;
@@ -59,8 +59,8 @@ public abstract class MixinLivingEntityRenderer extends EntityRenderer<LivingEnt
 
 	@FabModifyVariable(at=@At("STORE"), method="getRenderLayer(Lnet/minecraft/entity/LivingEntity;ZZZ)Lnet/minecraft/client/render/RenderLayer;")
 	public Identifier transformCreeperIdentifier(Identifier id){
-		if (FabConf.isEnabled("*.foliage_creepers") && id instanceof Grayscalable) {
-			((Grayscalable)id).fabrication$markGrayscale();
+		if (FabConf.isEnabled("*.foliage_creepers") && fabrication$creeperTexture.equals(id)) {
+			return new Identifier("fabrication_grayscale", id.getPath());
 		}
 		return id;
 	}
