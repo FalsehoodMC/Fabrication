@@ -31,7 +31,7 @@ public abstract class ResourcePackFeature implements Feature, ResourcePackProvid
 	private final String configKey;
 	private final String path;
 
-	private boolean active = false;
+	public boolean active = false;
 
 	public ResourcePackFeature(String path) {
 		this.configKey = "*."+path;
@@ -49,6 +49,7 @@ public abstract class ResourcePackFeature implements Feature, ResourcePackProvid
 		} catch (UnsupportedOperationException e) {
 			FabLog.info("Injecting mutable resource pack provider set, as no-one else has yet.");
 			providers = Sets.newHashSet(providers);
+			providers.add(this);
 			FabRefl.setProviders(MinecraftClient.getInstance().getResourcePackManager(), providers);
 		}
 	}
