@@ -108,6 +108,18 @@ public class FabRefl {
 	}
 
 	@FabReflField
+	private static final String tp_set_attackable_field = "net/minecraft/entity/ai/TargetPredicate;attackable";
+	private static final MethodHandle tp_set_attackable = unreflectSetter("TargetPredicate", () -> TargetPredicate.class, tp_set_attackable_field)
+			.requiredBy("*.taggable_players").get();
+	public static void setAttackable(TargetPredicate subject, boolean value) {
+		try {
+			checkHandle(tp_set_attackable).invokeExact(subject, value);
+		} catch (Throwable t) {
+			throw rethrow(t);
+		}
+	}
+
+	@FabReflField
 	private static final String es_basePredicate_field = "net/minecraft/command/EntitySelector;basePredicate";
 	private static final MethodHandle es_basePredicate = unreflectGetter("EntitySelector", () -> EntitySelector.class, es_basePredicate_field)
 			.requiredBy("*.canhit").get();
