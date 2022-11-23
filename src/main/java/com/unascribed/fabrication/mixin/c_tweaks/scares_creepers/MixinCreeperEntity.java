@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.c_tweaks.scares_creepers;
 
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.ConfigPredicates;
 import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -33,10 +34,10 @@ public abstract class MixinCreeperEntity extends HostileEntity {
 	@FabInject(at=@At("TAIL"), method="initGoals()V")
 	protected void initGoals(CallbackInfo ci) {
 		FleeEntityGoal<ServerPlayerEntity> goal = new FleeEntityGoal<>(this, ServerPlayerEntity.class,
-				spe -> fabrication$scaresCreepersPredicate.test((PlayerEntity)spe), 8, 1, 2,
+				spe -> FabConf.isEnabled("*.scares_creepers") && fabrication$scaresCreepersPredicate.test((PlayerEntity)spe), 8, 1, 2,
 				EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR::test);
 		TargetPredicate withinRangePredicate = FabRefl.getWithinRangePredicate(goal);
-		withinRangePredicate.ignoreVisibility();
+		FabRefl.setAttackable(withinRangePredicate, false);
 		goalSelector.add(3, goal);
 	}
 
