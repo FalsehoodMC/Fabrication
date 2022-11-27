@@ -84,6 +84,7 @@ public class FeatureToggleStance implements Feature {
 				RenderSystem.setShaderTexture(0, tex);
 				RenderSystem.setShaderColor(1, 1, 1, a);
 				DrawableHelper.drawTexture(ms, (w.getScaledWidth()/2)-48, (w.getScaledHeight()-32)/2, 0, 0, 0, 32, 32, 32, 32);
+				RenderSystem.setShaderColor(1, 1, 1, 1);
 				RenderSystem.disableBlend();
 				//GlStateManager.enableAlphaTest();
 			}
