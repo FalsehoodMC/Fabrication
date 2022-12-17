@@ -24,7 +24,9 @@ public final class EarlyAgnos {
 	public static boolean isModLoaded(String modid) {
 		if (modid.startsWith("fabric:")) return false;
 		if (modid.startsWith("forge:")) modid = modid.substring(6);
-		if (ModList.get() != null) return ModList.get().isLoaded(modid);
+		if (ModList.get() != null) try {
+			return ModList.get().isLoaded(modid);
+		} catch (java.lang.NullPointerException ignore) {}
 		return FMLLoader.getLoadingModList().getModFileById(modid) != null;
 	}
 
