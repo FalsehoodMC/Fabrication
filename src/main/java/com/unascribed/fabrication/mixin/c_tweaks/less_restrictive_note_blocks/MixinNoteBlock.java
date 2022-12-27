@@ -2,6 +2,7 @@ package com.unascribed.fabrication.mixin.c_tweaks.less_restrictive_note_blocks;
 
 import com.unascribed.fabrication.FabConf;
 import net.minecraft.entity.Entity;
+import net.minecraft.world.event.GameEvent;
 import org.spongepowered.asm.mixin.Mixin;
 
 import com.unascribed.fabrication.support.EligibleIf;
@@ -54,6 +55,7 @@ public abstract class MixinNoteBlock extends Block {
 				} else {
 					((ServerWorld)world).spawnParticles(ParticleTypes.NOTE, pX, pY, pZ, 0, note / 24.0, 0, (dir.ordinal() - 1), 1);
 				}
+				world.emitGameEvent(entity, GameEvent.NOTE_BLOCK_PLAY, pos);
 				break;
 			}
 		}
