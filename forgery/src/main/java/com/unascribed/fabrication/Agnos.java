@@ -3,17 +3,19 @@ package com.unascribed.fabrication;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.Options;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.List;
 
@@ -54,8 +56,7 @@ public final class Agnos {
 
 	@OnlyIn(Dist.CLIENT)
 	public static void registerKeyBinding(KeyMapping kb) {
-		MinecraftForge.EVENT_BUS.addListener((RegisterKeyMappingsEvent event) -> {
-			event.register(kb);
-		});
+		Options options = Minecraft.getInstance().options;
+		options.keyMappings = ArrayUtils.add(options.keyMappings, kb);
 	}
 }
