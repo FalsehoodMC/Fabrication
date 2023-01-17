@@ -24,11 +24,15 @@ import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3f;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 
 public class BlockLogoRenderer {
+	private static Quaternionf X_15 = new Quaternionf().setAngleAxis(Math.toRadians(15), 1, 0, 0);;
+	private static Quaternionf X_90 = new Quaternionf().setAngleAxis(Math.toRadians(90), 1, 0, 0);
+	private Quaternionf tmpQuat = new Quaternionf();
 
 	private LogoBlock[][] blocks = null;
 
@@ -96,9 +100,9 @@ public class BlockLogoRenderer {
 		matrices.translate(0.4f, 0.6f, 2000-13);
 		RenderSystem.disableCull();
 		RenderSystem.depthMask(true);
-		RenderSystem.setupLevelDiffuseLighting(
-				Util.make(new Vec3f(0f, -1.0f, -0.7f), Vec3f::normalize),
-				Util.make(new Vec3f(0f, -1.0f, -0.7f), Vec3f::normalize), matrices.peek().getPositionMatrix());
+		Vector3f lightDiffuse = new Vector3f(0f, -1.0f, -0.7f);
+		lightDiffuse.normalize();
+		RenderSystem.setupLevelDiffuseLighting(lightDiffuse, lightDiffuse, matrices.peek().getPositionMatrix());
 		BlockRenderManager brm = mc.getBlockRenderManager();
 		BufferBuilder bb = Tessellator.getInstance().getBuffer();
 		for (int pass = 0; pass < 2; pass++) {
@@ -119,7 +123,7 @@ public class BlockLogoRenderer {
 				RenderSystem.blendFunc(GL11.GL_SRC_COLOR, GL11.GL_ONE);
 			}
 			matrices.scale(1, -1, 1);
-			matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(15));
+			matrices.multiply(X_15);
 			matrices.scale(0.89f, 1, 0.4f);
 			matrices.translate(-logoDataWidth * 0.5f, -logoDataHeight * 0.5f, 0);
 
@@ -160,10 +164,10 @@ public class BlockLogoRenderer {
 					}
 					matrices.translate(x, y, position);
 					matrices.scale(scale, scale, scale);
-					matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(rot));
+					matrices.multiply(tmpQuat.setAngleAxis(Math.toRadians(rot), 0, 1, 0));
 					if (pass != 0) {
 						mc.getTextureManager().bindTexture(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE);
-						RenderSystem.setShader(GameRenderer::getPositionTexColorNormalShader);
+						RenderSystem.setShader(GameRenderer::getPositionTexColorNormalProgram);
 						RenderSystem.setShaderTexture(0, PlayerScreenHandler.BLOCK_ATLAS_TEXTURE);
 						RenderSystem.setShaderColor(1, 1, 1, 1);
 						if (state == null) {
@@ -208,13 +212,13 @@ public class BlockLogoRenderer {
 							Tessellator.getInstance().draw();
 						} else {
 							VertexConsumerProvider.Immediate vertexConsumer = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
-							matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(90));
+							matrices.multiply(X_90);
 							matrices.translate(0, 0, -1);
 							brm.renderBlockAsEntity(state, matrices, vertexConsumer, LightmapTextureManager.pack(15, 15), OverlayTexture.DEFAULT_UV);
 							vertexConsumer.draw();
 						}
 					} else {
-						RenderSystem.setShader(GameRenderer::getPositionShader);
+						RenderSystem.setShader(GameRenderer::getPositionProgram);
 						RenderSystem.setShaderColor(
 								LoaderBlockLogo.shadowRed, LoaderBlockLogo.shadowGreen, LoaderBlockLogo.shadowBlue,
 								LoaderBlockLogo.shadowAlpha*alpha*fade);

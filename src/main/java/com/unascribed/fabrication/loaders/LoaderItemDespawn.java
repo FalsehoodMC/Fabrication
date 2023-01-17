@@ -12,8 +12,8 @@ import com.google.common.collect.Maps;
 
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public class LoaderItemDespawn implements ConfigLoader {
 
@@ -55,7 +55,7 @@ public class LoaderItemDespawn implements ConfigLoader {
 			if (k.startsWith("@enchantments.")) {
 				String id = k.substring(14);
 				if (!id.startsWith("@")) {
-					enchDespawns.put(Resolvable.of(new Identifier(id), Registry.ENCHANTMENT), time);
+					enchDespawns.put(Resolvable.of(new Identifier(id), Registries.ENCHANTMENT), time);
 				}
 			} else if (k.startsWith("@tags.")) {
 				String id = k.substring(6);
@@ -64,7 +64,7 @@ public class LoaderItemDespawn implements ConfigLoader {
 				String key = k.substring(10);
 				nbtBools.put(key, time);
 			} else if (!k.startsWith("@")) {
-				itemDespawns.put(Resolvable.of(new Identifier(k), Registry.ITEM), time);
+				itemDespawns.put(Resolvable.of(new Identifier(k), Registries.ITEM), time);
 			}
 		}
 	}

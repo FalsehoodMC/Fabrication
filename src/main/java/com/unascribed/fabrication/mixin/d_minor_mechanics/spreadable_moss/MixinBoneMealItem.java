@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.mixin.d_minor_mechanics.spreadable_moss;
 
 import com.unascribed.fabrication.FabConf;
+import net.minecraft.registry.tag.BlockTags;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabInject;
@@ -11,7 +12,6 @@ import com.unascribed.fabrication.support.EligibleIf;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.BoneMealItem;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.tag.BlockTags;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;

@@ -4,9 +4,8 @@ import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Feature;
 
 import net.minecraft.block.Block;
-import net.minecraft.util.registry.RegistryEntryList;
 import net.minecraft.world.gen.feature.NetherConfiguredFeatures;
-
+/*
 @EligibleIf(configAvailable="*.no_dinnerlava")
 public class FeatureNoDinnerlava implements Feature {
 
@@ -32,4 +31,4 @@ public class FeatureNoDinnerlava implements Feature {
 		return "*.no_dinnerlava";
 	}
 
-}
+}*/

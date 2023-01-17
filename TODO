@@ -1,0 +1,12 @@
+commented out:
+AtlasViewerScreen
+FeatureNoDinnerLava
+FeatureOldLava
+SpriteLava
+SpriteLavaFlow
+
+
+Mixin:
+emeralds: MixinGenerationSettingsBuilder
+old_lava: MixdnSpriteAtlasTexture
+

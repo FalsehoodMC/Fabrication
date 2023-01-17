@@ -12,8 +12,8 @@ import com.google.common.io.Resources;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.item.Item;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public class LegacyIDs {
 
@@ -30,7 +30,7 @@ public class LegacyIDs {
 				int meta = Integer.parseInt(en.getKey().substring(colon+1));
 				int key = id << 16 | meta;
 				Identifier ident = new Identifier(en.getValue().getAsString());
-				data.put(key, Registry.ITEM.get(ident));
+				data.put(key, Registries.ITEM.get(ident));
 				data_id.put(key, ident);
 			}
 		} catch (Throwable t) {

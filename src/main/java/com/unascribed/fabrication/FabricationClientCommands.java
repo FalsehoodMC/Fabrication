@@ -10,7 +10,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.unascribed.fabrication.client.AtlasTracking;
-import com.unascribed.fabrication.client.AtlasViewerScreen;
 import com.unascribed.fabrication.client.FabricationConfigScreen;
 import com.unascribed.fabrication.client.OptionalFScriptScreen;
 import com.unascribed.fabrication.client.OptionalPrideFlag;

@@ -7,6 +7,9 @@ import java.nio.IntBuffer;
 
 import com.unascribed.fabrication.FabConf;
 import net.minecraft.util.math.random.Random;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.opengl.ARBCopyImage;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
@@ -46,10 +49,7 @@ import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.util.math.Vector4f;
 
 public class WoinaDrops {
 
@@ -163,10 +163,10 @@ public class WoinaDrops {
 		MatrixStack.Entry ent = matrices.peek();
 		int[] data = quad.getVertexData();
 		Vec3i faceVec = quad.getFace().getVector();
-		Vec3f normal = new Vec3f(faceVec.getX(), faceVec.getY(), faceVec.getZ());
+		Vector3f normal = new Vector3f(faceVec.getX(), faceVec.getY(), faceVec.getZ());
 		Vector4f pos = new Vector4f(0, 0, 0, 1);
 		Matrix4f mat = ent.getPositionMatrix();
-		normal.transform(ent.getNormalMatrix());
+		normal.mul(ent.getNormalMatrix());
 		int j = data.length / 8;
 		try (MemoryStack stack = MemoryStack.stackPush()) {
 			ByteBuffer buf = stack.malloc(VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL.getVertexSizeByte());
@@ -199,7 +199,7 @@ public class WoinaDrops {
 						float b = ((buf.get(14) & 0xFF) / 255.0f) * tintB;
 
 						pos.set(x, y, z, 1);
-						pos.transform(mat);
+						pos.mul(mat);
 
 						float uSize = maxU-minU;
 						float vSize = maxV-minV;
@@ -215,11 +215,11 @@ public class WoinaDrops {
 							v = minV + (vSize*((isProbablyGrass ? 9 : 12)/16f));
 						}
 
-						vertices.vertex(pos.getX(), pos.getY(), pos.getZ(),
+						vertices.vertex(pos.x, pos.y, pos.z,
 								r, g, b, 1,
 								u, v,
 								overlay, light,
-								normal.getX(), normal.getY(), normal.getZ());
+								normal.x, normal.y, normal.z);
 					}
 				}
 			}

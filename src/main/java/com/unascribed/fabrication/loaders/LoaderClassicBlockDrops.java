@@ -19,8 +19,8 @@ import com.unascribed.fabrication.support.Env;
 import com.google.common.collect.Lists;
 
 import net.minecraft.block.Block;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 @EligibleIf(envMatches=Env.CLIENT)
 public class LoaderClassicBlockDrops implements ConfigLoader {
@@ -33,7 +33,7 @@ public class LoaderClassicBlockDrops implements ConfigLoader {
 
 	public static boolean isSafe(Block b) {
 		if (cache.containsKey(b)) return cache.get(b);
-		Identifier id = Registry.BLOCK.getId(b);
+		Identifier id = Registries.BLOCK.getId(b);
 		if (id == null) return false;
 		for (Function<Identifier, ConfigValue> rule : rules) {
 			ConfigValue t = rule.apply(id);

@@ -2,6 +2,7 @@ package com.unascribed.fabrication.mixin.a_fixes.adventure_tags_in_survival;
 
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.injection.FabInject;
+import net.minecraft.registry.RegistryKeys;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -13,7 +14,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.registry.Registry;
 
 @Mixin(ItemStack.class)
 @EligibleIf(configAvailable="*.adventure_tags_in_survival")
@@ -28,7 +28,7 @@ public class MixinItemStack {
 		ItemStack self = (ItemStack)(Object)this;
 		if (!self.isEmpty()) {
 			if (self.hasNbt() && self.getNbt().contains("CanPlaceOn")) {
-				boolean able = self.canPlaceOn(iuc.getWorld().getRegistryManager().get(Registry.BLOCK_KEY), new CachedBlockPosition(iuc.getWorld(), iuc.getBlockPos(), false));
+				boolean able = self.canPlaceOn(iuc.getWorld().getRegistryManager().get(RegistryKeys.BLOCK), new CachedBlockPosition(iuc.getWorld(), iuc.getBlockPos(), false));
 				if (!able) {
 					ci.setReturnValue(ActionResult.PASS);
 				}

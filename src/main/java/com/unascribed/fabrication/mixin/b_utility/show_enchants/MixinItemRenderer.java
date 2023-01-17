@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.injection.FabInject;
+import net.minecraft.registry.Registries;
 import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -30,7 +31,6 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 @Mixin(ItemRenderer.class)
 @EligibleIf(anyConfigAvailable={"*.books_show_enchants", "*.tools_show_important_enchant"}, envMatches=Env.CLIENT)
@@ -52,7 +52,7 @@ public class MixinItemRenderer {
 				NbtCompound ct = tag.getCompound(i);
 				Identifier id = Identifier.tryParse(ct.getString("id"));
 				if (id != null) {
-					Enchantment e = Registry.ENCHANTMENT.get(id);
+					Enchantment e = Registries.ENCHANTMENT.get(id);
 					if (e != null) {
 						valid.add(e);
 					}

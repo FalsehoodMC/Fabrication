@@ -8,13 +8,13 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.Registries;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Mixin(ItemStack.class)
 @EligibleIf(configAvailable="*.swap_conflicting_enchants")
@@ -55,7 +54,7 @@ public abstract class MixinItemStack {
 				toAdd = currentConflicts.get(rmi);
 				currentConflicts.remove(rmi);
 			}
-			Enchantment toAddEnchant = Registry.ENCHANTMENT.get(new Identifier(toAdd.getLeft()));
+			Enchantment toAddEnchant = Registries.ENCHANTMENT.get(new Identifier(toAdd.getLeft()));
 			Map<Enchantment, Integer> currentEnchantments = new HashMap<>();
 			currentEnchantments.put(toAddEnchant, toAdd.getRight());
 			if (this.hasEnchantments()) {
@@ -63,12 +62,12 @@ public abstract class MixinItemStack {
 					if (entry.getKey().canCombine(toAddEnchant)) {
 						currentEnchantments.put(entry.getKey(), entry.getValue());
 					} else {
-						tag.putInt(String.valueOf(Registry.ENCHANTMENT.getId(entry.getKey())), entry.getValue());
+						tag.putInt(String.valueOf(Registries.ENCHANTMENT.getId(entry.getKey())), entry.getValue());
 					}
 				}
 			}
 			for (Pair<String, Integer> entry : currentConflicts) {
-				Enchantment enchant = Registry.ENCHANTMENT.get(new Identifier(entry.getLeft()));
+				Enchantment enchant = Registries.ENCHANTMENT.get(new Identifier(entry.getLeft()));
 				if (currentEnchantments.keySet().stream().anyMatch(e->!e.canCombine(enchant))) {
 					tag.putInt(entry.getLeft(), entry.getRight());
 					continue;

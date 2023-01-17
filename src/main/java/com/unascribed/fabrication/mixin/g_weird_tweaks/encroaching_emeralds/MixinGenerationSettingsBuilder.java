@@ -2,7 +2,6 @@ package com.unascribed.fabrication.mixin.g_weird_tweaks.encroaching_emeralds;
 
 import com.unascribed.fabrication.interfaces.GenerationSettingsAddEmeralds;
 import com.unascribed.fabrication.support.EligibleIf;
-import net.minecraft.util.registry.RegistryEntry;
 import net.minecraft.world.biome.GenerationSettings;
 import net.minecraft.world.gen.GenerationStep;
 import net.minecraft.world.gen.feature.OrePlacedFeatures;
@@ -15,7 +14,7 @@ import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
-
+/*
 @Mixin(GenerationSettings.Builder.class)
 @EligibleIf(configAvailable="*.encroaching_emeralds")
 public abstract class MixinGenerationSettingsBuilder implements GenerationSettingsAddEmeralds {
@@ -38,3 +37,4 @@ public abstract class MixinGenerationSettingsBuilder implements GenerationSettin
 		}
 	}
 }
+*/

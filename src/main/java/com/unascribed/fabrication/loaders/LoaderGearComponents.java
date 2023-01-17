@@ -23,11 +23,11 @@ import com.google.common.primitives.Ints;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
-import net.minecraft.tag.TagKey;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.random.Random;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryEntry;
 
 public class LoaderGearComponents implements ConfigLoader {
 
@@ -147,7 +147,7 @@ public class LoaderGearComponents implements ConfigLoader {
 				Supplier<Item> ingotGetter = resolver(namespace, ingotId);
 				materials.put(name, new MaterialData(npi, nuggetGetter, ingotGetter));
 			} else if (!k.startsWith("@")) {
-				Resolvable<Item> r = Resolvable.of(new Identifier(k), Registry.ITEM);
+				Resolvable<Item> r = Resolvable.of(new Identifier(k), Registries.ITEM);
 				for (String s : SPACE_SPLITTER.split(v)) {
 					Matcher m = MATERIAL_VALUE_PATTERN.matcher(s);
 					if (m.matches()) {
@@ -184,16 +184,16 @@ public class LoaderGearComponents implements ConfigLoader {
 		if (id.startsWith("#")) {
 			return tagResolver(FabricationMod.createIdWithCustomDefault(namespace, id.substring(1)));
 		} else {
-			return Resolvable.of(FabricationMod.createIdWithCustomDefault(namespace, id), Registry.ITEM)::getOrNull;
+			return Resolvable.of(FabricationMod.createIdWithCustomDefault(namespace, id), Registries.ITEM)::getOrNull;
 		}
 	}
 
 	private static Supplier<Item> tagResolver(Identifier id) {
 		return () -> {
-			TagKey<Item> itemTag = TagKey.of(Registry.ITEM_KEY, id);
-			if (Registry.ITEM.containsTag(itemTag)) return Registry.ITEM.getEntryList(itemTag).flatMap(items -> items.getRandom(rand)).map(RegistryEntry::value).orElse(null);
-			TagKey<Block> blockTag = TagKey.of(Registry.BLOCK_KEY, id);
-			if (Registry.BLOCK.containsTag(blockTag)) return Registry.BLOCK.getEntryList(blockTag).flatMap(blocks -> blocks.getRandom(rand)).map(blockEntry -> blockEntry.value().asItem()).orElse(null);
+			TagKey<Item> itemTag = TagKey.of(RegistryKeys.ITEM, id);
+			if (Registries.ITEM.containsTag(itemTag)) return Registries.ITEM.getEntryList(itemTag).flatMap(items -> items.getRandom(rand)).map(RegistryEntry::value).orElse(null);
+			TagKey<Block> blockTag = TagKey.of(RegistryKeys.BLOCK, id);
+			if (Registries.BLOCK.containsTag(blockTag)) return Registries.BLOCK.getEntryList(blockTag).flatMap(blocks -> blocks.getRandom(rand)).map(blockEntry -> blockEntry.value().asItem()).orElse(null);
 			return null;
 		};
 	}

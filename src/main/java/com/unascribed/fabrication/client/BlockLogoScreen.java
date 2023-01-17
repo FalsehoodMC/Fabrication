@@ -14,10 +14,10 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.command.argument.BlockArgumentParser;
+import net.minecraft.registry.Registries;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ public class BlockLogoScreen extends Screen{
 	ScrollBar leftBar = new ScrollBar(height-startY);
 	ScrollBar rightBar = new ScrollBar(leftBar.displayHeight);
 
-	final Set<Identifier> registryBlocks = Registry.BLOCK.getIds();
+	final Set<Identifier> registryBlocks = Registries.BLOCK.getIds();
 	Integer selectedColor = null;
 	BlockLogoRenderer blockLogo = new BlockLogoRenderer();
 	Pattern filter = Pattern.compile("");
@@ -129,7 +129,7 @@ public class BlockLogoScreen extends Screen{
 						LoaderBlockLogo.colorToState.put(selectedColor, () -> {
 							String block = l.get(ThreadLocalRandom.current().nextInt(l.size()));
 							try {
-								return BlockArgumentParser.block(Registry.BLOCK, new StringReader(block), false).blockState();
+								return BlockArgumentParser.block(Registries.BLOCK, new StringReader(block), false).blockState();
 							} catch (CommandSyntaxException e) {
 								FabLog.warn(block + " is not a valid identifier");
 								return Blocks.AIR.getDefaultState();

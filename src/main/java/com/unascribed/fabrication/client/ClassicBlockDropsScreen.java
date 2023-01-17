@@ -8,10 +8,10 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.registry.Registries;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Iterator;
@@ -54,7 +54,7 @@ public class ClassicBlockDropsScreen extends Screen{
 		searchField.render(matrices, mouseX, mouseY, delta);
 		{
 			float scroll = -addItemBar.getScaledScroll(client);
-			for (Identifier clr : Registry.ITEM.getIds()) {
+			for (Identifier clr : Registries.ITEM.getIds()) {
 				if (!filter.matcher(clr.toString()).find()) continue;
 				if (scroll > 0) {
 					textRenderer.drawWithShadow(matrices, clr.toString(), 5, scroll, -1);
@@ -68,7 +68,7 @@ public class ClassicBlockDropsScreen extends Screen{
 				scroll += 12;
 				if (scroll > 70) break;
 			}
-			addItemBar.height = Registry.ITEM.getIds().stream().filter(r->filter.matcher(r.toString()).find()).count() * 12 + 20;
+			addItemBar.height = Registries.ITEM.getIds().stream().filter(r->filter.matcher(r.toString()).find()).count() * 12 + 20;
 		}
 		float scroll = 102 - dropsBar.getScaledScroll(client);
 		Iterator<Map.Entry<String, Optional<Boolean>>> iter = LoaderClassicBlockDrops.heuristics.entrySet().iterator();

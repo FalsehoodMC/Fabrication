@@ -8,8 +8,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.tag.BlockTags;
-import net.minecraft.tag.TagKey;
+import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.registry.tag.TagKey;
 import org.spongepowered.asm.mixin.Mixin;
 
 import java.util.function.Predicate;

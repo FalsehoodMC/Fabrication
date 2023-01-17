@@ -7,14 +7,15 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.nbt.NbtType;
 import net.minecraft.nbt.scanner.NbtScanner;
-import net.minecraft.tag.TagKey;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 //searches nbt for an item identifier returns CONTINUE on fail, HALT on success
 public class ItemNbtScanner implements NbtScanner {
 	public static final ItemNbtScanner INSTANCE = new ItemNbtScanner();
-	public static final TagKey<Item> EXCEPTIONS = TagKey.of(Registry.ITEM_KEY, new Identifier("fabrication", "exclude_from_item_inventory_check"));
+	public static final TagKey<Item> EXCEPTIONS = TagKey.of(RegistryKeys.ITEM, new Identifier("fabrication", "exclude_from_item_inventory_check"));
 	public static boolean hasItemInvNBT(ItemStack stack) {
 		if (stack.isIn(EXCEPTIONS)) return false;
 		NbtCompound tag = stack.getNbt();
@@ -29,7 +30,7 @@ public class ItemNbtScanner implements NbtScanner {
 	@Override
 	public Result visitString(String value) {
 		Identifier id = Identifier.tryParse(value);
-		if (id != null && Registry.ITEM.containsId(id)) {
+		if (id != null && Registries.ITEM.containsId(id)) {
 			ret = Result.HALT;
 		}
 		return ret;

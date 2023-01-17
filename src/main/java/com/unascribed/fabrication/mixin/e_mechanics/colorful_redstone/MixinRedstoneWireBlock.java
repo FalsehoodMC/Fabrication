@@ -3,6 +3,7 @@ package com.unascribed.fabrication.mixin.e_mechanics.colorful_redstone;
 import java.util.Iterator;
 
 import com.unascribed.fabrication.support.injection.FabModifyVariable;
+import net.minecraft.registry.tag.BlockTags;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabInject;
@@ -17,7 +18,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RedstoneWireBlock;
 import net.minecraft.block.enums.WireConnection;
-import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;

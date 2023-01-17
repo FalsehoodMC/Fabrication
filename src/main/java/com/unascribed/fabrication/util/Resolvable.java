@@ -4,8 +4,8 @@ import java.util.Optional;
 
 import com.google.common.base.Objects;
 
+import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 /**
  * Allows referencing registry items that may not have been registered yet in an efficient manner.

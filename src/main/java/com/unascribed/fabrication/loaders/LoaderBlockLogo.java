@@ -15,7 +15,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.command.argument.BlockArgumentParser;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registries;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -128,7 +128,7 @@ public class LoaderBlockLogo implements ConfigLoader {
 						// are called by MixinTitleScreen, which runs after game init is done.
 						String block = blocks[ThreadLocalRandom.current().nextInt(blocks.length)];
 						try {
-							return BlockArgumentParser.block(Registry.BLOCK, new StringReader(block), false).blockState();
+							return BlockArgumentParser.block(Registries.BLOCK.getReadOnlyWrapper(), new StringReader(block), false).blockState();
 						} catch (CommandSyntaxException e) {
 							FabLog.warn(block+" is not a valid identifier at "+config.getBlame(key));
 							return Blocks.AIR.getDefaultState();

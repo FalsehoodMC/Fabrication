@@ -1,13 +1,13 @@
 package com.unascribed.fabrication.client;
 
-import com.unascribed.fabrication.features.FeatureOldLava;
-
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.texture.SpriteContents;
 import net.minecraft.client.texture.TextureTickListener;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
-
+/*
 public class SpriteLava extends Sprite implements TextureTickListener {
 	protected int SPRITE_SIZE;
 	protected int SPRITE_SIZEMINUSONE;
@@ -17,9 +17,9 @@ public class SpriteLava extends Sprite implements TextureTickListener {
 	protected float[] field_76879_i;
 	protected float[] field_76877_j;
 
-	public SpriteLava(SpriteAtlasTexture spriteAtlasTexture,
-			Info info, int maxLevel, int atlasWidth, int atlasHeight, int x,
-			int y, NativeImage image) {
+	public SpriteLava(Identifier spriteAtlasTexture,
+					  SpriteContents info, int maxLevel, int atlasWidth, int atlasHeight, int x,
+					  int y, NativeImage image) {
 		super(spriteAtlasTexture, info, maxLevel, atlasWidth, atlasHeight, x, y, image);
 		SPRITE_SIZE = info.getWidth();
 		SPRITE_SIZEMINUSONE = SPRITE_SIZE - 1;
@@ -111,3 +111,4 @@ public class SpriteLava extends Sprite implements TextureTickListener {
 		}
 	}
 }
+*/

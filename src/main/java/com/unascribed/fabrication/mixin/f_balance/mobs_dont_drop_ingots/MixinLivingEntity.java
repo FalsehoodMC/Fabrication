@@ -3,6 +3,7 @@ package com.unascribed.fabrication.mixin.f_balance.mobs_dont_drop_ingots;
 import java.util.function.Consumer;
 
 import com.unascribed.fabrication.FabConf;
+import net.minecraft.registry.Registries;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabModifyArg;
@@ -14,7 +15,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.registry.Registry;
 
 @Mixin(LivingEntity.class)
 @EligibleIf(configAvailable="*.mobs_dont_drop_ingots")
@@ -33,7 +33,7 @@ public class MixinLivingEntity {
 			if (replacement != null) {
 				NbtCompound tag = new NbtCompound();
 				stack.writeNbt(tag);
-				tag.putString("id", Registry.ITEM.getId(replacement).toString());
+				tag.putString("id", Registries.ITEM.getId(replacement).toString());
 				stack = ItemStack.fromNbt(tag);
 			}
 

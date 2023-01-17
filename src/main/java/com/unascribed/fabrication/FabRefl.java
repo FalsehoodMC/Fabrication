@@ -281,42 +281,6 @@ public class FabRefl {
 	public static final class Client {
 
 		@FabReflField
-		private static final String satd_width_field = "net/minecraft/client/texture/SpriteAtlasTexture$Data;width";
-		private static final MethodHandle satd_width = unreflectGetter("SpriteAtlasTexture.Data", () -> SpriteAtlasTexture.Data.class, satd_width_field)
-				.requiredBy("*.old_lava").get();
-		public static int getWidth(SpriteAtlasTexture.Data subject) {
-			try {
-				return (int)checkHandle(satd_width).invokeExact(subject);
-			} catch (Throwable t) {
-				throw rethrow(t);
-			}
-		}
-
-		@FabReflField
-		private static final String satd_height_field = "net/minecraft/client/texture/SpriteAtlasTexture$Data;height";
-		private static final MethodHandle satd_height = unreflectGetter("SpriteAtlasTexture.Data", () -> SpriteAtlasTexture.Data.class, satd_height_field)
-				.requiredBy("*.old_lava").get();
-		public static int getHeight(SpriteAtlasTexture.Data subject) {
-			try {
-				return (int)checkHandle(satd_height).invokeExact(subject);
-			} catch (Throwable t) {
-				throw rethrow(t);
-			}
-		}
-
-		@FabReflField
-		private static final String satd_maxLevel_field = "net/minecraft/client/texture/SpriteAtlasTexture$Data;maxLevel";
-		private static final MethodHandle satd_maxLevel = unreflectGetter("SpriteAtlasTexture.Data", () -> SpriteAtlasTexture.Data.class, satd_maxLevel_field)
-				.requiredBy("*.old_lava").get();
-		public static int getMaxLevel(SpriteAtlasTexture.Data subject) {
-			try {
-				return (int)checkHandle(satd_maxLevel).invokeExact(subject);
-			} catch (Throwable t) {
-				throw rethrow(t);
-			}
-		}
-
-		@FabReflField
 		private static final String sprite_x_field = "net/minecraft/client/texture/Sprite;x";
 		private static final MethodHandle sprite_x = unreflectGetter("Sprite", () -> Sprite.class, sprite_x_field)
 				.requiredBy("*.old_lava", "atlas_viewer").get();
@@ -335,30 +299,6 @@ public class FabRefl {
 		public static int getY(Sprite subject) {
 			try {
 				return (int)checkHandle(sprite_y).invokeExact(subject);
-			} catch (Throwable t) {
-				throw rethrow(t);
-			}
-		}
-
-		@FabReflField
-		private static final String spriteAnimation_frameIndex_field = "net/minecraft/client/texture/Sprite$Animation;frameIndex";
-		private static final MethodHandle spriteAnimation_frameIndex = unreflectGetter("Sprite.Animation", () -> Sprite.Animation.class, spriteAnimation_frameIndex_field)
-				.requiredBy("atlas_viewer").get();
-		public static int getFrameIndex(Sprite.Animation subject) {
-			try {
-				return (int)checkHandle(spriteAnimation_frameIndex).invokeExact(subject);
-			} catch (Throwable t) {
-				throw rethrow(t);
-			}
-		}
-
-		@FabReflField
-		private static final String spriteAnimation_frameTicks_field = "net/minecraft/client/texture/Sprite$Animation;frameTicks";
-		private static final MethodHandle spriteAnimation_frameTicks = unreflectGetter("Sprite.Animation", () -> Sprite.Animation.class, spriteAnimation_frameTicks_field)
-				.requiredBy("atlas_viewer").get();
-		public static int getFrameTicks(Sprite.Animation subject) {
-			try {
-				return (int)checkHandle(spriteAnimation_frameTicks).invokeExact(subject);
 			} catch (Throwable t) {
 				throw rethrow(t);
 			}

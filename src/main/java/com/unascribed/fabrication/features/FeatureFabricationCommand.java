@@ -1,19 +1,10 @@
 package com.unascribed.fabrication.features;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-
+import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -34,13 +25,6 @@ import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.OptionalFScript;
 import com.unascribed.fabrication.util.Cardinal;
-
-import com.google.common.base.Charsets;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.command.CommandException;
@@ -50,19 +34,18 @@ import net.minecraft.command.argument.DimensionArgumentType;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.Property;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.BuiltinRegistries;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
@@ -70,6 +53,21 @@ import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.noise.NoiseConfig;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class FeatureFabricationCommand implements Feature {
 
@@ -185,11 +183,11 @@ public class FeatureFabricationCommand implements Feature {
 				analyze.requires(scs -> scs.hasPermissionLevel(4));
 				{
 					LiteralArgumentBuilder<ServerCommandSource> biome = CommandManager.literal("biome");
-
-
-					for (Map.Entry<RegistryKey<Biome>, Biome> en : BuiltinRegistries.BIOME.getEntrySet()) {
-						Identifier id = en.getKey().getValue();
-						Identifier b = en.getKey().getValue();
+					registryAccess.createWrapper(RegistryKeys.BIOME).streamEntries().forEach(optBiome -> {
+						Optional<RegistryKey<Biome>> optKey = optBiome.getKey();
+						if (optKey.isEmpty()) return;
+						Identifier id = optKey.get().getValue();
+						Identifier b = optKey.get().getValue();
 						Command<ServerCommandSource> exec = c -> {
 							Set<Identifier> set = Sets.newHashSet(b);
 							World w;
@@ -207,7 +205,7 @@ public class FeatureFabricationCommand implements Feature {
 						}
 						biome.then(CommandManager.literal(id.toString())
 								.executes(exec));
-					}
+					});
 
 					analyze.then(CommandManager.literal("block_distribution")
 							.executes(c -> analyzeBlockDistribution(c, c.getSource().getEntityOrThrow().world, null))
@@ -239,7 +237,7 @@ public class FeatureFabricationCommand implements Feature {
 		if (biomesIn != null) {
 			biomes = Sets.newHashSet();
 			for (Identifier b : biomesIn) {
-				biomes.add(c.getSource().getServer().getRegistryManager().get(Registry.BIOME_KEY).get(b));
+				biomes.add(c.getSource().getServer().getRegistryManager().get(RegistryKeys.BIOME).get(b));
 			}
 		} else {
 			biomes = null;
@@ -341,7 +339,7 @@ public class FeatureFabricationCommand implements Feature {
 				BigDecimal scannedBD = new BigDecimal(scanned);
 				BigDecimal hundred = new BigDecimal(100);
 				for (Map.Entry<BlockState, MutableLong> en : sorted) {
-					osw.write(Registry.BLOCK.getId(en.getKey().getBlock()).toString().replace("\t", "    "));
+					osw.write(Registries.BLOCK.getId(en.getKey().getBlock()).toString().replace("\t", "    "));
 					if (!en.getKey().getEntries().isEmpty()) {
 						osw.write("[");
 						boolean first = true;

@@ -9,12 +9,12 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.Registries;
 import net.minecraft.screen.AnvilScreenHandler;
 import net.minecraft.screen.ForgingScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -41,7 +41,7 @@ public abstract class MixinAnvilScreenHandler extends ForgingScreenHandler {
 			NbtCompound tag = stack.getSubNbt("fabrication#conflictingEnchants");
 			if (tag != null && !tag.isEmpty()) {
 				for (String key : tag.getKeys()) {
-					old.put(Registry.ENCHANTMENT.get(new Identifier(key)), tag.getInt(key));
+					old.put(Registries.ENCHANTMENT.get(new Identifier(key)), tag.getInt(key));
 				}
 			}
 		}
@@ -59,7 +59,7 @@ public abstract class MixinAnvilScreenHandler extends ForgingScreenHandler {
 			for (int i=0; i<enchantList.length; i++) {
 				for (int ii=i+1; ii<enchantList.length; ii++){
 					if (!enchantList[i].canCombine(enchantList[ii])) {
-						conflictingEnchants.putInt(String.valueOf(Registry.ENCHANTMENT.getId(enchantList[i])), enchants.get(enchantList[i]));
+						conflictingEnchants.putInt(String.valueOf(Registries.ENCHANTMENT.getId(enchantList[i])), enchants.get(enchantList[i]));
 						enchants.remove(enchantList[i]);
 						break;
 					}

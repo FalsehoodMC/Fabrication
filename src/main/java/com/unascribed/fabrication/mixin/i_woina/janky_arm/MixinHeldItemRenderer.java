@@ -13,7 +13,6 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.item.HeldItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Arm;
-import net.minecraft.util.math.Vec3f;
 
 @Mixin(HeldItemRenderer.class)
 @EligibleIf(configAvailable="*.janky_arm", envMatches=Env.CLIENT)

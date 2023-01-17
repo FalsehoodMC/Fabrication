@@ -6,6 +6,9 @@ import java.util.UUID;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.injection.FabInject;
 import com.unascribed.fabrication.support.injection.FabModifyConst;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.tag.TagKey;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -36,9 +39,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.EntityPositionS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 @Mixin(ItemEntity.class)
@@ -117,7 +118,7 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 		final boolean debug = false;
 		ItemStack stack = getStack();
 		ParsedTime time = ParsedTime.UNSET;
-		ParsedTime itemTime = LoaderItemDespawn.itemDespawns.get(Resolvable.mapKey(stack.getItem(), Registry.ITEM));
+		ParsedTime itemTime = LoaderItemDespawn.itemDespawns.get(Resolvable.mapKey(stack.getItem(), Registries.ITEM));
 		if (debug) System.out.println("itemTime: "+itemTime);
 		if (itemTime != null) {
 			time = itemTime;
@@ -142,14 +143,14 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 						}
 					}
 				}
-				ParsedTime enchTime = LoaderItemDespawn.enchDespawns.get(Resolvable.mapKey(e, Registry.ENCHANTMENT));
+				ParsedTime enchTime = LoaderItemDespawn.enchDespawns.get(Resolvable.mapKey(e, Registries.ENCHANTMENT));
 				if (enchTime != null && enchTime.overshadows(time)) {
 					if (debug) System.out.println("Found a specific enchantment; it overshadows: "+enchTime);
 					time = enchTime;
 				}
 			}
 			for (Map.Entry<Identifier, ParsedTime> en : LoaderItemDespawn.tagDespawns.entrySet()) {
-				TagKey<Item> itemTag = TagKey.of(Registry.ITEM_KEY, en.getKey());
+				TagKey<Item> itemTag = TagKey.of(RegistryKeys.ITEM, en.getKey());
 				if (stack.isIn(itemTag)) {
 					if (en.getValue().overshadows(time)) {
 						if (debug) System.out.println("Found a tag; it overshadows: "+en.getValue());
@@ -158,7 +159,7 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 				}
 				if (stack.getItem() instanceof BlockItem) {
 					BlockItem bi = (BlockItem)stack.getItem();
-					TagKey<Block> blockTag = TagKey.of(Registry.BLOCK_KEY, en.getKey());
+					TagKey<Block> blockTag = TagKey.of(RegistryKeys.BLOCK, en.getKey());
 					if (bi.getBlock().getRegistryEntry().isIn(blockTag)) {
 						if (en.getValue().overshadows(time)) {
 							if (debug) System.out.println("Found a tag; it overshadows: "+en.getValue());

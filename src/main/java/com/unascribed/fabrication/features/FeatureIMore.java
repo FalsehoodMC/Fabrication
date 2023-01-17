@@ -15,10 +15,10 @@ import com.unascribed.fabrication.support.Feature;
 
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.command.CommandException;
-import net.minecraft.command.argument.EnchantmentArgumentType;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.ItemStackArgument;
 import net.minecraft.command.argument.ItemStackArgumentType;
+import net.minecraft.command.argument.RegistryEntryArgumentType;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
@@ -26,11 +26,12 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.minecraft.util.registry.Registry;
 
 @EligibleIf(configAvailable="*.i_and_more")
 public class FeatureIMore implements Feature {
@@ -72,10 +73,10 @@ public class FeatureIMore implements Feature {
 				dispatcher.register(CommandManager.literal("fenchant")
 						.requires(requirement)
 						.then(CommandManager.argument("targets", EntityArgumentType.entities())
-								.then(CommandManager.argument("enchantment", EnchantmentArgumentType.enchantment())
-										.executes((ctx) -> fenchant(ctx.getSource(), EntityArgumentType.getEntities(ctx, "targets"), EnchantmentArgumentType.getEnchantment(ctx, "enchantment"), 1))
+								.then(CommandManager.argument("enchantment", RegistryEntryArgumentType.registryEntry(registryAccess, RegistryKeys.ENCHANTMENT))
+										.executes((ctx) -> fenchant(ctx.getSource(), EntityArgumentType.getEntities(ctx, "targets"), RegistryEntryArgumentType.getEnchantment(ctx, "enchantment").value(), 1))
 										.then(CommandManager.argument("level", IntegerArgumentType.integer(0))
-												.executes((ctx) -> fenchant(ctx.getSource(), EntityArgumentType.getEntities(ctx, "targets"), EnchantmentArgumentType.getEnchantment(ctx, "enchantment"), IntegerArgumentType.getInteger(ctx, "level")))))));
+												.executes((ctx) -> fenchant(ctx.getSource(), EntityArgumentType.getEntities(ctx, "targets"), RegistryEntryArgumentType.getEnchantment(ctx, "enchantment").value(), IntegerArgumentType.getInteger(ctx, "level")))))));
 			});
 		}
 	}
@@ -94,7 +95,7 @@ public class FeatureIMore implements Feature {
 
 					NbtList ench = tag.getList("Enchantments", NbtType.COMPOUND);
 					NbtCompound c = new NbtCompound();
-					c.putString("id", String.valueOf(Registry.ENCHANTMENT.getId(enchantment)));
+					c.putString("id", String.valueOf(Registries.ENCHANTMENT.getId(enchantment)));
 					c.putInt("lvl", level);
 					ench.add(c);
 					amt++;

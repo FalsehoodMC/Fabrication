@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.injection.FabInject;
+import net.minecraft.registry.Registries;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,7 +35,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 @Mixin(LivingEntity.class)
@@ -64,7 +64,7 @@ public abstract class MixinLivingEntity extends Entity {
 		if (!stack.hasNbt()) stack.setNbt(new NbtCompound());
 		stack.getNbt().putBoolean("fabrication:ShatteredAlready", true);
 		List<ItemStack> enchantables = Lists.newArrayList();
-		for (ItemMaterialValue imv : LoaderGearComponents.items.get(Resolvable.mapKey(Registry.ITEM.getId(item), Registry.ITEM))) {
+		for (ItemMaterialValue imv : LoaderGearComponents.items.get(Resolvable.mapKey(Registries.ITEM.getId(item), Registries.ITEM))) {
 			double dropChance = 1;
 			Object self = this;
 			if (self instanceof MobEntity) {

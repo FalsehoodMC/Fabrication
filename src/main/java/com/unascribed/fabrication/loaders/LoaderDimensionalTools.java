@@ -1,5 +1,32 @@
 package com.unascribed.fabrication.loaders;
 
+import com.google.common.base.Function;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.SetMultimap;
+import com.google.common.collect.Sets;
+import com.google.common.collect.Table;
+import com.unascribed.fabrication.FabLog;
+import com.unascribed.fabrication.FabricationMod;
+import com.unascribed.fabrication.QDIni;
+import com.unascribed.fabrication.support.ConfigLoader;
+import net.fabricmc.fabric.api.util.NbtType;
+import net.minecraft.block.Block;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.TagKey;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.InvalidIdentifierException;
+import net.minecraft.world.dimension.DimensionTypes;
+import org.jetbrains.annotations.Nullable;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -11,36 +38,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-
-import net.minecraft.world.dimension.DimensionTypes;
-import org.jetbrains.annotations.Nullable;
-
-import com.unascribed.fabrication.FabLog;
-import com.unascribed.fabrication.FabricationMod;
-import com.unascribed.fabrication.QDIni;
-import com.unascribed.fabrication.support.ConfigLoader;
-
-import com.google.common.base.Function;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.SetMultimap;
-import com.google.common.collect.Sets;
-import com.google.common.collect.Table;
-
-import net.fabricmc.fabric.api.util.NbtType;
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.tag.TagKey;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.InvalidIdentifierException;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryEntry;
-import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.world.dimension.DimensionType;
 
 public class LoaderDimensionalTools implements ConfigLoader {
 
@@ -181,7 +178,7 @@ public class LoaderDimensionalTools implements ConfigLoader {
 	}
 
 	public static Set<MohsIdentifier> getAssociatedDimensionsForTool(ItemStack stack) {
-		Set<MohsIdentifier> dims = processTags(toolAssociations.get(Registry.ITEM.getId(stack.getItem())), toolTagAssociations, Registry.ITEM_KEY, stack.getItem().getRegistryEntry());
+		Set<MohsIdentifier> dims = processTags(toolAssociations.get(Registries.ITEM.getId(stack.getItem())), toolTagAssociations, Registries.ITEM.getKey(), stack.getItem().getRegistryEntry());
 		if (stack.hasNbt()) {
 			if (stack.getNbt().getBoolean("fabrication:ActLikeGold")) {
 				dims = Sets.newHashSet(dims);
@@ -194,7 +191,7 @@ public class LoaderDimensionalTools implements ConfigLoader {
 					try {
 						dims.add(MohsIdentifier.parse(li.getString(i)));
 					} catch (InvalidIdentifierException e) {
-						FabLog.warn("Bad honorary dimension "+li.getString(i)+" in stack "+Registry.ITEM.getId(stack.getItem())+stack.getNbt());
+						FabLog.warn("Bad honorary dimension "+li.getString(i)+" in stack "+Registries.ITEM.getId(stack.getItem())+stack.getNbt());
 					}
 				}
 			}
@@ -203,11 +200,11 @@ public class LoaderDimensionalTools implements ConfigLoader {
 	}
 
 	public static Set<MohsIdentifier> getAssociatedDimensionsForIngredient(ItemStack stack) {
-		return processTags(ingredientAssociations.get(Registry.ITEM.getId(stack.getItem())), ingredientTagAssociations, Registry.ITEM_KEY, stack.getItem().getRegistryEntry());
+		return processTags(ingredientAssociations.get(Registries.ITEM.getId(stack.getItem())), ingredientTagAssociations, Registries.ITEM.getKey(), stack.getItem().getRegistryEntry());
 	}
 
 	public static Set<MohsIdentifier> getAssociatedDimensions(Block block) {
-		return processTags(blockAssociations.get(Registry.BLOCK.getId(block)), blockTagAssociations, Registry.BLOCK_KEY, block.getRegistryEntry());
+		return processTags(blockAssociations.get(Registries.BLOCK.getId(block)), blockTagAssociations, Registries.BLOCK.getKey(), block.getRegistryEntry());
 	}
 
 	private static <T, U> Set<U> processTags(Set<U> out, SetMultimap<Identifier, U> assoc, RegistryKey<? extends Registry<T>> key, RegistryEntry<T> entry) {
@@ -226,9 +223,9 @@ public class LoaderDimensionalTools implements ConfigLoader {
 	}
 
 	public static boolean isSubstitutable(Item item) {
-		if (substitutableItems.contains(Registry.ITEM.getId(item))) return true;
+		if (substitutableItems.contains(Registries.ITEM.getId(item))) return true;
 		for (Identifier id : substitutableItemTags) {
-			TagKey<Item> tag = TagKey.of(Registry.ITEM_KEY, id);
+			TagKey<Item> tag = TagKey.of(Registries.ITEM.getKey(), id);
 			if (item.getRegistryEntry().isIn(tag)) return true;
 		}
 		return false;

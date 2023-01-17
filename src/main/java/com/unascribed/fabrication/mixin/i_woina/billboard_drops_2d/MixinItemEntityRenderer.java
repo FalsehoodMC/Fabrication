@@ -21,9 +21,9 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Quaternion;
-import net.minecraft.util.math.Vec3f;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -36,6 +36,7 @@ public class MixinItemEntityRenderer {
 
 	@Shadow @Final
 	private ItemRenderer itemRenderer;
+
 
 	@FabInject(at=@At("HEAD"), cancellable=true,
 			method="render(Lnet/minecraft/entity/ItemEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")
@@ -50,14 +51,14 @@ public class MixinItemEntityRenderer {
 		matrices.push();
 		{
 			float l = MathHelper.sin(((float) entity.getItemAge() + b) / 10.0F + entity.uniqueOffset) * 0.1F + 0.1F;
-			float m = bm.getTransformation().getTransformation(ModelTransformation.Mode.GROUND).scale.getY();
+			float m = bm.getTransformation().getTransformation(ModelTransformation.Mode.GROUND).scale.y;
 			matrices.translate(0.0, l + 0.5F * m, 0.0);
 		}
-		float scaleX = bm.getTransformation().ground.scale.getX()/2f;
-		float scaleY = bm.getTransformation().ground.scale.getY()/2f;
+		float scaleX = bm.getTransformation().ground.scale.x/2f;
+		float scaleY = bm.getTransformation().ground.scale.y/2f;
 
-		Quaternion quaternion = Vec3f.NEGATIVE_Y.getDegreesQuaternion(camera.getYaw());
-		Vec3f[] vec3fs = new Vec3f[]{new Vec3f(-scaleX, -scaleY, 0.0F), new Vec3f(-scaleX, scaleY, 0.0F), new Vec3f(scaleX, scaleY, 0.0F), new Vec3f(scaleX, -scaleY, 0.0F)};
+		Quaternionf quaternion = new Quaternionf().setAngleAxis(camera.getYaw(), 0, -1, 0);
+		Vector3f[] vec3fs = new Vector3f[]{new Vector3f(-scaleX, -scaleY, 0.0F), new Vector3f(-scaleX, scaleY, 0.0F), new Vector3f(scaleX, scaleY, 0.0F), new Vector3f(scaleX, -scaleY, 0.0F)};
 		for(int k = 0; k < 4; ++k) {
 			vec3fs[k].rotate(quaternion);
 		}
@@ -69,13 +70,13 @@ public class MixinItemEntityRenderer {
 		float m = sprite.getMaxU();
 		float n = sprite.getMinV();
 		float o = sprite.getMaxV();
-		RenderSystem.setShaderTexture(0, sprite.getAtlas().getId());
+		RenderSystem.setShaderTexture(0, sprite.getAtlasId());
 		VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(TexturedRenderLayers.getEntityTranslucentCull());
 		Matrix4f mat = matrices.peek().getPositionMatrix();;
-		vertexConsumer.vertex(mat, vec3fs[0].getX(), vec3fs[0].getY(), vec3fs[0].getZ()).color(255, 255, 255, 255).texture(m, o).overlay(OverlayTexture.DEFAULT_UV).light(i).normal(1, 1, 1).next();
-		vertexConsumer.vertex(mat, vec3fs[1].getX(), vec3fs[1].getY(), vec3fs[1].getZ()).color(255, 255, 255, 255).texture(m, n).overlay(OverlayTexture.DEFAULT_UV).light(i).normal(1, 1, 1).next();
-		vertexConsumer.vertex(mat, vec3fs[2].getX(), vec3fs[2].getY(), vec3fs[2].getZ()).color(255, 255, 255, 255).texture(l, n).overlay(OverlayTexture.DEFAULT_UV).light(i).normal(1, 1, 1).next();
-		vertexConsumer.vertex(mat, vec3fs[3].getX(), vec3fs[3].getY(), vec3fs[3].getZ()).color(255, 255, 255, 255).texture(l, o).overlay(OverlayTexture.DEFAULT_UV).light(i).normal(1, 1, 1).next();
+		vertexConsumer.vertex(mat, vec3fs[0].x, vec3fs[0].y, vec3fs[0].z).color(255, 255, 255, 255).texture(m, o).overlay(OverlayTexture.DEFAULT_UV).light(i).normal(1, 1, 1).next();
+		vertexConsumer.vertex(mat, vec3fs[1].x, vec3fs[1].y, vec3fs[1].z).color(255, 255, 255, 255).texture(m, n).overlay(OverlayTexture.DEFAULT_UV).light(i).normal(1, 1, 1).next();
+		vertexConsumer.vertex(mat, vec3fs[2].x, vec3fs[2].y, vec3fs[2].z).color(255, 255, 255, 255).texture(l, n).overlay(OverlayTexture.DEFAULT_UV).light(i).normal(1, 1, 1).next();
+		vertexConsumer.vertex(mat, vec3fs[3].x, vec3fs[3].y, vec3fs[3].z).color(255, 255, 255, 255).texture(l, o).overlay(OverlayTexture.DEFAULT_UV).light(i).normal(1, 1, 1).next();
 		matrices.pop();
 		ci.cancel();
 	}

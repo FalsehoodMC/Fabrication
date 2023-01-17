@@ -12,7 +12,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Matrix4f;
+import org.joml.Matrix4f;
 import org.lwjgl.system.MemoryStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -70,7 +70,7 @@ public abstract class MixinEndPortalBlockEntityRenderer {
 				float viewportCY = (viewportBuffer.get(1) + viewportBuffer.get(3)) / 2f;
 				Matrix4f scratchMat = RenderSystem.getModelViewMatrix().copy();
 				Matrix4f projMatrix = RenderSystem.getProjectionMatrix().copy();
-				scratchMat.multiply(model);
+				scratchMat.mul(model);
 				projMatrix.writeColumnMajor(projBuffer);
 				scratchMat.writeColumnMajor(scratchBuffer);
 

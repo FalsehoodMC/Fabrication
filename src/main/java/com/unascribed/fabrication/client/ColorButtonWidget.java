@@ -8,13 +8,8 @@ public class ColorButtonWidget extends ButtonWidget {
 
 	private int bg;
 
-	public ColorButtonWidget(int x, int y, int width, int height, int bg, Text message, PressAction onPress, TooltipSupplier tooltipSupplier) {
+	public ColorButtonWidget(int x, int y, int width, int height, int bg, Text message, PressAction onPress, NarrationSupplier tooltipSupplier) {
 		super(x, y, width, height, message, onPress, tooltipSupplier);
-		this.bg = bg;
-	}
-
-	public ColorButtonWidget(int x, int y, int width, int height, int bg, Text message, PressAction onPress) {
-		super(x, y, width, height, message, onPress);
 		this.bg = bg;
 	}
 
@@ -24,6 +19,7 @@ public class ColorButtonWidget extends ButtonWidget {
 
 	@Override
 	public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		int x = getX(), y = getY();
 		fill(matrices, x, y, x+width, y+height, bg);
 		if (isHovered() || isFocused()) {
 			fill(matrices, x, y, x+width, y+1, -1);

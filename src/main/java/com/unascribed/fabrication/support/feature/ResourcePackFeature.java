@@ -1,30 +1,25 @@
 package com.unascribed.fabrication.support.feature;
 
-import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
+import com.google.common.collect.Sets;
 import com.unascribed.fabrication.EarlyAgnos;
 import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.FabricationResourcePack;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Feature;
-
-import com.google.common.collect.Sets;
-
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.resource.ResourcePack;
 import net.minecraft.resource.ResourcePackProfile;
-import net.minecraft.resource.ResourcePackProfile.Factory;
 import net.minecraft.resource.ResourcePackProfile.InsertionPosition;
 import net.minecraft.resource.ResourcePackProvider;
 import net.minecraft.resource.ResourcePackSource;
-import net.minecraft.resource.metadata.PackResourceMetadata;
+import net.minecraft.resource.ResourceType;
 import net.minecraft.text.Text;
+
+import java.util.Set;
+import java.util.function.Consumer;
 
 public abstract class ResourcePackFeature implements Feature, ResourcePackProvider {
 
@@ -53,14 +48,11 @@ public abstract class ResourcePackFeature implements Feature, ResourcePackProvid
 			FabRefl.setProviders(MinecraftClient.getInstance().getResourcePackManager(), providers);
 		}
 	}
-
 	@Override
-	public void register(Consumer<ResourcePackProfile> consumer, Factory factory) {
+	public void register(Consumer<ResourcePackProfile> consumer) {
 		if (active) {
-			Supplier<ResourcePack> f = () -> new FabricationResourcePack(path);
-			consumer.accept(factory.create(MixinConfigPlugin.MOD_NAME+" "+path, Text.literal("Internal "+MixinConfigPlugin.MOD_NAME+" resources"),true, f,
-					new PackResourceMetadata(Text.literal("Internal " + MixinConfigPlugin.MOD_NAME + " resources"), 8),
-					InsertionPosition.TOP, ResourcePackSource.PACK_SOURCE_BUILTIN));
+			consumer.accept(ResourcePackProfile.create(MixinConfigPlugin.MOD_NAME+" "+path, Text.literal("Internal "+MixinConfigPlugin.MOD_NAME+" resources"),true,
+					s -> new FabricationResourcePack(path), ResourceType.CLIENT_RESOURCES, InsertionPosition.TOP, ResourcePackSource.BUILTIN));
 		}
 	}
 

@@ -5,13 +5,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.unascribed.fabrication.features.FeatureOldLava;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 
 import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.client.texture.SpriteAtlasTexture.Data;
-
+/*
 @Mixin(SpriteAtlasTexture.class)
 @EligibleIf(configAvailable="*.old_lava", envMatches=Env.CLIENT)
 public class MixinSpriteAtlasTexture {
@@ -22,3 +20,4 @@ public class MixinSpriteAtlasTexture {
 	}
 
 }
+*/

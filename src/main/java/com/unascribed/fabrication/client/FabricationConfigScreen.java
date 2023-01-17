@@ -47,10 +47,10 @@ import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.level.storage.SessionLock;
 import org.apache.commons.lang3.ArrayUtils;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.lwjgl.opengl.GL11;
 
 import java.io.File;
@@ -95,6 +95,10 @@ public class FabricationConfigScreen extends Screen {
 	private static final Set<String> newlyUnbannedKeysServer = Sets.newHashSet();
 
 	private static boolean isFScriptLoaded = EarlyAgnos.isModLoaded("fscript");
+
+	private static Quaternionf Z_180 = new Quaternionf().setAngleAxis(Math.toRadians(180), 0, 0, 1);
+	private static Quaternionf Z_5 = new Quaternionf().setAngleAxis(Math.toRadians(5), 0, 0, 1);
+	private static Quaternionf Z_45 = new Quaternionf().setAngleAxis(Math.toRadians(45), 0, 0, 1);
 
 	private final Screen parent;
 
@@ -153,6 +157,7 @@ public class FabricationConfigScreen extends Screen {
 	private Pattern queryPattern = Pattern.compile("");
 	private boolean emptyQuery = true;
 	private boolean searchingScriptable = false;
+	private Quaternionf tmpQuat = new Quaternionf();
 
 
 	public FabricationConfigScreen(Screen parent) {
@@ -252,12 +257,12 @@ public class FabricationConfigScreen extends Screen {
 			float a = sCurve5((leaving ? Math.max(0, 10 - timeLeaving) : timeExisted) / 10);
 			matrices.push();
 				matrices.translate(width / 2f, height, 0);
-				matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(a * (leaving ? -180 : 180)));
+				matrices.multiply(tmpQuat.setAngleAxis(Math.toRadians(a * (leaving ? -180 : 180)), 0, 0, 1));
 				matrices.translate(-width / 2, -height, 0);
 				matrices.push();
 					matrices.translate(0, height, 0);
 					matrices.translate(width / 2f, height / 2f, 0);
-					matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(180));
+					matrices.multiply(Z_180);
 					matrices.translate(-width / 2f, -height / 2f, 0);
 					fill(matrices, -width, -height, width * 2, 0, FabConf.isEnabled("general.dark_mode") ? 0xFF212020 : 0xFF2196F3);
 					matrices.push();
@@ -273,7 +278,7 @@ public class FabricationConfigScreen extends Screen {
 				projection.multiplyPositionMatrix(RenderSystem.getProjectionMatrix());
 				projection.push();
 					projection.translate(width / 2f, height, 0);
-					projection.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(a * (leaving ? -180 : 180)));
+					projection.multiply(tmpQuat.setAngleAxis(Math.toRadians(a * (leaving ? -180 : 180)), 0, 0, 1));
 					projection.translate(-width / 2, -height, 0);
 					for (int x = -1; x <= 1; x++) {
 						for (int y = -1; y <= 0; y++) {
@@ -326,7 +331,7 @@ public class FabricationConfigScreen extends Screen {
 		client.getTextureManager().bindTexture(bgGrad);
 		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-		RenderSystem.setShader(GameRenderer::getPositionTexShader);
+		RenderSystem.setShader(GameRenderer::getPositionTexProgram);
 
 		int startX = cutoffX == 0 ? -width : cutoffX;
 
@@ -335,7 +340,7 @@ public class FabricationConfigScreen extends Screen {
 		bb.vertex(mat, width*2, cutoffY, 0).texture(1, cutoffV).next();
 		bb.vertex(mat, width*2, height, 0).texture(1, 1).next();
 		bb.vertex(mat, startX, height, 0).texture(0, 1).next();
-		BufferRenderer.drawWithShader(bb.end());
+		BufferRenderer.draw(bb.end());
 		float ratio = 502/1080f;
 
 		float w = height*ratio;
@@ -354,7 +359,7 @@ public class FabricationConfigScreen extends Screen {
 				top = cutoffY;
 				flagCutoffV = 1-((bottom-top)/h);
 			}
-			RenderSystem.setShader(GameRenderer::getPositionColorShader);
+			RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 			if (prideFlag != null) {
 				prideFlag.render(matrices, brk, top, w, bottom-top);
 			} else {
@@ -367,7 +372,7 @@ public class FabricationConfigScreen extends Screen {
 				bb.vertex(mat, brk2, top, 0).color(r, g, b, 1).next();
 				bb.vertex(mat, brk2, bottom, 0).color(0.475f, 0.333f, 0.282f, 1).next();
 				bb.vertex(mat, brk, bottom, 0).color(0.475f, 0.333f, 0.282f, 1).next();
-				BufferRenderer.drawWithShader(bb.end());
+				BufferRenderer.draw(bb.end());
 				RenderSystem.enableTexture();
 			}
 		}
@@ -376,7 +381,7 @@ public class FabricationConfigScreen extends Screen {
 		client.getTextureManager().bindTexture(bg);
 		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-		RenderSystem.setShader(GameRenderer::getPositionTexShader);
+		RenderSystem.setShader(GameRenderer::getPositionTexProgram);
 		bb.begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
 		bb.vertex(mat, Math.max(cutoffX, border), cutoffY, 0).texture(0, cutoffV).next();
 		bb.vertex(mat, brk, cutoffY, 0).texture(0, cutoffV).next();
@@ -393,7 +398,7 @@ public class FabricationConfigScreen extends Screen {
 		bb.vertex(mat, width-border, height, 0).texture(1, 1).next();
 		bb.vertex(mat, brk2, height, 0).texture(1, 1).next();
 
-		BufferRenderer.drawWithShader(bb.end());
+		BufferRenderer.draw(bb.end());
 
 		float a = 1-(0.3f+(sCurve5(time/10f)*0.7f));
 		if (a > 0) {
@@ -404,7 +409,7 @@ public class FabricationConfigScreen extends Screen {
 			bb.vertex(mat, width*2, cutoffY, 0).texture(1, cutoffV).next();
 			bb.vertex(mat, width*2, height, 0).texture(1, 1).next();
 			bb.vertex(mat, startX, height, 0).texture(0, 1).next();
-			BufferRenderer.drawWithShader(bb.end());
+			BufferRenderer.draw(bb.end());
 		}
 
 		RenderSystem.setShaderColor(1, 1, 1, 1);
@@ -482,7 +487,7 @@ public class FabricationConfigScreen extends Screen {
 			RenderSystem.setShaderTexture(0, id);
 			matrices.push();
 			matrices.translate((130-4-size), icoY+y, 0);
-			matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(5));
+			matrices.multiply(Z_5);
 			drawTexture(matrices, 0, 0, 0, 0, 0, size, Math.min(size, (int)Math.ceil(height-y)), size, size);
 			matrices.pop();
 			textRenderer.draw(matrices, "§l"+FeaturesFile.get(s).shortName, 4, y, -1);
@@ -509,9 +514,9 @@ public class FabricationConfigScreen extends Screen {
 				if (mouseX >= 0 && mouseX <= 130 && mouseY > startY-4 && mouseY < y) {
 					boolean deselect = s.equals(selectedSection);
 					if ("search".equals(s) && !deselect) {
-						client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_PLING, 1.2f, 1f));
+						client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_PLING.value(), 1.2f, 1f));
 					} else {
-						client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_BELL, deselect ? 0.5f : 0.6f+(i*0.1f), 1f));
+						client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_BELL.value(), deselect ? 0.5f : 0.6f+(i*0.1f), 1f));
 					}
 					prevSelectedSection = selectedSection;
 					selectedSection = deselect ? null : s;
@@ -534,7 +539,7 @@ public class FabricationConfigScreen extends Screen {
 				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
 				RenderSystem.disableTexture();
-				RenderSystem.setShader(GameRenderer::getPositionColorShader);
+				RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 				BufferBuilder bb = Tessellator.getInstance().getBuffer();
 				Matrix4f mat = matrices.peek().getPositionMatrix();
 				bb.begin(DrawMode.QUADS, VertexFormats.POSITION_COLOR);
@@ -542,7 +547,7 @@ public class FabricationConfigScreen extends Screen {
 				bb.vertex(mat, 130*selectA, y-thisHeight-8, 0).color(1, 1, 1, 0.2f+((1-selectA)*0.8f)).next();
 				bb.vertex(mat, 130*selectA, y, 0).color(1, 1, 1, 0.2f+((1-selectA)*0.8f)).next();
 				bb.vertex(mat, 0, y, 0).color(1, 1, 1, 0.2f).next();
-				BufferRenderer.drawWithShader(bb.end());
+				BufferRenderer.draw(bb.end());
 				RenderSystem.enableTexture();
 			}
 			y += 8;
@@ -584,7 +589,7 @@ public class FabricationConfigScreen extends Screen {
 		matrices.push();
 		matrices.translate(width-60, 8, 0);
 		matrices.push();
-		matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(a*-180));
+		matrices.multiply(tmpQuat.setAngleAxis(Math.toRadians(a*-180), 0, 0, 1));
 		float h = (40+(a*-100))/360f;
 		if (h < 0) {
 			h = 1+h;
@@ -594,7 +599,7 @@ public class FabricationConfigScreen extends Screen {
 		fill(matrices, -60, -8, 0, 8, MathHelper.hsvToRgb(h, 0.9f, 0.9f)|0xFF000000);
 		matrices.pop();
 		matrices.push();
-		matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(45));
+		matrices.multiply(Z_45);
 		// 8 / sqrt(2)
 		float f = 5.6568542f;
 		matrices.scale(f, f, 1);
@@ -1078,10 +1083,10 @@ public class FabricationConfigScreen extends Screen {
 						}
 					}
 					client.getSoundManager().play(PositionedSoundInstance.master(
-							newValue == ConfigValue.BANNED ? SoundEvents.BLOCK_NOTE_BLOCK_BASEDRUM :
-								newValue == ConfigValue.FALSE ? SoundEvents.BLOCK_NOTE_BLOCK_BASS :
-									newValue == ConfigValue.UNSET ? SoundEvents.BLOCK_NOTE_BLOCK_COW_BELL :
-										SoundEvents.BLOCK_NOTE_BLOCK_CHIME,
+							newValue == ConfigValue.BANNED ? SoundEvents.BLOCK_NOTE_BLOCK_BASEDRUM.value() :
+								newValue == ConfigValue.FALSE ? SoundEvents.BLOCK_NOTE_BLOCK_BASS.value() :
+									newValue == ConfigValue.UNSET ? SoundEvents.BLOCK_NOTE_BLOCK_COW_BELL.value() :
+										SoundEvents.BLOCK_NOTE_BLOCK_CHIME.value(),
 										0.6f+pitch, 1f));
 					if (newValue != currentValue || (editingWorldPath && !FabConf.doesWorldContainValue(key))) {
 						optionPreviousValues.put(key, currentValue);
@@ -1204,8 +1209,8 @@ public class FabricationConfigScreen extends Screen {
 	}
 
 	private void playErrorFeedback(){
-		client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO, 0.8f, 1));
-		client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO, 0.7f, 1));
+		client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO.value(), 0.8f, 1));
+		client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO.value(), 0.7f, 1));
 		tooltipBlinkTicks = 20;
 	}
 
@@ -1302,10 +1307,10 @@ public class FabricationConfigScreen extends Screen {
 					serverAnimateTime = 10 - serverAnimateTime;
 					configuringServer = false;
 					hasClonked = false;
-					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_XYLOPHONE, 0.8f, 1));
+					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_XYLOPHONE.value(), 0.8f, 1));
 				} else if (client.world == null) {
 					hasClonked = false;
-					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_XYLOPHONE, 0.8f, 1));
+					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_XYLOPHONE.value(), 0.8f, 1));
 					serverAnimateTime = 10 - serverAnimateTime;
 					FabConf.setWorldPath(null);
 					if (editingWorldPath) {
@@ -1317,13 +1322,13 @@ public class FabricationConfigScreen extends Screen {
 				} else if (isSingleplayer) {
 					hasClonked = false;
 					serverAnimateTime = 10 - serverAnimateTime;
-					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_XYLOPHONE, 0.8f, 1));
+					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_XYLOPHONE.value(), 0.8f, 1));
 					editingWorldPath = !editingWorldPath;
 				} else if (whyCantConfigureServer == null) {
 					hasClonked = false;
 					serverAnimateTime = 10 - serverAnimateTime;
 					configuringServer = true;
-					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_XYLOPHONE, 1.2f, 1));
+					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_XYLOPHONE.value(), 1.2f, 1));
 				} else {
 					playErrorFeedback();
 				}

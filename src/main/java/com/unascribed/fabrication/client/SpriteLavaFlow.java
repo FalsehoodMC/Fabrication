@@ -1,13 +1,11 @@
 package com.unascribed.fabrication.client;
 
-import com.unascribed.fabrication.features.FeatureOldLava;
-
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.texture.TextureTickListener;
 import net.minecraft.util.math.MathHelper;
-
+/*
 public class SpriteLavaFlow extends Sprite implements TextureTickListener {
 	public SpriteLavaFlow(SpriteAtlasTexture spriteAtlasTexture,
 			Info info, int maxLevel, int atlasWidth, int atlasHeight, int x,
@@ -119,4 +117,4 @@ public class SpriteLavaFlow extends Sprite implements TextureTickListener {
 			}
 		}
 	}
-}
+}*/

@@ -6,11 +6,10 @@ import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.FabricationResourcePack;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.resource.ResourcePackProfile;
-import net.minecraft.resource.ResourcePackProfile.Factory;
 import net.minecraft.resource.ResourcePackProfile.InsertionPosition;
 import net.minecraft.resource.ResourcePackProvider;
 import net.minecraft.resource.ResourcePackSource;
-import net.minecraft.resource.metadata.PackResourceMetadata;
+import net.minecraft.resource.ResourceType;
 import net.minecraft.text.Text;
 
 import java.util.Set;
@@ -29,11 +28,9 @@ public class FabricationDefaultResources implements ResourcePackProvider {
 		}
 	}
 	@Override
-	public void register(Consumer<ResourcePackProfile> consumer, Factory factory) {
-		consumer.accept(factory.create(MixinConfigPlugin.MOD_NAME, Text.literal("Internal " + MixinConfigPlugin.MOD_NAME + " resources"),true,
-				() -> new FabricationResourcePack("default"),
-				new PackResourceMetadata(Text.literal("Internal "+MixinConfigPlugin.MOD_NAME+" resources"), 7),
-				InsertionPosition.TOP, ResourcePackSource.PACK_SOURCE_BUILTIN));
+	public void register(Consumer<ResourcePackProfile> consumer) {
+		consumer.accept(ResourcePackProfile.create(MixinConfigPlugin.MOD_NAME, Text.literal("Internal " + MixinConfigPlugin.MOD_NAME + " resources"),true,
+				s -> new FabricationResourcePack("default"), ResourceType.CLIENT_RESOURCES, InsertionPosition.TOP, ResourcePackSource.BUILTIN));
 	}
 
 }

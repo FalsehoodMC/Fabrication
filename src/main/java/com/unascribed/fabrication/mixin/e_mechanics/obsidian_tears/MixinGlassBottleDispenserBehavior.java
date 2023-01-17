@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(targets="net.minecraft.block.dispenser.DispenserBehavior$17")
+@Mixin(targets="net.minecraft.block.dispenser.DispenserBehavior$24")
 @EligibleIf(configAvailable="*.obsidian_tears")
 public abstract class MixinGlassBottleDispenserBehavior extends FallibleItemDispenserBehavior {
 

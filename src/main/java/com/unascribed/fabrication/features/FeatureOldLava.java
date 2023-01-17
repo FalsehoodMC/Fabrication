@@ -3,8 +3,6 @@ package com.unascribed.fabrication.features;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.FabricationMod;
-import com.unascribed.fabrication.client.SpriteLava;
-import com.unascribed.fabrication.client.SpriteLavaFlow;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Feature;
@@ -13,10 +11,10 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.texture.Sprite.Info;
 import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.texture.SpriteContents;
 import net.minecraft.util.Identifier;
-
+/*
 @EligibleIf(anyConfigAvailable={"*.old_lava", "*.old_lava_scaling"}, envMatches=Env.CLIENT)
 public class FeatureOldLava implements Feature {
 
@@ -29,15 +27,15 @@ public class FeatureOldLava implements Feature {
 				Sprite originalLavaFlow = atlas.getSprite(flow);
 				int lavaWidth, lavaHeight, lavaFlowWidth,  lavaFlowHeight;
 				if (FabConf.isEnabled("*.old_lava_scaling")) {
-					lavaWidth = originalLava.getWidth();
-					lavaHeight = originalLava.getHeight();
-					lavaFlowWidth = originalLavaFlow.getWidth();
-					lavaFlowHeight = originalLavaFlow.getHeight();
+					lavaWidth = originalLava.getContents().getWidth();
+					lavaHeight = originalLava.getContents().getHeight();
+					lavaFlowWidth = originalLavaFlow.getContents().getWidth();
+					lavaFlowHeight = originalLavaFlow.getContents().getHeight();
 				} else {
 					lavaWidth = lavaHeight = 16;
 					lavaFlowWidth = lavaFlowHeight = 32;
 				}
-				SpriteLava newLava = new SpriteLava(atlas, new Info(still, lavaWidth, lavaHeight, AnimationResourceMetadata.EMPTY), FabRefl.Client.getMaxLevel(data),
+				SpriteLava newLava = new SpriteLava(atlas, new SpriteContents(still, lavaWidth, lavaHeight, AnimationResourceMetadata.EMPTY), FabRefl.Client.getMaxLevel(data),
 						FabRefl.Client.getWidth(data), FabRefl.Client.getHeight(data), FabRefl.Client.getX(originalLava), FabRefl.Client.getY(originalLava), new NativeImage(lavaWidth, lavaHeight, false));
 				SpriteLavaFlow newLavaFlow = new SpriteLavaFlow(atlas, new Info(flow, lavaFlowWidth, lavaFlowHeight, AnimationResourceMetadata.EMPTY), FabRefl.Client.getMaxLevel(data),
 						FabRefl.Client.getWidth(data), FabRefl.Client.getHeight(data), FabRefl.Client.getX(originalLavaFlow), FabRefl.Client.getY(originalLavaFlow), new NativeImage(lavaFlowWidth, lavaFlowHeight, false));
@@ -107,3 +105,4 @@ public class FeatureOldLava implements Feature {
 	}
 
 }
+*/
