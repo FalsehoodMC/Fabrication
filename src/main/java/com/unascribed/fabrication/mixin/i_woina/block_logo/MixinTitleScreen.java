@@ -3,6 +3,7 @@ package com.unascribed.fabrication.mixin.i_woina.block_logo;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.injection.Hijack;
 import com.unascribed.fabrication.util.BlockLogoRenderer;
+import net.minecraft.util.math.RotationAxis;
 import org.joml.Quaternionf;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -100,7 +101,7 @@ public class MixinTitleScreen extends Screen {
 			int l = MathHelper.ceil(fade * 255.0f) << 24;
 			matrices.push();
 			matrices.translate(this.width / 2.0 + ((LoaderBlockLogo.unrecoverableLoadError ? 48 : LoaderBlockLogo.image.getWidth())*2.307692307692308f), 70, 0);
-			matrices.multiply(new Quaternionf().setAngleAxis(Math.toRadians(20), 0, 0, -1));
+			matrices.multiply(RotationAxis.NEGATIVE_Z.rotationDegrees(20));
 			float s = 1.8f - MathHelper.abs(MathHelper.sin(Util.getMeasuringTimeMs() % 1000 / 1000f * 6.28f) * 0.1f);
 			s = s * 100f / (textRenderer.getWidth(splashText) + 32);
 			matrices.scale(s, s, s);

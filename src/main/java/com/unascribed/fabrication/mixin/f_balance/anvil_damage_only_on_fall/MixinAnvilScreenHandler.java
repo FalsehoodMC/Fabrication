@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.Mixin;
 @EligibleIf(configAvailable="*.anvil_damage_only_on_fall", specialConditions=SpecialEligibility.NOT_FORGE)
 public class MixinAnvilScreenHandler {
 
-	@Hijack(target="Lnet/minecraft/block/BlockState;isIn(Lnet/minecraft/tag/TagKey;)Z",
+	@Hijack(target="Lnet/minecraft/block/BlockState;isIn(Lnet/minecraft/registry/tag/TagKey;)Z",
 			method="method_24922(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V")
 	private static HijackReturn fabrication$preventAnvilDmg() {
 		return FabConf.isEnabled("*.anvil_damage_only_on_fall") ? HijackReturn.FALSE : null;

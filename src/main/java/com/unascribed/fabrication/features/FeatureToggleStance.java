@@ -79,7 +79,7 @@ public class FeatureToggleStance implements Feature {
 				Identifier tex = new Identifier("fabrication", "textures/stance/"+currentStance.name().toLowerCase(Locale.ROOT)+".png");
 				RenderSystem.defaultBlendFunc();
 				RenderSystem.enableBlend();
-				RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+				RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
 				//GlStateManager.disableAlphaTest();
 				RenderSystem.setShaderTexture(0, tex);
 				RenderSystem.setShaderColor(1, 1, 1, a);

@@ -1,7 +1,6 @@
 package com.unascribed.fabrication.mixin.g_weird_tweaks.drop_exp_with_keep_inventory;
 
 import com.unascribed.fabrication.FabConf;
-import net.minecraft.network.encryption.PlayerPublicKey;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabInject;
@@ -19,8 +18,8 @@ import net.minecraft.world.World;
 @EligibleIf(configAvailable="*.drop_exp_with_keep_inventory")
 public abstract class MixinServerPlayerEntity extends PlayerEntity {
 
-	public MixinServerPlayerEntity(World world, BlockPos pos, float yaw, GameProfile gameProfile, PlayerPublicKey publicKey) {
-		super(world, pos, yaw, gameProfile, publicKey);
+	public MixinServerPlayerEntity(World world, BlockPos pos, float yaw, GameProfile gameProfile) {
+		super(world, pos, yaw, gameProfile);
 	}
 
 	@FabInject(at=@At("TAIL"), method="copyFrom(Lnet/minecraft/server/network/ServerPlayerEntity;Z)V")

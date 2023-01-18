@@ -47,7 +47,7 @@ public abstract class MixinEndPortalBlockEntityRenderer {
 	@Unique
 	private static final Random RANDOM = new Random(31100L);
 
-	@FabInject(at=@At("HEAD"), method="renderSide(Lnet/minecraft/block/entity/EndPortalBlockEntity;Lnet/minecraft/util/math/Matrix4f;Lnet/minecraft/client/render/VertexConsumer;FFFFFFFFLnet/minecraft/util/math/Direction;)V", cancellable=true)
+	@FabInject(at=@At("HEAD"), method="renderSide(Lnet/minecraft/block/entity/EndPortalBlockEntity;Lorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumer;FFFFFFFFLnet/minecraft/util/math/Direction;)V", cancellable=true)
 	public void fabrication$render(EndPortalBlockEntity be, Matrix4f model, VertexConsumer vertices, float x1, float x2, float y1, float y2, float z1, float z2, float z3, float z4, Direction side, CallbackInfo ci) {
 		if (canUseCompatFunctions() && FabConf.isEnabled("*.end_portal_parallax") && be.shouldDrawSide(side)) {
 			// YOU try to make it work with the gateway, I DARE YOU
@@ -68,11 +68,11 @@ public abstract class MixinEndPortalBlockEntityRenderer {
 				glGetIntegerv(GL_VIEWPORT, viewportBuffer);
 				float viewportCX = (viewportBuffer.get(0) + viewportBuffer.get(2)) / 2f;
 				float viewportCY = (viewportBuffer.get(1) + viewportBuffer.get(3)) / 2f;
-				Matrix4f scratchMat = RenderSystem.getModelViewMatrix().copy();
-				Matrix4f projMatrix = RenderSystem.getProjectionMatrix().copy();
+				Matrix4f scratchMat = new Matrix4f().set(RenderSystem.getModelViewMatrix());
+				Matrix4f projMatrix = new Matrix4f().set(RenderSystem.getProjectionMatrix());
 				scratchMat.mul(model);
-				projMatrix.writeColumnMajor(projBuffer);
-				scratchMat.writeColumnMajor(scratchBuffer);
+				projMatrix.get(projBuffer);
+				scratchMat.get(scratchBuffer);
 
 				GLUPort.gluUnProject(
 						viewportCX,

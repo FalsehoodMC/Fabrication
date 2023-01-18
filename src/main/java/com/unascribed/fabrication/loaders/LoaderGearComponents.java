@@ -25,6 +25,7 @@ import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.random.Random;
@@ -191,9 +192,9 @@ public class LoaderGearComponents implements ConfigLoader {
 	private static Supplier<Item> tagResolver(Identifier id) {
 		return () -> {
 			TagKey<Item> itemTag = TagKey.of(RegistryKeys.ITEM, id);
-			if (Registries.ITEM.containsTag(itemTag)) return Registries.ITEM.getEntryList(itemTag).flatMap(items -> items.getRandom(rand)).map(RegistryEntry::value).orElse(null);
+			if (Registries.ITEM.getEntryList(itemTag).isPresent()) return Registries.ITEM.getEntryList(itemTag).flatMap(items -> items.getRandom(rand)).map(RegistryEntry::value).orElse(null);
 			TagKey<Block> blockTag = TagKey.of(RegistryKeys.BLOCK, id);
-			if (Registries.BLOCK.containsTag(blockTag)) return Registries.BLOCK.getEntryList(blockTag).flatMap(blocks -> blocks.getRandom(rand)).map(blockEntry -> blockEntry.value().asItem()).orElse(null);
+			if (Registries.BLOCK.getEntryList(blockTag).isPresent()) return Registries.BLOCK.getEntryList(blockTag).flatMap(blocks -> blocks.getRandom(rand)).map(blockEntry -> blockEntry.value().asItem()).orElse(null);
 			return null;
 		};
 	}

@@ -1,30 +1,25 @@
 package com.unascribed.fabrication;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
-import java.util.function.Predicate;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.io.Resources;
-
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.resource.InputSupplier;
 import net.minecraft.resource.ResourcePack;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.resource.metadata.ResourceMetadataReader;
 import net.minecraft.util.Identifier;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Set;
 
 public class FabricationResourcePack implements ResourcePack {
 
@@ -46,16 +41,14 @@ public class FabricationResourcePack implements ResourcePack {
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	public InputStream openRoot(String fileName) throws IOException {
-		if (fileName.contains("/") || fileName.contains("\\")) {
-			throw new IllegalArgumentException("Root resources can only be filenames, not paths (no / allowed!)");
+	public InputSupplier<InputStream> openRoot(String... seg) {
+		if (seg.length == 0) return null;
+		if ("pack.png".equals(seg[0])) {
+			return () -> getClass().getClassLoader().getResourceAsStream("assets/fabrication/icon.png");
 		}
-		if ("pack.png".equals(fileName)) {
-			return getClass().getClassLoader().getResourceAsStream("assets/fabrication/icon.png");
-		}
-		InputStream is = getClass().getClassLoader().getResourceAsStream(path+"/"+fileName);
-		if (is == null) throw new FileNotFoundException(fileName);
-		return is;
+		InputStream is = getClass().getClassLoader().getResourceAsStream(path+"/"+String.join("/", seg));
+		if (is == null) return null;
+		return () -> is;
 	}
 
 	private URL url(ResourceType type, Identifier id) {
@@ -67,21 +60,15 @@ public class FabricationResourcePack implements ResourcePack {
 	}
 
 	@Override
-	public InputStream open(ResourceType type, Identifier id) throws IOException {
+	public InputSupplier<InputStream> open(ResourceType type, Identifier id) {
 		URL u = url(type, id);
-		if (u == null) throw new FileNotFoundException(id.toString());
-		return u.openStream();
+		if (u == null) return null;
+		return u::openStream;
 	}
 
 	@Override
-	public Collection<Identifier> findResources(ResourceType type, String namespace, String prefix, Predicate<Identifier> allowedPathPredicate) {
-		// SORRY NO BONUS
-		return Collections.emptySet();
-	}
-
-	@Override
-	public boolean contains(ResourceType type, Identifier id) {
-		return url(type, id) != null;
+	public void findResources(ResourceType type, String namespace, String prefix, ResultConsumer consumer) {
+		int a =0;
 	}
 
 	@Override

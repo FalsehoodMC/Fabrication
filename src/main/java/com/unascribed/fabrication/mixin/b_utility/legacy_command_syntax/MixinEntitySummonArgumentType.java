@@ -14,6 +14,7 @@ import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Locale;
 
@@ -21,8 +22,9 @@ import java.util.Locale;
 @EligibleIf(configAvailable="*.legacy_command_syntax")
 public class MixinEntitySummonArgumentType {
 	private boolean isNotEntityArgument = true;
+
 	@FabInject(at=@At("TAIL"), method="<init>(Lnet/minecraft/command/CommandRegistryAccess;Lnet/minecraft/registry/RegistryKey;)V")
-	public void legacyCommandInput(CommandRegistryAccess access, RegistryKey key) {
+	public void legacyCommandInput(CommandRegistryAccess access, RegistryKey key, CallbackInfo ci) {
 		if (key == RegistryKeys.ENTITY_TYPE) {
 			isNotEntityArgument = false;
 		}

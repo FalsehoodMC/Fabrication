@@ -107,7 +107,7 @@ public class WoinaDrops {
 									}
 									NativeImage img = FabRefl.Client.NativeImage_new(Format.RGBA, w, h, false, MemoryUtil.memAddress(dest));
 									try {
-										NativeImage mipped = MipmapHelper.getMipmapLevelsImages(img, 1)[1];
+										NativeImage mipped = MipmapHelper.getMipmapLevelsImages(new NativeImage[]{img}, 1)[1];
 										try {
 											TextureUtil.prepareImage(getGlId(), mipped.getWidth(), mipped.getHeight());
 											RenderSystem.bindTexture(getGlId());

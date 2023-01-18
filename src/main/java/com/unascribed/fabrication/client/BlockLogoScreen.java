@@ -129,7 +129,7 @@ public class BlockLogoScreen extends Screen{
 						LoaderBlockLogo.colorToState.put(selectedColor, () -> {
 							String block = l.get(ThreadLocalRandom.current().nextInt(l.size()));
 							try {
-								return BlockArgumentParser.block(Registries.BLOCK, new StringReader(block), false).blockState();
+								return BlockArgumentParser.block(Registries.BLOCK.getReadOnlyWrapper(), new StringReader(block), false).blockState();
 							} catch (CommandSyntaxException e) {
 								FabLog.warn(block + " is not a valid identifier");
 								return Blocks.AIR.getDefaultState();
@@ -160,7 +160,7 @@ public class BlockLogoScreen extends Screen{
 						LoaderBlockLogo.colorToState.put(selectedColor, () -> {
 							String block = blocks.get(ThreadLocalRandom.current().nextInt(blocks.size()));
 							try {
-								return BlockArgumentParser.block(Registry.BLOCK, new StringReader(block), false).blockState();
+								return BlockArgumentParser.block(Registries.BLOCK.getReadOnlyWrapper(), new StringReader(block), false).blockState();
 							} catch (CommandSyntaxException e) {
 								FabLog.warn(block+" is not a valid identifier");
 								return Blocks.AIR.getDefaultState();

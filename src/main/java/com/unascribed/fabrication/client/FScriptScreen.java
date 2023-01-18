@@ -64,8 +64,8 @@ public class FScriptScreen extends ScriptingScreen {
 				fabrication$writeLocal = !fabrication$writeLocal;
 			} else {
 				fabrication$writeLocal = true;
-				client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO, 0.8f, 1));
-				client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO, 0.7f, 1));
+				client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO.value(), 0.8f, 1));
+				client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO.value(), 0.7f, 1));
 			}
 		}
 		super.drawOptionButtons(matrices, mouseX, mouseY, delta);

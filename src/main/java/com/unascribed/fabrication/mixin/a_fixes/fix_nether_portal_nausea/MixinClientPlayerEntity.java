@@ -8,7 +8,6 @@ import com.unascribed.fabrication.support.Env;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.encryption.PlayerPublicKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -24,8 +23,8 @@ public abstract class MixinClientPlayerEntity extends PlayerEntity implements Po
 	private float fabrication$lastClientPortalTicks = 0;
 	private float fabrication$nextClientPortalTicks = 0;
 
-	public MixinClientPlayerEntity(World world, BlockPos pos, float yaw, GameProfile gameProfile, PlayerPublicKey publicKey) {
-		super(world, pos, yaw, gameProfile, publicKey);
+	public MixinClientPlayerEntity(World world, BlockPos pos, float yaw, GameProfile gameProfile) {
+		super(world, pos, yaw, gameProfile);
 	}
 
 	@FabInject(method="tickMovement()V", at=@At("HEAD"))

@@ -13,12 +13,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientPlayNetworkHandler.class)
 public class MixinClientPlayNetworkHandler {
-		@Shadow
-		private CommandDispatcher<CommandSource> commandDispatcher;
+	@Shadow
+	private CommandDispatcher<CommandSource> commandDispatcher;
 
-		@FabInject(method="onCommandTree(Lnet/minecraft/network/packet/s2c/play/CommandTreeS2CPacket;)V", at=@At("TAIL"))
-		private void addClientSuggestions(CommandTreeS2CPacket packet, CallbackInfo info) {
-			FabricationClientCommands.addSuggestions(commandDispatcher);
+	@FabInject(method="onCommandTree(Lnet/minecraft/network/packet/s2c/play/CommandTreeS2CPacket;)V", at=@At("TAIL"))
+	private void addClientSuggestions(CommandTreeS2CPacket packet, CallbackInfo info) {
+		FabricationClientCommands.addSuggestions(commandDispatcher);
+	}
+
+	@FabInject(method="sendChatCommand(Ljava/lang/String;)V", at=@At("HEAD"), cancellable=true)
+	private void onSendCommand(String command, CallbackInfo info) {
+		if (FabricationClientCommands.runCommand(command)) {
+			info.cancel();
 		}
-
+	}
 }

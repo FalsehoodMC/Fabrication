@@ -6,6 +6,7 @@ import java.util.Iterator;
 import com.unascribed.fabrication.FabConf;
 import net.minecraft.entity.Entity;
 import net.minecraft.text.Text;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -39,7 +40,7 @@ import net.minecraft.world.World;
 public abstract class MixinNoteBlock {
 
 	@Shadow
-	protected abstract void playNote(Entity entity, World world, BlockPos pos);
+	protected abstract void playNote(@Nullable Entity entity, BlockState state, World world, BlockPos pos);
 
 	private static final String FABRICATION$NOTE_COLORS = "aa66cccccdd559999bbbaaaaa";
 	private static final ImmutableList<String> FABRICATION$NOTES = ImmutableList.of(
@@ -110,7 +111,7 @@ public abstract class MixinNoteBlock {
 						world.setBlockState(pos, state, 3);
 						player.increaseStat(Stats.TUNE_NOTEBLOCK, dist);
 					}
-					playNote(player, world, pos);
+					playNote(player, state, world, pos);
 					fabrication$informNote(player, state);
 					ci.setReturnValue(ActionResult.CONSUME);
 					return;
@@ -120,7 +121,7 @@ public abstract class MixinNoteBlock {
 				if (player.isSneaking()) {
 					state = cycleBackward(state, NoteBlock.NOTE);
 					world.setBlockState(pos, state, 3);
-					playNote(player, world, pos);
+					playNote(player, state, world, pos);
 					player.incrementStat(Stats.TUNE_NOTEBLOCK);
 					fabrication$informNote(player, state);
 					ci.setReturnValue(ActionResult.CONSUME);

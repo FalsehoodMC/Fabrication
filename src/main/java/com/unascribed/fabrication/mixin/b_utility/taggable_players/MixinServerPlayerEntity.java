@@ -12,7 +12,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
-import net.minecraft.network.encryption.PlayerPublicKey;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -31,8 +30,8 @@ public abstract class MixinServerPlayerEntity extends PlayerEntity implements Ta
 
 	private final Set<String> fabrication$tags = new HashSet<>();
 
-	public MixinServerPlayerEntity(World world, BlockPos pos, float yaw, GameProfile gameProfile, PlayerPublicKey publicKey) {
-		super(world, pos, yaw, gameProfile, publicKey);
+	public MixinServerPlayerEntity(World world, BlockPos pos, float yaw, GameProfile gameProfile) {
+		super(world, pos, yaw, gameProfile);
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.mixin.d_minor_mechanics.note_blocks_play_on_landing;
 
 import com.unascribed.fabrication.FabConf;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
@@ -23,19 +24,19 @@ import net.minecraft.world.World;
 @EligibleIf(configAvailable="*.note_blocks_play_on_landing")
 public abstract class MixinNoteBlock extends Block {
 
+	@Shadow
+	protected abstract void playNote(@Nullable Entity entity, BlockState state, World world, BlockPos pos);
+
 	public MixinNoteBlock(Settings settings) {
 		super(settings);
 	}
-
-	@Shadow
-	private void playNote(Entity entity, World world, BlockPos pos) {}
 
 	@Override
 	public void onLandedUpon(World world, BlockState state, BlockPos pos, Entity entity, float distance) {
 		super.onLandedUpon(world, state, pos, entity, distance);
 		if (!world.isClient && FabConf.isEnabled("*.note_blocks_play_on_landing")) {
 			for (int i = 0; i < Math.min(8, Math.ceil(distance/2)); i++) {
-				playNote(entity, world, pos);
+				playNote(entity, state, world, pos);
 			}
 			if (entity instanceof PlayerEntity) {
 				((PlayerEntity)entity).incrementStat(Stats.PLAY_NOTEBLOCK);

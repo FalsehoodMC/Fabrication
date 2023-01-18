@@ -2,6 +2,7 @@ package com.unascribed.fabrication.mixin.e_mechanics.obsidian_tears;
 
 import com.unascribed.fabrication.logic.ObsidianTears;
 import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.injection.FabInject;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.DispenserBlock;
@@ -13,10 +14,9 @@ import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(targets="net.minecraft.block.dispenser.DispenserBehavior$24")
+@Mixin(targets="net.minecraft.block.dispenser.DispenserBehavior$17")
 @EligibleIf(configAvailable="*.obsidian_tears")
 public abstract class MixinGlassBottleDispenserBehavior extends FallibleItemDispenserBehavior {
 

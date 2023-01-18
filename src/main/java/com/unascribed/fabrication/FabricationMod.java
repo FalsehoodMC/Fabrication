@@ -9,7 +9,6 @@ import java.util.function.Predicate;
 
 import com.unascribed.fabrication.interfaces.SetFabricationConfigAware;
 import com.unascribed.fabrication.support.ConfigLoader;
-import com.unascribed.fabrication.support.ConfigValue;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.FabricationDefaultResources;
 import com.unascribed.fabrication.support.Feature;
@@ -90,9 +89,9 @@ public class FabricationMod implements ModInitializer {
 		}
 		if (EarlyAgnos.getCurrentEnv() == Env.CLIENT) {
 			FabricationClientCommands.registerCommands();
-			LEVELUP_LONG = new SoundEvent(new Identifier("fabrication", "levelup_long"));
-			OOF = new SoundEvent(new Identifier("fabrication", "oof"));
-			ABSORPTION_HURT = new SoundEvent(new Identifier("fabrication", "absorption_hurt"));
+			LEVELUP_LONG = SoundEvent.of(new Identifier("fabrication", "levelup_long"));
+			OOF = SoundEvent.of(new Identifier("fabrication", "oof"));
+			ABSORPTION_HURT = SoundEvent.of(new Identifier("fabrication", "absorption_hurt"));
 			FabricationDefaultResources.apply();
 		}
 

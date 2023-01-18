@@ -21,6 +21,7 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RotationAxis;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -57,7 +58,7 @@ public class MixinItemEntityRenderer {
 		float scaleX = bm.getTransformation().ground.scale.x/2f;
 		float scaleY = bm.getTransformation().ground.scale.y/2f;
 
-		Quaternionf quaternion = new Quaternionf().setAngleAxis(camera.getYaw(), 0, -1, 0);
+		Quaternionf quaternion = RotationAxis.NEGATIVE_Y.rotationDegrees(camera.getYaw());
 		Vector3f[] vec3fs = new Vector3f[]{new Vector3f(-scaleX, -scaleY, 0.0F), new Vector3f(-scaleX, scaleY, 0.0F), new Vector3f(scaleX, scaleY, 0.0F), new Vector3f(scaleX, -scaleY, 0.0F)};
 		for(int k = 0; k < 4; ++k) {
 			vec3fs[k].rotate(quaternion);

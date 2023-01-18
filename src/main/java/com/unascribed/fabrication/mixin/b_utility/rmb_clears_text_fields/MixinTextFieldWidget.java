@@ -35,7 +35,7 @@ public abstract class MixinTextFieldWidget extends ClickableWidget {
 	@FabInject(at=@At(value="HEAD"), method="mouseClicked(DDI)Z", cancellable=true)
 	public void rmbClear(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
 		if (!FabConf.isEnabled("*.rmb_clears_text_fields")) return;
-		if (button == 1 && this.isVisible() && this.isEditable() && (this.isFocused() || focusUnlocked) && mouseX >= this.x && mouseX < (this.x + this.width) && mouseY >= this.y && mouseY < (this.y + this.height)) {
+		if (button == 1 && this.isVisible() && this.isEditable() && (this.isFocused() || focusUnlocked) && mouseX >= this.getX() && mouseX < (this.getX() + this.width) && mouseY >= this.getY() && mouseY < (this.getY() + this.height)) {
 			this.setText("");
 			cir.setReturnValue(true);
 		}

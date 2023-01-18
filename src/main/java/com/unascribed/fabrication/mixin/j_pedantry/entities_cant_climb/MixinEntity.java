@@ -19,7 +19,7 @@ import java.util.function.Predicate;
 public class MixinEntity {
 
 	private static final Predicate<LivingEntity> fabrication$entitiesCantClimbPredicate = ConfigPredicates.getFinalPredicate("*.entities_cant_climb");
-	@ModifyReturn(method="move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V", target="Lnet/minecraft/block/BlockState;isIn(Lnet/minecraft/tag/TagKey;)Z")
+	@ModifyReturn(method="move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V", target="Lnet/minecraft/block/BlockState;isIn(Lnet/minecraft/registry/tag/TagKey;)Z")
 	private static boolean fabrication$disableClimbing(boolean old, BlockState state, TagKey<Block> tag, Entity entity) {
 		if (FabConf.isAnyEnabled("*.entities_cant_climb") &&
 				tag == BlockTags.CLIMBABLE &&

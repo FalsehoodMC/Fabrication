@@ -10,6 +10,7 @@ import net.minecraft.client.render.model.json.ModelTransformation.Mode;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.RotationAxis;
 import org.joml.Quaternionf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,7 +19,6 @@ import org.spongepowered.asm.mixin.injection.At;
 @EligibleIf(configAvailable="*.flat_items", envMatches=Env.CLIENT)
 public class MixinHeldItemRenderer {
 
-	private Quaternionf fabrication$flatItemY180 = new Quaternionf().setAngleAxis(Math.toRadians(180), 0, 1, 0);
 	@FabModifyVariable(at=@At("HEAD"), method="renderItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformation$Mode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",
 			index=3, argsOnly=true)
 	public Mode renderItemTransformMode(Mode orig, LivingEntity entity, ItemStack stack, Mode orig2, boolean leftHanded, MatrixStack matrices) {
@@ -29,7 +29,7 @@ public class MixinHeldItemRenderer {
 					// multiply the model matrix directly to avoid corrupting normals
 					matrices.peek().getPositionMatrix().scale(1, 1, 0);
 					if (leftHanded) {
-						matrices.multiply(fabrication$flatItemY180);
+						matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180));
 					}
 					return Mode.GROUND;
 				}

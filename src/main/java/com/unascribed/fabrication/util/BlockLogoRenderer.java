@@ -24,16 +24,13 @@ import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RotationAxis;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 
 public class BlockLogoRenderer {
-	private static Quaternionf X_15 = new Quaternionf().setAngleAxis(Math.toRadians(15), 1, 0, 0);;
-	private static Quaternionf X_90 = new Quaternionf().setAngleAxis(Math.toRadians(90), 1, 0, 0);
-	private Quaternionf tmpQuat = new Quaternionf();
-
 	private LogoBlock[][] blocks = null;
 
 	public void tick() {
@@ -92,7 +89,7 @@ public class BlockLogoRenderer {
 		MatrixStack matrices = new MatrixStack();
 		RenderSystem.backupProjectionMatrix();
 		int logoHeight = (int)(120 * mc.getWindow().getScaleFactor());
-		Matrix4f pmat = Matrix4f.viewboxMatrix(70, mc.getWindow().getFramebufferWidth()/(float)logoHeight, 0.05f, 100);
+		Matrix4f pmat = new Matrix4f().setPerspective(70, mc.getWindow().getFramebufferWidth()/(float)logoHeight, 0.05f, 100);
 		RenderSystem.setProjectionMatrix(pmat);
 		RenderSystem.viewport(0, mc.getWindow().getFramebufferHeight() - logoHeight, mc.getWindow().getFramebufferWidth(), logoHeight);
 		matrices.push();
@@ -123,7 +120,7 @@ public class BlockLogoRenderer {
 				RenderSystem.blendFunc(GL11.GL_SRC_COLOR, GL11.GL_ONE);
 			}
 			matrices.scale(1, -1, 1);
-			matrices.multiply(X_15);
+			matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(15));
 			matrices.scale(0.89f, 1, 0.4f);
 			matrices.translate(-logoDataWidth * 0.5f, -logoDataHeight * 0.5f, 0);
 
@@ -164,7 +161,7 @@ public class BlockLogoRenderer {
 					}
 					matrices.translate(x, y, position);
 					matrices.scale(scale, scale, scale);
-					matrices.multiply(tmpQuat.setAngleAxis(Math.toRadians(rot), 0, 1, 0));
+					matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rot));
 					if (pass != 0) {
 						mc.getTextureManager().bindTexture(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE);
 						RenderSystem.setShader(GameRenderer::getPositionTexColorNormalProgram);
@@ -212,7 +209,7 @@ public class BlockLogoRenderer {
 							Tessellator.getInstance().draw();
 						} else {
 							VertexConsumerProvider.Immediate vertexConsumer = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
-							matrices.multiply(X_90);
+							matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90));
 							matrices.translate(0, 0, -1);
 							brm.renderBlockAsEntity(state, matrices, vertexConsumer, LightmapTextureManager.pack(15, 15), OverlayTexture.DEFAULT_UV);
 							vertexConsumer.draw();

@@ -8,7 +8,6 @@ import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.injection.FabInject;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.encryption.PlayerPublicKey;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -22,11 +21,11 @@ import java.util.function.Predicate;
 @EligibleIf(configAvailable="*.no_hunger")
 public abstract class MixinServerPlayerEntity extends PlayerEntity {
 
-	public MixinServerPlayerEntity(World world, BlockPos pos, float yaw, GameProfile gameProfile, PlayerPublicKey publicKey) {
-		super(world, pos, yaw, gameProfile, publicKey);
-	}
-
 	private static final Predicate<PlayerEntity> fabrication$noHungerPredicate = ConfigPredicates.getFinalPredicate("*.no_hunger");
+
+	public MixinServerPlayerEntity(World world, BlockPos pos, float yaw, GameProfile gameProfile) {
+		super(world, pos, yaw, gameProfile);
+	}
 
 	@FabInject(at=@At("TAIL"), method="tick()V")
 	public void tick(CallbackInfo ci) {

@@ -47,6 +47,7 @@ import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RotationAxis;
 import net.minecraft.world.level.storage.SessionLock;
 import org.apache.commons.lang3.ArrayUtils;
 import org.joml.Matrix4f;
@@ -95,10 +96,6 @@ public class FabricationConfigScreen extends Screen {
 	private static final Set<String> newlyUnbannedKeysServer = Sets.newHashSet();
 
 	private static boolean isFScriptLoaded = EarlyAgnos.isModLoaded("fscript");
-
-	private static Quaternionf Z_180 = new Quaternionf().setAngleAxis(Math.toRadians(180), 0, 0, 1);
-	private static Quaternionf Z_5 = new Quaternionf().setAngleAxis(Math.toRadians(5), 0, 0, 1);
-	private static Quaternionf Z_45 = new Quaternionf().setAngleAxis(Math.toRadians(45), 0, 0, 1);
 
 	private final Screen parent;
 
@@ -157,8 +154,6 @@ public class FabricationConfigScreen extends Screen {
 	private Pattern queryPattern = Pattern.compile("");
 	private boolean emptyQuery = true;
 	private boolean searchingScriptable = false;
-	private Quaternionf tmpQuat = new Quaternionf();
-
 
 	public FabricationConfigScreen(Screen parent) {
 		super(Text.literal(MixinConfigPlugin.MOD_NAME+" configuration"));
@@ -257,12 +252,12 @@ public class FabricationConfigScreen extends Screen {
 			float a = sCurve5((leaving ? Math.max(0, 10 - timeLeaving) : timeExisted) / 10);
 			matrices.push();
 				matrices.translate(width / 2f, height, 0);
-				matrices.multiply(tmpQuat.setAngleAxis(Math.toRadians(a * (leaving ? -180 : 180)), 0, 0, 1));
+				matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(a * (leaving ? -180 : 180)));
 				matrices.translate(-width / 2, -height, 0);
 				matrices.push();
 					matrices.translate(0, height, 0);
 					matrices.translate(width / 2f, height / 2f, 0);
-					matrices.multiply(Z_180);
+					matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180));
 					matrices.translate(-width / 2f, -height / 2f, 0);
 					fill(matrices, -width, -height, width * 2, 0, FabConf.isEnabled("general.dark_mode") ? 0xFF212020 : 0xFF2196F3);
 					matrices.push();
@@ -278,7 +273,7 @@ public class FabricationConfigScreen extends Screen {
 				projection.multiplyPositionMatrix(RenderSystem.getProjectionMatrix());
 				projection.push();
 					projection.translate(width / 2f, height, 0);
-					projection.multiply(tmpQuat.setAngleAxis(Math.toRadians(a * (leaving ? -180 : 180)), 0, 0, 1));
+					projection.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(a * (leaving ? -180 : 180)));
 					projection.translate(-width / 2, -height, 0);
 					for (int x = -1; x <= 1; x++) {
 						for (int y = -1; y <= 0; y++) {
@@ -487,7 +482,7 @@ public class FabricationConfigScreen extends Screen {
 			RenderSystem.setShaderTexture(0, id);
 			matrices.push();
 			matrices.translate((130-4-size), icoY+y, 0);
-			matrices.multiply(Z_5);
+			matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(5));
 			drawTexture(matrices, 0, 0, 0, 0, 0, size, Math.min(size, (int)Math.ceil(height-y)), size, size);
 			matrices.pop();
 			textRenderer.draw(matrices, "§l"+FeaturesFile.get(s).shortName, 4, y, -1);
@@ -589,7 +584,7 @@ public class FabricationConfigScreen extends Screen {
 		matrices.push();
 		matrices.translate(width-60, 8, 0);
 		matrices.push();
-		matrices.multiply(tmpQuat.setAngleAxis(Math.toRadians(a*-180), 0, 0, 1));
+		matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(a*-180));
 		float h = (40+(a*-100))/360f;
 		if (h < 0) {
 			h = 1+h;
@@ -599,7 +594,7 @@ public class FabricationConfigScreen extends Screen {
 		fill(matrices, -60, -8, 0, 8, MathHelper.hsvToRgb(h, 0.9f, 0.9f)|0xFF000000);
 		matrices.pop();
 		matrices.push();
-		matrices.multiply(Z_45);
+		matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(45));
 		// 8 / sqrt(2)
 		float f = 5.6568542f;
 		matrices.scale(f, f, 1);

@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.mixin.a_fixes.better_pause_freezing;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.client.AtlasViewerScreen;
 import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

@@ -23,7 +23,7 @@ import com.unascribed.fabrication.FabRefl;
 
 import com.google.common.collect.Lists;
 import org.joml.Matrix4f;
-/*
+
 public class AtlasViewerScreen extends Screen {
 
 	private static final Identifier CHECKER = new Identifier("fabrication", "textures/checker.png");
@@ -49,7 +49,7 @@ public class AtlasViewerScreen extends Screen {
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {/*
 		matrices.push();
 		RenderSystem.clearColor(0.3f, 0.3f, 0.3f, 1);
 		RenderSystem.clear(GL_COLOR_BUFFER_BIT, false);
@@ -205,7 +205,7 @@ public class AtlasViewerScreen extends Screen {
 			}
 			renderTooltip(matrices, li, (int)(mouseX+panX), (int)(mouseY+panY));
 		}
-	}
+	*/}
 
 	@Override
 	public void renderTooltip(MatrixStack matrices, List<Text> lines, int x, int y) {
@@ -253,4 +253,4 @@ public class AtlasViewerScreen extends Screen {
 	}
 
 }
-*/
+

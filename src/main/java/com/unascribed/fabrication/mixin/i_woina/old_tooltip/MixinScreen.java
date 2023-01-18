@@ -10,10 +10,12 @@ import net.minecraft.client.gui.AbstractParentElement;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
+import net.minecraft.client.gui.tooltip.TooltipPositioner;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
+import org.joml.Vector2ic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -33,29 +35,27 @@ public abstract class MixinScreen extends AbstractParentElement implements Drawa
 
 	@Shadow protected MinecraftClient client;
 
-	@FabInject(method="renderTooltipFromComponents(Lnet/minecraft/client/util/math/MatrixStack;Ljava/util/List;II)V", at=@At(value="INVOKE", ordinal=0, shift=At.Shift.BEFORE, target="Lnet/minecraft/client/render/Tessellator;getInstance()Lnet/minecraft/client/render/Tessellator;"))
-	private void oldTooltip(MatrixStack matrices, List<TooltipComponent> components, int x, int y, CallbackInfo ci) {
+	@FabInject(method="renderTooltipFromComponents(Lnet/minecraft/client/util/math/MatrixStack;Ljava/util/List;IILnet/minecraft/client/gui/tooltip/TooltipPositioner;)V", at=@At(value="INVOKE", ordinal=0, shift=At.Shift.BEFORE, target="Lnet/minecraft/client/render/Tessellator;getInstance()Lnet/minecraft/client/render/Tessellator;"))
+	private void oldTooltip(MatrixStack matrices, List<TooltipComponent> components, int x, int y, TooltipPositioner pos, CallbackInfo ci) {
 		if (!(FabConf.isEnabled("*.old_tooltip") || components.isEmpty())) return;
 		int i = 0;
+		int j = components.size() == 1 ? -2 : 0;
 		int backgroundHeight = components.size() == 1 ? 0 : 2;
 		for (TooltipComponent line : components) {
 			backgroundHeight += line.getHeight();
-			int j = line.getWidth(client.textRenderer);
-			if (j > i) {
-				i = j;
+			int k = line.getWidth(client.textRenderer);
+			if (k > i) {
+				i = k;
 			}
+			j += line.getHeight();
 		}
 
 		int k = x + 12;
 		int l = y - 12;
 
-		if (k + i > this.width) {
-			k -= 28 + i;
-		}
-
-		if (l + backgroundHeight + 6 > this.height) {
-			l = this.height - backgroundHeight - 6;
-		}
+		Vector2ic vec = pos.getPosition((Screen) (Object)this, k, l, i, j);
+		k = vec.x();
+		l = vec.y();
 		matrices.push();
 		matrices.translate(0.0D, 0.0D, 400.0D);
 		VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
@@ -63,8 +63,8 @@ public abstract class MixinScreen extends AbstractParentElement implements Drawa
 		immediate.draw();
 		matrices.pop();
 	}
-	@Hijack(method="renderTooltipFromComponents(Lnet/minecraft/client/util/math/MatrixStack;Ljava/util/List;II)V",
-			target="Lnet/minecraft/client/render/BufferRenderer;drawWithShader(Lnet/minecraft/client/render/BufferBuilder$BuiltBuffer;)V")
+	@Hijack(method="renderTooltipFromComponents(Lnet/minecraft/client/util/math/MatrixStack;Ljava/util/List;IILnet/minecraft/client/gui/tooltip/TooltipPositioner;)V",
+			target="Lnet/minecraft/client/render/BufferRenderer;drawWithGlobalProgram(Lnet/minecraft/client/render/BufferBuilder$BuiltBuffer;)V")
 	private static boolean fabrication$cancelGradient(BufferBuilder.BuiltBuffer builder) {
 		if (!FabConf.isEnabled("*.old_tooltip")) return false;
 		builder.release();

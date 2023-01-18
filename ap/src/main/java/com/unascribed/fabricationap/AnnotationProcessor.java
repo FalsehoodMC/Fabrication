@@ -76,7 +76,12 @@ public class AnnotationProcessor extends AbstractProcessor {
 								while (cl != null) {
 									mixin.add(cl.getName());
 									for (Class<?> cla : cl.getInterfaces()) mixin.add(cla.getName());
-									for (Method m : cl.getMethods()) mixin.add(m.getDeclaringClass().getName());
+									try {
+										for (Method m : cl.getMethods()) mixin.add(m.getDeclaringClass().getName());
+									} catch (VerifyError er) {
+										processingEnv.getMessager().printMessage(Diagnostic.Kind.MANDATORY_WARNING, "Fabrication Annotation Processor VerifyError");
+										er.printStackTrace();
+									}
 									cl = cl.getSuperclass();
 								}
 							} catch (Exception ex) {

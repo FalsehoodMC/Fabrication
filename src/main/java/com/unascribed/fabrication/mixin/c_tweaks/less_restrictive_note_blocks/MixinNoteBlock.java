@@ -28,8 +28,8 @@ public abstract class MixinNoteBlock extends Block {
 		super(settings);
 	}
 
-	@FabInject(method="playNote(Lnet/minecraft/entity/Entity;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V", at=@At("HEAD"), cancellable=true)
-	private void playNote(Entity entity, World world, BlockPos pos, CallbackInfo ci) {
+	@FabInject(method="playNote(Lnet/minecraft/entity/Entity;Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V", at=@At("HEAD"), cancellable=true)
+	private void playNote(Entity entity, BlockState s1, World world, BlockPos pos, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.less_restrictive_note_blocks")) return;
 		Direction[] directions = {
 				Direction.UP,
@@ -46,7 +46,7 @@ public abstract class MixinNoteBlock extends Block {
 				BlockState state = world.getBlockState(pos);
 				int note = state.get(NoteBlock.NOTE);
 				float pitch = (float) Math.pow(2, (note - 12) / 12D);
-				world.playSound(null, pos, state.get(NoteBlock.INSTRUMENT).getSound(), SoundCategory.RECORDS, 3, pitch);
+				world.playSound(null, pos, state.get(NoteBlock.INSTRUMENT).getSound().value(), SoundCategory.RECORDS, 3, pitch);
 				double pX = pos.getX() + 0.5 + (dir.getOffsetX()*0.7);
 				double pY = pos.getY() + 0.5 + (dir.getOffsetY()*0.7);
 				double pZ = pos.getZ() + 0.5 + (dir.getOffsetZ()*0.7);

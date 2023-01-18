@@ -81,7 +81,7 @@ public abstract class MixinPoweredRailBlock extends AbstractRailBlock {
 					}
 				}
 			}
-			world.createAndScheduleBlockTick(pos, this, 20);
+			world.scheduleBlockTick(pos, this, 20);
 			world.updateComparators(pos, this);
 		}
 	}
