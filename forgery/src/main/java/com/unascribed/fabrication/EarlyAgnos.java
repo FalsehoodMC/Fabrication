@@ -20,7 +20,9 @@ public final class EarlyAgnos {
 	public static Env getCurrentEnv() {
 		return FMLEnvironment.dist == Dist.CLIENT ? Env.CLIENT : Env.SERVER;
 	}
-
+	public static boolean isDev() {
+		return "true".equals(System.getProperty("fml.deobfuscatedEnvironment"));
+	}
 	public static boolean isModLoaded(String modid) {
 		if (modid.startsWith("fabric:")) return false;
 		if (modid.startsWith("forge:")) modid = modid.substring(6);

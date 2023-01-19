@@ -10,6 +10,9 @@ public class EarlyAgnos {
 	public static Env getCurrentEnv() {
 		return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT ? Env.CLIENT : Env.SERVER;
 	}
+	public static boolean isDev() {
+		return "true".equals(System.getProperty("fabric.development"));
+	}
 
 	public static boolean isModLoaded(String modid) {
 		if (modid.startsWith("forge:")) return false;
