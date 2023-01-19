@@ -335,7 +335,7 @@ public class FabricationConfigScreen extends Screen {
 		bb.vertex(mat, width*2, cutoffY, 0).texture(1, cutoffV).next();
 		bb.vertex(mat, width*2, height, 0).texture(1, 1).next();
 		bb.vertex(mat, startX, height, 0).texture(0, 1).next();
-		BufferRenderer.draw(bb.end());
+		BufferRenderer.drawWithGlobalProgram(bb.end());
 		float ratio = 502/1080f;
 
 		float w = height*ratio;
@@ -367,7 +367,7 @@ public class FabricationConfigScreen extends Screen {
 				bb.vertex(mat, brk2, top, 0).color(r, g, b, 1).next();
 				bb.vertex(mat, brk2, bottom, 0).color(0.475f, 0.333f, 0.282f, 1).next();
 				bb.vertex(mat, brk, bottom, 0).color(0.475f, 0.333f, 0.282f, 1).next();
-				BufferRenderer.draw(bb.end());
+				BufferRenderer.drawWithGlobalProgram(bb.end());
 				RenderSystem.enableTexture();
 			}
 		}
@@ -393,7 +393,7 @@ public class FabricationConfigScreen extends Screen {
 		bb.vertex(mat, width-border, height, 0).texture(1, 1).next();
 		bb.vertex(mat, brk2, height, 0).texture(1, 1).next();
 
-		BufferRenderer.draw(bb.end());
+		BufferRenderer.drawWithGlobalProgram(bb.end());
 
 		float a = 1-(0.3f+(sCurve5(time/10f)*0.7f));
 		if (a > 0) {
@@ -404,7 +404,7 @@ public class FabricationConfigScreen extends Screen {
 			bb.vertex(mat, width*2, cutoffY, 0).texture(1, cutoffV).next();
 			bb.vertex(mat, width*2, height, 0).texture(1, 1).next();
 			bb.vertex(mat, startX, height, 0).texture(0, 1).next();
-			BufferRenderer.draw(bb.end());
+			BufferRenderer.drawWithGlobalProgram(bb.end());
 		}
 
 		RenderSystem.setShaderColor(1, 1, 1, 1);
@@ -542,7 +542,7 @@ public class FabricationConfigScreen extends Screen {
 				bb.vertex(mat, 130*selectA, y-thisHeight-8, 0).color(1, 1, 1, 0.2f+((1-selectA)*0.8f)).next();
 				bb.vertex(mat, 130*selectA, y, 0).color(1, 1, 1, 0.2f+((1-selectA)*0.8f)).next();
 				bb.vertex(mat, 0, y, 0).color(1, 1, 1, 0.2f).next();
-				BufferRenderer.draw(bb.end());
+				BufferRenderer.drawWithGlobalProgram(bb.end());
 				RenderSystem.enableTexture();
 			}
 			y += 8;
