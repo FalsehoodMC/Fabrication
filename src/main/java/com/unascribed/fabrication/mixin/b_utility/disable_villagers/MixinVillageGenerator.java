@@ -14,7 +14,7 @@ import net.minecraft.structure.VillageGenerator;
 @EligibleIf(configAvailable="*.disable_villagers")
 public class MixinVillageGenerator {
 
-	@FabInject(at=@At("HEAD"), method="init()V", cancellable=true)
+	@FabInject(at=@At("HEAD"), method="bootstrap(Lnet/minecraft/registry/Registerable;)V", cancellable=true)
 	private static void init(CallbackInfo ci) {
 		if (FabConf.isEnabled("*.disable_villagers")) {
 			ci.cancel();

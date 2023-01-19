@@ -14,8 +14,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @EligibleIf(configAvailable="*.encroaching_emeralds")
 public abstract class MixinDefaultBiomeFeatures {
 
-	@FabInject(at=@At("HEAD"), method="addDefaultOres(Lnet/minecraft/world/biome/GenerationSettings$Builder;)V")
-	private static void addEmeralds(GenerationSettings.Builder builder, CallbackInfo ci){
+	@FabInject(at=@At("HEAD"), method="addDefaultOres(Lnet/minecraft/world/biome/GenerationSettings$LookupBackedBuilder;Z)V")
+	private static void addEmeralds(GenerationSettings.LookupBackedBuilder builder, boolean bool, CallbackInfo ci){
 		if (!(FabConf.isEnabled("*.encroaching_emeralds") && builder instanceof GenerationSettingsAddEmeralds)) return;
 		((GenerationSettingsAddEmeralds)builder).fabrication$addEmeralds();
 	}

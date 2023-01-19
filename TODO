@@ -2,7 +2,6 @@ known issues:
 end portal paralax has NoClassDefFoundError: com/unascribed/lib39/core/api/util/ReflectionHelper Error
 
 commented out:
-FeatureNoDinnerLava
 FeatureOldLava
 SpriteLava
 SpriteLavaFlow

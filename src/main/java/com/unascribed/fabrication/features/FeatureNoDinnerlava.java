@@ -4,8 +4,12 @@ import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Feature;
 
 import net.minecraft.block.Block;
+import net.minecraft.registry.BuiltinRegistries;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntryList;
 import net.minecraft.world.gen.feature.NetherConfiguredFeatures;
-/*
+import net.minecraft.world.gen.feature.SpringFeatureConfig;
+
 @EligibleIf(configAvailable="*.no_dinnerlava")
 public class FeatureNoDinnerlava implements Feature {
 
@@ -13,14 +17,15 @@ public class FeatureNoDinnerlava implements Feature {
 
 	@Override
 	public void apply() {
-		originalValidBlocks = NetherConfiguredFeatures.SPRING_NETHER_CLOSED.value().config().validBlocks;
-		NetherConfiguredFeatures.SPRING_NETHER_CLOSED.value().config().validBlocks = RegistryEntryList.of();
+		SpringFeatureConfig featureConfig = (SpringFeatureConfig) BuiltinRegistries.createWrapperLookup().getWrapperOrThrow(RegistryKeys.CONFIGURED_FEATURE).getOrThrow(NetherConfiguredFeatures.SPRING_NETHER_CLOSED).value().config();
+		originalValidBlocks = featureConfig.validBlocks;
+		featureConfig.validBlocks = RegistryEntryList.of();
 	}
 
 	@Override
 	public boolean undo() {
 		if (originalValidBlocks != null) {
-			NetherConfiguredFeatures.SPRING_NETHER_CLOSED.value().config().validBlocks = originalValidBlocks;
+			((SpringFeatureConfig) BuiltinRegistries.createWrapperLookup().getWrapperOrThrow(RegistryKeys.CONFIGURED_FEATURE).getOrThrow(NetherConfiguredFeatures.SPRING_NETHER_CLOSED).value().config()).validBlocks = originalValidBlocks;
 			originalValidBlocks = null;
 		}
 		return true;
@@ -31,4 +36,4 @@ public class FeatureNoDinnerlava implements Feature {
 		return "*.no_dinnerlava";
 	}
 
-}*/
+}
