@@ -16,10 +16,17 @@ import net.minecraft.resource.ResourceType;
 import net.minecraft.resource.metadata.ResourceMetadataReader;
 import net.minecraft.util.Identifier;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.JarURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 public class FabricationResourcePack implements ResourcePack {
 
@@ -68,7 +75,43 @@ public class FabricationResourcePack implements ResourcePack {
 
 	@Override
 	public void findResources(ResourceType type, String namespace, String prefix, ResultConsumer consumer) {
-		int a =0;
+		String prePath = "packs/"+this.path+"/"+type.getDirectory()+"/"+namespace+"/";
+		String dirPathStr = prePath+prefix;
+		try {
+			URL dirUrl = getClass().getClassLoader().getResource(dirPathStr);
+			if (dirUrl == null) return;
+			if ("jar".equals(dirUrl.getProtocol())) {
+				JarFile jar = ((JarURLConnection) dirUrl.openConnection()).getJarFile();
+				Enumeration<JarEntry> en = jar.entries();
+				while (en.hasMoreElements()) {
+					String name = en.nextElement().getName();
+					int i = name.indexOf(dirPathStr);
+					if (i != -1) {
+						Identifier id = new Identifier("fabrication", name.substring(i+prePath.length()));
+						consumer.accept(id, open(type, id));
+					}
+				}
+			} else {
+				List<File> dirs = new ArrayList<>();
+				dirs.add(new File(dirUrl.getFile()));
+				for (int i=0; i<dirs.size(); i++) {
+					for (File file : dirs.get(i).listFiles()) {
+						if (file.isDirectory()) {
+							dirs.add(file);
+							continue;
+						}
+						String name = file.getPath();
+						int ix = name.indexOf(dirPathStr);
+						if (ix != -1) {
+							Identifier id = new Identifier("fabrication", name.substring(ix + prePath.length()));
+							consumer.accept(id, open(type, id));
+						}
+					}
+				}
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override

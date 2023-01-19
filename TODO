@@ -1,7 +1,6 @@
 known issues:
 config UI background doesn't render
 end portal paralax has NoClassDefFoundError: com/unascribed/lib39/core/api/util/ReflectionHelper Error
-resources like oof sound don't load
 
 commented out:
 AtlasViewerScreen
