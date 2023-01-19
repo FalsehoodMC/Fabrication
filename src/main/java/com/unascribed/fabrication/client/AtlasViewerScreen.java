@@ -9,7 +9,9 @@ import net.minecraft.client.render.VertexFormat.DrawMode;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.texture.SpriteContents;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.resource.Resource;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -17,6 +19,7 @@ import net.minecraft.util.Identifier;
 import static org.lwjgl.opengl.GL30C.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.unascribed.fabrication.FabRefl;
@@ -49,7 +52,7 @@ public class AtlasViewerScreen extends Screen {
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {/*
+	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		matrices.push();
 		RenderSystem.clearColor(0.3f, 0.3f, 0.3f, 1);
 		RenderSystem.clear(GL_COLOR_BUFFER_BIT, false);
@@ -70,7 +73,7 @@ public class AtlasViewerScreen extends Screen {
 			bb.vertex(mat, width, 0, 0).texture(width/8, 0).next();
 			bb.vertex(mat, width, height, 0).texture(width/8, height/8).next();
 			bb.vertex(mat, 0, height, 0).texture(0, height/8).next();
-		BufferRenderer.draw(bb.end());
+		BufferRenderer.drawWithGlobalProgram(bb.end());
 
 		client.getTextureManager().bindTexture(atlas);
 
@@ -91,7 +94,7 @@ public class AtlasViewerScreen extends Screen {
 			bb.vertex(mat, atlasWidth, 0, 0).next();
 			bb.vertex(mat, atlasWidth, atlasHeight, 0).next();
 			bb.vertex(mat, 0, atlasHeight, 0).next();
-		BufferRenderer.draw(bb.end());
+		BufferRenderer.drawWithGlobalProgram(bb.end());
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, level);
 
@@ -105,7 +108,7 @@ public class AtlasViewerScreen extends Screen {
 			bb.vertex(mat, atlasWidth, 0, 0).texture(1, 0).next();
 			bb.vertex(mat, atlasWidth, atlasHeight, 0).texture(1, 1).next();
 			bb.vertex(mat, 0, atlasHeight, 0).texture(0, 1).next();
-		BufferRenderer.draw(bb.end());
+		BufferRenderer.drawWithGlobalProgram(bb.end());
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 		matrices.pop();
@@ -146,7 +149,7 @@ public class AtlasViewerScreen extends Screen {
 				bb.vertex(mat, panX+x+w, panY+y, 0).next();
 				bb.vertex(mat, panX+x+w, panY+y+h, 0).next();
 				bb.vertex(mat, panX+x, panY+y+h, 0).next();
-			BufferRenderer.draw(bb.end());
+			BufferRenderer.drawWithGlobalProgram(bb.end());
 		}
 		RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 		RenderSystem.enableTexture();
@@ -164,26 +167,28 @@ public class AtlasViewerScreen extends Screen {
 			int y = FabRefl.Client.getY(s);
 			int w = s.getContents().getWidth();
 			int h = s.getContents().getHeight();
-			Identifier tex = new Identifier(s.getContents().getId().getNamespace(), "textures/"+s.getId().getPath()+".png");
-			String src;
+			Identifier tex = new Identifier(s.getContents().getId().getNamespace(), "textures/"+s.getContents().getId().getPath()+".png");
+			String src = "??";
 			if (s.getClass() == Sprite.class) {
 				try {
-					src = client.getResourceManager().getResource(tex).get().getResourcePackName();
+					Optional<Resource> opt = client.getResourceManager().getResource(tex);
+					if (opt.isPresent()) {
+						src = opt.get().getResourcePackName();
+					}
 				} catch (Throwable t) {
 					t.printStackTrace();
-					src = "??";
 				}
 			} else {
 				src = "Custom Sprite subclass "+s.getClass().getName();
 			}
 			String anim = "";
-			if (s.getAnimation() != null) {
+			/*if (animation != null) {
 				Sprite.Animation sa = (Sprite.Animation)s.getAnimation();
-				anim = " @"+FabRefl.Client.getFrameIndex(sa)+"."+FabRefl.Client.getFrameTicks(sa);
-			}
+				anim = FabRefl.Client.getFrameCount(s)+" @"+FabRefl.Client.getFrameIndex(sa)+"."+FabRefl.Client.getFrameTicks(sa);
+			}*/
 			renderTooltip(matrices, Lists.<Text>newArrayList(
-				Text.literal(s.getId().toString()),
-				Text.literal("§7At "+x+","+y+" "+w+"×"+h+"×"+FabRefl.Client.getFrameCount(s)+anim),
+				Text.literal(s.getContents().getId().toString()),
+				Text.literal("§7At "+x+","+y+" "+w+"×"+h+"×"+anim),
 				Text.literal("§7From §f"+src)
 			), (int)(mouseX+panX), (int)(mouseY+panY));
 		} else {
@@ -197,15 +202,14 @@ public class AtlasViewerScreen extends Screen {
 				int h = s.getContents().getHeight();
 				li.add(Text.literal(s.getContents().getId().toString()));
 				String anim = "";
-				if (s.getAnimation() != null) {
-					Sprite.Animation sa = (Sprite.Animation)s.getAnimation();
-					anim = " @"+FabRefl.Client.getFrameIndex(sa)+"."+FabRefl.Client.getFrameTicks(sa);
-				}
-				li.add(Text.literal("§7At "+x+","+y+" "+w+"×"+h+"×"+FabRefl.Client.getFrameCount(s)+anim));
+				/*if (animation != null) {
+					anim = FabRefl.Client.getFrameCount(s)+" @"+FabRefl.Client.getFrameIndex(sa)+"."+FabRefl.Client.getFrameTicks(sa);
+				}*/
+				li.add(Text.literal("§7At "+x+","+y+" "+w+"×"+h+"×"+anim));
 			}
 			renderTooltip(matrices, li, (int)(mouseX+panX), (int)(mouseY+panY));
 		}
-	*/}
+	}
 
 	@Override
 	public void renderTooltip(MatrixStack matrices, List<Text> lines, int x, int y) {

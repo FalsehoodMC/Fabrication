@@ -15,7 +15,11 @@ import java.util.function.Supplier;
 
 import com.unascribed.fabrication.support.FabReflField;
 import com.unascribed.fabrication.support.injection.FabRefMap;
+import net.minecraft.client.texture.SpriteContents;
 import net.minecraft.client.util.SelectionManager;
+import net.minecraft.registry.RegistryEntryLookup;
+import net.minecraft.world.biome.GenerationSettings;
+import net.minecraft.world.gen.feature.PlacedFeature;
 import org.spongepowered.asm.mixin.throwables.MixinError;
 import org.spongepowered.asm.mixin.throwables.MixinException;
 
@@ -224,6 +228,17 @@ public class FabRefl {
 	}
 
 	@FabReflField
+	private static final String fb_placedFeature_field = "net/minecraft/world/biome/GenerationSettings$LookupBackedBuilder;placedFeatureLookup";
+	private static final MethodHandle placedFeature = unreflectGetter("LookupBackedBuilder", () -> GenerationSettings.LookupBackedBuilder.class, fb_placedFeature_field)
+			.requiredBy("*.encroaching_emeralds").get();
+	public static RegistryEntryLookup<PlacedFeature> getPlacedFeatureLookup(GenerationSettings.LookupBackedBuilder subject) {
+		try {
+			return (RegistryEntryLookup<PlacedFeature>) checkHandle(placedFeature).invokeExact(subject);
+		} catch (Throwable t) {
+			throw rethrow(t);
+		}
+	}
+	@FabReflField
 	private static final String ie_pickupDelay_field = "net/minecraft/entity/ItemEntity;pickupDelay";
 	private static final MethodHandle ie_pickupDelay = unreflectGetter("ItemEntity", () -> ItemEntity.class, ie_pickupDelay_field)
 			.requiredBy("*.instant_pickup").get();
@@ -277,9 +292,9 @@ public class FabRefl {
 		}
 	}
 
+
 	@Environment(EnvType.CLIENT)
 	public static final class Client {
-
 		@FabReflField
 		private static final String sprite_x_field = "net/minecraft/client/texture/Sprite;x";
 		private static final MethodHandle sprite_x = unreflectGetter("Sprite", () -> Sprite.class, sprite_x_field)
@@ -380,18 +395,6 @@ public class FabRefl {
 		}
 
 		@FabReflField
-		private static final String s_getFrameCount_field = "Lnet/minecraft/client/texture/Sprite;getFrameCount()I";
-		private static final MethodHandle s_getFrameCount = unreflectMethod("Sprite", () -> Sprite.class, s_getFrameCount_field,
-				int.class)
-				.requiredBy("*.atlas_viewer").get();
-		public static int getFrameCount(Sprite subject) {
-			try {
-				return (int)checkHandle(s_getFrameCount).invokeExact(subject);
-			} catch (Throwable t) {
-				throw rethrow(t);
-			}
-		}
-		@FabReflField
 		private static final String s_clipboardGetter_field = "Lnet/minecraft/client/util/SelectionManager;clipboardGetter:Ljava/util/function/Supplier;";
 		private static final MethodHandle get_clipboardGetter = unreflectGetter("SelectionManager", () -> SelectionManager.class, s_clipboardGetter_field)
 				.requiredBy("*.multiline_sign_paste").get();
@@ -411,6 +414,7 @@ public class FabRefl {
 				throw rethrow(t);
 			}
 		}
+
 	}
 
 	private static MethodHandle checkHandle(MethodHandle handle) {

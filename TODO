@@ -2,7 +2,6 @@ known issues:
 end portal paralax has NoClassDefFoundError: com/unascribed/lib39/core/api/util/ReflectionHelper Error
 
 commented out:
-AtlasViewerScreen
 FeatureNoDinnerLava
 FeatureOldLava
 SpriteLava
@@ -10,6 +9,5 @@ SpriteLavaFlow
 
 
 Mixin:
-emeralds: MixinGenerationSettingsBuilder
 old_lava: MixdnSpriteAtlasTexture
 

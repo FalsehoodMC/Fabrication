@@ -6,6 +6,7 @@ mutable field net/minecraft/predicate/entity/EntityPredicates EXCEPT_CREATIVE_OR
 mutable field net/minecraft/world/gen/feature/SpringFeatureConfig validBlocks Lnet/minecraft/registry/entry/RegistryEntryList;
 
 accessible class net/minecraft/server/world/ThreadedAnvilChunkStorage$EntityTracker
+accessible class net/minecraft/client/texture/SpriteContents$Animation
 accessible class net/minecraft/entity/ai/brain/task/CrossbowAttackTask$CrossbowState
 accessible class net/minecraft/entity/ai/goal/CrossbowAttackGoal$Stage
 accessible class net/minecraft/client/render/RenderLayer$MultiPhaseParameters
