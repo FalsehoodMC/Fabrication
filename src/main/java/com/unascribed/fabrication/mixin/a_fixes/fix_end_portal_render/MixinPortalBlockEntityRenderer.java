@@ -19,7 +19,7 @@ public abstract class MixinPortalBlockEntityRenderer {
 	@Shadow
 	protected abstract float getBottomYOffset();
 
-	@FabModifyVariable(ordinal=2, at=@At("HEAD"), method="renderSide(Lnet/minecraft/block/entity/EndPortalBlockEntity;Lnet/minecraft/util/math/Matrix4f;Lnet/minecraft/client/render/VertexConsumer;FFFFFFFFLnet/minecraft/util/math/Direction;)V")
+	@FabModifyVariable(ordinal=2, at=@At("HEAD"), method="renderSide(Lnet/minecraft/block/entity/EndPortalBlockEntity;Lorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumer;FFFFFFFFLnet/minecraft/util/math/Direction;)V")
 	public float fixSideRender1(float y) {
 		if (FabConf.isEnabled("*.fix_end_portal_render")) {
 			if (y == 1) return this.getTopYOffset();
@@ -27,7 +27,7 @@ public abstract class MixinPortalBlockEntityRenderer {
 		}
 		return y;
 	}
-	@FabModifyVariable(ordinal=3, at=@At("HEAD"), method="renderSide(Lnet/minecraft/block/entity/EndPortalBlockEntity;Lnet/minecraft/util/math/Matrix4f;Lnet/minecraft/client/render/VertexConsumer;FFFFFFFFLnet/minecraft/util/math/Direction;)V")
+	@FabModifyVariable(ordinal=3, at=@At("HEAD"), method="renderSide(Lnet/minecraft/block/entity/EndPortalBlockEntity;Lorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumer;FFFFFFFFLnet/minecraft/util/math/Direction;)V")
 	public float fixSideRender2(float y) {
 		if (FabConf.isEnabled("*.fix_end_portal_render")) {
 			if (y == 1) return this.getTopYOffset();
