@@ -51,11 +51,21 @@ public class FabricationResourcePack implements ResourcePack {
 	public InputSupplier<InputStream> openRoot(String... seg) {
 		if (seg.length == 0) return null;
 		if ("pack.png".equals(seg[0])) {
-			return () -> getClass().getClassLoader().getResourceAsStream("assets/fabrication/icon.png");
+			return new InputSupplier() {
+				@Override
+				public InputStream get() {
+					return getClass().getClassLoader().getResourceAsStream("assets/fabrication/icon.png");
+				}
+			};
 		}
 		InputStream is = getClass().getClassLoader().getResourceAsStream(path+"/"+String.join("/", seg));
 		if (is == null) return null;
-		return () -> is;
+		return new InputSupplier<InputStream>() {
+			@Override
+			public InputStream get() {
+				return is;
+			}
+		};
 	}
 
 	private URL url(ResourceType type, Identifier id) {
@@ -70,7 +80,12 @@ public class FabricationResourcePack implements ResourcePack {
 	public InputSupplier<InputStream> open(ResourceType type, Identifier id) {
 		URL u = url(type, id);
 		if (u == null) return null;
-		return u::openStream;
+		return new InputSupplier<InputStream>() {
+			@Override
+			public InputStream get() throws IOException {
+				return u.openStream();
+			}
+		};
 	}
 
 	@Override
@@ -95,16 +110,19 @@ public class FabricationResourcePack implements ResourcePack {
 				List<File> dirs = new ArrayList<>();
 				dirs.add(new File(dirUrl.getFile()));
 				for (int i=0; i<dirs.size(); i++) {
-					for (File file : dirs.get(i).listFiles()) {
-						if (file.isDirectory()) {
-							dirs.add(file);
-							continue;
-						}
-						String name = file.getPath();
-						int ix = name.indexOf(dirPathStr);
-						if (ix != -1) {
-							Identifier id = new Identifier("fabrication", name.substring(ix + prePath.length()));
-							consumer.accept(id, open(type, id));
+					File[] files = dirs.get(i).listFiles();
+					if (files != null) {
+						for (File file : files) {
+							if (file.isDirectory()) {
+								dirs.add(file);
+								continue;
+							}
+							String name = file.getPath();
+							int ix = name.indexOf(dirPathStr);
+							if (ix != -1) {
+								Identifier id = new Identifier("fabrication", name.substring(ix + prePath.length()));
+								consumer.accept(id, open(type, id));
+							}
 						}
 					}
 				}

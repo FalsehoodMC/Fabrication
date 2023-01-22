@@ -2,7 +2,6 @@ buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
         maven { url = 'https://repo.spongepowered.org/maven' }
-        jcenter()
         mavenCentral()
     }
     dependencies {
@@ -21,13 +20,13 @@ sourceCompatibility = compileJava.sourceCompatibility = '8'
 targetCompatibility = compileJava.targetCompatibility = '17'
 
 minecraft {
-    mappings channel: 'official', version: '1.19.2'
+    mappings channel: 'official', version: '1.19.3'
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.19.2-43.1.1'
+    minecraft 'net.minecraftforge:forge:1.19.3-44.1.0'
 }
 
 jar.finalizedBy('reobfJar') 
