@@ -100,7 +100,7 @@ dependencies {
 	modImplementation('tf.ssf.sfort:fscript:3.1.7') {
 		transitive = false
 	}
-	modImplementation(include('com.unascribed:lib39-deferral:1.5.0-pre2.1+1.19.3'))
+	modImplementation(include('com.unascribed:lib39-deferral:1.5.0-pre2.2+1.19.3'))
 	modRuntimeOnly fabricApi.module('fabric-screen-api-v1', project.fabric_version)
 
 	annotationProcessor project(':ap')

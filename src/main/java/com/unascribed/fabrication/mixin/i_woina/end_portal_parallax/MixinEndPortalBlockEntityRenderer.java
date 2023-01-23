@@ -30,7 +30,8 @@ import com.unascribed.fabrication.support.SpecialEligibility;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Random;
-import static com.unascribed.lib39.deferral.api.RenderBridge.*;
+
+import static com.unascribed.fabrication.util.FabRenderBridge.*;
 
 @Environment(EnvType.CLIENT)
 @Mixin(EndPortalBlockEntityRenderer.class)
