@@ -1,14 +1,13 @@
 package com.unascribed.fabrication.client;
 
+import com.unascribed.fabrication.features.FeatureOldLava;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.texture.SpriteContents;
-import net.minecraft.client.texture.TextureTickListener;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
-/*
-public class SpriteLava extends Sprite implements TextureTickListener {
+
+public class SpriteLava extends Sprite implements Sprite.TickableAnimation {
 	protected int SPRITE_SIZE;
 	protected int SPRITE_SIZEMINUSONE;
 	protected int SPRITE_SIZESQUARED;
@@ -16,11 +15,12 @@ public class SpriteLava extends Sprite implements TextureTickListener {
 	protected float[] field_76878_h;
 	protected float[] field_76879_i;
 	protected float[] field_76877_j;
+	public NativeImage[] fab$image;
 
 	public SpriteLava(Identifier spriteAtlasTexture,
-					  SpriteContents info, int maxLevel, int atlasWidth, int atlasHeight, int x,
+					  SpriteContents info, int atlasWidth, int atlasHeight, int x,
 					  int y, NativeImage image) {
-		super(spriteAtlasTexture, info, maxLevel, atlasWidth, atlasHeight, x, y, image);
+		super(spriteAtlasTexture, info, atlasWidth, atlasHeight, x, y);
 		SPRITE_SIZE = info.getWidth();
 		SPRITE_SIZEMINUSONE = SPRITE_SIZE - 1;
 		SPRITE_SIZESQUARED = SPRITE_SIZE * SPRITE_SIZE;
@@ -29,14 +29,18 @@ public class SpriteLava extends Sprite implements TextureTickListener {
 		field_76878_h = new float[SPRITE_SIZESQUARED];
 		field_76879_i = new float[SPRITE_SIZESQUARED];
 		field_76877_j = new float[SPRITE_SIZESQUARED];
+		fab$image = new NativeImage[]{image};
 	}
 
-
-	@Override
 	public void tick() {
 		tickAnimation();
-		FeatureOldLava.mip(images);
+		FeatureOldLava.mip(fab$image);
 		upload();
+	}
+
+	@Override
+	public void close() {
+
 	}
 
 	public void tickAnimation() {
@@ -107,8 +111,8 @@ public class SpriteLava extends Sprite implements TextureTickListener {
 			var6 = (int)(var3 * var3 * 255.0F);
 			var7 = (int)(var3 * var3 * var3 * var3 * 128.0F);
 
-			images[0].setColor(var2%SPRITE_SIZE, var2/SPRITE_SIZE, (var5) | (var6 << 8) | (var7 << 16) | 0xFF000000);
+			fab$image[0].setColor(var2%SPRITE_SIZE, var2/SPRITE_SIZE, (var5) | (var6 << 8) | (var7 << 16) | 0xFF000000);
 		}
 	}
 }
-*/
+

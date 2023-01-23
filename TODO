@@ -1,9 +1,0 @@
-commented out:
-FeatureOldLava
-SpriteLava
-SpriteLavaFlow
-
-
-Mixin:
-old_lava: MixdnSpriteAtlasTexture
-

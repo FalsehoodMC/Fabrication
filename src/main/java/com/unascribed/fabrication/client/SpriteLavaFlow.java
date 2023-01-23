@@ -1,16 +1,18 @@
 package com.unascribed.fabrication.client;
 
+import com.unascribed.fabrication.features.FeatureOldLava;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.client.texture.TextureTickListener;
+import net.minecraft.client.texture.SpriteContents;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
-/*
-public class SpriteLavaFlow extends Sprite implements TextureTickListener {
-	public SpriteLavaFlow(SpriteAtlasTexture spriteAtlasTexture,
-			Info info, int maxLevel, int atlasWidth, int atlasHeight, int x,
-			int y, NativeImage image) {
-		super(spriteAtlasTexture, info, maxLevel, atlasWidth, atlasHeight, x, y, image);
+
+public class SpriteLavaFlow extends Sprite implements Sprite.TickableAnimation {
+	public NativeImage[] fab$image;
+	public SpriteLavaFlow(Identifier spriteAtlasTexture,
+						  SpriteContents info, int atlasWidth, int atlasHeight, int x,
+						  int y, NativeImage image) {
+		super(spriteAtlasTexture, info, atlasWidth, atlasHeight, x, y);
 		SPRITE_SIZE = info.getWidth() / 2;
 		SPRITE_SIZEMINUSONE = SPRITE_SIZE - 1;
 		SPRITE_SIZESQUARED = SPRITE_SIZE * SPRITE_SIZE;
@@ -20,6 +22,7 @@ public class SpriteLavaFlow extends Sprite implements TextureTickListener {
 		field_76874_h = new float[SPRITE_SIZESQUARED];
 		field_76875_i = new float[SPRITE_SIZESQUARED];
 		field_76872_j = new float[SPRITE_SIZESQUARED];
+		fab$image = new NativeImage[]{image};
 	}
 
 
@@ -34,11 +37,16 @@ public class SpriteLavaFlow extends Sprite implements TextureTickListener {
 	int field_76873_k = 0;
 
 
-	@Override
+
 	public void tick() {
 		tickAnimation();
-		FeatureOldLava.mip(images);
+		FeatureOldLava.mip(fab$image);
 		upload();
+	}
+
+	@Override
+	public void close() {
+
 	}
 
 	public void tickAnimation() {
@@ -112,9 +120,9 @@ public class SpriteLavaFlow extends Sprite implements TextureTickListener {
 
 			for (int xo = 0; xo <= 1; xo++) {
 				for (int yo = 0; yo <= 1; yo++) {
-					images[0].setColor((xo*SPRITE_SIZE)+(var2%SPRITE_SIZE), (yo*SPRITE_SIZE)+(var2/SPRITE_SIZE), (var5) | (var6 << 8) | (var7 << 16) | 0xFF000000);
+					fab$image[0].setColor((xo*SPRITE_SIZE)+(var2%SPRITE_SIZE), (yo*SPRITE_SIZE)+(var2/SPRITE_SIZE), (var5) | (var6 << 8) | (var7 << 16) | 0xFF000000);
 				}
 			}
 		}
 	}
-}*/
+}

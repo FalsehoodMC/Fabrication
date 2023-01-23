@@ -330,19 +330,36 @@ public class FabRefl {
 				throw rethrow(t);
 			}
 		}
-
-		@FabReflField
-		private static final String sat_animatedSprites_field = "net/minecraft/client/texture/SpriteAtlasTexture;animatedSprites";
-		private static final MethodHandle sat_animatedSprites = unreflectGetter("SpriteAtlasTexture", () -> SpriteAtlasTexture.class, sat_animatedSprites_field)
-				.requiredBy("*.old_lava").get();
-		public static List<Sprite> getAnimatedSprites(SpriteAtlasTexture subject) {
+		private static final MethodHandle sat_set_sprites = unreflectSetter("SpriteAtlasTexture", () -> SpriteAtlasTexture.class, sat_sprites_field)
+				.requiredBy("*.old_lava", "atlas_viewer").get();
+		public static void setSprites(SpriteAtlasTexture subject, Map<Identifier, Sprite> map) {
 			try {
-				return (List<Sprite>)checkHandle(sat_animatedSprites).invokeExact(subject);
+				checkHandle(sat_set_sprites).invokeExact(subject, map);
 			} catch (Throwable t) {
 				throw rethrow(t);
 			}
 		}
 
+		@FabReflField
+		private static final String sat_animatedSprites_field = "net/minecraft/client/texture/SpriteAtlasTexture;animatedSprites";
+		private static final MethodHandle sat_animatedSprites = unreflectGetter("SpriteAtlasTexture", () -> SpriteAtlasTexture.class, sat_animatedSprites_field)
+				.requiredBy("*.old_lava").get();
+		public static List<Sprite.TickableAnimation> getAnimatedSprites(SpriteAtlasTexture subject) {
+			try {
+				return (List<Sprite.TickableAnimation>)checkHandle(sat_animatedSprites).invokeExact(subject);
+			} catch (Throwable t) {
+				throw rethrow(t);
+			}
+		}
+		private static final MethodHandle sat_set_animatedSprites = unreflectSetter("SpriteAtlasTexture", () -> SpriteAtlasTexture.class, sat_animatedSprites_field)
+				.requiredBy("*.old_lava").get();
+		public static void setAnimatedSprites(SpriteAtlasTexture subject, List<Sprite.TickableAnimation> list) {
+			try {
+				checkHandle(sat_set_animatedSprites).invokeExact(subject, list);
+			} catch (Throwable t) {
+				throw rethrow(t);
+			}
+		}
 		@FabReflField
 		private static final String mc_itemColors_field = "net/minecraft/client/MinecraftClient;itemColors";
 		private static final MethodHandle mc_itemColors = unreflectGetter("MinecraftClient", () -> MinecraftClient.class, mc_itemColors_field)

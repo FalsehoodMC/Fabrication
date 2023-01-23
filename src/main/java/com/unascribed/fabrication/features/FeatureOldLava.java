@@ -3,6 +3,8 @@ package com.unascribed.fabrication.features;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.FabricationMod;
+import com.unascribed.fabrication.client.SpriteLava;
+import com.unascribed.fabrication.client.SpriteLavaFlow;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Feature;
@@ -13,12 +15,19 @@ import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.texture.SpriteContents;
+import net.minecraft.client.texture.SpriteDimensions;
+import net.minecraft.client.texture.SpriteLoader;
 import net.minecraft.util.Identifier;
-/*
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @EligibleIf(anyConfigAvailable={"*.old_lava", "*.old_lava_scaling"}, envMatches=Env.CLIENT)
 public class FeatureOldLava implements Feature {
 
-	public static void onLoaded(SpriteAtlasTexture atlas, SpriteAtlasTexture.Data data) {
+	public static void onLoaded(SpriteAtlasTexture atlas, SpriteLoader.StitchResult data) {
 		try {
 			if (FabConf.isAnyEnabled("*.old_lava") && atlas.getId().toString().equals("minecraft:textures/atlas/blocks.png")) {
 				Identifier still = new Identifier("block/lava_still");
@@ -35,24 +44,24 @@ public class FeatureOldLava implements Feature {
 					lavaWidth = lavaHeight = 16;
 					lavaFlowWidth = lavaFlowHeight = 32;
 				}
-				SpriteLava newLava = new SpriteLava(atlas, new SpriteContents(still, lavaWidth, lavaHeight, AnimationResourceMetadata.EMPTY), FabRefl.Client.getMaxLevel(data),
-						FabRefl.Client.getWidth(data), FabRefl.Client.getHeight(data), FabRefl.Client.getX(originalLava), FabRefl.Client.getY(originalLava), new NativeImage(lavaWidth, lavaHeight, false));
-				SpriteLavaFlow newLavaFlow = new SpriteLavaFlow(atlas, new Info(flow, lavaFlowWidth, lavaFlowHeight, AnimationResourceMetadata.EMPTY), FabRefl.Client.getMaxLevel(data),
-						FabRefl.Client.getWidth(data), FabRefl.Client.getHeight(data), FabRefl.Client.getX(originalLavaFlow), FabRefl.Client.getY(originalLavaFlow), new NativeImage(lavaFlowWidth, lavaFlowHeight, false));
-				FabRefl.Client.getSprites(atlas).put(still, newLava);
-				FabRefl.Client.getSprites(atlas).put(flow, newLavaFlow);
-				int origIdx = FabRefl.Client.getAnimatedSprites(atlas).indexOf(originalLava);
-				int origFlowIdx = FabRefl.Client.getAnimatedSprites(atlas).indexOf(originalLavaFlow);
-				if (origIdx != -1) {
-					FabRefl.Client.getAnimatedSprites(atlas).set(origIdx, newLava);
-				} else {
-					FabRefl.Client.getAnimatedSprites(atlas).add(newLava);
+				SpriteLava newLava;
+				SpriteLavaFlow newLavaFlow;
+				{
+					NativeImage image = new NativeImage(lavaWidth, lavaHeight, false);
+					newLava = new SpriteLava(atlas.getId(), new SpriteContents(still, new SpriteDimensions(lavaWidth, lavaHeight), image, AnimationResourceMetadata.EMPTY),
+							data.width(), data.height(), FabRefl.Client.getX(originalLava), FabRefl.Client.getY(originalLava), image);
+					image = new NativeImage(lavaFlowWidth, lavaFlowHeight, false);
+					newLavaFlow = new SpriteLavaFlow(atlas.getId(), new SpriteContents(flow, new SpriteDimensions(lavaFlowWidth, lavaFlowHeight), image, AnimationResourceMetadata.EMPTY),
+							data.width(), data.height(), FabRefl.Client.getX(originalLavaFlow), FabRefl.Client.getY(originalLavaFlow), image);
 				}
-				if (origFlowIdx != -1) {
-					FabRefl.Client.getAnimatedSprites(atlas).set(origFlowIdx, newLavaFlow);
-				} else {
-					FabRefl.Client.getAnimatedSprites(atlas).add(newLavaFlow);
-				}
+				Map<Identifier, Sprite> map = new HashMap<>(FabRefl.Client.getSprites(atlas));
+				map.put(still, newLava);
+				map.put(flow, newLavaFlow);
+				FabRefl.Client.setSprites(atlas, map);
+				List<Sprite.TickableAnimation> animatedSprites = new ArrayList<>(FabRefl.Client.getAnimatedSprites(atlas));
+				animatedSprites.add(newLava);
+				animatedSprites.add(newLavaFlow);
+				FabRefl.Client.setAnimatedSprites(atlas, animatedSprites);
 				// simulate the automata for 100 ticks to prevent a "fade-in" effect
 				for (int i = 0; i < 100; i++) {
 					newLava.tickAnimation();
@@ -105,4 +114,4 @@ public class FeatureOldLava implements Feature {
 	}
 
 }
-*/
+
