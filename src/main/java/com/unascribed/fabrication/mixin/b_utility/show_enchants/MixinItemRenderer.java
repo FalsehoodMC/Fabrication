@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.injection.FabInject;
+import com.unascribed.fabrication.util.forgery_nonsense.ForgeryMatrix;
 import net.minecraft.registry.Registries;
 import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.asm.mixin.Mixin;
@@ -42,7 +43,7 @@ public class MixinItemRenderer {
 	@FabInject(at=@At("TAIL"), method="renderGuiItemOverlay(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V")
 	public void renderGuiItemOverlay(TextRenderer renderer, ItemStack stack, int x, int y, String countLabel, CallbackInfo ci) {
 		if (stack == null) return;
-		MatrixStack matrixStack = new MatrixStack();
+		MatrixStack matrixStack = ForgeryMatrix.getStack();
 		matrixStack.translate(0, 0, zOffset + 200);
 		VertexConsumerProvider.Immediate vc = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
 		if (stack.getItem() == Items.ENCHANTED_BOOK && FabConf.isEnabled("*.books_show_enchants")) {

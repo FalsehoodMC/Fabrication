@@ -71,6 +71,6 @@ public class MixinBundleItem {
 	}
 
 	@Shadow
-	private static Stream<ItemStack> getBundledStacks(ItemStack stack) { throw new AbstractMethodError(); }
+	private static Stream<ItemStack> getBundledStacks(ItemStack stack) { return null; }
 
 }

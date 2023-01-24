@@ -5,6 +5,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import com.unascribed.fabrication.support.injection.FabInject;
+import com.unascribed.fabrication.util.forgery_nonsense.ForgeryNbt;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -35,7 +36,7 @@ public abstract class MixinPlayerEntity implements GetSuppressedSlots {
 
 	@FabInject(at=@At("TAIL"), method="writeCustomDataToNbt(Lnet/minecraft/nbt/NbtCompound;)V")
 	public void writeCustomDataToTag(NbtCompound tag, CallbackInfo ci) {
-		NbtList li = new NbtList();
+		NbtList li = ForgeryNbt.getList();
 		for (EquipmentSlot pt : fabrication$suppressedSlots) {
 			li.add(NbtString.of(pt.name().toLowerCase(Locale.ROOT)));
 		}

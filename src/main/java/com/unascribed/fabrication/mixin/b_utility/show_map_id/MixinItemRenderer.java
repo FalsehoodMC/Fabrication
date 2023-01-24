@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.mixin.b_utility.show_map_id;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.util.forgery_nonsense.ForgeryMatrix;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -29,7 +30,7 @@ public class MixinItemRenderer {
 	@FabInject(at=@At("TAIL"), method="renderGuiItemOverlay(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V")
 	public void renderGuiItemOverlay(TextRenderer renderer, ItemStack stack, int x, int y, String countLabel, CallbackInfo ci) {
 		if (FabConf.isEnabled("*.show_map_id") && stack.getItem() == Items.FILLED_MAP){
-			MatrixStack matrixStack = new MatrixStack();
+			MatrixStack matrixStack = ForgeryMatrix.getStack();
 			matrixStack.translate(0, 0, zOffset + 200);
 			VertexConsumerProvider.Immediate vc = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
 			String id = String.valueOf(FilledMapItem.getMapId(stack));
