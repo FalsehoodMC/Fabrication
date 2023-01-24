@@ -8,28 +8,6 @@ pedantry:
 	desc:
 		Fixes for non-problems.
 
-pedantry.tnt_is_dynamite:
-	name: TNT Is Dynamite
-	since: 1.0.1
-	sides: client_only
-	media: https://unascribed.com/fabrication/tnt_is_dynamite.png
-	desc:
-		TNT is renamed to Dynamite and doesn't say TNT on it. TNT is more stable than Minecraft's
-		representation of it, and the texture is clearly dynamite.
-
-		(Technically dynamite is made from nitroglycerin, but nitro is so incredibly unstable that
-		you would need to change a dozen different mechanics to make it "correct".)
-
-		Gunpowder is also renamed to Creeper Dust, because gunpowder is not that explosive.
-
-pedantry.oak_is_apple:
-	name: Oak Is Apple
-	since: 1.0.1
-	sides: client_only
-	media: https://unascribed.com/fabrication/oak_is_apple.png
-	desc:
-		Oak trees become apple trees. Because oak trees do not grow apples.
-
 pedantry.entities_cant_climb:
 	name: Entities Can't Climb
 	since: 3.0.0

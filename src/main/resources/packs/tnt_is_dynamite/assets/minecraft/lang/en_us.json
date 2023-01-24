@@ -1,8 +1,0 @@
-{
-	"block.minecraft.tnt": "Dynamite",
-	"item.minecraft.tnt_minecart": "Minecart with Dynamite",
-	"entity.minecraft.tnt": "Primed Dynamite",
-	"entity.minecraft.tnt_minecart": "Minecart with Dynamite",
-	"subtitles.entity.tnt.primed": "Dynamite fizzes",
-	"item.minecraft.gunpowder": "Creeper Dust"
-}

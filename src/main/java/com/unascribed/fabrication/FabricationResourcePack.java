@@ -51,7 +51,7 @@ public class FabricationResourcePack implements ResourcePack {
 	public InputSupplier<InputStream> openRoot(String... seg) {
 		if (seg.length == 0) return null;
 		if ("pack.png".equals(seg[0])) {
-			return new InputSupplier() {
+			return new InputSupplier<InputStream>() {
 				@Override
 				public InputStream get() {
 					return getClass().getClassLoader().getResourceAsStream("assets/fabrication/icon.png");

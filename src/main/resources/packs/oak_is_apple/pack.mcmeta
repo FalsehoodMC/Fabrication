@@ -1,9 +1,0 @@
-{
-	"pack": {
-		"description": "Fabrication internal pack",
-		"pack_format": 6
-	},
-	"fabrication": {
-		"namespaces": ["minecraft"]
-	}
-}

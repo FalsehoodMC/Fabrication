@@ -19,9 +19,19 @@ public class GrayscaleResourcePack implements ResourcePack {
 	public InputSupplier<InputStream> openRoot(String... seg) {
 		if (seg.length == 0) return null;
 		if ("pack.png".equals(seg[0])) {
-			return () -> getClass().getClassLoader().getResourceAsStream("assets/fabrication/icon.png");
+			return new InputSupplier<InputStream>() {
+				@Override
+				public InputStream get() throws IOException {
+					return getClass().getClassLoader().getResourceAsStream("assets/fabrication/icon.png");
+				}
+			};
 		}
-		return () -> getIS(String.join("/", seg));
+		return new InputSupplier<InputStream>() {
+			@Override
+			public InputStream get() throws IOException {
+				return getIS(String.join("/", seg));
+			}
+		};
 	}
 
 	public static InputStream getIS(String name) throws IOException {
@@ -35,7 +45,12 @@ public class GrayscaleResourcePack implements ResourcePack {
 	public InputSupplier<InputStream> open(ResourceType type, Identifier id) {
 		if (type!= ResourceType.CLIENT_RESOURCES) return null;
 		if (!id.getPath().endsWith(".png")) return null;
-		return () -> getIS(id.getPath());
+		return new InputSupplier<InputStream>() {
+			@Override
+			public InputStream get() throws IOException {
+				return getIS(id.getPath());
+			}
+		};
 	}
 
 	@Override
