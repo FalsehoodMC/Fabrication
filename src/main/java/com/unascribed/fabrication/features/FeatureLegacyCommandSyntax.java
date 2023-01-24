@@ -1,9 +1,5 @@
 package com.unascribed.fabrication.features;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -11,11 +7,11 @@ import java.util.Iterator;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Feature;
@@ -26,7 +22,6 @@ import com.google.common.primitives.Ints;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.DifficultyCommand;
-import net.minecraft.server.command.GameModeCommand;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -50,9 +45,9 @@ public class FeatureLegacyCommandSyntax implements Feature {
 						.requires(scs -> FabConf.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2));
 				for (GameMode mode : GameMode.values()) {
 					gmCmd.then(CommandManager.literal(Integer.toString(mode.getId()))
-							.executes(c -> (int)invoke(gmExecute, c, Collections.singleton(c.getSource().getPlayerOrThrow()), mode))
+							.executes(c -> FabRefl.gameModeExecute(c, Collections.singleton(c.getSource().getPlayerOrThrow()), mode))
 							.then(CommandManager.argument("target", EntityArgumentType.players())
-									.executes(c -> (int)invoke(gmExecute, c, EntityArgumentType.getPlayers(c, "target"), mode)))
+									.executes(c -> (int) FabRefl.gameModeExecute(c, EntityArgumentType.getPlayers(c, "target"), mode)))
 							);
 				}
 				dispatcher.register(gmCmd);
@@ -92,7 +87,7 @@ public class FeatureLegacyCommandSyntax implements Feature {
 						.requires(scs -> FabConf.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2))
 						.executes(c -> {
 							ServerWorld world = c.getSource().getWorld();
-							ServerWorldProperties props = (ServerWorldProperties) invoke(worldProperties, world);
+							ServerWorldProperties props = (ServerWorldProperties) FabRefl.getWorldProperties(world);
 							if (props.isRaining()) {
 								world.setWeather(12000, 0, false, props.isThundering());
 							} else {
@@ -134,55 +129,6 @@ public class FeatureLegacyCommandSyntax implements Feature {
 			}
 		}
 		throw new SimpleCommandExceptionType(Text.literal("Invalid XP amount")).create();
-	}
-
-	private final MethodHandle gmExecute = unreflect(GameModeCommand.class, "method_13387", "func_198484_a", "execute", CommandContext.class, Collection.class, GameMode.class);
-	private final MethodHandle worldProperties = unreflectField(ServerWorld.class, "field_24456", "field_241103_E_", "worldProperties");
-
-	private static Object invoke(MethodHandle execute, Object... args) {
-		try {
-			return execute.invokeWithArguments(args);
-		} catch (Throwable e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	private static MethodHandle unreflect(Class<?> clazz, String intermediateName, String srgName, String yarnName, Class<?>... args) {
-		try {
-			Method m;
-			try {
-				m = clazz.getDeclaredMethod(intermediateName, args);
-			} catch (NoSuchMethodException e) {
-				try {
-					m = clazz.getDeclaredMethod(srgName, args);
-				} catch (NoSuchMethodException e2) {
-					m = clazz.getDeclaredMethod(yarnName, args);
-				}
-			}
-			m.setAccessible(true);
-			return MethodHandles.lookup().unreflect(m);
-		} catch (Throwable e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	private static MethodHandle unreflectField(Class<?> clazz, String intermediateName, String srgName, String yarnName) {
-		try {
-			Field f;
-			try {
-				f = clazz.getDeclaredField(intermediateName);
-			} catch (NoSuchFieldException e) {
-				try {
-					f = clazz.getDeclaredField(srgName);
-				} catch (NoSuchFieldException e2) {
-					f = clazz.getDeclaredField(yarnName);
-				}
-			}
-			f.setAccessible(true);
-			return MethodHandles.lookup().unreflectGetter(f);
-		} catch (Throwable e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 	@Override

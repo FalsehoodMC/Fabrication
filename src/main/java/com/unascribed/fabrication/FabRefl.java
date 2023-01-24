@@ -13,9 +13,14 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import com.mojang.brigadier.context.CommandContext;
 import com.unascribed.fabrication.support.FabReflField;
 import com.unascribed.fabrication.support.injection.FabRefMap;
 import net.minecraft.client.util.SelectionManager;
+import net.minecraft.server.command.GameModeCommand;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.world.GameMode;
+import net.minecraft.world.level.ServerWorldProperties;
 import org.spongepowered.asm.mixin.throwables.MixinError;
 import org.spongepowered.asm.mixin.throwables.MixinException;
 
@@ -79,6 +84,18 @@ public class FabRefl {
 	public static Identifier getChannel(CustomPayloadC2SPacket subject) {
 		try {
 			return (Identifier)checkHandle(cpc2sp_channel).invokeExact(subject);
+		} catch (Throwable t) {
+			throw rethrow(t);
+		}
+	}
+
+	@FabReflField
+	private static final String sw_properties_field = "net/minecraft/server/world/ServerWorld;worldProperties";
+	private static final MethodHandle sw_properties = unreflectGetter("ServerWorld", () -> ServerWorld.class, sw_properties_field)
+			.requiredBy("*.legacy_command_syntax").get();
+	public static ServerWorldProperties getWorldProperties(ServerWorld subject) {
+		try {
+			return (ServerWorldProperties)checkHandle(sw_properties).invokeExact(subject);
 		} catch (Throwable t) {
 			throw rethrow(t);
 		}
@@ -230,6 +247,18 @@ public class FabRefl {
 	public static int getPickupDelay(ItemEntity subject) {
 		try {
 			return (int)checkHandle(ie_pickupDelay).invokeExact(subject);
+		} catch (Throwable t) {
+			throw rethrow(t);
+		}
+	}
+
+	@FabReflField
+	private static final String gmc_execute_field = "Lnet/minecraft/server/command/GameModeCommand;execute(Lcom/mojang/brigadier/context/CommandContext;Ljava/util/Collection;Lnet/minecraft/world/GameMode;)I";
+	private static final MethodHandle gmc_execute = unreflectMethod("GameModeCommand", () -> GameModeCommand.class, gmc_execute_field, int.class, CommandContext.class, Collection.class, GameMode.class)
+			.requiredBy("*.legacy_command_syntax").get();
+	public static int gameModeExecute(CommandContext<ServerCommandSource> context, Collection<ServerPlayerEntity> targets, GameMode gameMode) {
+		try {
+			return (int) checkHandle(gmc_execute).invokeExact(null, context, targets, gameMode);
 		} catch (Throwable t) {
 			throw rethrow(t);
 		}
