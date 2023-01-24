@@ -79,8 +79,9 @@ public class AnnotationProcessor extends AbstractProcessor {
 									try {
 										for (Method m : cl.getMethods()) mixin.add(m.getDeclaringClass().getName());
 									} catch (VerifyError er) {
-										processingEnv.getMessager().printMessage(Diagnostic.Kind.MANDATORY_WARNING, "Fabrication Annotation Processor VerifyError");
-										er.printStackTrace();
+										//doesn't seam to actually matter?
+										//processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Fabrication Annotation Processor VerifyError");
+										//er.printStackTrace();
 									}
 									cl = cl.getSuperclass();
 								}
