@@ -62,7 +62,6 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			"*.books_show_enchants",
 			"*.show_bee_count_on_item",
 			"*.hide_armor",
-			"*.legacy_command_syntax",
 			"*.show_map_id",
 			"*.tools_show_important_enchant",
 			"*.rainbow_experience",
