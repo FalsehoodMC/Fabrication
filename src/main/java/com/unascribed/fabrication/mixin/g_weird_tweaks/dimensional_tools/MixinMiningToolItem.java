@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.Set;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.util.forgery_nonsense.ForgeryNbt;
+import com.unascribed.fabrication.util.forgery_nonsense.ForgeryStatusEffect;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabInject;
@@ -76,7 +78,7 @@ public class MixinMiningToolItem {
 				}
 			}
 			if (factor < 0) {
-				if (!stack.hasNbt()) stack.setNbt(new NbtCompound());
+				if (!stack.hasNbt()) stack.setNbt(ForgeryNbt.getCompound());
 				int legacyPartialDamage = stack.getNbt().getInt("PartialDamage");
 				if (legacyPartialDamage != 0) {
 					stack.getNbt().putDouble("fabrication:PartialDamage", legacyPartialDamage/50D);
@@ -109,7 +111,7 @@ public class MixinMiningToolItem {
 				});
 				world.playSound(null, miner.getPos().x, miner.getPos().y, miner.getPos().z, SoundEvents.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, miner.getSoundCategory(), factor/125f, 2.0f);
 				world.sendEntityStatus(miner, (byte)47);
-				miner.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 40, 3, false, false, false));
+				miner.addStatusEffect(ForgeryStatusEffect.get(StatusEffects.MINING_FATIGUE, 40, 3, false, false, false));
 				if (miner instanceof PlayerEntity) {
 					((PlayerEntity)miner).getItemCooldownManager().set((Item)(Object)this, 40);
 				}

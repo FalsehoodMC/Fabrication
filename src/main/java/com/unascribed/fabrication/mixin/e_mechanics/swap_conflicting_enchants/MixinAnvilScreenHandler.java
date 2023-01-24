@@ -4,6 +4,8 @@ import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.injection.FabInject;
 import com.unascribed.fabrication.support.injection.ModifyReturn;
+import com.unascribed.fabrication.util.forgery_nonsense.ForgeryIdentifier;
+import com.unascribed.fabrication.util.forgery_nonsense.ForgeryNbt;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerInventory;
@@ -13,7 +15,6 @@ import net.minecraft.screen.AnvilScreenHandler;
 import net.minecraft.screen.ForgingScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -41,7 +42,7 @@ public abstract class MixinAnvilScreenHandler extends ForgingScreenHandler {
 			NbtCompound tag = stack.getSubNbt("fabrication#conflictingEnchants");
 			if (tag != null && !tag.isEmpty()) {
 				for (String key : tag.getKeys()) {
-					old.put(Registry.ENCHANTMENT.get(new Identifier(key)), tag.getInt(key));
+					old.put(Registry.ENCHANTMENT.get(ForgeryIdentifier.get(key)), tag.getInt(key));
 				}
 			}
 		}
@@ -53,9 +54,9 @@ public abstract class MixinAnvilScreenHandler extends ForgingScreenHandler {
 		if (!FabConf.isEnabled("*.swap_conflicting_enchants")) return;
 		ItemStack stack = output.getStack(0);
 		if (stack.hasEnchantments()) {
-			NbtCompound conflictingEnchants = new NbtCompound();
+			NbtCompound conflictingEnchants = ForgeryNbt.getCompound();
 			Map<Enchantment, Integer> enchants = EnchantmentHelper.get(stack);
-			Enchantment[] enchantList = enchants.keySet().toArray(new Enchantment[0]);
+			Enchantment[] enchantList = enchants.keySet().toArray(Enchantment[]::new);
 			for (int i=0; i<enchantList.length; i++) {
 				for (int ii=i+1; ii<enchantList.length; ii++){
 					if (!enchantList[i].canCombine(enchantList[ii])) {
