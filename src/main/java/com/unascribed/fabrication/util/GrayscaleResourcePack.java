@@ -44,6 +44,7 @@ public class GrayscaleResourcePack implements ResourcePack {
 
 	@Override
 	public boolean contains(ResourceType type, Identifier id) {
+		if (!"fabrication_grayscale".equals(id.getNamespace())) return false;
 		try {
 			InputStream is = getIS(id.getPath());
 			if (is instanceof Grayscale && ((Grayscale) is).err != null) return false;
