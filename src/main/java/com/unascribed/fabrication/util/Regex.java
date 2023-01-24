@@ -4,4 +4,5 @@ import java.util.regex.Pattern;
 
 public class Regex {
 	public static final Pattern webUrl = Pattern.compile("https?://[-a-zA-Z0-9()@:%_+.~#?&/=]+");
+	public static final Pattern number = Pattern.compile("\\d+");
 }
