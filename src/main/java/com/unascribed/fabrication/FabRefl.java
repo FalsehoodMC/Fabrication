@@ -273,7 +273,7 @@ public class FabRefl {
 			.requiredBy("*.legacy_command_syntax").get();
 	public static int gameModeExecute(CommandContext<ServerCommandSource> context, Collection<ServerPlayerEntity> targets, GameMode gameMode) {
 		try {
-			return (int) checkHandle(gmc_execute).invokeExact(null, context, targets, gameMode);
+			return (int) checkHandle(gmc_execute).invokeExact(context, targets, gameMode);
 		} catch (Throwable t) {
 			throw rethrow(t);
 		}
