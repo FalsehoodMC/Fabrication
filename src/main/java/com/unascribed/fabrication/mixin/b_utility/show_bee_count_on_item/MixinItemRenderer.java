@@ -2,6 +2,7 @@ package com.unascribed.fabrication.mixin.b_utility.show_bee_count_on_item;
 
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.injection.FabInject;
+import com.unascribed.fabrication.util.forgery_nonsense.ForgeryMatrix;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -33,7 +34,7 @@ public class MixinItemRenderer {
 		NbtCompound tag = stack.getNbt().getCompound("BlockEntityTag");
 		if (tag == null || !tag.contains("Bees", NbtElement.LIST_TYPE)) return;
 
-		MatrixStack matrixStack = new MatrixStack();
+		MatrixStack matrixStack = ForgeryMatrix.getStack();
 		matrixStack.translate(0, 0, zOffset + 200);
 		VertexConsumerProvider.Immediate vc = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
 		String count = String.valueOf(((NbtList)tag.get("Bees")).size());

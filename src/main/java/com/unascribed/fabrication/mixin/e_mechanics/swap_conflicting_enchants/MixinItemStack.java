@@ -3,6 +3,11 @@ package com.unascribed.fabrication.mixin.e_mechanics.swap_conflicting_enchants;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.injection.FabInject;
+import com.unascribed.fabrication.util.forgery_nonsense.ForgeryArrayList;
+import com.unascribed.fabrication.util.forgery_nonsense.ForgeryHashMap;
+import com.unascribed.fabrication.util.forgery_nonsense.ForgeryIdentifier;
+import com.unascribed.fabrication.util.forgery_nonsense.ForgeryNbt;
+import com.unascribed.fabrication.util.forgery_nonsense.ForgeryPair;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
@@ -11,7 +16,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.registry.Registry;
@@ -25,7 +29,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Mixin(ItemStack.class)
 @EligibleIf(configAvailable="*.swap_conflicting_enchants")
@@ -40,23 +43,24 @@ public abstract class MixinItemStack {
 	@FabInject(method="use(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/TypedActionResult;", at=@At("HEAD"), cancellable=true)
 	public void use(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<TypedActionResult<ItemStack>> cir) {
 		if (!FabConf.isEnabled("*.swap_conflicting_enchants")) return;
-		List<Pair<String, Integer>> currentConflicts = new ArrayList<>();
+		List<Pair<String, Integer>> currentConflicts = ForgeryArrayList.get();
 		if (nbt == null) return;
+
 		NbtCompound lTag = nbt.getCompound("fabrication#conflictingEnchants");
 		if (lTag == null || lTag.isEmpty()) return;
 		for (String key : lTag.getKeys()) {
-			currentConflicts.add(new Pair<>(key, lTag.getInt(key)));
+			currentConflicts.add(ForgeryPair.get(key, lTag.getInt(key)));
 		}
 		if (!currentConflicts.isEmpty() && user.isSneaky()) {
-			NbtCompound tag = new NbtCompound();
+			NbtCompound tag = ForgeryNbt.getCompound();
 			Pair<String, Integer> toAdd;
 			{
 				int rmi = world.random.nextInt(currentConflicts.size());
 				toAdd = currentConflicts.get(rmi);
 				currentConflicts.remove(rmi);
 			}
-			Enchantment toAddEnchant = Registry.ENCHANTMENT.get(new Identifier(toAdd.getLeft()));
-			Map<Enchantment, Integer> currentEnchantments = new HashMap<>();
+			Enchantment toAddEnchant = Registry.ENCHANTMENT.get(ForgeryIdentifier.get(toAdd.getLeft()));
+			Map<Enchantment, Integer> currentEnchantments = ForgeryHashMap.get();
 			currentEnchantments.put(toAddEnchant, toAdd.getRight());
 			if (this.hasEnchantments()) {
 				for (Map.Entry<Enchantment, Integer> entry : EnchantmentHelper.get((ItemStack)(Object)this).entrySet()) {
@@ -68,7 +72,7 @@ public abstract class MixinItemStack {
 				}
 			}
 			for (Pair<String, Integer> entry : currentConflicts) {
-				Enchantment enchant = Registry.ENCHANTMENT.get(new Identifier(entry.getLeft()));
+				Enchantment enchant = Registry.ENCHANTMENT.get(ForgeryIdentifier.get(entry.getLeft()));
 				if (currentEnchantments.keySet().stream().anyMatch(e->!e.canCombine(enchant))) {
 					tag.putInt(entry.getLeft(), entry.getRight());
 					continue;

@@ -8,7 +8,7 @@ import com.unascribed.fabrication.logic.LegacyIDs;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.injection.Hijack;
 import com.unascribed.fabrication.support.injection.HijackReturn;
-import com.unascribed.fabrication.util.EmptyNbt;
+import com.unascribed.fabrication.util.forgery_nonsense.ForgeryNbt;
 import net.minecraft.command.argument.ItemStringReader;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NbtCompound;
@@ -66,7 +66,7 @@ public class MixinItemStringReader {
 					}
 				}
 				if (i.isDamageable() && metaAsDamage) {
-					fabrication$legacyDamageNbt = EmptyNbt.getCopy();
+					fabrication$legacyDamageNbt = ForgeryNbt.getCompound();
 					fabrication$legacyDamageNbt.putInt("Damage", metaI);
 				}
 				return new HijackReturn(Optional.of(i));

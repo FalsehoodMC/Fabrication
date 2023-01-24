@@ -59,23 +59,14 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	public static final String MOD_NAME_LOWER = EarlyAgnos.isForge() ? "forgery" : "fabrication";
 	private static final SetMultimap<String, String> configKeysForDiscoveredClasses = HashMultimap.create();
 	private static final Set<String> brokenInForge = Set.of(
-			"*.books_show_enchants",
-			"*.show_bee_count_on_item",
-			"*.hide_armor",
-			"*.show_map_id",
-			"*.tools_show_important_enchant",
-			"*.rainbow_experience",
 			"*.gradual_block_breaking",
 			"*.launching_pistons",
-			"*.swap_conflicting_enchants",
 			"*.colorful_redstone",
 			"*.grindstone_disenchanting",
 			"*.pursurvers",
 			"*.environmentally_friendly_creepers",
 			"*.interrupting_damage",
 			"*.mobs_dont_drop_ingots",
-			"*.tools_in_bundles",
-			"*.dimensional_tools",
 			"*.photoallergic_creepers",
 			"*.end_portal_parallax",
 			"*.flat_items",

@@ -5,6 +5,7 @@ import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.injection.FabInject;
 import com.unascribed.fabrication.support.injection.FabModifyArg;
+import com.unascribed.fabrication.util.forgery_nonsense.ForgeryRandom;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.ExperienceOrbEntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -20,7 +21,7 @@ import java.util.Random;
 @EligibleIf(configAvailable="*.rainbow_experience", envMatches=Env.CLIENT)
 public class MixinExperienceOrbEntityRenderer {
 
-	private final Random fabrication$colorDecider = new Random();
+	private final Random fabrication$colorDecider = ForgeryRandom.get();
 	private int fabrication$orbColor6 = 0;
 	private int fabrication$orbColor7 = 0;
 
