@@ -698,9 +698,9 @@ class Mapp{
 	public List<Target> target
 }
 
-def mcVersions = [ '1.19.1', '1.19.2' ]
+def mcVersions = [ '1.19.3' ]
 
-def stability = 'release'
+def stability = 'alpha'
 
 def mrLoaders = [ 'fabric', 'quilt' ]
 
@@ -713,7 +713,7 @@ def mcmodcnLoaders = '2,11'
 def artifact = remapJar.archivePath
 
 if (System.getenv("PUBLISH_FORGERY")) {
-	stability = 'beta'
+	stability = 'alpha'
 
 	mrLoaders = [ 'forge' ]
 
