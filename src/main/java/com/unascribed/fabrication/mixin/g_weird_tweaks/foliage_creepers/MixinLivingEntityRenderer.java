@@ -18,7 +18,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(LivingEntityRenderer.class)
+//lower priority fixes an origins issue on forge caused by them using a redirect
+@Mixin(value=LivingEntityRenderer.class, priority=900)
 @EligibleIf(configAvailable="*.foliage_creepers", envMatches=Env.CLIENT)
 public abstract class MixinLivingEntityRenderer extends EntityRenderer<LivingEntity> {
 
