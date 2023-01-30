@@ -159,11 +159,7 @@ class FeatureConfigTransformer{
 						} else {
 							val = "false"
 						}
-					} else if (k == "general.runtime_checks") {
-						val = "true"
-					} else if (k == "general.reduced_motion") {
-						val = "false"
-					} else if (k == "general.data_upload") {
+					} else if (k.startsWith('general.')) {
 						val = "false"
 					}
 					desc = foldLine(desc, 78-(leadingTabs*8))
