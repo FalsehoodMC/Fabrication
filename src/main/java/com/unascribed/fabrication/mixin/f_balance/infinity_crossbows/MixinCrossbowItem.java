@@ -23,13 +23,13 @@ import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 
 @Mixin(CrossbowItem.class)
-@EligibleIf(configAvailable="*.infinity_crossbows")
+@EligibleIf(anyConfigAvailable={"*.infinity_crossbows", "*.infinity_crossbows_modded"})
 public class MixinCrossbowItem {
 
 	@FabModifyVariable(at=@At("HEAD"), method="loadProjectile(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemStack;ZZ)Z",
 			argsOnly=true, index=4)
 	private static boolean modifyCreativeModeLoadProjectile(boolean creative, LivingEntity shooter, ItemStack crossbow, ItemStack projectile) {
-		if (FabConf.isEnabled("*.infinity_crossbows") && EnchantmentHelper.getLevel(Enchantments.INFINITY, crossbow) > 0 && projectile.getItem() == Items.ARROW) {
+		if (FabConf.isAnyEnabled("*.infinity_crossbows") && EnchantmentHelper.getLevel(Enchantments.INFINITY, crossbow) > 0 && projectile.getItem() == Items.ARROW) {
 			return true;
 		}
 		return creative;
@@ -40,7 +40,7 @@ public class MixinCrossbowItem {
 			locals=LocalCapture.CAPTURE_FAILHARD)
 	private static void shoot(World world, LivingEntity shooter, Hand hand, ItemStack crossbow, ItemStack projectile, float soundPitch, boolean creative, float speed, float divergence, float simulated,
 			CallbackInfo ci, boolean firework, ProjectileEntity proj) {
-		if (!FabConf.isEnabled("*.infinity_crossbows")) return;
+		if (!FabConf.isAnyEnabled("*.infinity_crossbows")) return;
 		if (projectile.getItem() == Items.ARROW && EnchantmentHelper.getLevel(Enchantments.INFINITY, crossbow) > 0
 				&& proj instanceof PersistentProjectileEntity && ((PersistentProjectileEntity)proj).pickupType == PickupPermission.ALLOWED) {
 			((PersistentProjectileEntity)proj).pickupType = PickupPermission.CREATIVE_ONLY;
