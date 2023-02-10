@@ -177,5 +177,15 @@ balance.extra.lava_causes_fall_damage:
 	desc:
 		Lava halves fall damage instead of removing it.
 
+balance.extra.infinity_crossbows_modded:
+	name: Infinity Crossbows Modded
+	since: 3.1.7
+	sides: server_only_with_client_helper
+	extend: *.infinity_crossbows
+	desc:
+		Allow putting Infinity on vanilla and modded crossbows. Only works for plain arrows.
+
+		Honors InfiBows.
+
 # kate: space-indent off
 # vim: noai:noet
