@@ -4,6 +4,7 @@ import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.injection.FabInject;
 import com.unascribed.fabrication.support.injection.ModifyReturn;
+import com.unascribed.fabrication.util.forgery_nonsense.ForgeryEnchantArray;
 import com.unascribed.fabrication.util.forgery_nonsense.ForgeryIdentifier;
 import com.unascribed.fabrication.util.forgery_nonsense.ForgeryNbt;
 import net.minecraft.enchantment.Enchantment;
@@ -56,7 +57,7 @@ public abstract class MixinAnvilScreenHandler extends ForgingScreenHandler {
 		if (stack.hasEnchantments()) {
 			NbtCompound conflictingEnchants = ForgeryNbt.getCompound();
 			Map<Enchantment, Integer> enchants = EnchantmentHelper.get(stack);
-			Enchantment[] enchantList = enchants.keySet().toArray(Enchantment[]::new);
+			Enchantment[] enchantList = enchants.keySet().toArray(ForgeryEnchantArray.get(0));
 			for (int i=0; i<enchantList.length; i++) {
 				for (int ii=i+1; ii<enchantList.length; ii++){
 					if (!enchantList[i].canCombine(enchantList[ii])) {
