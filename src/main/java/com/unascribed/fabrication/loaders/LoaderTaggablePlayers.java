@@ -1,5 +1,7 @@
 package com.unascribed.fabrication.loaders;
 
+import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.QDIni;
 import com.unascribed.fabrication.features.FeatureTaggablePlayers;
 import com.unascribed.fabrication.support.ConfigLoader;
@@ -33,6 +35,10 @@ public class LoaderTaggablePlayers implements ConfigLoader {
 	@Override
 	public void load(Path configDir, QDIni config, boolean loadError) {
 		for (String key : config.keySet()){
+			if (!FabConf.isValid(key)) {
+				FabLog.error("TaggablePlayers config contains invalid key: "+key);
+				continue;
+			}
 			Optional<String> val = config.get(key);
 			if (val.isPresent()) {
 				try {
