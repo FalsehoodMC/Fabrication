@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.function.Consumer;
 
 import com.unascribed.fabrication.FabConf;
 import net.minecraft.util.math.random.Random;
@@ -80,10 +81,20 @@ public class WoinaDrops {
 					final int overlayf = overlay;
 					for (Direction dir : Direction.values()) {
 						r.setSeed(seed);
-						model.getQuads(null, dir, r).forEach(q -> drawExaggeratedQuad(stack, matrices, vertices, q, light, overlayf));
+						model.getQuads(null, dir, r).forEach(new Consumer<BakedQuad>() {
+							@Override
+							public void accept(BakedQuad q) {
+								drawExaggeratedQuad(stack, matrices, vertices, q, light, overlayf);
+							}
+						});
 					}
 					r.setSeed(seed);
-					model.getQuads(null, null, r).forEach(q -> drawExaggeratedQuad(stack, matrices, vertices, q, light, overlayf));
+					model.getQuads(null, null, r).forEach(new Consumer<BakedQuad>() {
+						@Override
+						public void accept(BakedQuad q) {
+							drawExaggeratedQuad(stack, matrices, vertices, q, light, overlayf);
+						}
+					});
 				} else {
 					if (mippedBlocks == null || mippedBlocksInvalid) {
 						mippedBlocksInvalid = false;
