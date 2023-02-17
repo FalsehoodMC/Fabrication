@@ -81,9 +81,8 @@ public abstract class MixinItemStack {
 				currentEnchantments.put(enchant, entry.getRight());
 			}
 			EnchantmentHelper.set(currentEnchantments, (ItemStack)(Object)this);
-			if (!tag.isEmpty()) {
 				this.tag.put("fabrication#conflictingEnchants", tag);
-			}
+
 			world.playSound(null, user.getBlockPos(), SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1, 1);
 			cir.setReturnValue(TypedActionResult.consume((ItemStack)(Object)this));
 		}
