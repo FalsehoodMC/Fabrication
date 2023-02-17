@@ -115,5 +115,13 @@ weird_tweaks.extra.flimsy_tripwire:
 	desc:
 		Tripwire breaks after being activated.
 
+weird_tweaks.extra.entities_cant_swim_upstream:
+	name: Entities Can't Swim Upstream
+	since: 3.2.0
+	sides: server_only
+	fscript: living_entity
+	desc:
+		Entities can no longer swim up fluids that are flowing downwards, still blocks are unaffected.
+
 # kate: space-indent off
 # vim: noai:noet
