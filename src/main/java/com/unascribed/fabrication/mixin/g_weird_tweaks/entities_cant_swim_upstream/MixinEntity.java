@@ -37,7 +37,7 @@ public class MixinEntity {
 			  at=@At(value="INVOKE", target="Lnet/minecraft/util/math/Vec3d;add(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;", ordinal=0))
 	private Vec3d fabrication$disableUpstream(Vec3d vec) {
 		if (fabrication$inUpstreamFluid) {
-			return new Vec3d(vec.x, vec.y-1.51, vec.z);
+			return new Vec3d(vec.x, vec.y-9, vec.z);
 		}
 		return vec;
 	}
