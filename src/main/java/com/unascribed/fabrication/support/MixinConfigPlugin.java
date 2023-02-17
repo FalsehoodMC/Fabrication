@@ -62,6 +62,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			"*.gradual_block_breaking",
 			"*.launching_pistons",
 			"*.colorful_redstone",
+			"*.grindstone_disenchanting",
 			"*.pursurvers",
 			"*.environmentally_friendly_creepers",
 			"*.interrupting_damage",
