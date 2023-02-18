@@ -1,4 +1,4 @@
-package com.unascribed.fabrication.mixin.g_weird_tweaks.entities_cant_swim_upstream;
+package com.unascribed.fabrication.mixin.g_weird_tweaks.entities_sink_in_falling_fluids;
 
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.ConfigPredicates;
@@ -16,14 +16,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import java.util.function.Predicate;
 
 @Mixin(Entity.class)
-@EligibleIf(configAvailable="*.entities_cant_swim_upstream")
+@EligibleIf(configAvailable="*.entities_sink_in_falling_fluids")
 public class MixinEntity {
 
-	private static final Predicate<LivingEntity> fabrication$entitiesCantSwimUpstream = ConfigPredicates.getFinalPredicate("*.entities_cant_swim_upstream");
+	private static final Predicate<LivingEntity> fabrication$entitiesCantSwimUpstream = ConfigPredicates.getFinalPredicate("*.entities_sink_in_falling_fluids");
 	private boolean fabrication$inUpstreamFluid = false;
 	@ModifyReturn(method="updateMovementInFluid(Lnet/minecraft/tag/TagKey;D)Z", target="Lnet/minecraft/world/World;getFluidState(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/fluid/FluidState;")
 	private FluidState fabrication$getUpstream(FluidState state) {
-		if (FabConf.isEnabled("*.entities_cant_swim_upstream")) {
+		if (FabConf.isEnabled("*.entities_sink_in_falling_fluids")) {
 			Object self = this;
 			if (self instanceof LivingEntity && fabrication$entitiesCantSwimUpstream.test((LivingEntity)self)) {
 				fabrication$inUpstreamFluid = state.getOrEmpty(FlowableFluid.FALLING).orElse(false);
