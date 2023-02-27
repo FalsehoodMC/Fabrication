@@ -18,12 +18,14 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
+import org.spongepowered.asm.mixin.extensibility.IMixinConfig;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
+import org.spongepowered.asm.mixin.refmap.IReferenceMapper;
 import org.spongepowered.asm.mixin.transformer.ClassInfo;
 import org.spongepowered.asm.util.asm.MethodNodeEx;
 
 import java.lang.reflect.Field;
-import java.util.AbstractMap;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -79,6 +81,27 @@ public class FabInjector {
 			FabLog.error("FabInjector failed to reflect mixin fields, redirect fixer has been disabled", e);
 		}
 	}
+	public static Function<IMixinInfo, IReferenceMapper> getMixinReferenceMapper = (i) -> null;
+	static {
+		try {
+			Class<?> classMixinConfig = Class.forName("org.spongepowered.asm.mixin.transformer.MixinConfig");
+			Method getMapper = classMixinConfig.getMethod("getReferenceMapper");
+			getMapper.setAccessible(true);
+			getMixinReferenceMapper = (i) -> {
+				try {
+					IMixinConfig conf = i.getConfig();
+					if (classMixinConfig.isInstance(conf)) {
+						return (IReferenceMapper) getMapper.invoke(conf);
+					}
+				} catch (Exception e) {
+					FabLog.error("FabInjector failed to reflect mixin: "+ i.getClassName(), e);
+				}
+				return null;
+			};
+		} catch (Throwable e) {
+			FabLog.error("FabInjector failed to reflect mixin remapper", e);
+		}
+	}
 
 	public static final Set<String> dejavu = new HashSet<>();
 
@@ -114,7 +137,14 @@ public class FabInjector {
 							int ani = an.values.indexOf("target");
 							if (ani != -1 && ani < an.values.size()){
 								Object target = an.values.get(ani+1);
-								if (target instanceof String) discoveredRedirects.put(mth.name, (String) target);
+								if (target instanceof String) {
+									IReferenceMapper mapper = getMixinReferenceMapper.apply(inf);
+									if (mapper != null) {
+										String mapped = mapper.remap(inf.getClassName().replace('.', '/'), ((String) target));
+										if (mapped != null) target = mapped;
+									}
+									discoveredRedirects.put(mth.name, (String) target);
+								}
 							}
 						}
 					}
