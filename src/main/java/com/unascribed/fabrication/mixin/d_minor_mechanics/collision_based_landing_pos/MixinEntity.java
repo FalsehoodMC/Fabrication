@@ -31,7 +31,8 @@ public abstract class MixinEntity {
 		if (!FabConf.isEnabled("*.collision_based_landing_pos")) return;
 		for (VoxelShape shape : world.getBlockCollisions((Entity)(Object)this, this.boundingBox.offset(0, -0.20000000298023224D, 0))) {
 			if (shape.getBoundingBox().getCenter().getY() <= this.getY()) {
-				cir.setReturnValue(new BlockPos(shape.getBoundingBox().getCenter()));
+				Vec3d vec = shape.getBoundingBox().getCenter();
+				cir.setReturnValue(new BlockPos((int)vec.x, (int)vec.y, (int)vec.z));
 				return;
 			}
 		}

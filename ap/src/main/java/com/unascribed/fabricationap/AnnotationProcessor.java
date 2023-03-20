@@ -71,7 +71,11 @@ public class AnnotationProcessor extends AbstractProcessor {
 									cl = Class.forName(ad, false, this.getClass().getClassLoader());
 								} catch (ClassNotFoundException ignore) {
 									int dot = ad.lastIndexOf('.');
-									cl = Class.forName(ad.substring(0, dot)+"$"+ad.substring(dot+1), false, this.getClass().getClassLoader());
+									try {
+										cl = Class.forName(ad.substring(0, dot) + "$" + ad.substring(dot + 1), false, this.getClass().getClassLoader());
+									} catch (StringIndexOutOfBoundsException ingore) {
+										continue;
+									}
 								}
 								while (cl != null) {
 									mixin.add(cl.getName());

@@ -6,7 +6,9 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.tag.DamageTypeTags;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,10 +28,10 @@ public abstract class MixinItemEntity {
 			int lvl = EnchantmentHelper.getLevel(Enchantments.PROTECTION, getStack());
 			if (lvl>3) lvl = 4;
 			switch (lvl){
-				case 4: if (source.isExplosive()) cir.setReturnValue(false);
-				case 3: if (source == DamageSource.LAVA) cir.setReturnValue(false);
-				case 2: if (source == DamageSource.IN_FIRE || source == DamageSource.ON_FIRE) cir.setReturnValue(false);
-				case 1: if (source == DamageSource.CACTUS) cir.setReturnValue(false);
+				case 4: if (source.isIn(DamageTypeTags.IS_EXPLOSION)) cir.setReturnValue(false);
+				case 3: if (source.isOf(DamageTypes.LAVA)) cir.setReturnValue(false);
+				case 2: if (source.isOf(DamageTypes.IN_FIRE) || source.isOf(DamageTypes.ON_FIRE)) cir.setReturnValue(false);
+				case 1: if (source.isOf(DamageTypes.CACTUS)) cir.setReturnValue(false);
 			}
 		}
 	}

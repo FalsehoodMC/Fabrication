@@ -26,6 +26,7 @@ import io.netty.buffer.Unpooled;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
@@ -281,7 +282,7 @@ public class FabricationConfigScreen extends Screen {
 							projection.push();
 							projection.translate(width * x, height * y, 0);
 							RenderSystem.setProjectionMatrix(projection.peek().getPositionMatrix());
-							parent.renderBackgroundTexture(0);
+							parent.renderBackgroundTexture(projection);
 							projection.pop();
 						}
 					}
@@ -358,7 +359,6 @@ public class FabricationConfigScreen extends Screen {
 			if (prideFlag != null) {
 				prideFlag.render(matrices, brk, top, w, bottom-top);
 			} else {
-				RenderSystem.disableTexture();
 				bb.begin(DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 				float r = MathHelper.lerp(flagCutoffV, 0.298f, 0.475f);
 				float g = MathHelper.lerp(flagCutoffV, 0.686f, 0.333f);
@@ -368,7 +368,6 @@ public class FabricationConfigScreen extends Screen {
 				bb.vertex(mat, brk2, bottom, 0).color(0.475f, 0.333f, 0.282f, 1).next();
 				bb.vertex(mat, brk, bottom, 0).color(0.475f, 0.333f, 0.282f, 1).next();
 				BufferRenderer.drawWithGlobalProgram(bb.end());
-				RenderSystem.enableTexture();
 			}
 		}
 
@@ -533,7 +532,6 @@ public class FabricationConfigScreen extends Screen {
 				RenderSystem.disableCull();
 				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
-				RenderSystem.disableTexture();
 				RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 				BufferBuilder bb = Tessellator.getInstance().getBuffer();
 				Matrix4f mat = matrices.peek().getPositionMatrix();
@@ -543,7 +541,6 @@ public class FabricationConfigScreen extends Screen {
 				bb.vertex(mat, 130*selectA, y, 0).color(1, 1, 1, 0.2f+((1-selectA)*0.8f)).next();
 				bb.vertex(mat, 0, y, 0).color(1, 1, 1, 0.2f).next();
 				BufferRenderer.drawWithGlobalProgram(bb.end());
-				RenderSystem.enableTexture();
 			}
 			y += 8;
 			newHeight += thisHeight;
@@ -575,7 +572,7 @@ public class FabricationConfigScreen extends Screen {
 			searchField.setAlpha(prevSelectedA);
 			searchField.render(matrices, mouseX, mouseY, delta);
 		}
-		searchField.setTextFieldFocused(searchSelected);
+		searchField.setFocused(searchSelected);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 
 		matrices.push();
@@ -1019,7 +1016,6 @@ public class FabricationConfigScreen extends Screen {
 		RenderSystem.defaultBlendFunc();
 		RenderSystem.setShaderTexture(0, new Identifier("fabrication", "configvalue.png"));
 		RenderSystem.setShaderColor(1, 1, 1, 0.5f+((1-da)*0.5f));
-		RenderSystem.enableTexture();
 		if (noUnset) {
 			drawTexture(matrices, 134+3, 1, 15, 0, 15, 9, 60, 9);
 			drawTexture(matrices, 134+4+22, 1, 45, 0, 15, 9, 60, 9);
@@ -1032,7 +1028,6 @@ public class FabricationConfigScreen extends Screen {
 			drawTexture(matrices, 134, 1, 0, 0, 60, 9, 60, 9);
 		}
 
-		RenderSystem.disableTexture();
 		int clickedIndex =(int)(mouseX - 134) / (noUnset ? 22 : onlyBannable ? 30 : 15);
 		if (didClick || mouseDragging) {
 			if (mouseX >= 134 && mouseX <= 134+trackSize && mouseY >= y+1 && mouseY <= y+10) {
@@ -1613,7 +1608,7 @@ public class FabricationConfigScreen extends Screen {
 			for (int i = 0; i < lines.size(); ++i) {
 				OrderedText line = lines.get(i);
 				if (line != null) {
-					textRenderer.draw(line, innerX, innerY, -1, false, matrices.peek().getPositionMatrix(), vcp, false, 0, 0xF000F0);
+					textRenderer.draw(line, innerX, innerY, -1, false, matrices.peek().getPositionMatrix(), vcp, TextRenderer.TextLayerType.NORMAL, 0, 0xF000F0);
 				}
 				//				if (i == 0) {
 				//					innerY += 2;

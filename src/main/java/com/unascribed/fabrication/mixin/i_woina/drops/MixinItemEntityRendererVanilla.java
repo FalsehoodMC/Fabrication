@@ -2,6 +2,7 @@ package com.unascribed.fabrication.mixin.i_woina.drops;
 
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.injection.Hijack;
+import net.minecraft.client.render.model.json.ModelTransformationMode;
 import org.spongepowered.asm.mixin.Mixin;
 
 import com.unascribed.fabrication.logic.WoinaDrops;
@@ -20,9 +21,9 @@ import net.minecraft.item.ItemStack;
 @EligibleIf(configAvailable="*.classic_block_drops", envMatches=Env.CLIENT, modNotLoaded="forge:obfuscate")
 public class MixinItemEntityRendererVanilla {
 
-	@Hijack(target="Lnet/minecraft/client/render/item/ItemRenderer;renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformation$Mode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/render/model/BakedModel;)V",
+	@Hijack(target="Lnet/minecraft/client/render/item/ItemRenderer;renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformationMode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/render/model/BakedModel;)V",
 			method="render(Lnet/minecraft/entity/ItemEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")
-	private static boolean fabrication$renderClassicBlockDrops(ItemRenderer subject, ItemStack stack, ModelTransformation.Mode renderMode, boolean leftHanded, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, BakedModel model) {
+	private static boolean fabrication$renderClassicBlockDrops(ItemRenderer subject, ItemStack stack, ModelTransformationMode renderMode, boolean leftHanded, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, BakedModel model) {
 		if (FabConf.isEnabled("*.classic_block_drops")) {
 			WoinaDrops.interceptRender(subject, stack, renderMode, leftHanded, matrices, vertexConsumers, light, overlay, model);
 			return true;

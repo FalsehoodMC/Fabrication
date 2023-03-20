@@ -7,6 +7,7 @@ import java.nio.IntBuffer;
 import java.util.function.Consumer;
 
 import com.unascribed.fabrication.FabConf;
+import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.util.math.random.Random;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -67,7 +68,7 @@ public class WoinaDrops {
 		return overlay;
 	}
 
-	public static void interceptRender(ItemRenderer subject, ItemStack stack, ModelTransformation.Mode renderMode, boolean leftHanded, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, BakedModel model) {
+	public static void interceptRender(ItemRenderer subject, ItemStack stack, ModelTransformationMode renderMode, boolean leftHanded, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, BakedModel model) {
 		if (FabConf.isEnabled("*.classic_block_drops")) {
 			if (stack.getItem() instanceof BlockItem && model instanceof BasicBakedModel && model.hasDepth()) {
 				matrices.push();

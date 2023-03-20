@@ -62,7 +62,6 @@ public class AtlasViewerScreen extends Screen {
 		RenderSystem.disableBlend();
 
 		client.getTextureManager().bindTexture(CHECKER);
-		RenderSystem.enableTexture();
 		RenderSystem.setShader(GameRenderer::getPositionTexProgram);
 		RenderSystem.setShaderTexture(0, CHECKER);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
@@ -84,7 +83,6 @@ public class AtlasViewerScreen extends Screen {
 		int atlasMaxLevel = glGetTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL);
 
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
-		RenderSystem.disableTexture();
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 		RenderSystem.setShaderColor(1f, 1f, 1f, 0.15f);
@@ -99,7 +97,6 @@ public class AtlasViewerScreen extends Screen {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, level);
 
 		RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-		RenderSystem.enableTexture();
 		RenderSystem.setShaderTexture(0, atlas);
 		RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 		mat = matrices.peek().getPositionMatrix();
@@ -135,7 +132,6 @@ public class AtlasViewerScreen extends Screen {
 			}
 		}
 		RenderSystem.disableCull();
-		RenderSystem.disableTexture();
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		for (Sprite s : sprites) {
 			int x = FabRefl.Client.getX(s);
@@ -152,7 +148,6 @@ public class AtlasViewerScreen extends Screen {
 			BufferRenderer.drawWithGlobalProgram(bb.end());
 		}
 		RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-		RenderSystem.enableTexture();
 		if (sprites.isEmpty()) {
 			if (mouseX >= 0 && mouseY >= 0 && mouseX < atlasWidth && mouseY < atlasHeight) {
 				renderTooltip(matrices, Lists.<Text>newArrayList(

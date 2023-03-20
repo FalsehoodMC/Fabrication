@@ -5,8 +5,8 @@ import com.unascribed.fabrication.logic.PingPrivacyPersistentState;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.injection.FabInject;
 import net.minecraft.network.ClientConnection;
-import net.minecraft.network.Packet;
 import net.minecraft.network.PacketCallbacks;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
@@ -28,7 +28,7 @@ public class MixinServerPlayNetworkHandler {
 	@Shadow @Final
 	public ClientConnection connection;
 
-	@FabInject(at=@At("HEAD"), method="sendPacket(Lnet/minecraft/network/Packet;Lnet/minecraft/network/PacketCallbacks;)V")
+	@FabInject(at=@At("HEAD"), method="sendPacket(Lnet/minecraft/network/packet/Packet;)V")
 	public void sendPacket(Packet<?> packet, PacketCallbacks callbacks, CallbackInfo ci) {
 		if (FabConf.isEnabled("*.ping_privacy") && packet instanceof GameJoinS2CPacket) {
 			SocketAddress addr = connection.getAddress();

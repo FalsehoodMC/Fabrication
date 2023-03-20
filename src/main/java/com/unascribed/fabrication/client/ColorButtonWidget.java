@@ -3,6 +3,7 @@ package com.unascribed.fabrication.client;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
 public class ColorButtonWidget extends ButtonWidget {
 
@@ -14,7 +15,7 @@ public class ColorButtonWidget extends ButtonWidget {
 	}
 
 	@Override
-	public void drawTexture(MatrixStack matrices, int x, int y, int u, int v, int width, int height) {
+	public void drawTexture(MatrixStack matrices, Identifier texture, int x, int y, int u, int v, int hoveredVOffset, int width, int height, int textureWidth, int textureHeight) {
 	}
 
 	@Override

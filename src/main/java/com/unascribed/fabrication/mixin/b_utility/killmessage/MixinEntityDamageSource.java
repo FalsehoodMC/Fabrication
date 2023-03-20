@@ -5,6 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.unascribed.fabrication.FabConf;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.text.MutableText;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -18,12 +19,10 @@ import com.unascribed.fabrication.support.EligibleIf;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.EntityDamageSource;
-import net.minecraft.entity.damage.ProjectileDamageSource;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 
-@Mixin({EntityDamageSource.class, ProjectileDamageSource.class})
+@Mixin(DamageSource.class)
 @EligibleIf(configAvailable="*.killmessage")
 public abstract class MixinEntityDamageSource {
 
@@ -33,7 +32,7 @@ public abstract class MixinEntityDamageSource {
 	@FabInject(at=@At("HEAD"), method="getDeathMessage(Lnet/minecraft/entity/LivingEntity;)Lnet/minecraft/text/Text;", cancellable=true)
 	public void getDeathMessage(LivingEntity victim, CallbackInfoReturnable<Text> rtrn) {
 		if (!FabConf.isEnabled("*.killmessage")) return;
-		Entity attacker = ((EntityDamageSource)(Object)this).getAttacker();
+		Entity attacker = victim.getPrimeAdversary();
 		if (attacker instanceof GetKillMessage) {
 			Iterator<ItemStack> iter = attacker.getHandItems().iterator();
 			ItemStack held;

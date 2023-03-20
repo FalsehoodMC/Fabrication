@@ -78,7 +78,7 @@ public abstract class MixinLivingEntity extends Entity {
 									new EntityAttributeModifier(
 											entry.getValue().getId(),
 											entry.getValue().getName(),
-											(old ? ArmorMaterials.DIAMOND.getProtectionAmount(slot) : entry.getValue().getValue())
+											(old ? ArmorMaterials.DIAMOND.getProtection(((ArmorItem)stack.getItem()).getType()) : entry.getValue().getValue())
 													* (scale ? ((stack.getMaxDamage() - stack.getDamage()) / (double) stack.getMaxDamage()) : 1),
 											EntityAttributeModifier.Operation.ADDITION))
 							: new AbstractMap.SimpleEntry<>(entry.getKey(), entry.getValue()))

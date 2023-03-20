@@ -26,7 +26,6 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 import org.joml.Matrix4f;
-import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 
@@ -137,10 +136,8 @@ public class BlockLogoRenderer {
 			//			Tessellator.getInstance().draw();
 
 			if (pass == 0) {
-				RenderSystem.disableTexture();
 				RenderSystem.setShaderColor(1, 1, 1, 1);
 			} else {
-				RenderSystem.enableTexture();
 				RenderSystem.setShaderColor(1, 1, 1, 1);
 			}
 
