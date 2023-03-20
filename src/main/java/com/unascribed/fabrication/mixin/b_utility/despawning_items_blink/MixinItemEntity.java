@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.b_utility.despawning_items_blink;
 
+import com.unascribed.fabrication.interfaces.SetItemDespawnAware;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -8,7 +9,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.interfaces.RenderingAgeAccess;
-import com.unascribed.fabrication.interfaces.SetAttackerYawAware;
 import com.unascribed.fabrication.support.EligibleIf;
 
 import io.netty.buffer.Unpooled;
@@ -42,7 +42,7 @@ public abstract class MixinItemEntity extends Entity implements RenderingAgeAcce
 				PacketByteBuf data = new PacketByteBuf(Unpooled.buffer(8));
 				data.writeInt(getEntityId());
 				data.writeInt(itemAge);
-				FabricationMod.sendToTrackersMatching(this, new CustomPayloadS2CPacket(FABRICATION$ITEM_DESPAWN, data), spe -> spe instanceof SetAttackerYawAware && ((SetAttackerYawAware) spe).fabrication$isAttackerYawAware());
+				FabricationMod.sendToTrackersMatching(this, new CustomPayloadS2CPacket(FABRICATION$ITEM_DESPAWN, data), spe -> spe instanceof SetItemDespawnAware && ((SetItemDespawnAware) spe).fabrication$isItemDespawnAware());
 			}
 		}
 		fabrication$renderingAge++;
