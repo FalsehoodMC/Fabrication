@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.Mixin;
 public class MixinItemRenderer {
 
 	@Hijack(target="Lnet/minecraft/client/render/RenderLayers;getItemLayer(Lnet/minecraft/item/ItemStack;Z)Lnet/minecraft/client/render/RenderLayer;",
-			method="renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformation$Mode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/render/model/BakedModel;)V")
+			method="renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformationMode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/render/model/BakedModel;)V")
 	private static HijackReturn fabrication$blink(ItemStack stack){
 		if (!FabConf.isEnabled("*.blinking_drops") || stack.getItem() instanceof BlockItem || !BlinkingDropsOverlay.isDropped) return null;
 		return BlinkingDropsOverlay.renderLayer;
