@@ -28,7 +28,7 @@ public abstract class MixinLivingEntity extends Entity {
 			this.fallDistance/=2F;
 			this.setVelocity(this.getVelocity().multiply(.4));
 			Object self = this;
-			if (self instanceof ServerPlayerEntity && ((ServerPlayerEntity)self).networkHandler.getConnection().isOpen()) {
+			if (self instanceof ServerPlayerEntity && ((ServerPlayerEntity)self).networkHandler.isConnectionOpen()) {
 				((ServerPlayerEntity)self).networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(this));
 			}
 			return true;

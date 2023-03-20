@@ -76,7 +76,7 @@ public abstract class MixinEnderPearlEntity extends ThrownItemEntity {
 			if (exposure > 0) {
 				Vec3d vec = getPos().subtract(hit.getEyePos()).multiply(exposure*(3f/Math.max(Math.min(hit.distanceTo(this), 10), 0.1f)));
 				hit.addVelocity(vec.x, vec.y, vec.z);
-				if (hit instanceof ServerPlayerEntity && ((ServerPlayerEntity)hit).networkHandler.getConnection().isOpen()) {
+				if (hit instanceof ServerPlayerEntity && ((ServerPlayerEntity)hit).networkHandler.isConnectionOpen()) {
 					((ServerPlayerEntity)hit).networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(hit));
 				}
 			}

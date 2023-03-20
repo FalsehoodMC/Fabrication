@@ -18,8 +18,8 @@ import net.minecraft.client.resource.language.TranslationStorage;
 @EligibleIf(configAvailable="*.boundless_levels", envMatches=Env.CLIENT)
 public class MixinTranslationStorage {
 
-	@FabInject(at=@At("HEAD"), method="get(Ljava/lang/String;)Ljava/lang/String;", cancellable=true)
-	public void get(String key, CallbackInfoReturnable<String> ci) {
+	@FabInject(at=@At("HEAD"), method="get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;", cancellable=true)
+	public void get(String key, String fallback, CallbackInfoReturnable<String> ci) {
 		if (!FabConf.isEnabled("*.boundless_levels")) return;
 		if (key.startsWith("enchantment.level.")) {
 			Integer i = Ints.tryParse(key.substring(18));

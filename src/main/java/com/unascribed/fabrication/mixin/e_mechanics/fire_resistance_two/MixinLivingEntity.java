@@ -7,6 +7,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -24,7 +25,7 @@ public abstract class MixinLivingEntity extends Entity {
 	@ModifyReturn(method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", target="Lnet/minecraft/entity/LivingEntity;hasStatusEffect(Lnet/minecraft/entity/effect/StatusEffect;)Z")
 	private static boolean fabrication$fireResistTwo(boolean hasEffect, LivingEntity self, StatusEffect effect, LivingEntity selfAgain, DamageSource source) {
 		if (!FabConf.isEnabled("*.fire_resistance_two")) return hasEffect;
-		if (hasEffect && effect == StatusEffects.FIRE_RESISTANCE && source == DamageSource.LAVA) {
+		if (hasEffect && effect == StatusEffects.FIRE_RESISTANCE && source.isOf(DamageTypes.LAVA)) {
 			StatusEffectInstance instance = self.getStatusEffect(StatusEffects.FIRE_RESISTANCE);
 			return instance == null || instance.getAmplifier() >= 1;
 		}

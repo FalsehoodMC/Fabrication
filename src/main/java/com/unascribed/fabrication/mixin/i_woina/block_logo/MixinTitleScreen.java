@@ -4,13 +4,11 @@ import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.injection.Hijack;
 import com.unascribed.fabrication.util.BlockLogoRenderer;
 import net.minecraft.util.math.RotationAxis;
-import org.joml.Quaternionf;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabInject;
-import com.unascribed.fabrication.support.injection.FabModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.unascribed.fabrication.loaders.LoaderBlockLogo;
@@ -22,18 +20,12 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 
 @Mixin(TitleScreen.class)
 @EligibleIf(configAvailable="*.block_logo", envMatches=Env.CLIENT)
 public class MixinTitleScreen extends Screen {
-
-	private static final Identifier FABRICATION$EMPTY = new Identifier("fabrication", "empty.png");
-
-	@Shadow @Final
-	private static Identifier EDITION_TITLE_TEXTURE;
 
 	protected MixinTitleScreen(Text title) {
 		super(title);
@@ -49,7 +41,7 @@ public class MixinTitleScreen extends Screen {
 	@Shadow
 	private long backgroundFadeStart;
 
-	@Hijack(target="Lnet/minecraft/client/gui/screen/TitleScreen;drawWithOutline(IILjava/util/function/BiConsumer;)V",
+	@Hijack(target="Lnet/minecraft/client/gui/DrawableHelper;drawTextWithShadow(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/font/TextRenderer;Ljava/lang/String;III)V",
 			method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
 	public boolean fabrication$drawBlockLogo() {
 		if (FabConf.isEnabled("*.block_logo")) {
@@ -59,24 +51,9 @@ public class MixinTitleScreen extends Screen {
 		return false;
 	}
 
-	// the mixture of deobf and obf classes here confuses MixinGradle, so we have to spell it out
-
-	@FabModifyArg(at=@At(value="INVOKE", target="com/mojang/blaze3d/systems/RenderSystem.setShaderTexture(ILnet/minecraft/class_2960;)V", ordinal=2),
-			method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V", require=0)
-	public Identifier setShaderTextureDev(Identifier id) {
-		if (FabConf.isEnabled("*.block_logo") && id == EDITION_TITLE_TEXTURE) {
-			id = FABRICATION$EMPTY;
-		}
-		return id;
-	}
-
-	@FabModifyArg(at=@At(value="INVOKE", target="com/mojang/blaze3d/systems/RenderSystem.setShaderTexture(ILnet/minecraft/util/Identifier;)V", ordinal=2),
-			method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V", require=0)
-	public Identifier setShaderTextureObf(Identifier id) {
-		if (FabConf.isEnabled("*.block_logo") && id == EDITION_TITLE_TEXTURE) {
-			id = FABRICATION$EMPTY;
-		}
-		return id;
+	@Hijack(method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V", target="Lnet/minecraft/client/gui/LogoDrawer;draw(Lnet/minecraft/client/util/math/MatrixStack;IF)V")
+	private static boolean fabrication$blockLogoCancelDraw() {
+		return FabConf.isEnabled("*.block_logo");
 	}
 
 	@FabInject(at=@At("HEAD"), method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
@@ -105,7 +82,7 @@ public class MixinTitleScreen extends Screen {
 			float s = 1.8f - MathHelper.abs(MathHelper.sin(Util.getMeasuringTimeMs() % 1000 / 1000f * 6.28f) * 0.1f);
 			s = s * 100f / (textRenderer.getWidth(splashText) + 32);
 			matrices.scale(s, s, s);
-			drawCenteredText(matrices, textRenderer, splashText, 0, -8, 0xFFFF00 | l);
+			drawCenteredTextWithShadow(matrices, textRenderer, splashText, 0, -8, 0xFFFF00 | l);
 			matrices.pop();
 		}
 

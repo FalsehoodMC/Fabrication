@@ -1,7 +1,6 @@
 package com.unascribed.fabrication.mixin.i_woina.oof;
 
 import com.unascribed.fabrication.FabConf;
-import net.minecraft.entity.damage.DamageSources;
 import net.minecraft.entity.damage.DamageTypes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

@@ -30,7 +30,7 @@ public class MixinClientPlayNetworkHandler {
 						Entity e = world.getEntityById(id);
 						e.timeUntilRegen = 20;
 						if (e instanceof LivingEntity) {
-							((LivingEntity)e).limbDistance = 1.5f;
+							((LivingEntity)e).limbAnimator.setSpeed(1.5f);
 							((LivingEntity)e).hurtTime = ((LivingEntity)e).maxHurtTime = 10;
 						}
 						world.playSound(e.getPos().x, e.getPos().y, e.getPos().z, FabricationMod.ABSORPTION_HURT, e.getSoundCategory(), 1.0f, 0.75f+(world.random.nextFloat()/2), false);

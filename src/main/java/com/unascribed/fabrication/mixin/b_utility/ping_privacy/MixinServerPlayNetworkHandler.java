@@ -28,7 +28,7 @@ public class MixinServerPlayNetworkHandler {
 	@Shadow @Final
 	public ClientConnection connection;
 
-	@FabInject(at=@At("HEAD"), method="sendPacket(Lnet/minecraft/network/packet/Packet;)V")
+	@FabInject(at=@At("HEAD"), method="sendPacket(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/PacketCallbacks;)V")
 	public void sendPacket(Packet<?> packet, PacketCallbacks callbacks, CallbackInfo ci) {
 		if (FabConf.isEnabled("*.ping_privacy") && packet instanceof GameJoinS2CPacket) {
 			SocketAddress addr = connection.getAddress();

@@ -50,8 +50,8 @@ public abstract class MixinScreen extends AbstractParentElement implements Drawa
 			j += line.getHeight();
 		}
 
-		int k = x + 12;
-		int l = y - 12;
+		int k = x /*+ 12*/;
+		int l = y /*- 12*/;
 
 		Vector2ic vec = pos.getPosition((Screen) (Object)this, k, l, i, j);
 		k = vec.x();

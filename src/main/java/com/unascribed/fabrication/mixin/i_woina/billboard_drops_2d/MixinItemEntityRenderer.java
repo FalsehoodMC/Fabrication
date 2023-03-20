@@ -14,7 +14,7 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.ItemEntityRenderer;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.render.model.json.ModelTransformation;
+import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.ItemEntity;
@@ -52,7 +52,7 @@ public class MixinItemEntityRenderer {
 		matrices.push();
 		{
 			float l = MathHelper.sin(((float) entity.getItemAge() + b) / 10.0F + entity.uniqueOffset) * 0.1F + 0.1F;
-			float m = bm.getTransformation().getTransformation(ModelTransformation.Mode.GROUND).scale.y;
+			float m = bm.getTransformation().getTransformation(ModelTransformationMode.GROUND).scale.y;
 			matrices.translate(0.0, l + 0.5F * m, 0.0);
 		}
 		float scaleX = bm.getTransformation().ground.scale.x/2f;

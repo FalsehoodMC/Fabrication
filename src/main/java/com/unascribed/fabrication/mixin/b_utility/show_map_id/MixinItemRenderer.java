@@ -1,9 +1,7 @@
 package com.unascribed.fabrication.mixin.b_utility.show_map_id;
 
 import com.unascribed.fabrication.FabConf;
-import com.unascribed.fabrication.util.forgery_nonsense.ForgeryMatrix;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -24,17 +22,15 @@ import net.minecraft.item.Items;
 @EligibleIf(anyConfigAvailable={"*.show_map_id"}, envMatches=Env.CLIENT)
 public class MixinItemRenderer {
 
-	@Shadow
-	public float zOffset;
-
-	@FabInject(at=@At("TAIL"), method="renderGuiItemOverlay(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V")
-	public void renderGuiItemOverlay(TextRenderer renderer, ItemStack stack, int x, int y, String countLabel, CallbackInfo ci) {
+	@FabInject(at=@At("TAIL"), method="renderGuiItemOverlay(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V")
+	public void renderGuiItemOverlay(MatrixStack matrices, TextRenderer renderer, ItemStack stack, int x, int y, String countLabel, CallbackInfo ci) {
 		if (FabConf.isEnabled("*.show_map_id") && stack.getItem() == Items.FILLED_MAP){
-			MatrixStack matrixStack = ForgeryMatrix.getStack();
-			matrixStack.translate(0, 0, zOffset + 200);
 			VertexConsumerProvider.Immediate vc = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
 			String id = String.valueOf(FilledMapItem.getMapId(stack));
-			renderer.draw(id, (float)(x + 19 - 2 - renderer.getWidth(id)), (float)(y + 6 + 3), 16777215, true, matrixStack.peek().getPositionMatrix(), vc, false, 0, 15728880);
+			matrices.push();
+			matrices.translate(0, 0, 400);
+			renderer.draw(id, (float)(x + 19 - 2 - renderer.getWidth(id)), (float)(y + 6 + 3), 16777215, true, matrices.peek().getPositionMatrix(), vc, TextRenderer.TextLayerType.NORMAL, 0, 15728880);
+			matrices.pop();
 			vc.draw();
 		}
 	}

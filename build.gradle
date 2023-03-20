@@ -93,7 +93,7 @@ dependencies {
 	//ModMenu dep
 	modImplementation fabricApi.module('fabric-lifecycle-events-v1', project.fabric_version)
 	modImplementation fabricApi.module('fabric-key-binding-api-v1', project.fabric_version)
-	modImplementation('com.terraformersmc:modmenu:5.0.2') {
+	modImplementation('com.terraformersmc:modmenu:6.1.0-rc.4') {
 		transitive = false
 	}
 	modImplementation 'com.unascribed:ears-api:1.4.5'

@@ -2,6 +2,8 @@ package com.unascribed.fabrication.mixin.b_utility.ping_privacy;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -50,18 +52,21 @@ public class MixinServerQueryNetworkHandler {
 				InetSocketAddress isa = (InetSocketAddress)sa;
 				if (PingPrivacy.isEvil(isa.getAddress()) || !PingPrivacyPersistentState.get(server.getOverworld()).isKnownAndRecent(isa.getAddress())) {
 					ServerMetadata realData = server.getServerMetadata();
-					ServerMetadata junkData = new ServerMetadata();
+					Text desc;
 					Version v;
 					int playerCount;
 					Random tlr = ThreadLocalRandom.current();
+					boolean chatEnforced;
 					if (PingPrivacy.isEvil(((InetSocketAddress)sa).getAddress())) {
 						playerCount = tlr.nextInt(128)+128;
 						v = new Version("?", 99999999);
-						junkData.setDescription(Text.literal("A Minecraft Server"));
+						desc = Text.literal("A Minecraft Server");
+						chatEnforced = false;
 					} else {
 						playerCount = 12;
-						junkData.setDescription(Text.literal("To protect the privacy of this server and its\nusers, you must log in once to see ping data.").formatted(Formatting.ITALIC));
-						v = new Version("§7?§8/§7"+realData.getPlayers().getPlayerLimit(), 99999999);
+						desc = Text.literal("To protect the privacy of this server and its\nusers, you must log in once to see ping data.").formatted(Formatting.ITALIC);
+						v = new Version("§7?§8/§7"+realData.players().map(Players::max).orElse(0), 99999999);
+						chatEnforced = realData.secureChatEnforced();
 					}
 					GameProfile[] sample = new GameProfile[playerCount];
 					StringBuilder sb = new StringBuilder(16);
@@ -71,11 +76,8 @@ public class MixinServerQueryNetworkHandler {
 						PingPrivacy.generateBelievableUsername(tlr, sb);
 						sample[i] = new GameProfile(id, sb.toString());
 					}
-					junkData.setVersion(v);
-					Players players = new Players(realData.getPlayers().getPlayerLimit(), playerCount);
-					players.setSample(sample);
-					junkData.setPlayers(players);
-					this.connection.send(new QueryResponseS2CPacket(junkData));
+					Players players = new Players(realData.players().map(Players::max).orElse(0), playerCount, List.of(sample));
+					this.connection.send(new QueryResponseS2CPacket(new ServerMetadata(desc, Optional.of(players), Optional.of(v), Optional.empty(), chatEnforced)));
 					responseSent = true;
 					ci.cancel();
 				}

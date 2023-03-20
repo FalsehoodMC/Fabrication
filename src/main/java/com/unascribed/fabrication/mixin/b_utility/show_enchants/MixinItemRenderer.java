@@ -4,11 +4,9 @@ import java.util.List;
 
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.injection.FabInject;
-import com.unascribed.fabrication.util.forgery_nonsense.ForgeryMatrix;
 import net.minecraft.registry.Registries;
 import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
@@ -37,14 +35,9 @@ import net.minecraft.util.Identifier;
 @EligibleIf(anyConfigAvailable={"*.books_show_enchants", "*.tools_show_important_enchant"}, envMatches=Env.CLIENT)
 public class MixinItemRenderer {
 
-	@Shadow
-	public float zOffset;
-
-	@FabInject(at=@At("TAIL"), method="renderGuiItemOverlay(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V")
-	public void renderGuiItemOverlay(TextRenderer renderer, ItemStack stack, int x, int y, String countLabel, CallbackInfo ci) {
+	@FabInject(at=@At("TAIL"), method="renderGuiItemOverlay(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V")
+	public void renderGuiItemOverlay(MatrixStack matrices, TextRenderer renderer, ItemStack stack, int x, int y, String countLabel, CallbackInfo ci) {
 		if (stack == null) return;
-		MatrixStack matrixStack = ForgeryMatrix.getStack();
-		matrixStack.translate(0, 0, zOffset + 200);
 		VertexConsumerProvider.Immediate vc = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
 		if (stack.getItem() == Items.ENCHANTED_BOOK && FabConf.isEnabled("*.books_show_enchants")) {
 			NbtList tag = EnchantedBookItem.getEnchantmentNbt(stack);
@@ -86,7 +79,10 @@ public class MixinItemRenderer {
 				}
 			}
 			String firstCodepoint = new String(Character.toChars(translated.codePoints().findFirst().getAsInt()));
-			renderer.draw(firstCodepoint, x, y + 6 + 3, display.isCursed() ? 0xFFFF5555 : display.isTreasure() ? 0xFF55FFFF : 0xFFFFFFFF, true, matrixStack.peek().getPositionMatrix(), vc, false, 0, 0xF000F0);
+			matrices.push();
+			matrices.translate(0, 0, 400);
+			renderer.draw(firstCodepoint, x, y + 6 + 3, display.isCursed() ? 0xFFFF5555 : display.isTreasure() ? 0xFF55FFFF : 0xFFFFFFFF, true, matrices.peek().getPositionMatrix(), vc, TextRenderer.TextLayerType.NORMAL, 0, 0xF000F0);
+			matrices.pop();
 			vc.draw();
 		}
 		if (FabConf.isEnabled("*.tools_show_important_enchant")) {
@@ -101,7 +97,10 @@ public class MixinItemRenderer {
 			if (display != null) {
 				String translated = I18n.translate(display.getTranslationKey());
 				String firstCodepoint = new String(Character.toChars(translated.codePoints().findFirst().getAsInt()));
-				renderer.draw(firstCodepoint, x, y, 0xFFFF55FF, true, matrixStack.peek().getPositionMatrix(), vc, false, 0, 0xF000F0);
+				matrices.push();
+				matrices.translate(0, 0, 400);
+				renderer.draw(firstCodepoint, x, y, 0xFFFF55FF, true, matrices.peek().getPositionMatrix(), vc, TextRenderer.TextLayerType.NORMAL, 0, 0xF000F0);
+				matrices.pop();
 				vc.draw();
 			}
 		}

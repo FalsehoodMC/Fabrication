@@ -8,6 +8,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -27,7 +28,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 	@FabInject(at=@At("HEAD"), method="isInvulnerableTo(Lnet/minecraft/entity/damage/DamageSource;)Z", cancellable=true)
 	public void isInvulnerableTo(DamageSource ds, CallbackInfoReturnable<Boolean> ci) {
 		if (FabConf.isEnabled("*.fireproof")) {
-			if (fabrication$fireproofPredicate.test((PlayerEntity)(Object)this) && ds.isFire()) {
+			if (fabrication$fireproofPredicate.test((PlayerEntity)(Object)this) && ds.isIn(DamageTypeTags.IS_FIRE)) {
 				ci.setReturnValue(true);
 			}
 		}

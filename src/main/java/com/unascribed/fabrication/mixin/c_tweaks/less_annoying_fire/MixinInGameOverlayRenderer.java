@@ -22,7 +22,7 @@ public class MixinInGameOverlayRenderer {
 	@FabInject(at=@At("HEAD"), method="renderFireOverlay(Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/util/math/MatrixStack;)V", cancellable=true)
 	private static void renderFireOverlayHead(MinecraftClient client, MatrixStack stack, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.less_annoying_fire")) return;
-		if (client.player.isInvulnerableTo(DamageSource.ON_FIRE) || client.player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE)) {
+		if (client.player.isInvulnerableTo(client.world.getDamageSources().onFire()) || client.player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE)) {
 			ci.cancel();
 		} else {
 			stack.push();

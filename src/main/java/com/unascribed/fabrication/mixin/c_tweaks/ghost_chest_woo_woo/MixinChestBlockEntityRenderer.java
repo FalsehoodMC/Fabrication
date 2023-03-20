@@ -59,7 +59,7 @@ public class MixinChestBlockEntityRenderer {
 		World world = entity.getWorld();
 		BlockState bs = world != null ? entity.getCachedState() : Blocks.CHEST.getDefaultState().with(ChestBlock.FACING, Direction.SOUTH);
 		ChestType type = bs.contains(ChestBlock.CHEST_TYPE) ? bs.get(ChestBlock.CHEST_TYPE) : ChestType.SINGLE;
-		SpriteIdentifier sprite = TexturedRenderLayers.getChestTexture(entity, type, this.christmas);
+		SpriteIdentifier sprite = TexturedRenderLayers.getChestTextureId(entity, type, this.christmas);
 		return sprite.getRenderLayer(RenderLayer::getEntityCutout);
 	}
 }

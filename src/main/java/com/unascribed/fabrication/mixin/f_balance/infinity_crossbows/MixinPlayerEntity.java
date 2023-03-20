@@ -16,7 +16,7 @@ import net.minecraft.item.ItemStack;
 public class MixinPlayerEntity {
 
 	@ModifyGetField(target="net/minecraft/entity/player/PlayerAbilities.creativeMode:Z",
-			method="getArrowType(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;")
+			method="getProjectileType(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;")
 	private static boolean fabrication$redirectIsCreativeMode(boolean old, PlayerAbilities subject, PlayerEntity pe, ItemStack crossbow) {
 		if (FabConf.isAnyEnabled("*.infinity_crossbows") && FabConf.isEnabled("*.infibows")
 				&& EnchantmentHelper.getLevel(Enchantments.INFINITY, crossbow) > 0) {

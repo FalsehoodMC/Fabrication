@@ -18,17 +18,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @EligibleIf(configAvailable="*.fix_nether_portal_nausea", envMatches=Env.CLIENT)
 public abstract class MixinInGameHud {
 
-	@Shadow
-	protected abstract void renderPortalOverlay(float nauseaStrength);
-
 	@Shadow @Final
 	private MinecraftClient client;
+
+	@Shadow
+	protected abstract void renderPortalOverlay(MatrixStack matrices, float nauseaStrength);
 
 	@FabInject(method="render(Lnet/minecraft/client/util/math/MatrixStack;F)V", at=@At(value="INVOKE",target="Lnet/minecraft/client/network/ClientPlayerEntity;hasStatusEffect(Lnet/minecraft/entity/effect/StatusEffect;)Z"))
 	private void fixPortal(MatrixStack matrices, float tickDelta, CallbackInfo ci){
 		if (!FabConf.isEnabled("*.fix_nether_portal_nausea")) return;
 		if (((PortalRenderFix)this.client.player).fabrication$shouldRenderPortal()) {
-			this.renderPortalOverlay(((PortalRenderFix)this.client.player).fabrication$getPortalRenderProgress(tickDelta));
+			this.renderPortalOverlay(matrices, ((PortalRenderFix)this.client.player).fabrication$getPortalRenderProgress(tickDelta));
 		}
 	}
 }
