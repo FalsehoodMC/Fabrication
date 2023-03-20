@@ -8,21 +8,6 @@ fixes:
 	desc:
 		Fixes for bugs and weird behavior.
 
-fixes.sync_attacker_yaw:
-	name: Sync Attacker Yaw
-	since: 1.0
-	sides: server_and_client
-	media: https://unascribed.com/fabrication/sync_attacker_yaw.mp4
-	short_desc: Correctly sync the last attacker yaw for damage tilt; fixes MC-26678
-	desc:
-		Makes the last attacker yaw field sync properly when the player is damaged, instead of
-		always being zero. Causes the camera shake animation when being hurt to tilt away from the
-		source of damage instead of always tilting right.
-
-		Fixes MC-26678, which is closed as Won't Fix.
-
-		Needed on both client and server, but doesn't break vanilla clients.
-
 fixes.furnace_minecart_pushing:
 	name: Furnace Minecart Pushing
 	since: 1.0

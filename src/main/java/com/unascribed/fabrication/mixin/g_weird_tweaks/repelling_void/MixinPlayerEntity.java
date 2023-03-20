@@ -5,6 +5,7 @@ import java.util.List;
 import com.unascribed.fabrication.support.injection.FabInject;
 import net.minecraft.block.BlockState;
 import com.unascribed.fabrication.FabConf;
+import net.minecraft.entity.damage.DamageTypes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -54,14 +55,14 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 		}
 		if (fabrication$debted) {
 			fabrication$debted = false;
-			damage(DamageSource.OUT_OF_WORLD, 12);
+			damage(world.getDamageSources().outOfWorld(), 12);
 		}
 	}
 
 
 	@FabInject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", cancellable=true)
 	public void remove(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-		if (FabConf.isEnabled("*.repelling_void") && !fabrication$debted && source == DamageSource.OUT_OF_WORLD && fabrication$lastLandingPos != null && this.getY() < this.world.getBottomY() -10) {
+		if (FabConf.isEnabled("*.repelling_void") && !fabrication$debted && source.isOf(DamageTypes.OUT_OF_WORLD) && fabrication$lastLandingPos != null && this.getY() < this.world.getBottomY() -10) {
 			BlockPos bp = fabrication$lastLandingPos;
 			Vec3d pos = fabrication$lastGroundPos;
 			BlockState state = world.getBlockState(bp);
