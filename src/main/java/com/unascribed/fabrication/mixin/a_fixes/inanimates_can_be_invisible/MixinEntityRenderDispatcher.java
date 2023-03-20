@@ -22,7 +22,7 @@ public abstract class MixinEntityRenderDispatcher {
 		if (e instanceof LivingEntity) return;
 		if (e.isInvisible()) {
 			if (!FabConf.isEnabled("*.inanimates_can_be_invisible")) return;
-			if (!e.getClass().isAssignableFrom(ItemFrameEntity.class)) {
+			if (!(e instanceof ItemFrameEntity)) {
 				ci.setReturnValue(false);
 			}
 		}
