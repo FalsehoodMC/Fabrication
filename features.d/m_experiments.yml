@@ -8,16 +8,6 @@ experiments:
 	desc:
 		Bad ideas given form.
 
-experiments.packed_atlases:
-	name: Packed Atlases
-	since: 1.2.8
-	sides: client_only
-	desc:
-		Disables rounding of atlases to the next power-of-two. GPU drivers have supported "NPOT"
-		textures since forever.
-
-		Possibly reduces VRAM usage. May reduce performance. Might cause incompatibilites.
-
 experiments.no_set_window_pos:
 	name: No Set Window Pos
 	since: 1.3.2
