@@ -72,7 +72,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			"*.classic_block_drops",
 			"*.dropped_items_dont_stack",
 			"*.obsidian_tears",
-			"*.enter_selects_highlighted_suggestion"
+			"*.enter_selects_highlighted_suggestion",
+			"*.less_restrictive_note_blocks"
 	);
 	public static boolean loadComplete = false;
 
