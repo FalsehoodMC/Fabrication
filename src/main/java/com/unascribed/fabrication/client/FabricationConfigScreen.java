@@ -484,6 +484,7 @@ public class FabricationConfigScreen extends Screen {
 			matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(5));
 			drawTexture(matrices, 0, 0, 0, 0, 0, size, Math.min(size, (int)Math.ceil(height-y)), size, size);
 			matrices.pop();
+			RenderSystem.setShaderColor(1, 1, 1, 1);
 			textRenderer.draw(matrices, "§l"+FeaturesFile.get(s).shortName, 4, y, -1);
 			y += 12;
 			thisHeight += 12;
@@ -788,6 +789,7 @@ public class FabricationConfigScreen extends Screen {
 			matrices.translate(130+((width-130)/2f), height/2f, 0);
 			drawTexture(matrices, -80, -80, 0, 0, 0, 160, 160, 160, 160);
 			matrices.pop();
+			RenderSystem.setShaderColor(1, 1, 1, 1);
 			if ("general".equals(section)) {
 				if (y > 0) {
 					textRenderer.draw(matrices, "§lGeneral", 135, y-12, -1);
