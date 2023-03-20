@@ -41,19 +41,13 @@ public class MixinTitleScreen extends Screen {
 	@Shadow
 	private long backgroundFadeStart;
 
-	@Hijack(target="Lnet/minecraft/client/gui/DrawableHelper;drawTextWithShadow(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/font/TextRenderer;Ljava/lang/String;III)V",
-			method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
+	@Hijack(method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V", target="Lnet/minecraft/client/gui/LogoDrawer;draw(Lnet/minecraft/client/util/math/MatrixStack;IF)V")
 	public boolean fabrication$drawBlockLogo() {
 		if (FabConf.isEnabled("*.block_logo")) {
 			fabrication$blockLogo.drawLogo(doBackgroundFade, backgroundFadeStart, MinecraftClient.getInstance().getTickDelta());
 			return true;
 		}
 		return false;
-	}
-
-	@Hijack(method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V", target="Lnet/minecraft/client/gui/LogoDrawer;draw(Lnet/minecraft/client/util/math/MatrixStack;IF)V")
-	private static boolean fabrication$blockLogoCancelDraw() {
-		return FabConf.isEnabled("*.block_logo");
 	}
 
 	@FabInject(at=@At("HEAD"), method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
