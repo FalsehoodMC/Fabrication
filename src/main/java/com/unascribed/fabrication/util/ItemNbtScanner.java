@@ -14,8 +14,10 @@ import net.minecraft.util.registry.Registry;
 //searches nbt for an item identifier returns CONTINUE on fail, HALT on success
 public class ItemNbtScanner implements NbtScanner {
 	public static final ItemNbtScanner INSTANCE = new ItemNbtScanner();
+	public static final TagKey<Item> INCLUSIONS = TagKey.of(Registry.ITEM_KEY, new Identifier("fabrication", "include_in_item_inventory_check"));
 	public static final TagKey<Item> EXCEPTIONS = TagKey.of(Registry.ITEM_KEY, new Identifier("fabrication", "exclude_from_item_inventory_check"));
 	public static boolean hasItemInvNBT(ItemStack stack) {
+		if (stack.isIn(INCLUSIONS)) return true;
 		if (stack.isIn(EXCEPTIONS)) return false;
 		NbtCompound tag = stack.getNbt();
 		return tag != null && tag.doAccept(INSTANCE.reset()) == Result.HALT;

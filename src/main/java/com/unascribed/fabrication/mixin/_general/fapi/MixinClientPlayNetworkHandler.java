@@ -2,6 +2,8 @@ package com.unascribed.fabrication.mixin._general.fapi;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.unascribed.fabrication.FabricationClientCommands;
+import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.injection.FabInject;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.command.CommandSource;
@@ -12,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientPlayNetworkHandler.class)
+@EligibleIf(envMatches=Env.CLIENT)
 public class MixinClientPlayNetworkHandler {
 		@Shadow
 		private CommandDispatcher<CommandSource> commandDispatcher;
