@@ -11,6 +11,7 @@ import com.google.common.collect.ImmutableMap;
 import com.unascribed.fabrication.FabLog;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffects;
@@ -72,6 +73,10 @@ public class ConfigPredicates {
 
 	static{
 		Map<String, Predicate<?>> defaultsMap = new HashMap<>();
+		defaultsMap.put(remap("*.velocity_based_fall_damage_reset"),
+				(Predicate<Entity>) entity ->
+		!(entity instanceof LivingEntity) || !((LivingEntity)entity).isClimbing()
+				);
 		defaultsMap.put(remap("*.cactus_walk_doesnt_hurt_with_boots"),
 				(Predicate<LivingEntity>) livingEntity ->
 		!livingEntity.getEquippedStack(EquipmentSlot.FEET).isEmpty()

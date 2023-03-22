@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.mixin._general.fapi;
 
 import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.FabricationEventsClient;
 import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.injection.FabInject;
@@ -11,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(InGameHud.class)
-@EligibleIf(specialConditions=SpecialEligibility.NOT_FORGE)
+@EligibleIf(specialConditions=SpecialEligibility.NOT_FORGE, envMatches=Env.CLIENT)
 public class MixinInGameHud {
 
 		@FabInject(method="render(Lnet/minecraft/client/util/math/MatrixStack;F)V", at=@At(value="TAIL"))
