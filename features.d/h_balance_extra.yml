@@ -199,5 +199,13 @@ balance.extra.infinity_crossbows_modded:
 
 		Honors InfiBows.
 
+balance.extra.velocity_based_fall_damage_reset:
+	name: Velocity Based Fall Damage Reset
+	since: 3.2.1
+	sides: server_only
+	fscript: entity
+	desc:
+		Fall distance will get gradually reduced instead of being reset in fluids like water.
+
 # kate: space-indent off
 # vim: noai:noet
