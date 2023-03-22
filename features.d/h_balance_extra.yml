@@ -168,12 +168,12 @@ balance.extra.no_filled_inventories_in_shulkers:
 		Shulker boxes will only allow inserting items which don't store other items
 		this also allows empty shulker boxes to be stored inside a shulker box.
 
-		exceptions can be added via fabrication:exclude_from_item_inventory_check item tag.
 
 balance.extra.lava_causes_fall_damage:
 	name: Lava Causes Fall Damage
 	since: 3.0.3
 	sides: server_only
+	fscript: living_entity
 	desc:
 		Lava halves fall damage instead of removing it.
 
