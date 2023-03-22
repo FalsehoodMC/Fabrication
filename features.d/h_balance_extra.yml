@@ -152,6 +152,7 @@ balance.extra.tools_in_bundles:
 		Allows storing up to 8 nonstackable items in a bundle, as long as nothing else is stored.
 
 		exceptions can be added via fabrication:exclude_from_item_inventory_check item tag.
+		item can be included via fabrication:include_in_item_inventory_check item tag.
 
 balance.extra.anvil_no_xp_cost:
 	name: Anvil No Xp Cost
@@ -178,11 +179,13 @@ balance.extra.no_filled_inventories_in_shulkers:
 		this also allows empty shulker boxes to be stored inside a shulker box.
 
 		exceptions can be added via fabrication:exclude_from_item_inventory_check item tag.
+		item can be included via fabrication:include_in_item_inventory_check item tag.
 
 balance.extra.lava_causes_fall_damage:
 	name: Lava Causes Fall Damage
 	since: 3.0.3
 	sides: server_only
+	fscript: living_entity
 	desc:
 		Lava halves fall damage instead of removing it.
 
