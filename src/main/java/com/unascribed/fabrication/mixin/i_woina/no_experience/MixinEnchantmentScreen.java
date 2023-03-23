@@ -61,7 +61,7 @@ public abstract class MixinEnchantmentScreen extends HandledScreen<EnchantmentSc
 
 	@Hijack(target="net/minecraft/client/gui/screen/ingame/EnchantmentScreen.drawTexture(Lnet/minecraft/client/util/math/MatrixStack;IIIIII)V",
 			method="drawBackground(Lnet/minecraft/client/util/math/MatrixStack;FII)V")
-	public boolean fabrication$noXpHijackDrawTexture(EnchantmentScreen subject, MatrixStack matrices, int x, int y, int u, int v) {
+	public boolean fabrication$noXpHijackDrawTexture(MatrixStack matrices, int x, int y, int u, int v) {
 		if (FabConf.isEnabled("*.no_experience") && (v == 223 || v == 239)) {
 			if (v == 223) {
 				textRenderer.drawWithShadow(matrices, ""+((u/16)+1), x+98, y+8, 0x5577FF);
