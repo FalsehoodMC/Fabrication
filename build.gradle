@@ -41,7 +41,7 @@ targetCompatibility = JavaVersion.VERSION_17
 
 archivesBaseName = project.archives_base_name
 def origVersion = project.version
-version = project.version+"+1.19.3"
+version = project.version+"+1.19.4"
 group = project.maven_group
 
 repositories {
@@ -694,7 +694,7 @@ class Mapp{
 	public List<Target> target
 }
 
-def mcVersions = [ '1.19.3' ]
+def mcVersions = [ '1.19.4' ]
 
 def stability = 'beta'
 
