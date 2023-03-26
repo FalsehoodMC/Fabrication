@@ -36,7 +36,7 @@ public class GrayscaleResourcePack implements ResourcePack {
 
 	public static InputStream getIS(String name) throws IOException {
 		Optional<Resource> optional = MinecraftClient.getInstance().getResourceManager().getResource(new Identifier(name));
-		if (optional.isEmpty()) return null;
+		if (optional.isEmpty()) throw new IOException("Resource doesn't exist");
 		return new Grayscale(optional.get().getInputStream());
 	}
 
