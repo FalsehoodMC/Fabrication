@@ -207,16 +207,18 @@ public class FabInjector {
 	}
 	public static void apply(ClassNode targetClass, List<ToInject> injects, List<EntryMixinMerged> redirects){
 		Map<String, String> redirectMap = new HashMap<>();
-		injects.forEach(toInject -> redirects.forEach(redirect -> {
-			//TODO target should probably match other formats?
-			String mapped = FabRefMap.absoluteMap(redirect.target);
-			if (toInject.target.contains(mapped)) {
-				String r = redirect.name+redirect.desc;
-				toInject.potentiallyRedirected.add(r);
-				redirectMap.put(r, mapped);
-				FabLog.warn("FabInjector found a Redirect from "+redirect.mixin+";"+redirect.name+";"+" which has been added to "+toInject.owner+";"+toInject.name);
-			}
-		}));
+		injects.forEach(toInject -> {
+			if (toInject.annotation.equals("Lcom/unascribed/fabrication/support/injection/ModifyGetField;")) return;
+			redirects.forEach(redirect -> {
+					String mapped = FabRefMap.absoluteMap(redirect.target);
+					if (toInject.target.contains(mapped)) {
+						String r = redirect.name + redirect.desc;
+						toInject.potentiallyRedirected.add(r);
+						redirectMap.put(r, mapped);
+						FabLog.warn("FabInjector found a Redirect from " + redirect.mixin + ";" + redirect.name + ";" + " which has been added to " + toInject.owner + ";" + toInject.name);
+					}
+				});
+		});
 		targetClass.methods.forEach(methodNode -> injects.forEach(toInject -> {
 			for (String m : toInject.method){
 				if (!m.equals(methodNode.name+methodNode.desc)) continue;
