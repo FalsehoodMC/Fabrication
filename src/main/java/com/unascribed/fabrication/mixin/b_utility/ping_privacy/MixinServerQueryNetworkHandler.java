@@ -1,28 +1,12 @@
 package com.unascribed.fabrication.mixin.b_utility.ping_privacy;
 
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
-
-import com.unascribed.fabrication.FabConf;
-import net.minecraft.text.Text;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import com.unascribed.fabrication.support.injection.FabInject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
 import com.mojang.authlib.GameProfile;
+import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.interfaces.SetServerAware;
 import com.unascribed.fabrication.logic.PingPrivacy;
 import com.unascribed.fabrication.logic.PingPrivacyPersistentState;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.SpecialEligibility;
-
+import com.unascribed.fabrication.support.injection.FabInject;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.packet.c2s.query.QueryRequestC2SPacket;
 import net.minecraft.network.packet.s2c.query.QueryResponseS2CPacket;
@@ -31,27 +15,45 @@ import net.minecraft.server.ServerMetadata;
 import net.minecraft.server.ServerMetadata.Players;
 import net.minecraft.server.ServerMetadata.Version;
 import net.minecraft.server.network.ServerQueryNetworkHandler;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Mixin(ServerQueryNetworkHandler.class)
 @EligibleIf(configAvailable="*.ping_privacy")
-public class MixinServerQueryNetworkHandler {
+public class MixinServerQueryNetworkHandler implements SetServerAware {
 
-	@Shadow @Final
-	private MinecraftServer server;
+	private MinecraftServer fabrication$pingPrivacyServer;
+
 	@Shadow @Final
 	private ClientConnection connection;
 	@Shadow
 	private boolean responseSent;
 
+	@Shadow @Final
+	private ServerMetadata metadata;
+
 	@FabInject(at=@At("HEAD"), method="onRequest(Lnet/minecraft/network/packet/c2s/query/QueryRequestC2SPacket;)V", cancellable=true)
 	public void onRequest(QueryRequestC2SPacket p, CallbackInfo ci) {
+		if (fabrication$pingPrivacyServer == null) return;
 		if (FabConf.isEnabled("*.ping_privacy") && !responseSent) {
 			SocketAddress sa = connection.getAddress();
 			if (sa instanceof InetSocketAddress) {
 				InetSocketAddress isa = (InetSocketAddress)sa;
-				if (PingPrivacy.isEvil(isa.getAddress()) || !PingPrivacyPersistentState.get(server.getOverworld()).isKnownAndRecent(isa.getAddress())) {
-					ServerMetadata realData = server.getServerMetadata();
+				if (PingPrivacy.isEvil(isa.getAddress()) || !PingPrivacyPersistentState.get(fabrication$pingPrivacyServer.getOverworld()).isKnownAndRecent(isa.getAddress())) {
+					ServerMetadata realData = metadata;
 					Text desc;
 					Version v;
 					int playerCount;
@@ -85,4 +87,8 @@ public class MixinServerQueryNetworkHandler {
 		}
 	}
 
+	@Override
+	public void fabrication$pingSetServer(MinecraftServer server) {
+		fabrication$pingPrivacyServer = server;
+	}
 }
