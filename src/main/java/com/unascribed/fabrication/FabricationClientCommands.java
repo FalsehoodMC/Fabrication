@@ -112,8 +112,7 @@ public class FabricationClientCommands {
 					return 1;
 				});
 				ui.then(key);
-				if (s.contains("."))
-					ui.then(LiteralArgumentBuilder.<T>literal("*"+s.substring(s.indexOf('.'))).executes(key.getCommand()));
+				FeatureFabricationCommand.setAltKeys(s, alt -> ui.then(LiteralArgumentBuilder.<T>literal(alt).executes(key.getCommand())));
 			}
 			script.then(ui);
 		}
