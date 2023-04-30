@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.mixin.e_mechanics.weaponized_pearls;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.injection.FabInject;
 import net.minecraft.entity.Entity;
@@ -26,6 +27,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.function.Predicate;
+
 @Mixin(EnderPearlEntity.class)
 @EligibleIf(configAvailable="*.weaponized_pearls")
 public abstract class MixinEnderPearlEntity extends ThrownItemEntity {
@@ -34,11 +37,14 @@ public abstract class MixinEnderPearlEntity extends ThrownItemEntity {
 		super(entityType, world);
 	}
 
+	private static final Predicate<ThrownItemEntity> fabrication$weaponizedPearsPredicate = ConfigPredicates.getFinalPredicate("*.weaponized_pearls");
+
 	private LivingEntity fabrication$pearljustTeleported = null;
 
 	@FabInject(method="onEntityHit(Lnet/minecraft/util/hit/EntityHitResult;)V", at=@At("TAIL"))
 	public void chorusEffect(EntityHitResult entityHitResult, CallbackInfo ci){
 		if (!FabConf.isEnabled("*.weaponized_pearls") || world.isClient) return;
+		if (!fabrication$weaponizedPearsPredicate.test(this)) return;
 		Entity ent = entityHitResult.getEntity();
 		if (ent instanceof LivingEntity) {
 			LivingEntity hit = (LivingEntity)ent;
@@ -68,6 +74,7 @@ public abstract class MixinEnderPearlEntity extends ThrownItemEntity {
 	@FabInject(method="onCollision(Lnet/minecraft/util/hit/HitResult;)V", at=@At(value="INVOKE", shift=At.Shift.AFTER, target="Lnet/minecraft/entity/projectile/thrown/ThrownItemEntity;onCollision(Lnet/minecraft/util/hit/HitResult;)V"), cancellable = true)
 	public void pushEffect(HitResult hitResult, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.weaponized_pearls") || world.isClient || this.isAlive()) return;
+		if (!fabrication$weaponizedPearsPredicate.test(this)) return;		
 		world.playSound(null, getBlockPos(), SoundEvents.ENTITY_DRAGON_FIREBALL_EXPLODE, SoundCategory.PLAYERS, 0.1f, 2.0F);
 		((ServerWorld)world).spawnParticles(ParticleTypes.PORTAL, getX(), getY(), getZ(), 32, 0.125F, 0.125F, 0.125F, 0.8F);
 		world.playSound( null, getX(), getY(), getZ(), SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT, SoundCategory.PLAYERS, 0.6F, 3.0F);

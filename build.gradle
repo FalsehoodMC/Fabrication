@@ -96,7 +96,7 @@ dependencies {
 		transitive = false
 	}
 	modImplementation 'com.unascribed:ears-api:1.4.5'
-	modImplementation('tf.ssf.sfort:fscript:3.1.2-1.16.5') {
+	modImplementation('tf.ssf.sfort:fscript:3.2.0+1.16.5') {
 		transitive = false
 	}
 	modRuntimeOnly fabricApi.module('fabric-screen-api-v1', project.fabric_version)
