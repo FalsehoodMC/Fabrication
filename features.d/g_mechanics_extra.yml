@@ -22,6 +22,7 @@ mechanics.extra.weaponized_pearls:
 	name: Weaponized Pearls
 	since: 3.0.0
 	sides: server_only
+	fscript: THROWN_ITEM_ENTITY
 	desc:
 		Pearls will teleport entities they hit and pull nearby ones.
 
