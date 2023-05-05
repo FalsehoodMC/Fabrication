@@ -26,21 +26,5 @@ mechanics.extra.weaponized_pearls:
 	desc:
 		Pearls will teleport entities they hit and pull nearby ones.
 
-minor_mechanics.extra.launching_pistons:
-	name: Launching Pistons
-	since: 3.0.0
-	sides: server_only
-	media: https://unascribed.com/fabrication/launching_pistons.mp4
-	desc:
-		Pistons launch players up as if they were pushing slime blocks.
-
-minor_mechanics.extra.fire_resistance_two:
-	name: Fire Resistance II
-	since: 3.0.4
-	sides: server_only
-	desc:
-		Potions of Fire Resistance only protect against fire.
-		They have to be brewed with glowstone dust to also protect against lava.
-
 # kate: space-indent off
 # vim: noai:noet
