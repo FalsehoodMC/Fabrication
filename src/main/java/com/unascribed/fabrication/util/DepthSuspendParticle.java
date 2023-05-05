@@ -27,7 +27,7 @@ public class DepthSuspendParticle extends SpriteBillboardParticle {
 		this.velocityZ = this.velocityZ / d2 * d1 * 0.00799999940D;
 		this.maxAge = (int)(20.0D / (Math.random() * 0.8D + 0.2D));
 		this.collidesWithWorld = false;
-		
+
 		//definitely hacky, but i give up trying to understand how to add a single white pixel
 		this.setSprite(MinecraftClient.getInstance().getBlockRenderManager().getModels().getSprite(Blocks.WHITE_WOOL.getDefaultState()));
 	}
@@ -48,8 +48,9 @@ public class DepthSuspendParticle extends SpriteBillboardParticle {
 		return ParticleTextureSheet.TERRAIN_SHEET;
 	}
 
+
 	protected float getMinU() {
-		return this.sprite.getFrameU(1);
+		return this.sprite.getFrameU(0);
 	}
 
 	protected float getMaxU() {
@@ -61,7 +62,8 @@ public class DepthSuspendParticle extends SpriteBillboardParticle {
 	}
 
 	protected float getMaxV() {
-		return this.sprite.getFrameV(0);
+		return this.sprite.getFrameV(1);
 	}
+
 
 }
