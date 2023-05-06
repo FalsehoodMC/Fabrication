@@ -5,26 +5,19 @@ import com.google.common.collect.Multimap;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.injection.FabInject;
 import com.unascribed.fabrication.support.injection.ModifyReturn;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.AttributeContainer;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorMaterials;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.AbstractMap;
 import java.util.function.Predicate;
@@ -36,30 +29,6 @@ public abstract class MixinLivingEntity extends Entity {
 
 	public MixinLivingEntity(EntityType<?> type, World world) {
 		super(type, world);
-	}
-
-	@Shadow
-	public abstract ItemStack getEquippedStack(EquipmentSlot slot);
-
-	@Shadow
-	public abstract AttributeContainer getAttributes();
-
-	@FabInject(at=@At("HEAD"), method="applyArmorToDamage(Lnet/minecraft/entity/damage/DamageSource;F)F")
-	public void refreshArmor(DamageSource source, float amount, CallbackInfoReturnable<Float> cir){
-		for(EquipmentSlot slot : EquipmentSlot.values()) {
-			if (slot.getType() != EquipmentSlot.Type.ARMOR) continue;
-			ItemStack itemStack3 = this.getEquippedStack(slot);
-				if (!itemStack3.isEmpty()) {
-					this.getAttributes().removeModifiers(fabrication$oldArmor(itemStack3.getAttributeModifiers(slot), itemStack3, slot, (LivingEntity)(Object)this));
-					this.getAttributes().addTemporaryModifiers(fabrication$oldArmor(itemStack3.getAttributeModifiers(slot), itemStack3, slot, (LivingEntity)(Object)this));
-				}
-		}
-	}
-
-	//Purely for visuals
-	@FabInject(at=@At("HEAD"), method="tick()V")
-	public void tickArmor(CallbackInfo ci){
-		if ((this.age & 16) == 0) refreshArmor(null, 0, null);
 	}
 
 	private static final Predicate<LivingEntity> fabrication$oldArmorScalePredicate = ConfigPredicates.getFinalPredicate("*.old_armor_scale");
