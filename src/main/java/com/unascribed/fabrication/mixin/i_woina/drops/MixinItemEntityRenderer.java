@@ -28,6 +28,7 @@ public class MixinItemEntityRenderer {
 				RenderingAgeAccess aa = (RenderingAgeAccess)entity;
 				int age = aa.fabrication$getRenderingAge();
 				int timeUntilDespawn = 6000-age;
+				if (timeUntilDespawn < 0) timeUntilDespawn = 0;
 				if (timeUntilDespawn < 100) {
 					m += 0.5f+(1-(timeUntilDespawn/100f))*4;
 				} else if (timeUntilDespawn < 200) {
