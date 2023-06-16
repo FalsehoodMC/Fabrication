@@ -80,7 +80,7 @@ public class MixinItemRenderer {
 			}
 			String firstCodepoint = new String(Character.toChars(translated.codePoints().findFirst().getAsInt()));
 			matrices.push();
-			matrices.translate(0, 0, 400);
+			matrices.translate(0, 0, 200);
 			renderer.draw(firstCodepoint, x, y + 6 + 3, display.isCursed() ? 0xFFFF5555 : display.isTreasure() ? 0xFF55FFFF : 0xFFFFFFFF, true, matrices.peek().getPositionMatrix(), vc, TextRenderer.TextLayerType.NORMAL, 0, 0xF000F0);
 			matrices.pop();
 			vc.draw();
@@ -98,7 +98,7 @@ public class MixinItemRenderer {
 				String translated = I18n.translate(display.getTranslationKey());
 				String firstCodepoint = new String(Character.toChars(translated.codePoints().findFirst().getAsInt()));
 				matrices.push();
-				matrices.translate(0, 0, 400);
+				matrices.translate(0, 0, 200);
 				renderer.draw(firstCodepoint, x, y, 0xFFFF55FF, true, matrices.peek().getPositionMatrix(), vc, TextRenderer.TextLayerType.NORMAL, 0, 0xF000F0);
 				matrices.pop();
 				vc.draw();

@@ -28,7 +28,7 @@ public class MixinItemRenderer {
 			VertexConsumerProvider.Immediate vc = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
 			String id = String.valueOf(FilledMapItem.getMapId(stack));
 			matrices.push();
-			matrices.translate(0, 0, 400);
+			matrices.translate(0, 0, 200);
 			renderer.draw(id, (float)(x + 19 - 2 - renderer.getWidth(id)), (float)(y + 6 + 3), 16777215, true, matrices.peek().getPositionMatrix(), vc, TextRenderer.TextLayerType.NORMAL, 0, 15728880);
 			matrices.pop();
 			vc.draw();
