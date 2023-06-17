@@ -1,28 +1,22 @@
 package com.unascribed.fabrication.mixin.i_woina.block_logo;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.Env;
+import com.unascribed.fabrication.support.injection.FabInject;
 import com.unascribed.fabrication.support.injection.Hijack;
 import com.unascribed.fabrication.util.BlockLogoRenderer;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.util.math.RotationAxis;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.SplashTextRenderer;
+import net.minecraft.client.gui.screen.TitleScreen;
+import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import com.unascribed.fabrication.loaders.LoaderBlockLogo;
-import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.Env;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.MathHelper;
 
 @Mixin(TitleScreen.class)
 @EligibleIf(configAvailable="*.block_logo", envMatches=Env.CLIENT)
@@ -34,8 +28,8 @@ public class MixinTitleScreen extends Screen {
 
 	private final BlockLogoRenderer fabrication$blockLogo = new BlockLogoRenderer();
 	@Shadow
-	private String splashText;
-	private String fabrication$splashText;
+	private SplashTextRenderer splashText;
+	private SplashTextRenderer fabrication$splashText;
 
 	@Shadow @Final
 	private boolean doBackgroundFade;
@@ -69,17 +63,7 @@ public class MixinTitleScreen extends Screen {
 	public void renderTail(DrawContext drawContext, int mouseX, int mouseY, float tickDelta, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.block_logo")) return;
 		if (splashText != null) {
-			float fade = doBackgroundFade ? MathHelper.clamp(((Util.getMeasuringTimeMs() - backgroundFadeStart) / 1000f)-1, 0, 1) : 1;
-			int l = MathHelper.ceil(fade * 255.0f) << 24;
-			MatrixStack matrices = drawContext.getMatrices();
-			matrices.push();
-			matrices.translate(this.width / 2.0 + ((LoaderBlockLogo.unrecoverableLoadError ? 48 : LoaderBlockLogo.image.getWidth())*2.307692307692308f), 70, 0);
-			matrices.multiply(RotationAxis.NEGATIVE_Z.rotationDegrees(20));
-			float s = 1.8f - MathHelper.abs(MathHelper.sin(Util.getMeasuringTimeMs() % 1000 / 1000f * 6.28f) * 0.1f);
-			s = s * 100f / (textRenderer.getWidth(splashText) + 32);
-			matrices.scale(s, s, s);
-			drawContext.drawCenteredTextWithShadow(textRenderer, splashText, 0, -8, 0xFFFF00 | l);
-			matrices.pop();
+			splashText.render(drawContext, width, textRenderer, 1);
 		}
 
 	}

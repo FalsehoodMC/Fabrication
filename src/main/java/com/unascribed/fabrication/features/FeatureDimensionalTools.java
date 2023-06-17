@@ -19,6 +19,7 @@ import com.google.common.collect.Sets;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.inventory.CraftingInventory;
+import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
@@ -79,7 +80,7 @@ public class FeatureDimensionalTools implements Feature {
 		return "*.dimensional_tools";
 	}
 
-	public static void handleCraft(CraftingInventory inv, ItemStack stack) {
+	public static void handleCraft(RecipeInputInventory inv, ItemStack stack) {
 		if (LoaderDimensionalTools.isSubstitutable(stack.getItem())) {
 			int count = 0;
 			Multiset<MohsIdentifier> dimensions = null;

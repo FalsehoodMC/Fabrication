@@ -2,7 +2,7 @@ package com.unascribed.fabrication.mixin.a_fixes.omniscent_player;
 
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.injection.FabModifyVariable;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawContext;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,8 +22,8 @@ public class MixinInventoryScreen {
 
 	private static float fabrication$mouseY;
 
-	@FabModifyVariable(method="drawEntity(Lnet/minecraft/client/util/math/MatrixStack;IIIFFLnet/minecraft/entity/LivingEntity;)V", at=@At("HEAD"), index=4, argsOnly=true)
-	private static float modifyX(float value, MatrixStack matrices, int x, int y, int size, float mouseX, float mouseY, LivingEntity entity) {
+	@FabModifyVariable(method="drawEntity(Lnet/minecraft/client/gui/DrawContext;IIIFFLnet/minecraft/entity/LivingEntity;)V", at=@At("HEAD"), index=4, argsOnly=true)
+	private static float modifyX(float value, DrawContext matrices, int x, int y, int size, float mouseX, float mouseY, LivingEntity entity) {
 		fabrication$mouseY = mouseY;
 		if (!FabConf.isEnabled("*.omniscent_player")) return value;
 		if (!(entity instanceof PlayerEntity)) return value;
@@ -40,7 +40,7 @@ public class MixinInventoryScreen {
 		return x-curX;
 	}
 
-	@FabModifyVariable(method="drawEntity(Lnet/minecraft/client/util/math/MatrixStack;IIIFFLnet/minecraft/entity/LivingEntity;)V", at=@At("HEAD"), index=5, argsOnly=true)
+	@FabModifyVariable(method="drawEntity(Lnet/minecraft/client/gui/DrawContext;IIIFFLnet/minecraft/entity/LivingEntity;)V", at=@At("HEAD"), index=5, argsOnly=true)
 	private static float modifyY(float value) {
 		return fabrication$mouseY;
 	}
