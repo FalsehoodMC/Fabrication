@@ -31,7 +31,8 @@ public class MixinPlayerEntity {
 		BlockState state = world.getBlockState(pos);
 		Block bl = state.getBlock();
 		if (bl == Blocks.CRYING_OBSIDIAN) {
-			if (world.getBlockState(pos.up()).getBlock().canMobSpawnInside() && world.getBlockState(pos.up().up()).getBlock().canMobSpawnInside()) {
+			BlockState bs;
+			if ((bs = world.getBlockState(pos.up())).getBlock().canMobSpawnInside(bs) && (bs = world.getBlockState(pos.up().up())).getBlock().canMobSpawnInside(bs)) {
 				ci.setReturnValue(Optional.of(new Vec3d(pos.getX()+0.5, pos.getY()+1, pos.getZ()+0.5)));
 			} else {
 				Optional<Vec3d> attempt = RespawnAnchorBlock.findRespawnPosition(EntityType.PLAYER, world, pos);

@@ -27,7 +27,7 @@ public abstract class MixinCreeperEntity extends HostileEntity {
 	@Override
 	public void setFireTicks(int ticks) {
 		super.setFireTicks(ticks);
-		if (FabConf.isEnabled("*.creepers_explode_when_on_fire") && !world.isClient &&
+		if (FabConf.isEnabled("*.creepers_explode_when_on_fire") && !getWorld().isClient &&
 				fabrication$creepersExplodeWhenOnFirePredicate.test(this)) {
 			ignite();
 		}

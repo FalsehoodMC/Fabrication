@@ -6,9 +6,9 @@ import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.loaders.LoaderFScript;
 import com.unascribed.fabrication.support.OptionalFScript;
 import io.netty.buffer.Unpooled;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.command.CommandSource;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
@@ -53,10 +53,10 @@ public class FScriptScreen extends ScriptingScreen {
 		}
 	}
 	@Override
-	protected void drawOptionButtons(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		if (drawButton(matrices, width - 83, 1, 35, 10, fabrication$writeLocal ? "Client" : "Server", "Toggle where scripts are saved/loaded", mouseX, mouseY)) {
+	protected void drawOptionButtons(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+		if (drawButton(drawContext, width - 83, 1, 35, 10, fabrication$writeLocal ? "Client" : "Server", "Toggle where scripts are saved/loaded", mouseX, mouseY)) {
 			if (this.client == null || client.player == null) {
-				super.drawOptionButtons(matrices, mouseX, mouseY, delta);
+				super.drawOptionButtons(drawContext, mouseX, mouseY, delta);
 				return;
 			}
 			CommandNode<CommandSource> cmd = client.player.networkHandler.getCommandDispatcher().getRoot().getChild("fabrication");
@@ -68,13 +68,13 @@ public class FScriptScreen extends ScriptingScreen {
 				client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO.value(), 0.7f, 1));
 			}
 		}
-		super.drawOptionButtons(matrices, mouseX, mouseY, delta);
+		super.drawOptionButtons(drawContext, mouseX, mouseY, delta);
 	}
 
 	@Override
-	protected void drawScriptButtons(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	protected void drawScriptButtons(DrawContext drawContext, int mouseX, int mouseY, float delta) {
 		int x = this.width - 100;
-		if (this.drawButton(matrices, x, this.height - 20, 50, 20, "Save", null, mouseX, mouseY)) {
+		if (this.drawButton(drawContext, x, this.height - 20, 50, 20, "Save", null, mouseX, mouseY)) {
 			if (fabrication$writeLocal){
 				OptionalFScript.set(fabrication$key, this.unloadScript(), e -> fabrication$failedSave());
 			}else {
@@ -87,7 +87,7 @@ public class FScriptScreen extends ScriptingScreen {
 		}
 		x -= 50;
 
-		if (this.drawButton(matrices, x, this.height - 20, 50, 20, "Reset", "Restore Fabrications default behaviour", mouseX, mouseY)) {
+		if (this.drawButton(drawContext, x, this.height - 20, 50, 20, "Reset", "Restore Fabrications default behaviour", mouseX, mouseY)) {
 			if (fabrication$writeLocal){
 				OptionalFScript.restoreDefault(fabrication$key);
 			}else{
@@ -99,7 +99,7 @@ public class FScriptScreen extends ScriptingScreen {
 		}
 		x -= 50;
 
-		if (this.drawButton(matrices, x, this.height - 20, 50, 20, "Load", null, mouseX, mouseY)) {
+		if (this.drawButton(drawContext, x, this.height - 20, 50, 20, "Load", null, mouseX, mouseY)) {
 			if (fabrication$writeLocal) {
 				String script = LoaderFScript.get(fabrication$key);
 				if (script != null){
@@ -147,22 +147,22 @@ public class FScriptScreen extends ScriptingScreen {
 	}
 
 	@Override
-	protected boolean drawButton(MatrixStack matrices, int x, int y, int w, int h, String text, String desc, int mouseX, int mouseY) {
-		fill(matrices, x, y, x+w, y+h, FabConf.isEnabled("general.dark_mode") ? 0x44FFFFFF : 0x55000000);
-		return super.drawButton(matrices, x, y, w, h, text, desc, mouseX, mouseY);
+	protected boolean drawButton(DrawContext drawContext, int x, int y, int w, int h, String text, String desc, int mouseX, int mouseY) {
+		drawContext.fill(x, y, x+w, y+h, FabConf.isEnabled("general.dark_mode") ? 0x44FFFFFF : 0x55000000);
+		return super.drawButton(drawContext, x, y, w, h, text, desc, mouseX, mouseY);
 	}
 	@Override
-	protected boolean drawToggleButton(MatrixStack matrices, int x, int y, int w, int h, String text, String desc, int mouseX, int mouseY, boolean toggled) {
-		fill(matrices, x, y, x+w, y+h, FabConf.isEnabled("general.dark_mode") ? 0x44FFFFFF : 0x55000000);
-		return super.drawToggleButton(matrices, x, y, w, h, text, desc, mouseX, mouseY, toggled);
+	protected boolean drawToggleButton(DrawContext drawContext, int x, int y, int w, int h, String text, String desc, int mouseX, int mouseY, boolean toggled) {
+		drawContext.fill(x, y, x+w, y+h, FabConf.isEnabled("general.dark_mode") ? 0x44FFFFFF : 0x55000000);
+		return super.drawToggleButton(drawContext, x, y, w, h, text, desc, mouseX, mouseY, toggled);
 	}
 	@Override
-	public void renderBackground(MatrixStack matrices) {
-		FabricationConfigScreen.drawBackground(height, width, client, fabrication$prideFlag, 0, matrices, 0, 0, 0, 0, 0);
+	public void renderBackground(DrawContext drawContext) {
+		FabricationConfigScreen.drawBackground(height, width, client, fabrication$prideFlag, 0, drawContext, 0, 0, 0, 0, 0);
 	}
 	@Override
-	protected void renderWorldBackground(MatrixStack matrices) {
-		renderBackground(matrices);
+	protected void renderWorldBackground(DrawContext drawContext) {
+		renderBackground(drawContext);
 	}
 
 }

@@ -112,9 +112,9 @@ public class FeatureIMore implements Feature {
 		}
 
 		if (targets.size() == 1) {
-			source.sendFeedback(Text.translatable("commands.enchant.success.single", enchantment.getName(level), targets.iterator().next().getDisplayName()), true);
+			source.sendFeedback(()->Text.translatable("commands.enchant.success.single", enchantment.getName(level), targets.iterator().next().getDisplayName()), true);
 		} else {
-			source.sendFeedback(Text.translatable("commands.enchant.success.multiple", enchantment.getName(level), targets.size()), true);
+			source.sendFeedback(()->Text.translatable("commands.enchant.success.multiple", enchantment.getName(level), targets.size()), true);
 		}
 
 		return amt;
@@ -141,7 +141,7 @@ public class FeatureIMore implements Feature {
 			throw new CommandException(Text.literal("Your stack is already bigger than that"));
 		}
 		int amt = count-held.getCount();
-		ctx.getSource().sendFeedback(Text.translatable("commands.give.success.single", amt, held.toHoverableText(), player.getDisplayName()), true);
+		ctx.getSource().sendFeedback(()->Text.translatable("commands.give.success.single", amt, held.toHoverableText(), player.getDisplayName()), true);
 		held.setCount(count);
 		player.equipStack(slot, held);
 		return 1;

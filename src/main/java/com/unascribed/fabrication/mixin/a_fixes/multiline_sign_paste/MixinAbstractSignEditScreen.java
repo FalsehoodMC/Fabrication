@@ -4,7 +4,6 @@ import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.support.injection.FabInject;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.AbstractSignEditScreen;
-import net.minecraft.client.gui.screen.ingame.SignEditScreen;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,7 +18,6 @@ import com.unascribed.fabrication.support.Env;
 
 import com.google.common.base.Joiner;
 
-import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.client.util.SelectionManager;
 import net.minecraft.text.Text;
 
@@ -30,17 +28,16 @@ import java.util.function.Supplier;
 public abstract class MixinAbstractSignEditScreen extends Screen {
 	@Shadow
 	@Final
-	protected String[] text;
+	private String[] messages;
 
 	@Shadow
 	private SelectionManager selectionManager;
 
 	@Shadow
-	@Final
-	protected SignBlockEntity blockEntity;
+	private int currentRow;
 
 	@Shadow
-	private int currentRow;
+	protected abstract void setCurrentRowMessage(String message);
 
 	protected MixinAbstractSignEditScreen(Text title) {
 		super(title);
@@ -48,10 +45,7 @@ public abstract class MixinAbstractSignEditScreen extends Screen {
 
 	@FabInject(at=@At("TAIL"), method="init()V")
 	public void init(CallbackInfo ci) {
-		this.selectionManager = new SelectionManager(() -> this.text[this.currentRow], (text) -> {
-			this.text[this.currentRow] = text;
-			this.blockEntity.setTextOnRow(this.currentRow, Text.literal(text));
-		}, SelectionManager.makeClipboardGetter(this.client), SelectionManager.makeClipboardSetter(this.client), (text) -> this.client.textRenderer.getWidth(text) <= 90) {
+		this.selectionManager = new SelectionManager(() -> this.messages[this.currentRow], this::setCurrentRowMessage, SelectionManager.makeClipboardGetter(this.client), SelectionManager.makeClipboardSetter(this.client), (text) -> this.client.textRenderer.getWidth(text) <= 90) {
 			@Override
 			public void paste() {
 				Supplier<String> supplier = FabRefl.Client.getClipboardGetter(this);
@@ -78,7 +72,7 @@ public abstract class MixinAbstractSignEditScreen extends Screen {
 	@FabInject(at=@At("HEAD"), method="keyPressed(III)Z", cancellable=true)
 	public void keyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> ci) {
 		if (keyCode == GLFW.GLFW_KEY_C && hasControlDown() && hasShiftDown() && !hasAltDown()) {
-			SelectionManager.setClipboard(client, Joiner.on(Platform.isWindows() ? "\r\n" : "\n").join(text));
+			SelectionManager.setClipboard(client, Joiner.on(Platform.isWindows() ? "\r\n" : "\n").join(messages));
 			ci.setReturnValue(true);
 		}
 	}

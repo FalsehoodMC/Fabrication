@@ -3,8 +3,8 @@ package com.unascribed.fabrication.client;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.math.MatrixStack;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -34,8 +34,8 @@ class SelectionScreen<T> extends Screen {
 		}
 
 		@Override
-		public void render(MatrixStack matrices, float x, float y, float delta) {
-			textRenderer.drawWithShadow(matrices, text, x, y, -1);
+		public void render(DrawContext drawContext, float x, float y, float delta) {
+			drawContext.drawText(textRenderer, text, (int) x, (int) y, -1, true);
 		}
 
 		@Override
@@ -55,7 +55,7 @@ class SelectionScreen<T> extends Screen {
 	}
 
 	public interface PreciseDrawable<T> {
-		void render(MatrixStack matrices, float x, float y, float delta);
+		void render(DrawContext drawContext, float x, float y, float delta);
 		int width();
 		int height();
 		T val();
@@ -63,19 +63,19 @@ class SelectionScreen<T> extends Screen {
 
 
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
 		parent.height = this.height;
 		parent.width = this.width;
-		parent.renderBackground(matrices);
+		parent.renderBackground(drawContext);
 		float scroll = scrollBar.getScaledScroll(client);
 		scrollBar.height = 20;
 		scroll = (float) (Math.floor((scroll * client.getWindow().getScaleFactor())) / client.getWindow().getScaleFactor());
 		float y = 22 - scroll;
 		for (PreciseDrawable<?> feature : features) {
-			feature.render(matrices, 16, y, delta);
+			feature.render(drawContext, 16, y, delta);
 			int height = feature.height();
 			if (mouseY > y - 2 && mouseY < y + height) {
-				fill(matrices, 0, (int) y+height, feature.width()+16, (int) y+height+1, -1);
+				drawContext.fill(0, (int) y+height, feature.width()+16, (int) y+height+1, -1);
 				if (didClick) {
 					out.accept((T) feature.val());
 					close();

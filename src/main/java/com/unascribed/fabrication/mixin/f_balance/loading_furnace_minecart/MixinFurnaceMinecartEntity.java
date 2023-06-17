@@ -38,8 +38,8 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 	}
 	@FabInject(method="tick()V", at=@At("HEAD"))
 	void tick(CallbackInfo ci) {
-		if (FabConf.isEnabled("*.loading_furnace_minecart") && fuel>0 && world instanceof ServerWorld) {
-			((ServerWorld)world).getChunkManager().addTicket(ChunkTicketType.PORTAL, new ChunkPos(this.getBlockPos()),3, this.getBlockPos());
+		if (FabConf.isEnabled("*.loading_furnace_minecart") && fuel>0 && getWorld() instanceof ServerWorld) {
+			((ServerWorld)getWorld()).getChunkManager().addTicket(ChunkTicketType.PORTAL, new ChunkPos(this.getBlockPos()),3, this.getBlockPos());
 		}
 	}
 }

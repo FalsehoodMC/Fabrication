@@ -33,7 +33,7 @@ public abstract class MixinSpiderEntity extends HostileEntity {
 
 	@FabInject(at=@At("TAIL"), method="tick()V")
 	public void tickTail(CallbackInfo ci) {
-		if (!world.isClient) {
+		if (!getWorld().isClient) {
 			if (isClimbingWall()) {
 				if (FabConf.isEnabled("*.spiders_cant_climb_while_wet") && isWet()) {
 					setClimbingWall(false);
@@ -42,7 +42,7 @@ public abstract class MixinSpiderEntity extends HostileEntity {
 					// this used to be done by shrinking the terracotta hitbox and using
 					// onEntityCollision, but that makes spiders get caught on things...
 					FabricationMod.forAllAdjacentBlocks(this, (w, bp, bp2, dir) -> {
-						BlockState bs = world.getBlockState(bp);
+						BlockState bs = getWorld().getBlockState(bp);
 						if (bs.getBlock() instanceof GlazedTerracottaBlock) {
 							setClimbingWall(false);
 							return false;

@@ -12,13 +12,18 @@ import com.unascribed.fabrication.support.Feature;
 
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.Window;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
+import org.joml.Matrix4f;
 
 @EligibleIf(configAvailable="*.toggle_stance", envMatches=Env.CLIENT)
 public class FeatureToggleStance implements Feature {
@@ -69,7 +74,7 @@ public class FeatureToggleStance implements Feature {
 			}
 		};
 		Agnos.registerKeyBinding(keybind);
-		Agnos.runForHudRender((ms, d) -> {
+		Agnos.runForHudRender((dc, d) -> {
 			MinecraftClient mc = MinecraftClient.getInstance();
 			PlayerEntity p = mc.player;
 			if (p == null) return;
@@ -78,14 +83,11 @@ public class FeatureToggleStance implements Feature {
 				float a = FabricationConfigScreen.sCurve5(1-(toggleTime/40f));
 				Identifier tex = new Identifier("fabrication", "textures/stance/"+currentStance.name().toLowerCase(Locale.ROOT)+".png");
 				RenderSystem.defaultBlendFunc();
-				RenderSystem.enableBlend();
-				RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
 				//GlStateManager.disableAlphaTest();
 				RenderSystem.setShaderTexture(0, tex);
 				RenderSystem.setShaderColor(1, 1, 1, a);
-				DrawableHelper.drawTexture(ms, (w.getScaledWidth()/2)-48, (w.getScaledHeight()-32)/2, 0, 0, 0, 32, 32, 32, 32);
+				dc.drawTexture(tex, (w.getScaledWidth()/2)-48, (w.getScaledHeight()-32)/2, 0, 0, 0, 32, 32, 32, 32);
 				RenderSystem.setShaderColor(1, 1, 1, 1);
-				RenderSystem.disableBlend();
 				//GlStateManager.enableAlphaTest();
 			}
 			if (p.age != lastAge) {

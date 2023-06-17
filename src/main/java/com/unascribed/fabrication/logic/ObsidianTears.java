@@ -43,7 +43,7 @@ public class ObsidianTears {
 	};
 
 	public static void setSpawnPoint(ServerPlayerEntity p, ItemStack stack) {
-		World world = p.world;
+		World world = p.getWorld();
 		RegistryKey<World> key = RegistryKey.of(RegistryKeys.WORLD, new Identifier(stack.getNbt().getString("fabrication:ObsidianTearsOriginDim")));
 		BlockPos pos = BlockPos.fromLong(stack.getNbt().getLong("fabrication:ObsidianTearsOrigin"));
 		if (world instanceof ServerWorld) {

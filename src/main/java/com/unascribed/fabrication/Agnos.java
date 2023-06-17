@@ -5,6 +5,7 @@ import com.unascribed.fabrication.support.FabricationEvents;
 import com.unascribed.fabrication.support.FabricationEventsClient;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.command.CommandRegistryAccess;
@@ -34,7 +35,7 @@ public final class Agnos {
 	}
 
 	public interface HudRenderCallback {
-		void render(MatrixStack matrixStack, float tickDelta);
+		void render(DrawContext drawContext, float tickDelta);
 	}
 
 	public static void runForCommandRegistration(CommandRegistrationCallback r) {

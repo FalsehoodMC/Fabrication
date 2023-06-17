@@ -46,7 +46,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 	@FabInject(at=@At("TAIL"), method="tick()V")
 	public void tick(CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.repelling_void")) return;
-		if (onGround) {
+		if (isOnGround()) {
 			fabrication$lastGroundPos = getPos();
 			fabrication$lastLandingPos = getSteppingPos();
 			fabrication$voidFallTrail.clear();
@@ -55,19 +55,20 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 		}
 		if (fabrication$debted) {
 			fabrication$debted = false;
-			damage(world.getDamageSources().outOfWorld(), 12);
+			damage(getWorld().getDamageSources().outOfWorld(), 12);
 		}
 	}
 
 
 	@FabInject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", cancellable=true)
 	public void remove(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-		if (FabConf.isEnabled("*.repelling_void") && !fabrication$debted && source.isOf(DamageTypes.OUT_OF_WORLD) && fabrication$lastLandingPos != null && this.getY() < this.world.getBottomY() -10) {
+		if (FabConf.isEnabled("*.repelling_void") && !fabrication$debted && source.isOf(DamageTypes.OUT_OF_WORLD) && fabrication$lastLandingPos != null && this.getY() < getWorld().getBottomY() -10) {
+			World world = getWorld();
 			BlockPos bp = fabrication$lastLandingPos;
 			Vec3d pos = fabrication$lastGroundPos;
 			BlockState state = world.getBlockState(bp);
 			if (!state.getCollisionShape(world, bp).isEmpty()) {
-				Box bounds = state.getCollisionShape(world, bp).getBoundingBox();
+				Box bounds = state.getCollisionShape(getWorld(), bp).getBoundingBox();
 				pos = new Vec3d(bp.getX()+bounds.minX+(bounds.maxX-bounds.minX)/2, bp.getY()+bounds.maxY+0.1, bp.getZ()+bounds.minZ+(bounds.maxZ-bounds.minZ)/2);
 			} else {
 				out: for (int d = 1; d <= 3; d++) {

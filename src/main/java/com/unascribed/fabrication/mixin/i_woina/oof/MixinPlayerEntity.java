@@ -23,7 +23,7 @@ public abstract class MixinPlayerEntity {
 	@FabInject(at=@At("HEAD"), method="getHurtSound(Lnet/minecraft/entity/damage/DamageSource;)Lnet/minecraft/sound/SoundEvent;",
 			cancellable=true)
 	public void getHurtSound(DamageSource src, CallbackInfoReturnable<SoundEvent> ci) {
-		if (!FabConf.isEnabled("*.oof") || !((PlayerEntity)(Object)this).world.isClient) return;
+		if (!FabConf.isEnabled("*.oof") || !((PlayerEntity)(Object)this).getWorld().isClient) return;
 		if (src.isOf(DamageTypes.DROWN)) {
 			ci.setReturnValue(SoundEvents.ENTITY_PLAYER_HURT_DROWN);
 		} else {

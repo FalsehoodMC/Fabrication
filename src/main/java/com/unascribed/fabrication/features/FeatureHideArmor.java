@@ -118,20 +118,21 @@ public class FeatureHideArmor implements Feature {
 			for (EquipmentSlot es : EquipmentSlot.values()) {
 				li.add(Pair.of(es, suppressed.contains(es) ? ItemStack.EMPTY : ent.getEquippedStack(es)));
 			}
-			((ServerWorld)ent.world).getChunkManager().sendToOtherNearbyPlayers(ent, new EntityEquipmentUpdateS2CPacket(ent.getId(), li));
+			((ServerWorld)ent.getWorld()).getChunkManager().sendToOtherNearbyPlayers(ent, new EntityEquipmentUpdateS2CPacket(ent.getId(), li));
 			sendSuppressedSlotsForSelf(ent);
 			String verb = hidden ? "hidden" : "shown";
 			if (amt == 4) {
-				c.getSource().sendFeedback(Text.literal("All armor slots "+verb), false);
+				c.getSource().sendFeedback(()->Text.literal("All armor slots "+verb), false);
 			} else if (amt > 1) {
-				c.getSource().sendFeedback(Text.literal(amt+" armor slots "+verb), false);
+				int aamt = amt;
+				c.getSource().sendFeedback(()->Text.literal(aamt+" armor slots "+verb), false);
 			} else if (amt > 0) {
-				c.getSource().sendFeedback(Text.literal("1 armor slot "+verb), false);
+				c.getSource().sendFeedback(()->Text.literal("1 armor slot "+verb), false);
 			} else {
-				c.getSource().sendFeedback(Text.literal("All specified slots are already "+verb), false);
+				c.getSource().sendFeedback(()->Text.literal("All specified slots are already "+verb), false);
 			}
 		} else {
-			c.getSource().sendFeedback(Text.literal("Patch error!"), false);
+			c.getSource().sendFeedback(()->Text.literal("Patch error!"), false);
 		}
 		return 1;
 	}

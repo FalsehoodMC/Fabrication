@@ -30,7 +30,7 @@ public class MixinServerPlayerInteractionManager {
 	@FabInject(at=@At("HEAD"), method="continueMining(Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;I)F")
 	private void cactusHurt(BlockState state, BlockPos pos, int i, CallbackInfoReturnable<Float> cir) {
 		if (FabConf.isEnabled("*.cactus_punching_hurts") && state.isOf(Blocks.CACTUS) && fabrication$cactusPunchingPredicate.test(player))
-			player.damage(player.world.getDamageSources().cactus(), 1.0F);
+			player.damage(player.getWorld().getDamageSources().cactus(), 1.0F);
 	}
 
 }

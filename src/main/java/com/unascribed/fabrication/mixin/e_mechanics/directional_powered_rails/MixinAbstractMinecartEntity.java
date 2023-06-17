@@ -34,7 +34,7 @@ public abstract class MixinAbstractMinecartEntity extends Entity {
 		if (!FabConf.isEnabled("*.directional_powered_rails")) return;
 		if (state.isOf(Blocks.POWERED_RAIL)) {
 			BlockPos down = pos.down();
-			BlockState downState = world.getBlockState(down);
+			BlockState downState = getWorld().getBlockState(down);
 			if (downState.isOf(Blocks.MAGENTA_GLAZED_TERRACOTTA)) {
 				Direction dir = downState.get(GlazedTerracottaBlock.FACING).getOpposite();
 				Vec3d vel = getVelocity();

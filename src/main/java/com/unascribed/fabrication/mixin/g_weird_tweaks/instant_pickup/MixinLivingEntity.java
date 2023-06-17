@@ -31,7 +31,7 @@ public abstract class MixinLivingEntity extends Entity {
 	@FabInject(at=@At("TAIL"), method="onDeath(Lnet/minecraft/entity/damage/DamageSource;)V")
 	public void onDeath(DamageSource src, CallbackInfo ci) {
 		if (FabConf.isEnabled("*.instant_pickup") && src.getSource() instanceof PlayerEntity) {
-			InstantPickup.slurp(world, getBoundingBox().expand(0.25), (PlayerEntity)src.getSource());
+			InstantPickup.slurp(getWorld(), getBoundingBox().expand(0.25), (PlayerEntity)src.getSource());
 		}
 	}
 

@@ -26,9 +26,9 @@ public abstract class MixinPersistentProjectileEntity {
 		Object self = this;
 		if ((self instanceof TridentEntity)) {
 			BlockPos blockPos = blockHitResult.getBlockPos().offset(blockHitResult.getSide());
-			BlockState state = ((TridentEntity) self).world.getBlockState(blockPos);
-			if (state.isOf(Blocks.LEVER) && state.getOutlineShape(((TridentEntity) self).world, blockPos).getBoundingBox().offset(blockPos).expand(0.01).contains(blockHitResult.getPos())) {
-				((TridentEntity) self).world.setBlockState(blockPos, state.cycle(LeverBlock.POWERED));
+			BlockState state = ((TridentEntity) self).getWorld().getBlockState(blockPos);
+			if (state.isOf(Blocks.LEVER) && state.getOutlineShape(((TridentEntity) self).getWorld(), blockPos).getBoundingBox().offset(blockPos).expand(0.01).contains(blockHitResult.getPos())) {
+				((TridentEntity) self).getWorld().setBlockState(blockPos, state.cycle(LeverBlock.POWERED));
 			}
 		}
 	}

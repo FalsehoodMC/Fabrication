@@ -79,7 +79,7 @@ public abstract class MixinLivingEntity extends Entity {
 				while (xpAmt > 0) {
 					int thisOrb = ExperienceOrbEntity.roundToOrbSize(xpAmt);
 					xpAmt -= thisOrb;
-					world.spawnEntity(new ExperienceOrbEntity(world, c.x, c.y, c.z, thisOrb));
+					getWorld().spawnEntity(new ExperienceOrbEntity(getWorld(), c.x, c.y, c.z, thisOrb));
 				}
 			} else {
 				MaterialData md = LoaderGearComponents.materials.get(imv.materialName);
@@ -103,7 +103,7 @@ public abstract class MixinLivingEntity extends Entity {
 					} else if (guaranteed >= maxIngotsToReturn) {
 						ingotsToReturn = maxIngotsToReturn;
 					} else {
-						ingotsToReturn = world.random.nextInt(maxIngotsToReturn+1-guaranteed)+guaranteed;
+						ingotsToReturn = getWorld().random.nextInt(maxIngotsToReturn+1-guaranteed)+guaranteed;
 					}
 					nuggetsToReturn -= ingotsToReturn * nuggetsPerIngot;
 					if (imv.enchant && stack.hasEnchantments()) {
@@ -135,19 +135,19 @@ public abstract class MixinLivingEntity extends Entity {
 			for (Map.Entry<Enchantment, Integer> en : EnchantmentHelper.get(stack).entrySet()) {
 				int lvl = en.getValue();
 				int[] values;
-				if (lvl == 1 || world.random.nextInt(3) == 0) {
+				if (lvl == 1 || getWorld().random.nextInt(3) == 0) {
 					values = new int[] {lvl};
 				} else if (lvl == 2) {
 					values = new int[] {1, 1};
-				} else if (lvl >= 4 && enchantables.size() >= 4 && world.random.nextBoolean()) {
+				} else if (lvl >= 4 && enchantables.size() >= 4 && getWorld().random.nextBoolean()) {
 					values = new int[] {lvl-1, lvl-2, lvl-3, lvl-3};
-				} else if (enchantables.size() >= 3 && world.random.nextBoolean()) {
+				} else if (enchantables.size() >= 3 && getWorld().random.nextBoolean()) {
 					values = new int[] {lvl-1, lvl-2, lvl-2};
 				} else  {
 					values = new int[] {lvl-1, lvl-1};
 				}
 				if (values.length == 1) {
-					enchantables.get(world.random.nextInt(enchantables.size())).addEnchantment(en.getKey(), values[0]);
+					enchantables.get(getWorld().random.nextInt(enchantables.size())).addEnchantment(en.getKey(), values[0]);
 				} else {
 					Collections.shuffle(enchantables);
 					for (int i = 0; i < values.length; i++) {

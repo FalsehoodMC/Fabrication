@@ -10,9 +10,9 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.command.argument.BlockArgumentParser;
 import net.minecraft.registry.Registries;
 import net.minecraft.sound.SoundEvents;
@@ -53,45 +53,45 @@ public class BlockLogoScreen extends Screen{
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		renderBackground(matrices);
-		fill(matrices, 0, 0, width, 30, FabConf.isEnabled("general.dark_mode") ? 0x44FFFFFF : 0x55000000);
-		fill(matrices, 0, startY, width/2, height, FabConf.isEnabled("general.dark_mode") ? 0x44FFFFFF : 0x55000000);
-		if (drawToggleButton(matrices, 5, 5, 60, 20, "Sound", mouseX, mouseY, LoaderBlockLogo.sound)){
+	public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+		renderBackground(drawContext);
+		drawContext.fill(0, 0, width, 30, FabConf.isEnabled("general.dark_mode") ? 0x44FFFFFF : 0x55000000);
+		drawContext.fill(0, startY, width/2, height, FabConf.isEnabled("general.dark_mode") ? 0x44FFFFFF : 0x55000000);
+		if (drawToggleButton(drawContext, 5, 5, 60, 20, "Sound", mouseX, mouseY, LoaderBlockLogo.sound)){
 			LoaderBlockLogo.sound = !LoaderBlockLogo.sound;
 			LoaderBlockLogo.instance.set("general.sound", String.valueOf(LoaderBlockLogo.sound));
 		}
-		if (drawToggleButton(matrices, 70, 5, 90, 20, "Reverse: " + LoaderBlockLogo.rawReverse.name(), mouseX, mouseY, false)){
+		if (drawToggleButton(drawContext, 70, 5, 90, 20, "Reverse: " + LoaderBlockLogo.rawReverse.name(), mouseX, mouseY, false)){
 			int i = LoaderBlockLogo.rawReverse.ordinal()+1;
 			if (i>=LoaderBlockLogo.Reverse.values().length) i=0;
 			LoaderBlockLogo.rawReverse = LoaderBlockLogo.Reverse.values()[i];
 			LoaderBlockLogo.getReverse = LoaderBlockLogo.rawReverse.sup;
 			LoaderBlockLogo.instance.set("general.reverse", LoaderBlockLogo.rawReverse.name().toLowerCase(Locale.ROOT));
 		}
-		textRenderer.draw(matrices, "Shadow Color:", width-160, 2, -1);
+		drawContext.drawText(textRenderer, "Shadow Color:", width-160, 2, -1, false);
 		if (filter.pattern().length() > 0) {
-			textRenderer.draw(matrices, "Filter:", width/2f-20, 2, -1);
-			textRenderer.draw(matrices, filter.toString(), width/2f-20, 12, -1);
+			drawContext.drawText(textRenderer, "Filter:", (int) (width/2f-20), 2, -1, false);
+			drawContext.drawText(textRenderer, filter.toString(), (int) (width/2f-20), 12, -1, false);
 		}
-		if (drawNumSelectable(matrices, width-160, 12, 35, 15, "R: ", LoaderBlockLogo.rawShadowRed, mouseX, mouseY, 1)){
+		if (drawNumSelectable(drawContext, width-160, 12, 35, 15, "R: ", LoaderBlockLogo.rawShadowRed, mouseX, mouseY, 1)){
 			LoaderBlockLogo.rawShadowRed = num;
 			LoaderBlockLogo.shadowRed = num / 255.f;
 			num = 0;
 			LoaderBlockLogo.instance.set("shadow.red", String.valueOf(LoaderBlockLogo.rawShadowRed));
 		}
-		if (drawNumSelectable(matrices, width-120, 12, 35, 15, "G: ", LoaderBlockLogo.rawShadowGreen, mouseX, mouseY, 2)){
+		if (drawNumSelectable(drawContext, width-120, 12, 35, 15, "G: ", LoaderBlockLogo.rawShadowGreen, mouseX, mouseY, 2)){
 			LoaderBlockLogo.rawShadowGreen = num;
 			LoaderBlockLogo.shadowGreen = num / 255.f;
 			num = 0;
 			LoaderBlockLogo.instance.set("shadow.green", String.valueOf(LoaderBlockLogo.rawShadowGreen));
 		}
-		if (drawNumSelectable(matrices, width-80, 12, 35, 15, "B: ", LoaderBlockLogo.rawShadowBlue, mouseX, mouseY, 3)){
+		if (drawNumSelectable(drawContext, width-80, 12, 35, 15, "B: ", LoaderBlockLogo.rawShadowBlue, mouseX, mouseY, 3)){
 			LoaderBlockLogo.rawShadowBlue = num;
 			LoaderBlockLogo.shadowBlue = num / 255.f;
 			num = 0;
 			LoaderBlockLogo.instance.set("shadow.blue", String.valueOf(LoaderBlockLogo.rawShadowBlue));
 		}
-		if (drawNumSelectable(matrices, width-40, 12, 35, 15, "A: ", LoaderBlockLogo.rawShadowAlpha, mouseX, mouseY, 4)) {
+		if (drawNumSelectable(drawContext, width-40, 12, 35, 15, "A: ", LoaderBlockLogo.rawShadowAlpha, mouseX, mouseY, 4)) {
 			LoaderBlockLogo.rawShadowAlpha = num;
 			LoaderBlockLogo.shadowAlpha = num / 255.f;
 			num = 0;
@@ -101,8 +101,8 @@ public class BlockLogoScreen extends Screen{
 			float y = startY+5-leftBar.getScaledScroll(client);
 			for (int clr : LoaderBlockLogo.validColors) {
 				if (y>=startY) {
-					textRenderer.draw(matrices, String.valueOf(clr), 5+0.2F, y+0.2F, clr ^ 0xFFFFFF);
-					textRenderer.draw(matrices, String.valueOf(clr), 5, y, clr);
+					drawContext.drawText(textRenderer, String.valueOf(clr), (int) (5+0.2F), (int) (y+0.2F), clr ^ 0xFFFFFF, false);
+					drawContext.drawText(textRenderer, String.valueOf(clr), 5, (int) y, clr, false);
 				}
 				if (didClick && mouseX >= 0 && mouseX <= width/2 && mouseY > y && mouseY < y+12) {
 					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON, 1.2f, 1f));
@@ -120,7 +120,7 @@ public class BlockLogoScreen extends Screen{
 				for (Identifier clr : registryBlocks) {
 					if (!filter.matcher(clr.toString()).find()) continue;
 					if (y >= startY) {
-						textRenderer.drawWithShadow(matrices, clr.toString(), 5, y, -1);
+						drawContext.drawText(textRenderer, clr.toString(), 5, (int) y, -1, true);
 					}
 					if (didClick && mouseX >= 0 && mouseX <= width / 2 && mouseY > y && mouseY < y + 12 && y > startY) {
 						client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON, 1.2f, 1f));
@@ -147,7 +147,7 @@ public class BlockLogoScreen extends Screen{
 			for (int i = 0; i<blocks.size(); i++) {
 				String clr = blocks.get(i);
 				if (!(y<startY)) {
-					textRenderer.drawWithShadow(matrices, clr, width/2f+5, y, -1);
+					drawContext.drawText(textRenderer, clr, (int) (width/2f+5), (int) y, -1, false);
 				}
 				if (didRClick && mouseX >= 0 && mouseX > width/2 && mouseY > y && mouseY < y+12 && y > startY) {
 					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON, 1.2f, 1f));
@@ -178,7 +178,7 @@ public class BlockLogoScreen extends Screen{
 		if (didClick) didClick = false;
 		if (didRClick) didRClick = false;
 	}
-	private boolean drawNumSelectable(MatrixStack matrices, int x, int y, int w, int h, String text, int val, float mouseX, float mouseY, int index) {
+	private boolean drawNumSelectable(DrawContext drawContext, int x, int y, int w, int h, String text, int val, float mouseX, float mouseY, int index) {
 		if (didRClick && mouseX >= x && mouseX <= x+w && mouseY >= y && mouseY <= y+h) {
 			num = 0;
 			selected = 0;
@@ -190,7 +190,7 @@ public class BlockLogoScreen extends Screen{
 			selected = 0;
 			return true;
 		}
-		if (drawToggleButton(matrices, x, y, w, h, text + (num == 0 || selected != index ? val : num), mouseX, mouseY, selected == index)){
+		if (drawToggleButton(drawContext, x, y, w, h, text + (num == 0 || selected != index ? val : num), mouseX, mouseY, selected == index)){
 			selected = index;
 			num = val;
 			return false;
@@ -198,8 +198,8 @@ public class BlockLogoScreen extends Screen{
 		return false;
 	}
 
-	private boolean drawToggleButton(MatrixStack matrices, int x, int y, int w, int h, String text, float mouseX, float mouseY, boolean toggle) {
-		return FabricationConfigScreen.drawToggleButton(matrices, x, y, w, h, text, mouseX, mouseY, toggle, didClick, client);
+	private boolean drawToggleButton(DrawContext drawContext, int x, int y, int w, int h, String text, float mouseX, float mouseY, boolean toggle) {
+		return FabricationConfigScreen.drawToggleButton(drawContext, x, y, w, h, text, mouseX, mouseY, toggle, didClick, client);
 	}
 
 	@Override
@@ -211,7 +211,7 @@ public class BlockLogoScreen extends Screen{
 	}
 
 	@Override
-	public void renderBackground(MatrixStack matrices) {
+	public void renderBackground(DrawContext matrices) {
 		FabricationConfigScreen.drawBackground(height, width, client, prideFlag, 0, matrices, 0, 0, 0, 0, 0);
 	}
 

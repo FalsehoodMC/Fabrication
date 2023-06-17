@@ -45,7 +45,7 @@ public class MixinItemEntityRenderer {
 		if (!FabConf.isEnabled("*.billboard_drops_2d")) return;
 		ItemStack stack = entity.getStack();
 		if (stack.isEmpty()) return;
-		BakedModel bm = this.itemRenderer.getModel(stack, entity.world, null, 1);
+		BakedModel bm = this.itemRenderer.getModel(stack, entity.getWorld(), null, 1);
 		if (bm.hasDepth() && !stack.isOf(Items.TRIDENT) && !stack.isOf(Items.SPYGLASS)) return;
 		Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
 		if (camera == null) return;
@@ -64,7 +64,7 @@ public class MixinItemEntityRenderer {
 			vec3fs[k].rotate(quaternion);
 		}
 
-		BakedModel bakedModel = this.itemRenderer.getModel(entity.getStack(), entity.world, null, -1);
+		BakedModel bakedModel = this.itemRenderer.getModel(entity.getStack(), entity.getWorld(), null, -1);
 		Sprite sprite = bakedModel.getParticleSprite();
 		if (sprite == null) return;
 		float l = sprite.getMinU();

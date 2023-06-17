@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.util;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.systems.VertexSorter;
 import com.unascribed.fabrication.loaders.LoaderBlockLogo;
 import com.unascribed.fabrication.logic.LogoBlock;
 import net.minecraft.block.BlockRenderType;
@@ -89,7 +90,7 @@ public class BlockLogoRenderer {
 		RenderSystem.backupProjectionMatrix();
 		int logoHeight = (int)(120 * mc.getWindow().getScaleFactor());
 		Matrix4f pmat = new Matrix4f().setPerspective(70, mc.getWindow().getFramebufferWidth()/(float)logoHeight, 0.05f, 100);
-		RenderSystem.setProjectionMatrix(pmat);
+		RenderSystem.setProjectionMatrix(pmat, VertexSorter.BY_DISTANCE);
 		RenderSystem.viewport(0, mc.getWindow().getFramebufferHeight() - logoHeight, mc.getWindow().getFramebufferWidth(), logoHeight);
 		matrices.push();
 		matrices.loadIdentity();

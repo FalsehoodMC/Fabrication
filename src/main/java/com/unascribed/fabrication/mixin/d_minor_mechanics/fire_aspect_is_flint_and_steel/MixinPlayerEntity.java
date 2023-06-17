@@ -37,7 +37,7 @@ public class MixinPlayerEntity {
 					ActionResult ar = self.interact(e, hand);
 					if (ar.isAccepted()) {
 						self.swingHand(hand, true);
-						self.world.playSound(null, e.getPos().x, e.getPos().y, e.getPos().z, SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 1, self.world.random.nextFloat() * 0.4f + 0.8f);
+						self.getWorld().playSound(null, e.getPos().x, e.getPos().y, e.getPos().z, SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 1, self.getWorld().random.nextFloat() * 0.4f + 0.8f);
 					}
 					if (flintAndSteel.getDamage() > 0) {
 						stack.damage(flintAndSteel.getDamage(), self, (en) -> {

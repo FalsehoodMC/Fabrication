@@ -142,7 +142,7 @@ public abstract class MixinNoteBlock {
 	}
 
 	private void fabrication$informNote(PlayerEntity player, BlockState state) {
-		if (!player.world.isClient && FabConf.isEnabled("*.note_block_notes")) {
+		if (!player.getWorld().isClient && FabConf.isEnabled("*.note_block_notes")) {
 			int note = state.get(NoteBlock.NOTE);
 			Instrument instrument = state.get(NoteBlock.INSTRUMENT);
 			char color = FABRICATION$NOTE_COLORS.charAt(note);

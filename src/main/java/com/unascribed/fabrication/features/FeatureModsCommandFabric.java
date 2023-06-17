@@ -49,7 +49,7 @@ public class FeatureModsCommandFabric implements Feature {
 				} catch (Throwable t) {
 					dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("plugins")
 							.executes((c) -> {
-								c.getSource().sendFeedback(Text.literal("§cThis ain't no Bukkit!\nTry /mods"), false);
+								c.getSource().sendFeedback(()->Text.literal("§cThis ain't no Bukkit!\nTry /mods"), false);
 								return 1;
 							}));
 				}
@@ -104,7 +104,7 @@ public class FeatureModsCommandFabric implements Feature {
 			lt.setStyle(s);
 			mt.append(lt);
 		}
-		c.getSource().sendFeedback(mt, false);
+		c.getSource().sendFeedback(()->mt, false);
 	}
 
 	@Override

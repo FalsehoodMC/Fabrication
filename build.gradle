@@ -41,7 +41,7 @@ targetCompatibility = JavaVersion.VERSION_17
 
 archivesBaseName = project.archives_base_name
 def origVersion = project.version
-version = project.version+"+1.19.4"
+version = project.version+"+1.20"
 group = project.maven_group
 
 repositories {
@@ -93,11 +93,11 @@ dependencies {
 	//ModMenu dep
 	modImplementation fabricApi.module('fabric-lifecycle-events-v1', project.fabric_version)
 	modImplementation fabricApi.module('fabric-key-binding-api-v1', project.fabric_version)
-	modImplementation('com.terraformersmc:modmenu:6.1.0-rc.4') {
+	modImplementation('com.terraformersmc:modmenu:7.0.1') {
 		transitive = false
 	}
 	modImplementation 'com.unascribed:ears-api:1.4.5'
-	modImplementation('tf.ssf.sfort:fscript:3.2.0') {
+	modImplementation('tf.ssf.sfort:fscript:3.2.1') {
 		transitive = false
 	}
 	modImplementation(include('com.unascribed:lib39-deferral:1.5.0-pre2.2+1.19.3'))
@@ -694,7 +694,7 @@ class Mapp{
 	public List<Target> target
 }
 
-def mcVersions = [ '1.19.4' ]
+def mcVersions = [ '1.20', '1.20.1' ]
 
 def stability = 'beta'
 

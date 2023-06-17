@@ -7,7 +7,9 @@ import java.nio.IntBuffer;
 import java.util.function.Consumer;
 
 import com.unascribed.fabrication.FabConf;
+import net.minecraft.block.MapColor;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
+import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.math.random.Random;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -25,7 +27,6 @@ import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.loaders.LoaderClassicBlockDrops;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.Material;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
@@ -38,7 +39,6 @@ import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.render.model.BasicBakedModel;
-import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.client.texture.AbstractTexture;
 import net.minecraft.client.texture.MipmapHelper;
 import net.minecraft.client.texture.NativeImage;
@@ -164,9 +164,8 @@ public class WoinaDrops {
 		if (quad.hasColor()) {
 			packedColor = FabRefl.Client.getItemColors(MinecraftClient.getInstance()).getColor(is, quad.getColorIndex());
 			Block b = ((BlockItem)is.getItem()).getBlock();
-			if (b.getDefaultState().getMaterial() == Material.SOIL || b.getDefaultState().getMaterial() == Material.SOLID_ORGANIC) {
-				isProbablyGrass = true;
-			}
+			BlockSoundGroup sg = b.getDefaultState().getSoundGroup();
+			isProbablyGrass = sg == BlockSoundGroup.GRASS || (sg == BlockSoundGroup.GRAVEL && b.getDefaultMapColor() == MapColor.DIRT_BROWN);
 		}
 		float tintR = (packedColor >> 16 & 0xFF) / 255.0f;
 		float tintG = (packedColor >> 8 & 0xFF) / 255.0f;

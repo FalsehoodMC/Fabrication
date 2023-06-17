@@ -4,10 +4,10 @@ import com.unascribed.fabrication.loaders.LoaderClassicBlockDrops;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -49,15 +49,15 @@ public class ClassicBlockDropsScreen extends Screen{
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		renderBackground(matrices);
-		searchField.render(matrices, mouseX, mouseY, delta);
+	public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+		renderBackground(drawContext);
+		searchField.render(drawContext, mouseX, mouseY, delta);
 		{
 			float scroll = -addItemBar.getScaledScroll(client);
 			for (Identifier clr : Registries.ITEM.getIds()) {
 				if (!filter.matcher(clr.toString()).find()) continue;
 				if (scroll > 0) {
-					textRenderer.drawWithShadow(matrices, clr.toString(), 5, scroll, -1);
+					drawContext.drawText(textRenderer, clr.toString(), 5, (int) scroll, -1, true);
 				}
 				if (didClick && mouseY > scroll && mouseY < scroll + 12) {
 					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON, 1.2f, 1f));
@@ -78,12 +78,12 @@ public class ClassicBlockDropsScreen extends Screen{
 			if (scroll > 102) {
 				String k = entry.getKey();
 				Optional<Boolean> val = entry.getValue();
-				textRenderer.drawWithShadow(matrices, k, 5, scroll, val.isPresent() ? -1 : 0xffff2222);
-				if (!val.isPresent() && drawButton(matrices, width - 80, (int) scroll, 45, 10, "Reset", mouseX, mouseY)) {
+				drawContext.drawText(textRenderer, k, 5, (int) scroll, val.isPresent() ? -1 : 0xffff2222, true);
+				if (!val.isPresent() && drawButton(drawContext, width - 80, (int) scroll, 45, 10, "Reset", mouseX, mouseY)) {
 					entry.setValue(Optional.of(true));
 					LoaderClassicBlockDrops.instance.reload();
 					LoaderClassicBlockDrops.instance.set(firstPass ? "@heuristics." + k : k, "true");
-				} else if (val.isPresent() && drawToggleButton(matrices, width - 80, (int) scroll, 45, 10, "Tiled", mouseX, mouseY, val.get())) {
+				} else if (val.isPresent() && drawToggleButton(drawContext, width - 80, (int) scroll, 45, 10, "Tiled", mouseX, mouseY, val.get())) {
 					boolean inverted = !val.get();
 					entry.setValue(Optional.of(inverted));
 					LoaderClassicBlockDrops.instance.reload();
@@ -113,12 +113,12 @@ public class ClassicBlockDropsScreen extends Screen{
 		if (didRClick) didRClick = false;
 	}
 
-	private boolean drawButton(MatrixStack matrices, int x, int y, int w, int h, String text, float mouseX, float mouseY) {
-		return FabricationConfigScreen.drawButton(matrices, x, y, w, h, text, mouseX, mouseY, didClick, client);
+	private boolean drawButton(DrawContext drawContext, int x, int y, int w, int h, String text, float mouseX, float mouseY) {
+		return FabricationConfigScreen.drawButton(drawContext, x, y, w, h, text, mouseX, mouseY, didClick, client);
 	}
 
-	private boolean drawToggleButton(MatrixStack matrices, int x, int y, int w, int h, String text, float mouseX, float mouseY, boolean toggle) {
-		return FabricationConfigScreen.drawToggleButton(matrices, x, y, w, h, text, mouseX, mouseY, toggle, didClick, client);
+	private boolean drawToggleButton(DrawContext drawContext, int x, int y, int w, int h, String text, float mouseX, float mouseY, boolean toggle) {
+		return FabricationConfigScreen.drawToggleButton(drawContext, x, y, w, h, text, mouseX, mouseY, toggle, didClick, client);
 	}
 
 	@Override
@@ -129,7 +129,7 @@ public class ClassicBlockDropsScreen extends Screen{
 	}
 
 	@Override
-	public void renderBackground(MatrixStack matrices) {
+	public void renderBackground(DrawContext matrices) {
 		FabricationConfigScreen.drawBackground(height, width, client, prideFlag, 0, matrices, 0, 0, 0, 0, 0);
 	}
 

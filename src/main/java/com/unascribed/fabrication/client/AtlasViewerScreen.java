@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.client;
 
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
@@ -9,7 +10,6 @@ import net.minecraft.client.render.VertexFormat.DrawMode;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.client.texture.SpriteContents;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.resource.Resource;
 import net.minecraft.text.OrderedText;
@@ -52,7 +52,8 @@ public class AtlasViewerScreen extends Screen {
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+		MatrixStack matrices = drawContext.getMatrices();
 		matrices.push();
 		RenderSystem.clearColor(0.3f, 0.3f, 0.3f, 1);
 		RenderSystem.clear(GL_COLOR_BUFFER_BIT, false);
@@ -115,7 +116,7 @@ public class AtlasViewerScreen extends Screen {
 
 
 		SpriteAtlasTexture sat = getAtlas();
-		renderTooltip(matrices, Lists.<Text>newArrayList(
+		renderTooltip(drawContext, Lists.<Text>newArrayList(
 				Text.literal(atlas.toString()),
 				Text.literal("§7"+atlasWidth+"×"+atlasHeight+"×"+(atlasMaxLevel+1)+" @"+(level+1)+" §f|§7 "+FabRefl.Client.getSprites(sat).size()+" sprites")
 			), -9, 15);
@@ -150,7 +151,7 @@ public class AtlasViewerScreen extends Screen {
 		RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 		if (sprites.isEmpty()) {
 			if (mouseX >= 0 && mouseY >= 0 && mouseX < atlasWidth && mouseY < atlasHeight) {
-				renderTooltip(matrices, Lists.<Text>newArrayList(
+				renderTooltip(drawContext, Lists.<Text>newArrayList(
 						Text.literal("<nothing>"),
 						Text.literal("§7"+mouseX+", "+mouseY),
 						Text.literal("If there is something here, it's either garbage from your graphics driver or an unregistered sprite")
@@ -181,7 +182,7 @@ public class AtlasViewerScreen extends Screen {
 				Sprite.Animation sa = (Sprite.Animation)s.getAnimation();
 				anim = FabRefl.Client.getFrameCount(s)+" @"+FabRefl.Client.getFrameIndex(sa)+"."+FabRefl.Client.getFrameTicks(sa);
 			}*/
-			renderTooltip(matrices, Lists.<Text>newArrayList(
+			renderTooltip(drawContext, Lists.<Text>newArrayList(
 				Text.literal(s.getContents().getId().toString()),
 				Text.literal("§7At "+x+","+y+" "+w+"×"+h+"×"+anim),
 				Text.literal("§7From §f"+src)
@@ -202,17 +203,16 @@ public class AtlasViewerScreen extends Screen {
 				}*/
 				li.add(Text.literal("§7At "+x+","+y+" "+w+"×"+h+"×"+anim));
 			}
-			renderTooltip(matrices, li, (int)(mouseX+panX), (int)(mouseY+panY));
+			renderTooltip(drawContext, li, (int)(mouseX+panX), (int)(mouseY+panY));
 		}
 	}
 
-	@Override
-	public void renderTooltip(MatrixStack matrices, List<Text> lines, int x, int y) {
+	public void renderTooltip(DrawContext matrices, List<Text> lines, int x, int y) {
 		List<OrderedText> ordered = Lists.newArrayList();
 		for (Text t : lines) {
 			ordered.addAll(textRenderer.wrapLines(t, 240));
 		}
-		renderOrderedTooltip(matrices, ordered, x, y);
+		matrices.drawOrderedTooltip(textRenderer, ordered, x, y);
 	}
 
 	private SpriteAtlasTexture getAtlas() {

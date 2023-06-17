@@ -5,10 +5,10 @@ import com.unascribed.fabrication.features.FeatureTaggablePlayers;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 
@@ -43,9 +43,9 @@ public class TaggablePlayersScreen extends Screen{
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		renderBackground(matrices);
-		searchField.render(matrices, mouseX, mouseY, delta);
+	public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+		renderBackground(drawContext);
+		searchField.render(drawContext, mouseX, mouseY, delta);
 		float scroll = scrollBar.getScaledScroll(client);
 		float y = 22 - scroll;
 		for (Map.Entry<String, Integer> entry : FeatureTaggablePlayers.validTags.entrySet()) {
@@ -53,13 +53,13 @@ public class TaggablePlayersScreen extends Screen{
 			if (!filter.matcher(key).find()) continue;
 			if (y>22) {
 				boolean isActive = FeatureTaggablePlayers.activeTags.containsKey(key);
-				textRenderer.drawWithShadow(matrices, key, 5, y, isActive ? FabConf.isEnabled(key) ? -1 : 0xffff2222 : 0xffaaaaaa);
+				drawContext.drawText(textRenderer, key, 5, (int) y, isActive ? FabConf.isEnabled(key) ? -1 : 0xffff2222 : 0xffaaaaaa, true);
 				if (isActive) {
 					int val = FeatureTaggablePlayers.activeTags.get(key);
 					int mask = entry.getValue();
-					if ((mask & 0b1) != 0 && drawToggleButton(matrices, width - 160, (int) y, 45, 10, "Invert", mouseX, mouseY, (val & 0b1) != 0)) {
+					if ((mask & 0b1) != 0 && drawToggleButton(drawContext, width - 160, (int) y, 45, 10, "Invert", mouseX, mouseY, (val & 0b1) != 0)) {
 						FeatureTaggablePlayers.add(key, val ^ 0b1);
-					} else if ((mask & 0b10) != 0 && drawToggleButton(matrices, width - 100, (int) y, 90, 10, "Player Exclusive", mouseX, mouseY, (val & 0b10) == 0)) {
+					} else if ((mask & 0b10) != 0 && drawToggleButton(drawContext, width - 100, (int) y, 90, 10, "Player Exclusive", mouseX, mouseY, (val & 0b10) == 0)) {
 						FeatureTaggablePlayers.add(key, val ^ 0b10);
 					} else if (didClick && mouseY > y && mouseY < y + 12) {
 						FeatureTaggablePlayers.remove(key);
@@ -78,7 +78,7 @@ public class TaggablePlayersScreen extends Screen{
 		if (didClick) didClick = false;
 	}
 
-	private boolean drawToggleButton(MatrixStack matrices, int x, int y, int w, int h, String text, float mouseX, float mouseY, boolean toggle) {
+	private boolean drawToggleButton(DrawContext matrices, int x, int y, int w, int h, String text, float mouseX, float mouseY, boolean toggle) {
 		return FabricationConfigScreen.drawToggleButton(matrices, x, y, w, h, text, mouseX, mouseY, toggle, didClick, client);
 	}
 
@@ -89,7 +89,7 @@ public class TaggablePlayersScreen extends Screen{
 	}
 
 	@Override
-	public void renderBackground(MatrixStack matrices) {
+	public void renderBackground(DrawContext matrices) {
 		FabricationConfigScreen.drawBackground(height, width, client, prideFlag, 0, matrices, 0, 0, 0, 0, 0);
 	}
 

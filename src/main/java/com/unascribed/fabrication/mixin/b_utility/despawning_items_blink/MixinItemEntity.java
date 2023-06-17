@@ -37,7 +37,7 @@ public abstract class MixinItemEntity extends Entity implements RenderingAgeAcce
 
 	@FabInject(at=@At("TAIL"), method="tick()V")
 	public void tick(CallbackInfo ci) {
-		if (!world.isClient) {
+		if (!getWorld().isClient) {
 			if (age % 10 == 0) {
 				PacketByteBuf data = new PacketByteBuf(Unpooled.buffer(8));
 				data.writeInt(getId());

@@ -33,7 +33,7 @@ public abstract class MixinPotionEntity extends ThrownItemEntity {
 
 	@FabInject(at=@At("TAIL"), method= "applySplashPotion(Ljava/util/List;Lnet/minecraft/entity/Entity;)V", locals=LocalCapture.CAPTURE_FAILHARD)
 	public void applySplashPotion(List<StatusEffectInstance> effects, Entity hit, CallbackInfo ci, Box box) {
-		if (!(FabConf.isEnabled("*.invisibility_splash_on_inanimates") || FabConf.isEnabled("*.slowfall_splash_on_inanimates")) || world.isClient) return;
+		if (!(FabConf.isEnabled("*.invisibility_splash_on_inanimates") || FabConf.isEnabled("*.slowfall_splash_on_inanimates")) || getWorld().isClient) return;
 		boolean invis = false;
 		boolean slowfall = false;
 
@@ -47,7 +47,7 @@ public abstract class MixinPotionEntity extends ThrownItemEntity {
 		}
 
 		if (invis || slowfall) {
-			for (Entity e : world.getEntitiesByClass(Entity.class, box, e -> (!(e instanceof LivingEntity) || e instanceof ArmorStandEntity) && e instanceof SetInvisNoGravReversible)) {
+			for (Entity e : getWorld().getEntitiesByClass(Entity.class, box, e -> (!(e instanceof LivingEntity) || e instanceof ArmorStandEntity) && e instanceof SetInvisNoGravReversible)) {
 				if (invis) {
 					e.setInvisible(true);
 					((SetInvisNoGravReversible)e).fabrication$setInvisibilityReversible(true);

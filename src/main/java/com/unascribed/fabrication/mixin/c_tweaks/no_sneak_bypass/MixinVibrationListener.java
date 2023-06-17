@@ -4,13 +4,13 @@ import com.unascribed.fabrication.interfaces.SetActualBypassState;
 import com.unascribed.fabrication.support.EligibleIf;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.event.GameEvent;
-import net.minecraft.world.event.listener.VibrationListener;
+import net.minecraft.world.event.Vibrations;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(VibrationListener.Callback.class)
+@Mixin(Vibrations.Callback.class)
 @EligibleIf(configAvailable="*.no_sneak_bypass")
 public interface MixinVibrationListener {
 

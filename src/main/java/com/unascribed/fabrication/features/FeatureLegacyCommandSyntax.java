@@ -93,7 +93,7 @@ public class FeatureLegacyCommandSyntax implements Feature {
 							} else {
 								world.setWeather(0, 12000, true, props.isThundering());
 							}
-							c.getSource().sendFeedback(Text.literal("Toggled downfall"), true);
+							c.getSource().sendFeedback(()->Text.literal("Toggled downfall"), true);
 							return 1;
 						}));
 			} catch (Throwable t) {
@@ -114,9 +114,9 @@ public class FeatureLegacyCommandSyntax implements Feature {
 		}
 		String thing = (areLevels ? "levels" : "points");
 		if (targets.size() == 1) {
-			source.sendFeedback(Text.translatable("commands.experience.add."+thing+".success.single", amount, Iterables.getOnlyElement(targets).getDisplayName()), true);
+			source.sendFeedback(()->Text.translatable("commands.experience.add."+thing+".success.single", amount, Iterables.getOnlyElement(targets).getDisplayName()), true);
 		} else {
-			source.sendFeedback(Text.translatable("commands.experience.add."+thing+".success.multiple", amount, targets.size()), true);
+			source.sendFeedback(()->Text.translatable("commands.experience.add."+thing+".success.multiple", amount, targets.size()), true);
 		}
 		return targets.size();
 	}

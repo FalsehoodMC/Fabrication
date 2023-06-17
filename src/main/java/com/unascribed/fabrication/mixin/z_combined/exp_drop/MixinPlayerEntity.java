@@ -24,7 +24,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 
 	@FabInject(at=@At("HEAD"), method="getXpToDrop()I", cancellable=true)
 	public void getCurrentExperience(CallbackInfoReturnable<Integer> ci) {
-		boolean keepInv = world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY);
+		boolean keepInv = getWorld().getGameRules().getBoolean(GameRules.KEEP_INVENTORY);
 		boolean keepInvDrop = FabConf.isEnabled("*.drop_exp_with_keep_inventory") && keepInv;
 		if (keepInv && !keepInvDrop) return;
 		if (FabConf.isEnabled("*.drop_more_exp_on_death") || keepInvDrop) {

@@ -53,6 +53,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 		if (!FabConf.isEnabled("*.adventure_tags_in_survival") || abilities.creativeMode || !abilities.allowModifyWorld) return;
 		if (!stack.isEmpty()) {
 			if (stack.hasNbt() && stack.getNbt().contains("CanPlaceOn")) {
+				World world = getWorld();
 				ci.setReturnValue(stack.canPlaceOn(world.getRegistryManager().get(RegistryKeys.BLOCK), new CachedBlockPosition(world, pos.offset(dir.getOpposite()), false)));
 			}
 		}

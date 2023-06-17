@@ -27,7 +27,7 @@ abstract public class MixinTridentEntity extends PersistentProjectileEntity {
 	@ModifyReturn(method="onEntityHit(Lnet/minecraft/util/hit/EntityHitResult;)V", target="Lnet/minecraft/world/World;isThundering()Z")
 	public boolean fabrication$channellingTwo(boolean bool) {
 		if (!(FabConf.isEnabled("*.channeling_two") && EnchantmentHelper.getLevel(Enchantments.CHANNELING, this.tridentStack) > 1)) return bool;
-		return this.world.hasRain(this.getBlockPos());
+		return this.getWorld().hasRain(this.getBlockPos());
 	}
 
 }

@@ -19,7 +19,7 @@ public abstract class MixinShulkerBulletEntity {
 	@FabInject(at=@At("HEAD"), method="tick()V", cancellable=true)
 	public void tick(CallbackInfo ci) {
 		Object self = this;
-		if (FabConf.isEnabled("*.shulker_bullets_despawn_on_death") && !((Entity)self).world.isClient) {
+		if (FabConf.isEnabled("*.shulker_bullets_despawn_on_death") && !((Entity)self).getWorld().isClient) {
 			Entity owner = ((ProjectileEntity)self).getOwner();
 			if (owner == null || !owner.isAlive()) {
 				((Entity)self).discard();

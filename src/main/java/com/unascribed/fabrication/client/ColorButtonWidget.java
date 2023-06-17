@@ -1,7 +1,7 @@
 package com.unascribed.fabrication.client;
 
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -15,18 +15,18 @@ public class ColorButtonWidget extends ButtonWidget {
 	}
 
 	@Override
-	public void drawTexture(MatrixStack matrices, Identifier texture, int x, int y, int u, int v, int hoveredVOffset, int width, int height, int textureWidth, int textureHeight) {
+	public void drawTexture(DrawContext drawContext, Identifier texture, int x, int y, int u, int v, int hoveredVOffset, int width, int height, int textureWidth, int textureHeight) {
 	}
 
 	@Override
-	public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void renderButton(DrawContext drawContext, int mouseX, int mouseY, float delta) {
 		int x = getX(), y = getY();
-		fill(matrices, x, y, x+width, y+height, bg);
+		drawContext.fill(x, y, x+width, y+height, bg);
 		if (isHovered() || isFocused()) {
-			fill(matrices, x, y, x+width, y+1, -1);
-			fill(matrices, x, y, x+1, y+height, -1);
-			fill(matrices, x+width-1, y, x+width, y+height, -1);
-			fill(matrices, x, y+height-1, x+width, y+height, -1);
+			drawContext.fill(x, y, x+width, y+1, -1);
+			drawContext.fill(x, y, x+1, y+height, -1);
+			drawContext.fill(x+width-1, y, x+width, y+height, -1);
+			drawContext.fill(x, y+height-1, x+width, y+height, -1);
 		}
 	}
 

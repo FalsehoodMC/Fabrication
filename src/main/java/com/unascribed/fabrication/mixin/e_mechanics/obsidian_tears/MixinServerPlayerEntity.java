@@ -31,8 +31,8 @@ public abstract class MixinServerPlayerEntity extends PlayerEntity {
 		if (!FabConf.isEnabled("*.obsidian_tears")) return;
 		if (!alive) {
 			ServerPlayerEntity self = (ServerPlayerEntity)(Object)this;
-			if (oldPlayer.getSpawnPointPosition() != null && world.getRegistryKey().equals(oldPlayer.getSpawnPointDimension())
-					&& world.getBlockState(oldPlayer.getSpawnPointPosition()).getBlock() == Blocks.CRYING_OBSIDIAN) {
+			if (oldPlayer.getSpawnPointPosition() != null && getWorld().getRegistryKey().equals(oldPlayer.getSpawnPointDimension())
+					&& getWorld().getBlockState(oldPlayer.getSpawnPointPosition()).getBlock() == Blocks.CRYING_OBSIDIAN) {
 				NbtCompound hunger = new NbtCompound();
 				self.getHungerManager().writeNbt(hunger);
 				hunger.putFloat("foodSaturationLevel", 0);

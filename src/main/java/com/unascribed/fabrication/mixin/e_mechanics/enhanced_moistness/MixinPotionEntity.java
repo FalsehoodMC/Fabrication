@@ -29,8 +29,8 @@ public abstract class MixinPotionEntity extends ThrownItemEntity {
 
 	@FabInject(at=@At("TAIL"), method="applyWater()V", locals=LocalCapture.CAPTURE_FAILHARD)
 	public void damageEntitiesHurtByWater(CallbackInfo ci, Box box) {
-		if (!FabConf.isEnabled("*.enhanced_moistness") || world.isClient) return;
-		for (Entity e : world.getEntitiesByClass(Entity.class, box, e -> true)) {
+		if (!FabConf.isEnabled("*.enhanced_moistness") || getWorld().isClient) return;
+		for (Entity e : getWorld().getEntitiesByClass(Entity.class, box, e -> true)) {
 			if (e instanceof MarkWet) {
 				((MarkWet)e).fabrication$markWet();
 			}

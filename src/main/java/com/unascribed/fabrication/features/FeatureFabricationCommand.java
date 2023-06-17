@@ -144,7 +144,7 @@ public class FeatureFabricationCommand implements Feature {
 						{
 							LiteralArgumentBuilder<ServerCommandSource> literalKey = CommandManager.literal(key);
 							literalKey.executes(c -> {
-								c.getSource().sendFeedback(Text.literal("TaggablePlayers removed " + key), true);
+								c.getSource().sendFeedback(()->Text.literal("TaggablePlayers removed " + key), true);
 								FeatureTaggablePlayers.remove(key);
 								return 1;
 							});
@@ -195,7 +195,7 @@ public class FeatureFabricationCommand implements Feature {
 								c.getArgument("dimension", Identifier.class);
 								w = DimensionArgumentType.getDimensionArgument(c, "dimension");
 							} catch (IllegalArgumentException e) {
-								w = c.getSource().getEntityOrThrow().world;
+								w = c.getSource().getEntityOrThrow().getWorld();
 							}
 							return analyzeBlockDistribution(c, w, set);
 						};
@@ -208,7 +208,7 @@ public class FeatureFabricationCommand implements Feature {
 					});
 
 					analyze.then(CommandManager.literal("block_distribution")
-							.executes(c -> analyzeBlockDistribution(c, c.getSource().getEntityOrThrow().world, null))
+							.executes(c -> analyzeBlockDistribution(c, c.getSource().getEntityOrThrow().getWorld(), null))
 							.then(biome)
 							.then(CommandManager.literal("in")
 									.then(CommandManager.argument("dimension", DimensionArgumentType.dimension())
@@ -226,7 +226,7 @@ public class FeatureFabricationCommand implements Feature {
 
 	private static Command<ServerCommandSource> createPushTagCommandContextFor(String key, int type){
 		return c -> {
-			c.getSource().sendFeedback(Text.literal("TaggablePlayers added " + key), true);
+			c.getSource().sendFeedback(()->Text.literal("TaggablePlayers added " + key), true);
 			FeatureTaggablePlayers.add(key, type);
 			return 1;
 		};
@@ -243,10 +243,10 @@ public class FeatureFabricationCommand implements Feature {
 			biomes = null;
 		}
 		String name = MixinConfigPlugin.MOD_NAME_LOWER+"_block_distribution_"+System.currentTimeMillis()+".tsv";
-		c.getSource().sendFeedback(Text.literal("Starting background block distribution analysis"), false);
-		c.getSource().sendFeedback(Text.literal("This could take a while, but the server should remain usable"), false);
-		c.getSource().sendFeedback(Text.literal("Once complete a file named "+name+" will appear in the server directory"), false);
-		c.getSource().sendFeedback(Text.literal("Progress reports will go to the console"), false);
+		c.getSource().sendFeedback(()->Text.literal("Starting background block distribution analysis"), false);
+		c.getSource().sendFeedback(()->Text.literal("This could take a while, but the server should remain usable"), false);
+		c.getSource().sendFeedback(()->Text.literal("Once complete a file named "+name+" will appear in the server directory"), false);
+		c.getSource().sendFeedback(()->Text.literal("Progress reports will go to the console"), false);
 		new Thread((Runnable)() -> {
 			int x = 0;
 			int z = 0;
@@ -540,7 +540,7 @@ public class FeatureFabricationCommand implements Feature {
 
 	public static void sendFeedback(CommandContext<? extends CommandSource> c, MutableText text, boolean broadcast) {
 		if (c.getSource() instanceof ServerCommandSource) {
-			((ServerCommandSource)c.getSource()).sendFeedback(text, broadcast);
+			((ServerCommandSource)c.getSource()).sendFeedback(()->text, broadcast);
 		} else {
 			sendFeedbackClient(c, text);
 		}
@@ -553,7 +553,7 @@ public class FeatureFabricationCommand implements Feature {
 	private int clearTags(CommandContext<ServerCommandSource> c, Collection<ServerPlayerEntity> players) {
 		for (ServerPlayerEntity spe : players) {
 			((TaggablePlayer)spe).fabrication$clearTags();
-			c.getSource().sendFeedback(Text.literal("Cleared tags for ").append(spe.getDisplayName()), true);
+			c.getSource().sendFeedback(()->Text.literal("Cleared tags for ").append(spe.getDisplayName()), true);
 		}
 		return 1;
 	}
@@ -566,21 +566,21 @@ public class FeatureFabricationCommand implements Feature {
 		} else {
 			lt.append(Joiner.on(", ").join(tags));
 		}
-		c.getSource().sendFeedback(lt, false);
+		c.getSource().sendFeedback(()->lt, false);
 		return 1;
 	}
 
 	private int addTag(CommandContext<ServerCommandSource> c, Collection<ServerPlayerEntity> players, String key) {
 		if (!FabConf.isEnabled(key)) {
-			c.getSource().sendFeedback(Text.literal(key+" has to be enabled for this tag to work"), true);
+			c.getSource().sendFeedback(()->Text.literal(key+" has to be enabled for this tag to work"), true);
 		}
 		if (!FeatureTaggablePlayers.activeTags.containsKey(key)) {
-			c.getSource().sendFeedback(Text.literal("Automatically switched "+key+" to TaggablePlayers because a player was tagged with it"), true);
+			c.getSource().sendFeedback(()->Text.literal("Automatically switched "+key+" to TaggablePlayers because a player was tagged with it"), true);
 			FeatureTaggablePlayers.add(key, 0);
 		}
 		for (ServerPlayerEntity spe : players) {
 			((TaggablePlayer)spe).fabrication$setTag(key.substring(key.lastIndexOf('.')+1), true);
-			c.getSource().sendFeedback(Text.literal("Added tag "+key+" to ").append(spe.getDisplayName()), true);
+			c.getSource().sendFeedback(()->Text.literal("Added tag "+key+" to ").append(spe.getDisplayName()), true);
 		}
 		return 1;
 	}
@@ -588,7 +588,7 @@ public class FeatureFabricationCommand implements Feature {
 	private int removeTag(CommandContext<ServerCommandSource> c, Collection<ServerPlayerEntity> players, String pt) {
 		for (ServerPlayerEntity spe : players) {
 			((TaggablePlayer)spe).fabrication$setTag(pt.substring(pt.lastIndexOf('.')+1), false);
-			c.getSource().sendFeedback(Text.literal("Removed tag "+pt+" from ").append(spe.getDisplayName()), true);
+			c.getSource().sendFeedback(()->Text.literal("Removed tag "+pt+" from ").append(spe.getDisplayName()), true);
 		}
 		return 1;
 	}

@@ -3,6 +3,7 @@ package com.unascribed.fabrication.mixin.i_woina.block_logo;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.injection.Hijack;
 import com.unascribed.fabrication.util.BlockLogoRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.math.RotationAxis;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -41,7 +42,7 @@ public class MixinTitleScreen extends Screen {
 	@Shadow
 	private long backgroundFadeStart;
 
-	@Hijack(method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V", target="Lnet/minecraft/client/gui/LogoDrawer;draw(Lnet/minecraft/client/util/math/MatrixStack;IF)V")
+	@Hijack(method="render(Lnet/minecraft/client/gui/DrawContext;IIF)V", target="Lnet/minecraft/client/gui/LogoDrawer;draw(Lnet/minecraft/client/gui/DrawContext;IF)V")
 	public boolean fabrication$drawBlockLogo() {
 		if (FabConf.isEnabled("*.block_logo")) {
 			fabrication$blockLogo.drawLogo(doBackgroundFade, backgroundFadeStart, MinecraftClient.getInstance().getTickDelta());
@@ -50,33 +51,34 @@ public class MixinTitleScreen extends Screen {
 		return false;
 	}
 
-	@FabInject(at=@At("HEAD"), method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
-	public void renderHead(MatrixStack matrices, int mouseX, int mouseY, float tickDelta, CallbackInfo ci) {
+	@FabInject(at=@At("HEAD"), method="render(Lnet/minecraft/client/gui/DrawContext;IIF)V")
+	public void renderHead(DrawContext matrices, int mouseX, int mouseY, float tickDelta, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.block_logo")) return;
 		fabrication$splashText = splashText;
 		splashText = null;
 	}
 
-	@FabInject(at=@At("RETURN"), method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
-	public void renderReturn(MatrixStack matrices, int mouseX, int mouseY, float tickDelta, CallbackInfo ci) {
+	@FabInject(at=@At("RETURN"), method="render(Lnet/minecraft/client/gui/DrawContext;IIF)V")
+	public void renderReturn(DrawContext matrices, int mouseX, int mouseY, float tickDelta, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.block_logo")) return;
 		splashText = fabrication$splashText;
 		fabrication$splashText = null;
 	}
 
-	@FabInject(at=@At("TAIL"), method="render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V")
-	public void renderTail(MatrixStack matrices, int mouseX, int mouseY, float tickDelta, CallbackInfo ci) {
+	@FabInject(at=@At("TAIL"), method="render(Lnet/minecraft/client/gui/DrawContext;IIF)V")
+	public void renderTail(DrawContext drawContext, int mouseX, int mouseY, float tickDelta, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.block_logo")) return;
 		if (splashText != null) {
 			float fade = doBackgroundFade ? MathHelper.clamp(((Util.getMeasuringTimeMs() - backgroundFadeStart) / 1000f)-1, 0, 1) : 1;
 			int l = MathHelper.ceil(fade * 255.0f) << 24;
+			MatrixStack matrices = drawContext.getMatrices();
 			matrices.push();
 			matrices.translate(this.width / 2.0 + ((LoaderBlockLogo.unrecoverableLoadError ? 48 : LoaderBlockLogo.image.getWidth())*2.307692307692308f), 70, 0);
 			matrices.multiply(RotationAxis.NEGATIVE_Z.rotationDegrees(20));
 			float s = 1.8f - MathHelper.abs(MathHelper.sin(Util.getMeasuringTimeMs() % 1000 / 1000f * 6.28f) * 0.1f);
 			s = s * 100f / (textRenderer.getWidth(splashText) + 32);
 			matrices.scale(s, s, s);
-			drawCenteredTextWithShadow(matrices, textRenderer, splashText, 0, -8, 0xFFFF00 | l);
+			drawContext.drawCenteredTextWithShadow(textRenderer, splashText, 0, -8, 0xFFFF00 | l);
 			matrices.pop();
 		}
 

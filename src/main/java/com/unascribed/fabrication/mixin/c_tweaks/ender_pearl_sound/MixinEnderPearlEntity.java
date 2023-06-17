@@ -25,6 +25,6 @@ public abstract class MixinEnderPearlEntity extends ThrownItemEntity {
 	@FabInject(at=@At(value="INVOKE", target="Lnet/minecraft/entity/projectile/thrown/EnderPearlEntity;discard()V"), method="onCollision(Lnet/minecraft/util/hit/HitResult;)V")
 	public void teleportSound(HitResult hitResult, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.ender_pearl_sound")) return;
-		world.playSound(null, getX(), getY(), getZ(), SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1, 0.5f);
+		getWorld().playSound(null, getX(), getY(), getZ(), SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1, 0.5f);
 	}
 }

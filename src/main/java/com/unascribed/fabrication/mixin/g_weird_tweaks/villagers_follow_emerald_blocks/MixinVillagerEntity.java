@@ -23,8 +23,8 @@ public abstract class MixinVillagerEntity extends MerchantEntity  {
 	@FabInject(method="mobTick()V", at=@At("TAIL"))
 	public void mobTick(CallbackInfo ci){
 		if(FabConf.isEnabled("*.villagers_follow_emerald_blocks") && !isAiDisabled()){
-			if (world.getTime()%40 == 0)
-				fabrication$player = world.getClosestPlayer(getX(), getY(), getZ(), 10, (player) -> player instanceof PlayerEntity && !player.isSpectator() && ((PlayerEntity)player).isHolding(Items.EMERALD_BLOCK));
+			if (getWorld().getTime()%40 == 0)
+				fabrication$player = getWorld().getClosestPlayer(getX(), getY(), getZ(), 10, (player) -> player instanceof PlayerEntity && !player.isSpectator() && ((PlayerEntity)player).isHolding(Items.EMERALD_BLOCK));
 			if (fabrication$player != null) {
 				getLookControl().lookAt(fabrication$player, getMaxHeadRotation(), getMaxLookPitchChange());
 				if (squaredDistanceTo(fabrication$player) < 6.25D)

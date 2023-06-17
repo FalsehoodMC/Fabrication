@@ -74,9 +74,9 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 			if (fabrication$invincible) {
 				teleport(getPos().x, 1, getPos().z);
 				setVelocity(0,0,0);
-				if (!world.isClient) {
-					((ServerWorld)world).getChunkManager().sendToNearbyPlayers(this, new EntityPositionS2CPacket(this));
-					((ServerWorld)world).getChunkManager().sendToNearbyPlayers(this, new EntityVelocityUpdateS2CPacket(this));
+				if (!getWorld().isClient) {
+					((ServerWorld)getWorld()).getChunkManager().sendToNearbyPlayers(this, new EntityPositionS2CPacket(this));
+					((ServerWorld)getWorld()).getChunkManager().sendToNearbyPlayers(this, new EntityVelocityUpdateS2CPacket(this));
 				}
 			}
 		}
@@ -84,7 +84,7 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 
 	@FabInject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", cancellable=true)
 	public void damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> ci) {
-		if (fabrication$invincible || (FabConf.isEnabled("*.item_despawn") && world.isClient)) {
+		if (fabrication$invincible || (FabConf.isEnabled("*.item_despawn") && getWorld().isClient)) {
 			ci.setReturnValue(false);
 		}
 	}
@@ -114,7 +114,7 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 
 	@Unique
 	private void calculateDespawn() {
-		if (world.isClient) return;
+		if (getWorld().isClient) return;
 		final boolean debug = false;
 		ItemStack stack = getStack();
 		ParsedTime time = ParsedTime.UNSET;

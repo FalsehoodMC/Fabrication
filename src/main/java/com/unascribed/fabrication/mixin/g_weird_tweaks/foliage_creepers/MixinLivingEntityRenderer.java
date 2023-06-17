@@ -33,7 +33,7 @@ public abstract class MixinLivingEntityRenderer extends EntityRenderer<LivingEnt
 	@FabInject(at=@At("HEAD"), method="render(Lnet/minecraft/entity/LivingEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")
 	public void captureEntity(LivingEntity livingEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci){
 		if (FabConf.isEnabled("*.foliage_creepers") && fabrication$creeperTexture.equals(this.getTexture(livingEntity))) {
-			fabrication$colorFoliageCreeper = livingEntity.world.getColor(livingEntity.getBlockPos(), BiomeColors.FOLIAGE_COLOR);
+			fabrication$colorFoliageCreeper = livingEntity.getWorld().getColor(livingEntity.getBlockPos(), BiomeColors.FOLIAGE_COLOR);
 		} else if (fabrication$colorFoliageCreeper != -1) {
 			fabrication$colorFoliageCreeper = -1;
 		}

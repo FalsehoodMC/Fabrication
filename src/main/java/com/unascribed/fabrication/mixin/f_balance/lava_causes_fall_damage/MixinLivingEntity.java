@@ -29,7 +29,7 @@ public abstract class MixinLivingEntity extends Entity {
 	@FabModifyVariable(method="fall(DZLnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;)V", at=@At("HEAD"), argsOnly=true)
 	public boolean fabrication$treatLavaAsGround(boolean onGround) {
 		if (!FabConf.isEnabled("*.lava_causes_fall_damage")) return onGround;
-		if (!this.world.isClient && this.fallDistance > 6F && this.updateMovementInFluid(FluidTags.LAVA, 0.014D)) {
+		if (!this.getWorld().isClient && this.fallDistance > 6F && this.updateMovementInFluid(FluidTags.LAVA, 0.014D)) {
 			if (fabrication$lavaFallDamagePredicate.test((LivingEntity)(Object) this)) {
 				this.fallDistance /= 2F;
 				this.setVelocity(this.getVelocity().multiply(.4));

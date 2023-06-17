@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.mixin.c_tweaks.legible_signs;
 
 import com.unascribed.fabrication.FabConf;
+import net.minecraft.block.entity.SignText;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabInject;
@@ -17,10 +18,10 @@ import net.minecraft.util.DyeColor;
 @EligibleIf(configAvailable="*.legible_signs", envMatches=Env.CLIENT)
 public class MixinSignBlockEntityRenderer {
 
-	@FabInject(at=@At("HEAD"), method= "getColor(Lnet/minecraft/block/entity/SignBlockEntity;)I", cancellable = true)
-	private static void modifySignTextColor(SignBlockEntity sign, CallbackInfoReturnable<Integer> cir) {
-		if (FabConf.isEnabled("*.legible_signs") && !sign.isGlowingText()){
-			DyeColor dc = sign.getTextColor();
+	@FabInject(at=@At("HEAD"), method= "getColor(Lnet/minecraft/block/entity/SignText;)I", cancellable = true)
+	private static void modifySignTextColor(SignText sign, CallbackInfoReturnable<Integer> cir) {
+		if (FabConf.isEnabled("*.legible_signs") && !sign.isGlowing()){
+			DyeColor dc = sign.getColor();
 
 			int res;
 			switch (dc) {

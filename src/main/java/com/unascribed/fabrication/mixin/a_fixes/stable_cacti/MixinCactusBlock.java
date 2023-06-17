@@ -7,7 +7,6 @@ import com.unascribed.fabrication.support.injection.FabModifyVariable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CactusBlock;
-import net.minecraft.block.Material;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -46,8 +45,7 @@ public class MixinCactusBlock extends Block {
 			for (Direction d : Direction.Type.HORIZONTAL) {
 				BlockPos p = posFrom.offset(d);
 				BlockState bs = world.getBlockState(p);
-				Material m = bs.getMaterial();
-				if (bs.getBlock() != this && (m.isSolid() || world.getFluidState(p).isIn(FluidTags.LAVA))) {
+				if (bs.getBlock() != this && (bs.isSolid() || world.getFluidState(p).isIn(FluidTags.LAVA))) {
 					shouldBreak = true;
 					break;
 				}

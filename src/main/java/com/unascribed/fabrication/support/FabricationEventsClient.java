@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.support;
 
 import com.unascribed.fabrication.Agnos;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
@@ -39,9 +40,9 @@ public class FabricationEventsClient {
 			c.render(stack, lines);
 		}
 	}
-	public static void hud(MatrixStack matrixStack, float tickDelta) {
+	public static void hud(DrawContext drawContext, float tickDelta) {
 		for (Agnos.HudRenderCallback c : hudRender) {
-			c.render(matrixStack, tickDelta);
+			c.render(drawContext, tickDelta);
 		}
 	}
 

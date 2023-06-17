@@ -20,7 +20,7 @@ public class MixinEntity {
 	@FabInject(at=@At("HEAD"), method="getCustomName()Lnet/minecraft/text/Text;", cancellable=true)
 	public void getCustomName(CallbackInfoReturnable<Text> ci) {
 		Entity e = ((Entity)(Object)this);
-		if (!FabConf.isEnabled("*.mob_ids") || !e.world.isClient) return;
+		if (!FabConf.isEnabled("*.mob_ids") || !e.getWorld().isClient) return;
 		MinecraftClient mc = MinecraftClient.getInstance();
 		if (mc.player != null && mc.player.isCreative() && mc.options.debugEnabled) {
 			ci.setReturnValue(Text.literal(Integer.toString(e.getId())));
@@ -30,7 +30,7 @@ public class MixinEntity {
 	@FabInject(at=@At("HEAD"), method={"hasCustomName()Z","isCustomNameVisible()Z"}, cancellable=true)
 	public void hasCustomNameAndIsVisible(CallbackInfoReturnable<Boolean> ci) {
 		Entity e = ((Entity)(Object)this);
-		if (!FabConf.isEnabled("*.mob_ids") || !e.world.isClient) return;
+		if (!FabConf.isEnabled("*.mob_ids") || !e.getWorld().isClient) return;
 		MinecraftClient mc = MinecraftClient.getInstance();
 		if (mc.player != null && mc.player.isCreative() && mc.options.debugEnabled) {
 			ci.setReturnValue(true);

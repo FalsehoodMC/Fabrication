@@ -140,7 +140,7 @@ public class FabricationMod implements ModInitializer {
 	}
 
 	public static Set<EntityTrackingListener> getTrackers(Entity entity) {
-		ServerChunkManager cm = ((ServerWorld)entity.world).getChunkManager();
+		ServerChunkManager cm = ((ServerWorld)entity.getWorld()).getChunkManager();
 		ThreadedAnvilChunkStorage tacs = cm.threadedAnvilChunkStorage;
 		Int2ObjectMap<EntityTracker> entityTrackers = FabRefl.getEntityTrackers(tacs);
 		EntityTracker tracker = entityTrackers.get(entity.getId());
@@ -149,7 +149,7 @@ public class FabricationMod implements ModInitializer {
 	}
 
 	public static void sendToTrackersMatching(Entity entity, CustomPayloadS2CPacket pkt, Predicate<ServerPlayerEntity> predicate) {
-		if (entity.world.isClient) return;
+		if (entity.getWorld().isClient) return;
 		Set<EntityTrackingListener> playersTracking = getTrackers(entity);
 		if (entity instanceof ServerPlayerEntity) {
 			ServerPlayerEntity spe = (ServerPlayerEntity)entity;
@@ -217,7 +217,7 @@ public class FabricationMod implements ModInitializer {
 	}
 
 	public static void forAllAdjacentBlocks(Entity entity, BlockScanCallback callback) {
-		World w = entity.world;
+		World w = entity.getWorld();
 		Box box = entity.getBoundingBox();
 		if (!scanBlocks(w, box.minX, box.minY, box.minZ, box.maxX, box.minY, box.maxZ, Direction.DOWN, callback)) return;
 		if (!scanBlocks(w, box.minX, box.maxY, box.minZ, box.maxX, box.maxY, box.maxZ, Direction.UP, callback)) return;
