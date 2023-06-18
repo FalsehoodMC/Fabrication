@@ -33,7 +33,7 @@ if [ "$canforgery" == "1" ]; then
 	./gradlew clean build
 	cd ..
 	echo Running Forgery...
-	java -jar ~/ForgeryTools.jar "$forgeryIn" "$forgery" ~/.gradle/caches/fabric-loom/1.19.4/intermediary-v2.tiny ~/.gradle/caches/forge_gradle/minecraft_repo/versions/1.19.4/mcp_mappings.tsrg ./forgery/build/libs/forgery.jar ~/.gradle/caches/fabric-loom/1.19.4/minecraft-merged-intermediary.jar com.unascribed.fabrication ~/.gradle/caches/forge_gradle/minecraft_repo/versions/1.19.4/client_mappings.txt ~/.gradle/caches/forge_gradle/minecraft_repo/versions/1.19.4/server_mappings.txt
+	java -jar ~/ForgeryTools.jar "$forgeryIn" "$forgery" ~/.gradle/caches/fabric-loom/1.20.1/intermediary-v2.tiny ~/.gradle/caches/forge_gradle/minecraft_repo/versions/1.20.1/mcp_mappings.tsrg ./forgery/build/libs/forgery.jar ~/.gradle/caches/fabric-loom/1.20.1/minecraft-merged-intermediary.jar com.unascribed.fabrication ~/.gradle/caches/forge_gradle/minecraft_repo/versions/1.20.1/client_mappings.txt ~/.gradle/caches/forge_gradle/minecraft_repo/versions/1.20.1/server_mappings.txt
 	rm -rf $tmp
 fi
 echo Done

@@ -5,6 +5,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
@@ -31,7 +32,7 @@ public final class Agnos {
 	}
 
 	public interface HudRenderCallback {
-		void render(PoseStack matrixStack, float tickDelta);
+		void render(GuiGraphics matrixStack, float tickDelta);
 	}
 
 	public static void runForCommandRegistration(CommandRegistrationCallback r) {
@@ -50,7 +51,7 @@ public final class Agnos {
 	@OnlyIn(Dist.CLIENT)
 	public static void runForHudRender(HudRenderCallback r) {
 		MinecraftForge.EVENT_BUS.addListener((RenderGuiOverlayEvent.Post e) -> {
-			r.render(e.getPoseStack(), e.getPartialTick());
+			r.render(e.getGuiGraphics(), e.getPartialTick());
 		});
 	}
 

@@ -25,7 +25,7 @@ public class MixinEntityTrackerEntry {
 	private Entity entity;
 
 	@FabModifyArg(at=@At(value="INVOKE", target="Lnet/minecraft/network/packet/s2c/play/EntityEquipmentUpdateS2CPacket;<init>(ILjava/util/List;)V"),
-			method="sendPackets(Ljava/util/function/Consumer;)V")
+			method="sendPackets(Lnet/minecraft/server/network/ServerPlayerEntity;Ljava/util/function/Consumer;)V")
 	public List<Pair<EquipmentSlot, ItemStack>> constructUpdatePacket(List<Pair<EquipmentSlot, ItemStack>> equipmentList) {
 		return FeatureHideArmor.muddle(entity, equipmentList);
 	}

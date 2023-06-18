@@ -46,7 +46,7 @@ public class FeatureModsCommandForgeImpl implements Feature {
 				} catch (Throwable t) {
 					dispatcher.register(LiteralArgumentBuilder.<CommandSourceStack>literal("plugins")
 							.executes((c) -> {
-								c.getSource().sendSuccess(Component.literal("§cThis ain't no Bukkit!\nTry /mods"), false);
+								c.getSource().sendSuccess(()->Component.literal("§cThis ain't no Bukkit!\nTry /mods"), false);
 								return 1;
 							}));
 				}
@@ -105,7 +105,7 @@ public class FeatureModsCommandForgeImpl implements Feature {
 				lt.setStyle(s);
 				mt.append(lt);
 			}
-			c.getSource().sendSuccess(mt, false);
+			c.getSource().sendSuccess(()->mt, false);
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}

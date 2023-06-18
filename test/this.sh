@@ -1,9 +1,9 @@
 #!/bin/bash
 cd `dirname "$0"`
-instance="1194"
+instance="1201"
 cp -r .. "./$instance"
 cd "$instance"
-git checkout 3.0/1.19.4
+git checkout 3.0/1.20.1
 ./build.sh
 ../var/apply.sh build/libs/fabrication* "fab$instance/.minecraft/mods"
 ../var/apply.sh build/libs/forgery* "fabForge$instance/.minecraft/mods"
