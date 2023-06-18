@@ -20,8 +20,8 @@ public abstract class MixinClickableWidget extends ClickableWidget {
 		super(x, y, width, height, message);
 	}
 
-	@FabModifyArg(method="renderButton(Lnet/minecraft/client/util/math/MatrixStack;IIF)V", index=2,
-			at=@At(value="INVOKE", target="Lnet/minecraft/client/gui/widget/PressableWidget;drawMessage(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/font/TextRenderer;I)V"))
+	@FabModifyArg(method="renderButton(Lnet/minecraft/client/gui/DrawContext;IIF)V", index=2,
+			at=@At(value="INVOKE", target="Lnet/minecraft/client/gui/widget/PressableWidget;drawMessage(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/font/TextRenderer;I)V"))
 	private int yellowText(int old) {
 		if(FabConf.isEnabled("*.yellow_button_hover") && this.isHovered() && this.active) return 0xFFFFA0 | (old & 0xFF000000);
 		return old;

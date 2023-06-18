@@ -6,37 +6,22 @@ import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.injection.FabInject;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(TextFieldWidget.class)
+//Should mixin TextFieldWidget but 1.20 removed the mouseCliked method
+@Mixin(ClickableWidget.class)
 @EligibleIf(configAvailable="*.rmb_clears_text_fields", envMatches=Env.CLIENT)
-public abstract class MixinTextFieldWidget extends ClickableWidget {
-
-	@Shadow
-	private boolean focusUnlocked;
-
-	@Shadow
-	public abstract boolean isVisible();
-
-	@Shadow
-	protected abstract boolean isEditable();
-
-	@Shadow
-	public abstract void setText(String text);
-
-	public MixinTextFieldWidget(int x, int y, int width, int height, Text message) {
-		super(x, y, width, height, message);
-	}
+public abstract class MixinClickableWidget {
 
 	@FabInject(at=@At(value="HEAD"), method="mouseClicked(DDI)Z", cancellable=true)
 	public void rmbClear(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
+		if (!(this instanceof AccessorTextFieldWidget)) return;
+		TextFieldWidget self = (TextFieldWidget)(Object) this;
 		if (!FabConf.isEnabled("*.rmb_clears_text_fields")) return;
-		if (button == 1 && this.isVisible() && this.isEditable() && (this.isFocused() || focusUnlocked) && mouseX >= this.getX() && mouseX < (this.getX() + this.width) && mouseY >= this.getY() && mouseY < (this.getY() + this.height)) {
-			this.setText("");
+		if (button == 1 && self.isVisible() && ((AccessorTextFieldWidget)self).fabrication$clear$isEditable() && (self.isFocused() || ((AccessorTextFieldWidget)self).fabrication$clear$getFocusUnlocked()) && mouseX >= self.getX() && mouseX < (self.getX() + self.getWidth()) && mouseY >= self.getY() && mouseY < (self.getY() + self.getHeight())) {
+			self.setText("");
 			cir.setReturnValue(true);
 		}
 	}

@@ -3,14 +3,13 @@ package com.unascribed.fabrication.mixin.j_pedantry.entities_cant_climb;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.injection.ModifyReturn;
-import net.minecraft.block.Block;
+import com.unascribed.fabrication.support.injection.FabInject;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.registry.tag.TagKey;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.function.Predicate;
 
@@ -19,15 +18,12 @@ import java.util.function.Predicate;
 public class MixinEntity {
 
 	private static final Predicate<LivingEntity> fabrication$entitiesCantClimbPredicate = ConfigPredicates.getFinalPredicate("*.entities_cant_climb");
-	@ModifyReturn(method="move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V", target="Lnet/minecraft/block/BlockState;isIn(Lnet/minecraft/registry/tag/TagKey;)Z")
-	private static boolean fabrication$disableClimbing(boolean old, BlockState state, TagKey<Block> tag, Entity entity) {
-		if (FabConf.isAnyEnabled("*.entities_cant_climb") &&
-				tag == BlockTags.CLIMBABLE &&
-				entity instanceof LivingEntity &&
-				fabrication$entitiesCantClimbPredicate.test((LivingEntity)entity)
-		){
-			return false;
+	@FabInject(method="canClimb(Lnet/minecraft/block/BlockState;)Z", at=@At("HEAD"), cancellable=true)
+	private void fabrication$disableClimbing(BlockState state, CallbackInfoReturnable<Boolean> cir) {
+		if (!FabConf.isAnyEnabled("*.entities_cant_climb")) return;
+		Object self = this;
+		if (self instanceof LivingEntity && fabrication$entitiesCantClimbPredicate.test((LivingEntity)self)) {
+			cir.setReturnValue(false);
 		}
-		return old;
 	}
 }

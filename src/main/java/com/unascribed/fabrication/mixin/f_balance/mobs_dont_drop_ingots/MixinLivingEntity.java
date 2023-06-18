@@ -20,7 +20,7 @@ import net.minecraft.nbt.NbtCompound;
 @EligibleIf(configAvailable="*.mobs_dont_drop_ingots")
 public class MixinLivingEntity {
 
-	@FabModifyArg(method="dropLoot(Lnet/minecraft/entity/damage/DamageSource;Z)V", at=@At(value="INVOKE", target="Lnet/minecraft/loot/LootTable;generateLoot(Lnet/minecraft/loot/context/LootContext;Ljava/util/function/Consumer;)V"))
+	@FabModifyArg(method="dropLoot(Lnet/minecraft/entity/damage/DamageSource;Z)V", at=@At(value="INVOKE", target="Lnet/minecraft/loot/LootTable;generateLoot(Lnet/minecraft/loot/context/LootContextParameterSet;JLjava/util/function/Consumer;)V"))
 	public Consumer<ItemStack> generateLoot(Consumer<ItemStack> lootConsumer) {
 		if(!FabConf.isEnabled("*.mobs_dont_drop_ingots")) return lootConsumer;
 		return (stack)-> {

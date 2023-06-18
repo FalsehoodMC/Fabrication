@@ -4,9 +4,13 @@ import java.util.List;
 
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.injection.FabInject;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.registry.Registries;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
@@ -16,9 +20,6 @@ import com.unascribed.fabrication.support.Env;
 import com.google.common.collect.Lists;
 
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.Enchantment;
@@ -31,14 +32,20 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.util.Identifier;
 
-@Mixin(ItemRenderer.class)
+@Mixin(DrawContext.class)
 @EligibleIf(anyConfigAvailable={"*.books_show_enchants", "*.tools_show_important_enchant"}, envMatches=Env.CLIENT)
-public class MixinItemRenderer {
+public abstract class MixinDrawContext {
 
-	@FabInject(at=@At("TAIL"), method="renderGuiItemOverlay(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V")
-	public void renderGuiItemOverlay(MatrixStack matrices, TextRenderer renderer, ItemStack stack, int x, int y, String countLabel, CallbackInfo ci) {
+	@Shadow
+	@Final
+	private MatrixStack matrices;
+
+	@Shadow
+	public abstract int drawText(TextRenderer textRenderer, @Nullable String text, int x, int y, int color, boolean shadow);
+
+	@FabInject(at=@At("TAIL"), method="drawItemInSlot(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V")
+	public void renderGuiItemOverlay(TextRenderer renderer, ItemStack stack, int x, int y, String countLabel, CallbackInfo ci) {
 		if (stack == null) return;
-		VertexConsumerProvider.Immediate vc = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
 		if (stack.getItem() == Items.ENCHANTED_BOOK && FabConf.isEnabled("*.books_show_enchants")) {
 			NbtList tag = EnchantedBookItem.getEnchantmentNbt(stack);
 			List<Enchantment> valid = Lists.newArrayList();
@@ -79,11 +86,11 @@ public class MixinItemRenderer {
 				}
 			}
 			String firstCodepoint = new String(Character.toChars(translated.codePoints().findFirst().getAsInt()));
+
 			matrices.push();
 			matrices.translate(0, 0, 200);
-			renderer.draw(firstCodepoint, x, y + 6 + 3, display.isCursed() ? 0xFFFF5555 : display.isTreasure() ? 0xFF55FFFF : 0xFFFFFFFF, true, matrices.peek().getPositionMatrix(), vc, TextRenderer.TextLayerType.NORMAL, 0, 0xF000F0);
+			this.drawText(renderer, firstCodepoint, x, y+6+3, display.isCursed() ? 0xFFFF5555 : display.isTreasure() ? 0xFF55FFFF : 0xFFFFFFFF, true);
 			matrices.pop();
-			vc.draw();
 		}
 		if (FabConf.isEnabled("*.tools_show_important_enchant")) {
 			Enchantment display = null;
@@ -99,9 +106,8 @@ public class MixinItemRenderer {
 				String firstCodepoint = new String(Character.toChars(translated.codePoints().findFirst().getAsInt()));
 				matrices.push();
 				matrices.translate(0, 0, 200);
-				renderer.draw(firstCodepoint, x, y, 0xFFFF55FF, true, matrices.peek().getPositionMatrix(), vc, TextRenderer.TextLayerType.NORMAL, 0, 0xF000F0);
+				this.drawText(renderer, firstCodepoint, x, y, 0xFFFF55FF, true);
 				matrices.pop();
-				vc.draw();
 			}
 		}
 	}

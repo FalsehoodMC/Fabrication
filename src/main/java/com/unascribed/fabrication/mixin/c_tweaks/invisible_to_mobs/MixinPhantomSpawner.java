@@ -17,7 +17,7 @@ public class MixinPhantomSpawner {
 	private static final Predicate<PlayerEntity> fabrication$noPhantomsPredicate = ConfigPredicates.getFinalPredicate("*.no_phantoms");
 	private static final Predicate<PlayerEntity> fabrication$invisMobsPredicate = ConfigPredicates.getFinalPredicate("*.invisible_to_mobs");
 
-	@ModifyReturn(method="spawn(Lnet/minecraft/server/world/ServerWorld;ZZ)I", target="Lnet/minecraft/entity/player/PlayerEntity;isSpectator()Z")
+	@ModifyReturn(method="spawn(Lnet/minecraft/server/world/ServerWorld;ZZ)I", target="Lnet/minecraft/server/network/ServerPlayerEntity;isSpectator()Z")
 	private static boolean fabrication$InvisTaggablePlayersIsSpectator(boolean original, PlayerEntity subject) {
 		if (FabConf.isEnabled("*.invisible_to_mobs") && fabrication$invisMobsPredicate.test(subject)) return true;
 		if (FabConf.isEnabled("*.no_phantoms") && fabrication$noPhantomsPredicate.test(subject)) return true;
