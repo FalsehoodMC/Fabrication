@@ -1,0 +1,15 @@
+plugins {
+	id 'java'
+}
+
+repositories {
+	mavenCentral()
+}
+
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
+
+dependencies {
+	implementation 'com.google.code.gson:gson:2.8.9'
+	implementation 'com.github.jknack:handlebars:4.3.1'
+}
