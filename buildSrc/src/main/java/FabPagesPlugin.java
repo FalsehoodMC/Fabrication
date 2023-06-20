@@ -15,10 +15,10 @@ public class FabPagesPlugin implements Plugin<Project> {
 		project.task("fabGenPages", test -> {
 			/*const hbs = require('handlebars');
 			const md = require('markdown-it')();*/
-			try {
+			/*try {
 				JsonElement json = JsonParser.parseString(Files.readString(Path.of("src/main/resources/features.json"), StandardCharsets.UTF_8));
 				new Handlebars().compile("modrinth.md.hbs");//.apply()
-			/*let data = JSON.parse(fs.readFileSync(process.argv[2] || 'src/main/resources/features.json').toString('utf8'));
+			let data = JSON.parse(fs.readFileSync(process.argv[2] || 'src/main/resources/features.json').toString('utf8'));
 			let metaSection = {name: 'Meta', key: 'meta', features: [], features_incl_meta: []};
 			let ctx = {feature_count:0,sections:[],sections_incl_meta:[metaSection]};
 			let buildingSection = null;
@@ -85,10 +85,10 @@ public class FabPagesPlugin implements Plugin<Project> {
 			fs.writeFileSync('curse-forgery.html', render({...ctx, fabrication: false}));
 			fs.writeFileSync('modrinth.md', hbs.compile(fs.readFileSync(path.resolve(me, 'modrinth.md.hbs')).toString('utf8'))(ctx));
 			fs.writeFileSync('wiki.html', hbs.compile(fs.readFileSync(path.resolve(me, 'wiki.html.hbs')).toString('utf8'))(ctx));
-			*/
+
 			} catch (IOException e) {
 				throw new RuntimeException(e);
-			}
+			}*/
 		});
 	}
 }
