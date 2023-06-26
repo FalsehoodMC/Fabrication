@@ -4,6 +4,8 @@ import com.google.common.base.Joiner;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -18,6 +20,10 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
+import org.objectweb.asm.tree.analysis.Analyzer;
+import org.objectweb.asm.tree.analysis.AnalyzerException;
+import org.objectweb.asm.tree.analysis.BasicValue;
+import org.objectweb.asm.tree.analysis.SimpleVerifier;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfig;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 import org.spongepowered.asm.mixin.refmap.IReferenceMapper;
@@ -34,6 +40,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -169,8 +176,8 @@ public class FabInjector {
 		Map<String, String> existingRedirects = transformRedirectsToOriginalNames(getMixinRedirects(targetClass.name), targetClass);
 		List<ToInject> injects = new ArrayList<>();
 		List<EntryMixinMerged> redirects = new ArrayList<>();
-		targetClass.methods.forEach(methodNode -> {
-			if (!(methodNode instanceof MethodNodeEx)) return;
+		for (MethodNode methodNode : targetClass.methods) {
+			if (!(methodNode instanceof MethodNodeEx)) continue;
 			AnnotationNode inject = null;
 			String mixin = null;
 			for (AnnotationNode annotationNode : methodNode.visibleAnnotations) {
@@ -202,63 +209,65 @@ public class FabInjector {
 						mixin
 				));
 			}
-		});
+		}
 		apply(targetClass, injectIn != null ? injectIn : injects, redirects);
 	}
 	public static void apply(ClassNode targetClass, List<ToInject> injects, List<EntryMixinMerged> redirects){
 		Map<String, String> redirectMap = new HashMap<>();
-		injects.forEach(toInject -> {
-			if (toInject.annotation.equals("Lcom/unascribed/fabrication/support/injection/ModifyGetField;")) return;
-			redirects.forEach(redirect -> {
-					String mapped = FabRefMap.absoluteMap(redirect.target);
-					if (toInject.target.contains(mapped)) {
-						String r = redirect.name + redirect.desc;
-						toInject.potentiallyRedirected.add(r);
-						redirectMap.put(r, mapped);
-						FabLog.warn("FabInjector found a Redirect from " + redirect.mixin + ";" + redirect.name + ";" + " which has been added to " + toInject.owner + ";" + toInject.name);
-					}
-				});
-		});
-		targetClass.methods.forEach(methodNode -> injects.forEach(toInject -> {
-			for (String m : toInject.method){
-				if (!m.equals(methodNode.name+methodNode.desc)) continue;
-				for (AbstractInsnNode insnNode : methodNode.instructions){
-					String insnOwner = null;
-					String insnName = null;
-					String insnDesc = null;
-					if (insnNode instanceof MethodInsnNode) {
-						MethodInsnNode insn = (MethodInsnNode) insnNode;
-						insnOwner = insn.owner;
-						insnName = insn.name;
-						insnDesc = insn.desc;
-					} else if (insnNode instanceof FieldInsnNode) {
-						FieldInsnNode insn = (FieldInsnNode) insnNode;
-						insnOwner = insn.owner;
-						insnName = insn.name;
-						insnDesc = ":"+insn.desc;
-					}
-					if (insnOwner != null && insnName != null && insnDesc != null) {
-						for (String target : toInject.target) {
-							String unchangedTarget = target;
-							if (target.charAt(0) == 'L') target = target.substring(1);
-							if (target.startsWith(insnOwner)) {
-								char d = target.charAt(insnOwner.length());
-								if ((d == '.' || d == ';') && target.substring(insnOwner.length() + 1).equals(insnName + insnDesc)) {
-									if (performInjection(methodNode, insnNode, toInject, target, false)) {
-										toInject.done.put(m, unchangedTarget);
-										String type = toInject.annotation.substring(toInject.annotation.lastIndexOf('/'), toInject.annotation.length()-1);
-										FabLog.debug("Completed "+type+" Injection : " + toInject.owner + ";" + m + "\t" + unchangedTarget);
+		for (ToInject toInject : injects) {
+			if (toInject.annotation.equals("Lcom/unascribed/fabrication/support/injection/ModifyGetField;")) continue;
+			for (EntryMixinMerged redirect : redirects) {
+				String mapped = FabRefMap.absoluteMap(redirect.target);
+				if (toInject.target.contains(mapped)) {
+					String r = redirect.name + redirect.desc;
+					toInject.potentiallyRedirected.add(r);
+					redirectMap.put(r, mapped);
+					FabLog.info("FabInjector found a Redirect from " + redirect.mixin + ";" + redirect.name + ";" + " which has been added to " + toInject.owner + ";" + toInject.name);
+				}
+			}
+		}
+		for (MethodNode methodNode : targetClass.methods) {
+			for (ToInject toInject : injects) {
+				for (String m : toInject.method) {
+					if (!m.equals(methodNode.name + methodNode.desc)) continue;
+					for (AbstractInsnNode insnNode : methodNode.instructions) {
+						String insnOwner = null;
+						String insnName = null;
+						String insnDesc = null;
+						if (insnNode instanceof MethodInsnNode) {
+							MethodInsnNode insn = (MethodInsnNode) insnNode;
+							insnOwner = insn.owner;
+							insnName = insn.name;
+							insnDesc = insn.desc;
+						} else if (insnNode instanceof FieldInsnNode) {
+							FieldInsnNode insn = (FieldInsnNode) insnNode;
+							insnOwner = insn.owner;
+							insnName = insn.name;
+							insnDesc = ":" + insn.desc;
+						}
+						if (insnOwner != null && insnName != null && insnDesc != null) {
+							for (String target : toInject.target) {
+								String unchangedTarget = target;
+								if (target.charAt(0) == 'L') target = target.substring(1);
+								if (target.startsWith(insnOwner)) {
+									char d = target.charAt(insnOwner.length());
+									if ((d == '.' || d == ';') && target.substring(insnOwner.length() + 1).equals(insnName + insnDesc)) {
+										if (performInjection(methodNode, insnNode, toInject, target, false, targetClass)) {
+											toInject.done.put(m, unchangedTarget);
+											String type = toInject.annotation.substring(toInject.annotation.lastIndexOf('/'), toInject.annotation.length() - 1);
+											FabLog.debug("Completed " + type + " Injection : " + toInject.owner + ";" + m + "\t" + unchangedTarget);
+										}
 									}
 								}
 							}
-						}
-						if (toInject.owner.equals(insnOwner)) {
-							for (String target : toInject.potentiallyRedirected) {
-								if (target.equals(insnName + insnDesc)) {
-									if (performInjection(methodNode, insnNode, toInject, target, true)) {
-										toInject.redirect_fixed.put(m, redirectMap.get(target));
-										String type = toInject.annotation.substring(toInject.annotation.lastIndexOf('/'), toInject.annotation.length() - 1);
-										FabLog.debug("Completed " + type + " Injection over existing Redirect : " + toInject.owner + ";" + m + "\t" + target);
+							if (toInject.owner.equals(insnOwner)) {
+								for (String target : toInject.potentiallyRedirected) {
+									if (target.equals(insnName + insnDesc)) {
+										if (performInjection(methodNode, insnNode, toInject, target, true, targetClass)) {
+											toInject.redirect_fixed.put(m, redirectMap.get(target));
+											String type = toInject.annotation.substring(toInject.annotation.lastIndexOf('/'), toInject.annotation.length() - 1);
+											FabLog.debug("Completed " + type + " Injection over existing Redirect : " + toInject.owner + ";" + m + "\t" + target);
+										}
 									}
 								}
 							}
@@ -266,13 +275,13 @@ public class FabInjector {
 					}
 				}
 			}
-		}));
-		injects.forEach(ti -> ti.method.forEach(m -> ti.target.forEach(t ->{
+		}
+		for (ToInject ti: injects) for (String m : ti.method) for (String t : ti.target) {
 			if (!t.equals(ti.done.get(m))) {
 				if (t.equals(ti.redirect_fixed.get(m))) {
 					FabLog.warn("FabInjector failed to find injection point for "+ti.owner+";"+m+"\t"+t+"\n may have been caused by another mods Redirect, assuming fixed");
 				} else {
-					FabLog.error("FabInjector failed to find injection point for "+ti.owner+";"+m+"\t"+t+"\n located in "+ti.mixin);
+					FabLog.warn("FabInjector failed to find injection point for "+ti.owner+";"+m+"\t"+t+"\n located in "+ti.mixin);
 					Set<String> keys = MixinConfigPlugin.getConfigKeysForDiscoveredClass(ti.mixin);
 					if (!keys.isEmpty()) {
 						FabLog.warn("! Force-disabling " + Joiner.on(", ").join(keys));
@@ -282,10 +291,42 @@ public class FabInjector {
 					}
 				}
 			}
-		})));
+		}
 	}
+	public static boolean performInjection(MethodNode methodNode, AbstractInsnNode insn, ToInject toInject, String target, boolean isRedirect, ClassNode classNode) {
+		List<Runnable> undo = new ArrayList<>();
+		boolean ret = performInjection(methodNode, insn, toInject, target, isRedirect, undo);
+		Exception e = verifyMethodNode(classNode, methodNode);
+		if (e == null) {
+			return ret;
+		}
+		FabLog.error("Injection test failed, attempting recovery, this is likely a mod conflict, please report it\n"+e.getLocalizedMessage());
+		for (Runnable u : undo) {
+			if (u!=null)u.run();
+		}
+		return false;
+	}
+	public static Exception verifyMethodNode(ClassNode classNode, MethodNode method) {
+		Type syperType = classNode.superName == null ? null : Type.getObjectType(classNode.superName);
 
-	public static boolean performInjection(MethodNode methodNode, AbstractInsnNode insn, ToInject toInject, String target, boolean isRedirect) {
+		List<Type> interfaces = new ArrayList<>();
+		for (String interfaceName : classNode.interfaces) {
+			interfaces.add(Type.getObjectType(interfaceName));
+		}
+		SimpleVerifier verifier = new SimpleVerifier(Type.getObjectType(classNode.name), syperType, interfaces, (classNode.access & Opcodes.ACC_INTERFACE) != 0);
+		Analyzer<BasicValue> analyzer = new Analyzer<>(verifier);
+		try {
+			analyzer.analyzeAndComputeMaxs(classNode.name, method);
+		} catch (AnalyzerException e) {
+			return e;
+		}
+		return null;
+	}
+	public static AbstractInsnNode addUndoInsn(AbstractInsnNode insnNode, InsnList list, List<Runnable> undo) {
+		undo.add(()->list.remove(insnNode));
+		return insnNode;
+	}
+	public static boolean performInjection(MethodNode methodNode, AbstractInsnNode insn, ToInject toInject, String target, boolean isRedirect, List<Runnable> undo) {
 		boolean toInjectIsStatic = (toInject.access & Opcodes.ACC_STATIC) != 0;
 		InsnList mod = new InsnList();
 		List<Type> argTypes = new ArrayList<>();
@@ -299,29 +340,34 @@ public class FabInjector {
 		Type[] toInjectArgTypes = toInjectType.getArgumentTypes();
 		int countDesc = toInjectArgTypes.length;
 		int max = methodNode.maxLocals;
+		{
+			int fmax = max;
+			undo.add(() -> methodNode.maxLocals = fmax);
+		}
 		InsnList oldVars = new InsnList();
 		InsnList newVars = new InsnList();
+		InsnList instructions = methodNode.instructions;
 		if ("Lcom/unascribed/fabrication/support/injection/ModifyGetField;".equals(toInject.annotation)) {
 			if (!toInjectIsStatic) {
-				mod.add(new VarInsnNode(getStoreOpcode(targetType.getReturnType().getSort()), max));
-				mod.add(new VarInsnNode(Opcodes.ALOAD, 0));
-				mod.add(new VarInsnNode(getLoadOpcode(targetType.getReturnType().getSort()), max++));
+				mod.add(addUndoInsn(new VarInsnNode(getStoreOpcode(targetType.getReturnType().getSort()), max), instructions, undo));
+				mod.add(addUndoInsn(new VarInsnNode(Opcodes.ALOAD, 0), instructions, undo));
+				mod.add(addUndoInsn(new VarInsnNode(getLoadOpcode(targetType.getReturnType().getSort()), max++), instructions, undo));
 			}
 			if (--countDesc > 0) {
 				String clazz = ((FieldInsnNode)insn).owner;
 				int type = Type.getType(clazz.startsWith("L") ? clazz : "L"+clazz).getSort();
-				methodNode.instructions.insertBefore(insn, new VarInsnNode(getStoreOpcode(type), max));
-				methodNode.instructions.insertBefore(insn, new VarInsnNode(getLoadOpcode(type), max));
-				mod.add(new VarInsnNode(getLoadOpcode(type), max++));
+				instructions.insertBefore(insn, addUndoInsn(new VarInsnNode(getStoreOpcode(type), max), instructions, undo));
+				instructions.insertBefore(insn, addUndoInsn(new VarInsnNode(getLoadOpcode(type), max), instructions, undo));
+				mod.add(addUndoInsn(new VarInsnNode(getLoadOpcode(type), max++), instructions, undo));
 				countDesc-=1;
 			}
 			methodNode.maxLocals = max;
 			for (int c = toInjectIsStatic ? 0 : 1; c < countDesc; c++) {
-				mod.add(new VarInsnNode(getLoadOpcode(toInjectArgTypes[toInjectArgTypes.length-countDesc+c].getSort()), c));
+				mod.add(addUndoInsn(new VarInsnNode(getLoadOpcode(toInjectArgTypes[toInjectArgTypes.length-countDesc+c].getSort()), c), instructions, undo));
 			}
 
-			mod.add(new MethodInsnNode(toInjectIsStatic ? Opcodes.INVOKESTATIC : Opcodes.INVOKEVIRTUAL, toInject.owner, toInject.name, toInject.desc, (toInject.access & Opcodes.ACC_INTERFACE) != 0));
-			methodNode.instructions.insert(insn, mod);
+			mod.add(addUndoInsn(new MethodInsnNode(toInjectIsStatic ? Opcodes.INVOKESTATIC : Opcodes.INVOKEVIRTUAL, toInject.owner, toInject.name, toInject.desc, (toInject.access & Opcodes.ACC_INTERFACE) != 0), instructions, undo));
+			instructions.insert(insn, mod);
 			return true;
 		}else if ("Lcom/unascribed/fabrication/support/injection/ModifyReturn;".equals(toInject.annotation)) {
 			//TODO probably never. continue the variable trace after the first method to further reduce allocation
@@ -340,15 +386,15 @@ public class FabInjector {
 						}
 					} else {
 						int sort = argTypes.get(argTypes.size()-1-c).getSort();
-						newVars.insert(new VarInsnNode(getLoadOpcode(sort), max));
-						methodNode.instructions.insertBefore(varTrace == null ? insn : varTrace, new VarInsnNode(getStoreOpcode(sort), max++));
+						newVars.insert(addUndoInsn(new VarInsnNode(getLoadOpcode(sort), max), instructions, undo));
+						instructions.insertBefore(varTrace == null ? insn : varTrace, addUndoInsn(new VarInsnNode(getStoreOpcode(sort), max++), instructions, undo));
 					}
 				}
 				methodNode.maxLocals=max;
 				if (!toInjectIsStatic) {
-					mod.add(new VarInsnNode(getStoreOpcode(targetType.getReturnType().getSort()), methodNode.maxLocals));
-					mod.add(new VarInsnNode(Opcodes.ALOAD, 0));
-					mod.add(new VarInsnNode(getLoadOpcode(targetType.getReturnType().getSort()), methodNode.maxLocals));
+					mod.add(addUndoInsn(new VarInsnNode(getStoreOpcode(targetType.getReturnType().getSort()), methodNode.maxLocals), instructions, undo));
+					mod.add(addUndoInsn(new VarInsnNode(Opcodes.ALOAD, 0), instructions, undo));
+					mod.add(addUndoInsn(new VarInsnNode(getLoadOpcode(targetType.getReturnType().getSort()), methodNode.maxLocals), instructions, undo));
 					methodNode.maxLocals += 1;
 				}
 				if (isRedirect && !argTypes.isEmpty() && argTypes.get(0) == Type.VOID_TYPE) {
@@ -359,102 +405,104 @@ public class FabInjector {
 					}
 				}
 				for (AbstractInsnNode a : newVars) {
-					if (countDesc-->0) mod.add(a.clone(new HashMap<>()));
+					if (countDesc-->0) mod.add(addUndoInsn(a.clone(new HashMap<>()), instructions, undo));
 				}
 				for (AbstractInsnNode a : oldVars) {
-					if (countDesc-->0) mod.add(a.clone(new HashMap<>()));
+					if (countDesc-->0) mod.add(addUndoInsn(a.clone(new HashMap<>()), instructions, undo));
 				}
-				methodNode.instructions.insertBefore(varTrace == null ? insn : varTrace, newVars);
+				instructions.insertBefore(varTrace == null ? insn : varTrace, newVars);
 				for (int c = toInjectIsStatic ? 0 : 1; c < countDesc; c++) {
-					mod.add(new VarInsnNode(getLoadOpcode(toInjectArgTypes[toInjectArgTypes.length-countDesc+c].getSort()), c));
+					mod.add(addUndoInsn(new VarInsnNode(getLoadOpcode(toInjectArgTypes[toInjectArgTypes.length-countDesc+c].getSort()), c), instructions, undo));
 				}
 			} else if (!toInjectIsStatic) {
-				mod.add(new VarInsnNode(getStoreOpcode(targetType.getReturnType().getSort()), methodNode.maxLocals));
-				mod.add(new VarInsnNode(Opcodes.ALOAD, 0));
-				mod.add(new VarInsnNode(getLoadOpcode(targetType.getReturnType().getSort()), methodNode.maxLocals));
+				mod.add(addUndoInsn(new VarInsnNode(getStoreOpcode(targetType.getReturnType().getSort()), methodNode.maxLocals), instructions, undo));
+				mod.add(addUndoInsn(new VarInsnNode(Opcodes.ALOAD, 0), instructions, undo));
+				mod.add(addUndoInsn(new VarInsnNode(getLoadOpcode(targetType.getReturnType().getSort()), methodNode.maxLocals), instructions, undo));
 				methodNode.maxLocals += 1;
 			}
-			mod.add(new MethodInsnNode(toInjectIsStatic ? Opcodes.INVOKESTATIC : Opcodes.INVOKEVIRTUAL, toInject.owner, toInject.name, toInject.desc, (toInject.access & Opcodes.ACC_INTERFACE) != 0));
-			methodNode.instructions.insert(insn, mod);
+			mod.add(addUndoInsn(new MethodInsnNode(toInjectIsStatic ? Opcodes.INVOKESTATIC : Opcodes.INVOKEVIRTUAL, toInject.owner, toInject.name, toInject.desc, (toInject.access & Opcodes.ACC_INTERFACE) != 0), instructions, undo));
+			instructions.insert(insn, mod);
 			return true;
 		} else if ("Lcom/unascribed/fabrication/support/injection/Hijack;".equals(toInject.annotation)) {
 			for (int c = 0; c < argTypes.size(); c++) {
-				methodNode.instructions.insertBefore(insn, new VarInsnNode(getStoreOpcode(argTypes.get(argTypes.size() - 1 - c).getSort()), max++));
+				instructions.insertBefore(insn, addUndoInsn(new VarInsnNode(getStoreOpcode(argTypes.get(argTypes.size() - 1 - c).getSort()), max++), instructions, undo));
 			}
 			LabelNode label = new LabelNode(new Label());
 			LabelNode label2 = new LabelNode(new Label());
 			boolean optionalReturn = toInjectType.getReturnType().getSort() != Type.BOOLEAN;
-			mod.add(new MethodInsnNode(toInjectIsStatic ? Opcodes.INVOKESTATIC : Opcodes.INVOKEVIRTUAL, toInject.owner, toInject.name, toInject.desc, (toInject.access & Opcodes.ACC_INTERFACE) != 0));
+			mod.add(addUndoInsn(new MethodInsnNode(toInjectIsStatic ? Opcodes.INVOKESTATIC : Opcodes.INVOKEVIRTUAL, toInject.owner, toInject.name, toInject.desc, (toInject.access & Opcodes.ACC_INTERFACE) != 0), instructions, undo));
 			if (optionalReturn) {
-				mod.add(new VarInsnNode(Opcodes.ASTORE, max));
-				mod.add(new VarInsnNode(Opcodes.ALOAD, max));
-				mod.add(new JumpInsnNode(Opcodes.IFNULL, label));
-				mod.add(new VarInsnNode(Opcodes.ALOAD, max));
-				mod.add(new FieldInsnNode(Opcodes.GETFIELD, "com/unascribed/fabrication/support/injection/HijackReturn", "object", "Ljava/lang/Object;"));
-				castHijackReturnResult(targetType.getReturnType(), mod);
-				mod.add(new JumpInsnNode(Opcodes.GOTO, label2));
-				mod.add(label);
+				mod.add(addUndoInsn(new VarInsnNode(Opcodes.ASTORE, max), instructions, undo));
+				mod.add(addUndoInsn(new VarInsnNode(Opcodes.ALOAD, max), instructions, undo));
+				mod.add(addUndoInsn(new JumpInsnNode(Opcodes.IFNULL, label), instructions, undo));
+				mod.add(addUndoInsn(new VarInsnNode(Opcodes.ALOAD, max), instructions, undo));
+				mod.add(addUndoInsn(new FieldInsnNode(Opcodes.GETFIELD, "com/unascribed/fabrication/support/injection/HijackReturn", "object", "Ljava/lang/Object;"), instructions, undo));
+				castHijackReturnResult(targetType.getReturnType(), i->{
+					mod.add(addUndoInsn(i, instructions, undo));
+				});
+				mod.add(addUndoInsn(new JumpInsnNode(Opcodes.GOTO, label2), instructions, undo));
+				mod.add(addUndoInsn(label, instructions, undo));
 				methodNode.maxLocals=max+1;
 			} else {
-				mod.add(new JumpInsnNode(Opcodes.IFNE, label));
+				mod.add(addUndoInsn(new JumpInsnNode(Opcodes.IFNE, label), instructions, undo));
 				methodNode.maxLocals=max;
 			}
 			if (!toInjectIsStatic) methodNode.instructions.insertBefore(insn, new VarInsnNode(Opcodes.ALOAD, 0));
 			for (int i=0; i<argTypes.size();i++) {
 				Type argType = argTypes.get(i);
 				int opcode = getLoadOpcode(argType.getSort());
-				mod.add(new VarInsnNode(opcode, --max));
+				mod.add(addUndoInsn(new VarInsnNode(opcode, --max), instructions, undo));
 				if (!(i==0 && argTypes.get(0) == Type.VOID_TYPE && isRedirect) && countDesc-->0)
-					methodNode.instructions.insertBefore(insn, new VarInsnNode(opcode, max));
+					instructions.insertBefore(insn, addUndoInsn(new VarInsnNode(opcode, max), instructions, undo));
 			}
 			for (int c = toInjectIsStatic ? 0 : 1; c < countDesc; c++) {
-				methodNode.instructions.insertBefore(insn, new VarInsnNode(getLoadOpcode(toInjectArgTypes[toInjectArgTypes.length-countDesc+c].getSort()), c));
+				instructions.insertBefore(insn, addUndoInsn(new VarInsnNode(getLoadOpcode(toInjectArgTypes[toInjectArgTypes.length-countDesc+c].getSort()), c), instructions, undo));
 			}
 
-			methodNode.instructions.insertBefore(insn, mod);
-			methodNode.instructions.insert(insn, optionalReturn? label2 : label);
+			instructions.insertBefore(insn, mod);
+			instructions.insert(insn, addUndoInsn(optionalReturn? label2 : label, instructions, undo));
 			return true;
 		}
 		return false;
 	}
 
-	public static void castHijackReturnResult(Type desc, InsnList mod) {
+	public static void castHijackReturnResult(Type desc, Consumer<AbstractInsnNode> insnConsumer) {
 		switch (desc.getSort()) {
 			case Type.BOOLEAN:
-				mod.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Boolean"));
-				mod.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue", "()Z", false));
+				insnConsumer.accept(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Boolean"));
+				insnConsumer.accept(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue", "()Z", false));
 				break;
 			case Type.BYTE:
-				mod.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Byte"));
-				mod.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Byte", "byteValue", "()B", false));
+				insnConsumer.accept(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Byte"));
+				insnConsumer.accept(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Byte", "byteValue", "()B", false));
 				break;
 			case Type.CHAR:
-				mod.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Character"));
-				mod.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Character", "charValue", "()C", false));
+				insnConsumer.accept(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Character"));
+				insnConsumer.accept(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Character", "charValue", "()C", false));
 				break;
 			case Type.SHORT:
-				mod.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Short"));
-				mod.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Short", "shortValue", "()S", false));
+				insnConsumer.accept(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Short"));
+				insnConsumer.accept(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Short", "shortValue", "()S", false));
 				break;
 			case Type.INT:
-				mod.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Integer"));
-				mod.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Integer", "intValue", "()I", false));
+				insnConsumer.accept(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Integer"));
+				insnConsumer.accept(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Integer", "intValue", "()I", false));
 				break;
 			case Type.LONG:
-				mod.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Long"));
-				mod.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Long", "longValue", "()J", false));
+				insnConsumer.accept(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Long"));
+				insnConsumer.accept(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Long", "longValue", "()J", false));
 				break;
 			case Type.FLOAT:
-				mod.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Float"));
-				mod.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Float", "floatValue", "()F", false));
+				insnConsumer.accept(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Float"));
+				insnConsumer.accept(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Float", "floatValue", "()F", false));
 				break;
 			case Type.DOUBLE:
-				mod.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Double"));
-				mod.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Double", "doubleValue", "()D", false));
+				insnConsumer.accept(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Double"));
+				insnConsumer.accept(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Double", "doubleValue", "()D", false));
 				break;
 			default:
 				String descStr = desc.toString();
-				mod.add(new TypeInsnNode(Opcodes.CHECKCAST, descStr.substring(1, descStr.length() - 1)));
+				insnConsumer.accept(new TypeInsnNode(Opcodes.CHECKCAST, descStr.substring(1, descStr.length() - 1)));
 		}
 	}
 
