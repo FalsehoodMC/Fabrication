@@ -27,6 +27,7 @@ import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 import org.spongepowered.asm.mixin.refmap.IReferenceMapper;
 import org.spongepowered.asm.mixin.transformer.ClassInfo;
 import org.spongepowered.asm.util.asm.MethodNodeEx;
+import org.spongepowered.asm.util.asm.MixinVerifier;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -311,7 +312,7 @@ public class FabInjector {
 		for (String interfaceName : classNode.interfaces) {
 			interfaces.add(Type.getObjectType(interfaceName));
 		}
-		SimpleVerifier verifier = new SimpleVerifier(Type.getObjectType(classNode.name), syperType, interfaces, (classNode.access & Opcodes.ACC_INTERFACE) != 0);
+		SimpleVerifier verifier = new MixinVerifier(Opcodes.ASM9, Type.getObjectType(classNode.name), syperType, interfaces, (classNode.access & Opcodes.ACC_INTERFACE) != 0);
 		Analyzer<BasicValue> analyzer = new Analyzer<>(verifier);
 		try {
 			analyzer.analyzeAndComputeMaxs(classNode.name, method);
