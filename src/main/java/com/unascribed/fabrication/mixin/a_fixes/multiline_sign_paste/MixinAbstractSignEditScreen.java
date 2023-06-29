@@ -34,9 +34,6 @@ public abstract class MixinAbstractSignEditScreen extends Screen {
 	private SelectionManager selectionManager;
 
 	@Shadow
-	private int currentRow;
-
-	@Shadow
 	protected abstract void setCurrentRowMessage(String message);
 
 	protected MixinAbstractSignEditScreen(Text title) {
@@ -45,7 +42,13 @@ public abstract class MixinAbstractSignEditScreen extends Screen {
 
 	@FabInject(at=@At("TAIL"), method="init()V")
 	public void init(CallbackInfo ci) {
-		this.selectionManager = new SelectionManager(() -> this.messages[this.currentRow], this::setCurrentRowMessage, SelectionManager.makeClipboardGetter(this.client), SelectionManager.makeClipboardSetter(this.client), (text) -> this.client.textRenderer.getWidth(text) <= 90) {
+		Object o = this;
+		if (!(o instanceof AccessorAbstractSignEditScreen)) return;
+		AccessorAbstractSignEditScreen self = (AccessorAbstractSignEditScreen) o;
+		this.selectionManager = new SelectionManager(() -> this.messages[self.getCurrentRow()], (message) -> {
+			this.setCurrentRowMessage(message);
+		},
+			SelectionManager.makeClipboardGetter(this.client), SelectionManager.makeClipboardSetter(this.client), (text) -> this.client.textRenderer.getWidth(text) <= 90) {
 			@Override
 			public void paste() {
 				Supplier<String> supplier = FabRefl.Client.getClipboardGetter(this);
@@ -60,7 +63,7 @@ public abstract class MixinAbstractSignEditScreen extends Screen {
 					FabRefl.Client.setClipboardGetter(this, () -> line);
 					super.paste();
 					if (i+1<lines.length) {
-						currentRow = currentRow + 1 & 3;
+						self.setCurrentRow(self.getCurrentRow() + 1 & 3);
 						this.putCursorAtEnd();
 					}
 				}
