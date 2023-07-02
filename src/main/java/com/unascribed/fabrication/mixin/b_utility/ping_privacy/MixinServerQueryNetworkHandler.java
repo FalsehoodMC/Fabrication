@@ -8,6 +8,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.injection.FabInject;
+import com.unascribed.fabrication.util.forgery_nonsense.ForgeryServerMetadata;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -49,10 +50,11 @@ public class MixinServerQueryNetworkHandler {
 				InetSocketAddress isa = (InetSocketAddress)sa;
 				if (PingPrivacy.isEvil(isa.getAddress()) || !PingPrivacyPersistentState.get(server.getOverworld()).isKnownAndRecent(isa.getAddress())) {
 					ServerMetadata realData = server.getServerMetadata();
-					ServerMetadata junkData = new ServerMetadata();
+					ServerMetadata junkData = ForgeryServerMetadata.get();
 					Version v;
 					int playerCount;
 					Random tlr = ThreadLocalRandom.current();
+
 					if (PingPrivacy.isEvil(((InetSocketAddress)sa).getAddress())) {
 						playerCount = tlr.nextInt(128)+128;
 						v = new Version("?", 99999999);
