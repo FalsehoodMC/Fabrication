@@ -7,6 +7,7 @@ import com.unascribed.fabrication.logic.PingPrivacy;
 import com.unascribed.fabrication.logic.PingPrivacyPersistentState;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.injection.FabInject;
+import com.unascribed.fabrication.util.forgery_nonsense.ForgeryServerMetadata;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.packet.c2s.query.QueryRequestC2SPacket;
 import net.minecraft.network.packet.s2c.query.QueryResponseS2CPacket;
@@ -79,7 +80,7 @@ public class MixinServerQueryNetworkHandler implements SetServerAware {
 						sample[i] = new GameProfile(id, sb.toString());
 					}
 					Players players = new Players(realData.players().map(Players::max).orElse(0), playerCount, List.of(sample));
-					this.connection.send(new QueryResponseS2CPacket(new ServerMetadata(desc, Optional.of(players), Optional.of(v), Optional.empty(), chatEnforced)));
+					this.connection.send(new QueryResponseS2CPacket(ForgeryServerMetadata.get(desc, Optional.of(players), Optional.of(v), Optional.empty(), chatEnforced)));
 					responseSent = true;
 					ci.cancel();
 				}
