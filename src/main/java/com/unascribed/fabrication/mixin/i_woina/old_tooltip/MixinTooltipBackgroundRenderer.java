@@ -14,13 +14,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @EligibleIf(configAvailable="*.old_tooltip", envMatches=Env.CLIENT)
 public abstract class MixinTooltipBackgroundRenderer {
 
-	@FabInject(method="render(Lnet/minecraft/client/gui/DrawContext;IIIII)V", at=@At("HEAD"))
+	@FabInject(method="render(Lnet/minecraft/client/gui/DrawContext;IIIII)V", at=@At("HEAD"), cancellable=true)
 	private static void oldTooltip(DrawContext context, int x, int y, int width, int height, int z, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.old_tooltip")) return;
-		int i = x - 3;
-		int j = y - 3;
-		int k = width + 3 + 3;
-		int l = height + 3 + 3;
-		context.fillGradient(k - 3, l - 3, k + i + 3, l + height, z, -1073741824, -1073741824);
+		context.fillGradient(x-3, y-3, x+width+3, y+height+3, z, -1073741824, -1073741824);
+		ci.cancel();
 	}
 }
