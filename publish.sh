@@ -23,9 +23,16 @@ if [ "$3" != "-" ]; then
 	tasks="$tasks mcmodcn"
 fi
 
-echo Changelog:
-cat > changelog.md
+if [ "$5" == "REUSE" ]; then
+	if ![ -s changelog.md ]; then
+		echo "Aborted, reuse changelog was specified, but no there's no existing file"
+		exit
+	fi
+else
+	echo Changelog:
+	cat > changelog.md
+fi
 
-gw $tasks
-#PUBLISH_FORGERY=1 gw $tasks
+./gradlew $tasks
+#PUBLISH_FORGERY=1 ./gradlew $tasks
 
