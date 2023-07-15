@@ -40,9 +40,9 @@ atlas_viewer:
 	meta: true
 	media: https://unascribed.com/fabrication/atlas_viewer.png
 	desc:
-		The /fabrication:client command (available only under Fabric - Forge does not support client
-		commands) has an "atlas" subcommand that can be used to view any of the loaded texture
-		atlases. Information on sprites will be shown when hovered.
+		The /fabrication:client command has an "atlas" subcommand
+		that can be used to view any of the loaded texture atlases.
+		Information on sprites will be shown when hovered.
 
 		This is an invaluable debugging tool for various kinds of atlas disasters, and was added to
 		debug a sprite overwrite issue with Old Lava.
