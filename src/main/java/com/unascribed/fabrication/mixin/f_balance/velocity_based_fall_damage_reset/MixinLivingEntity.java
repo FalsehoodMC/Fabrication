@@ -3,12 +3,12 @@ package com.unascribed.fabrication.mixin.f_balance.velocity_based_fall_damage_re
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.injection.FabInject;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.function.Predicate;
@@ -26,7 +26,7 @@ public abstract class MixinLivingEntity {
 	private float fabrication$lastFallDistanceVelFallDamage = 0f;
 	private static final Predicate<Entity> fabrication$FallDamageResetPredicate = ConfigPredicates.getFinalPredicate("*.velocity_based_fall_damage_reset");
 
-	@Inject(method="checkWaterState()V", at=@At("HEAD"))
+	@FabInject(method="checkWaterState()V", at=@At("HEAD"))
 	private void fabrication$memFallDistance(CallbackInfo ci) {
 		if (FabConf.isEnabled("*.velocity_based_fall_damage_reset") && fabrication$FallDamageResetPredicate.test((Entity)(Object)this)) {
 			fabrication$lastFallDistanceVelFallDamage = fallDistance;
@@ -35,7 +35,7 @@ public abstract class MixinLivingEntity {
 		}
 	}
 
-	@Inject(method="checkWaterState()V", at=@At(value="FIELD", target="Lnet/minecraft/entity/Entity;fallDistance:F", shift=At.Shift.AFTER))
+	@FabInject(method="checkWaterState()V", at=@At(value="FIELD", target="Lnet/minecraft/entity/Entity;fallDistance:F", shift=At.Shift.AFTER))
 	private void fabrication$altFallReset(CallbackInfo ci) {
 		if (fabrication$lastFallDistanceVelFallDamage == 0f) return;
 		if (this.velocity.y > 0.2) return;
