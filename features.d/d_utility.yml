@@ -232,7 +232,7 @@ utility.linkify_urls:
 	since: 3.0.0
 	sides: client_only
 	desc:
-		Links in chat are clickable. Does not work on 1.19.1.
+		Links in chat are clickable.
 
 utility.rmb_clears_text_fields:
 	name: RMB Clears Text Fields
