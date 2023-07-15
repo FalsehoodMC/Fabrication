@@ -95,7 +95,5 @@ utility.extra.ping_privacy:
 		history of discovered users permanently and make their cape publicly searchable, among
 		other things.
 
-		Does not work on 1.19.1.
-
 # kate: space-indent off
 # vim: noai:noet
