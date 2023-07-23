@@ -52,8 +52,8 @@ public abstract class MixinEndPortalBlockEntityRenderer {
 		if (canUseCompatFunctions() && FabConf.isEnabled("*.end_portal_parallax") && be.shouldDrawSide(side)) {
 			// YOU try to make it work with the gateway, I DARE YOU
 			if (be instanceof EndGatewayBlockEntity) return;
-			ci.cancel();
 			if (side.getHorizontal() != -1) return;
+			ci.cancel();
 			// ABANDON  ALL HOPE
 			// YE WHO ENTER HERE
 			MinecraftClient mc = MinecraftClient.getInstance();
