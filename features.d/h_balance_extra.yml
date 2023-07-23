@@ -199,12 +199,12 @@ balance.extra.infinity_crossbows_modded:
 
 		Honors InfiBows.
 
-balance.extra.dimly_lit_mob_spawning
-	name: Dimly Lit Mob Spawning
+balance.extra.block_lit_mob_spawning
+	name: Block Lit Mob Spawning
 	since: 3.3.4
 	sides: server_only
 	desc:
-		Reverts mob spawning to pre-1.18, so they spawn when block light level is bellow 8.
+		Reverts hostile mob spawning to pre-1.18, so mobs spawn when block light level is bellow 8.
 
 balance.extra.velocity_based_fall_damage_reset:
 	name: Velocity Based Fall Damage Reset
