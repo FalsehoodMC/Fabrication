@@ -48,8 +48,11 @@ public class MixinTitleScreen extends Screen {
 	@FabInject(at=@At("HEAD"), method="render(Lnet/minecraft/client/gui/DrawContext;IIF)V")
 	public void renderHead(DrawContext matrices, int mouseX, int mouseY, float tickDelta, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.block_logo")) return;
+		FabConf.addFailure("*.block_logo");
+		/*
 		fabrication$splashText = splashText;
 		splashText = null;
+		*/
 	}
 
 	@FabInject(at=@At("RETURN"), method="render(Lnet/minecraft/client/gui/DrawContext;IIF)V")
