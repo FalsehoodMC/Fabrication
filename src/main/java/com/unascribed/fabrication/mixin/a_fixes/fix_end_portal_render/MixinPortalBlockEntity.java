@@ -24,6 +24,7 @@ public abstract class MixinPortalBlockEntity extends BlockEntity {
 	@FabInject(at=@At("HEAD"), method="shouldDrawSide(Lnet/minecraft/util/math/Direction;)Z", cancellable=true)
 	public void renderAllSides(Direction direction, CallbackInfoReturnable<Boolean> cir) {
 		if (FabConf.isEnabled("*.fix_end_portal_render")) {
+			if (direction == Direction.UP) return;
 			boolean shouldDrawSide = !world.getBlockState(pos.offset(direction)).isOf(getCachedState().getBlock());
 			if (shouldDrawSide) {
 				shouldDrawSide = Block.shouldDrawSide(this.getCachedState(), this.world, this.getPos(), direction);

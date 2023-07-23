@@ -1,5 +1,9 @@
 package com.unascribed.fabrication.mixin.i_woina.end_portal_parallax;
 
+import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.client.GLUPort;
+import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.injection.FabInject;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -13,6 +17,7 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Matrix4f;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.system.MemoryStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,16 +26,58 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.unascribed.fabrication.FabConf;
-import com.unascribed.fabrication.client.GLUPort;
-import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.SpecialEligibility;
-
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Random;
-import static org.lwjgl.opengl.GL11.*;
+
+import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_EYE_LINEAR;
+import static org.lwjgl.opengl.GL11.GL_EYE_PLANE;
+import static org.lwjgl.opengl.GL11.GL_LEQUAL;
+import static org.lwjgl.opengl.GL11.GL_LIGHTING;
+import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
+import static org.lwjgl.opengl.GL11.GL_MODELVIEW_MATRIX;
+import static org.lwjgl.opengl.GL11.GL_OBJECT_LINEAR;
+import static org.lwjgl.opengl.GL11.GL_OBJECT_PLANE;
+import static org.lwjgl.opengl.GL11.GL_ONE;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_PROJECTION;
+import static org.lwjgl.opengl.GL11.GL_PROJECTION_MATRIX;
+import static org.lwjgl.opengl.GL11.GL_Q;
+import static org.lwjgl.opengl.GL11.GL_QUADS;
+import static org.lwjgl.opengl.GL11.GL_R;
+import static org.lwjgl.opengl.GL11.GL_S;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_T;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_GEN_MODE;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_GEN_Q;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_GEN_R;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_GEN_S;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_GEN_T;
+import static org.lwjgl.opengl.GL11.GL_VIEWPORT;
+import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
+import static org.lwjgl.opengl.GL11.glColor4f;
+import static org.lwjgl.opengl.GL11.glDepthFunc;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.glGetFloatv;
+import static org.lwjgl.opengl.GL11.glGetIntegerv;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glMatrixMode;
+import static org.lwjgl.opengl.GL11.glMultMatrixf;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glRotatef;
+import static org.lwjgl.opengl.GL11.glScalef;
+import static org.lwjgl.opengl.GL11.glTexGenfv;
+import static org.lwjgl.opengl.GL11.glTexGeni;
+import static org.lwjgl.opengl.GL11.glTranslatef;
+import static org.lwjgl.opengl.GL11.glVertex3d;
 
 @Environment(EnvType.CLIENT)
 @Mixin(EndPortalBlockEntityRenderer.class)
@@ -47,11 +94,12 @@ public abstract class MixinEndPortalBlockEntityRenderer {
 	@Unique
 	private static final Random RANDOM = new Random(31100L);
 
-	@FabInject(at=@At("HEAD"), method="renderSide(Lnet/minecraft/block/entity/EndPortalBlockEntity;Lnet/minecraft/util/math/Matrix4f;Lnet/minecraft/client/render/VertexConsumer;FFFFFFFFLnet/minecraft/util/math/Direction;)V", cancellable=true)
-	public void fabrication$render(EndPortalBlockEntity be, Matrix4f model, VertexConsumer vertices, float x1, float x2, float y1, float y2, float z1, float z2, float z3, float z4, Direction side, CallbackInfo ci) {
+	private static final FloatBuffer fabrication$endParalax$MATRIX_BUFFER = BufferUtils.createFloatBuffer(4*4);
+
+	@FabInject(at=@At("HEAD"), method="method_23085(Lnet/minecraft/block/entity/EndPortalBlockEntity;Lnet/minecraft/util/math/Matrix4f;Lnet/minecraft/client/render/VertexConsumer;FFFFFFFFFFFLnet/minecraft/util/math/Direction;)V", cancellable=true)
+	public void fabrication$render(EndPortalBlockEntity be, Matrix4f model, VertexConsumer vertexConsumer, float x1, float x2, float y1, float y2, float z1, float z2, float z3, float z4, float n, float o, float p, Direction side, CallbackInfo ci) {
 		if (FabConf.isEnabled("*.end_portal_parallax") && be.shouldDrawSide(side)) {
 			FabConf.addFailure("*.end_portal_parallax");
-			/*
 			// YOU try to make it work with the gateway, I DARE YOU
 			if (be instanceof EndGatewayBlockEntity) return;
 			ci.cancel();
@@ -70,11 +118,20 @@ public abstract class MixinEndPortalBlockEntityRenderer {
 				glGetIntegerv(GL_VIEWPORT, viewportBuffer);
 				float viewportCX = (viewportBuffer.get(0) + viewportBuffer.get(2)) / 2f;
 				float viewportCY = (viewportBuffer.get(1) + viewportBuffer.get(3)) / 2f;
-				Matrix4f scratchMat = RenderSystem.getModelViewMatrix().copy();
+				glGetFloatv(GL_PROJECTION_MATRIX, projBuffer);
+				glGetFloatv(GL_MODELVIEW_MATRIX, scratchBuffer);
+				//projBuffer.rewind();
+				//scratchBuffer.rewind();
+				/*{
+				GlStateManager.getFloat();
+				Matrix4f scratchMat = new Matrix4f();
+				scratchMat.;
+				scratchMat.writeRowFirst();
 				Matrix4f projMatrix = RenderSystem.getProjectionMatrix().copy();
 				scratchMat.multiply(model);
-				projMatrix.writeColumnMajor(projBuffer);
-				scratchMat.writeColumnMajor(scratchBuffer);
+				projMatrix.writeRowFirst(projBuffer);
+				scratchMat.writeRowFirst(scratchBuffer);
+				}*/
 
 				GLUPort.gluUnProject(
 						viewportCX,
@@ -92,8 +149,20 @@ public abstract class MixinEndPortalBlockEntityRenderer {
 				float baseTexTransX = pos.getX();
 				float baseTexTransY = pos.getY();
 				float baseTexTransZ = pos.getZ();
-				glPushMCMatrix();
-				glMultMatrixf(model);
+				/*glPushMCMatrix*/{
+					glMatrixMode(GL_PROJECTION);
+					glPushMatrix();
+					glLoadIdentity();
+					glMultMatrixf(projBuffer);
+					glMatrixMode(GL_MODELVIEW);
+					glPushMatrix();
+					glMultMatrixf(scratchBuffer);
+				}
+				/*glMultMatrixf*/{
+					model.writeRowFirst(fabrication$endParalax$MATRIX_BUFFER);
+					fabrication$endParalax$MATRIX_BUFFER.rewind();
+					glMultMatrixf(fabrication$endParalax$MATRIX_BUFFER);
+				}
 				glEnable(GL_TEXTURE_2D);
 				glEnable(GL_DEPTH_TEST);
 				glDepthFunc(GL_LEQUAL);
@@ -111,7 +180,9 @@ public abstract class MixinEndPortalBlockEntityRenderer {
 						ri = 65.0F;
 						scale = 0.125F;
 						glEnable(GL_BLEND);
-						glDefaultBlendFunc();
+						/*glDefaultBlendFunc*/ {
+							glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+						}
 					}
 
 					if (i == 1) {
@@ -184,9 +255,14 @@ public abstract class MixinEndPortalBlockEntityRenderer {
 				glDisable(GL_TEXTURE_GEN_R);
 				glDisable(GL_TEXTURE_GEN_Q);
 				glEnable(GL_LIGHTING);
-				glPopMCMatrix();
+				/*glPopMCMatrix*/ {
+					glMatrixMode(GL_PROJECTION);
+					glPopMatrix();
+					glMatrixMode(GL_MODELVIEW);
+					glPopMatrix();
+				}
 			}
-			*/
+
 		}
 	}
 }

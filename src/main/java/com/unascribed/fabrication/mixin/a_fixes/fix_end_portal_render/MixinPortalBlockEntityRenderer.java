@@ -20,7 +20,6 @@ public abstract class MixinPortalBlockEntityRenderer {
 	public float fixSideRender1(float y) {
 		if (FabConf.isEnabled("*.fix_end_portal_render")) {
 			if (y == 1) return this.method_3594();
-			else if (y == 0) return 0.375f;
 		}
 		return y;
 	}
@@ -28,7 +27,6 @@ public abstract class MixinPortalBlockEntityRenderer {
 	public float fixSideRender2(float y) {
 		if (FabConf.isEnabled("*.fix_end_portal_render")) {
 			if (y == 1) return this.method_3594();
-			else if (y == 0) return 0.375f;
 		}
 		return y;
 	}
