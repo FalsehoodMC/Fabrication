@@ -40,9 +40,9 @@ atlas_viewer:
 	meta: true
 	media: https://unascribed.com/fabrication/atlas_viewer.png
 	desc:
-		The /fabrication:client command (available only under Fabric - Forge does not support client
-		commands) has an "atlas" subcommand that can be used to view any of the loaded texture
-		atlases. Information on sprites will be shown when hovered.
+		The /fabrication:client command has an "atlas" subcommand
+		that can be used to view any of the loaded texture atlases.
+		Information on sprites will be shown when hovered.
 
 		This is an invaluable debugging tool for various kinds of atlas disasters, and was added to
 		debug a sprite overwrite issue with Old Lava.
@@ -52,6 +52,33 @@ search:
 	since: 1.4.0
 	meta: true
 	desc:
+
+feature_parity:
+	name: Feature Parity
+	since: 3.3.4
+	meta: true
+	desc:
+		Fabrication is maintained on a few minecraft versions.
+		However the wiki only shows the latest version, here's a list of how the wiki would change going backwards.
+
+		1.19.3:
+			Added sync_attacker_yaw.
+
+		1.19:
+			Added oak_is_apple.
+			Added tnt_is_dynamite.
+
+		1.18:
+			Changed chat_markdown from client_only to server_only.
+
+		1.17:
+			Added fix_superflat_bad_structures.
+			Changed tools_in_bundles and no_filled_inventories_in_shulkers since item tags don't exist.
+
+		1.16:
+			Removed tools_in_bundles.
+			Removed fix_charm_amethyst_dupe.
+			Removed thrown_buckets_empty_lava_cauldrons.
 
 # kate: space-indent off
 # vim: noai:noet
