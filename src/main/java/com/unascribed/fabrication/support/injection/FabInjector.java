@@ -316,7 +316,7 @@ public class FabInjector {
 		Analyzer<BasicValue> analyzer = new Analyzer<>(verifier);
 		try {
 			analyzer.analyzeAndComputeMaxs(classNode.name, method);
-		} catch (AnalyzerException e) {
+		} catch (Exception e) {
 			return e;
 		}
 		return null;
