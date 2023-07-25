@@ -31,6 +31,7 @@ public class ClassicBlockDropsScreen extends Screen{
 	PrideFlagRenderer prideFlag;
 	boolean didClick;
 	boolean didRClick;
+	double lastMouseX, lastMouseY;
 
 
 	public ClassicBlockDropsScreen(Screen parent, PrideFlagRenderer prideFlag, String title, String configKey) {
@@ -38,6 +39,7 @@ public class ClassicBlockDropsScreen extends Screen{
 		this.parent = parent;
 		this.prideFlag = prideFlag;
 	}
+
 	@Override
 	protected void init() {
 		super.init();
@@ -160,6 +162,12 @@ public class ClassicBlockDropsScreen extends Screen{
 
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+		switch (keyCode) {
+			case GLFW.GLFW_KEY_PAGE_UP: mouseScrolled(lastMouseX, lastMouseY, 20); break;
+			case GLFW.GLFW_KEY_PAGE_DOWN: mouseScrolled(lastMouseX, lastMouseY, -20); break;
+			case GLFW.GLFW_KEY_UP: mouseScrolled(lastMouseX, lastMouseY, 2); break;
+			case GLFW.GLFW_KEY_DOWN: mouseScrolled(lastMouseX, lastMouseY, -2); break;
+		}
 		if (keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_KP_ENTER) {
 			String input = searchField.getText();
 			if (searchField.isActive() && !input.isEmpty()) {
@@ -181,6 +189,8 @@ public class ClassicBlockDropsScreen extends Screen{
 
 	@Override
 	public void mouseMoved(double mouseX, double mouseY) {
+		lastMouseX = mouseX;
+		lastMouseY = mouseY;
 		searchField.mouseMoved(mouseX, mouseY);
 		super.mouseMoved(mouseX, mouseY);
 	}
