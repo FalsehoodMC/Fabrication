@@ -50,6 +50,7 @@ import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.level.storage.SessionLock;
 import org.apache.commons.lang3.ArrayUtils;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
 import java.io.File;
@@ -155,6 +156,7 @@ public class FabricationConfigScreen extends Screen {
 	private Pattern queryPattern = Pattern.compile("");
 	private boolean emptyQuery = true;
 	private boolean searchingScriptable = false;
+	private double lastMouseX, lastMouseY;
 
 
 	public FabricationConfigScreen(Screen parent) {
@@ -1425,6 +1427,8 @@ public class FabricationConfigScreen extends Screen {
 
 	@Override
 	public void mouseMoved(double mouseX, double mouseY) {
+		lastMouseX = mouseX;
+		lastMouseY = mouseY;
 		if ("search".equals(selectedSection)) {
 			searchField.mouseMoved(mouseX, mouseY);
 		}
@@ -1449,6 +1453,12 @@ public class FabricationConfigScreen extends Screen {
 
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+		switch (keyCode) {
+			case GLFW.GLFW_KEY_PAGE_UP: mouseScrolled(lastMouseX, lastMouseY, 20); break;
+			case GLFW.GLFW_KEY_PAGE_DOWN: mouseScrolled(lastMouseX, lastMouseY, -20); break;
+			case GLFW.GLFW_KEY_UP: mouseScrolled(lastMouseX, lastMouseY, 2); break;
+			case GLFW.GLFW_KEY_DOWN: mouseScrolled(lastMouseX, lastMouseY, -2); break;
+		}
 		if ("search".equals(selectedSection)) {
 			searchField.keyPressed(keyCode, scanCode, modifiers);
 		}

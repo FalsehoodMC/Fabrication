@@ -13,6 +13,7 @@ import net.minecraft.recipe.Recipe;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.Iterator;
 import java.util.regex.Pattern;
@@ -29,6 +30,7 @@ public class YeetRecipesScreen extends Screen{
 	PrideFlagRenderer prideFlag;
 	boolean didClick;
 	boolean didRClick;
+	double lastMouseX, lastMouseY;
 
 
 	public YeetRecipesScreen(Screen parent, PrideFlagRenderer prideFlag, String title, String configKey) {
@@ -131,6 +133,12 @@ public class YeetRecipesScreen extends Screen{
 
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+		switch (keyCode) {
+			case GLFW.GLFW_KEY_PAGE_UP: mouseScrolled(lastMouseX, lastMouseY, 20); break;
+			case GLFW.GLFW_KEY_PAGE_DOWN: mouseScrolled(lastMouseX, lastMouseY, -20); break;
+			case GLFW.GLFW_KEY_UP: mouseScrolled(lastMouseX, lastMouseY, 2); break;
+			case GLFW.GLFW_KEY_DOWN: mouseScrolled(lastMouseX, lastMouseY, -2); break;
+		}
 		searchField.keyPressed(keyCode, scanCode, modifiers);
 		return super.keyPressed(keyCode, scanCode, modifiers);
 	}
@@ -142,6 +150,8 @@ public class YeetRecipesScreen extends Screen{
 
 	@Override
 	public void mouseMoved(double mouseX, double mouseY) {
+		lastMouseX = mouseX;
+		lastMouseY = mouseY;
 		searchField.mouseMoved(mouseX, mouseY);
 		super.mouseMoved(mouseX, mouseY);
 	}

@@ -44,12 +44,18 @@ public class BlockLogoScreen extends Screen{
 	PrideFlagRenderer prideFlag;
 	boolean didClick;
 	boolean didRClick;
+	double lastMouseX, lastMouseY;
 
 
 	public BlockLogoScreen(Screen parent, PrideFlagRenderer prideFlag, String title, String configKey) {
 		super(new LiteralText("Fabrication Block Logo"));
 		this.parent = parent;
 		this.prideFlag = prideFlag;
+	}
+	@Override
+	public void mouseMoved(double mouseX, double mouseY) {
+		lastMouseX = mouseX;
+		lastMouseY = mouseY;
 	}
 
 	@Override
@@ -263,6 +269,12 @@ public class BlockLogoScreen extends Screen{
 
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+		switch (keyCode) {
+			case GLFW.GLFW_KEY_PAGE_UP: mouseScrolled(lastMouseX, lastMouseY, 20); break;
+			case GLFW.GLFW_KEY_PAGE_DOWN: mouseScrolled(lastMouseX, lastMouseY, -20); break;
+			case GLFW.GLFW_KEY_UP: mouseScrolled(lastMouseX, lastMouseY, 2); break;
+			case GLFW.GLFW_KEY_DOWN: mouseScrolled(lastMouseX, lastMouseY, -2); break;
+		}
 		if (selected != 0) {
 			if (keyCode == GLFW.GLFW_KEY_BACKSPACE)
 				num = 0;
