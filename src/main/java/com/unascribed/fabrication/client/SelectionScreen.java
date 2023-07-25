@@ -5,6 +5,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -16,6 +17,7 @@ class SelectionScreen<T> extends Screen {
 	final Consumer<T> out;
 	final ScrollBar scrollBar = new ScrollBar(height);
 	boolean didClick = false;
+	double lastMouseX, lastMouseY;
 
 	public SelectionScreen(Screen parent, List<? extends PreciseDrawable<T>> options, Consumer<T> out) {
 		super(parent.getTitle());
@@ -97,6 +99,24 @@ class SelectionScreen<T> extends Screen {
 	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
 		scrollBar.scroll(amount * 20);
 		return super.mouseScrolled(mouseX, mouseY, amount);
+	}
+
+	@Override
+	public void mouseMoved(double x, double y) {
+        lastMouseX = x;
+        lastMouseY = y;
+
+	}
+
+	@Override
+	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+		switch (keyCode) {
+			case GLFW.GLFW_KEY_PAGE_UP: mouseScrolled(lastMouseX, lastMouseY, 20); break;
+			case GLFW.GLFW_KEY_PAGE_DOWN: mouseScrolled(lastMouseX, lastMouseY, -20); break;
+			case GLFW.GLFW_KEY_UP: mouseScrolled(lastMouseX, lastMouseY, 2); break;
+			case GLFW.GLFW_KEY_DOWN: mouseScrolled(lastMouseX, lastMouseY, -2); break;
+		}
+		return super.keyPressed(keyCode, scanCode, modifiers);
 	}
 
 	@Override
