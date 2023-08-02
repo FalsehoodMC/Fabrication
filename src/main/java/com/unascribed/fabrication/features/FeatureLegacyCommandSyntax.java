@@ -45,6 +45,7 @@ public class FeatureLegacyCommandSyntax implements Feature {
 				LiteralArgumentBuilder<ServerCommandSource> gmCmd = CommandManager.literal("gamemode")
 						.requires(scs -> FabConf.isEnabled("*.legacy_command_syntax") && scs.hasPermissionLevel(2));
 				for (GameMode mode : GameMode.values()) {
+					if (mode == GameMode.NOT_SET) continue;
 					gmCmd.then(CommandManager.literal(Integer.toString(mode.getId()))
 							.executes(c -> FabRefl.gameModeExecute(c, Collections.singleton(c.getSource().getPlayer()), mode))
 							.then(CommandManager.argument("target", EntityArgumentType.players())
