@@ -23,7 +23,7 @@ public class MixinAnvilScreenHandler {
 	@FabInject(at=@At("TAIL"), method="updateResult()V")
 	public void modifyLevelCost(CallbackInfo ci) {
 		if (!(FabConf.isEnabled("*.no_experience") || FabConf.isEnabled("*.anvil_no_xp_cost"))) return;
-		levelCost.set(1);
+		levelCost.set(0);
 	}
 
 	@FabInject(at=@At("HEAD"), method="canTakeOutput(Lnet/minecraft/entity/player/PlayerEntity;Z)Z", cancellable=true)
@@ -35,7 +35,7 @@ public class MixinAnvilScreenHandler {
 
 	@FabInject(at=@At("HEAD"), method="getLevelCost()I", cancellable=true)
 	public void getLevelCost(CallbackInfoReturnable<Integer> ci) {
-		if (FabConf.isEnabled("*.no_experience")) {
+		if (FabConf.isEnabled("*.no_experience") || FabConf.isEnabled("*.anvil_no_xp_cost")) {
 			ci.setReturnValue(0);
 		}
 	}
