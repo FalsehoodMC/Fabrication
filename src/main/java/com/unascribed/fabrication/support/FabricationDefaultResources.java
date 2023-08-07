@@ -32,7 +32,7 @@ public class FabricationDefaultResources implements ResourcePackProvider {
 	public void register(Consumer<ResourcePackProfile> consumer, Factory factory) {
 		consumer.accept(factory.create(MixinConfigPlugin.MOD_NAME, new LiteralText("Internal "+ MixinConfigPlugin.MOD_NAME+" resources"),true,
 				() -> new FabricationResourcePack("default"),
-				new PackResourceMetadata(new LiteralText("Internal "+ MixinConfigPlugin.MOD_NAME+" resources"), 7),
+				new PackResourceMetadata(new LiteralText("Internal "+ MixinConfigPlugin.MOD_NAME+" resources"), 8),
 				InsertionPosition.TOP, ResourcePackSource.PACK_SOURCE_BUILTIN));
 	}
 
