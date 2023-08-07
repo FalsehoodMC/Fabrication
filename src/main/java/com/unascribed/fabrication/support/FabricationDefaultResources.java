@@ -30,9 +30,9 @@ public class FabricationDefaultResources implements ResourcePackProvider {
 	}
 	@Override
 	public void register(Consumer<ResourcePackProfile> consumer, Factory factory) {
-		consumer.accept(factory.create(MixinConfigPlugin.MOD_NAME, Text.literal("Internal " + MixinConfigPlugin.MOD_NAME + " resources"),true,
+		consumer.accept(factory.create(MixinConfigPlugin.MOD_NAME, Text.literal("Internal "+ MixinConfigPlugin.MOD_NAME+" resources"),true,
 				() -> new FabricationResourcePack("default"),
-				new PackResourceMetadata(Text.literal("Internal "+MixinConfigPlugin.MOD_NAME+" resources"), 7),
+				new PackResourceMetadata(Text.literal("Internal "+MixinConfigPlugin.MOD_NAME+" resources"), 9),
 				InsertionPosition.TOP, ResourcePackSource.PACK_SOURCE_BUILTIN));
 	}
 

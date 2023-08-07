@@ -59,7 +59,7 @@ public abstract class ResourcePackFeature implements Feature, ResourcePackProvid
 		if (active) {
 			Supplier<ResourcePack> f = () -> new FabricationResourcePack(path);
 			consumer.accept(factory.create(MixinConfigPlugin.MOD_NAME+" "+path, Text.literal("Internal "+MixinConfigPlugin.MOD_NAME+" resources"),true, f,
-					new PackResourceMetadata(Text.literal("Internal " + MixinConfigPlugin.MOD_NAME + " resources"), 8),
+					new PackResourceMetadata(Text.literal("Internal " + MixinConfigPlugin.MOD_NAME + " resources"), 9),
 					InsertionPosition.TOP, ResourcePackSource.PACK_SOURCE_BUILTIN));
 		}
 	}
