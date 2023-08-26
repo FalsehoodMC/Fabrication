@@ -387,6 +387,7 @@ public class FabConf {
 
 	public static void addFailure(String configKey) {
 		failures.add(remap(configKey));
+
 	}
 	private static void getDefaults(Predicate<String> shouldSkipSection, Consumer<String> add) {
 		for (Map.Entry<String, ImmutableSet<String>> entry : sectionFeatureKeyToFeatures.entrySet()) {
