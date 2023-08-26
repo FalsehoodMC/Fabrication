@@ -202,5 +202,37 @@ balance.extra.velocity_based_fall_damage_reset:
 	desc:
 		Fall distance will get gradually reduced instead of being reset in fluids like water.
 
+balance.extra.hunger_is_peaceful:
+	name: Hunger is Peaceful
+	since: 3.3.8
+	sides: server_only
+	fscript: player_entity
+	desc:
+		Hunger acts as if the difficulty is peaceful.
+
+balance.extra.hunger_is_easy:
+	name: Hunger is Easy
+	since: 3.3.8
+	sides: server_only
+	fscript: player_entity
+	desc:
+		Hunger acts as if the difficulty is easy.
+
+balance.extra.hunger_is_normal:
+	name: Hunger is Normal
+	since: 3.3.8
+	sides: server_only
+	fscript: player_entity
+	desc:
+		Hunger acts as if the difficulty is normal.
+
+balance.extra.hunger_is_hard:
+	name: Hunger is Hard
+	since: 3.3.8
+	sides: server_only
+	fscript: player_entity
+	desc:
+		Hunger acts as if the difficulty is hard.
+
 # kate: space-indent off
 # vim: noai:noet
