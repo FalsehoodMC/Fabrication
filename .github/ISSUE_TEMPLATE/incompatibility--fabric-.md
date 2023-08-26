@@ -8,4 +8,5 @@ assignees: ''
 
 ---
 
+Narrow down which mods are conflicting, please don't post a crash log with 300 mods.
 You must include a link to a COMPLETE game log. You can find it in .minecraft/logs/latest.log. Crash reports DO NOT supply enough context for many kinds of errors, and the crash report is included in the log anyway. Please upload your log to Gist and do not paste it into the issue body. https://gist.github.com - Delete this text when you're done with it and replace it with your Gist link.
