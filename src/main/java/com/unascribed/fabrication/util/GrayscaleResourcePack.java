@@ -33,7 +33,8 @@ public class GrayscaleResourcePack implements ResourcePack {
 
 	@Override
 	public InputStream open(ResourceType type, Identifier id) throws IOException {
-		if (type!= ResourceType.CLIENT_RESOURCES) throw new FileNotFoundException(id.toString());
+		if (!"fabrication_grayscale".equals(id.getNamespace())) throw new FileNotFoundException(id.toString());
+		if (type!=ResourceType.CLIENT_RESOURCES) throw new FileNotFoundException(id.toString());
 		return getIS(id.getPath());
 	}
 
