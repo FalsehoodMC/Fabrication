@@ -44,8 +44,13 @@ public class GrayscaleResourcePack implements ResourcePack {
 	@Override
 	public InputSupplier<InputStream> open(ResourceType type, Identifier id) {
 		if (!"fabrication_grayscale".equals(id.getNamespace())) return null;
-		if (type!= ResourceType.CLIENT_RESOURCES) return null;
+		if (type!=ResourceType.CLIENT_RESOURCES) return null;
 		if (!id.getPath().endsWith(".png")) return null;
+		try {
+			getIS(id.getPath());
+		} catch (Exception e) {
+			return null;
+		}
 		return new InputSupplier<InputStream>() {
 			@Override
 			public InputStream get() throws IOException {
