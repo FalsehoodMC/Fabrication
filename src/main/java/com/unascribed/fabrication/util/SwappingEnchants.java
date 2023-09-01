@@ -19,7 +19,7 @@ import net.minecraft.world.World;
 import java.util.List;
 import java.util.Map;
 
-public class SwapingEnchants {
+public class SwappingEnchants {
 	public static boolean swapEnchants(ItemStack self, World world, PlayerEntity user) {
 		List<Pair<String, Integer>> currentConflicts = ForgeryArrayList.get();
 		NbtCompound nbt = self.getNbt();

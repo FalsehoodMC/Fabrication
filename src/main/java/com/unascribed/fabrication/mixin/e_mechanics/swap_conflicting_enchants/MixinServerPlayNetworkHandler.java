@@ -3,7 +3,7 @@ package com.unascribed.fabrication.mixin.e_mechanics.swap_conflicting_enchants;
 import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.injection.FabInject;
-import com.unascribed.fabrication.util.SwapingEnchants;
+import com.unascribed.fabrication.util.SwappingEnchants;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
@@ -30,7 +30,7 @@ public class MixinServerPlayNetworkHandler {
 			if (recvdData.readBoolean()) {
 				ItemStack stack = player.getMainHandStack();
 				if (stack != null && !stack.isEmpty() && player.world != null) {
-					SwapingEnchants.swapEnchants(stack, player.world, player);
+					SwappingEnchants.swapEnchants(stack, player.world, player);
 				}
 			}
 			ci.cancel();
