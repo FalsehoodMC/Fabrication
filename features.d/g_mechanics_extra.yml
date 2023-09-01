@@ -16,7 +16,7 @@ mechanics.extra.swap_conflicting_enchants:
 	media: https://unascribed.com/fabrication/swap_conflicting_enchants.mp4
 	desc:
 		When adding enchants that would normally not be compatible it will instead get added in an inactive state.
-		Conflicting enchants can be swapped on the go by shift right-clicking the item.
+		Conflicting enchants can be swapped on the go by right-clicking the item or pressing a keybind while sneaking.
 
 mechanics.extra.weaponized_pearls:
 	name: Weaponized Pearls
