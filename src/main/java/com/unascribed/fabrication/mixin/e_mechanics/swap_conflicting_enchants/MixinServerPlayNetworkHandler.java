@@ -1,8 +1,6 @@
 package com.unascribed.fabrication.mixin.e_mechanics.swap_conflicting_enchants;
 
 import com.unascribed.fabrication.FabRefl;
-import com.unascribed.fabrication.features.FeatrueSwapEnchants;
-import com.unascribed.fabrication.interfaces.SetCrawling;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.injection.FabInject;
 import com.unascribed.fabrication.util.SwapingEnchants;
@@ -12,7 +10,6 @@ import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-import org.lwjgl.openal.EnumerateAllExt;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
