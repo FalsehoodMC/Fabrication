@@ -1,7 +1,7 @@
 package com.unascribed.fabrication.features;
 
 import com.unascribed.fabrication.Agnos;
-import com.unascribed.fabrication.interfaces.SetCrawling;
+import com.unascribed.fabrication.EarlyAgnos;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Feature;
@@ -23,6 +23,7 @@ public class FeatrueSwapEnchants implements Feature {
 		keybind = new KeyBinding("["+ MixinConfigPlugin.MOD_NAME+"] Swap Enchant", InputUtil.UNKNOWN_KEY.getCode(), "key.categories.gameplay") {
 			@Override
 			public void setPressed(boolean pressed) {
+				if (EarlyAgnos.isForge() && pressed && MinecraftClient.getInstance().currentScreen != null) return;
 				if (pressed) {
 					PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
 					data.writeBoolean(pressed);
