@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.features;
 
 import com.unascribed.fabrication.Agnos;
+import com.unascribed.fabrication.EarlyAgnos;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Feature;
@@ -21,6 +22,7 @@ public class FeatureToggleSprint implements Feature {
 		keybind = new KeyBinding("["+ MixinConfigPlugin.MOD_NAME+"] Toggle/Hold Sprint", InputUtil.UNKNOWN_KEY.getCode(), "key.categories.movement") {
 			@Override
 			public void setPressed(boolean pressed) {
+				if (EarlyAgnos.isForge() && pressed && MinecraftClient.getInstance().currentScreen != null) return;
 				if (!pressed && MinecraftClient.getInstance().getNetworkHandler() == null) {
 					// reset() was probably called, so, reset
 					sprinting = false;

@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.features;
 
 import com.unascribed.fabrication.Agnos;
+import com.unascribed.fabrication.EarlyAgnos;
 import com.unascribed.fabrication.interfaces.SetCrawling;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
@@ -26,6 +27,7 @@ public class FeatureCrawling implements Feature {
 		keybind = new KeyBinding("["+ MixinConfigPlugin.MOD_NAME+"] Crawl", InputUtil.UNKNOWN_KEY.getCode(), "key.categories.movement") {
 			@Override
 			public void setPressed(boolean pressed) {
+				if (EarlyAgnos.isForge() && pressed && MinecraftClient.getInstance().currentScreen != null) return;
 				boolean send = !forced && isPressed() != pressed && MinecraftClient.getInstance().getNetworkHandler() != null;
 				boolean state = pressed;
 				boolean toggle = MinecraftClient.getInstance().options.getSneakToggled().getValue();
