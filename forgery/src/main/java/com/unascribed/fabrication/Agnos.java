@@ -57,6 +57,8 @@ public final class Agnos {
 
 	@OnlyIn(Dist.CLIENT)
 	public static void registerKeyBinding(KeyBinding kb) {
+		//cool a API, with conflicting defaults
+		//kb.setKeyConflictContext(KeyConflictContext.IN_GAME);
 		ClientRegistry.registerKeyBinding(kb);
 	}
 }
