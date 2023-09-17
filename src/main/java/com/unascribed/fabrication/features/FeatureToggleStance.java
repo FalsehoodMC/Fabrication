@@ -4,6 +4,7 @@ import java.util.Locale;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.unascribed.fabrication.Agnos;
+import com.unascribed.fabrication.EarlyAgnos;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.client.FabricationConfigScreen;
 import com.unascribed.fabrication.support.EligibleIf;
@@ -53,6 +54,7 @@ public class FeatureToggleStance implements Feature {
 		keybind = new KeyBinding("["+ MixinConfigPlugin.MOD_NAME+"] Toggle Stance", InputUtil.UNKNOWN_KEY.getCode(), "key.categories.movement") {
 			@Override
 			public void setPressed(boolean pressed) {
+				if (EarlyAgnos.isForge() && pressed && MinecraftClient.getInstance().currentScreen != null) return;
 				if (!pressed && MinecraftClient.getInstance().getNetworkHandler() == null) {
 					// reset() was probably called, so, reset
 					currentStance = Stance.STANDING;
