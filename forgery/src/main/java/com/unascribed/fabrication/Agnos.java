@@ -57,6 +57,8 @@ public final class Agnos {
 
 	@OnlyIn(Dist.CLIENT)
 	public static void registerKeyBinding(KeyMapping kb) {
+		//cool a API, with conflicting defaults
+		//kb.setKeyConflictContext(KeyConflictContext.IN_GAME);
 		Options options = Minecraft.getInstance().options;
 		options.keyMappings = ArrayUtils.add(options.keyMappings, kb);
 	}
