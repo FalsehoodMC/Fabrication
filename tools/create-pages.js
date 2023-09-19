@@ -27,7 +27,7 @@ Object.entries(data).forEach(([k, v]) => {
 				case "server_only_with_client_helper": sides_friendly = "Server & Client (Client Optional)"; break;
 				case "server_and_client": sides_friendly = "Server & Client"; break;
 			}
-			let desc = v.desc;
+			let desc = v.desc_raw;
 			if (k === 'general.profile') {
 				desc += '\n\nThe available profiles are:\n';
 				['green', 'blonde', 'light', 'medium', 'dark', 'vienna', 'burnt'].forEach((p) => {

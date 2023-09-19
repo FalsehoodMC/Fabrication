@@ -25,6 +25,7 @@ public class FeaturesFileParser {
 	int lineNum = 0;
 	String multilineKey = null;
 	String multilineBuf = "";
+	String multilineBufRaw = "";
 	List<JsonObject> data = new LinkedList<>();
 	String projectVersion;
 	@Inject
@@ -54,8 +55,8 @@ public class FeaturesFileParser {
 				}
 				continue;
 			}
+			if (line.startsWith("#")) continue;
 			String trim = line.trim();
-			if (trim.startsWith("#")) continue;
 			int leadingTabs = 0;
 			for (int i = 0; i < line.length(); i++) {
 				if (line.charAt(i) == '\t') {
@@ -77,6 +78,7 @@ public class FeaturesFileParser {
 				} else {
 					if (multilineKey != null) {
 						multilineBuf += "\n";
+						multilineBufRaw += "\n";
 					}
 				}
 			} else if (curKey == null) {
@@ -118,6 +120,7 @@ public class FeaturesFileParser {
 					}
 				} else if (leadingTabs >= 2) {
 					if (multilineKey != null) {
+						multilineBufRaw += line.substring(2)+"\n";
 						if (trim.length() == 0) {
 							// paragraph separator
 							multilineBuf += "\n\n";
@@ -135,9 +138,11 @@ public class FeaturesFileParser {
 	void commitMultiline() {
 		if (multilineKey != null) {
 			cur.add(multilineKey, new JsonPrimitive(multilineBuf.trim().replaceAll(" +\\n","\n")));
+			cur.add(multilineKey+"_raw", new JsonPrimitive(multilineBufRaw.trim()));
 		}
 		multilineKey = null;
 		multilineBuf = "";
+		multilineBufRaw = "";
 	}
 
 	JsonObject defaults(String curKey, JsonObject cur){
@@ -170,6 +175,7 @@ public class FeaturesFileParser {
 		}
 		ret.addProperty("short_desc", short_desc);
 		ret.add("desc", JsonNull.INSTANCE);
+		ret.add("desc_raw", JsonNull.INSTANCE);
 		ret.addProperty("brand_new", cur.has("since") && projectVersion.equals(cur.get("since").getAsString()));
 		ret.add("fscript", JsonNull.INSTANCE);
 		ret.add("fscript_default", JsonNull.INSTANCE);
