@@ -17,7 +17,7 @@ import net.minecraft.util.math.BlockPos;
 public class MixinDispenserBlock {
 
 	@Hijack(target="Lnet/minecraft/server/world/ServerWorld;syncWorldEvent(ILnet/minecraft/util/math/BlockPos;I)V",
-			method="dispense(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;)V")
+			method="dispense(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;)V")
 	private static boolean fabrication$preventSyncWorldEvent(ServerWorld subject, int event, BlockPos pos) {
 		return event == 1001 && FabConf.isEnabled("*.mechanism_muffling") && MechanismMuffling.isMuffled(subject, pos);
 	}
