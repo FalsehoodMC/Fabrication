@@ -34,7 +34,7 @@ public abstract class MixinProjectileAttackGoal<T extends HostileEntity & Ranged
 	public void fabrication$interruptRangedMob() {
 		if (canStart()) {
 			if (this.updateCountdownTicks >=0 && this.updateCountdownTicks < minIntervalTicks-10)
-				this.owner.attack(this.target, 0.4F);
+				this.owner.shootAt(this.target, 0.4F);
 			this.updateCountdownTicks = -1;
 		}
 	}

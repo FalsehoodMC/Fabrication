@@ -52,7 +52,7 @@ public class ClassicBlockDropsScreen extends Screen{
 
 	@Override
 	public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-		renderBackground(drawContext);
+		renderBackground(drawContext, mouseX, mouseY, delta);
 		searchField.render(drawContext, mouseX, mouseY, delta);
 		{
 			float scroll = -addItemBar.getScaledScroll(client);
@@ -131,7 +131,7 @@ public class ClassicBlockDropsScreen extends Screen{
 	}
 
 	@Override
-	public void renderBackground(DrawContext matrices) {
+	public void renderBackground(DrawContext matrices, int mouseX, int mouseY, float delta) {
 		FabricationConfigScreen.drawBackground(height, width, client, prideFlag, 0, matrices, 0, 0, 0, 0, 0);
 	}
 
@@ -151,22 +151,22 @@ public class ClassicBlockDropsScreen extends Screen{
 		return super.mouseClicked(mouseX, mouseY, button);
 	}
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+	public boolean mouseScrolled(double mouseX, double mouseY, double horizon, double amount) {
 		if (mouseY > 90) {
 			dropsBar.scroll(amount*20);
 		} else {
 			addItemBar.scroll(amount*20);
 		}
-		return super.mouseScrolled(mouseX, mouseY, amount);
+		return super.mouseScrolled(mouseX, mouseY, horizon, amount);
 	}
 
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		switch (keyCode) {
-			case GLFW.GLFW_KEY_PAGE_UP: mouseScrolled(lastMouseX, lastMouseY, 20); break;
-			case GLFW.GLFW_KEY_PAGE_DOWN: mouseScrolled(lastMouseX, lastMouseY, -20); break;
-			case GLFW.GLFW_KEY_UP: mouseScrolled(lastMouseX, lastMouseY, 2); break;
-			case GLFW.GLFW_KEY_DOWN: mouseScrolled(lastMouseX, lastMouseY, -2); break;
+			case GLFW.GLFW_KEY_PAGE_UP: mouseScrolled(lastMouseX, lastMouseY, 0, 20); break;
+			case GLFW.GLFW_KEY_PAGE_DOWN: mouseScrolled(lastMouseX, lastMouseY, 0, -20); break;
+			case GLFW.GLFW_KEY_UP: mouseScrolled(lastMouseX, lastMouseY, 0, 2); break;
+			case GLFW.GLFW_KEY_DOWN: mouseScrolled(lastMouseX, lastMouseY, 0, -2); break;
 		}
 		if (keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_KP_ENTER) {
 			String input = searchField.getText();

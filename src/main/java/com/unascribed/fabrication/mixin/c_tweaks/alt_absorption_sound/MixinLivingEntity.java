@@ -1,8 +1,10 @@
 package com.unascribed.fabrication.mixin.c_tweaks.alt_absorption_sound;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.util.ByteBufCustomPayload;
+import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
 import net.minecraft.registry.Registries;
-import org.spongepowered.asm.mixin.Final;
+import net.minecraft.server.network.PlayerAssociatedNetworkHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -22,10 +24,8 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlaySoundFromEntityS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.EntityTrackingListener;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
@@ -71,10 +71,10 @@ public abstract class MixinLivingEntity extends Entity implements DidJustAbsorp 
 		if (fabrication$didJustAbsorp()) {
 			PacketByteBuf data = new PacketByteBuf(Unpooled.buffer(4));
 			data.writeInt(getId());
-			CustomPayloadS2CPacket fabPkt = new CustomPayloadS2CPacket(new Identifier("fabrication", "play_absorp_sound"), data);
+			CustomPayloadS2CPacket fabPkt = new CustomPayloadS2CPacket(new ByteBufCustomPayload(new Identifier("fabrication", "play_absorp_sound"), data));
 			SoundEvent defHurtSound = getHurtSound(src);
 			PlaySoundFromEntityS2CPacket vanPkt = defHurtSound == null ? null : new PlaySoundFromEntityS2CPacket(Registries.SOUND_EVENT.getEntry(defHurtSound), getSoundCategory(), this, getSoundVolume(), getSoundPitch(), this.random.nextLong());
-			for (EntityTrackingListener etl : FabricationMod.getTrackers(this)) {
+			for (PlayerAssociatedNetworkHandler etl : FabricationMod.getTrackers(this)) {
 				ServerPlayerEntity spe = etl.getPlayer();
 				//TODO access spe.entity for instanceof check
 				if (spe instanceof SetFabricationConfigAware && ((SetFabricationConfigAware) spe).fabrication$isConfigAware()) {

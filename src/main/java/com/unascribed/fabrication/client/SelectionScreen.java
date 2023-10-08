@@ -68,7 +68,7 @@ class SelectionScreen<T> extends Screen {
 	public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
 		parent.height = this.height;
 		parent.width = this.width;
-		parent.renderBackground(drawContext);
+		parent.renderBackground(drawContext, mouseX, mouseY, delta);
 		float scroll = scrollBar.getScaledScroll(client);
 		scrollBar.height = 20;
 		scroll = (float) (Math.floor((scroll * client.getWindow().getScaleFactor())) / client.getWindow().getScaleFactor());
@@ -96,9 +96,9 @@ class SelectionScreen<T> extends Screen {
 	}
 
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+	public boolean mouseScrolled(double mouseX, double mouseY, double horizon, double amount) {
 		scrollBar.scroll(amount * 20);
-		return super.mouseScrolled(mouseX, mouseY, amount);
+		return super.mouseScrolled(mouseX, mouseY, horizon, amount);
 	}
 
 	@Override
@@ -111,10 +111,10 @@ class SelectionScreen<T> extends Screen {
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		switch (keyCode) {
-			case GLFW.GLFW_KEY_PAGE_UP: mouseScrolled(lastMouseX, lastMouseY, 20); break;
-			case GLFW.GLFW_KEY_PAGE_DOWN: mouseScrolled(lastMouseX, lastMouseY, -20); break;
-			case GLFW.GLFW_KEY_UP: mouseScrolled(lastMouseX, lastMouseY, 2); break;
-			case GLFW.GLFW_KEY_DOWN: mouseScrolled(lastMouseX, lastMouseY, -2); break;
+			case GLFW.GLFW_KEY_PAGE_UP: mouseScrolled(lastMouseX, lastMouseY, 0, 20); break;
+			case GLFW.GLFW_KEY_PAGE_DOWN: mouseScrolled(lastMouseX, lastMouseY, 0, -20); break;
+			case GLFW.GLFW_KEY_UP: mouseScrolled(lastMouseX, lastMouseY, 0, 2); break;
+			case GLFW.GLFW_KEY_DOWN: mouseScrolled(lastMouseX, lastMouseY, 0, -2); break;
 		}
 		return super.keyPressed(keyCode, scanCode, modifiers);
 	}

@@ -10,6 +10,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -50,27 +51,27 @@ public class YeetRecipesScreen extends Screen{
 
 	@Override
 	public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-		renderBackground(drawContext);
+		renderBackground(drawContext, mouseX, mouseY, delta);
 		drawContext.fill(0, 22, width, height / 2+10, FabConf.isEnabled("general.dark_mode") ? 0x44FFFFFF : 0x55000000);
 		searchField.render(drawContext, mouseX, mouseY, delta);
 		if (client.world == null) {
 			drawContext.drawText(textRenderer, "Load a world to see suggestions", 5, 25, -1, true);
 		} else {
 			float y = 22 - availableRecipesBar.getScaledScroll(client);
-			for (Recipe<?> clr : client.world.getRecipeManager().values()) {
-				if (!filter.matcher(clr.getId().toString()).find()) continue;
+			for (RecipeEntry<?> clr : client.world.getRecipeManager().values()) {
+				if (!filter.matcher(clr.id().toString()).find()) continue;
 				if (y > 20) {
-					drawContext.drawText(textRenderer, clr.getId().toString(), 5, (int) y, -1, true);
+					drawContext.drawText(textRenderer, clr.id().toString(), 5, (int) y, -1, true);
 				}
 				if (didClick && y > 20 && mouseY > 22 && mouseY > y && mouseY < y + 12) {
 					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON, 1.2f, 1f));
-					LoaderYeetRecipes.recipesToYeet.add(clr.getId());
-					LoaderYeetRecipes.instance.set(clr.getId().toString(), "true");
+					LoaderYeetRecipes.recipesToYeet.add(clr.id());
+					LoaderYeetRecipes.instance.set(clr.id().toString(), "true");
 				}
 				y += 12;
 				if (y > height/2f) break;
 			}
-			availableRecipesBar.height = client.world.getRecipeManager().values().stream().filter(r->filter.matcher(r.getId().toString()).find()).count() * 12 + 20;
+			availableRecipesBar.height = client.world.getRecipeManager().values().stream().filter(r->filter.matcher(r.id().toString()).find()).count() * 12 + 20;
 
 		}
 		float y = 12 + height/2f - yeetRecipesBar.getScaledScroll(client);
@@ -102,7 +103,7 @@ public class YeetRecipesScreen extends Screen{
 	}
 
 	@Override
-	public void renderBackground(DrawContext matrices) {
+	public void renderBackground(DrawContext matrices, int mouseX, int mouseY, float delta) {
 		FabricationConfigScreen.drawBackground(height, width, client, prideFlag, 0, matrices, 0, 0, 0, 0, 0);
 	}
 
@@ -122,22 +123,22 @@ public class YeetRecipesScreen extends Screen{
 		return super.mouseClicked(mouseX, mouseY, button);
 	}
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+	public boolean mouseScrolled(double mouseX, double mouseY, double horizon, double amount) {
 		if (mouseY > height/2d) {
 			yeetRecipesBar.scroll(amount*20);
 		} else {
 			availableRecipesBar.scroll(amount*20);
 		}
-		return super.mouseScrolled(mouseX, mouseY, amount);
+		return super.mouseScrolled(mouseX, mouseY, horizon, amount);
 	}
 
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		switch (keyCode) {
-			case GLFW.GLFW_KEY_PAGE_UP: mouseScrolled(lastMouseX, lastMouseY, 20); break;
-			case GLFW.GLFW_KEY_PAGE_DOWN: mouseScrolled(lastMouseX, lastMouseY, -20); break;
-			case GLFW.GLFW_KEY_UP: mouseScrolled(lastMouseX, lastMouseY, 2); break;
-			case GLFW.GLFW_KEY_DOWN: mouseScrolled(lastMouseX, lastMouseY, -2); break;
+			case GLFW.GLFW_KEY_PAGE_UP: mouseScrolled(lastMouseX, lastMouseY, 0, 20); break;
+			case GLFW.GLFW_KEY_PAGE_DOWN: mouseScrolled(lastMouseX, lastMouseY, 0, -20); break;
+			case GLFW.GLFW_KEY_UP: mouseScrolled(lastMouseX, lastMouseY, 0, 2); break;
+			case GLFW.GLFW_KEY_DOWN: mouseScrolled(lastMouseX, lastMouseY, 0, -2); break;
 		}
 		searchField.keyPressed(keyCode, scanCode, modifiers);
 		return super.keyPressed(keyCode, scanCode, modifiers);

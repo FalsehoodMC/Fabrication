@@ -33,7 +33,7 @@ public class MixinEntityType {
 			Entity e = ci.getReturnValue();
 			Box box = e.getBoundingBox();
 			Vec3d center = box.getCenter();
-			world.spawnParticles(new ItemStackParticleEffect(ParticleTypes.ITEM, stack), center.x, center.y, center.z, 20, box.getXLength()/2, box.getYLength()/2, box.getZLength()/2, 0.05);
+			world.spawnParticles(new ItemStackParticleEffect(ParticleTypes.ITEM, stack), center.x, center.y, center.z, 20, box.getLengthX()/2, box.getLengthY()/2, box.getLengthZ()/2, 0.05);
 			e.playSound(SoundEvents.ENTITY_TURTLE_EGG_CRACK, 1.0f, 1.0f);
 		}
 	}

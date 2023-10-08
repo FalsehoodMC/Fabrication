@@ -30,7 +30,7 @@ public abstract class MixinBowAttackGoal implements InterruptableRangedMob {
 		if (target != null && this.actor.isUsingItem()) {
 			this.actor.clearActiveItem();
 			if (BowItem.getPullProgress(this.actor.getItemUseTime()) > 0.4f)
-				((RangedAttackMob)this.actor).attack(target, 0.4f);
+				((RangedAttackMob)this.actor).shootAt(target, 0.4f);
 			this.cooldown = this.attackInterval;
 		}
 	}

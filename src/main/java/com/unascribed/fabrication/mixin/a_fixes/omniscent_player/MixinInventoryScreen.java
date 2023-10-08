@@ -22,8 +22,10 @@ public class MixinInventoryScreen {
 
 	private static float fabrication$mouseY;
 
-	@FabModifyVariable(method="drawEntity(Lnet/minecraft/client/gui/DrawContext;IIIFFLnet/minecraft/entity/LivingEntity;)V", at=@At("HEAD"), index=4, argsOnly=true)
-	private static float modifyX(float value, DrawContext matrices, int x, int y, int size, float mouseX, float mouseY, LivingEntity entity) {
+	@FabModifyVariable(method="drawEntity(Lnet/minecraft/client/gui/DrawContext;IIIIIFFFLnet/minecraft/entity/LivingEntity;)V", at=@At("HEAD"), index=4, argsOnly=true)
+	private static float modifyX(float value, DrawContext matrices, int x1, int y1, int x2, int y2, int size, float f, float mouseX, float mouseY, LivingEntity entity) {
+		float x = (float)(x1 + x2) / 2.0F;
+		float y = (float)(y1 + y2) / 2.0F;
 		fabrication$mouseY = mouseY;
 		if (!FabConf.isEnabled("*.omniscent_player")) return value;
 		if (!(entity instanceof PlayerEntity)) return value;
@@ -40,7 +42,7 @@ public class MixinInventoryScreen {
 		return x-curX;
 	}
 
-	@FabModifyVariable(method="drawEntity(Lnet/minecraft/client/gui/DrawContext;IIIFFLnet/minecraft/entity/LivingEntity;)V", at=@At("HEAD"), index=5, argsOnly=true)
+	@FabModifyVariable(method="drawEntity(Lnet/minecraft/client/gui/DrawContext;IIIIIFFFLnet/minecraft/entity/LivingEntity;)V", at=@At("HEAD"), index=5, argsOnly=true)
 	private static float modifyY(float value) {
 		return fabrication$mouseY;
 	}

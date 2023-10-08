@@ -10,13 +10,13 @@ import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Feature;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.texture.SpriteContents;
 import net.minecraft.client.texture.SpriteDimensions;
 import net.minecraft.client.texture.SpriteLoader;
+import net.minecraft.resource.metadata.ResourceMetadata;
 import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
@@ -48,10 +48,10 @@ public class FeatureOldLava implements Feature {
 				SpriteLavaFlow newLavaFlow;
 				{
 					NativeImage image = new NativeImage(lavaWidth, lavaHeight, false);
-					newLava = new SpriteLava(atlas.getId(), new SpriteContents(still, new SpriteDimensions(lavaWidth, lavaHeight), image, AnimationResourceMetadata.EMPTY),
+					newLava = new SpriteLava(atlas.getId(), new SpriteContents(still, new SpriteDimensions(lavaWidth, lavaHeight), image, ResourceMetadata.NONE),
 							data.width(), data.height(), FabRefl.Client.getX(originalLava), FabRefl.Client.getY(originalLava), image);
 					image = new NativeImage(lavaFlowWidth, lavaFlowHeight, false);
-					newLavaFlow = new SpriteLavaFlow(atlas.getId(), new SpriteContents(flow, new SpriteDimensions(lavaFlowWidth, lavaFlowHeight), image, AnimationResourceMetadata.EMPTY),
+					newLavaFlow = new SpriteLavaFlow(atlas.getId(), new SpriteContents(flow, new SpriteDimensions(lavaFlowWidth, lavaFlowHeight), image, ResourceMetadata.NONE),
 							data.width(), data.height(), FabRefl.Client.getX(originalLavaFlow), FabRefl.Client.getY(originalLavaFlow), image);
 				}
 				Map<Identifier, Sprite> map = new HashMap<>(FabRefl.Client.getSprites(atlas));

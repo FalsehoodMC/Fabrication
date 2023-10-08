@@ -16,10 +16,10 @@ import java.util.function.Supplier;
 import com.mojang.brigadier.context.CommandContext;
 import com.unascribed.fabrication.support.FabReflField;
 import com.unascribed.fabrication.support.injection.FabRefMap;
-import net.minecraft.client.texture.SpriteContents;
 import net.minecraft.client.util.SelectionManager;
 import net.minecraft.registry.RegistryEntryLookup;
 import net.minecraft.server.command.GameModeCommand;
+import net.minecraft.server.network.PlayerAssociatedNetworkHandler;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.biome.GenerationSettings;
@@ -63,14 +63,11 @@ import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.ai.goal.FleeEntityGoal;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.resource.ResourcePackProvider;
 import net.minecraft.server.command.GiveCommand;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.EntityTrackingListener;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage.EntityTracker;
 import net.minecraft.util.Identifier;
@@ -83,34 +80,12 @@ public class FabRefl {
 	// on an invokeExact or the calltime signature will be wrong and the JVM will get confused.
 
 	@FabReflField
-	private static final String cpc2sp_channel_field = "net/minecraft/network/packet/c2s/play/CustomPayloadC2SPacket;channel";
-	private static final MethodHandle cpc2sp_channel = unreflectGetter("CustomPayloadC2SPacket", () -> CustomPayloadC2SPacket.class, cpc2sp_channel_field).get();
-	public static Identifier getChannel(CustomPayloadC2SPacket subject) {
-		try {
-			return (Identifier)checkHandle(cpc2sp_channel).invokeExact(subject);
-		} catch (Throwable t) {
-			throw rethrow(t);
-		}
-	}
-
-	@FabReflField
 	private static final String sw_properties_field = "net/minecraft/server/world/ServerWorld;worldProperties";
 	private static final MethodHandle sw_properties = unreflectGetter("ServerWorld", () -> ServerWorld.class, sw_properties_field)
 			.requiredBy("*.legacy_command_syntax").get();
 	public static ServerWorldProperties getWorldProperties(ServerWorld subject) {
 		try {
 			return (ServerWorldProperties)checkHandle(sw_properties).invokeExact(subject);
-		} catch (Throwable t) {
-			throw rethrow(t);
-		}
-	}
-
-	@FabReflField
-	private static final String cpc2sp_data_field = "net/minecraft/network/packet/c2s/play/CustomPayloadC2SPacket;data";
-	private static final MethodHandle cpc2sp_data = unreflectGetter("CustomPayloadC2SPacket", () -> CustomPayloadC2SPacket.class, cpc2sp_data_field).get();
-	public static PacketByteBuf getData(CustomPayloadC2SPacket subject) {
-		try {
-			return (PacketByteBuf)checkHandle(cpc2sp_data).invokeExact(subject);
 		} catch (Throwable t) {
 			throw rethrow(t);
 		}
@@ -168,9 +143,9 @@ public class FabRefl {
 	private static final String et_playersTracking_field = "net/minecraft/server/world/ThreadedAnvilChunkStorage$EntityTracker;listeners";
 	private static final MethodHandle et_playersTracking = unreflectGetter("EntityTracker", () -> EntityTracker.class, et_playersTracking_field)
 			.requiredBy("*.sync_attacker_yaw", "*.despawning_items_blink").get();
-	public static Set<EntityTrackingListener> getPlayersTracking(EntityTracker subject) {
+	public static Set<PlayerAssociatedNetworkHandler> getPlayersTracking(EntityTracker subject) {
 		try {
-			return (Set<EntityTrackingListener>)checkHandle(et_playersTracking).invokeExact(subject);
+			return (Set<PlayerAssociatedNetworkHandler>)checkHandle(et_playersTracking).invokeExact(subject);
 		} catch (Throwable t) {
 			throw rethrow(t);
 		}

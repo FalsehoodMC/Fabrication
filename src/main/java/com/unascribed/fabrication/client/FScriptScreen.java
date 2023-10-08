@@ -5,13 +5,14 @@ import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.loaders.LoaderFScript;
 import com.unascribed.fabrication.support.OptionalFScript;
+import com.unascribed.fabrication.util.ByteBufCustomPayload;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.command.CommandSource;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
+import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -82,7 +83,7 @@ public class FScriptScreen extends ScriptingScreen {
 				data.writeVarInt(1);
 				data.writeString(fabrication$key);
 				data.writeString(this.unloadScript());
-				client.getNetworkHandler().sendPacket(new CustomPayloadC2SPacket(new Identifier("fabrication", "fscript"), data));
+				client.getNetworkHandler().sendPacket(new CustomPayloadC2SPacket(new ByteBufCustomPayload(new Identifier("fabrication", "fscript"), data)));
 			}
 		}
 		x -= 50;
@@ -94,7 +95,7 @@ public class FScriptScreen extends ScriptingScreen {
 				PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
 				data.writeVarInt(2);
 				data.writeString(fabrication$key);
-				client.getNetworkHandler().sendPacket(new CustomPayloadC2SPacket(new Identifier("fabrication", "fscript"), data));
+				client.getNetworkHandler().sendPacket(new CustomPayloadC2SPacket(new ByteBufCustomPayload(new Identifier("fabrication", "fscript"), data)));
 			}
 		}
 		x -= 50;
@@ -112,7 +113,7 @@ public class FScriptScreen extends ScriptingScreen {
 				PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
 				data.writeVarInt(0);
 				data.writeString(fabrication$key);
-				client.getNetworkHandler().sendPacket(new CustomPayloadC2SPacket(new Identifier("fabrication", "fscript"), data));
+				client.getNetworkHandler().sendPacket(new CustomPayloadC2SPacket(new ByteBufCustomPayload(new Identifier("fabrication", "fscript"), data)));
 				fabrication$requestedScript = true;
 			}
 		}
@@ -157,12 +158,12 @@ public class FScriptScreen extends ScriptingScreen {
 		return super.drawToggleButton(drawContext, x, y, w, h, text, desc, mouseX, mouseY, toggled);
 	}
 	@Override
-	public void renderBackground(DrawContext drawContext) {
+	public void renderBackground(DrawContext drawContext, int mouseX, int mouseY, float delta) {
 		FabricationConfigScreen.drawBackground(height, width, client, fabrication$prideFlag, 0, drawContext, 0, 0, 0, 0, 0);
 	}
 	@Override
 	protected void renderWorldBackground(DrawContext drawContext) {
-		renderBackground(drawContext);
+		renderBackground(drawContext, 0, 0, 0);
 	}
 
 }

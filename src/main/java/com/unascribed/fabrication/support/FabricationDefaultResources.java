@@ -38,6 +38,11 @@ public class FabricationDefaultResources implements ResourcePackProvider {
 							public ResourcePack open(String name) {
 								return new FabricationResourcePack("default");
 							}
+
+							@Override
+							public ResourcePack openWithOverlays(String name, ResourcePackProfile.Metadata metadata) {
+								return open(name);
+							}
 						}, ResourceType.CLIENT_RESOURCES, InsertionPosition.TOP, ResourcePackSource.BUILTIN));
 	}
 

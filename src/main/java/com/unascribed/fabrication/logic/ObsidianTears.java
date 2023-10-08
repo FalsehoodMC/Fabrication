@@ -30,8 +30,8 @@ public class ObsidianTears {
 
 		@Override
 		protected ItemStack dispenseSilently(BlockPointer pointer, ItemStack stack) {
-			BlockPos pos = pointer.getPos().offset(pointer.getBlockState().get(DispenserBlock.FACING));
-			List<ServerPlayerEntity> players = pointer.getWorld().getEntitiesByClass(ServerPlayerEntity.class, new Box(pos), EntityPredicates.EXCEPT_SPECTATOR);
+			BlockPos pos = pointer.pos().offset(pointer.state().get(DispenserBlock.FACING));
+			List<ServerPlayerEntity> players = pointer.world().getEntitiesByClass(ServerPlayerEntity.class, new Box(pos), EntityPredicates.EXCEPT_SPECTATOR);
 			if (players.isEmpty()) {
 				return stack;
 			} else {
@@ -47,8 +47,8 @@ public class ObsidianTears {
 		RegistryKey<World> key = RegistryKey.of(RegistryKeys.WORLD, new Identifier(stack.getNbt().getString("fabrication:ObsidianTearsOriginDim")));
 		BlockPos pos = BlockPos.fromLong(stack.getNbt().getLong("fabrication:ObsidianTearsOrigin"));
 		if (world instanceof ServerWorld) {
-			((ServerWorld)world).spawnParticles(ParticleTypes.FALLING_OBSIDIAN_TEAR, p.getPos().x, p.getPos().y+p.getBoundingBox().getYLength()/2, p.getPos().z, 16,
-					p.getBoundingBox().getXLength()/2, p.getBoundingBox().getYLength()/2, p.getBoundingBox().getZLength()/2,
+			((ServerWorld)world).spawnParticles(ParticleTypes.FALLING_OBSIDIAN_TEAR, p.getPos().x, p.getPos().y+p.getBoundingBox().getLengthY()/2, p.getPos().z, 16,
+					p.getBoundingBox().getLengthX()/2, p.getBoundingBox().getLengthY()/2, p.getBoundingBox().getLengthZ()/2,
 					0.5);
 		}
 		p.setSpawnPoint(key, pos, p.getYaw(), false, true);

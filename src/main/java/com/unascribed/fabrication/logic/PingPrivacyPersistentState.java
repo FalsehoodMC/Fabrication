@@ -10,6 +10,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import com.google.common.collect.Maps;
 
 import net.fabricmc.fabric.api.util.NbtType;
+import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.world.ServerWorld;
@@ -22,8 +23,10 @@ public class PingPrivacyPersistentState extends PersistentState {
 	private final Map<InetAddress, Long> knownIps = Maps.newHashMap();
 	private final ReadWriteLock rwl = new ReentrantReadWriteLock();
 
+	public static Type<PingPrivacyPersistentState> TYPE = new Type<>(PingPrivacyPersistentState::new, PingPrivacyPersistentState::fromNbt, DataFixTypes.OPTIONS);
+
 	public static PingPrivacyPersistentState get(ServerWorld world) {
-		return world.getPersistentStateManager().getOrCreate(PingPrivacyPersistentState::fromNbt, PingPrivacyPersistentState::new, name);
+		return world.getPersistentStateManager().getOrCreate(TYPE, name);
 	}
 
 	public void addKnownIp(InetAddress addr) {

@@ -32,7 +32,7 @@ public abstract class MixinEntityRenderer {
 	public void render(Entity e, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vcp, int light, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.mob_ids")) return;
 		MinecraftClient mc = MinecraftClient.getInstance();
-		if (mc.player != null && mc.player.isCreative() && mc.options.debugEnabled) {
+		if (mc.player != null && mc.player.isCreative() && mc.inGameHud.getDebugHud().shouldShowDebugHud()) {
 			matrices.push();
 			matrices.translate(0, ((e.getHeight()+0.5f)/2), 0);
 			matrices.scale(0.5f, 0.5f, 0.5f);

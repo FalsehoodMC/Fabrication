@@ -5,11 +5,12 @@ import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.injection.FabInject;
+import com.unascribed.fabrication.util.ByteBufCustomPayload;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -19,11 +20,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @EligibleIf(configAvailable="*.alt_absorption_sound", envMatches=Env.CLIENT)
 public class MixinClientPlayNetworkHandler {
 
-	@FabInject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/s2c/play/CustomPayloadS2CPacket;)V", cancellable=true)
-	public void onCustomPayload(CustomPayloadS2CPacket packet, CallbackInfo ci) {
-		if (packet.getChannel().getNamespace().equals("fabrication") && packet.getChannel().getPath().equals("play_absorp_sound")) {
+	@FabInject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/CustomPayload;)V", cancellable=true)
+	public void onCustomPayload(CustomPayload payload, CallbackInfo ci) {
+		if (!(payload instanceof ByteBufCustomPayload)) return;
+		if (payload.id().getNamespace().equals("fabrication") && payload.id().getPath().equals("play_absorp_sound")) {
 			if (FabConf.isEnabled("*.alt_absorption_sound")) {
-				int id = packet.getData().readInt();
+				int id = ((ByteBufCustomPayload) payload).buf.readInt();
 				MinecraftClient.getInstance().send(() -> {
 					World world = MinecraftClient.getInstance().world;
 					if (world != null) {

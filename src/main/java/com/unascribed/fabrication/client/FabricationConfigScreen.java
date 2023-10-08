@@ -23,6 +23,7 @@ import com.unascribed.fabrication.interfaces.GetServerConfig;
 import com.unascribed.fabrication.support.ConfigValue;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.ResolvedConfigValue;
+import com.unascribed.fabrication.util.ByteBufCustomPayload;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.SharedConstants;
@@ -44,7 +45,7 @@ import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
+import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
@@ -310,7 +311,7 @@ public class FabricationConfigScreen extends Screen {
 	}
 
 	@Override
-	public void renderBackground(DrawContext matrices) {
+	public void renderBackground(DrawContext matrices, int mouseX, int mouseY, float delta) {
 		drawBackground(height, width, client, prideFlag, 0, matrices, 0, 0, 0, 0, 0);
 	}
 
@@ -1290,17 +1291,16 @@ public class FabricationConfigScreen extends Screen {
 		if (tooltipBlinkTicks > 0) {
 			tooltipBlinkTicks--;
 		}
-		searchField.tick();
 	}
 
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+	public boolean mouseScrolled(double mouseX, double mouseY, double horizon, double amount) {
 		if (mouseX <= 120) {
 			sidebarScrollTarget -= amount*20;
 		} else {
 			selectedSectionScrollTarget -= amount*20;
 		}
-		return super.mouseScrolled(mouseX, mouseY, amount);
+		return super.mouseScrolled(mouseX, mouseY, horizon, amount);
 	}
 
 	@Override
@@ -1465,10 +1465,10 @@ public class FabricationConfigScreen extends Screen {
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		switch (keyCode) {
-			case GLFW.GLFW_KEY_PAGE_UP: mouseScrolled(lastMouseX, lastMouseY, 20); break;
-			case GLFW.GLFW_KEY_PAGE_DOWN: mouseScrolled(lastMouseX, lastMouseY, -20); break;
-			case GLFW.GLFW_KEY_UP: mouseScrolled(lastMouseX, lastMouseY, 2); break;
-			case GLFW.GLFW_KEY_DOWN: mouseScrolled(lastMouseX, lastMouseY, -2); break;
+			case GLFW.GLFW_KEY_PAGE_UP: mouseScrolled(lastMouseX, lastMouseY, 0, 20); break;
+			case GLFW.GLFW_KEY_PAGE_DOWN: mouseScrolled(lastMouseX, lastMouseY, 0, -20); break;
+			case GLFW.GLFW_KEY_UP: mouseScrolled(lastMouseX, lastMouseY, 0, 2); break;
+			case GLFW.GLFW_KEY_DOWN: mouseScrolled(lastMouseX, lastMouseY, 0, -2); break;
 		}
 		if ("search".equals(selectedSection)) {
 			searchField.keyPressed(keyCode, scanCode, modifiers);
@@ -1567,7 +1567,7 @@ public class FabricationConfigScreen extends Screen {
 			data.writeVarInt(1);
 			data.writeString(key);
 			data.writeString(value);
-			client.getNetworkHandler().sendPacket(new CustomPayloadC2SPacket(new Identifier("fabrication", "config"), data));
+			client.getNetworkHandler().sendPacket(new CustomPayloadC2SPacket(new ByteBufCustomPayload(new Identifier("fabrication", "config"), data)));
 		} else if (editingWorldPath && FabConf.hasWorldPath()) {
 			FabConf.worldSet(key, value);
 			if (FabricationMod.isAvailableFeature(key)) {

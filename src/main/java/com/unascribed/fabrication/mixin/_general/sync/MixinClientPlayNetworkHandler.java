@@ -3,9 +3,12 @@ package com.unascribed.fabrication.mixin._general.sync;
 import java.util.Map;
 import java.util.Set;
 
-import org.spongepowered.asm.mixin.Final;
+import com.unascribed.fabrication.util.ByteBufCustomPayload;
+import net.minecraft.client.network.ClientCommonNetworkHandler;
+import net.minecraft.client.network.ClientConnectionState;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -24,19 +27,13 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
 import net.minecraft.util.Identifier;
 
 @Mixin(ClientPlayNetworkHandler.class)
 @EligibleIf(envMatches=Env.CLIENT)
-public class MixinClientPlayNetworkHandler implements GetServerConfig {
+public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkHandler implements GetServerConfig {
 
-	@Shadow @Final
-	private ClientConnection connection;
-
-	@Shadow @Final private MinecraftClient client;
 	private boolean fabrication$hasHandshook = false;
 	private final Map<String, ResolvedConfigValue> fabrication$serverTrileanConfig = Maps.newHashMap();
 	private final Map<String, String> fabrication$serverStringConfig = Maps.newHashMap();
@@ -45,20 +42,26 @@ public class MixinClientPlayNetworkHandler implements GetServerConfig {
 	private final Set<String> fabrication$serverBanned = Sets.newHashSet();
 	private String fabrication$serverVersion;
 
+	protected MixinClientPlayNetworkHandler(MinecraftClient client, ClientConnection connection, ClientConnectionState connectionState) {
+		super(client, connection, connectionState);
+	}
+
 	@FabInject(at=@At("TAIL"), method="onGameJoin(Lnet/minecraft/network/packet/s2c/play/GameJoinS2CPacket;)V")
 	public void onGameJoin(GameJoinS2CPacket packet, CallbackInfo ci) {
 		PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
 		data.writeVarInt(0);
-		connection.send(new CustomPayloadC2SPacket(new Identifier("fabrication", "config"), data));
+		connection.send(new CustomPayloadC2SPacket(new ByteBufCustomPayload(new Identifier("fabrication", "config"), data)));
 	}
 
-	@FabInject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/s2c/play/CustomPayloadS2CPacket;)V", cancellable=true)
-	public void onCustomPayload(CustomPayloadS2CPacket packet, CallbackInfo ci) {
-		if (packet.getChannel().getNamespace().equals("fabrication")) {
-			if (packet.getChannel().getPath().equals("config")) {
+	@FabInject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/CustomPayload;)V", cancellable=true)
+	public void onCustomPayload(CustomPayload payload, CallbackInfo ci) {
+		if (!(payload instanceof ByteBufCustomPayload)) return;
+
+		if (payload.id().getNamespace().equals("fabrication")) {
+			if (payload.id().getPath().equals("config")) {
 				try {
 					fabrication$hasHandshook = true;
-					PacketByteBuf buf = packet.getData();
+					PacketByteBuf buf = ((ByteBufCustomPayload) payload).buf;
 					int trileanKeys = buf.readVarInt();
 					for (int i = 0; i < trileanKeys; i++) {
 						String k = buf.readString(32767);
@@ -100,9 +103,9 @@ public class MixinClientPlayNetworkHandler implements GetServerConfig {
 					e.printStackTrace();
 					throw e;
 				}
-			}else if (packet.getChannel().getPath().equals("fscript")){
+			}else if (payload.id().getPath().equals("fscript")){
 				try{
-					PacketByteBuf buf = packet.getData();
+					PacketByteBuf buf = ((ByteBufCustomPayload) payload).buf;
 					int code = buf.readVarInt();
 					if (code == 0){
 						if (client.currentScreen instanceof FScriptScreen){

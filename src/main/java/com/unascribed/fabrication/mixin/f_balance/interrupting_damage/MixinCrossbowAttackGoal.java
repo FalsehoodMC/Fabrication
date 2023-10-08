@@ -32,7 +32,7 @@ public abstract class MixinCrossbowAttackGoal implements InterruptableRangedMob 
 			case READY_TO_ATTACK:
 				LivingEntity target = actor.getTarget();
 				if (target != null) {
-					((RangedAttackMob)this.actor).attack(target, 1.0F);
+					((RangedAttackMob)this.actor).shootAt(target, 1.0F);
 					ItemStack itemStack2 = this.actor.getStackInHand(ProjectileUtil.getHandPossiblyHolding(this.actor, Items.CROSSBOW));
 					CrossbowItem.setCharged(itemStack2, false);
 				}

@@ -22,7 +22,8 @@ public class MixinEntity {
 		Entity e = ((Entity)(Object)this);
 		if (!FabConf.isEnabled("*.mob_ids") || !e.getWorld().isClient) return;
 		MinecraftClient mc = MinecraftClient.getInstance();
-		if (mc.player != null && mc.player.isCreative() && mc.options.debugEnabled) {
+
+		if (mc.player != null && mc.player.isCreative() && mc.inGameHud.getDebugHud().shouldShowDebugHud()) {
 			ci.setReturnValue(Text.literal(Integer.toString(e.getId())));
 		}
 	}
@@ -32,7 +33,7 @@ public class MixinEntity {
 		Entity e = ((Entity)(Object)this);
 		if (!FabConf.isEnabled("*.mob_ids") || !e.getWorld().isClient) return;
 		MinecraftClient mc = MinecraftClient.getInstance();
-		if (mc.player != null && mc.player.isCreative() && mc.options.debugEnabled) {
+		if (mc.player != null && mc.player.isCreative() && mc.inGameHud.getDebugHud().shouldShowDebugHud()) {
 			ci.setReturnValue(true);
 		}
 	}

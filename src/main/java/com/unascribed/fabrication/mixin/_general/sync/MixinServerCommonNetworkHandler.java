@@ -3,12 +3,15 @@ package com.unascribed.fabrication.mixin._general.sync;
 import com.unascribed.fabrication.EarlyAgnos;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.injection.FabInject;
+import com.unascribed.fabrication.util.ByteBufCustomPayload;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
+import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
+import net.minecraft.server.network.ServerCommonNetworkHandler;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.features.FeatureHideArmor;
@@ -18,29 +21,28 @@ import com.unascribed.fabrication.support.OptionalFScript;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
 import net.minecraft.world.GameRules;
 
-@Mixin(ServerPlayNetworkHandler.class)
-public class MixinServerPlayNetworkHandler {
+@Mixin(ServerCommonNetworkHandler.class)
+public class MixinServerCommonNetworkHandler {
 
-	@Shadow
-	public ServerPlayerEntity player;
-
-	@FabInject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/c2s/play/CustomPayloadC2SPacket;)V", cancellable=true)
+	@FabInject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/c2s/common/CustomPayloadC2SPacket;)V", cancellable=true)
 	public void onCustomPayload(CustomPayloadC2SPacket packet, CallbackInfo ci) {
-		Identifier channel = FabRefl.getChannel(packet);
+		Object self = this;
+		if (!(self instanceof ServerPlayNetworkHandler)) return;
+		ServerPlayerEntity player = ((ServerPlayNetworkHandler) self).getPlayer();
+		CustomPayload payload = packet.payload();
+		if (!(payload instanceof ByteBufCustomPayload)) return;
+		Identifier channel = payload.id();
 		if (channel.getNamespace().equals("fabrication")) {
 			if (channel.getPath().equals("config")) {
 				ci.cancel();
-				PacketByteBuf recvdData = FabRefl.getData(packet);
+				PacketByteBuf recvdData = ((ByteBufCustomPayload) payload).buf;
 				int id = recvdData.readVarInt();
 				if (id == 0) {
 					// hello
@@ -71,7 +73,7 @@ public class MixinServerPlayNetworkHandler {
 				}
 			} else if (channel.getPath().equals("fscript")) {
 				ci.cancel();
-				PacketByteBuf recvdData = FabRefl.getData(packet);
+				PacketByteBuf recvdData = ((ByteBufCustomPayload) payload).buf;
 				int id = recvdData.readVarInt();
 				if(id == 0){
 					// get
@@ -80,7 +82,7 @@ public class MixinServerPlayNetworkHandler {
 						PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
 						data.writeVarInt(0);
 						data.writeString(LoaderFScript.get(key));
-						player.networkHandler.sendPacket(new CustomPayloadS2CPacket(new Identifier("fabrication", "fscript"), data));
+						player.networkHandler.sendPacket(new CustomPayloadS2CPacket(new ByteBufCustomPayload(new Identifier("fabrication", "fscript"), data)));
 					}
 				}else if (id == 1) {
 					// set
@@ -122,6 +124,9 @@ public class MixinServerPlayNetworkHandler {
 		}
 	}
 	public void fabrication$sendCommandFeedback(Text text){
+		Object self = this;
+		if (!(self instanceof ServerPlayNetworkHandler)) return;
+		ServerPlayerEntity player = ((ServerPlayNetworkHandler) self).getPlayer();
 		if (player.server.getGameRules().getBoolean(GameRules.SEND_COMMAND_FEEDBACK)) {
 			for (ServerPlayerEntity spe : player.server.getPlayerManager().getPlayerList()) {
 				if (player.server.getPlayerManager().isOperator(spe.getGameProfile())) {

@@ -11,6 +11,7 @@ import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.resource.ResourcePack;
 import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.resource.ResourcePackProfile.InsertionPosition;
 import net.minecraft.resource.ResourcePackProvider;
@@ -51,8 +52,17 @@ public abstract class ResourcePackFeature implements Feature, ResourcePackProvid
 	@Override
 	public void register(Consumer<ResourcePackProfile> consumer) {
 		if (active) {
-			consumer.accept(ResourcePackProfile.create(MixinConfigPlugin.MOD_NAME+" "+path, Text.literal("Internal "+MixinConfigPlugin.MOD_NAME+" resources"),true,
-					s -> new FabricationResourcePack(path), ResourceType.CLIENT_RESOURCES, InsertionPosition.TOP, ResourcePackSource.BUILTIN));
+			consumer.accept(ResourcePackProfile.create(MixinConfigPlugin.MOD_NAME + " " + path, Text.literal("Internal " + MixinConfigPlugin.MOD_NAME + " resources"), true,
+				new ResourcePackProfile.PackFactory() {
+					@Override
+					public ResourcePack open(String name) {
+						return new FabricationResourcePack(path);
+					}
+					@Override
+					public ResourcePack openWithOverlays(String name, ResourcePackProfile.Metadata metadata) {
+						return open(name);
+					}
+				}, ResourceType.CLIENT_RESOURCES, InsertionPosition.TOP, ResourcePackSource.BUILTIN));
 		}
 	}
 

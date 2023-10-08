@@ -237,7 +237,7 @@ public class AtlasViewerScreen extends Screen {
 	}
 
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+	public boolean mouseScrolled(double mouseX, double mouseY, double horizon, double amount) {
 		int oldBind = glGetInteger(GL_TEXTURE_BINDING_2D);
 		SpriteAtlasTexture sat = getAtlas();
 		if (sat != null) {

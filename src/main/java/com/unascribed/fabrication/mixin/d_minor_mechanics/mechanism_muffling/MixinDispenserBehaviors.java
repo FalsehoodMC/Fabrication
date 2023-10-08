@@ -21,7 +21,7 @@ public class MixinDispenserBehaviors {
 
 	@FabInject(at=@At("HEAD"), method="playSound(Lnet/minecraft/util/math/BlockPointer;)V", cancellable=true)
 	public void playSound(BlockPointer ptr, CallbackInfo ci) {
-		if (FabConf.isEnabled("*.mechanism_muffling") && MechanismMuffling.isMuffled(ptr.getWorld(), ptr.getPos())) {
+		if (FabConf.isEnabled("*.mechanism_muffling") && MechanismMuffling.isMuffled(ptr.world(), ptr.pos())) {
 			ci.cancel();
 		}
 	}

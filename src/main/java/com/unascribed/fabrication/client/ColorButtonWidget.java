@@ -15,10 +15,6 @@ public class ColorButtonWidget extends ButtonWidget {
 	}
 
 	@Override
-	public void drawTexture(DrawContext drawContext, Identifier texture, int x, int y, int u, int v, int hoveredVOffset, int width, int height, int textureWidth, int textureHeight) {
-	}
-
-	@Override
 	public void renderButton(DrawContext drawContext, int mouseX, int mouseY, float delta) {
 		int x = getX(), y = getY();
 		drawContext.fill(x, y, x+width, y+height, bg);

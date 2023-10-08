@@ -1,8 +1,10 @@
 package com.unascribed.fabrication.mixin.b_utility.hide_armor;
 
-import org.spongepowered.asm.mixin.Final;
+import com.unascribed.fabrication.util.ByteBufCustomPayload;
+import net.minecraft.client.network.ClientCommonNetworkHandler;
+import net.minecraft.client.network.ClientConnectionState;
+import net.minecraft.network.packet.CustomPayload;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -18,19 +20,20 @@ import net.minecraft.entity.EquipmentSlot.Type;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 
 @Mixin(ClientPlayNetworkHandler.class)
 @EligibleIf(configAvailable="*.hide_armor", envMatches=Env.CLIENT)
-public class MixinClientPlayNetworkHandler {
+public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkHandler {
 
-	@Shadow @Final
-	private ClientConnection connection;
+	protected MixinClientPlayNetworkHandler(MinecraftClient client, ClientConnection connection, ClientConnectionState connectionState) {
+		super(client, connection, connectionState);
+	}
 
-	@FabInject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/s2c/play/CustomPayloadS2CPacket;)V", cancellable=true)
-	public void onCustomPayload(CustomPayloadS2CPacket packet, CallbackInfo ci) {
-		if (packet.getChannel().getNamespace().equals("fabrication") && packet.getChannel().getPath().equals("hide_armor")) {
-			PacketByteBuf buf = packet.getData();
+	@FabInject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/CustomPayload;)V", cancellable=true)
+	public void onCustomPayload(CustomPayload payload, CallbackInfo ci) {
+		if (!(payload instanceof ByteBufCustomPayload)) return;
+		if (payload.id().getNamespace().equals("fabrication") && payload.id().getPath().equals("hide_armor")) {
+			PacketByteBuf buf = ((ByteBufCustomPayload) payload).buf;
 			int bits = buf.readVarInt();
 			PlayerEntity p = MinecraftClient.getInstance().player;
 			if (p instanceof GetSuppressedSlots) {

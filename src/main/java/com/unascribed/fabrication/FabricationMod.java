@@ -20,15 +20,16 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import com.unascribed.fabrication.util.ByteBufCustomPayload;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
+import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.PlayerAssociatedNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.EntityTrackingListener;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage;
@@ -139,7 +140,7 @@ public class FabricationMod implements ModInitializer {
 		}
 	}
 
-	public static Set<EntityTrackingListener> getTrackers(Entity entity) {
+	public static Set<PlayerAssociatedNetworkHandler> getTrackers(Entity entity) {
 		ServerChunkManager cm = ((ServerWorld)entity.getWorld()).getChunkManager();
 		ThreadedAnvilChunkStorage tacs = cm.threadedAnvilChunkStorage;
 		Int2ObjectMap<EntityTracker> entityTrackers = FabRefl.getEntityTrackers(tacs);
@@ -150,14 +151,14 @@ public class FabricationMod implements ModInitializer {
 
 	public static void sendToTrackersMatching(Entity entity, CustomPayloadS2CPacket pkt, Predicate<ServerPlayerEntity> predicate) {
 		if (entity.getWorld().isClient) return;
-		Set<EntityTrackingListener> playersTracking = getTrackers(entity);
+		Set<PlayerAssociatedNetworkHandler> playersTracking = getTrackers(entity);
 		if (entity instanceof ServerPlayerEntity) {
 			ServerPlayerEntity spe = (ServerPlayerEntity)entity;
 			if (predicate.test(spe)) {
 				spe.networkHandler.sendPacket(pkt);
 			}
 		}
-		for (EntityTrackingListener etl : playersTracking) {
+		for (PlayerAssociatedNetworkHandler etl : playersTracking) {
 			ServerPlayerEntity spe = etl.getPlayer();
 			if (predicate.test(spe)) {
 				spe.networkHandler.sendPacket(pkt);
@@ -203,7 +204,7 @@ public class FabricationMod implements ModInitializer {
 		for (String k : FabConf.getAllBanned()) {
 			data.writeString(k);
 		}
-		CustomPayloadS2CPacket pkt = new CustomPayloadS2CPacket(new Identifier("fabrication", "config"), data);
+		CustomPayloadS2CPacket pkt = new CustomPayloadS2CPacket(new ByteBufCustomPayload(new Identifier("fabrication", "config"), data));
 		spe.networkHandler.sendPacket(pkt);
 	}
 

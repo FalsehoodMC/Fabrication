@@ -26,12 +26,12 @@ public abstract class MixinGlassBottleDispenserBehavior extends FallibleItemDisp
 	@FabInject(at=@At("HEAD"), method="dispenseSilently(Lnet/minecraft/util/math/BlockPointer;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;",
 			cancellable=true)
 	public void dispenseSilently(BlockPointer pointer, ItemStack stack, CallbackInfoReturnable<ItemStack> ci) {
-		ServerWorld w = pointer.getWorld();
-		BlockPos pos = pointer.getPos().offset(pointer.getBlockState().get(DispenserBlock.FACING));
+		ServerWorld w = pointer.world();
+		BlockPos pos = pointer.pos().offset(pointer.state().get(DispenserBlock.FACING));
 		BlockState state = w.getBlockState(pos);
 		if (state.getBlock() == Blocks.CRYING_OBSIDIAN) {
 			setSuccess(true);
-			ci.setReturnValue(tryPutFilledBottle(pointer, stack, ObsidianTears.createStack(pointer.getWorld(), pos)));
+			ci.setReturnValue(tryPutFilledBottle(pointer, stack, ObsidianTears.createStack(pointer.world(), pos)));
 		}
 	}
 

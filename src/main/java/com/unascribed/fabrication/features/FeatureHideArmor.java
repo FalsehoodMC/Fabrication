@@ -21,12 +21,13 @@ import com.unascribed.fabrication.support.Feature;
 
 import com.google.common.collect.Lists;
 
+import com.unascribed.fabrication.util.ByteBufCustomPayload;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
+import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityEquipmentUpdateS2CPacket;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -168,7 +169,7 @@ public class FeatureHideArmor implements Feature {
 				bits |= 1 << es.getEntitySlotId();
 			}
 			data.writeVarInt(bits);
-			CustomPayloadS2CPacket pkt = new CustomPayloadS2CPacket(new Identifier("fabrication", "hide_armor"), data);
+			CustomPayloadS2CPacket pkt = new CustomPayloadS2CPacket(new ByteBufCustomPayload(new Identifier("fabrication", "hide_armor"), data));
 			ent.networkHandler.sendPacket(pkt);
 		}
 	}
