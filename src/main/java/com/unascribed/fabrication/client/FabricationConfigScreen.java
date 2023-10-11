@@ -312,7 +312,8 @@ public class FabricationConfigScreen extends Screen {
 
 	@Override
 	public void renderBackground(DrawContext matrices, int mouseX, int mouseY, float delta) {
-		drawBackground(height, width, client, prideFlag, 0, matrices, 0, 0, 0, 0, 0);
+		//I don't know why this was even here
+		//drawBackground(height, width, client, prideFlag, 0, matrices, 0, 0, 0, 0, 0);
 	}
 
 	private void drawBackground(DrawContext drawContext, int mouseX, int mouseY, float delta, int cutoffX, int cutoffY) {
