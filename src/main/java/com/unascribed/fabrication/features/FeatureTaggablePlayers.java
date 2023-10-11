@@ -41,6 +41,7 @@ public class FeatureTaggablePlayers implements Feature {
 					if (!val.extraFscript.isEmpty()) list.add(key);
 					break;
 				case "LIVING_ENTITY" :
+				case "ENTITY" :
 					tags.put(key, 0b11);
 					if (!val.extraFscript.isEmpty()) list.add(key);
 					break;
