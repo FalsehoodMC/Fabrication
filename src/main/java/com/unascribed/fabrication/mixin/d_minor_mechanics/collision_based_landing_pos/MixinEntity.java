@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.mixin.d_minor_mechanics.collision_based_landing_pos;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.support.EligibleIf;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
@@ -15,6 +16,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.function.Predicate;
+
 @Mixin(Entity.class)
 @EligibleIf(configAvailable="*.collision_based_landing_pos")
 public abstract class MixinEntity {
@@ -26,9 +29,12 @@ public abstract class MixinEntity {
 	@Shadow public abstract double getZ();
 	@Shadow public abstract Vec3d getPos();
 
+	private static final Predicate<Entity> fabrication$collisionBasedLandingPos = ConfigPredicates.getFinalPredicate("*.collision_based_landing_pos");
+
 	@FabInject(method="getLandingPos()Lnet/minecraft/util/math/BlockPos;", at=@At(value="HEAD"), cancellable=true)
 	public void getLandingPos(CallbackInfoReturnable<BlockPos> cir) {
 		if (!FabConf.isEnabled("*.collision_based_landing_pos")) return;
+		if (!fabrication$collisionBasedLandingPos.test((Entity)(Object)this)) return;
 		for (VoxelShape shape : world.getBlockCollisions((Entity)(Object)this, this.boundingBox.offset(0, -0.20000000298023224D, 0))) {
 			if (shape.getBoundingBox().getCenter().getY() <= this.getY()) {
 				Vec3d vec = shape.getBoundingBox().getCenter();
