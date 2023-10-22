@@ -1,6 +1,10 @@
 package com.unascribed.fabrication.mixin.z_combined.spiders_cant_climb;
 
 import com.unascribed.fabrication.FabConf;
+import net.minecraft.block.Block;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.tag.TagKey;
+import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,6 +24,7 @@ import net.minecraft.world.World;
 @Mixin(SpiderEntity.class)
 @EligibleIf(anyConfigAvailable={"*.spiders_cant_climb_glazed_terracotta", "*.spiders_cant_climb_while_wet"})
 public abstract class MixinSpiderEntity extends HostileEntity {
+	private static final TagKey<Block> fabrication$spidersCantClimb = TagKey.of(RegistryKeys.BLOCK, new Identifier("fabrication", "spiders_cant_climb"));
 
 	protected MixinSpiderEntity(EntityType<? extends HostileEntity> entityType, World world) {
 		super(entityType, world);
@@ -43,7 +48,7 @@ public abstract class MixinSpiderEntity extends HostileEntity {
 					// onEntityCollision, but that makes spiders get caught on things...
 					FabricationMod.forAllAdjacentBlocks(this, (w, bp, bp2, dir) -> {
 						BlockState bs = getWorld().getBlockState(bp);
-						if (bs.getBlock() instanceof GlazedTerracottaBlock) {
+						if (bs.getBlock() instanceof GlazedTerracottaBlock || bs.isIn(fabrication$spidersCantClimb)) {
 							setClimbingWall(false);
 							return false;
 						}
