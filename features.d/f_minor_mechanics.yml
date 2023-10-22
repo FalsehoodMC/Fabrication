@@ -99,6 +99,8 @@ minor_mechanics.spiders_cant_climb_glazed_terracotta:
 		Logic: Slime blocks can't stick to glazed terracotta. Are spiders really stickier than solid
 		slime?
 
+		Blocks can be included via fabrication:include_in_item_inventory_check item tag.
+
 minor_mechanics.water_fills_on_break:
 	name: Water Fills On Break
 	since: 1.1.1
