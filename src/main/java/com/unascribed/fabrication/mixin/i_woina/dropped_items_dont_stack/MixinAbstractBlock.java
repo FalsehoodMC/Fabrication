@@ -21,9 +21,10 @@ public abstract class MixinAbstractBlock {
 		for (ItemStack stack : inp) {
 			ItemStack single = stack.copy();
 			single.setCount(1);
-			for (int i = 0; i < stack.getCount(); i++) {
-				ret.add(single);
+			for (int i = 0; i < stack.getCount()-1; i++) {
+				ret.add(single.copy());
 			}
+			ret.add(single);
 		}
 		return ret;
 	}
