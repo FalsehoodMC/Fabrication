@@ -3,6 +3,7 @@ package com.unascribed.fabrication.mixin._general.sync;
 import java.util.Map;
 import java.util.Set;
 
+import com.unascribed.fabrication.support.ConfigValues;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -14,7 +15,6 @@ import com.unascribed.fabrication.client.FScriptScreen;
 import com.unascribed.fabrication.interfaces.GetServerConfig;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.ResolvedConfigValue;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -38,7 +38,7 @@ public class MixinClientPlayNetworkHandler implements GetServerConfig {
 
 	@Shadow @Final private MinecraftClient client;
 	private boolean fabrication$hasHandshook = false;
-	private final Map<String, ResolvedConfigValue> fabrication$serverTrileanConfig = Maps.newHashMap();
+	private final Map<String, ConfigValues.ResolvedFeature> fabrication$serverTrileanConfig = Maps.newHashMap();
 	private final Map<String, String> fabrication$serverStringConfig = Maps.newHashMap();
 	private long fabrication$launchId;
 	private final Set<String> fabrication$serverFailedConfig = Sets.newHashSet();
@@ -63,7 +63,7 @@ public class MixinClientPlayNetworkHandler implements GetServerConfig {
 					for (int i = 0; i < trileanKeys; i++) {
 						String k = buf.readString(32767);
 						int v = buf.readUnsignedByte();
-						fabrication$serverTrileanConfig.put(k, ResolvedConfigValue.values()[v]);
+						fabrication$serverTrileanConfig.put(k, ConfigValues.ResolvedFeature.values()[v]);
 					}
 					int stringKeys = buf.readVarInt();
 					for (int i = 0; i < stringKeys; i++) {
@@ -124,7 +124,7 @@ public class MixinClientPlayNetworkHandler implements GetServerConfig {
 	}
 
 	@Override
-	public Map<String, ResolvedConfigValue> fabrication$getServerTrileanConfig() {
+	public Map<String, ConfigValues.ResolvedFeature> fabrication$getServerTrileanConfig() {
 		return fabrication$serverTrileanConfig;
 	}
 

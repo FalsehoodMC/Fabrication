@@ -30,6 +30,7 @@ import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.FeaturesFile.Sides;
 import com.unascribed.fabrication.interfaces.TaggablePlayer;
 import com.unascribed.fabrication.loaders.LoaderFScript;
+import com.unascribed.fabrication.support.ConfigValues;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.OptionalFScript;
@@ -412,9 +413,13 @@ public class FeatureFabricationCommand implements Feature {
 
 				String[] values;
 				if (s.startsWith("general.")) {
-					values = new String[]{"true", "false"};
+					if (s.startsWith("general.category")) {
+						values = ConfigValues.Category.vals;
+					} else {
+						values = ConfigValues.Feature.vals_true_false;
+					}
 				} else {
-					values = new String[]{"unset", "true", "false", "banned"};
+					values = ConfigValues.Feature.vals_unset_true_false_banned;
 				}
 				for (String v : values) {
 					LiteralArgumentBuilder<T> value =
@@ -442,9 +447,10 @@ public class FeatureFabricationCommand implements Feature {
 
 				String[] values;
 				if (s.startsWith("general.")) {
-					values = new String[]{"unset", "true", "false"};
+					if (s.startsWith("general.category")) continue;
+					values = ConfigValues.Feature.vals_unset_true_false;
 				} else {
-					values = new String[]{"unset", "true", "false", "banned"};
+					values = ConfigValues.Feature.vals_unset_true_false_banned;
 				}
 				for (String v : values) {
 					key.then(LiteralArgumentBuilder.<T>literal(v)

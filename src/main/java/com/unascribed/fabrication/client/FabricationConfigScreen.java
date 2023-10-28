@@ -3,6 +3,7 @@ package com.unascribed.fabrication.client;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -19,9 +20,8 @@ import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.FeaturesFile.FeatureEntry;
 import com.unascribed.fabrication.FeaturesFile.Sides;
 import com.unascribed.fabrication.interfaces.GetServerConfig;
-import com.unascribed.fabrication.support.ConfigValue;
+import com.unascribed.fabrication.support.ConfigValues;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
-import com.unascribed.fabrication.support.ResolvedConfigValue;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.SharedConstants;
@@ -81,7 +81,6 @@ public class FabricationConfigScreen extends Screen {
 	public enum ConfigValueFlag {
 		CLIENT_ONLY, REQUIRES_FABRIC_API, SHOW_SOURCE_SECTION, HIGHLIGHT_QUERY_MATCH
 	}
-
 	private final Map<String, String> SECTION_DESCRIPTIONS = Maps.newHashMap();
 	private static final Identifier BG = new Identifier("fabrication", "bg.png");
 	private static final Identifier BG_DARK = new Identifier("fabrication", "bg-dark.png");
@@ -138,7 +137,7 @@ public class FabricationConfigScreen extends Screen {
 	private final List<String> tabs = Lists.newArrayList();
 	private final Multimap<String, String> options = Multimaps.newMultimap(Maps.newLinkedHashMap(), Lists::newArrayList);
 
-	private final Map<String, ConfigValue> optionPreviousValues = Maps.newHashMap();
+	private final Map<String, ConfigValues.Feature> optionPreviousValues = Maps.newHashMap();
 	private final Map<String, Float> optionAnimationTime = Maps.newHashMap();
 	private final Map<String, Float> disabledAnimationTime = Maps.newHashMap();
 	private final Map<String, Float> becomeBanAnimationTime = Maps.newHashMap();
@@ -813,9 +812,13 @@ public class FabricationConfigScreen extends Screen {
 							int i = tabs.indexOf(e.getKey().substring(17));
 							return i == -1 ? Integer.MAX_VALUE : i;
 						})).toList();
-				for (Map.Entry<String, FeatureEntry> en : categories) {
-					FeatureEntry fe = en.getValue();
-					y = drawConfigValue(matrices, en.getKey(), fe.name, fe.desc, y, mouseX, mouseY);
+				if (editingWorldPath) {
+					y += drawWrappedText(matrices, 200, 2, "Categories are not available in world settings", width-200, 0xFFFFFF, false) + 6;
+				} else {
+					for (Map.Entry<String, FeatureEntry> en : categories) {
+						FeatureEntry fe = en.getValue();
+						y = drawCategoryValue(matrices, en.getKey(), fe.name, fe.desc, y, mouseX, mouseY);
+					}
 				}
 			} else if ("search".equals(section)) {
 				y += 4;
@@ -913,7 +916,59 @@ public class FabricationConfigScreen extends Screen {
 		client.textRenderer.draw(matrices, text, x+((w-textWidth)/2f), y+((h-8)/2f), -1);
 		return click;
 	}
-
+	private int drawCategoryValue(MatrixStack matrices, String key, String title, String desc, int y, float mouseX, float mouseY) {
+		matrices.push();
+		matrices.translate(0, y, 0);
+		int startY = y;
+		y += drawWrappedText(matrices, 200, 2, title, width-200, 0xFFFFFF, false) + 6;
+		RenderSystem.enableBlend();
+		RenderSystem.defaultBlendFunc();
+		RenderSystem.setShaderTexture(0, new Identifier("fabrication", "coffee_bean.png"));
+		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+		int x = 0;
+		ConfigValues.Category hovered = null;
+		for (ConfigValues.Category p : ConfigValues.Category.values()) {
+			boolean profSel;
+			try {
+				profSel = ConfigValues.Category.parse(getRawValue(key)) == p;
+			} catch (IllegalArgumentException e) {
+				profSel = p == ConfigValues.Category.GREEN;
+			}
+			if (mouseX >= 134+x && mouseX <= 134+x+16 && mouseY >= startY && mouseY <= startY+16) {
+				hovered = p;
+			}
+			if (didClick && mouseX >= 134+x && mouseX <= 134+x+16 && mouseY >= startY && mouseY <= startY+16) {
+				if (p == ConfigValues.Category.ASH) {
+					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_CHIME, 2f, 1f));
+					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_SAND_BREAK, 1f, 1f));
+					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_SAND_BREAK, 1f, 1.2f));
+					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_SAND_BREAK, 1f, 0.7f));
+					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_SAND_BREAK, 1f, 0.5f));
+				} /*else if (p == ConfigValues.Category.BURNT) {
+					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_CHIME, 1.8f, 1f));
+					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.ITEM_FLINTANDSTEEL_USE, 1f));
+					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_FIRE_AMBIENT, 1f, 1f));
+				}*/ else if (p == ConfigValues.Category.GREEN) {
+					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_BASS, 0.5f, 1f));
+				} else {
+					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_COW_BELL, 0.707107f+(p.ordinal()*0.22f), 1f));
+				}
+				setValue(key, p.name().toLowerCase(Locale.ROOT));
+			}
+			color(p.getColor(), profSel ? 1f : hovered == p ? 0.6f : 0.3f);
+			drawTexture(matrices, 134+x, 0, 0, 0, 0, 16, 16, 16, 16);
+			x += 18;
+		}
+		if (mouseX >= 200 && mouseX <= width-200 && mouseY >= startY && mouseY <= y) {
+			renderWrappedTooltip(matrices, desc, mouseX, mouseY);
+		}
+		if (hovered != null) {
+			renderWrappedTooltip(matrices, "§l"+hovered.displayName()+"\n§f"+hovered.displayDesc(), mouseX, mouseY);
+		}
+		matrices.pop();
+		return y;
+	}
 	private int drawConfigValue(MatrixStack matrices, String key, String title, String desc, int y, float mouseX, float mouseY, ConfigValueFlag... flags) {
 		if (y < -12 || y > height-16) return y+14;
 		boolean clientOnly = ArrayUtils.contains(flags, CLIENT_ONLY);
@@ -977,9 +1032,9 @@ public class FabricationConfigScreen extends Screen {
 		float scale = 1;
 		boolean noBan = key.startsWith("general.");
 		boolean noUnset = noBan && !editingWorldPath;
-		ConfigValue currentValue = noUnset ? (isEnabled(key) ? ConfigValue.TRUE : ConfigValue.FALSE) : onlyBannable ? getValue(key) == ConfigValue.BANNED ? ConfigValue.BANNED : ConfigValue.UNSET : getValue(key);
-		boolean keyEnabled = getResolvedValue(key) == ResolvedConfigValue.DEFAULT_TRUE;
-		ConfigValue prevValue = animateDisabled ? currentValue : optionPreviousValues.getOrDefault(key, currentValue);
+		ConfigValues.Feature currentValue = noUnset ? (isEnabled(key) ? ConfigValues.Feature.TRUE : ConfigValues.Feature.FALSE) : onlyBannable ? getValue(key) == ConfigValues.Feature.BANNED ? ConfigValues.Feature.BANNED : ConfigValues.Feature.UNSET : getValue(key);
+		boolean keyEnabled = getResolvedValue(key) == ConfigValues.ResolvedFeature.DEFAULT_TRUE;
+		ConfigValues.Feature prevValue = animateDisabled ? currentValue : optionPreviousValues.getOrDefault(key, currentValue);
 		int[] xes;
 		if (noUnset) {
 			xes = new int[] { 0, 23, 0, 0 };
@@ -1019,7 +1074,7 @@ public class FabricationConfigScreen extends Screen {
 		int knobAlpha = ((int) ((noValue ? 1 - da : 1) * 255)) << 24;
 		int selectedWidth = noUnset ? 22 : onlyBannable ? 30 : 15;
 		fill(matrices, 0, 1, selectedWidth, 10, MathHelper.hsvToRgb(Math.floorMod((int) (prevHue + ((curHue - prevHue) * a)), 360) / 360f, 0.9f, (prevHSValue + ((curHSValue - prevHSValue) * a)) / 100f) | knobAlpha);
-		if (!noUnset && a >= 1 && (currentValue == ConfigValue.UNSET || editingWorldPath) && !onlyBannable && !(noBan && currentValue != ConfigValue.UNSET)) {
+		if (!noUnset && a >= 1 && (currentValue == ConfigValues.Feature.UNSET || editingWorldPath) && !onlyBannable && !(noBan && currentValue != ConfigValues.Feature.UNSET)) {
 			fill(matrices, keyEnabled ? selectedWidth : -1, 1, keyEnabled ? selectedWidth+1 : 0, 10, MathHelper.hsvToRgb((keyEnabled ? 120 : 0) / 360f, 0.9f, 0.8f) | knobAlpha);
 		}
 		matrices.pop();
@@ -1048,47 +1103,47 @@ public class FabricationConfigScreen extends Screen {
 				if (disabled) {
 					playErrorFeedback();
 				} else {
-					ConfigValue newValue;
+					ConfigValues.Feature newValue;
 					if (noUnset) {
-						newValue = clickedIndex == 0 ? ConfigValue.FALSE : ConfigValue.TRUE;
+						newValue = clickedIndex == 0 ? ConfigValues.Feature.FALSE : ConfigValues.Feature.TRUE;
 					} else if (noBan) {
 						switch (clickedIndex) {
 							case 0:
-								newValue = ConfigValue.FALSE;
+								newValue = ConfigValues.Feature.FALSE;
 								break;
 							case 2:
-								newValue = ConfigValue.TRUE;
+								newValue = ConfigValues.Feature.TRUE;
 								break;
 							case 1:
 							default:
-								newValue = ConfigValue.UNSET;
+								newValue = ConfigValues.Feature.UNSET;
 								break;
 						}
 					} else if (onlyBannable) {
-						newValue = clickedIndex == 0 ? ConfigValue.BANNED : ConfigValue.UNSET;
+						newValue = clickedIndex == 0 ? ConfigValues.Feature.BANNED : ConfigValues.Feature.UNSET;
 					} else {
 						switch (clickedIndex) {
 							case 0:
-								newValue = ConfigValue.BANNED;
+								newValue = ConfigValues.Feature.BANNED;
 								break;
 							case 1:
-								newValue = ConfigValue.FALSE;
+								newValue = ConfigValues.Feature.FALSE;
 								break;
 							case 2:
-								newValue = ConfigValue.UNSET;
+								newValue = ConfigValues.Feature.UNSET;
 								break;
 							case 3:
-								newValue = ConfigValue.TRUE;
+								newValue = ConfigValues.Feature.TRUE;
 								break;
 							default:
-								newValue = ConfigValue.UNSET;
+								newValue = ConfigValues.Feature.UNSET;
 								break;
 						}
 					}
 					client.getSoundManager().play(PositionedSoundInstance.master(
-							newValue == ConfigValue.BANNED ? SoundEvents.BLOCK_NOTE_BLOCK_BASEDRUM :
-								newValue == ConfigValue.FALSE ? SoundEvents.BLOCK_NOTE_BLOCK_BASS :
-									newValue == ConfigValue.UNSET ? SoundEvents.BLOCK_NOTE_BLOCK_COW_BELL :
+							newValue == ConfigValues.Feature.BANNED ? SoundEvents.BLOCK_NOTE_BLOCK_BASEDRUM :
+								newValue == ConfigValues.Feature.FALSE ? SoundEvents.BLOCK_NOTE_BLOCK_BASS :
+									newValue == ConfigValues.Feature.UNSET ? SoundEvents.BLOCK_NOTE_BLOCK_COW_BELL :
 										SoundEvents.BLOCK_NOTE_BLOCK_CHIME,
 										0.6f+pitch, 1f));
 					if (newValue != currentValue || (editingWorldPath && !FabConf.doesWorldContainValue(key))) {
@@ -1179,7 +1234,7 @@ public class FabricationConfigScreen extends Screen {
 						if (clickedIndex == (noUnset || noBan ? 0 : 1)) {
 							renderTooltip(matrices, new LiteralText("§cDisable"), (int)mouseX, (int)mouseY);
 						} else if (clickedIndex == (noUnset ? -99 : noBan ? 1 : 2)) {
-							if (currentValue == ConfigValue.UNSET) {
+							if (currentValue == ConfigValues.Feature.UNSET) {
 								renderTooltip(matrices, Lists.newArrayList(
 										new LiteralText("§eUse default value §f(see General > Profile)"),
 										new LiteralText("§rCurrent default: "+(keyEnabled ? "§aEnabled" : "§cDisabled"))
@@ -1506,16 +1561,16 @@ public class FabricationConfigScreen extends Screen {
 		}
 	}
 
-	private ResolvedConfigValue getResolvedValue(String key) {
+	private ConfigValues.ResolvedFeature getResolvedValue(String key) {
 		if (configuringServer) {
-			return ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerTrileanConfig().getOrDefault(key, ResolvedConfigValue.DEFAULT_FALSE);
+			return ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerTrileanConfig().getOrDefault(key, ConfigValues.ResolvedFeature.DEFAULT_FALSE);
 		} else {
 			return FabConf.getResolvedValue(key, editingWorldPath);
 		}
 	}
 
-	private ConfigValue getValue(String key) {
-		return getResolvedValue(key).trilean;
+	private ConfigValues.Feature getValue(String key) {
+		return getResolvedValue(key).feature;
 	}
 
 	private boolean isEnabled(String key) {

@@ -9,13 +9,12 @@ import java.util.function.Predicate;
 
 import com.unascribed.fabrication.interfaces.SetFabricationConfigAware;
 import com.unascribed.fabrication.support.ConfigLoader;
-import com.unascribed.fabrication.support.ConfigValue;
+import com.unascribed.fabrication.support.ConfigValues;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.FabricationDefaultResources;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.OptionalFScript;
-import com.unascribed.fabrication.support.ResolvedConfigValue;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -178,7 +177,7 @@ public class FabricationMod implements ModInitializer {
 		if (key != null && key.startsWith("general.category")) key = null;
 		PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
 		if (key == null) {
-			Map<String, ResolvedConfigValue> trileans = Maps.newHashMap();
+			Map<String, ConfigValues.ResolvedFeature> trileans = Maps.newHashMap();
 			Map<String, String> strings = Maps.newHashMap();
 			for (String k : FabConf.getAllKeys()) {
 				trileans.put(k, FabConf.getResolvedValue(k));
