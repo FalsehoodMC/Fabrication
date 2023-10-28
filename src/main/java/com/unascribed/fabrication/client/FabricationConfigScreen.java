@@ -111,6 +111,7 @@ public class FabricationConfigScreen extends Screen {
 
 	private boolean didClick;
 	private boolean mouseDragging;
+	private int lastDragY;
 	private float selectTime;
 	private String selectedSection;
 	private String prevSelectedSection;
@@ -689,7 +690,10 @@ public class FabricationConfigScreen extends Screen {
 		if (drawButton(matrices, width-100, height-20, 100, 20, "Done", mouseX, mouseY)) {
 			close();
 		}
-		if (didClick) didClick = false;
+		if (didClick) {
+			didClick = false;
+			lastDragY = 0;
+		}
 		if (mouseDragging) mouseDragging = false;
 
 		super.render(matrices, mouseX, mouseY, delta);
@@ -938,7 +942,15 @@ public class FabricationConfigScreen extends Screen {
 			if (mouseX >= 134+x && mouseX <= 134+x+16 && mouseY >= startY && mouseY <= startY+16) {
 				hovered = p;
 			}
-			if (didClick && mouseX >= 134+x && mouseX <= 134+x+16 && mouseY >= startY && mouseY <= startY+16) {
+			clicky:
+			if ((didClick || mouseDragging) && mouseX >= 134+x && mouseX <= 134+x+16 && mouseY >= startY && mouseY <= startY+16) {
+				if (!didClick && mouseDragging) {
+					if (lastDragY != startY) {
+						lastDragY = startY;
+					} else {
+						break clicky;
+					}
+				}
 				if (p == ConfigValues.Category.ASH) {
 					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_NOTE_BLOCK_CHIME, 2f, 1f));
 					client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.BLOCK_SAND_BREAK, 1f, 1f));
@@ -1097,63 +1109,70 @@ public class FabricationConfigScreen extends Screen {
 
 		RenderSystem.disableTexture();
 		int clickedIndex =(int)(mouseX - 134) / (noUnset ? 22 : onlyBannable ? 30 : 15);
-		if (didClick || mouseDragging) {
-			if (mouseX >= 134 && mouseX <= 134+trackSize && mouseY >= y+1 && mouseY <= y+10) {
-				float pitch = y*0.005f;
-				if (disabled) {
-					playErrorFeedback();
+		clicky:
+		if ((didClick || mouseDragging) && mouseX >= 134 && mouseX <= 134+trackSize && mouseY >= y+1 && mouseY <= y+10) {
+			if (!didClick && mouseDragging) {
+				if (lastDragY != y) {
+					lastDragY = y;
 				} else {
-					ConfigValues.Feature newValue;
-					if (noUnset) {
-						newValue = clickedIndex == 0 ? ConfigValues.Feature.FALSE : ConfigValues.Feature.TRUE;
-					} else if (noBan) {
-						switch (clickedIndex) {
-							case 0:
-								newValue = ConfigValues.Feature.FALSE;
-								break;
-							case 2:
-								newValue = ConfigValues.Feature.TRUE;
-								break;
-							case 1:
-							default:
-								newValue = ConfigValues.Feature.UNSET;
-								break;
-						}
-					} else if (onlyBannable) {
-						newValue = clickedIndex == 0 ? ConfigValues.Feature.BANNED : ConfigValues.Feature.UNSET;
-					} else {
-						switch (clickedIndex) {
-							case 0:
-								newValue = ConfigValues.Feature.BANNED;
-								break;
-							case 1:
-								newValue = ConfigValues.Feature.FALSE;
-								break;
-							case 2:
-								newValue = ConfigValues.Feature.UNSET;
-								break;
-							case 3:
-								newValue = ConfigValues.Feature.TRUE;
-								break;
-							default:
-								newValue = ConfigValues.Feature.UNSET;
-								break;
-						}
+					break clicky;
+				}
+			}
+			float pitch = y * 0.005f;
+			if (disabled) {
+				playErrorFeedback();
+			} else {
+				ConfigValues.Feature newValue;
+				if (noUnset) {
+					newValue = clickedIndex == 0 ? ConfigValues.Feature.FALSE : ConfigValues.Feature.TRUE;
+				} else if (noBan) {
+					switch (clickedIndex) {
+						case 0:
+							newValue = ConfigValues.Feature.FALSE;
+							break;
+						case 2:
+							newValue = ConfigValues.Feature.TRUE;
+							break;
+						case 1:
+						default:
+							newValue = ConfigValues.Feature.UNSET;
+							break;
 					}
-					client.getSoundManager().play(PositionedSoundInstance.master(
-							newValue == ConfigValues.Feature.BANNED ? SoundEvents.BLOCK_NOTE_BLOCK_BASEDRUM :
-								newValue == ConfigValues.Feature.FALSE ? SoundEvents.BLOCK_NOTE_BLOCK_BASS :
-									newValue == ConfigValues.Feature.UNSET ? SoundEvents.BLOCK_NOTE_BLOCK_COW_BELL :
-										SoundEvents.BLOCK_NOTE_BLOCK_CHIME,
-										0.6f+pitch, 1f));
-					if (newValue != currentValue || (editingWorldPath && !FabConf.doesWorldContainValue(key))) {
-						optionPreviousValues.put(key, currentValue);
-						optionAnimationTime.compute(key, (k, f) -> 5 - (f == null ? 0 : f));
-						setValue(key, newValue.toString().toLowerCase(Locale.ROOT));
+				} else if (onlyBannable) {
+					newValue = clickedIndex == 0 ? ConfigValues.Feature.BANNED : ConfigValues.Feature.UNSET;
+				} else {
+					switch (clickedIndex) {
+						case 0:
+							newValue = ConfigValues.Feature.BANNED;
+							break;
+						case 1:
+							newValue = ConfigValues.Feature.FALSE;
+							break;
+						case 2:
+							newValue = ConfigValues.Feature.UNSET;
+							break;
+						case 3:
+							newValue = ConfigValues.Feature.TRUE;
+							break;
+						default:
+							newValue = ConfigValues.Feature.UNSET;
+							break;
 					}
+				}
+				client.getSoundManager().play(PositionedSoundInstance.master(
+					newValue == ConfigValues.Feature.BANNED ? SoundEvents.BLOCK_NOTE_BLOCK_BASEDRUM :
+						newValue == ConfigValues.Feature.FALSE ? SoundEvents.BLOCK_NOTE_BLOCK_BASS :
+							newValue == ConfigValues.Feature.UNSET ? SoundEvents.BLOCK_NOTE_BLOCK_COW_BELL :
+								SoundEvents.BLOCK_NOTE_BLOCK_CHIME,
+					0.6f + pitch, 1f));
+				if (newValue != currentValue || (editingWorldPath && !FabConf.doesWorldContainValue(key))) {
+					optionPreviousValues.put(key, currentValue);
+					optionAnimationTime.compute(key, (k, f) -> 5 - (f == null ? 0 : f));
+					setValue(key, newValue.toString().toLowerCase(Locale.ROOT));
 				}
 			}
 		}
+
 		int textAlpha = ((int)((0.7f+((1-da)*0.3f)) * 255))<<24;
 		int startY = y;
 		int startX = 136+(noUnset||noBan ? 45 : 60)+5;
