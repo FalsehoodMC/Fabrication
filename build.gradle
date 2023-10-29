@@ -336,6 +336,20 @@ def mcmodcnLoaders = '2'
 
 def artifact = remapJar.archivePath
 
+if (System.getenv("PUBLISH_FORGERY")) {
+        stability = 'beta'
+
+        mrLoaders = [ 'forge' ]
+
+        curseProject = '434087'
+        curseLoaders = [ 'Forge' ]
+
+        mcmodcnClassID = '3547'
+        mcmodcnLoaders = '1'
+
+        artifact = file(remapJar.archivePath.getPath().reverse().replaceFirst("fabrication".reverse(), "forgery".reverse()).reverse())
+}
+
 if (System.getenv("MODRINTH_TOKEN")) {
 	modrinth {
 		token = System.getenv("MODRINTH_TOKEN")
