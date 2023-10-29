@@ -57,14 +57,14 @@ public class FabricationClientCommands {
 		}
 	}
 	private static final CommandDispatcher<CommandSource> dispatcher = new CommandDispatcher<>();
-	public static String rootCommand = "/"+ MixinConfigPlugin.MOD_NAME_LOWER+":client";
+	public static String rootCommand = MixinConfigPlugin.MOD_NAME_LOWER+":client";
 	public static void registerCommands() {
 		registerCommands(dispatcher);
 	}
 	public static boolean runCommand(String command) {
 		if (command.isEmpty() || !command.startsWith(rootCommand)) return false;
 		try {
-			dispatcher.execute(command.substring(1), MinecraftClient.getInstance().getNetworkHandler().getCommandSource());
+			dispatcher.execute(command, MinecraftClient.getInstance().getNetworkHandler().getCommandSource());
 		} catch (CommandException ignore) {
 			sendFeedback(ignore.getTextMessage());
 		} catch (Exception e) {
@@ -77,7 +77,7 @@ public class FabricationClientCommands {
 		registerCommands(dispatcher);
 	}
 	private static<T extends CommandSource> void registerCommands(CommandDispatcher<T> dispatcher) {
-		LiteralArgumentBuilder<T> root = LiteralArgumentBuilder.<T>literal(rootCommand.substring(1));
+		LiteralArgumentBuilder<T> root = LiteralArgumentBuilder.<T>literal(rootCommand);
 		if (EarlyAgnos.isModLoaded("fscript")) addFScript(root);
 		FeatureFabricationCommand.addConfig(root, false);
 		root.then(LiteralArgumentBuilder.<T>literal("ui")
