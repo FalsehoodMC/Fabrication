@@ -72,7 +72,7 @@ public abstract class MixinLivingEntity extends Entity implements DidJustAbsorp 
 			SoundEvent defHurtSound = getHurtSound(src);
 			PlaySoundFromEntityS2CPacket vanPkt = defHurtSound == null ? null : new PlaySoundFromEntityS2CPacket(defHurtSound, getSoundCategory(), this, getSoundVolume(), getSoundPitch());
 			for (ServerPlayerEntity spe : FabricationMod.getTrackers(this)) {
-				if (spe instanceof SetFabricationConfigAware && ((SetFabricationConfigAware) spe).fabrication$isConfigAware()) {
+				if (spe instanceof SetFabricationConfigAware && ((SetFabricationConfigAware) spe).fabrication$getReqVer() >= 0) {
 					spe.networkHandler.sendPacket(fabPkt);
 				} else if (vanPkt != null) {
 					spe.networkHandler.sendPacket(vanPkt);
@@ -80,7 +80,7 @@ public abstract class MixinLivingEntity extends Entity implements DidJustAbsorp 
 			}
 			if (self instanceof ServerPlayerEntity) {
 				ServerPlayerEntity selfp = (ServerPlayerEntity)self;
-				if (selfp instanceof SetFabricationConfigAware && ((SetFabricationConfigAware) selfp).fabrication$isConfigAware()) {
+				if (selfp instanceof SetFabricationConfigAware && ((SetFabricationConfigAware) selfp).fabrication$getReqVer() >= 0) {
 					selfp.networkHandler.sendPacket(fabPkt);
 				} else if (vanPkt != null) {
 					selfp.networkHandler.sendPacket(vanPkt);

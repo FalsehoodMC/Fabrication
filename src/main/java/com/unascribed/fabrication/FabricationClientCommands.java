@@ -16,6 +16,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.unascribed.fabrication.client.AtlasTracking;
 import com.unascribed.fabrication.client.AtlasViewerScreen;
 import com.unascribed.fabrication.client.FabricationConfigScreen;
+import com.unascribed.fabrication.client.FabricationSummaryScreen;
 import com.unascribed.fabrication.client.OptionalFScriptScreen;
 import com.unascribed.fabrication.client.OptionalPrideFlag;
 import com.unascribed.fabrication.features.FeatureFabricationCommand;
@@ -31,6 +32,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
+import org.lwjgl.system.macosx.EnumerationMutationHandlerI;
 
 public class FabricationClientCommands {
 
@@ -89,6 +91,17 @@ public class FabricationClientCommands {
 					});
 					return 1;
 				}));
+		root.then(LiteralArgumentBuilder.<T>literal("summary_ui").executes((c)-> {
+			MinecraftClient.getInstance().send(() -> {
+				FabricationSummaryScreen screen = FabricationSummaryScreen.tryCreate(null);
+				if (screen == null) {
+					sendFeedback(Text.of("Server isn't running "+MixinConfigPlugin.MOD_NAME));
+				} else {
+					MinecraftClient.getInstance().setScreen(screen);
+				}
+			});
+			return 1;
+		}));
 		if (!FabConf.isFailed("atlas_viewer")) {
 			root.then(LiteralArgumentBuilder.<T>literal("atlas")
 					.then(LiteralArgumentBuilder.<T>literal("view")

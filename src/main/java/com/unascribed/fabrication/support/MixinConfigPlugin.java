@@ -57,6 +57,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	public static final String MOD_NAME = EarlyAgnos.isForge() ? "Forgery" : "Fabrication";
 	// NOT the modid. We keep the mod id as "fabrication" even on Forge to keep things from getting too nutty.
 	public static final String MOD_NAME_LOWER = EarlyAgnos.isForge() ? "forgery" : "fabrication";
+	public static final String MOD_NAME_LOWER_OTHER = !EarlyAgnos.isForge() ? "forgery" : "fabrication";
 	private static final SetMultimap<String, String> configKeysForDiscoveredClasses = HashMultimap.create();
 	public static boolean loadComplete = false;
 

@@ -19,7 +19,6 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.tree.analysis.Analyzer;
-import org.objectweb.asm.tree.analysis.AnalyzerException;
 import org.objectweb.asm.tree.analysis.BasicValue;
 import org.objectweb.asm.tree.analysis.SimpleVerifier;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfig;
@@ -285,7 +284,11 @@ public class FabInjector {
 					if (!keys.isEmpty()) {
 						FabLog.warn("! Force-disabling " + Joiner.on(", ").join(keys));
 						for (String opt : keys) {
-							FabConf.addFailure(opt);
+							if (ti.potentiallyRedirected.isEmpty()) {
+								FabConf.addFailure(opt, "Injection Fail");
+							} else {
+								FabConf.addFailure(opt, "Injection Fail: Likely Mod Conflict");
+							}
 						}
 					}
 				}

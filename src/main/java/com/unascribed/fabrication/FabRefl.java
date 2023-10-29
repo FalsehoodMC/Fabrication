@@ -518,7 +518,7 @@ public class FabRefl {
 				if (requiredBy.isEmpty()) throw rethrow(err);
 				FabLog.warn("Failed to retrieve "+desc+" - force-disabling "+Joiner.on(", ").join(requiredBy));
 				for (String s : requiredBy) {
-					FabConf.addFailure(s);
+					FabConf.addFailure(s, "Reflection Failed");
 				}
 				return null;
 			}
