@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 import com.unascribed.fabrication.QDIni;
 import com.unascribed.fabrication.support.ConfigLoader;
-import com.unascribed.fabrication.support.ConfigValue;
+import com.unascribed.fabrication.support.ConfigValues;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 
@@ -25,7 +25,7 @@ import net.minecraft.util.registry.Registry;
 @EligibleIf(envMatches=Env.CLIENT)
 public class LoaderClassicBlockDrops implements ConfigLoader {
 
-	public static final List<Function<Identifier, ConfigValue>> rules = Lists.newArrayList();
+	public static final List<Function<Identifier, ConfigValues.Feature>> rules = Lists.newArrayList();
 	public static final Map<String, Optional<Boolean>> literals = new HashMap<>();
 	public static final Map<String, Optional<Boolean>> heuristics = new HashMap<>();
 	private static final Map<Block, Boolean> cache = new WeakHashMap<>();
@@ -35,9 +35,9 @@ public class LoaderClassicBlockDrops implements ConfigLoader {
 		if (cache.containsKey(b)) return cache.get(b);
 		Identifier id = Registry.BLOCK.getId(b);
 		if (id == null) return false;
-		for (Function<Identifier, ConfigValue> rule : rules) {
-			ConfigValue t = rule.apply(id);
-			if (t != ConfigValue.UNSET) {
+		for (Function<Identifier, ConfigValues.Feature> rule : rules) {
+			ConfigValues.Feature t = rule.apply(id);
+			if (t != ConfigValues.Feature.UNSET) {
 				boolean r = t.resolve(true);
 				cache.put(b, r);
 				return r;
@@ -58,8 +58,8 @@ public class LoaderClassicBlockDrops implements ConfigLoader {
 		}
 		rules.add(id -> {
 			Boolean k = validLiterals.get(id.toString());
-			if (k == null) return ConfigValue.UNSET;
-			return k ? ConfigValue.TRUE : ConfigValue.FALSE;
+			if (k == null) return ConfigValues.Feature.UNSET;
+			return k ? ConfigValues.Feature.TRUE : ConfigValues.Feature.FALSE;
 		});
 		for (Map.Entry<String, Optional<Boolean>> entry : heuristics.entrySet()) {
 			String k = entry.getKey();
@@ -77,8 +77,8 @@ public class LoaderClassicBlockDrops implements ConfigLoader {
 			if (valueOpt.isPresent()) {
 				boolean value = valueOpt.get();
 				rules.add(id -> {
-					if (p.matcher(id.getPath()).matches()) return value ? ConfigValue.TRUE : ConfigValue.FALSE;
-					return ConfigValue.UNSET;
+					if (p.matcher(id.getPath()).matches()) return value ? ConfigValues.Feature.TRUE : ConfigValues.Feature.FALSE;
+					return ConfigValues.Feature.UNSET;
 				});
 			}
 		}
