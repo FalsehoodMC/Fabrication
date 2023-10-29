@@ -933,7 +933,7 @@ public class FabricationConfigScreen extends Screen {
 		matrices.push();
 		matrices.translate(0, y, 0);
 		int startY = y;
-		y += drawWrappedText(drawContext, 200, 2, title, width-200, 0xFFFFFF, false) + 6;
+		y += drawWrappedText(drawContext, 200, 2, title, width-200, 0xFFFFFFFF, false) + 6;
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 		RenderSystem.setShaderTexture(0, new Identifier("fabrication", "coffee_bean.png"));
@@ -981,7 +981,7 @@ public class FabricationConfigScreen extends Screen {
 			drawContext.drawTexture(new Identifier("fabrication", "coffee_bean.png"), 134+x, 0, 0, 0, 0, 16, 16, 16, 16);
 			x += 18;
 		}
-		if (mouseX >= 200 && mouseX <= width-200 && mouseY >= startY && mouseY <= y) {
+		if (mouseX >= 200 && mouseX <= width-200 && mouseY >= startY && mouseY <= y-6) {
 			renderWrappedTooltip(drawContext, desc, mouseX, mouseY);
 		}
 		if (hovered != null) {
