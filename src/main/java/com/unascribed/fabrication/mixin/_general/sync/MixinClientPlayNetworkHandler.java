@@ -86,7 +86,7 @@ public class MixinClientPlayNetworkHandler implements GetServerConfig {
 								for (int i = 0; i < failedKeys; i++) {
 									fabrication$serverFailedConfig.put(buf.readString(32767), buf.readString(32767));
 								}
-							} else {
+							} else if (reqVer == 0) {
 								for (int i = 0; i < failedKeys; i++) {
 									fabrication$serverFailedConfig.put(buf.readString(32767), "Unknown");
 								}
