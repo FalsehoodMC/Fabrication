@@ -9,16 +9,16 @@ import net.minecraft.entity.player.PlayerEntity;
 @Mixin(PlayerEntity.class)
 public class MixinPlayerEntity implements SetFabricationConfigAware {
 
-	private boolean fabrication$configAware;
+	private int fabrication$configReqVer = -1;
 
 	@Override
-	public void fabrication$setConfigAware(boolean aware) {
-		fabrication$configAware = aware;
+	public void fabrication$setReqVer(int reqVer) {
+		fabrication$configReqVer = reqVer;
 	}
 
 	@Override
-	public boolean fabrication$isConfigAware() {
-		return fabrication$configAware;
+	public int fabrication$getReqVer() {
+		return fabrication$configReqVer;
 	}
 
 }

@@ -97,7 +97,7 @@ public class FeatureLegacyCommandSyntax implements Feature {
 							return 1;
 						}));
 			} catch (Throwable t) {
-				FabricationMod.featureError(this, t);
+				FabricationMod.featureError(this, t, "Unknown");
 			}
 		});
 	}
