@@ -27,7 +27,7 @@ public class MixinErrorHandler {
 					FabLog.debug("Original Mixin error", th);
 					FabLog.warn("Mixin "+mixin.getClassName()+" failed to "+verb+"! Force-disabling "+Joiner.on(", ").join(keys));
 					for (String opt : keys) {
-						FabConf.addFailure(opt);
+						FabConf.addFailure(opt, "Mixin Fail");
 					}
 					return IMixinErrorHandler.ErrorAction.NONE;
 				} else {

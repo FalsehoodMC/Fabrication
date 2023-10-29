@@ -160,7 +160,7 @@ public class FeatureHideArmor implements Feature {
 	public static void sendSuppressedSlotsForSelf(ServerPlayerEntity ent) {
 		// we need client support for self-hiding of armor to prevent the inventory from
 		// glitching out, as we're lying to the client about what armor is equipped
-		if (ent instanceof SetFabricationConfigAware && ((SetFabricationConfigAware)ent).fabrication$isConfigAware()) {
+		if (ent instanceof SetFabricationConfigAware && ((SetFabricationConfigAware)ent).fabrication$getReqVer() >= 0) {
 			PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
 			int bits = 0;
 			for (EquipmentSlot es : ((GetSuppressedSlots)ent).fabrication$getSuppressedSlots()) {

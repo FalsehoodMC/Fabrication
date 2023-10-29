@@ -54,7 +54,7 @@ public class FeatureModsCommandFabric implements Feature {
 							}));
 				}
 			} catch (Throwable t) {
-				FabricationMod.featureError(this, t);
+				FabricationMod.featureError(this, t, "Unknown");
 			}
 		});
 	}

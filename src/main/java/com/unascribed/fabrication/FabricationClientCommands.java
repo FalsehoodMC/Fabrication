@@ -12,6 +12,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.unascribed.fabrication.client.AtlasTracking;
 import com.unascribed.fabrication.client.AtlasViewerScreen;
 import com.unascribed.fabrication.client.FabricationConfigScreen;
+import com.unascribed.fabrication.client.FabricationSummaryScreen;
 import com.unascribed.fabrication.client.OptionalFScriptScreen;
 import com.unascribed.fabrication.client.OptionalPrideFlag;
 import com.unascribed.fabrication.features.FeatureFabricationCommand;
@@ -22,7 +23,6 @@ import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.screen.PlayerScreenHandler;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -57,14 +57,14 @@ public class FabricationClientCommands {
 		}
 	}
 	private static final CommandDispatcher<CommandSource> dispatcher = new CommandDispatcher<>();
-	public static String rootCommand = MixinConfigPlugin.MOD_NAME_LOWER+":client";
+	public static String rootCommand = "/"+ MixinConfigPlugin.MOD_NAME_LOWER+":client";
 	public static void registerCommands() {
 		registerCommands(dispatcher);
 	}
 	public static boolean runCommand(String command) {
 		if (command.isEmpty() || !command.startsWith(rootCommand)) return false;
 		try {
-			dispatcher.execute(command, MinecraftClient.getInstance().getNetworkHandler().getCommandSource());
+			dispatcher.execute(command.substring(1), MinecraftClient.getInstance().getNetworkHandler().getCommandSource());
 		} catch (CommandException ignore) {
 			sendFeedback(ignore.getTextMessage());
 		} catch (Exception e) {
@@ -77,7 +77,7 @@ public class FabricationClientCommands {
 		registerCommands(dispatcher);
 	}
 	private static<T extends CommandSource> void registerCommands(CommandDispatcher<T> dispatcher) {
-		LiteralArgumentBuilder<T> root = LiteralArgumentBuilder.<T>literal(rootCommand);
+		LiteralArgumentBuilder<T> root = LiteralArgumentBuilder.<T>literal(rootCommand.substring(1));
 		if (EarlyAgnos.isModLoaded("fscript")) addFScript(root);
 		FeatureFabricationCommand.addConfig(root, false);
 		root.then(LiteralArgumentBuilder.<T>literal("ui")
@@ -87,6 +87,17 @@ public class FabricationClientCommands {
 					});
 					return 1;
 				}));
+		root.then(LiteralArgumentBuilder.<T>literal("summary_ui").executes((c)-> {
+			MinecraftClient.getInstance().send(() -> {
+				FabricationSummaryScreen screen = FabricationSummaryScreen.tryCreate(null);
+				if (screen == null) {
+					sendFeedback(Text.of("Server isn't running "+MixinConfigPlugin.MOD_NAME));
+				} else {
+					MinecraftClient.getInstance().setScreen(screen);
+				}
+			});
+			return 1;
+		}));
 		if (!FabConf.isFailed("atlas_viewer")) {
 			root.then(LiteralArgumentBuilder.<T>literal("atlas")
 					.then(LiteralArgumentBuilder.<T>literal("view")
