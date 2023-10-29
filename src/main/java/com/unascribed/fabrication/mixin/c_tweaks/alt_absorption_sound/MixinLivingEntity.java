@@ -76,7 +76,7 @@ public abstract class MixinLivingEntity extends Entity implements DidJustAbsorp 
 			for (EntityTrackingListener etl : FabricationMod.getTrackers(this)) {
 				ServerPlayerEntity spe = etl.getPlayer();
 				//TODO access spe.entity for instanceof check
-				if (spe instanceof SetFabricationConfigAware && ((SetFabricationConfigAware) spe).fabrication$isConfigAware()) {
+				if (spe instanceof SetFabricationConfigAware && ((SetFabricationConfigAware) spe).fabrication$getReqVer() >= 0) {
 					spe.networkHandler.sendPacket(fabPkt);
 				} else if (vanPkt != null) {
 					spe.networkHandler.sendPacket(vanPkt);
@@ -84,7 +84,7 @@ public abstract class MixinLivingEntity extends Entity implements DidJustAbsorp 
 			}
 			if (self instanceof ServerPlayerEntity) {
 				ServerPlayerEntity selfp = (ServerPlayerEntity)self;
-				if (selfp instanceof SetFabricationConfigAware && ((SetFabricationConfigAware) selfp).fabrication$isConfigAware()) {
+				if (selfp instanceof SetFabricationConfigAware && ((SetFabricationConfigAware) selfp).fabrication$getReqVer() >= 0) {
 					selfp.networkHandler.sendPacket(fabPkt);
 				} else if (vanPkt != null) {
 					selfp.networkHandler.sendPacket(vanPkt);

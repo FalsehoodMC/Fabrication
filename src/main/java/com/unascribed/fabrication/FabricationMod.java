@@ -9,13 +9,12 @@ import java.util.function.Predicate;
 
 import com.unascribed.fabrication.interfaces.SetFabricationConfigAware;
 import com.unascribed.fabrication.support.ConfigLoader;
-import com.unascribed.fabrication.support.ConfigValue;
+import com.unascribed.fabrication.support.ConfigValues;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.FabricationDefaultResources;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.OptionalFScript;
-import com.unascribed.fabrication.support.ResolvedConfigValue;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -75,7 +74,7 @@ public class FabricationMod implements ModInitializer {
 							enabledFeatures.add(key);
 						}
 					} catch (Throwable t) {
-						featureError(r, t);
+						featureError(r, t, "Unknown");
 						continue;
 					}
 				}
@@ -98,18 +97,18 @@ public class FabricationMod implements ModInitializer {
 
 	}
 
-	public static void featureError(Feature f, Throwable t) {
-		featureError(f.getClass(), f.getConfigKey(), t);
+	public static void featureError(Feature f, Throwable t, String reason) {
+		featureError(f.getClass(), f.getConfigKey(), t, reason);
 	}
 
-	public static void featureError(Class<?> clazz, String configKey, Throwable t) {
+	public static void featureError(Class<?> clazz, String configKey, Throwable t, String reason) {
 		FabLog.debug("Original feature error", t);
 		if (configKey == null) {
 			FabLog.warn("Feature "+clazz.getName()+" failed to apply!");
 		} else {
 			FabLog.warn("Feature "+clazz.getName()+" failed to apply! Force-disabling "+configKey);
 		}
-		FabConf.addFailure(configKey);
+		FabConf.addFailure(configKey, reason);
 	}
 
 	public static Identifier createIdWithCustomDefault(String namespace, String pathOrId) {
@@ -168,20 +167,27 @@ public class FabricationMod implements ModInitializer {
 
 	public static void sendConfigUpdate(MinecraftServer server, String key) {
 		for (ServerPlayerEntity spe : server.getPlayerManager().getPlayerList()) {
-			if (spe instanceof SetFabricationConfigAware && ((SetFabricationConfigAware)spe).fabrication$isConfigAware()) {
-				sendConfigUpdate(server, key, spe);
+			if (spe instanceof SetFabricationConfigAware && ((SetFabricationConfigAware)spe).fabrication$getReqVer() > 0) {
+				sendConfigUpdate(server, key, spe, ((SetFabricationConfigAware) spe).fabrication$getReqVer());
 			}
 		}
 	}
 
-	public static void sendConfigUpdate(MinecraftServer server, String key, ServerPlayerEntity spe) {
+	public static void sendConfigUpdate(MinecraftServer server, String key, ServerPlayerEntity spe, int reqVer) {
 		if (key != null && key.startsWith("general.category")) key = null;
 		PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
+		if (reqVer > 0) {
+			data.writeVarInt(1);
+		}
 		if (key == null) {
-			Map<String, ResolvedConfigValue> trileans = Maps.newHashMap();
+			Map<String, ConfigValues.ResolvedFeature> trileans = Maps.newHashMap();
 			Map<String, String> strings = Maps.newHashMap();
 			for (String k : FabConf.getAllKeys()) {
-				trileans.put(k, FabConf.getResolvedValue(k));
+				if (k.startsWith("general.category")) {
+					strings.put(k, FabConf.getRawValue(k));
+				} else {
+					trileans.put(k, FabConf.getResolvedValue(k));
+				}
 			}
 			data.writeVarInt(trileans.size());
 			trileans.entrySet().forEach(en -> data.writeString(en.getKey()).writeByte(en.getValue().ordinal()));
@@ -197,14 +203,21 @@ public class FabricationMod implements ModInitializer {
 		}
 		data.writeString(EarlyAgnos.getModVersion());
 		data.writeVarInt(FabConf.getAllFailures().size());
-		for (String k : FabConf.getAllFailures()) {
-			data.writeString(k);
+		if (reqVer == 1) {
+			for (Map.Entry<String, String> k : FabConf.getAllFailures().entrySet()) {
+				data.writeString(k.getKey());
+				data.writeString(k.getValue());
+			}
+		} else if (reqVer == 0) {
+			for (String k : FabConf.getAllFailures().keySet()) {
+				data.writeString(k);
+			}
 		}
 		data.writeVarInt(FabConf.getAllBanned().size());
 		for (String k : FabConf.getAllBanned()) {
 			data.writeString(k);
 		}
-		CustomPayloadS2CPacket pkt = new CustomPayloadS2CPacket(new Identifier("fabrication", "config"), data);
+		CustomPayloadS2CPacket pkt = new CustomPayloadS2CPacket(new Identifier("fabrication", reqVer > 0 ? "config2" :"config"), data);
 		spe.networkHandler.sendPacket(pkt);
 	}
 

@@ -27,7 +27,7 @@ public abstract class MixinServerPlayerEntity extends PlayerEntity {
 			if (oldPlayer instanceof SetFabricationConfigAware) {
 				SetFabricationConfigAware us = (SetFabricationConfigAware)this;
 				SetFabricationConfigAware them = (SetFabricationConfigAware)oldPlayer;
-				us.fabrication$setConfigAware(them.fabrication$isConfigAware());
+				us.fabrication$setReqVer(them.fabrication$getReqVer());
 			}
 		}
 	}
