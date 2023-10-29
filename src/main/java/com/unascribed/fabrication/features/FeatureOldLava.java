@@ -72,7 +72,7 @@ public class FeatureOldLava implements Feature {
 				newLava.tick();
 			}
 		} catch (Throwable t) {
-			FabricationMod.featureError(FeatureOldLava.class, "*.old_lava", t);
+			FabricationMod.featureError(FeatureOldLava.class, "*.old_lava", t, "Unknown");
 		}
 	}
 
