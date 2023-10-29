@@ -46,9 +46,11 @@ public class MixinServerCommonNetworkHandler {
 				int id = recvdData.readVarInt();
 				if (id == 0) {
 					// hello
+					int reqVer = 0;
+					if (recvdData.isReadable(4)) reqVer = recvdData.readVarInt();
 					if (player instanceof SetFabricationConfigAware) {
-						((SetFabricationConfigAware) player).fabrication$setConfigAware(true);
-						FabricationMod.sendConfigUpdate(player.server, null, player);
+						((SetFabricationConfigAware) player).fabrication$setReqVer(reqVer);
+						FabricationMod.sendConfigUpdate(player.server, null, player, reqVer);
 						if (FabConf.isEnabled("*.hide_armor")) {
 							FeatureHideArmor.sendSuppressedSlotsForSelf(player);
 						}

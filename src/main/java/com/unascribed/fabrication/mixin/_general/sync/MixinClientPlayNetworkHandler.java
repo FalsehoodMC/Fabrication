@@ -3,12 +3,16 @@ package com.unascribed.fabrication.mixin._general.sync;
 import java.util.Map;
 import java.util.Set;
 
+import com.mojang.brigadier.ParseResults;
+import com.unascribed.fabrication.support.ConfigValues;
 import com.unascribed.fabrication.util.ByteBufCustomPayload;
 import net.minecraft.client.network.ClientCommonNetworkHandler;
 import net.minecraft.client.network.ClientConnectionState;
+import net.minecraft.command.CommandSource;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -17,7 +21,6 @@ import com.unascribed.fabrication.client.FScriptScreen;
 import com.unascribed.fabrication.interfaces.GetServerConfig;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
-import com.unascribed.fabrication.support.ResolvedConfigValue;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -34,11 +37,14 @@ import net.minecraft.util.Identifier;
 @EligibleIf(envMatches=Env.CLIENT)
 public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkHandler implements GetServerConfig {
 
+	@Shadow
+	protected abstract ParseResults<CommandSource> parse(String command);
+
 	private boolean fabrication$hasHandshook = false;
-	private final Map<String, ResolvedConfigValue> fabrication$serverTrileanConfig = Maps.newHashMap();
+	private final Map<String, ConfigValues.ResolvedFeature> fabrication$serverTrileanConfig = Maps.newHashMap();
 	private final Map<String, String> fabrication$serverStringConfig = Maps.newHashMap();
 	private long fabrication$launchId;
-	private final Set<String> fabrication$serverFailedConfig = Sets.newHashSet();
+	private final Map<String, String> fabrication$serverFailedConfig = Maps.newHashMap();
 	private final Set<String> fabrication$serverBanned = Sets.newHashSet();
 	private String fabrication$serverVersion;
 
@@ -50,6 +56,7 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
 	public void onGameJoin(GameJoinS2CPacket packet, CallbackInfo ci) {
 		PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
 		data.writeVarInt(0);
+		data.writeVarInt(1);
 		connection.send(new CustomPayloadC2SPacket(new ByteBufCustomPayload(new Identifier("fabrication", "config"), data)));
 	}
 
@@ -58,15 +65,19 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
 		if (!(payload instanceof ByteBufCustomPayload)) return;
 
 		if (payload.id().getNamespace().equals("fabrication")) {
-			if (payload.id().getPath().equals("config")) {
+			if (payload.id().getPath().equals("config") || payload.id().getPath().equals("config2")) {
 				try {
 					fabrication$hasHandshook = true;
 					PacketByteBuf buf = ((ByteBufCustomPayload) payload).buf;
+					int reqVer = 0;
+					if (payload.id().getPath().equals("config2")) {
+						reqVer = buf.readVarInt();
+					}
 					int trileanKeys = buf.readVarInt();
 					for (int i = 0; i < trileanKeys; i++) {
 						String k = buf.readString(32767);
 						int v = buf.readUnsignedByte();
-						fabrication$serverTrileanConfig.put(k, ResolvedConfigValue.values()[v]);
+						fabrication$serverTrileanConfig.put(k, ConfigValues.ResolvedFeature.values()[v]);
 					}
 					int stringKeys = buf.readVarInt();
 					for (int i = 0; i < stringKeys; i++) {
@@ -80,8 +91,14 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
 							fabrication$serverVersion = buf.readString(32767);
 							fabrication$serverFailedConfig.clear();
 							int failedKeys = buf.readVarInt();
-							for (int i = 0; i < failedKeys; i++) {
-								fabrication$serverFailedConfig.add(buf.readString(32767));
+							if (reqVer == 1) {
+								for (int i = 0; i < failedKeys; i++) {
+									fabrication$serverFailedConfig.put(buf.readString(32767), buf.readString(32767));
+								}
+							} else if (reqVer == 0) {
+								for (int i = 0; i < failedKeys; i++) {
+									fabrication$serverFailedConfig.put(buf.readString(32767), "Unknown");
+								}
 							}
 						} else {
 							fabrication$serverVersion = "1.2.11 or earlier";
@@ -127,7 +144,7 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
 	}
 
 	@Override
-	public Map<String, ResolvedConfigValue> fabrication$getServerTrileanConfig() {
+	public Map<String, ConfigValues.ResolvedFeature> fabrication$getServerTrileanConfig() {
 		return fabrication$serverTrileanConfig;
 	}
 
@@ -142,7 +159,7 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
 	}
 
 	@Override
-	public Set<String> fabrication$getServerFailedConfig() {
+	public Map<String, String> fabrication$getServerFailedConfig() {
 		return fabrication$serverFailedConfig;
 	}
 
