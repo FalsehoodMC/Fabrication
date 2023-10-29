@@ -815,7 +815,7 @@ public class FabricationConfigScreen extends Screen {
 							return i == -1 ? Integer.MAX_VALUE : i;
 						})).collect(Collectors.toList());
 				if (editingWorldPath) {
-					y += drawWrappedText(matrices, 200, 2, "Categories are not available in world settings", width-200, 0xFFFFFF, false) + 6;
+					y += drawWrappedText(matrices, 200, y, "Categories are not available in world settings", width-200, 0xFFFFFF, false) + 6;
 				} else {
 					for (Map.Entry<String, FeatureEntry> en : categories) {
 						FeatureEntry fe = en.getValue();
