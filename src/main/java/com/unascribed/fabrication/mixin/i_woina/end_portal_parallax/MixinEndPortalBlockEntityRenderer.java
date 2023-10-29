@@ -99,7 +99,7 @@ public abstract class MixinEndPortalBlockEntityRenderer {
 	@FabInject(at=@At("HEAD"), method="method_23085(Lnet/minecraft/block/entity/EndPortalBlockEntity;Lnet/minecraft/util/math/Matrix4f;Lnet/minecraft/client/render/VertexConsumer;FFFFFFFFFFFLnet/minecraft/util/math/Direction;)V", cancellable=true)
 	public void fabrication$render(EndPortalBlockEntity be, Matrix4f model, VertexConsumer vertexConsumer, float x1, float x2, float y1, float y2, float z1, float z2, float z3, float z4, float n, float o, float p, Direction side, CallbackInfo ci) {
 		if (FabConf.isEnabled("*.end_portal_parallax") && be.shouldDrawSide(side)) {
-			FabConf.addFailure("*.end_portal_parallax");
+			FabConf.addFailure("*.end_portal_parallax", "Not Ported");
 			// YOU try to make it work with the gateway, I DARE YOU
 			if (be instanceof EndGatewayBlockEntity) return;
 			if (side.getHorizontal() != -1) return;

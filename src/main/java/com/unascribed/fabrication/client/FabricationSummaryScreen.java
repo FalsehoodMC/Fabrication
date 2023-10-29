@@ -129,7 +129,7 @@ public class FabricationSummaryScreen extends Screen {
 
 	@Override
 	public void onClose() {
-		client.setScreen(parent);
+		client.openScreen(parent);
 	}
 
 	@Override

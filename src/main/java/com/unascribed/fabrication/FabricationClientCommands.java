@@ -97,7 +97,7 @@ public class FabricationClientCommands {
 				if (screen == null) {
 					sendFeedback(Text.of("Server isn't running "+MixinConfigPlugin.MOD_NAME));
 				} else {
-					MinecraftClient.getInstance().setScreen(screen);
+					MinecraftClient.getInstance().openScreen(screen);
 				}
 			});
 			return 1;

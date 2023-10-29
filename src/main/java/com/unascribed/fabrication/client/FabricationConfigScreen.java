@@ -20,9 +20,8 @@ import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.FeaturesFile.FeatureEntry;
 import com.unascribed.fabrication.FeaturesFile.Sides;
 import com.unascribed.fabrication.interfaces.GetServerConfig;
-import com.unascribed.fabrication.support.ConfigValue;
+import com.unascribed.fabrication.support.ConfigValues;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
-import com.unascribed.fabrication.support.ResolvedConfigValue;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.SharedConstants;
@@ -786,7 +785,7 @@ public class FabricationConfigScreen extends Screen {
 			}
 			if (drawButton(matrices, 140, 42+height+32, 80, 20, "Summary", mouseX, mouseY)) {
 				Screen screen = FabricationSummaryScreen.tryCreate(this);
-				if (screen != null) client.setScreen(screen);
+				if (screen != null) client.openScreen(screen);
 			}
 			y += height;
 			y += 44;
@@ -926,7 +925,7 @@ public class FabricationConfigScreen extends Screen {
 		y += drawWrappedText(matrices, 200, 2, title, width-200, 0xFFFFFF, false) + 6;
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
-		RenderSystem.setShaderTexture(0, new Identifier("fabrication", "coffee_bean.png"));
+		client.getTextureManager().bindTexture(new Identifier("fabrication", "coffee_bean.png"));
 		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 		int x = 0;
