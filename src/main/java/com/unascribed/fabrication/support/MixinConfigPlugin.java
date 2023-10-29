@@ -70,7 +70,8 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			"*.photoallergic_creepers",
 			"*.end_portal_parallax",
 			"*.classic_block_drops",
-			"*.dropped_items_dont_stack"
+			"*.dropped_items_dont_stack",
+			"*.foliage_creepers"
 	);
 	public static boolean loadComplete = false;
 
