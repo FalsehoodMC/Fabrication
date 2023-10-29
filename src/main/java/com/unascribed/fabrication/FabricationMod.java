@@ -208,7 +208,7 @@ public class FabricationMod implements ModInitializer {
 				data.writeString(k.getKey());
 				data.writeString(k.getValue());
 			}
-		} else {
+		} else if (reqVer == 0) {
 			for (String k : FabConf.getAllFailures().keySet()) {
 				data.writeString(k);
 			}
