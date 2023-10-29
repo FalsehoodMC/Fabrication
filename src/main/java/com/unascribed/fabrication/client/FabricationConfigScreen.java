@@ -971,6 +971,7 @@ public class FabricationConfigScreen extends Screen {
 			}
 			color(p.getColor(), profSel ? 1f : hovered == p ? 0.6f : 0.3f);
 			drawTexture(matrices, 134+x, 0, 0, 0, 0, 16, 16, 16, 16);
+			color(-1);
 			x += 18;
 		}
 		if (mouseX >= 200 && mouseX <= width-200 && mouseY >= startY && mouseY <= y-6) {
