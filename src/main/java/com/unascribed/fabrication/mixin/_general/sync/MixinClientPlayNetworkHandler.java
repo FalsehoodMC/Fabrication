@@ -41,7 +41,7 @@ public class MixinClientPlayNetworkHandler implements GetServerConfig {
 	private final Map<String, ConfigValues.ResolvedFeature> fabrication$serverTrileanConfig = Maps.newHashMap();
 	private final Map<String, String> fabrication$serverStringConfig = Maps.newHashMap();
 	private long fabrication$launchId;
-	private final Set<String> fabrication$serverFailedConfig = Sets.newHashSet();
+	private final Map<String, String> fabrication$serverFailedConfig = Maps.newHashMap();
 	private final Set<String> fabrication$serverBanned = Sets.newHashSet();
 	private String fabrication$serverVersion;
 
@@ -49,16 +49,21 @@ public class MixinClientPlayNetworkHandler implements GetServerConfig {
 	public void onGameJoin(GameJoinS2CPacket packet, CallbackInfo ci) {
 		PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
 		data.writeVarInt(0);
+		data.writeVarInt(1);
 		connection.send(new CustomPayloadC2SPacket(new Identifier("fabrication", "config"), data));
 	}
 
 	@FabInject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/s2c/play/CustomPayloadS2CPacket;)V", cancellable=true)
 	public void onCustomPayload(CustomPayloadS2CPacket packet, CallbackInfo ci) {
 		if (packet.getChannel().getNamespace().equals("fabrication")) {
-			if (packet.getChannel().getPath().equals("config")) {
+			if (packet.getChannel().getPath().equals("config") || packet.getChannel().getPath().equals("config2")) {
 				try {
 					fabrication$hasHandshook = true;
 					PacketByteBuf buf = packet.getData();
+					int reqVer = 0;
+					if (packet.getChannel().getPath().equals("config2")) {
+						reqVer = buf.readVarInt();
+					}
 					int trileanKeys = buf.readVarInt();
 					for (int i = 0; i < trileanKeys; i++) {
 						String k = buf.readString(32767);
@@ -77,8 +82,14 @@ public class MixinClientPlayNetworkHandler implements GetServerConfig {
 							fabrication$serverVersion = buf.readString(32767);
 							fabrication$serverFailedConfig.clear();
 							int failedKeys = buf.readVarInt();
-							for (int i = 0; i < failedKeys; i++) {
-								fabrication$serverFailedConfig.add(buf.readString(32767));
+							if (reqVer == 1) {
+								for (int i = 0; i < failedKeys; i++) {
+									fabrication$serverFailedConfig.put(buf.readString(32767), buf.readString(32767));
+								}
+							} else {
+								for (int i = 0; i < failedKeys; i++) {
+									fabrication$serverFailedConfig.put(buf.readString(32767), "Unknown");
+								}
 							}
 						} else {
 							fabrication$serverVersion = "1.2.11 or earlier";
@@ -139,7 +150,7 @@ public class MixinClientPlayNetworkHandler implements GetServerConfig {
 	}
 
 	@Override
-	public Set<String> fabrication$getServerFailedConfig() {
+	public Map<String, String> fabrication$getServerFailedConfig() {
 		return fabrication$serverFailedConfig;
 	}
 

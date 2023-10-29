@@ -12,7 +12,7 @@ public interface GetServerConfig {
 	String fabrication$getServerVersion();
 	Map<String, ConfigValues.ResolvedFeature> fabrication$getServerTrileanConfig();
 	Map<String, String> fabrication$getServerStringConfig();
-	Set<String> fabrication$getServerFailedConfig();
+	Map<String, String> fabrication$getServerFailedConfig();
 	Set<String> fabrication$getServerBanned();
 
 	long fabrication$getLaunchId();

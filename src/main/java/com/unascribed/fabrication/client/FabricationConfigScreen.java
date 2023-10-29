@@ -3,7 +3,6 @@ package com.unascribed.fabrication.client;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -11,6 +10,7 @@ import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.tree.CommandNode;
 import com.unascribed.fabrication.EarlyAgnos;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.FabLog;
@@ -212,7 +212,9 @@ public class FabricationConfigScreen extends Screen {
 			isSingleplayer = true;
 		} else {
 			CommandDispatcher<?> disp = client.player.networkHandler.getCommandDispatcher();
-			if (disp.getRoot().getChild(MixinConfigPlugin.MOD_NAME_LOWER) == null) {
+			CommandNode<?> root = disp.getRoot().getChild(MixinConfigPlugin.MOD_NAME_LOWER);
+			if (root == null) root = disp.getRoot().getChild(MixinConfigPlugin.MOD_NAME_LOWER_OTHER);
+			if (root == null) {
 				whyCantConfigureServer = "This server doesn't have "+ MixinConfigPlugin.MOD_NAME+".";
 			} else {
 				ClientPlayNetworkHandler cpnh = client.getNetworkHandler();
@@ -221,7 +223,8 @@ public class FabricationConfigScreen extends Screen {
 					if (!gsc.fabrication$hasHandshook()) {
 						whyCantConfigureServer = "This server's version of "+ MixinConfigPlugin.MOD_NAME+" is too old.";
 					} else {
-						serverReadOnly = (disp.getRoot().getChild(MixinConfigPlugin.MOD_NAME_LOWER).getChild("config") == null);
+						CommandNode<?> config = root.getChild("config");
+						serverReadOnly = config == null || config.getChild("set") == null;
 						serverKnownConfigKeys.clear();
 						serverKnownConfigKeys.addAll(gsc.fabrication$getServerTrileanConfig().keySet());
 						serverKnownConfigKeys.addAll(gsc.fabrication$getServerStringConfig().keySet());
@@ -789,8 +792,12 @@ public class FabricationConfigScreen extends Screen {
 			if (!configuringServer && drawButton(matrices, 140, 20+height+32, 120, 20, "Reload files", mouseX, mouseY)) {
 				FabConf.reload();
 			}
+			if (drawButton(matrices, 140, 42+height+32, 80, 20, "Summary", mouseX, mouseY)) {
+				Screen screen = FabricationSummaryScreen.tryCreate(this);
+				if (screen != null) client.setScreen(screen);
+			}
 			y += height;
-			y += 22;
+			y += 44;
 		} else {
 			RenderSystem.enableBlend();
 			RenderSystem.defaultBlendFunc();
@@ -828,7 +835,7 @@ public class FabricationConfigScreen extends Screen {
 				y += 4;
 				Predicate<FeatureEntry> pen;
 				if ("#failed".equals(searchField.getText())) {
-					pen = fe -> FabConf.isFailed(fe.key);
+					pen = fe -> isFailed(fe.key);
 				} else {
 					pen = (en) -> emptyQuery || (queryPattern.matcher(en.name).find() || queryPattern.matcher(en.shortName).find() || queryPattern.matcher(en.desc).find());
 				}
@@ -989,7 +996,7 @@ public class FabricationConfigScreen extends Screen {
 		boolean showSourceSection = ArrayUtils.contains(flags, SHOW_SOURCE_SECTION);
 		boolean highlightQueryMatch = ArrayUtils.contains(flags, HIGHLIGHT_QUERY_MATCH);
 		boolean noFabricApi = !configuringServer && requiresFabricApi && !FabricLoader.getInstance().isModLoaded("fabric");
-		boolean failed = isFailed(key);
+		String failed = getFailed(key);
 		boolean banned = !configuringServer && FabricationModClient.isBannedByServer(key);
 		boolean disabled = banned || noFabricApi || (configuringServer && serverReadOnly) || !isValid(key);
 		boolean noValue = noFabricApi || (configuringServer && clientOnly || !isValid(key));
@@ -1067,7 +1074,7 @@ public class FabricationConfigScreen extends Screen {
 		int curHSValue = values[currentValue.ordinal()];
 		float a = sCurve5((5-time)/5f);
 		float da = sCurve5((5-disabledTime)/5f);
-		if (!(disabled || failed)) {
+		if (!(disabled || failed != null)) {
 			da = 1-da;
 		}
 		int trackSize = (noUnset||noBan?45:60);
@@ -1192,6 +1199,7 @@ public class FabricationConfigScreen extends Screen {
 			drawTitle = queryPattern.matcher(drawTitle).replaceAll("§e§l$0§r");
 			drawDesc = queryPattern.matcher(drawDesc).replaceAll("§e§l$0§r");
 		}
+		if (failed != null) drawTitle += " §4 "+failed;
 		y += drawWrappedText(matrices, startX, 2, drawTitle, width-startX-6, 0xFFFFFF | textAlpha, false)*scale;
 		int endX = startY == y-8 ? width - 6 : startX+textRenderer.getWidth(title);
 		//		int endX = textRenderer.draw(matrices, title, startX, 2, 0xFFFFFF | textAlpha);
@@ -1234,8 +1242,8 @@ public class FabricationConfigScreen extends Screen {
 					} else {
 						renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"You cannot configure this server"), (int)mouseX, (int)mouseY);
 					}
-				} else if (failed) {
-					renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"This feature failed to initialize"), (int)mouseX, (int)mouseY);
+				} else if (failed != null) {
+					renderTooltip(matrices, new LiteralText(((tooltipBlinkTicks/5)%2 == 1 ? "§c" : "")+"This feature failed to initialize, reason: "+failed), (int)mouseX, (int)mouseY);
 				} else {
 					if (onlyBannable) {
 						if (clickedIndex == 0) {
@@ -1565,9 +1573,16 @@ public class FabricationConfigScreen extends Screen {
 
 	private boolean isFailed(String key) {
 		if (configuringServer) {
-			return ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerFailedConfig().contains(key);
+			return ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerFailedConfig().containsKey(key);
 		} else {
 			return FabConf.isFailed(key);
+		}
+	}
+	private String getFailed(String key) {
+		if (configuringServer) {
+			return ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerFailedConfig().get(key);
+		} else {
+			return FabConf.getFailed(key);
 		}
 	}
 

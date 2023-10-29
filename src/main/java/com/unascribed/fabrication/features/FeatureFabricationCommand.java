@@ -219,7 +219,7 @@ public class FeatureFabricationCommand implements Feature {
 
 				dispatcher.register(root);
 			} catch (Throwable t) {
-				FabricationMod.featureError(this, t);
+				FabricationMod.featureError(this, t, "Unknown");
 			}
 		});
 	}

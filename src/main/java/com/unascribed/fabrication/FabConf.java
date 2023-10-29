@@ -67,8 +67,8 @@ public class FabConf {
 	private static final ImmutableMap<String, Pair<ImmutableSet<String>, ImmutableSet<String>>> sectionFeatureKeyToFeatures;
 	private static final List<ConfigLoader> loaders = Lists.newArrayList();
 	private static final Set<SpecialEligibility> metSpecialEligibility = EnumSet.noneOf(SpecialEligibility.class);
-	private static final Set<String> failures = Sets.newHashSet();
-	private static final Set<String> failuresReadOnly = Collections.unmodifiableSet(failures);
+	private static final Map<String, String> failures = Maps.newHashMap();
+	private static final Map<String, String> failuresReadOnly = Collections.unmodifiableMap(failures);
 	private static Map<String, ConfigValues.Feature> worldConfig = new HashMap<>();
 	private static QDIni rawConfig;
 	public static Map<String, ConfigValues.Category> categoryConfig = new HashMap<>();
@@ -308,7 +308,10 @@ public class FabConf {
 	}
 
 	public static boolean isFailed(String configKey) {
-		return failures.contains(remap(configKey));
+		return failures.containsKey(remap(configKey));
+	}
+	public static String getFailed(String configKey) {
+		return failures.get(remap(configKey));
 	}
 
 	public static ConfigValues.Feature getValue(String configKey) {
@@ -369,7 +372,7 @@ public class FabConf {
 		return validSections;
 	}
 
-	public static Set<String> getAllFailures() {
+	public static Map<String, String> getAllFailures() {
 		return failuresReadOnly;
 	}
 
@@ -380,8 +383,8 @@ public class FabConf {
 		}), Map.Entry::getKey);
 	}
 
-	public static void addFailure(String configKey) {
-		failures.add(remap(configKey));
+	public static void addFailure(String configKey, String reason) {
+		failures.put(remap(configKey), reason);
 
 	}
 	private static void getDefaults(Function<String, ConfigValues.Category> getCategory, Consumer<String> add) {
