@@ -31,7 +31,11 @@ public abstract class MixinCraftingScreen extends HandledScreen<CraftingScreenHa
 
 	@FabInject(method="mouseClicked(DDI)Z", at=@At(value="INVOKE", target="Lnet/minecraft/client/gui/screen/ingame/CraftingScreen;setFocused(Lnet/minecraft/client/gui/Element;)V"))
 	private void mouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir){
-		if (FabConf.isEnabled("*.recipe_book_auto_craft") && button == 0 && !hasControlDown())
-			onMouseClick(handler.getSlot(handler.getCraftingResultSlotIndex()), handler.getCraftingResultSlotIndex(), 0, hasShiftDown() ? SlotActionType.QUICK_MOVE : SlotActionType.PICKUP);
+		if (FabConf.isEnabled("*.recipe_book_auto_craft") && button == 0 && !hasControlDown()) {
+			onMouseClick(handler.getSlot(handler.getCraftingResultSlotIndex()), handler.getCraftingResultSlotIndex(), 0, SlotActionType.QUICK_MOVE);
+			if (handler.getSlot(handler.getCraftingResultSlotIndex()).hasStack()) {
+				onMouseClick(handler.getSlot(handler.getCraftingResultSlotIndex()), handler.getCraftingResultSlotIndex(), 0, SlotActionType.PICKUP);
+			}
+		}
 	}
 }
