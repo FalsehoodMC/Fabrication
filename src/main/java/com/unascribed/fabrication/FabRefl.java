@@ -18,6 +18,7 @@ import com.unascribed.fabrication.support.FabReflField;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.injection.FabRefMap;
 import net.minecraft.client.util.SelectionManager;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.command.GameModeCommand;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.GameMode;
@@ -77,6 +78,17 @@ public class FabRefl {
 	// invokeExact becomes a standard INVOKE* insn after the JIT gets its hands on it. The entire
 	// purpose of MethodHandles is to be basically free. the catch is there can be *no* abstraction
 	// on an invokeExact or the calltime signature will be wrong and the JVM will get confused.
+
+	@FabReflField
+	private static final String slot_index_field = "Lnet/minecraft/screen/slot/Slot;index:I";
+	private static final MethodHandle slot_index = unreflectGetter("Slot", () -> Slot.class, slot_index_field).get();
+	public static int getSlotIndex(Slot subject) {
+		try {
+			return (int)checkHandle(slot_index).invokeExact(subject);
+		} catch (Throwable t) {
+			throw rethrow(t);
+		}
+	}
 
 	@FabReflField
 	private static final String cpc2sp_channel_field = "net/minecraft/network/packet/c2s/play/CustomPayloadC2SPacket;channel";
