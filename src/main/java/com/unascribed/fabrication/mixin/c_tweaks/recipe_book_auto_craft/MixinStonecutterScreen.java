@@ -16,6 +16,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.OptionalInt;
+
 @Mixin(StonecutterScreen.class)
 @EligibleIf(configAvailable="*.recipe_book_auto_craft", envMatches=Env.CLIENT)
 public abstract class MixinStonecutterScreen extends HandledScreen<StonecutterScreenHandler> {
@@ -39,7 +41,9 @@ public abstract class MixinStonecutterScreen extends HandledScreen<StonecutterSc
 			for(int i = 0; i < pInv.main.size(); ++i) {
 				ItemStack insStack = pInv.main.get(i);
 				if (ItemStack.canCombine(stack, insStack)) {
-					onMouseClick(handler.getSlot(handler.getSlotIndex(pInv, i).getAsInt()), i, 0, SlotActionType.PICKUP);
+					OptionalInt oi = handler.getSlotIndex(pInv, i);
+					if (!oi.isPresent()) continue;
+					onMouseClick(handler.getSlot(oi.getAsInt()), i, 0, SlotActionType.PICKUP);
 					if (count - (64-insStack.getCount()) <= 0) {
 						return;
 					}
@@ -48,7 +52,9 @@ public abstract class MixinStonecutterScreen extends HandledScreen<StonecutterSc
 			for(int i = 0; i < pInv.main.size(); ++i) {
 				ItemStack insStack = pInv.main.get(i);
 				if (insStack.isEmpty()) {
-					onMouseClick(handler.getSlot(handler.getSlotIndex(pInv, i).getAsInt()), i, 0, SlotActionType.PICKUP);
+					OptionalInt oi = handler.getSlotIndex(pInv, i);
+					if (!oi.isPresent()) continue;
+					onMouseClick(handler.getSlot(oi.getAsInt()), i, 0, SlotActionType.PICKUP);
 					return;
 				}
 			}
