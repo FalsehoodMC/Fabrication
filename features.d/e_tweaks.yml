@@ -279,7 +279,7 @@ tweaks.recipe_book_auto_craft:
 	sides: client_only
 	media: https://unascribed.com/fabrication/recipe_book_auto_craft.mp4
 	desc:
-		Recipe book crafts items instead of moving them to the crafting area.
+		Recipe book and stone cutter crafts items instead of moving them to the crafting area.
 		Holding controll uses vanilla behaviour.
 
 tweaks.no_heavy_minecarts:
