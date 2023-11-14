@@ -4,6 +4,7 @@ import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.SpecialEligibility;
 
+import com.unascribed.fabrication.support.injection.FabModifyArg;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -13,7 +14,6 @@ import net.minecraft.util.registry.Registry;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 import java.util.function.Consumer;
 
@@ -21,8 +21,8 @@ import java.util.function.Consumer;
 @EligibleIf(configAvailable="*.mobs_dont_drop_ingots", specialConditions=SpecialEligibility.FORGE)
 public abstract class MixinLivingEntityForge {
 
-	@ModifyArg(method="dropLoot(Lnet/minecraft/entity/damage/DamageSource;Z)V",
-			at=@At(value="INVOKE", target="java/util/List.forEach(Ljava/util/function/Consumer;)V", remap=false))
+	@FabModifyArg(method="dropLoot(Lnet/minecraft/entity/damage/DamageSource;Z)V",
+			  at=@At(value="INVOKE", target="java/util/List.forEach(Ljava/util/function/Consumer;)V", remap=false))
 	public Consumer<ItemStack> splitLoot(Consumer<ItemStack> lootConsumer) {
 		if(!FabConf.isEnabled("*.mobs_dont_drop_ingots")) return lootConsumer;
 		return (stack)-> {
