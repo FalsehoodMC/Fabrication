@@ -128,11 +128,13 @@ public class FabInjector {
 		if (ci == null) return Collections.emptyMap();
 		Map<String, String> discoveredRedirects = new HashMap<>();
 		for (IMixinInfo inf : getMixinInfoFromClassInfo.apply(ci)) {
+			if (inf == null) continue;
 			ClassNode cn = inf.getClassNode(0);
 			if (cn.methods == null) continue;
 			for (MethodNode mth : cn.methods) {
 				if (mth.visibleAnnotations == null) continue;
 				for (AnnotationNode annotation : mth.visibleAnnotations) {
+					if (annotation == null) continue;
 					if (!"Lorg/spongepowered/asm/mixin/injection/Redirect;".equals(annotation.desc)) continue;
 					int at = annotation.values.indexOf("at");
 					if (at != -1 && at < annotation.values.size()){
@@ -171,7 +173,12 @@ public class FabInjector {
 		apply(targetClass, null);
 	}
 	public static void apply(ClassNode targetClass, List<ToInject> injectIn) {
-		Map<String, String> existingRedirects = transformRedirectsToOriginalNames(getMixinRedirects(targetClass.name), targetClass);
+		Map<String, String> existingRedirects = new HashMap<>();
+		try {
+			existingRedirects = transformRedirectsToOriginalNames(getMixinRedirects(targetClass.name), targetClass);
+		} catch (Exception e) {
+			FabLog.error("Failed to get mixin redirects please report this", e);
+		}
 		List<ToInject> injects = new ArrayList<>();
 		List<EntryMixinMerged> redirects = new ArrayList<>();
 		for (MethodNode methodNode : targetClass.methods) {
