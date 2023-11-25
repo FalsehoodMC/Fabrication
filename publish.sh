@@ -31,6 +31,6 @@ else
 fi
 
 ./gradlew $tasks
-#PUBLISH_FORGERY=1 ./gradlew $tasks
+PUBLISH_FORGERY=1 ./gradlew $tasks
 rm changelog.md
 
