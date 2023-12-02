@@ -20,7 +20,7 @@ import net.minecraft.util.registry.Registry;
 
 import java.util.Optional;
 
-@EligibleIf(configAvailable="*.swap_conflicting_enchants")
+@EligibleIf(configAvailable="*.swap_conflicting_enchants", envMatches=Env.CLIENT)
 public class FeatureSwapConflictingEnchants implements Feature {
 
 	private boolean applied = false;
@@ -28,7 +28,6 @@ public class FeatureSwapConflictingEnchants implements Feature {
 
 	@Override
 	public void apply() {
-		active = true;
 		if (!applied) {
 			applied = true;
 			if (EarlyAgnos.getCurrentEnv() == Env.CLIENT) {
@@ -71,7 +70,6 @@ public class FeatureSwapConflictingEnchants implements Feature {
 
 	@Override
 	public boolean undo() {
-		active = false;
 		return true;
 	}
 
