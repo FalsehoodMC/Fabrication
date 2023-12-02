@@ -15,6 +15,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import static com.unascribed.fabrication.FabConf.remap;
@@ -73,6 +74,9 @@ public class ConfigPredicates {
 
 	static{
 		Map<String, Predicate<?>> defaultsMap = new HashMap<>();
+		defaultsMap.put(remap("*.swap_conflicting_enchants"),
+			(Predicate<PlayerEntity>) Entity::isSneaky
+		);
 		defaultsMap.put(remap("*.velocity_based_fall_damage_reset"),
 			(Predicate<Entity>) entity ->
 				!(entity instanceof LivingEntity) || !((LivingEntity)entity).isClimbing()

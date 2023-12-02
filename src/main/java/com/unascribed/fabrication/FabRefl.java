@@ -306,6 +306,18 @@ public class FabRefl {
 		}
 	}
 
+	@FabReflField
+	private static final String is_hideFlags_mthd = "Lnet/minecraft/item/ItemStack;getHideFlags()I";
+	private static final MethodHandle is_hideFlags = unreflectMethod("ItemStack", () -> ItemStack.class, is_hideFlags_mthd, int.class)
+		.requiredBy("*.swap_conflicting_enchants").get();
+	public static int ItemStack_getHideFlags(ItemStack subject) {
+		try {
+			return (int) checkHandle(is_hideFlags).invokeExact(subject);
+		} catch (Throwable t) {
+			throw rethrow(t);
+		}
+	}
+
 	@Environment(EnvType.CLIENT)
 	public static final class Client {
 
