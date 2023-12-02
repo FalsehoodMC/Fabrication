@@ -24,7 +24,6 @@ import java.util.Optional;
 public class FeatureSwapConflictingEnchants implements Feature {
 
 	private boolean applied = false;
-	private boolean active = false;
 
 	@Override
 	public void apply() {
@@ -39,7 +38,7 @@ public class FeatureSwapConflictingEnchants implements Feature {
 	@Environment(EnvType.CLIENT)
 	private void applyClient() {
 		Agnos.runForTooltipRender((stack, lines) -> {
-			if (active && !stack.isEmpty() && stack.hasNbt() && stack.getNbt().contains("fabrication#conflictingEnchants")) {
+			if (!stack.isEmpty() && stack.hasNbt() && stack.getNbt().contains("fabrication#conflictingEnchants")) {
 				if ((FabRefl.ItemStack_getHideFlags(stack) & ItemStack.TooltipSection.ENCHANTMENTS.getFlag()) != 0) return;
 				NbtCompound lTag = stack.getNbt().getCompound("fabrication#conflictingEnchants");
 				if (lTag == null || lTag.isEmpty()) return;

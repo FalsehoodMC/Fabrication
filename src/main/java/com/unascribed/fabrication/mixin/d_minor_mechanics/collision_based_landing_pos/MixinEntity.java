@@ -30,7 +30,7 @@ public abstract class MixinEntity {
 	public void getLandingPos(CallbackInfoReturnable<BlockPos> cir) {
 		if (!FabConf.isEnabled("*.collision_based_landing_pos")) return;
 		Entity self = (Entity)(Object)this;
-		World world = self.getWorld();
+		World world = self.world;
 		if (!fabrication$collisionBasedLandingPos.test(self)) return;
 		VoxelShape inp = world.getBlockState(cir.getReturnValue()).getCollisionShape(world, cir.getReturnValue());
 		if (!inp.isEmpty()) return;
