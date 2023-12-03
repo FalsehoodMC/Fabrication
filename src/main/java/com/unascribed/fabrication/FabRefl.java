@@ -296,6 +296,17 @@ public class FabRefl {
 		}
 	}
 
+	@FabReflField
+	private static final String is_hideFlags_mthd = "Lnet/minecraft/item/ItemStack;getHideFlags()I";
+	private static final MethodHandle is_hideFlags = unreflectMethod("ItemStack", () -> ItemStack.class, is_hideFlags_mthd, int.class)
+		.requiredBy("*.swap_conflicting_enchants").get();
+	public static int ItemStack_getHideFlags(ItemStack subject) {
+		try {
+			return (int) checkHandle(is_hideFlags).invokeExact(subject);
+		} catch (Throwable t) {
+			throw rethrow(t);
+		}
+	}
 
 	@Environment(EnvType.CLIENT)
 	public static final class Client {
@@ -364,6 +375,7 @@ public class FabRefl {
 				throw rethrow(t);
 			}
 		}
+
 		@FabReflField
 		private static final String mc_itemColors_field = "net/minecraft/client/MinecraftClient;itemColors";
 		private static final MethodHandle mc_itemColors = unreflectGetter("MinecraftClient", () -> MinecraftClient.class, mc_itemColors_field)
@@ -435,7 +447,6 @@ public class FabRefl {
 				throw rethrow(t);
 			}
 		}
-
 	}
 
 	private static MethodHandle checkHandle(MethodHandle handle) {
