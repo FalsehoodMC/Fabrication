@@ -13,6 +13,8 @@ mechanics.extra.swap_conflicting_enchants:
 	name: Swap Conflicting Enchants
 	since: 3.0.0
 	sides: server_only
+	fscript: PLAYER_ENTITY
+	fscript_default: sneaky
 	media: https://unascribed.com/fabrication/swap_conflicting_enchants.mp4
 	desc:
 		When adding enchants that would normally not be compatible it will instead get added in an inactive state.
