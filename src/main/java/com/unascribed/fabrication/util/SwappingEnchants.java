@@ -1,5 +1,7 @@
 package com.unascribed.fabrication.util;
 
+import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.util.forgery_nonsense.ForgeryArrayList;
 import com.unascribed.fabrication.util.forgery_nonsense.ForgeryHashMap;
 import com.unascribed.fabrication.util.forgery_nonsense.ForgeryIdentifier;
@@ -18,9 +20,13 @@ import net.minecraft.world.World;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 public class SwappingEnchants {
+	private static final Predicate<PlayerEntity> configPredicate = ConfigPredicates.getFinalPredicate("*.swap_conflicting_enchants");
 	public static boolean swapEnchants(ItemStack self, World world, PlayerEntity user) {
+		if (!FabConf.isEnabled("*.swap_conflicting_enchants")) return false;
+		if (!configPredicate.test(user)) return false;
 		List<Pair<String, Integer>> currentConflicts = ForgeryArrayList.get();
 		NbtCompound nbt = self.getTag();
 		if (nbt == null) return false;
@@ -30,7 +36,7 @@ public class SwappingEnchants {
 		for (String key : lTag.getKeys()) {
 			currentConflicts.add(ForgeryPair.get(key, lTag.getInt(key)));
 		}
-		if (!currentConflicts.isEmpty() && user.isSneaky()) {
+		if (!currentConflicts.isEmpty()) {
 			NbtCompound tag = ForgeryNbt.getCompound();
 			Pair<String, Integer> toAdd;
 			{
