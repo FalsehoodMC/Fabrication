@@ -174,11 +174,12 @@ jar {
 		Map<String, String> targetMap = new HashMap<>()
 		Map<String, String> methodMap = new HashMap<>()
 		Map<String, String> classMap = new HashMap<>()
-		for (def cl : mappings.classes){
-			String clName = cl.getName('named')
-			String clNameRez = cl.getName('intermediary')
-			def dottedClName = clName.replace('/', '.')
-			for (def map : toInter.values()){
+
+		for (def map : toInter.values()){
+			for (def cl : mappings.classes){
+                String clName = cl.getName('named')
+                String clNameRez = cl.getName('intermediary')
+                String dottedClName = clName.replace('/', '.')
 				if (map.mixin.contains(dottedClName)) {
 					for (def clMethod : cl.methods) {
 						for (String mthd : map.method) {
@@ -223,6 +224,31 @@ jar {
 					}
 				}
 			}
+            //basic <init> pass because #656
+            {
+                for (Mapp.Target mapt : map.target) {
+                    String target = mapt.self
+                    int col = target.indexOf(';')
+                    int dot = target.indexOf('.')
+                    if (col == -1 || dot < col && dot != -1) col = dot
+                    int brc = target.indexOf('(')
+                    if (brc == -1) {
+                        continue
+                    }
+                    String desc = target.substring(brc)
+                    String name = target.substring(col+1, brc)
+                    if (!"<init>".equals(name)) continue
+                    //TODO map desc
+                    if (!"()V".equals(desc)) continue
+                    String claz = target.substring(0, col)
+                    for (def cl : mappings.classes) {
+                        String clName = cl.getName('named')
+                        if (claz.endsWith(clName)) {
+                            targetMap.put(target, clName+"<init>()V")
+                        }
+                    }
+                }
+            }
 		}
 		StringBuilder bldrRel = new StringBuilder()
 		Map<String, String> bldrAbs = new HashMap<>()
