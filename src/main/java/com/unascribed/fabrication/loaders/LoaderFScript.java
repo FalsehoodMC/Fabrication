@@ -1,5 +1,10 @@
 package com.unascribed.fabrication.loaders;
 
+import com.unascribed.fabrication.FabLog;
+import com.unascribed.fabrication.FeaturesFile;
+import com.unascribed.fabrication.QDIni;
+import com.unascribed.fabrication.support.ConfigLoader;
+
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -7,16 +12,9 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
-import com.unascribed.fabrication.FabLog;
-import com.unascribed.fabrication.FeaturesFile;
-import com.unascribed.fabrication.QDIni;
-import com.unascribed.fabrication.support.ConfigLoader;
-import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.Env;
 import com.google.common.base.Charsets;
 import com.google.common.io.MoreFiles;
 
-@EligibleIf(envMatches=Env.CLIENT)
 public class LoaderFScript implements ConfigLoader {
 
 	private static Map<String, String> scripts = new HashMap<>();

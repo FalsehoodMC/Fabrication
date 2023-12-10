@@ -3,6 +3,7 @@ package com.unascribed.fabrication.mixin.e_mechanics.grindstone_disenchanting;
 import java.util.Map;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.FailOn;
 import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -24,7 +25,8 @@ import net.minecraft.screen.GrindstoneScreenHandler;
 import net.minecraft.world.World;
 
 @Mixin(targets="net.minecraft.screen.GrindstoneScreenHandler$4")
-@EligibleIf(configAvailable="*.grindstone_disenchanting", modNotLoaded={"fabric:grindenchantments"})
+@EligibleIf(configAvailable="*.grindstone_disenchanting")
+@FailOn(modLoaded="fabric:grindenchantments")
 public class MixinGrindstoneScreenHandlerResultSlot implements SetOwner<GrindstoneScreenHandler> {
 
 	@Unique

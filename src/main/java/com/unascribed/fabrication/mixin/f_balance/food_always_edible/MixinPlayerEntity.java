@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.mixin.f_balance.food_always_edible;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.FailOn;
 import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -14,7 +15,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import java.util.function.Predicate;
 
 @Mixin(PlayerEntity.class)
-@EligibleIf(configAvailable="*.food_always_edible", modNotLoaded="eternaleats")
+@EligibleIf(configAvailable="*.food_always_edible")
+@FailOn(modLoaded="eternaleats")
 public class MixinPlayerEntity {
 
 	private static final Predicate<PlayerEntity> fabrication$foodAlwaysEdiblePredicate = ConfigPredicates.getFinalPredicate("*.food_always_edible");

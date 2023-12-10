@@ -4,6 +4,7 @@ import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.client.GLUPort;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.SpecialEligibility;
+import com.unascribed.fabrication.support.FailOn;
 import com.unascribed.fabrication.support.injection.FabInject;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -81,7 +82,8 @@ import static org.lwjgl.opengl.GL11.glVertex3d;
 
 @Environment(EnvType.CLIENT)
 @Mixin(EndPortalBlockEntityRenderer.class)
-@EligibleIf(configAvailable="*.end_portal_parallax", specialConditions=SpecialEligibility.NOT_MACOS, modNotLoaded="endlessencore")
+@EligibleIf(configAvailable="*.end_portal_parallax")
+@FailOn(invertedSpecialConditions={SpecialEligibility.NOT_MACOS, SpecialEligibility.NEVER}, modLoaded="endlessencore")
 public abstract class MixinEndPortalBlockEntityRenderer {
 
 	@Shadow
@@ -99,7 +101,6 @@ public abstract class MixinEndPortalBlockEntityRenderer {
 	@FabInject(at=@At("HEAD"), method="method_23085(Lnet/minecraft/block/entity/EndPortalBlockEntity;Lnet/minecraft/util/math/Matrix4f;Lnet/minecraft/client/render/VertexConsumer;FFFFFFFFFFFLnet/minecraft/util/math/Direction;)V", cancellable=true)
 	public void fabrication$render(EndPortalBlockEntity be, Matrix4f model, VertexConsumer vertexConsumer, float x1, float x2, float y1, float y2, float z1, float z2, float z3, float z4, float n, float o, float p, Direction side, CallbackInfo ci) {
 		if (FabConf.isEnabled("*.end_portal_parallax") && be.shouldDrawSide(side)) {
-			FabConf.addFailure("*.end_portal_parallax", "Not Ported");
 			// YOU try to make it work with the gateway, I DARE YOU
 			if (be instanceof EndGatewayBlockEntity) return;
 			if (side.getHorizontal() != -1) return;
@@ -262,7 +263,6 @@ public abstract class MixinEndPortalBlockEntityRenderer {
 					glPopMatrix();
 				}
 			}
-
 		}
 	}
 }
