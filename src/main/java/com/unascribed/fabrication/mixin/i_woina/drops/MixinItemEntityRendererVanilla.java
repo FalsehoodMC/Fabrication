@@ -1,6 +1,8 @@
 package com.unascribed.fabrication.mixin.i_woina.drops;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.FailOn;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.injection.Hijack;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,6 +21,7 @@ import net.minecraft.item.ItemStack;
 
 @Mixin(ItemEntityRenderer.class)
 @EligibleIf(configAvailable="*.classic_block_drops", envMatches=Env.CLIENT, modNotLoaded="forge:obfuscate")
+@FailOn(invertedSpecialConditions=SpecialEligibility.NOT_FORGE)
 public class MixinItemEntityRendererVanilla {
 
 	@Hijack(target="Lnet/minecraft/client/render/item/ItemRenderer;renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformationMode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/render/model/BakedModel;)V",

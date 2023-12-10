@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.a_fixes.fix_charm_amethyst_dupe;
 
+import com.unascribed.fabrication.support.FailOn;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabInject;
@@ -17,7 +18,8 @@ import net.minecraft.world.World;
 import svenhjol.charm.module.clear_item_frames.ClearItemFrames;
 
 @Mixin(value=ClearItemFrames.class)
-@EligibleIf(configAvailable="*.fix_charm_amethyst_dupe", modLoaded="charm")
+@EligibleIf(configAvailable="*.fix_charm_amethyst_dupe")
+@FailOn(modNotLoaded="charm")
 public class MixinClearItemFrames {
 
 	private boolean fabrication$wasInvisible;

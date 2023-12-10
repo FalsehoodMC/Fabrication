@@ -3,6 +3,8 @@ package com.unascribed.fabrication.mixin.d_minor_mechanics.gradual_block_breakin
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.FailOn;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.injection.Hijack;
 import com.unascribed.fabrication.support.injection.HijackReturn;
 import com.unascribed.fabrication.support.injection.ModifyReturn;
@@ -26,6 +28,7 @@ import java.util.function.Predicate;
 
 @Mixin(ServerPlayerInteractionManager.class)
 @EligibleIf(configAvailable="*.gradual_block_breaking")
+@FailOn(invertedSpecialConditions=SpecialEligibility.NOT_FORGE)
 public class MixinServerPlayerInteractionManager {
 
 	@Shadow

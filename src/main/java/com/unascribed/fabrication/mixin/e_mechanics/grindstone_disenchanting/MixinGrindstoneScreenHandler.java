@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.e_mechanics.grindstone_disenchanting;
 
+import com.unascribed.fabrication.support.FailOn;
 import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -17,7 +18,8 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 
 @Mixin(GrindstoneScreenHandler.class)
-@EligibleIf(configAvailable="*.grindstone_disenchanting", modNotLoaded="fabric:grindenchantments")
+@EligibleIf(configAvailable="*.grindstone_disenchanting")
+@FailOn(modLoaded="fabric:grindenchantments")
 public abstract class MixinGrindstoneScreenHandler extends ScreenHandler {
 
 	protected MixinGrindstoneScreenHandler(ScreenHandlerType<?> type, int syncId) {

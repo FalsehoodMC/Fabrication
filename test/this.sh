@@ -1,13 +1,8 @@
 #!/bin/bash
-cd `dirname "$0"`
+cd "`dirname "$0"`/.."
 instance="1201"
-cp -r .. "./$instance"
-cd "$instance"
-git checkout 3.0/1.20.1
 ./build.sh
-../var/apply.sh build/libs/fabrication* "fab$instance/.minecraft/mods"
-../var/apply.sh build/libs/forgery* "fabForge$instance/.minecraft/mods"
-cd ..
-rm -rf "$instance"
-./var/start.sh "fab$instance" & ./var/start.sh "fabForge$instance" &
+./test/var/apply.sh build/libs/fabrication* "fab$instance/.minecraft/mods"
+./test/var/apply.sh build/libs/forgery* "fabForge$instance/.minecraft/mods"
+./test/var/start.sh "fab$instance" & ./test/var/start.sh "fabForge$instance" &
 
