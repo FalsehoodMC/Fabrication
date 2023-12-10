@@ -5,6 +5,8 @@ import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.interfaces.InterruptableRangedMob;
 import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.FailOn;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.injection.FabInject;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -18,6 +20,7 @@ import java.util.function.Predicate;
 
 @Mixin(LivingEntity.class)
 @EligibleIf(configAvailable="*.interrupting_damage")
+@FailOn(invertedSpecialConditions=SpecialEligibility.NOT_FORGE)
 public abstract class MixinLivingEntity {
 
 	@Shadow

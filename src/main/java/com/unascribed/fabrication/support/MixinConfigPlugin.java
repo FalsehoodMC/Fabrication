@@ -47,6 +47,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -59,19 +60,6 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 	public static final String MOD_NAME_LOWER = EarlyAgnos.isForge() ? "forgery" : "fabrication";
 	public static final String MOD_NAME_LOWER_OTHER = !EarlyAgnos.isForge() ? "forgery" : "fabrication";
 	private static final SetMultimap<String, String> configKeysForDiscoveredClasses = HashMultimap.create();
-	private static final Set<String> brokenInForge = Set.of(
-			"*.gradual_block_breaking",
-			"*.launching_pistons",
-			"*.colorful_redstone",
-			"*.pursurvers",
-			"*.environmentally_friendly_creepers",
-			"*.interrupting_damage",
-			"*.mobs_dont_drop_ingots",
-			"*.photoallergic_creepers",
-			"*.end_portal_parallax",
-			"*.classic_block_drops",
-			"*.dropped_items_dont_stack"
-	);
 	public static boolean loadComplete = false;
 
 	@Override
@@ -86,11 +74,6 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 			}
 		}
 		FabConf.reload();
-		if (FabConf.isMet(SpecialEligibility.FORGE)) {
-			for (String s : brokenInForge) {
-				FabConf.addFailure(s, "Not Ported");
-			}
-		}
 		InjectionInfo.register(FailsoftCallbackInjectionInfo.class);
 		InjectionInfo.register(FailsoftModifyArgInjectionInfo.class);
 		InjectionInfo.register(FailsoftModifyVariableInjectionInfo.class);
@@ -114,9 +97,123 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 
 	@Override
 	public List<String> getMixins() {
+		checkFailOn("com.unascribed.fabrication.mixin");
 		return discoverClassesInPackage("com.unascribed.fabrication.mixin", true);
 	}
-
+	public static void checkFailOn(String pkg) {
+		try {
+			int count = 0;
+			int failed = 0;
+			classLabel:
+			for (ClassInfo ci : getClassesInPackage(pkg)) {
+				// we want nothing to do with inner classes and the like
+				if (ci.getName().contains("$")) continue;
+				count++;
+				String truncName = ci.getName().substring(pkg.length()+1);
+				FabLog.debug("--");
+				FabLog.debug((Math.random() < 0.01 ? "👅" : "👀")+" Checking for failure "+truncName);
+				ClassReader cr = new ClassReader(ci.asByteSource().read());
+				ClassNode cn = new ClassNode();
+				cr.accept(cn, ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
+				if (cn.visibleAnnotations != null) {
+					Set<String> foundFeatures = new HashSet<>();
+					for (AnnotationNode an : cn.visibleAnnotations) {
+						if (an.desc.equals("Lcom/unascribed/fabrication/support/EligibleIf;")) {
+							if (an.values == null) continue;
+							for (int i = 0; i < an.values.size(); i += 2) {
+								String k = (String)an.values.get(i);
+								Object v = an.values.get(i+1);
+								if (k.equals("configAvailable")) {
+									foundFeatures.add((String) v);
+								} else if (k.equals("anyConfigAvailable")) {
+									foundFeatures.addAll((List<String>)v);
+								}
+							}
+						}
+					}
+					if (foundFeatures.isEmpty()) continue classLabel;
+					for (AnnotationNode an : cn.visibleAnnotations) {
+						if (an.desc.equals("Lcom/unascribed/fabrication/support/FailOn;")) {
+							if (an.values == null) continue;
+							for (int i = 0; i < an.values.size(); i += 2) {
+								String k = (String)an.values.get(i);
+								Object v = an.values.get(i+1);
+								if (k.equals("modLoaded")) {
+									for (String s : (List<String>)v) {
+										if (EarlyAgnos.isModLoaded(s)) {
+											int cid = s.indexOf(':');
+											if (cid != -1) s = s.substring(cid+1);
+											for (String fk : foundFeatures) FabConf.addFailure(fk, "Incompatible mod: "+s);
+											continue classLabel;
+										}
+									}
+								} else if (k.equals("modNotLoaded")) {
+									for (String s : (List<String>)v) {
+										if (!EarlyAgnos.isModLoaded(s)) {
+											int cid = s.indexOf(':');
+											if (cid != -1) s = s.substring(cid+1);
+											for (String fk : foundFeatures) FabConf.addFailure(fk, "Requires mod: "+s);
+											continue classLabel;
+										}
+									}
+								} else if (k.equals("classPresent")) {
+									for (String s : (List<String>)v) {
+										try {
+											Class.forName(s, false, MixinConfigPlugin.class.getClassLoader());
+											for (String fk : foundFeatures) FabConf.addFailure(fk, "Incompatible class: "+s);
+										} catch (ClassNotFoundException ignore) {}
+									}
+								} else if (k.equals("classNotPresent")) {
+									for (String s : (List<String>)v) {
+										try {
+											Class.forName(s, false, MixinConfigPlugin.class.getClassLoader());
+										} catch (ClassNotFoundException e) {
+											for (String fk : foundFeatures) FabConf.addFailure(fk, "Requires class: "+s);
+										}
+									}
+								} else if (k.equals("invertedSpecialConditions")) {
+									List<String[]> li = (List<String[]>)v;
+									if (!li.isEmpty()) {
+										for (String[] e : li) {
+											if (!"Lcom/unascribed/fabrication/support/SpecialEligibility;".equals(e[0])) {
+												FabLog.debug("Unknown FailOn special condition type "+e[0]+" - ignoring");
+											} else {
+												try {
+													SpecialEligibility se = SpecialEligibility.valueOf(e[1]);
+													if (!FabConf.isMet(se)) {
+														String reason = "Unknown condition";
+														switch (se) {
+															case FORGE:
+															case NOT_FORGE:
+															case NEVER:
+																reason = "Not Ported"; break;
+															case NOT_MACOS:
+																reason = "MacOS Not Supported"; break;
+															case NO_OPTIFINE:
+																reason = "Optifine Not Supported"; break;
+														}
+														for (String fk : foundFeatures) FabConf.addFailure(fk, reason);
+													}
+												} catch (IllegalArgumentException ex) {
+													FabLog.debug("Unknown FailOn special condition "+e[1]);
+													for (String fk : foundFeatures) FabConf.addFailure(fk, "Unknown failure condition : "+e[1]);
+												}
+											}
+										}
+									}
+								} else {
+									FabLog.warn("Unknown annotation setting for FailOn "+k);
+								}
+							}
+						}
+					}
+				}
+			}
+			FabLog.debug("Failing pass complete. Found "+count+" candidates, failed "+failed+".");
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 	@SuppressWarnings("unchecked")
 	public static List<String> discoverClassesInPackage(String pkg, boolean truncate) {
 		FabLog.debug("Starting discovery pass...");
@@ -293,7 +390,7 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 										}
 									}
 								} else {
-									FabLog.warn("Unknown annotation setting "+k);
+									FabLog.warn("Unknown annotation setting for EligibleIf "+k);
 								}
 							}
 						}
