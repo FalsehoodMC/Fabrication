@@ -4,6 +4,8 @@ import java.util.function.Consumer;
 
 import com.unascribed.fabrication.FabConf;
 import net.minecraft.registry.Registries;
+import com.unascribed.fabrication.support.FailOn;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabModifyArg;
@@ -18,6 +20,7 @@ import net.minecraft.nbt.NbtCompound;
 
 @Mixin(LivingEntity.class)
 @EligibleIf(configAvailable="*.mobs_dont_drop_ingots")
+@FailOn(invertedSpecialConditions=SpecialEligibility.NOT_FORGE)
 public class MixinLivingEntity {
 
 	@FabModifyArg(method="dropLoot(Lnet/minecraft/entity/damage/DamageSource;Z)V", at=@At(value="INVOKE", target="Lnet/minecraft/loot/LootTable;generateLoot(Lnet/minecraft/loot/context/LootContext;Ljava/util/function/Consumer;)V"))

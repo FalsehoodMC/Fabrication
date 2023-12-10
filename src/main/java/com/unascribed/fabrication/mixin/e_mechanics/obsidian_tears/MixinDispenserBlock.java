@@ -1,6 +1,8 @@
 package com.unascribed.fabrication.mixin.e_mechanics.obsidian_tears;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.FailOn;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,6 +18,7 @@ import net.minecraft.item.Items;
 
 @Mixin(DispenserBlock.class)
 @EligibleIf(configAvailable="*.obsidian_tears")
+@FailOn(invertedSpecialConditions=SpecialEligibility.NOT_FORGE)
 public class MixinDispenserBlock {
 
 	@FabInject(at=@At("HEAD"), method="getBehaviorForItem(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/block/dispenser/DispenserBehavior;",

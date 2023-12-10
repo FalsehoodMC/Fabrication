@@ -2,6 +2,8 @@ package com.unascribed.fabrication.mixin.d_minor_mechanics.launching_pistons;
 
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.FailOn;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.injection.ModifyReturn;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -11,6 +13,7 @@ import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(PistonBlockEntity.class)
 @EligibleIf(configAvailable="*.launching_pistons")
+@FailOn(invertedSpecialConditions=SpecialEligibility.NOT_FORGE)
 public class MixinPistonBlockEntity {
 
 	@ModifyReturn(target="Lnet/minecraft/block/BlockState;isOf(Lnet/minecraft/block/Block;)Z",
