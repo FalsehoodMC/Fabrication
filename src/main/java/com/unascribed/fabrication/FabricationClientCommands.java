@@ -20,7 +20,6 @@ import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.OptionalFScript;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.text.Text;
@@ -40,7 +39,7 @@ public class FabricationClientCommands {
 			for (SpriteAtlasTexture sat : AtlasTracking.allAtlases) {
 				if (sat.getId().equals(id)) return id;
 			}
-			throw new CommandException(Text.literal("There is no atlas with ID " + id));
+			throw FeatureFabricationCommand.EXCETION_TYPE.create(Text.literal("There is no atlas with ID " + id));
 		}
 
 		@Override
@@ -65,8 +64,8 @@ public class FabricationClientCommands {
 		if (command.isEmpty() || !command.startsWith(rootCommand)) return false;
 		try {
 			dispatcher.execute(command, MinecraftClient.getInstance().getNetworkHandler().getCommandSource());
-		} catch (CommandException ignore) {
-			sendFeedback(ignore.getTextMessage());
+		} catch (CommandSyntaxException ignore) {
+			sendFeedback(Text.literal(ignore.getMessage()));
 		} catch (Exception e) {
 			FabLog.error("Failed to execute client command: "+command, e);
 			sendFeedback(Text.literal("§c"+e));

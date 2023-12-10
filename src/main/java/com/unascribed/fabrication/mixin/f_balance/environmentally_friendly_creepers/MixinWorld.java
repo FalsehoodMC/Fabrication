@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.Mixin;
 public class MixinWorld {
 
 	@Hijack(target="Lnet/minecraft/world/GameRules;getBoolean(Lnet/minecraft/world/GameRules$Key;)Z",
-			method="createExplosion(Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/damage/DamageSource;Lnet/minecraft/world/explosion/ExplosionBehavior;DDDFZLnet/minecraft/world/World$ExplosionSourceType;Z)Lnet/minecraft/world/explosion/Explosion;")
+			method="createExplosion(Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/damage/DamageSource;Lnet/minecraft/world/explosion/ExplosionBehavior;DDDFZLnet/minecraft/world/World$ExplosionSourceType;ZLnet/minecraft/particle/ParticleEffect;Lnet/minecraft/particle/ParticleEffect;Lnet/minecraft/sound/SoundEvent;)Lnet/minecraft/world/explosion/Explosion;")
 	private static HijackReturn fabrication$nonMobGriefingDestructionType(GameRules rules, GameRules.Key<GameRules.BooleanRule> gamerule) {
 		return FabConf.isEnabled("*.environmentally_friendly_creepers") && gamerule == GameRules.DO_MOB_GRIEFING ? HijackReturn.FALSE : null;
 	}

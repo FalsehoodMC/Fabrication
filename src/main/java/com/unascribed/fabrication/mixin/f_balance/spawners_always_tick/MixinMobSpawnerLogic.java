@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
 
-import net.minecraft.world.MobSpawnerLogic;
+import net.minecraft.block.spawner.MobSpawnerLogic;
 
 @Mixin(MobSpawnerLogic.class)
 @EligibleIf(configAvailable="*.spawners_always_tick")

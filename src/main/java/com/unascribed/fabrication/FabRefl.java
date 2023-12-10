@@ -17,6 +17,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.unascribed.fabrication.support.FabReflField;
 import com.unascribed.fabrication.support.injection.FabRefMap;
 import net.minecraft.client.util.SelectionManager;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.registry.RegistryEntryLookup;
 import net.minecraft.server.command.GameModeCommand;
 import net.minecraft.server.network.PlayerAssociatedNetworkHandler;
@@ -53,7 +54,6 @@ import net.minecraft.client.texture.NativeImage.Format;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.command.CommandException;
 import net.minecraft.command.EntitySelector;
 import net.minecraft.command.argument.ItemStackArgument;
 import net.minecraft.entity.Entity;
@@ -78,6 +78,18 @@ public class FabRefl {
 	// invokeExact becomes a standard INVOKE* insn after the JIT gets its hands on it. The entire
 	// purpose of MethodHandles is to be basically free. the catch is there can be *no* abstraction
 	// on an invokeExact or the calltime signature will be wrong and the JVM will get confused.
+
+	@FabReflField
+	private static final String eam_name_field = "Lnet/minecraft/entity/attribute/EntityAttributeModifier;name";
+	private static final MethodHandle eam_name = unreflectGetter("EntityAttributeModifier", () -> EntityAttributeModifier.class, eam_name_field)
+		.requiredBy("*.old_armor_scale", "*.old_armor").get();
+	public static String EntityAttributeModifier_name(EntityAttributeModifier subject) {
+		try {
+			return (String) checkHandle(eam_name).invokeExact(subject);
+		} catch (Throwable t) {
+			throw rethrow(t);
+		}
+	}
 
 	@FabReflField
 	private static final String sw_properties_field = "net/minecraft/server/world/ServerWorld;worldProperties";
@@ -264,7 +276,7 @@ public class FabRefl {
 		try {
 			return (int)checkHandle(gc_execute).invokeExact(source, item, targets, count);
 		} catch (Throwable t) {
-			throw rethrow(t, CommandException.class);
+			throw rethrow(t, CommandSyntaxException.class);
 		}
 	}
 

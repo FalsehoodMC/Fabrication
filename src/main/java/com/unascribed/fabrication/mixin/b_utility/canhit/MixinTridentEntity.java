@@ -1,7 +1,9 @@
 package com.unascribed.fabrication.mixin.b_utility.canhit;
 
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.projectile.PersistentProjectileEntity;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 
 import com.unascribed.fabrication.interfaces.SetCanHitList;
 import com.unascribed.fabrication.logic.CanHitUtil;
@@ -14,13 +16,15 @@ import net.minecraft.nbt.NbtList;
 
 @Mixin(TridentEntity.class)
 @EligibleIf(configAvailable="*.canhit")
-public abstract class MixinTridentEntity implements SetCanHitList {
+public abstract class MixinTridentEntity extends PersistentProjectileEntity implements SetCanHitList {
 
-	@Shadow
-	private ItemStack tridentStack;
+	protected MixinTridentEntity(EntityType<? extends PersistentProjectileEntity> type, World world, ItemStack stack) {
+		super(type, world, stack);
+	}
 
 	@Override
 	public NbtList fabrication$getCanHitList() {
+		ItemStack tridentStack = getItemStack();
 		return tridentStack.hasNbt() && tridentStack.getNbt().contains("CanHit") && !CanHitUtil.isExempt(((TridentEntity)(Object)this).getOwner()) ?
 				tridentStack.getNbt().getList("CanHit", NbtType.STRING) : null;
 	}

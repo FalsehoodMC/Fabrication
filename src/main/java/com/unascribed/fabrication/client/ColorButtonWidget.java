@@ -3,7 +3,6 @@ package com.unascribed.fabrication.client;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 
 public class ColorButtonWidget extends ButtonWidget {
 
@@ -15,7 +14,7 @@ public class ColorButtonWidget extends ButtonWidget {
 	}
 
 	@Override
-	public void renderButton(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+	public void renderWidget(DrawContext drawContext, int mouseX, int mouseY, float delta) {
 		int x = getX(), y = getY();
 		drawContext.fill(x, y, x+width, y+height, bg);
 		if (isHovered() || isFocused()) {

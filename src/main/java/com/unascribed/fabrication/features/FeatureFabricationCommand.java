@@ -6,10 +6,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mojang.brigadier.Command;
+import com.mojang.brigadier.Message;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.tree.CommandNode;
 import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.EarlyAgnos;
@@ -28,7 +30,6 @@ import com.unascribed.fabrication.support.OptionalFScript;
 import com.unascribed.fabrication.util.Cardinal;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.EntitySelector;
 import net.minecraft.command.argument.DimensionArgumentType;
@@ -367,6 +368,7 @@ public class FeatureFabricationCommand implements Feature {
 		}, MixinConfigPlugin.MOD_NAME+" block analysis").start();
 		return 1;
 	}
+	public static DynamicCommandExceptionType EXCETION_TYPE = new DynamicCommandExceptionType(t-> (Message) t);
 
 	public static <T extends CommandSource> void addConfig(LiteralArgumentBuilder<T> root, boolean dediServer) {
 		LiteralArgumentBuilder<T> config = LiteralArgumentBuilder.<T>literal("config");
@@ -398,7 +400,8 @@ public class FeatureFabricationCommand implements Feature {
 					MutableText txt = Text.literal(s+" = "+value+(" (default "+def+")"));
 					if (!FabConf.isEnabled(s)) {
 						// so that command blocks report failure
-						throw new CommandException(txt.formatted(Formatting.WHITE));
+
+						throw EXCETION_TYPE.create(txt.formatted(Formatting.WHITE));
 					} else {
 						sendFeedback(c, txt, false);
 					}

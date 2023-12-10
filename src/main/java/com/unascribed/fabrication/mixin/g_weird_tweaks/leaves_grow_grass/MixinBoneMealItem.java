@@ -32,9 +32,9 @@ public abstract class MixinBoneMealItem {
 		BlockPos blockPos = context.getBlockPos().up();
 		if (world.getBlockState(blockPos.down()).isIn(BlockTags.LEAVES) && world.isAir(blockPos)) {
 			if (!world.isClient) {
-				world.setBlockState(blockPos, Blocks.GRASS.getDefaultState(), 3);
+				world.setBlockState(blockPos, Blocks.SHORT_GRASS.getDefaultState(), 3);
 				if (world.random.nextInt(10) == 0) {
-					((Fertilizable) Blocks.GRASS).grow((ServerWorld) world, world.random, blockPos, Blocks.GRASS.getDefaultState());
+					((Fertilizable) Blocks.SHORT_GRASS).grow((ServerWorld) world, world.random, blockPos, Blocks.SHORT_GRASS.getDefaultState());
 				}
 				((ServerWorld)world).spawnParticles(ParticleTypes.HAPPY_VILLAGER, blockPos.getX()+0.5, blockPos.getY()+0.4, blockPos.getZ()+0.5, 4, 0.3, 0.3, 0.3, 0.05);
 				PlayerEntity player = context.getPlayer();

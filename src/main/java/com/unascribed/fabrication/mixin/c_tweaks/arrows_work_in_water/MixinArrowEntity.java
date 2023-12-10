@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.mixin.c_tweaks.arrows_work_in_water;
 
 import com.unascribed.fabrication.FabConf;
+import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 
 import com.unascribed.fabrication.support.EligibleIf;
@@ -14,9 +15,8 @@ import net.minecraft.world.World;
 @EligibleIf(configAvailable="*.arrows_work_in_water")
 public abstract class MixinArrowEntity extends PersistentProjectileEntity {
 
-
-	protected MixinArrowEntity(EntityType<? extends PersistentProjectileEntity> type, double x, double y, double z, World world) {
-		super(type, x, y, z, world);
+	protected MixinArrowEntity(EntityType<? extends PersistentProjectileEntity> type, World world, ItemStack stack) {
+		super(type, world, stack);
 	}
 
 	@Override

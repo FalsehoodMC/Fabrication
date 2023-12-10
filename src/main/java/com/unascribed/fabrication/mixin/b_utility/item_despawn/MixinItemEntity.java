@@ -58,7 +58,7 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 	@Shadow
 	private int itemAge;
 	@Shadow
-	private UUID thrower;
+	private Entity thrower;
 
 	@Shadow
 	public abstract ItemStack getStack();
@@ -94,8 +94,8 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 		calculateDespawn();
 	}
 
-	@FabInject(at=@At("TAIL"), method="setThrower(Ljava/util/UUID;)V")
-	public void setThrower(UUID id, CallbackInfo ci) {
+	@FabInject(at=@At("TAIL"), method="setThrower(Lnet/minecraft/entity/Entity;)V")
+	public void setThrower(Entity id, CallbackInfo ci) {
 		calculateDespawn();
 	}
 

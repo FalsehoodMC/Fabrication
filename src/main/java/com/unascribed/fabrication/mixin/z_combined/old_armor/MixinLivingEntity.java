@@ -3,6 +3,7 @@ package com.unascribed.fabrication.mixin.z_combined.old_armor;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.injection.ModifyReturn;
@@ -46,7 +47,7 @@ public abstract class MixinLivingEntity extends Entity {
 									entry.getKey(),
 									new EntityAttributeModifier(
 											entry.getValue().getId(),
-											entry.getValue().getName(),
+											FabRefl.EntityAttributeModifier_name(entry.getValue()),
 											(old ? ArmorMaterials.DIAMOND.getProtection(((ArmorItem)stack.getItem()).getType()) : entry.getValue().getValue())
 													* (scale ? ((stack.getMaxDamage() - stack.getDamage()) / (double) stack.getMaxDamage()) : 1),
 											EntityAttributeModifier.Operation.ADDITION))

@@ -31,7 +31,7 @@ public class MixinServerCommonNetworkHandler {
 		Identifier channel = payload.id();
 		if (channel.getNamespace().equals("fabrication") && channel.getPath().equals("item_despawn")) {
 			if (player instanceof SetItemDespawnAware) {
-				FabLog.debug("Enabling item despawn syncing for "+player.getEntityName());
+				FabLog.debug("Enabling item despawn syncing for "+player.getName());
 				((SetItemDespawnAware)player).fabrication$setItemDespawnAware(true);
 			}
 			ci.cancel();

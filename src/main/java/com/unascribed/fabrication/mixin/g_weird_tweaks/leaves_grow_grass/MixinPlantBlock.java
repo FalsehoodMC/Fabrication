@@ -22,7 +22,7 @@ public abstract class MixinPlantBlock {
 	@FabInject(at=@At("HEAD"), method="canPlantOnTop(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)Z", cancellable=true)
 	private void canPlantOnTop(BlockState floor, BlockView world, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
 		if (!FabConf.isEnabled("*.leaves_grow_grass")) return;
-		if (floor.isIn(BlockTags.LEAVES) && (((Object)this) == Blocks.GRASS || ((Object)this) == Blocks.TALL_GRASS)){
+		if (floor.isIn(BlockTags.LEAVES) && (((Object)this) == Blocks.SHORT_GRASS || ((Object)this) == Blocks.TALL_GRASS)){
 			cir.setReturnValue(true);
 		}
 	}

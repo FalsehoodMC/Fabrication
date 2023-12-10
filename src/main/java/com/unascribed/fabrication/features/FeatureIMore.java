@@ -14,7 +14,6 @@ import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Feature;
 
 import net.fabricmc.fabric.api.util.NbtType;
-import net.minecraft.command.CommandException;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.ItemStackArgument;
 import net.minecraft.command.argument.ItemStackArgumentType;
@@ -100,15 +99,15 @@ public class FeatureIMore implements Feature {
 					ench.add(c);
 					amt++;
 				} else if (targets.size() == 1) {
-					throw new CommandException(Text.translatable("commands.enchant.failed.itemless", le.getName()));
+					throw FeatureFabricationCommand.EXCETION_TYPE.create(Text.translatable("commands.enchant.failed.itemless", le.getName()));
 				}
 			} else if (targets.size() == 1) {
-				throw new CommandException(Text.translatable("commands.enchant.failed.entity", e.getName()));
+				throw FeatureFabricationCommand.EXCETION_TYPE.create(Text.translatable("commands.enchant.failed.entity", e.getName()));
 			}
 		}
 
 		if (amt == 0) {
-			throw new CommandException(Text.translatable("commands.enchant.failed"));
+			throw FeatureFabricationCommand.EXCETION_TYPE.create(Text.translatable("commands.enchant.failed"));
 		}
 
 		if (targets.size() == 1) {
@@ -124,21 +123,21 @@ public class FeatureIMore implements Feature {
 		ServerPlayerEntity player = ctx.getSource().getPlayerOrThrow();
 		ItemStack held = player.getEquippedStack(slot);
 		if (held.isEmpty()) {
-			throw new CommandException(Text.literal("Cannot duplicate an empty stack"));
+			throw FeatureFabricationCommand.EXCETION_TYPE.create(Text.literal("Cannot duplicate an empty stack"));
 		}
 		int count;
 		try {
 			count = ctx.getArgument("count", Integer.class);
 			if (count > held.getMaxCount()) {
-				throw new CommandException(Text.translatable("arguments.item.overstacked", held.getName(), held.getMaxCount()));
+				throw FeatureFabricationCommand.EXCETION_TYPE.create(Text.translatable("arguments.item.overstacked", held.getName(), held.getMaxCount()));
 			}
 		} catch (IllegalArgumentException e) {
 			count = held.getMaxCount();
 		}
 		if (held.getCount() == count) {
-			throw new CommandException(Text.literal("Your stack is already that large"));
+			throw FeatureFabricationCommand.EXCETION_TYPE.create(Text.literal("Your stack is already that large"));
 		} else if (held.getCount() > count) {
-			throw new CommandException(Text.literal("Your stack is already bigger than that"));
+			throw FeatureFabricationCommand.EXCETION_TYPE.create(Text.literal("Your stack is already bigger than that"));
 		}
 		int amt = count-held.getCount();
 		ctx.getSource().sendFeedback(()->Text.translatable("commands.give.success.single", amt, held.toHoverableText(), player.getDisplayName()), true);
