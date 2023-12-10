@@ -1,6 +1,8 @@
 package com.unascribed.fabrication.mixin.g_weird_tweaks.photoallergic_creepers;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.FailOn;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,6 +19,7 @@ import net.minecraft.world.World;
 
 @Mixin(CreeperEntity.class)
 @EligibleIf(configAvailable="*.photoallergic_creepers")
+@FailOn(invertedSpecialConditions=SpecialEligibility.NOT_FORGE)
 public abstract class MixinCreeperEntity extends HostileEntity {
 
 	protected MixinCreeperEntity(EntityType<? extends HostileEntity> entityType, World world) {

@@ -1,5 +1,7 @@
 package com.unascribed.fabrication.mixin.c_tweaks.less_restrictive_note_blocks;
 
+import com.unascribed.fabrication.support.FailOn;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import org.spongepowered.asm.mixin.Mixin;
 
 import com.unascribed.fabrication.interfaces.SetVelocity;
@@ -12,6 +14,7 @@ import net.minecraft.client.world.ClientWorld;
 
 @Mixin(NoteParticle.class)
 @EligibleIf(configAvailable="*.less_restrictive_note_blocks", envMatches=Env.CLIENT)
+@FailOn(invertedSpecialConditions=SpecialEligibility.NOT_FORGE)
 public abstract class MixinNoteParticle extends Particle implements SetVelocity {
 
 	protected MixinNoteParticle(ClientWorld world, double x, double y, double z) {

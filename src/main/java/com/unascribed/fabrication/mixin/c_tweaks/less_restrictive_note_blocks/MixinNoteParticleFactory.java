@@ -1,5 +1,7 @@
 package com.unascribed.fabrication.mixin.c_tweaks.less_restrictive_note_blocks;
 
+import com.unascribed.fabrication.support.FailOn;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import net.minecraft.client.particle.NoteParticle;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,6 +19,7 @@ import net.minecraft.util.math.Direction;
 
 @Mixin(NoteParticle.Factory.class)
 @EligibleIf(configAvailable="*.less_restrictive_note_blocks", envMatches=Env.CLIENT)
+@FailOn(invertedSpecialConditions=SpecialEligibility.NOT_FORGE)
 public class MixinNoteParticleFactory {
 
 	@FabInject(at=@At("RETURN"), method="createParticle(Lnet/minecraft/particle/DefaultParticleType;Lnet/minecraft/client/world/ClientWorld;DDDDDD)Lnet/minecraft/client/particle/Particle;")
