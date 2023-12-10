@@ -2,6 +2,8 @@ package com.unascribed.fabrication.mixin.i_woina.dropped_items_dont_stack;
 
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.FailOn;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.injection.ModifyReturn;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.item.ItemStack;
@@ -12,6 +14,7 @@ import java.util.List;
 
 @Mixin(AbstractBlock.class)
 @EligibleIf(configAvailable="*.dropped_items_dont_stack")
+@FailOn(invertedSpecialConditions=SpecialEligibility.NOT_FORGE)
 public abstract class MixinAbstractBlock {
 
 	@ModifyReturn(method="getDroppedStacks(Lnet/minecraft/block/BlockState;Lnet/minecraft/loot/context/LootContext$Builder;)Ljava/util/List;", target="Lnet/minecraft/loot/LootTable;generateLoot(Lnet/minecraft/loot/context/LootContext;)Lit/unimi/dsi/fastutil/objects/ObjectArrayList;")

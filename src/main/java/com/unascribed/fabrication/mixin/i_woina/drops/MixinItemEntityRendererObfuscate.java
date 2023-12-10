@@ -1,5 +1,7 @@
 package com.unascribed.fabrication.mixin.i_woina.drops;
 
+import com.unascribed.fabrication.support.FailOn;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabModifyVariable;
@@ -19,6 +21,7 @@ import net.minecraft.item.ItemStack;
 
 @Mixin(value=Hooks.class)
 @EligibleIf(anyConfigAvailable= {"*.blinking_drops", "*.classic_block_drops"}, envMatches=Env.CLIENT, modLoaded="forge:obfuscate")
+@FailOn(invertedSpecialConditions=SpecialEligibility.NOT_FORGE)
 public class MixinItemEntityRendererObfuscate {
 
 	@FabModifyVariable(at=@At("HEAD"), method="fireRenderEntityItem",

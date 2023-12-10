@@ -2,6 +2,8 @@ package com.unascribed.fabrication.mixin.f_balance.environmentally_friendly_cree
 
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.FailOn;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.injection.Hijack;
 import com.unascribed.fabrication.support.injection.HijackReturn;
 import net.minecraft.entity.mob.CreeperEntity;
@@ -10,6 +12,7 @@ import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(CreeperEntity.class)
 @EligibleIf(configAvailable="*.environmentally_friendly_creepers")
+@FailOn(invertedSpecialConditions= SpecialEligibility.NOT_FORGE)
 public class MixinCreeperEntity {
 
 	@Hijack(target="Lnet/minecraft/world/GameRules;getBoolean(Lnet/minecraft/world/GameRules$Key;)Z",

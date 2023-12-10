@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.i_woina.end_portal_parallax;
 
+import com.unascribed.fabrication.support.FailOn;
 import com.unascribed.fabrication.support.injection.FabInject;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -34,7 +35,8 @@ import static com.unascribed.lib39.deferral.api.RenderBridge.*;
 
 @Environment(EnvType.CLIENT)
 @Mixin(EndPortalBlockEntityRenderer.class)
-@EligibleIf(configAvailable="*.end_portal_parallax", specialConditions=SpecialEligibility.NOT_MACOS, modNotLoaded="endlessencore")
+@EligibleIf(configAvailable="*.end_portal_parallax")
+@FailOn(invertedSpecialConditions={SpecialEligibility.NOT_MACOS, SpecialEligibility.NOT_FORGE}, modLoaded="endlessencore")
 public abstract class MixinEndPortalBlockEntityRenderer {
 
 	@Shadow
