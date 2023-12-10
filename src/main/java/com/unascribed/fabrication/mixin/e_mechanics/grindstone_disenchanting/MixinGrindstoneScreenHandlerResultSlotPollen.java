@@ -3,6 +3,7 @@ package com.unascribed.fabrication.mixin.e_mechanics.grindstone_disenchanting;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.interfaces.SetOwner;
 import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.FailOn;
 import com.unascribed.fabrication.support.injection.FabInject;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -20,7 +21,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.Map;
 
 @Mixin(targets="net.minecraft.screen.GrindstoneScreenHandler$4")
-@EligibleIf(configAvailable="*.grindstone_disenchanting", modNotLoaded="fabric:grindenchantments", modLoaded="pollen")
+@EligibleIf(configAvailable="*.grindstone_disenchanting", modLoaded="pollen")
+@FailOn(modLoaded="fabric:grindenchantments")
 public class MixinGrindstoneScreenHandlerResultSlotPollen implements SetOwner<GrindstoneScreenHandler> {
 	@Unique
 	private GrindstoneScreenHandler fabrication$owner;

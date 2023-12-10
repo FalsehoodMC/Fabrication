@@ -1192,7 +1192,7 @@ public class FabricationConfigScreen extends Screen {
 			drawTitle = queryPattern.matcher(drawTitle).replaceAll("§e§l$0§r");
 			drawDesc = queryPattern.matcher(drawDesc).replaceAll("§e§l$0§r");
 		}
-		if (failed != null) drawTitle += " §4 "+failed;
+		if (failed != null) drawTitle += (failed.startsWith("Requires") || failed.startsWith("Not Ported") ? " §e " : " §4 ")+failed;
 		y += drawWrappedText(matrices, startX, 2, drawTitle, width-startX-6, 0xFFFFFF | textAlpha, false)*scale;
 		int endX = startY == y-8 ? width - 6 : startX+textRenderer.getWidth(title);
 		//		int endX = textRenderer.draw(matrices, title, startX, 2, 0xFFFFFF | textAlpha);

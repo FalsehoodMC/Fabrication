@@ -1,6 +1,8 @@
 package com.unascribed.fabrication.mixin.e_mechanics.pursurvers;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.FailOn;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,6 +22,7 @@ import net.minecraft.util.math.Direction;
 
 @Mixin(ServerPlayerInteractionManager.class)
 @EligibleIf(configAvailable="*.pursurvers")
+@FailOn(invertedSpecialConditions=SpecialEligibility.NOT_FORGE)
 public class MixinServerPlayerInteractionManager {
 
 	@Shadow

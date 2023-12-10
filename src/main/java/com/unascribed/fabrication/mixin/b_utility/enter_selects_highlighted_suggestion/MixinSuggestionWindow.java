@@ -8,6 +8,8 @@ import com.unascribed.fabrication.support.Env;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_KP_ENTER;
 
+import com.unascribed.fabrication.support.FailOn;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.injection.Hijack;
 import com.unascribed.fabrication.support.injection.HijackReturn;
 import net.minecraft.client.gui.screen.ChatInputSuggestor;
@@ -15,6 +17,7 @@ import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(ChatInputSuggestor.class)
 @EligibleIf(configAvailable="*.enter_selects_highlighted_suggestion", envMatches=Env.CLIENT)
+@FailOn(invertedSpecialConditions=SpecialEligibility.NOT_FORGE)
 public abstract class MixinSuggestionWindow {
 
 	@Hijack(method="keyPressed(III)Z", target="Lnet/minecraft/client/gui/screen/ChatInputSuggestor$SuggestionWindow;keyPressed(III)Z")

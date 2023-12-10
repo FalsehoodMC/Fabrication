@@ -1,6 +1,8 @@
 package com.unascribed.fabrication.mixin.c_tweaks.less_restrictive_note_blocks;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.FailOn;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.event.GameEvent;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,6 +24,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(NoteBlock.class)
 @EligibleIf(configAvailable="*.less_restrictive_note_blocks")
+@FailOn(invertedSpecialConditions=SpecialEligibility.NOT_FORGE)
 public abstract class MixinNoteBlock extends Block {
 
 	public MixinNoteBlock(Settings settings) {

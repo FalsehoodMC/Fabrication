@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.mixin.d_minor_mechanics.infibows;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.FailOn;
 import com.unascribed.fabrication.support.injection.FabModifyVariable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,7 +16,8 @@ import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 
 @Mixin(BowItem.class)
-@EligibleIf(configAvailable="*.infibows", classNotPresent="net.parker8283.bif.BowInfinityFix")
+@EligibleIf(configAvailable="*.infibows")
+@FailOn(classPresent="net.parker8283.bif.BowInfinityFix")
 public class MixinBowItem {
 
 	@FabModifyVariable(at=@At("STORE"), method="use(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/TypedActionResult;")
