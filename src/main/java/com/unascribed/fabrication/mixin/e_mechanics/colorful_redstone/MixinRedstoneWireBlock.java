@@ -2,6 +2,7 @@ package com.unascribed.fabrication.mixin.e_mechanics.colorful_redstone;
 
 import java.util.Iterator;
 
+import com.unascribed.fabrication.support.FailOn;
 import com.unascribed.fabrication.support.injection.FabModifyVariable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -24,7 +25,8 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
 @Mixin(RedstoneWireBlock.class)
-@EligibleIf(configAvailable="*.colorful_redstone", specialConditions=SpecialEligibility.NOT_FORGE)
+@EligibleIf(configAvailable="*.colorful_redstone")
+@FailOn(invertedSpecialConditions=SpecialEligibility.NOT_FORGE)
 public class MixinRedstoneWireBlock {
 
 	@FabInject(at=@At("RETURN"), method="getRenderConnectionType(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;Z)Lnet/minecraft/block/enums/WireConnection;", cancellable=true)

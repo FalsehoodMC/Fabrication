@@ -3,6 +3,8 @@ package com.unascribed.fabrication.mixin.g_weird_tweaks.foliage_creepers;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
+import com.unascribed.fabrication.support.FailOn;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.injection.FabInject;
 import com.unascribed.fabrication.support.injection.FabModifyArg;
 import com.unascribed.fabrication.support.injection.FabModifyVariable;
@@ -21,6 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //lower priority fixes an origins issue on forge caused by them using a redirect
 @Mixin(value=LivingEntityRenderer.class, priority=900)
 @EligibleIf(configAvailable="*.foliage_creepers", envMatches=Env.CLIENT)
+@FailOn(invertedSpecialConditions=SpecialEligibility.NOT_FORGE)
 public abstract class MixinLivingEntityRenderer extends EntityRenderer<LivingEntity> {
 
 	private static final Identifier fabrication$creeperTexture = new Identifier("textures/entity/creeper/creeper.png");

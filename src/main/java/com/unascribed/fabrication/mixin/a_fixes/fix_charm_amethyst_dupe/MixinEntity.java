@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.a_fixes.fix_charm_amethyst_dupe;
 
+import com.unascribed.fabrication.support.FailOn;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabInject;
@@ -13,7 +14,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NbtCompound;
 
 @Mixin(Entity.class)
-@EligibleIf(configAvailable="*.fix_charm_amethyst_dupe", modLoaded="charm")
+@EligibleIf(configAvailable="*.fix_charm_amethyst_dupe")
+@FailOn(modNotLoaded="charm")
 public abstract class MixinEntity implements SetInvisibleByCharm {
 
 	private boolean fabrication$invisibleByCharm;
