@@ -68,7 +68,7 @@ weird_tweaks.extra.villager_trades_reset:
 	desc:
 		Instead of restocking villagers will completely reset their trades.
 		This also soft-limits the trades to the villager's level (one trade of each level).
-		Cartographers also gain the ability to re-sell the same map.
+		Cartographers new always sell the nearest map of a type.
 
 weird_tweaks.extra.no_dolphin_theft:
 	name: No Dolphin Theft
