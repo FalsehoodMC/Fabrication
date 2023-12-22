@@ -105,11 +105,11 @@ public class ParsedTime {
 			case "unset":
 				return cached(Unset::new, 6000, priority);
 			case "forever": case "f":
-				return cached(Forever::new, 6000, priority);
+				return cached(Forever::new, Integer.MAX_VALUE, priority);
 			case "invincible": case "invulnerable": case "i":
-				return cached(Invincible::new, 6000, priority);
+				return cached(Invincible::new, Integer.MAX_VALUE, priority);
 			case "instantly": case "0":
-				return cached(Instant::new, 6000, priority);
+				return cached(Instant::new, 0, priority);
 		}
 		int multiplier;
 		char qualifier = time.charAt(time.length()-1);
