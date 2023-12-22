@@ -22,14 +22,14 @@ public class LoaderItemDespawn implements ConfigLoader {
 	public static final Map<Identifier, ParsedTime> tagDespawns = Maps.newHashMap();
 	public static final Map<String, ParsedTime> nbtBools = Maps.newHashMap();
 
-	public static ParsedTime curseDespawn = ParsedTime.UNSET;
-	public static ParsedTime normalEnchDespawn = ParsedTime.UNSET;
-	public static ParsedTime treasureDespawn = ParsedTime.UNSET;
+	public static ParsedTime curseDespawn = ParsedTime.Unset.NORMAL;
+	public static ParsedTime normalEnchDespawn = ParsedTime.Unset.NORMAL;
+	public static ParsedTime treasureDespawn = ParsedTime.Unset.NORMAL;
 
-	public static ParsedTime defaultDespawn = ParsedTime.UNSET;
-	public static ParsedTime dropsDespawn = ParsedTime.UNSET;
-	public static ParsedTime renamedDespawn = ParsedTime.UNSET;
-	public static ParsedTime playerDeathDespawn = ParsedTime.UNSET;
+	public static ParsedTime defaultDespawn = ParsedTime.Unset.NORMAL;
+	public static ParsedTime dropsDespawn = ParsedTime.Unset.NORMAL;
+	public static ParsedTime renamedDespawn = ParsedTime.Unset.NORMAL;
+	public static ParsedTime playerDeathDespawn = ParsedTime.Unset.NORMAL;
 
 	@Override
 	public String getConfigName() {
@@ -51,7 +51,7 @@ public class LoaderItemDespawn implements ConfigLoader {
 		playerDeathDespawn = ParsedTime.getFrom(config, "@special.player_death");
 		for (String k : config.keySet()) {
 			ParsedTime time = ParsedTime.getFrom(config, k);
-			if (time == ParsedTime.UNSET) continue;
+			if (time instanceof ParsedTime.Unset) continue;
 			if (k.startsWith("@enchantments.")) {
 				String id = k.substring(14);
 				if (!id.startsWith("@")) {
@@ -67,6 +67,7 @@ public class LoaderItemDespawn implements ConfigLoader {
 				itemDespawns.put(Resolvable.of(new Identifier(k), Registry.ITEM), time);
 			}
 		}
+		ParsedTime.clearCache();
 	}
 
 }

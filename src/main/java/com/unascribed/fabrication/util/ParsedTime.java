@@ -2,6 +2,9 @@ package com.unascribed.fabrication.util;
 
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiFunction;
 
 import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.QDIni;
@@ -10,16 +13,32 @@ import com.google.common.base.CharMatcher;
 import com.google.common.base.Preconditions;
 
 public class ParsedTime {
+	public static class Unset extends ParsedTime {
+		public static final Unset NORMAL = new Unset(6000, false);
+		private Unset(int timeInTicks, boolean priority) {
+			super(6000, priority);
+		}
+	}
+	public static class Forever extends ParsedTime {
+		private Forever(int timeInTicks, boolean priority) {
+			super(Integer.MAX_VALUE, priority);
+		}
+	}
+	public static class Invincible extends ParsedTime {
+		private Invincible(int timeInTicks, boolean priority) {
+			super(Integer.MAX_VALUE, priority);
+		}
+	}
+	public static class Instant extends ParsedTime {
+		private Instant(int timeInTicks, boolean priority) {
+			super(0, priority);
+		}
+	}
 
 	private static final int SECOND_IN_TICKS = 20;
 	private static final int MINUTE_IN_TICKS = SECOND_IN_TICKS*60;
 	private static final int HOUR_IN_TICKS = MINUTE_IN_TICKS*60;
-
-	public static final ParsedTime UNSET = new ParsedTime(6000, false);
-	public static final ParsedTime FOREVER = new ParsedTime(Integer.MAX_VALUE, false);
-	public static final ParsedTime INVINCIBLE = new ParsedTime(Integer.MAX_VALUE, false);
-	public static final ParsedTime INSTANTLY = new ParsedTime(0, false);
-
+	private static final Map<BiFunction<Integer, Boolean, ParsedTime>, Map<Integer, Map<Boolean, ParsedTime>>> cache = new HashMap<>();
 	public final int timeInTicks;
 	public final boolean priority;
 
@@ -31,23 +50,24 @@ public class ParsedTime {
 
 	public boolean overshadows(ParsedTime that) {
 		if (this == that) return false;
-		if (this == UNSET) return false;
-		if (that == UNSET) return true;
+		if (this instanceof Unset) return false;
+		if (that instanceof Unset) return true;
 		if (that.priority && !this.priority) return false;
 		if (this.priority && !that.priority) return true;
+		if (this instanceof Invincible && that instanceof Forever) return true;
 		return this.timeInTicks > that.timeInTicks;
 	}
 
 	@Override
 	public String toString() {
 		String s;
-		if (this == UNSET) {
+		if (this instanceof Unset) {
 			s = "unset";
-		} else if (this == FOREVER) {
+		} else if (this instanceof Forever) {
 			s = "forever";
-		} else if (this == INVINCIBLE) {
+		} else if (this instanceof Invincible) {
 			s = "invincible";
-		} else if (this == INSTANTLY) {
+		} else if (this instanceof Instant) {
 			s = "instantly";
 		} else if (timeInTicks % HOUR_IN_TICKS == 0) {
 			s = (timeInTicks/HOUR_IN_TICKS)+"h";
@@ -67,7 +87,7 @@ public class ParsedTime {
 			return parse(v);
 		} catch (IllegalArgumentException e) {
 			FabLog.warn(k+" must be one of unset, forever, f, invincible, invulnerable, i, instantly, or a timespec like 30s (got "+v+") at "+cfg.getBlame(k));
-			return UNSET;
+			return cached(Unset::new, 6000, false);
 		}
 	}
 
@@ -83,13 +103,13 @@ public class ParsedTime {
 		}
 		switch (time) {
 			case "unset":
-				return UNSET;
+				return cached(Unset::new, 6000, priority);
 			case "forever": case "f":
-				return FOREVER;
+				return cached(Forever::new, 6000, priority);
 			case "invincible": case "invulnerable": case "i":
-				return INVINCIBLE;
+				return cached(Invincible::new, 6000, priority);
 			case "instantly": case "0":
-				return INSTANTLY;
+				return cached(Instant::new, 6000, priority);
 		}
 		int multiplier;
 		char qualifier = time.charAt(time.length()-1);
@@ -104,7 +124,20 @@ public class ParsedTime {
 			case 'h': multiplier = HOUR_IN_TICKS; break;
 			default: throw new IllegalArgumentException("Unknown qualifier "+qualifier+" for time value "+time);
 		}
-		return new ParsedTime(new BigDecimal(timeNumPart).multiply(new BigDecimal(multiplier)).intValueExact(), priority);
+		return cached(ParsedTime::new, new BigDecimal(timeNumPart).multiply(new BigDecimal(multiplier)).intValueExact(), priority);
+	}
+	private static ParsedTime cached(BiFunction<Integer, Boolean, ParsedTime> constructor, int time, boolean priority) {
+		Map<Boolean, ParsedTime> pCache = buildCache(constructor, time);
+		ParsedTime ret = pCache.get(priority);
+		if (ret == null) pCache.put(priority,  ret = constructor.apply(time, priority));
+		return ret;
+	}
+	public static void clearCache() {
+		cache.clear();
+		buildCache(Unset::new, Unset.NORMAL.timeInTicks).put(Unset.NORMAL.priority, Unset.NORMAL);
+	}
+	private static Map<Boolean, ParsedTime> buildCache(BiFunction<Integer, Boolean, ParsedTime> constructor, int time) {
+		return cache.computeIfAbsent(constructor, k -> new HashMap<>()).computeIfAbsent(time, k -> new HashMap<>());
 	}
 
 }
