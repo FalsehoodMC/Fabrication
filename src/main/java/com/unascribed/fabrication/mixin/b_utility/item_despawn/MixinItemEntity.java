@@ -117,11 +117,10 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 		if (getWorld().isClient) return;
 		final boolean debug = false;
 		ItemStack stack = getStack();
-		ParsedTime time = ParsedTime.UNSET;
-		ParsedTime itemTime = LoaderItemDespawn.itemDespawns.get(Resolvable.mapKey(stack.getItem(), Registries.ITEM));
-		if (debug) System.out.println("itemTime: "+itemTime);
-		if (itemTime != null) {
-			time = itemTime;
+		ParsedTime time = LoaderItemDespawn.itemDespawns.get(Resolvable.mapKey(stack.getItem(), Registries.ITEM));
+		if (debug) System.out.println("itemTime: "+time);
+		if (time == null) {
+			time = ParsedTime.Unset.NORMAL;
 		}
 		if (!time.priority) {
 			if (debug) System.out.println("Not priority, check enchantments");
@@ -187,22 +186,22 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 			if (debug) System.out.println("Item is from player death; playerDeathDespawn overshadows: "+LoaderItemDespawn.playerDeathDespawn);
 			time = LoaderItemDespawn.playerDeathDespawn;
 		}
-		if (time == ParsedTime.UNSET) {
+		if (time instanceof ParsedTime.Unset) {
 			if (debug) System.out.println("Time is unset, using default");
 			time = thrower == null ? LoaderItemDespawn.dropsDespawn : LoaderItemDespawn.defaultDespawn;
 		}
 		if (debug) System.out.println("Final time: "+time);
 		fabrication$invincible = false;
-		if (time == ParsedTime.FOREVER) {
+		if (time instanceof ParsedTime.Forever) {
 			fabrication$extraTime = 0;
 			itemAge = -32768;
-		} else if (time == ParsedTime.INVINCIBLE) {
+		} else if (time instanceof ParsedTime.Invincible) {
 			fabrication$extraTime = 0;
 			itemAge = -32768;
 			fabrication$invincible = true;
-		} else if (time == ParsedTime.INSTANTLY) {
+		} else if (time instanceof ParsedTime.Instant) {
 			discard();
-		} else if (time == ParsedTime.UNSET) {
+		} else if (time instanceof ParsedTime.Unset) {
 			fabrication$extraTime = 0;
 		} else {
 			int extra = time.timeInTicks-6000;

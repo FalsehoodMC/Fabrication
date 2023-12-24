@@ -33,7 +33,7 @@ targetCompatibility = JavaVersion.VERSION_17
 
 archivesBaseName = project.archives_base_name
 def origVersion = project.version
-version = project.version+"+1.20.2"
+version = project.version+"+1.20.4"
 group = project.maven_group
 
 repositories {
