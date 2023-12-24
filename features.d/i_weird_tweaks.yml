@@ -135,5 +135,12 @@ weird_tweaks.chaining_creepers:
 	desc:
 		Creepers explode after taking explosion damage.
 
+weird_tweaks.crunchy_cake:
+	name: Crunchy Cake
+	since: 2.4.6
+	sides: server_only
+	desc:
+		Gives cake a crunch.
+
 # kate: space-indent off
 # vim: noai:noet
