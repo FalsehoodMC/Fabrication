@@ -1,6 +1,9 @@
 package com.unascribed.fabrication.mixin.f_balance.infinity_crossbows;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.injection.ModifyReturn;
+import net.minecraft.nbt.NbtByte;
+import net.minecraft.nbt.NbtCompound;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabInject;
@@ -28,11 +31,23 @@ public class MixinCrossbowItem {
 
 	@FabModifyVariable(at=@At("HEAD"), method="loadProjectile(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemStack;ZZ)Z",
 			argsOnly=true, index=4)
-	private static boolean modifyCreativeModeLoadProjectile(boolean creative, LivingEntity shooter, ItemStack crossbow, ItemStack projectile) {
-		if (FabConf.isAnyEnabled("*.infinity_crossbows") && EnchantmentHelper.getLevel(Enchantments.INFINITY, crossbow) > 0 && projectile.getItem() == Items.ARROW) {
-			return true;
+	private static boolean fabrication$modifyCreativeModeLoadProjectile(boolean creative, LivingEntity shooter, ItemStack crossbow, ItemStack projectile) {
+		if (!FabConf.isAnyEnabled("*.infinity_crossbows") || creative) return creative;
+		int infinity = EnchantmentHelper.getLevel(Enchantments.INFINITY, crossbow);
+		if (infinity > 0) {
+			if (projectile.getItem() == Items.ARROW) {
+				return true;
+			}
 		}
 		return creative;
+	}
+	@ModifyReturn(method="loadProjectile(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemStack;ZZ)Z",
+				target="Lnet/minecraft/item/ItemStack;copy()Lnet/minecraft/item/ItemStack;")
+	private static ItemStack fabrication$tagCreativeModeLoadProjectile(ItemStack projectile) {
+		if (FabConf.isAnyEnabled("*.infinity_crossbows")) {
+			projectile.setSubNbt("fabrication$infcrossbow", NbtByte.ONE);
+		}
+		return projectile;
 	}
 
 	@FabInject(at=@At(value="INVOKE", target="net/minecraft/item/ItemStack.damage(ILnet/minecraft/entity/LivingEntity;Ljava/util/function/Consumer;)V"),
@@ -41,10 +56,12 @@ public class MixinCrossbowItem {
 	private static void shoot(World world, LivingEntity shooter, Hand hand, ItemStack crossbow, ItemStack projectile, float soundPitch, boolean creative, float speed, float divergence, float simulated,
 			CallbackInfo ci, boolean firework, ProjectileEntity proj) {
 		if (!FabConf.isAnyEnabled("*.infinity_crossbows")) return;
-		if (projectile.getItem() == Items.ARROW && EnchantmentHelper.getLevel(Enchantments.INFINITY, crossbow) > 0
-				&& proj instanceof PersistentProjectileEntity && ((PersistentProjectileEntity)proj).pickupType == PickupPermission.ALLOWED) {
-			((PersistentProjectileEntity)proj).pickupType = PickupPermission.CREATIVE_ONLY;
+		NbtCompound tag = projectile.getNbt();
+		if (tag == null || !tag.contains("fabrication$infcrossbow")) return;
+		if (proj instanceof PersistentProjectileEntity && ((PersistentProjectileEntity) proj).pickupType == PickupPermission.ALLOWED) {
+			((PersistentProjectileEntity) proj).pickupType = PickupPermission.CREATIVE_ONLY;
 		}
+
 	}
 
 }
