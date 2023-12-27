@@ -47,6 +47,7 @@ minor_mechanics.infibows:
 		Makes Infinity bows not require an arrow in your inventory to fire.
 
 		If not present on client, firing bows with no arrows is a bit janky.
+		Works with balance.infinity_crossbows.
 
 minor_mechanics.note_blocks_play_on_landing:
 	name: Note Blocks Play On Landing

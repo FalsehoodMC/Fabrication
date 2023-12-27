@@ -1,6 +1,8 @@
 package com.unascribed.fabrication.mixin.g_weird_tweaks.leaves_grow_grass;
 
 import com.unascribed.fabrication.FabConf;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabInject;
@@ -36,6 +38,7 @@ public abstract class MixinBoneMealItem {
 				if (world.random.nextInt(10) == 0) {
 					((Fertilizable) Blocks.GRASS).grow((ServerWorld) world, world.random, blockPos, Blocks.GRASS.getDefaultState());
 				}
+				world.playSound(null, blockPos, SoundEvents.BLOCK_GRASS_STEP, SoundCategory.PLAYERS, 1F, 1F);
 				((ServerWorld)world).spawnParticles(ParticleTypes.HAPPY_VILLAGER, blockPos.getX()+0.5, blockPos.getY()+0.4, blockPos.getZ()+0.5, 4, 0.3, 0.3, 0.3, 0.05);
 				PlayerEntity player = context.getPlayer();
 				if (!(player == null || player.isCreative())) {

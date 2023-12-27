@@ -74,6 +74,8 @@ public class ConfigPredicates {
 
 	static{
 		Map<String, Predicate<?>> defaultsMap = new HashMap<>();
+		defaultsMap.put(remap("*.no_sprint"),
+			(Predicate<Entity>) entity -> !entity.isSubmergedInWater());
 		defaultsMap.put(remap("*.swap_conflicting_enchants"),
 			(Predicate<PlayerEntity>) Entity::isSneaky
 		);
