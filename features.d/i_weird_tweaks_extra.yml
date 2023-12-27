@@ -130,5 +130,12 @@ weird_tweaks.extra.entities_sink_in_falling_fluids:
 	desc:
 		Entities rapidly sink in fluids that are flowing downwards. still and horizontal flowing fluids are unaffected.
 
+weird_tweaks.extra.disable_lightning_burn:
+	name: Disable Lightning Burn
+	since: 3.4.7
+	sides: server_only
+	desc:
+		Prevents lightning catching entities aflame.
+
 # kate: space-indent off
 # vim: noai:noet
