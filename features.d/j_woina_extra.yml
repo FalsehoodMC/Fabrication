@@ -61,8 +61,11 @@ woina.extra.no_sprint:
 	name: No Sprint
 	since: 1.4.0
 	sides: server_only
+	fscript: entity
+	fscript_default: !submerged_in_water
 	desc:
 		Disable sprinting.
+		Note that for taggable_players/scripting, sprinting will not be interrupted.
 
 woina.extra.instant_eat:
 	name: Instant Eat
