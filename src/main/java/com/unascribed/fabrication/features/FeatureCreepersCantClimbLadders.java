@@ -14,7 +14,7 @@ public class FeatureCreepersCantClimbLadders extends EitherPredicateFeature<Livi
 	}
 
 	public FeatureCreepersCantClimbLadders() {
-		super("*.creepers_cant_climb",
+		super("*.entities_cant_climb",
 				livingEntity -> livingEntity instanceof CreeperEntity
 		);
 	}
