@@ -34,7 +34,7 @@ public class MixinItemRenderer {
 			matrixStack.translate(0, 0, zOffset + 200);
 			VertexConsumerProvider.Immediate vc = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
 			String id = String.valueOf(FilledMapItem.getMapId(stack));
-			renderer.draw(id, (float)(x + 19 - 2 - renderer.getWidth(id)), (float)(y + 6 + 3), 16777215, true, matrixStack.peek().getModel(), vc, false, 0, 15728880);
+			renderer.draw(id, (float)(x + 19 - 2 - renderer.getWidth(id)), (float)y, 16777215, true, matrixStack.peek().getModel(), vc, false, 0, 15728880);
 			vc.draw();
 		}
 	}
