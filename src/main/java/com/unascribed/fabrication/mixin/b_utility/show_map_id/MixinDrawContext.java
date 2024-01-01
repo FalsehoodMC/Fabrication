@@ -39,7 +39,7 @@ public abstract class MixinDrawContext {
 			String id = String.valueOf(FilledMapItem.getMapId(stack));
 			matrices.push();
 			matrices.translate(0, 0, 200);
-			drawText(renderer, id, (x + 19 - 2 - renderer.getWidth(id)), (y + 6 + 3), 16777215, true);
+			drawText(renderer, id, (x + 19 - 2 - renderer.getWidth(id)), y, 16777215, true);
 			matrices.pop();
 			vc.draw();
 		}
