@@ -1,7 +1,9 @@
 package com.unascribed.fabrication.mixin.i_woina.void_fog;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.injection.FabInject;
@@ -65,8 +67,15 @@ public abstract class MixinBackgroundRenderer {
 			if (fog < 10f) {
 				fog = 10f;
 			}
-			RenderSystem.fogStart(fog*.8f);
-			RenderSystem.fogEnd(fog);
+
+			if (GlStateManager.FOG.end > fog) {
+				RenderSystem.fogEnd(fog);
+			}
+			if (GlStateManager.FOG.start > (fog *= .8f)) {
+				RenderSystem.fogStart(fog);
+			}
+			RenderSystem.fogDensity(0);
+			RenderSystem.fogMode(GlStateManager.FogMode.LINEAR);
 		}
 	}
 }
