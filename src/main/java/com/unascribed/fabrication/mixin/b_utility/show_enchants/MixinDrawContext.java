@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.mixin.b_utility.show_enchants;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.injection.FabInject;
@@ -36,6 +37,9 @@ import net.minecraft.util.Identifier;
 @EligibleIf(anyConfigAvailable={"*.books_show_enchants", "*.tools_show_important_enchant"}, envMatches=Env.CLIENT)
 public abstract class MixinDrawContext {
 
+	//remove color, spaces and unicode private use area characters #682
+	private static Pattern fabrication$enchantFilterPattern = Pattern.compile("(\u00A7[0-9A-FK-ORa-fk-or])|([\ue000-\uf8ff ])");
+
 	@Shadow
 	@Final
 	private MatrixStack matrices;
@@ -62,10 +66,10 @@ public abstract class MixinDrawContext {
 			if (valid.isEmpty()) return;
 			int j = (int)((System.currentTimeMillis()/1000)%valid.size());
 			Enchantment display = valid.get(j);
-			String translated = I18n.translate(display.getTranslationKey());
+			String translated = fabrication$enchantFilterPattern.matcher(I18n.translate(display.getTranslationKey())).replaceAll("");
 			if (display.isCursed()) {
-				String curseOfBinding = I18n.translate(Enchantments.BINDING_CURSE.getTranslationKey());
-				String curseOfVanishing = I18n.translate(Enchantments.VANISHING_CURSE.getTranslationKey());
+				String curseOfBinding = fabrication$enchantFilterPattern.matcher(I18n.translate(Enchantments.BINDING_CURSE.getTranslationKey())).replaceAll("");
+				String curseOfVanishing = fabrication$enchantFilterPattern.matcher(I18n.translate(Enchantments.VANISHING_CURSE.getTranslationKey())).replaceAll("");
 				//				boolean suffix = false;
 				String curseOf = StringUtils.getCommonPrefix(curseOfBinding, curseOfVanishing);
 				//				if (curseOf.isEmpty()) {
@@ -86,7 +90,6 @@ public abstract class MixinDrawContext {
 				}
 			}
 			String firstCodepoint = new String(Character.toChars(translated.codePoints().findFirst().getAsInt()));
-
 			matrices.push();
 			matrices.translate(0, 0, 200);
 			this.drawText(renderer, firstCodepoint, x, y+6+3, display.isCursed() ? 0xFFFF5555 : display.isTreasure() ? 0xFF55FFFF : 0xFFFFFFFF, true);
@@ -102,7 +105,7 @@ public abstract class MixinDrawContext {
 				display = Enchantments.RIPTIDE;
 			}
 			if (display != null) {
-				String translated = I18n.translate(display.getTranslationKey());
+				String translated = fabrication$enchantFilterPattern.matcher(I18n.translate(display.getTranslationKey())).replaceAll("");
 				String firstCodepoint = new String(Character.toChars(translated.codePoints().findFirst().getAsInt()));
 				matrices.push();
 				matrices.translate(0, 0, 200);
