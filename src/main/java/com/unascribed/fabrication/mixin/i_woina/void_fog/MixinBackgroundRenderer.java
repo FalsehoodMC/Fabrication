@@ -66,8 +66,10 @@ public abstract class MixinBackgroundRenderer {
 				fog = 10f;
 			}
 			if (RenderSystem.getShaderFogEnd() > fog) {
-				RenderSystem.setShaderFogStart(fog*.8f);
 				RenderSystem.setShaderFogEnd(fog);
+			}
+			if (RenderSystem.getShaderFogStart() > (fog *= .8f)) {
+				RenderSystem.setShaderFogStart(fog);
 			}
 		}
 	}
