@@ -65,6 +65,7 @@ feature_parity:
 		- Added sync_attacker_yaw.
 
 		#### 1.19:
+		- Added no_dinnerlava
 		- Added oak_is_apple.
 		- Added tnt_is_dynamite.
 
