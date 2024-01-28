@@ -26,6 +26,10 @@ public class MixinErrorHandler {
 				if (!keys.isEmpty()) {
 					FabLog.debug("Original Mixin error", th);
 					FabLog.warn("Mixin "+mixin.getClassName()+" failed to "+verb+"! Force-disabling "+Joiner.on(", ").join(keys));
+					//TODO add something that allows soft fail per injection
+					if ("com.unascribed.fabrication.mixin.b_utility.rmb_clears_text_fields.RecipeBookWidget".equals(mixin.getClassName())) {
+						return IMixinErrorHandler.ErrorAction.NONE;
+					}
 					for (String opt : keys) {
 						FabConf.addFailure(opt, "Mixin Fail");
 					}
