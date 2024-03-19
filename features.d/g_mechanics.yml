@@ -36,7 +36,7 @@ mechanics.broken_tools_drop_components:
 	since: 1.1.2
 	sides: server_only
 	media: https://unascribed.com/fabrication/broken_tools_drop_components.mp4
-	link_url: https://github.com/unascribed/Fabrication/blob/trunk/src/main/resources/default_gear_components_config.ini
+	link_url: https://github.com/FalsehoodMC/Fabrication/blob/3.0/1.18/src/main/resources/default_gear_components_config.ini
 	link_text: See the default config for more info
 	desc:
 		Makes gear drop its consituent items when broken. This is completely configurable in

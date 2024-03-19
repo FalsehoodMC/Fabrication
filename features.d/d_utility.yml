@@ -106,7 +106,7 @@ utility.item_despawn:
 	name: Item Despawn Control
 	since: 1.1
 	sides: server_only
-	link_url: https://github.com/unascribed/Fabrication/blob/trunk/src/main/resources/default_item_despawn_config.ini
+	link_url: https://github.com/FalsehoodMC/Fabrication/blob/3.0/1.18/src/main/resources/default_item_despawn_config.ini
 	link_text: See the default config for more info
 	short_desc: Allows fine-grained control over item despawn times
 	desc:
