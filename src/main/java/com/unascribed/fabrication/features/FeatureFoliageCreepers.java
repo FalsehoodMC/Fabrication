@@ -24,7 +24,7 @@ public class FeatureFoliageCreepers extends ResourcePackFeature {
 						return new GrayscaleResourcePack();
 					}
 				},
-				new ResourcePackProfile.Metadata(Text.of(MixinConfigPlugin.MOD_NAME+" internal pack"), 12, null), ResourceType.CLIENT_RESOURCES, ResourcePackProfile.InsertionPosition.TOP, false, ResourcePackSource.BUILTIN));
+				new ResourcePackProfile.Metadata(Text.of(MixinConfigPlugin.MOD_NAME+" grayscale internal pack"), 12, null), ResourceType.CLIENT_RESOURCES, ResourcePackProfile.InsertionPosition.TOP, false, ResourcePackSource.BUILTIN));
 	}
 	@Override
 	public void apply() {
