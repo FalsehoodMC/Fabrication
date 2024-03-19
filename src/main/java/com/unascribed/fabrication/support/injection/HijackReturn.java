@@ -9,6 +9,7 @@ public class HijackReturn {
 		return b ? TRUE : FALSE;
 	}
 	public static final HijackReturn OPTIONAL_EMPTY = new HijackReturn(Optional.empty());
+	public static final HijackReturn NULL = new HijackReturn(null);
 	public Object object;
 
 	public HijackReturn(Object object){

@@ -70,7 +70,7 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 			itemAge--;
 		}
 		fabrication$trueAge++;
-		if (getPos().y < -32) {
+		if (getPos().y < -32 - world.getBottomY()) {
 			if (fabrication$invincible) {
 				teleport(getPos().x, 1, getPos().z);
 				setVelocity(0,0,0);
