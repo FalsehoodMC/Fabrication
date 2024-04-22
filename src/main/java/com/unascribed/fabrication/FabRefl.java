@@ -263,7 +263,28 @@ public class FabRefl {
 			throw rethrow(t);
 		}
 	}
-
+	@FabReflField
+	private static final String e_setSprinting_field = "Lnet/minecraft/entity/Entity;setSprinting(Z)V";
+	private static final MethodHandle e_setSprinting = unreflectMethod("Entity", () -> Entity.class, e_setSprinting_field, void.class, boolean.class)
+		.requiredBy("*.no_sprint").get();
+	public static void setSprinting(Entity context, boolean on) {
+		try {
+			checkHandle(e_setSprinting).invokeExact(context, on);
+		} catch (Throwable t) {
+			throw rethrow(t);
+		}
+	}
+	@FabReflField
+	private static final String e_isSwimming_field = "Lnet/minecraft/entity/Entity;isSwimming()Z";
+	private static final MethodHandle e_isSwimming = unreflectMethod("Entity", () -> Entity.class, e_isSwimming_field, boolean.class)
+		.requiredBy("*.no_sprint").get();
+	public static boolean isSwimming(Entity context) {
+		try {
+			return (boolean) checkHandle(e_isSwimming).invokeExact(context);
+		} catch (Throwable t) {
+			throw rethrow(t);
+		}
+	}
 	@FabReflField
 	private static final String gc_execute_field = "Lnet/minecraft/server/command/GiveCommand;execute(Lnet/minecraft/server/command/ServerCommandSource;Lnet/minecraft/command/argument/ItemStackArgument;Ljava/util/Collection;I)I";
 	private static final MethodHandle gc_execute = unreflectMethod("GiveCommand", () -> GiveCommand.class, gc_execute_field,
