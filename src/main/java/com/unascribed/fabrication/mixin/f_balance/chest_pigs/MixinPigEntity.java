@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.f_balance.chest_pigs;
 
+import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.FailOn;
 import net.minecraft.entity.Entity;
@@ -40,7 +41,7 @@ public abstract class MixinPigEntity extends Entity {
 	}
 	@Inject(method="dropInventory()V", at=@At("HEAD"))
 	protected void dropInventory(CallbackInfo info) {
-		if (fabrication$chestPig !=null) {
+		if (fabrication$chestPig != null) {
 			switch (fabrication$chestPig.size()) {
 				case 53:
 					this.dropItem(Items.CHEST);
@@ -58,18 +59,20 @@ public abstract class MixinPigEntity extends Entity {
 	}
 	@Inject(method="interactMob(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;", at=@At("HEAD"), cancellable=true)
 	private void interact(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> info) {
+		if (!FabConf.isEnabled("*.chest_pigs")) return;
 		if (player.isSneaking()) {
-			info.setReturnValue(ActionResult.SUCCESS);
 			if (fabrication$chestPig == null) {
 				ItemStack stack = player.getInventory().getMainHandStack();
 				boolean isChest = stack.getItem().equals(Items.CHEST);
 				if (isChest || stack.getItem().equals(Items.ENDER_CHEST)) {
+					info.setReturnValue(ActionResult.SUCCESS);
 					stack.decrement(1);
 					fabrication$chestPig = new SimpleInventory(isChest ? 27 : 0);
 					world.playSound(null, this.getBlockPos(), SoundEvents.BLOCK_CHEST_LOCKED, SoundCategory.NEUTRAL, 0.2F, 0.4F);
 					world.playSound(null, this.getBlockPos(), SoundEvents.ENTITY_PIG_AMBIENT, SoundCategory.NEUTRAL, 0.7F, 0.1F);
 				}
 			} else {
+				info.setReturnValue(ActionResult.SUCCESS);
 				int invSize = fabrication$chestPig.size();
 				switch (invSize) {
 					case 0:
@@ -114,7 +117,7 @@ public abstract class MixinPigEntity extends Entity {
 	}
 	@Inject(method="writeCustomDataToNbt(Lnet/minecraft/nbt/NbtCompound;)V", at=@At("HEAD"))
 	public void writeCustomDataToTag(NbtCompound tags, CallbackInfo info) {
-		if (fabrication$chestPig !=null) {
+		if (fabrication$chestPig != null) {
 			NbtCompound tag = new NbtCompound();
 			tags.putByte("fabrication$chestPigs$size", (byte)fabrication$chestPig.size());
 			for (byte i=0; i<fabrication$chestPig.size();++i) {
@@ -128,10 +131,8 @@ public abstract class MixinPigEntity extends Entity {
 	@Inject(method="readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V", at=@At("HEAD"))
 	public void readCustomDataFromTag(NbtCompound tags, CallbackInfo info) {
 		NbtCompound tag = tags.getCompound("fabrication$chestPigs$inv");
-		if (tags.contains("fabrication$chestPigs$size")){
-
-		}
-		byte size = tags.getByte("fabrication$chestPigs$inv");
+		if (tag == null || !tags.contains("fabrication$chestPigs$size")) return;
+		byte size = tags.getByte("fabrication$chestPigs$size");
 		switch (size) {
 			case 0:
 				fabrication$chestPig = new SimpleInventory(0);
