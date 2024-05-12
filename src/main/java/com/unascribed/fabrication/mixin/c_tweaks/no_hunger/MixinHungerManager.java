@@ -1,42 +1,66 @@
 package com.unascribed.fabrication.mixin.c_tweaks.no_hunger;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.interfaces.NoHungerAdd;
 import com.unascribed.fabrication.support.ConfigPredicates;
-import net.minecraft.entity.effect.StatusEffects;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import com.unascribed.fabrication.support.injection.FabInject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import com.unascribed.fabrication.interfaces.SetSaturation;
 import com.unascribed.fabrication.support.EligibleIf;
-
+import com.unascribed.fabrication.support.injection.FabInject;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.HungerManager;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.FoodComponent;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.function.Predicate;
 
-@Mixin(HungerManager.class)
+@Mixin(value=HungerManager.class, priority=200)
 @EligibleIf(configAvailable="*.no_hunger")
-public abstract class MixinHungerManager implements SetSaturation {
+public abstract class MixinHungerManager implements NoHungerAdd {
+	@Unique
+	private float fabrication$noHungerHeal = 0f;
 
 	@Shadow
 	private float foodSaturationLevel;
+
+	@Shadow
+	private int foodLevel;
 	private static final Predicate<PlayerEntity> fabrication$noHungerPredicate = ConfigPredicates.getFinalPredicate("*.no_hunger");
 
-	@FabInject(at=@At("HEAD"), method="update(Lnet/minecraft/entity/player/PlayerEntity;)V", cancellable=true)
-	public void update(PlayerEntity pe, CallbackInfo ci) {
-		if (FabConf.isEnabled("*.no_hunger")) {
-			if (fabrication$noHungerPredicate.test(pe) && !pe.hasStatusEffect(StatusEffects.HUNGER)) {
-				ci.cancel();
-			}
+	@FabInject(at=@At("HEAD"), method="eat(Lnet/minecraft/item/Item;Lnet/minecraft/item/ItemStack;)V", cancellable=true)
+	public void eatFood(Item item, ItemStack stack, CallbackInfo ci) {
+		if (!FabConf.isEnabled("*.no_hunger")) return;
+		if (item.isFood()) {
+			FoodComponent food = item.getFoodComponent();
+			if (food == null) return;
+			setFabrication$noHungerHeal(food.getHunger(), food.getSaturationModifier());
 		}
 	}
 
-	@Override
-	public void fabrication$setSaturation(float sat) {
-		foodSaturationLevel = sat;
+	@Unique
+	public void setFabrication$noHungerHeal(int food, float sat) {
+		fabrication$noHungerHeal += (sat = (food+sat)*0.75f) < 1f ? sat*.5f : (int) sat;
 	}
 
+	@FabInject(at=@At("HEAD"), method="update(Lnet/minecraft/entity/player/PlayerEntity;)V", cancellable=true)
+	public void update(PlayerEntity pe, CallbackInfo ci) {
+		if (!FabConf.isEnabled("*.no_hunger")) return;
+		if (!fabrication$noHungerPredicate.test(pe)) {
+			fabrication$noHungerHeal = 0f;
+			return;
+		}
+		if (fabrication$noHungerHeal != 0f) {
+			pe.heal(fabrication$noHungerHeal);
+			fabrication$noHungerHeal = 0f;
+		}
+		this.foodLevel = pe.hasStatusEffect(StatusEffects.HUNGER) ? 0 : pe.getHealth() >= pe.getMaxHealth() ? 20 : 17;
+		// prevent the hunger bar from jiggling
+		this.foodSaturationLevel = 10;
+		if (!pe.hasStatusEffect(StatusEffects.HUNGER)) ci.cancel();
+	}
 }
