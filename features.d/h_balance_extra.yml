@@ -234,5 +234,15 @@ balance.extra.hunger_is_hard:
 	desc:
 		Hunger acts as if the difficulty is hard.
 
+balance.extra.chest_pigs:
+	name: Chest Pigs
+	since: 3.3.14
+	sides: server_only
+	desc:
+		Pigs can carry chests.
+
+		Shift-right click to open the chest.
+		Shift-right click with a chest in hand to attach it.
+
 # kate: space-indent off
 # vim: noai:noet
