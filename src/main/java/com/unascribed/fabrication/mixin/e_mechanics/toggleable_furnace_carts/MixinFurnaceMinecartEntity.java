@@ -1,14 +1,18 @@
 package com.unascribed.fabrication.mixin.e_mechanics.toggleable_furnace_carts;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.interfaces.ToggleableFurnaceCart;
 import com.unascribed.fabrication.support.EligibleIf;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.PoweredRailBlock;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.AbstractMinecartEntity;
 import net.minecraft.entity.vehicle.FurnaceMinecartEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -17,10 +21,11 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(FurnaceMinecartEntity.class)
+@Mixin(value=FurnaceMinecartEntity.class, priority=990)
 @EligibleIf(configAvailable="*.toggleable_furnace_carts")
-public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity {
+public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity implements ToggleableFurnaceCart {
 
 	@Shadow
 	private int fuel;
@@ -33,6 +38,11 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 
 	public MixinFurnaceMinecartEntity(EntityType<?> type, World world) {
 		super(type, world);
+	}
+
+	@FabInject(method="interact(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;", at=@At("HEAD"))
+	public void interact(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
+		if (fabrication$pauseFuel > 32000) cir.setReturnValue(ActionResult.success(this.world.isClient));
 	}
 
 	@FabInject(at=@At("HEAD"), method="moveOnRail(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)V")
@@ -50,7 +60,7 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 			fabrication$pauseFuel = 0;
 			Direction dir = this.getMovementDirection();
 			pushX = dir.getOffsetX();
-			pushZ = dir.getOffsetY();
+			pushZ = dir.getOffsetZ();
 		}
 	}
 
@@ -63,6 +73,14 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 	@FabInject(at=@At("TAIL"), method="readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V")
 	protected void readCustomDataFromTag(NbtCompound nbt, CallbackInfo ci) {
 		fabrication$pauseFuel = nbt.getInt("fabrication:PauseFuel");
+	}
+
+	public int fabrication$tgfc$getPauseFuel() {
+		return this.fabrication$pauseFuel;
+	}
+	public void fabrication$tgfc$setFuel(int fuel) {
+		if (this.fabrication$pauseFuel == 0) this.fuel = fuel;
+		else this.fabrication$pauseFuel = fuel;
 	}
 
 }

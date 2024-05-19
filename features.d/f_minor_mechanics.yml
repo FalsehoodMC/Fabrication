@@ -217,5 +217,12 @@ minor_mechanics.gradual_block_breaking:
 	desc:
 		Snow layers and slabs will be mined a layer at a time.
 
+minor_mechanics.furnace_minecart_resupplying:
+	name: Furnace Minecart Resupplying
+	since: 3.4.16
+	sides: server_only
+	desc:
+		Allows furnace minecarts to accept fuel from hoppers.
+
 # kate: space-indent off
 # vim: noai:noet

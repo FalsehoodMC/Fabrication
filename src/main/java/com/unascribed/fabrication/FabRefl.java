@@ -17,6 +17,8 @@ import com.mojang.brigadier.context.CommandContext;
 import com.unascribed.fabrication.support.FabReflField;
 import com.unascribed.fabrication.support.injection.FabRefMap;
 import net.minecraft.client.util.SelectionManager;
+import net.minecraft.entity.vehicle.FurnaceMinecartEntity;
+import net.minecraft.recipe.Ingredient;
 import net.minecraft.server.command.GameModeCommand;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.GameMode;
@@ -247,6 +249,17 @@ public class FabRefl {
 	public static int getPickupDelay(ItemEntity subject) {
 		try {
 			return (int)checkHandle(ie_pickupDelay).invokeExact(subject);
+		} catch (Throwable t) {
+			throw rethrow(t);
+		}
+	}
+	@FabReflField
+	private static final String fme_acceptableFuel_field = "net/minecraft/entity/vehicle/FurnaceMinecartEntity;ACCEPTABLE_FUEL";
+	private static final MethodHandle fme_acceptableFuel = unreflectGetter("FurnaceMinecartEntity", () -> FurnaceMinecartEntity.class, fme_acceptableFuel_field)
+		.requiredBy("*.furnace_minecart_resupplying").get();
+	public static Ingredient getAcceltableFuel() {
+		try {
+			return (Ingredient)checkHandle(fme_acceptableFuel).invokeExact();
 		} catch (Throwable t) {
 			throw rethrow(t);
 		}

@@ -1,7 +1,6 @@
 package com.unascribed.fabrication.mixin.a_fixes.furnace_minecart_pushing;
 
 import com.unascribed.fabrication.FabConf;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,7 +16,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.AbstractMinecartEntity;
 import net.minecraft.entity.vehicle.FurnaceMinecartEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.Ingredient;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
@@ -29,9 +27,6 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 	protected MixinFurnaceMinecartEntity(EntityType<?> entityType, World world) {
 		super(entityType, world);
 	}
-
-	@Shadow @Final
-	private static Ingredient ACCEPTABLE_FUEL;
 	@Shadow
 	private int fuel;
 
