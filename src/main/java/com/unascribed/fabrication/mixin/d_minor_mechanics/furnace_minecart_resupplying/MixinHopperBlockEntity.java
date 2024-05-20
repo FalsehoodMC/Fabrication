@@ -7,13 +7,14 @@ import com.unascribed.fabrication.support.injection.FabInject;
 import com.unascribed.fabrication.support.injection.FabModifyArg;
 import com.unascribed.fabrication.util.forgery_nonsense.ForgeryFurnaceCartResupplying;
 import net.minecraft.block.entity.HopperBlockEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -31,9 +32,20 @@ public class MixinHopperBlockEntity {
 	private static void checkFurnaceCarts(World world, double x, double y, double z, CallbackInfoReturnable<Inventory> cir) {
 		List<ResupplyingFurnaceCart> furnaceList = ForgeryFurnaceCartResupplying.fabrication$fmr$lastCart.get();
 		if (furnaceList == null) return;
-		int i = world.random.nextInt(furnaceList.size()+1);
-		if (i != furnaceList.size()) {
-			cir.setReturnValue(furnaceList.get(i).fabrication$getResupplyingFurnaceCart());
+		int i = 0;
+		while (i<furnaceList.size()) {
+			Vec3d pos = ((Entity)furnaceList.get(i)).getPos();
+			if (Math.abs(x-pos.getX())>1 ||Math.abs(y-pos.getY())>1 ||Math.abs(z-pos.getZ())>1) {
+				furnaceList.remove(i);
+			} else {
+				i++;
+			}
+		}
+		if (!furnaceList.isEmpty()) {
+			i = world.random.nextInt(furnaceList.size()+1);
+			if (i != furnaceList.size()) {
+				cir.setReturnValue(furnaceList.get(i).fabrication$getResupplyingFurnaceCart());
+			}
 		}
 		ForgeryFurnaceCartResupplying.fabrication$fmr$lastCart.remove();
 	}
