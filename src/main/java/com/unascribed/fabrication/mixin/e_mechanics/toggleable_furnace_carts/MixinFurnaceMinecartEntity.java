@@ -71,7 +71,7 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 	protected void writeCustomDataToTag(NbtCompound nbt, CallbackInfo ci) {
 		super.writeCustomDataToNbt(nbt);
 		nbt.putInt("fabrication:PauseFuel", fabrication$pauseFuel);
-		nbt.putByte("fabrication:LastMoveDir", (byte) fabrication$lastMovDirection.getId());
+		if (fabrication$lastMovDirection != null) nbt.putByte("fabrication:LastMoveDir", (byte) fabrication$lastMovDirection.getId());
 	}
 
 	@FabInject(at=@At("TAIL"), method="readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V")
