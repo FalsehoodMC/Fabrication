@@ -35,6 +35,7 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 	public double pushZ;
 
 	public int fabrication$pauseFuel = 0;
+	public Direction fabrication$lastMovDirection = null;
 
 	public MixinFurnaceMinecartEntity(EntityType<?> type, World world) {
 		super(type, world);
@@ -50,6 +51,7 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 		if (!FabConf.isEnabled("*.toggleable_furnace_carts")) return;
 		if (state.isOf(Blocks.POWERED_RAIL) && !state.get(PoweredRailBlock.POWERED)) {
 			if (fuel > 0) {
+				fabrication$lastMovDirection = this.getMovementDirection();
 				fabrication$pauseFuel += fuel;
 				fuel = 0;
 				pushX = 0;
@@ -58,7 +60,7 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 		} else if (fabrication$pauseFuel > 0) {
 			fuel += fabrication$pauseFuel;
 			fabrication$pauseFuel = 0;
-			Direction dir = this.getMovementDirection();
+			Direction dir = fabrication$lastMovDirection == null ? this.getMovementDirection() : fabrication$lastMovDirection;
 			pushX = dir.getOffsetX();
 			pushZ = dir.getOffsetZ();
 		}
@@ -68,11 +70,13 @@ public abstract class MixinFurnaceMinecartEntity extends AbstractMinecartEntity 
 	protected void writeCustomDataToTag(NbtCompound nbt, CallbackInfo ci) {
 		super.writeCustomDataToNbt(nbt);
 		nbt.putInt("fabrication:PauseFuel", fabrication$pauseFuel);
+		if (fabrication$lastMovDirection != null) nbt.putByte("fabrication:LastMoveDir", (byte) fabrication$lastMovDirection.getId());
 	}
 
 	@FabInject(at=@At("TAIL"), method="readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V")
 	protected void readCustomDataFromTag(NbtCompound nbt, CallbackInfo ci) {
 		fabrication$pauseFuel = nbt.getInt("fabrication:PauseFuel");
+		if (nbt.contains("fabrication:LastMoveDir", 1)) fabrication$lastMovDirection = Direction.byId(nbt.getByte("fabrication:LastMoveDir"));
 	}
 
 	public int fabrication$tgfc$getPauseFuel() {
