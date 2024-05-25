@@ -224,5 +224,8 @@ minor_mechanics.furnace_minecart_resupplying:
 	desc:
 		Allows furnace minecarts to accept fuel from hoppers.
 
+		Conflicts with lithiums hopper optimizations.
+		mixin.block.hopper can be disabled in lithium to fix this.
+
 # kate: space-indent off
 # vim: noai:noet
