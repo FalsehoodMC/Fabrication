@@ -23,6 +23,7 @@ import net.minecraft.entity.vehicle.FurnaceMinecartEntity;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.server.command.GameModeCommand;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.level.ServerWorldProperties;
 import org.spongepowered.asm.mixin.throwables.MixinError;
@@ -272,6 +273,17 @@ public class FabRefl {
 	public static int gameModeExecute(CommandContext<ServerCommandSource> context, Collection<ServerPlayerEntity> targets, GameMode gameMode) {
 		try {
 			return (int) checkHandle(gmc_execute).invokeExact(context, targets, gameMode);
+		} catch (Throwable t) {
+			throw rethrow(t);
+		}
+	}
+	@FabReflField
+	private static final String e_getLandingPos_field = "Lnet/minecraft/entity/Entity;getLandingPos()Lnet/minecraft/util/math/BlockPos;";
+	private static final MethodHandle e_getLandingPos = unreflectMethod("Entity", () -> Entity.class, e_getLandingPos_field, BlockPos.class)
+		.requiredBy("*.repelling_void").get();
+	public static BlockPos getLandingPos(Entity context) {
+		try {
+			return (BlockPos) checkHandle(e_getLandingPos).invokeExact(context);
 		} catch (Throwable t) {
 			throw rethrow(t);
 		}

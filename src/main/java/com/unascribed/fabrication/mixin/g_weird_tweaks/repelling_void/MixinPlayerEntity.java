@@ -2,6 +2,7 @@ package com.unascribed.fabrication.mixin.g_weird_tweaks.repelling_void;
 
 import java.util.List;
 
+import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.support.injection.FabInject;
 import net.minecraft.block.BlockState;
 import com.unascribed.fabrication.FabConf;
@@ -54,7 +55,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 		}
 		if (entity.isOnGround()) {
 			fabrication$lastGroundPos = entity.getPos();
-			fabrication$lastLandingPos = entity.getLandingPos();
+			fabrication$lastLandingPos = FabRefl.getLandingPos(entity);
 			fabrication$voidFallTrail.clear();
 		} else if (fabrication$voidFallTrail.size() < 20) {
 			fabrication$voidFallTrail.add(getPos());
