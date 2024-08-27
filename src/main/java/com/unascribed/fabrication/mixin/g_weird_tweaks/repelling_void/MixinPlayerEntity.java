@@ -106,7 +106,9 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 					((ServerWorld)world).spawnParticles(ParticleTypes.CLOUD, vec.x, vec.y, vec.z, 0, 0, 1, 0, 0.05);
 				}
 			}
-			fabrication$debted = true;
+			if (!(self instanceof PlayerEntity && (((PlayerEntity)self).getAbilities().invulnerable))) {
+				fabrication$debted = true;
+			}
 			cir.setReturnValue(false);
 		}
 	}
