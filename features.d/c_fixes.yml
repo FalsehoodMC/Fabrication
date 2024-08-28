@@ -228,5 +228,12 @@ fixes.declared_travel:
 	desc:
 		Re-adds Entering/Leaving Dimension Text
 
+fixes.fix_dragon_egg_trails:
+	name: Fix Dragon Egg Trails
+	since: 3.4.19
+	sides: server_and_client
+	desc:
+		Fixes dragon egg trails to point to the dragon egg.
+
 # kate: space-indent off
 # vim: noai:noet

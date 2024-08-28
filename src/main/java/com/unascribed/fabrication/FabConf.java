@@ -11,6 +11,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.MoreFiles;
 import com.google.common.io.Resources;
+import com.mojang.brigadier.CommandDispatcher;
 import com.unascribed.fabrication.FeaturesFile.FeatureEntry;
 import com.unascribed.fabrication.QDIni.IniTransformer;
 import com.unascribed.fabrication.QDIni.SyntaxErrorException;
@@ -21,15 +22,15 @@ import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.SpecialEligibility;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.util.Pair;
+import org.lwjgl.system.Platform;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.plaf.metal.MetalLookAndFeel;
-
-import net.minecraft.util.Pair;
-import org.lwjgl.system.Platform;
-
 import java.awt.Toolkit;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -661,4 +662,13 @@ public class FabConf {
 		}
 	}
 
+	@Environment(EnvType.CLIENT)
+	public static final class Client {
+		public static boolean serverHasFabrication() {
+			ClientPlayerEntity player = MinecraftClient.getInstance().player;
+			if (player == null) return false;
+			CommandDispatcher<?> disp = player.networkHandler.getCommandDispatcher();
+			return disp.getRoot().getChild(MixinConfigPlugin.MOD_NAME_LOWER) != null || disp.getRoot().getChild(MixinConfigPlugin.MOD_NAME_LOWER_OTHER) != null;
+		}
+	}
 }
