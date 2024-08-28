@@ -19,7 +19,7 @@ public class MixinDragonEggBlock {
 
 	@FabInject(method= "teleport(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V",
 			at=@At("HEAD"), cancellable=true)
-	public void isPlayerInRange(BlockState state, World world, BlockPos pos, CallbackInfo ci) {
+	public void stopTeleport(BlockState state, World world, BlockPos pos, CallbackInfo ci) {
 		if (FabConf.isEnabled("*.static_dragon_egg"))
 			ci.cancel();
 	}
