@@ -17,6 +17,7 @@ import net.minecraft.resource.ResourcePackProvider;
 import net.minecraft.resource.ResourcePackSource;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.text.Text;
+import net.minecraft.world.World;
 
 import java.util.Set;
 import java.util.function.Consumer;
@@ -57,7 +58,7 @@ public abstract class ResourcePackFeature implements Feature, ResourcePackProvid
 	}
 
 	@Override
-	public void apply() {
+	public void apply(World world) {
 		active = true;
 		if (EarlyAgnos.getCurrentEnv() == Env.CLIENT) {
 			reloadClient();
@@ -72,7 +73,7 @@ public abstract class ResourcePackFeature implements Feature, ResourcePackProvid
 	}
 
 	@Override
-	public boolean undo() {
+	public boolean undo(World world) {
 		active = false;
 		if (EarlyAgnos.getCurrentEnv() == Env.CLIENT) {
 			reloadClient();

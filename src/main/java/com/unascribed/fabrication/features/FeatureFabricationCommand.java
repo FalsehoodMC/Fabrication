@@ -73,8 +73,8 @@ import java.util.function.Predicate;
 public class FeatureFabricationCommand implements Feature {
 
 	@Override
-	public void apply() {
-		Agnos.runForCommandRegistration((dispatcher, registryAccess, dedi) -> {
+	public void apply(World world) {
+			Agnos.runForCommandRegistration((dispatcher, registryAccess, dedi) -> {
 			try {
 				LiteralArgumentBuilder<ServerCommandSource> root = LiteralArgumentBuilder.<ServerCommandSource>literal(MixinConfigPlugin.MOD_NAME_LOWER);
 				addConfig(root, dedi);
@@ -612,7 +612,8 @@ public class FeatureFabricationCommand implements Feature {
 			}
 			sendFeedback(c, Text.literal(key+" is now set to "+value+(" (default "+def+")")+(local ? " for this world" : "")), true);
 			if (FabricationMod.isAvailableFeature(key)) {
-				if (FabricationMod.updateFeature(key)) {
+				CommandSource commandSource = c.getSource();
+				if (FabricationMod.updateFeature(key, commandSource instanceof ServerCommandSource ? ((ServerCommandSource) commandSource).getWorld() : null)) {
 					return;
 				}
 			}
@@ -628,7 +629,7 @@ public class FeatureFabricationCommand implements Feature {
 	}
 
 	@Override
-	public boolean undo() {
+	public boolean undo(World world) {
 		return false;
 	}
 
