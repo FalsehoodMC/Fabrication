@@ -54,7 +54,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.Property;
 import net.minecraft.text.MutableText;
@@ -75,8 +74,8 @@ import net.minecraft.world.gen.noise.NoiseConfig;
 public class FeatureFabricationCommand implements Feature {
 
 	@Override
-	public void apply() {
-		Agnos.runForCommandRegistration((dispatcher, registryAccess, dedi) -> {
+	public void apply(World world) {
+			Agnos.runForCommandRegistration((dispatcher, registryAccess, dedi) -> {
 			try {
 				LiteralArgumentBuilder<ServerCommandSource> root = LiteralArgumentBuilder.<ServerCommandSource>literal(MixinConfigPlugin.MOD_NAME_LOWER);
 				addConfig(root, dedi);
@@ -614,7 +613,8 @@ public class FeatureFabricationCommand implements Feature {
 			}
 			sendFeedback(c, Text.literal(key+" is now set to "+value+(" (default "+def+")")+(local ? " for this world" : "")), true);
 			if (FabricationMod.isAvailableFeature(key)) {
-				if (FabricationMod.updateFeature(key)) {
+				CommandSource commandSource = c.getSource();
+				if (FabricationMod.updateFeature(key, commandSource instanceof ServerCommandSource ? ((ServerCommandSource) commandSource).getWorld() : null)) {
 					return;
 				}
 			}
@@ -630,7 +630,7 @@ public class FeatureFabricationCommand implements Feature {
 	}
 
 	@Override
-	public boolean undo() {
+	public boolean undo(World world) {
 		return false;
 	}
 

@@ -8,6 +8,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.text.Text;
+import net.minecraft.world.World;
 
 @EligibleIf(configAvailable="*.show_bee_count_tooltip", envMatches=Env.CLIENT)
 public class FeatureShowBeeCountTooltip implements Feature {
@@ -16,7 +17,7 @@ public class FeatureShowBeeCountTooltip implements Feature {
 	private boolean active = false;
 
 	@Override
-	public void apply() {
+	public void apply(World world) {
 		active = true;
 		if (!applied) {
 			applied = true;
@@ -32,7 +33,7 @@ public class FeatureShowBeeCountTooltip implements Feature {
 	}
 
 	@Override
-	public boolean undo() {
+	public boolean undo(World world) {
 		active = false;
 		return true;
 	}

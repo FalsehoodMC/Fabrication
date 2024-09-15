@@ -31,6 +31,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
 
 @EligibleIf(configAvailable="*.i_and_more")
 public class FeatureIMore implements Feature {
@@ -39,7 +40,7 @@ public class FeatureIMore implements Feature {
 	private boolean registered = false;
 
 	@Override
-	public void apply() {
+	public void apply(World world) {
 		applied = true;
 		if (!registered) {
 			registered = true;
@@ -157,7 +158,7 @@ public class FeatureIMore implements Feature {
 	}
 
 	@Override
-	public boolean undo() {
+	public boolean undo(World world) {
 		applied = false;
 		return true;
 	}

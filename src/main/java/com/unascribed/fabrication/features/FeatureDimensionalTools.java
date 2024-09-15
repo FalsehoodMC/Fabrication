@@ -26,6 +26,7 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.Language;
+import net.minecraft.world.World;
 
 @EligibleIf(configAvailable="*.dimensional_tools")
 public class FeatureDimensionalTools implements Feature {
@@ -40,7 +41,7 @@ public class FeatureDimensionalTools implements Feature {
 	private boolean active = false;
 
 	@Override
-	public void apply() {
+	public void apply(World world) {
 		active = true;
 		if (!applied) {
 			applied = true;
@@ -69,7 +70,7 @@ public class FeatureDimensionalTools implements Feature {
 	}
 
 	@Override
-	public boolean undo() {
+	public boolean undo(World world) {
 		active = false;
 		return true;
 	}

@@ -69,7 +69,7 @@ public class FabricationMod implements ModInitializer {
 				String key = FabConf.remap(r.getConfigKey());
 				if (key == null || FabConf.isEnabled(key)) {
 					try {
-						r.apply();
+						r.apply(null);
 						if (key != null) {
 							enabledFeatures.add(key);
 						}
@@ -122,16 +122,16 @@ public class FabricationMod implements ModInitializer {
 		return features.containsKey(FabConf.remap(configKey));
 	}
 
-	public static boolean updateFeature(String configKey) {
+	public static boolean updateFeature(String configKey, World world) {
 		configKey = FabConf.remap(configKey);
 		boolean enabled = FabConf.isEnabled(configKey);
 		if (enabledFeatures.contains(configKey) == enabled) return true;
 		if (enabled) {
-			features.get(configKey).apply();
+			features.get(configKey).apply(world);
 			enabledFeatures.add(configKey);
 			return true;
 		} else {
-			boolean b = features.get(configKey).undo();
+			boolean b = features.get(configKey).undo(world);
 			if (b) {
 				enabledFeatures.remove(configKey);
 			}
