@@ -8,6 +8,7 @@ import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.resource.ResourcePackSource;
 import net.minecraft.resource.metadata.PackResourceMetadata;
 import net.minecraft.text.LiteralText;
+import net.minecraft.world.World;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -26,10 +27,10 @@ public class FeatureFoliageCreepers extends ResourcePackFeature {
 		}
 	}
 	@Override
-	public void apply() {
+	public void apply(World world) {
 	}
 	@Override
-	public boolean undo() {
+	public boolean undo(World world) {
 		return true;
 	}
 }

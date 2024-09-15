@@ -17,6 +17,7 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
 
 import java.util.Optional;
 
@@ -26,7 +27,7 @@ public class FeatureSwapConflictingEnchants implements Feature {
 	private boolean applied = false;
 
 	@Override
-	public void apply() {
+	public void apply(World world) {
 		if (!applied) {
 			applied = true;
 			if (EarlyAgnos.getCurrentEnv() == Env.CLIENT) {
@@ -68,7 +69,7 @@ public class FeatureSwapConflictingEnchants implements Feature {
 	}
 
 	@Override
-	public boolean undo() {
+	public boolean undo(World world) {
 		return true;
 	}
 

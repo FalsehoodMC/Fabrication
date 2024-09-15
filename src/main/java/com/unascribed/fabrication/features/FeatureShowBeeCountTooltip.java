@@ -4,11 +4,11 @@ import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Feature;
-import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.text.LiteralText;
+import net.minecraft.world.World;
 
 @EligibleIf(configAvailable="*.show_bee_count_tooltip", envMatches=Env.CLIENT)
 public class FeatureShowBeeCountTooltip implements Feature {
@@ -17,7 +17,7 @@ public class FeatureShowBeeCountTooltip implements Feature {
 	private boolean active = false;
 
 	@Override
-	public void apply() {
+	public void apply(World world) {
 		active = true;
 		if (!applied) {
 			applied = true;
@@ -33,7 +33,7 @@ public class FeatureShowBeeCountTooltip implements Feature {
 	}
 
 	@Override
-	public boolean undo() {
+	public boolean undo(World world) {
 		active = false;
 		return true;
 	}
