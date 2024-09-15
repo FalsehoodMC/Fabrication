@@ -28,6 +28,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
+import net.minecraft.world.World;
 import net.minecraft.world.level.ServerWorldProperties;
 
 @EligibleIf(configAvailable="*.legacy_command_syntax")
@@ -36,7 +37,7 @@ public class FeatureLegacyCommandSyntax implements Feature {
 	private boolean applied = false;
 
 	@Override
-	public void apply() {
+	public void apply(World w) {
 		if (applied) return;
 		applied = true;
 		Agnos.runForCommandRegistration((dispatcher, registryAccess, dedi) -> {
@@ -132,7 +133,7 @@ public class FeatureLegacyCommandSyntax implements Feature {
 	}
 
 	@Override
-	public boolean undo() {
+	public boolean undo(World world) {
 		return true;
 	}
 
