@@ -1,6 +1,7 @@
 package com.unascribed.fabrication;
 
 import com.unascribed.fabrication.support.Feature;
+import net.minecraft.world.World;
 
 public class DelegateFeature implements Feature {
 
@@ -15,13 +16,13 @@ public class DelegateFeature implements Feature {
 	}
 
 	@Override
-	public void apply() {
-		delegate.apply();
+	public void apply(World world) {
+		delegate.apply(world);
 	}
 
 	@Override
-	public boolean undo() {
-		return delegate.undo();
+	public boolean undo(World world) {
+		return delegate.undo(world);
 	}
 
 	@Override
