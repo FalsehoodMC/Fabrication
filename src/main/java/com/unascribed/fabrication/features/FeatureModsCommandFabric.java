@@ -13,6 +13,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.fabricmc.loader.api.metadata.Person;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
@@ -28,7 +29,7 @@ public class FeatureModsCommandFabric implements Feature {
 	private boolean applied = false;
 
 	@Override
-	public void apply(World world) {
+	public void apply(MinecraftServer minecraftServer, World world) {
 		if (applied) return;
 		applied = true;
 		Agnos.runForCommandRegistration((dispatcher, registryAccess, dedi) -> {
@@ -61,7 +62,7 @@ public class FeatureModsCommandFabric implements Feature {
 	}
 
 	@Override
-	public boolean undo(World world) {
+	public boolean undo(MinecraftServer minecraftServer, World world) {
 		return true;
 	}
 

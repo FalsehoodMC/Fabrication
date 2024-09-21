@@ -14,6 +14,7 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
@@ -24,7 +25,7 @@ public class FeatureCrawling implements Feature {
 	public static boolean forced = false;
 
 	@Override
-	public void apply(World world) {
+	public void apply(MinecraftServer minecraftServer, World world) {
 		keybind = new KeyBinding("["+ MixinConfigPlugin.MOD_NAME+"] Crawl", InputUtil.UNKNOWN_KEY.getCode(), "key.categories.movement") {
 			@Override
 			public void setPressed(boolean pressed) {
@@ -56,7 +57,7 @@ public class FeatureCrawling implements Feature {
 	}
 
 	@Override
-	public boolean undo(World world) {
+	public boolean undo(MinecraftServer minecraftServer, World world) {
 		return false;
 	}
 
