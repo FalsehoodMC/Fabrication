@@ -44,6 +44,8 @@ import com.google.common.collect.Sets;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientCommandSource;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.EntitySelector;
@@ -51,6 +53,7 @@ import net.minecraft.command.argument.DimensionArgumentType;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -72,7 +75,7 @@ import net.minecraft.world.gen.chunk.ChunkGenerator;
 public class FeatureFabricationCommand implements Feature {
 
 	@Override
-	public void apply(World world) {
+	public void apply(MinecraftServer minecraftServer, World world) {
 		Agnos.runForCommandRegistration((dispatcher, dedi) -> {
 			try {
 				LiteralArgumentBuilder<ServerCommandSource> root = LiteralArgumentBuilder.<ServerCommandSource>literal(MixinConfigPlugin.MOD_NAME_LOWER);
@@ -610,7 +613,16 @@ public class FeatureFabricationCommand implements Feature {
 			sendFeedback(c, new LiteralText(key+" is now set to "+value+(" (default "+def+")")+(local ? " for this world" : "")), true);
 			if (FabricationMod.isAvailableFeature(key)) {
 				CommandSource commandSource = c.getSource();
-				if (FabricationMod.updateFeature(key, commandSource instanceof ServerCommandSource ? ((ServerCommandSource) commandSource).getWorld() : null)) {
+				MinecraftServer server = null;
+				World world = null;
+				if (commandSource instanceof ServerCommandSource) {
+					server = ((ServerCommandSource) commandSource).getServer();
+					world = ((ServerCommandSource) commandSource).getWorld();
+				} else if (commandSource instanceof ClientCommandSource) {
+					server = MinecraftClient.getInstance().getServer();
+					world = MinecraftClient.getInstance().world;
+				}
+				if (FabricationMod.updateFeature(key, server, world)) {
 					return;
 				}
 			}
@@ -626,7 +638,7 @@ public class FeatureFabricationCommand implements Feature {
 	}
 
 	@Override
-	public boolean undo(World world) {
+	public boolean undo(MinecraftServer minecraftServer, World world) {
 		return false;
 	}
 

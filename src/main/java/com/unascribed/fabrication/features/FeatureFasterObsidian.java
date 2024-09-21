@@ -9,6 +9,7 @@ import com.google.common.collect.ImmutableList;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 
 @EligibleIf(configAvailable="*.faster_obsidian")
@@ -21,12 +22,12 @@ public class FeatureFasterObsidian implements Feature {
 			);
 
 	@Override
-	public void apply(World world) {
+	public void apply(MinecraftServer minecraftServer, World world) {
 		amendHardness(1/3f);
 	}
 
 	@Override
-	public boolean undo(World world) {
+	public boolean undo(MinecraftServer minecraftServer, World world) {
 		amendHardness(3);
 		return true;
 	}
