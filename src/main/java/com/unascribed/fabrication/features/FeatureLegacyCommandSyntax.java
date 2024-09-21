@@ -20,6 +20,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.primitives.Ints;
 
 import net.minecraft.command.argument.EntityArgumentType;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.DifficultyCommand;
 import net.minecraft.server.command.ServerCommandSource;
@@ -37,7 +38,7 @@ public class FeatureLegacyCommandSyntax implements Feature {
 	private boolean applied = false;
 
 	@Override
-	public void apply(World w) {
+	public void apply(MinecraftServer minecraftServer, World w) {
 		if (applied) return;
 		applied = true;
 		Agnos.runForCommandRegistration((dispatcher, registryAccess, dedi) -> {
@@ -133,7 +134,7 @@ public class FeatureLegacyCommandSyntax implements Feature {
 	}
 
 	@Override
-	public boolean undo(World world) {
+	public boolean undo(MinecraftServer minecraftServer, World world) {
 		return true;
 	}
 

@@ -9,6 +9,7 @@ import com.unascribed.fabrication.loaders.LoaderTaggablePlayers;
 import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Feature;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 
 import java.util.HashMap;
@@ -94,12 +95,12 @@ public class FeatureTaggablePlayers implements Feature {
 	}
 
 	@Override
-	public void apply(World world) {
+	public void apply(MinecraftServer minecraftServer, World world) {
 		activeTags.forEach(FeatureTaggablePlayers::set);
 	}
 
 	@Override
-	public boolean undo(World world) {
+	public boolean undo(MinecraftServer minecraftServer, World world) {
 		activeTags.keySet().forEach(k->ConfigPredicates.remove(k, 1));
 		return true;
 	}
