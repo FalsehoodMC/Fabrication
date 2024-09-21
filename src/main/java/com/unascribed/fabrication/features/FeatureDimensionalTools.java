@@ -26,6 +26,7 @@ import net.minecraft.nbt.NbtString;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableTextContent;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Language;
 import net.minecraft.world.World;
 
@@ -42,7 +43,7 @@ public class FeatureDimensionalTools implements Feature {
 	private boolean active = false;
 
 	@Override
-	public void apply(World world) {
+	public void apply(MinecraftServer minecraftServer, World world) {
 		active = true;
 		if (!applied) {
 			applied = true;
@@ -71,7 +72,7 @@ public class FeatureDimensionalTools implements Feature {
 	}
 
 	@Override
-	public boolean undo(World world) {
+	public boolean undo(MinecraftServer minecraftServer, World world) {
 		active = false;
 		return true;
 	}
