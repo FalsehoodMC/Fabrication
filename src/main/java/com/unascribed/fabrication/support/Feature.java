@@ -1,9 +1,10 @@
 package com.unascribed.fabrication.support;
 
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 
 public interface Feature {
-	void apply(World world);
-	boolean undo(World world);
+	void apply(MinecraftServer minecraftServer, World world);
+	boolean undo(MinecraftServer minecraftServer, World world);
 	String getConfigKey();
 }
