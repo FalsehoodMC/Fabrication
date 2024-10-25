@@ -22,19 +22,19 @@ import java.util.Locale;
 @Mixin(RegistryEntryArgumentType.class)
 @EligibleIf(configAvailable="*.legacy_command_syntax")
 public class MixinEntitySummonArgumentType {
-	private boolean fabrication$isNotEntityArgument = true;
+	private static final ThreadLocal<Boolean> fabrication$isNotEntityArgument = ThreadLocal.withInitial(() -> true);
 
 	@FabInject(at=@At("TAIL"), method="<init>(Lnet/minecraft/command/CommandRegistryAccess;Lnet/minecraft/registry/RegistryKey;Lcom/mojang/serialization/Codec;)V")
 	public void legacyCommandInput(CommandRegistryAccess access, RegistryKey key, Codec codec, CallbackInfo ci) {
 		if (key == RegistryKeys.ENTITY_TYPE) {
-			fabrication$isNotEntityArgument = false;
+			fabrication$isNotEntityArgument.set(false);
 		}
 	}
 
 	@Hijack(method="parseAsNbt(Lcom/mojang/brigadier/StringReader;)Lnet/minecraft/nbt/NbtElement;",
 			target="Lnet/minecraft/util/Identifier;fromCommandInput(Lcom/mojang/brigadier/StringReader;)Lnet/minecraft/util/Identifier;")
-	public HijackReturn legacyCommandInput(RegistryEntryArgumentType self, StringReader sr) {
-		if (fabrication$isNotEntityArgument) return null;
+	private static HijackReturn legacyCommandInput(StringReader sr) {
+		if (fabrication$isNotEntityArgument.get()) return null;
 		if (!FabConf.isEnabled("*.legacy_command_syntax")) return null;
 		char peek = sr.peek();
 		if (peek >= 'A' && peek <= 'Z') {
