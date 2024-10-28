@@ -60,14 +60,16 @@ public abstract class MixinEnchantmentScreen extends HandledScreen<EnchantmentSc
 		return original;
 	}
 
-	@Hijack(target="Lnet/minecraft/client/gui/DrawContext;drawTexture(Lnet/minecraft/util/Identifier;IIIIII)V",
+	@Hijack(target="Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Lnet/minecraft/util/Identifier;IIII)V",
 			method="drawBackground(Lnet/minecraft/client/gui/DrawContext;FII)V")
-	public boolean fabrication$noXpHijackDrawTexture(DrawContext drawContext, Identifier texture, int x, int y, int u, int v) {
-		if (FabConf.isEnabled("*.no_experience") && (v == 223 || v == 239)) {
-			if (v == 223) {
-				drawContext.drawText(textRenderer, ""+((u/16)+1), x+98, y+8, 0x5577FF, true);
+	public boolean fabrication$noXpHijackDrawTexture(DrawContext drawContext, Identifier texture, int x, int y) {
+		if (FabConf.isEnabled("*.no_experience")) {
+			if (texture.getPath().startsWith("container/enchanting_table/level_")) {
+				if (!texture.getPath().endsWith("_disabled")) {
+					drawContext.drawText(textRenderer, "" + Integer.parseInt(texture.getPath().substring("container/enchanting_table/level_".length())), x + 98, y + 8, 0x5577FF, true);
+				}
+				return true;
 			}
-			return true;
 		}
 		return false;
 	}
