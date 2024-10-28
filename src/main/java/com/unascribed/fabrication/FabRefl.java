@@ -10,13 +10,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.unascribed.fabrication.support.FabReflField;
 import com.unascribed.fabrication.support.injection.FabRefMap;
 import net.minecraft.client.util.SelectionManager;
+import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.registry.RegistryEntryLookup;
 import net.minecraft.entity.vehicle.FurnaceMinecartEntity;
 import net.minecraft.recipe.Ingredient;
@@ -56,9 +56,7 @@ import net.minecraft.client.texture.NativeImage.Format;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.command.EntitySelector;
 import net.minecraft.command.argument.ItemStackArgument;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.ai.TargetPredicate;
@@ -86,6 +84,18 @@ public class FabRefl {
 	public static ServerWorldProperties getWorldProperties(ServerWorld subject) {
 		try {
 			return (ServerWorldProperties)checkHandle(sw_properties).invokeExact(subject);
+		} catch (Throwable t) {
+			throw rethrow(t);
+		}
+	}
+
+	@FabReflField
+	private static final String iec_showInTooltip_field = "net/minecraft/component/type/ItemEnchantmentsComponent;showInTooltip";
+	private static final MethodHandle iec_showInTooltip = unreflectGetter("ItemEnchantmentsComponent", () -> ItemEnchantmentsComponent.class, iec_showInTooltip_field)
+		.requiredBy("*.swap_conflicting_enchants").get();
+	public static boolean getShowInTooltip(ItemEnchantmentsComponent subject) {
+		try {
+			return (boolean)checkHandle(iec_showInTooltip).invokeExact(subject);
 		} catch (Throwable t) {
 			throw rethrow(t);
 		}
