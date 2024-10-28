@@ -60,17 +60,17 @@ public abstract class MixinEnchantmentScreen extends HandledScreen<EnchantmentSc
 	}
 
 	// TODO: I have no idea what this is supposed to be doing.
-//	@Hijack(target="Lnet/minecraft/client/gui/DrawContext;drawTexture(Lnet/minecraft/util/Identifier;IIIIII)V",
-//			method="drawBackground(Lnet/minecraft/client/gui/DrawContext;FII)V")
-//	public boolean fabrication$noXpHijackDrawTexture(DrawContext drawContext, Identifier texture, int x, int y, int u, int v) {
-//		if (FabConf.isEnabled("*.no_experience") && (v == 223 || v == 239)) {
-//			if (v == 223) {
-//				drawContext.drawText(textRenderer, ""+((u/16)+1), x+98, y+8, 0x5577FF, true);
-//			}
-//			return true;
-//		}
-//		return false;
-//	}
+	@Hijack(target="Lnet/minecraft/client/gui/DrawContext;drawTexture(Lnet/minecraft/util/Identifier;IIIIII)V",
+			method="drawBackground(Lnet/minecraft/client/gui/DrawContext;FII)V")
+	public boolean fabrication$noXpHijackDrawTexture(DrawContext drawContext, Identifier texture, int x, int y, int u, int v) {
+		if (FabConf.isEnabled("*.no_experience") && (v == 223 || v == 239)) {
+			if (v == 223) {
+				drawContext.drawText(textRenderer, ""+((u/16)+1), x+98, y+8, 0x5577FF, true);
+			}
+			return true;
+		}
+		return false;
+	}
 
 	@FabModifyVariable(at=@At(value="INVOKE", target="net/minecraft/client/font/TextRenderer.getWidth(Ljava/lang/String;)I", ordinal=0),
 			method="drawBackground(Lnet/minecraft/client/gui/DrawContext;FII)V", ordinal=0)

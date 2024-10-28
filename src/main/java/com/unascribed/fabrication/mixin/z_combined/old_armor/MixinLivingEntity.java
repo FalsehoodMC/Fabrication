@@ -2,6 +2,8 @@ package com.unascribed.fabrication.mixin.z_combined.old_armor;
 
 import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.FailOn;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -12,6 +14,7 @@ import java.util.function.Predicate;
 
 @Mixin(LivingEntity.class)
 @EligibleIf(anyConfigAvailable={"*.old_armor_scale", "*.old_armor"})
+@FailOn(invertedSpecialConditions={SpecialEligibility.FORGE, SpecialEligibility.NOT_FORGE})
 public abstract class MixinLivingEntity extends Entity {
 
 	public MixinLivingEntity(EntityType<?> type, World world) {

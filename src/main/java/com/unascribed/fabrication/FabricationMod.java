@@ -25,8 +25,6 @@ import com.unascribed.fabrication.util.ByteBufCustomPayload;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;

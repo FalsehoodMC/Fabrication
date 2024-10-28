@@ -3,6 +3,8 @@ package com.unascribed.fabrication.mixin.c_tweaks.fullres_banner_shields;
 import java.util.Optional;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.FailOn;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.component.type.BannerPatternsComponent;
 import net.minecraft.registry.RegistryKey;
@@ -36,6 +38,7 @@ import net.minecraft.util.DyeColor;
 
 @Mixin(BannerBlockEntityRenderer.class)
 @EligibleIf(configAvailable="*.fullres_banner_shields", envMatches=Env.CLIENT)
+@FailOn(invertedSpecialConditions={SpecialEligibility.FORGE, SpecialEligibility.NOT_FORGE})
 public class MixinBannerBlockEntityRenderer {
 
 	@Unique

@@ -1,6 +1,8 @@
 package com.unascribed.fabrication.mixin.c_tweaks.legible_signs;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.FailOn;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import net.minecraft.block.entity.SignText;
 import net.minecraft.util.math.ColorHelper;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,6 +19,7 @@ import net.minecraft.util.DyeColor;
 
 @Mixin(SignBlockEntityRenderer.class)
 @EligibleIf(configAvailable="*.legible_signs", envMatches=Env.CLIENT)
+@FailOn(invertedSpecialConditions={SpecialEligibility.FORGE, SpecialEligibility.NOT_FORGE})
 public class MixinSignBlockEntityRenderer {
 
 	@FabInject(at=@At("HEAD"), method="getColor(Lnet/minecraft/block/entity/SignText;)I", cancellable = true)

@@ -3,6 +3,8 @@ package com.unascribed.fabrication.mixin.b_utility.item_despawn;
 import java.util.Map;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.FailOn;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.injection.FabInject;
 import com.unascribed.fabrication.support.injection.FabModifyConst;
 import net.minecraft.component.DataComponentTypes;
@@ -46,6 +48,7 @@ import net.minecraft.world.World;
 
 @Mixin(ItemEntity.class)
 @EligibleIf(configAvailable="*.item_despawn")
+@FailOn(invertedSpecialConditions={SpecialEligibility.FORGE, SpecialEligibility.NOT_FORGE}) //TODO LoaderItemDespawn
 public abstract class MixinItemEntity extends Entity implements SetFromPlayerDeath {
 
 	public MixinItemEntity(EntityType<?> type, World world) {

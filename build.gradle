@@ -76,7 +76,6 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	modImplementation fabricApi.module('fabric-api-base', project.fabric_version)
-    modImplementation fabricApi.module('fabric-networking-api-v1', project.fabric_version)
 	//Required by pridelib/modmenu
 	modImplementation fabricApi.module('fabric-resource-loader-v0', project.fabric_version)
 	modImplementation('io.github.queerbric:pridelib:1.2.1+1.21') {

@@ -9,8 +9,6 @@ import com.unascribed.fabrication.logic.WoinaDrops;
 import com.unascribed.fabrication.util.ByteBufCustomPayload;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.resource.ReloadableResourceManagerImpl;
