@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(CommandManager.class)
 @EligibleIf(specialConditions=SpecialEligibility.NOT_FORGE)
-public class MixinComamndManager {
+public class MixinCommandManager {
 
 		@Shadow @Final
 		private CommandDispatcher<ServerCommandSource> dispatcher;
