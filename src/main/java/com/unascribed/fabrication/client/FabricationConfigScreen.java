@@ -91,6 +91,7 @@ public class FabricationConfigScreen extends Screen {
 	private static final Identifier BG_DARK = Identifier.of("fabrication", "bg-dark.png");
 	private static final Identifier BG_GRAD = Identifier.of("fabrication", "bg-grad.png");
 	private static final Identifier BG_GRAD_DARK = Identifier.of("fabrication", "bg-grad-dark.png");
+	private static final Identifier INWORLD_MENU_BACKGROUND_TEXTURE = Identifier.ofVanilla("textures/gui/inworld_menu_background.png");
 
 	private static long serverLaunchId = -1;
 
@@ -293,7 +294,7 @@ public class FabricationConfigScreen extends Screen {
 							projection.push();
 							projection.translate(width * x, height * y, 0);
 							RenderSystem.setProjectionMatrix(projection.peek().getPositionMatrix(), VertexSorter.BY_Z);
-							parent.renderInGameBackground(drawContext); // TODO: parent.renderBackgroundTexture(drawContext);
+							Screen.renderBackgroundTexture(drawContext, this.client.world == null ? MENU_BACKGROUND_TEXTURE : INWORLD_MENU_BACKGROUND_TEXTURE, x, y, 0.0F, 0.0F, width, height);
 							projection.pop();
 						}
 					}
