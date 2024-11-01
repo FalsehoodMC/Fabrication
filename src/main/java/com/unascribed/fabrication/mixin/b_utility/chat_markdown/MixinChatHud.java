@@ -2,6 +2,7 @@ package com.unascribed.fabrication.mixin.b_utility.chat_markdown;
 
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.injection.FabModifyVariable;
 import com.unascribed.fabrication.util.Markdown;
 import net.minecraft.client.gui.hud.ChatHud;
@@ -12,7 +13,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(ChatHud.class)
-@EligibleIf(configAvailable="*.chat_markdown")
+@EligibleIf(configAvailable="*.chat_markdown", envMatches=Env.CLIENT)
 public class MixinChatHud {
 
 	@FabModifyVariable(at=@At(value="HEAD"), method="addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;ILnet/minecraft/client/gui/hud/MessageIndicator;Z)V", argsOnly=true)
