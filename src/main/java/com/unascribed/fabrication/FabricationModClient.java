@@ -3,7 +3,6 @@ package com.unascribed.fabrication;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
-import com.unascribed.fabrication.interfaces.ByteBufCustomPayloadReceiver;
 import com.unascribed.fabrication.interfaces.GetServerConfig;
 import com.unascribed.fabrication.logic.WoinaDrops;
 import com.unascribed.fabrication.util.ByteBufCustomPayload;
@@ -34,11 +33,6 @@ public class FabricationModClient implements ClientModInitializer {
 				});
 			});
 		}
-		ClientPlayNetworking.registerGlobalReceiver(ByteBufCustomPayload.ID, (payload, context) -> {
-			context.client().execute(() -> {
-				((ByteBufCustomPayloadReceiver) context.client().getNetworkHandler()).fabrication$onCustomPayload(payload);
-			});
-		});
 	}
 
 	public static boolean isBannedByServer(String configKey) {

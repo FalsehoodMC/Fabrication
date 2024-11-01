@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 
-import com.unascribed.fabrication.interfaces.ByteBufCustomPayloadReceiver;
 import com.unascribed.fabrication.interfaces.SetFabricationConfigAware;
 import com.unascribed.fabrication.support.ConfigLoader;
 import com.unascribed.fabrication.support.ConfigValues;
@@ -95,13 +94,6 @@ public class FabricationMod implements ModInitializer {
 			ABSORPTION_HURT = SoundEvent.of(Identifier.of("fabrication", "absorption_hurt"));
 			FabricationDefaultResources.apply();
 		}
-		PayloadTypeRegistry.playC2S().register(ByteBufCustomPayload.ID, ByteBufCustomPayload.CODEC);
-		PayloadTypeRegistry.playS2C().register(ByteBufCustomPayload.ID, ByteBufCustomPayload.CODEC);
-		ServerPlayNetworking.registerGlobalReceiver(ByteBufCustomPayload.ID, (payload, context) -> {
-			context.server().execute(() -> {
-				((ByteBufCustomPayloadReceiver) context.player().networkHandler).fabrication$onCustomPayload(payload);
-			});
-		});
 
 	}
 

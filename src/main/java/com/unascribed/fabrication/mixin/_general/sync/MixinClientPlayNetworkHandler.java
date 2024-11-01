@@ -1,55 +1,39 @@
 package com.unascribed.fabrication.mixin._general.sync;
 
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.mojang.brigadier.ParseResults;
+import com.unascribed.fabrication.client.FScriptScreen;
+import com.unascribed.fabrication.interfaces.GetServerConfig;
+import com.unascribed.fabrication.support.ConfigValues;
+import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.Env;
+import com.unascribed.fabrication.support.injection.FabInject;
+import com.unascribed.fabrication.util.ByteBufCustomPayload;
+import io.netty.buffer.Unpooled;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientCommonNetworkHandler;
+import net.minecraft.client.network.ClientConnectionState;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.command.CommandSource;
+import net.minecraft.network.ClientConnection;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
+import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
+import net.minecraft.util.Identifier;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import com.mojang.brigadier.ParseResults;
-import com.unascribed.fabrication.FabConf;
-import com.unascribed.fabrication.FabricationMod;
-import com.unascribed.fabrication.interfaces.ByteBufCustomPayloadReceiver;
-import com.unascribed.fabrication.interfaces.GetSuppressedSlots;
-import com.unascribed.fabrication.interfaces.RenderingAgeAccess;
-import com.unascribed.fabrication.support.ConfigValues;
-import com.unascribed.fabrication.util.ByteBufCustomPayload;
-import net.minecraft.client.network.ClientCommonNetworkHandler;
-import net.minecraft.client.network.ClientConnectionState;
-import net.minecraft.command.CommandSource;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import com.unascribed.fabrication.support.injection.FabInject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import com.unascribed.fabrication.client.FScriptScreen;
-import com.unascribed.fabrication.interfaces.GetServerConfig;
-import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.Env;
-
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
-import io.netty.buffer.Unpooled;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.network.ClientConnection;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
-import net.minecraft.util.Identifier;
-
 @Mixin(ClientPlayNetworkHandler.class)
 @EligibleIf(envMatches=Env.CLIENT)
-public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkHandler implements ByteBufCustomPayloadReceiver, GetServerConfig {
+public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkHandler implements GetServerConfig {
 
 	@Shadow
 	protected abstract ParseResults<CommandSource> parse(String command);
@@ -75,15 +59,17 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
 		connection.send(new CustomPayloadC2SPacket(new ByteBufCustomPayload(Identifier.of("fabrication", "config"), data)));
 	}
 
-	@Override
-	public void fabrication$onCustomPayload(ByteBufCustomPayload payload) {
-		if (payload.id().getNamespace().equals("fabrication")) {
-			if (payload.id().getPath().equals("config") || payload.id().getPath().equals("config2")) {
+	@FabInject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/CustomPayload;)V", cancellable=true)
+	public void onCustomPayload(CustomPayload payload, CallbackInfo ci) {
+		if (!(payload instanceof ByteBufCustomPayload)) return;
+
+		if (payload.getId().id().getNamespace().equals("fabrication")) {
+			if (payload.getId().id().getPath().equals("config") || payload.getId().id().getPath().equals("config2")) {
 				try {
 					fabrication$hasHandshook = true;
-					PacketByteBuf buf = payload.buf();
+					PacketByteBuf buf = ((ByteBufCustomPayload) payload).buf();
 					int reqVer = 0;
-					if (payload.id().getPath().equals("config2")) {
+					if (payload.getId().id().getPath().equals("config2")) {
 						reqVer = buf.readVarInt();
 					}
 					int trileanKeys = buf.readVarInt();
@@ -128,76 +114,24 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
 							fabrication$serverBanned.add(k);
 						}
 					}
+					ci.cancel();
 				} catch (RuntimeException e) {
 					e.printStackTrace();
 					throw e;
 				}
-			}else if (payload.id().getPath().equals("fscript")){
+			}else if (payload.getId().id().getPath().equals("fscript")){
 				try{
-					PacketByteBuf buf = payload.buf();
+					PacketByteBuf buf = ((ByteBufCustomPayload) payload).buf();
 					int code = buf.readVarInt();
 					if (code == 0){
 						if (client.currentScreen instanceof FScriptScreen){
 							((FScriptScreen) client.currentScreen).fabrication$setScript(buf.readString());
 						}
 					}
+					ci.cancel();
 				}catch (RuntimeException e) {
 					e.printStackTrace();
 					throw e;
-				}
-			} else if (payload.id().getPath().equals("play_absorp_sound") && FabConf.isEnabled("*.alt_absorption_sound")) {
-				int id = payload.buf().readInt();
-				MinecraftClient.getInstance().send(() -> {
-					World world = MinecraftClient.getInstance().world;
-					if (world != null) {
-						Entity e = world.getEntityById(id);
-						e.timeUntilRegen = 20;
-						if (e instanceof LivingEntity) {
-							((LivingEntity)e).limbAnimator.setSpeed(1.5f);
-							((LivingEntity)e).hurtTime = ((LivingEntity)e).maxHurtTime = 10;
-						}
-						world.playSound(e.getPos().x, e.getPos().y, e.getPos().z, FabricationMod.ABSORPTION_HURT, e.getSoundCategory(), 1.0f, 0.75f+(world.random.nextFloat()/2), false);
-					}
-				});
-			} else if (payload.id().getPath().equals("item_despawn") && FabConf.isEnabled("*.despawning_items_blink")) {
-				if (MinecraftClient.getInstance().world != null) {
-					PacketByteBuf buf = payload.buf();
-					Entity e = MinecraftClient.getInstance().world.getEntityById(buf.readInt());
-					if (e instanceof ItemEntity && e instanceof RenderingAgeAccess) {
-						((RenderingAgeAccess)e).fabrication$setRenderingAge(buf.readInt());
-					}
-				}
-			} else if (payload.id().getPath().equals("dragon_egg_trail") && FabConf.isEnabled("*.fix_dragon_egg_trails")) {
-				PacketByteBuf buf = payload.buf();
-				BlockPos pos = buf.readBlockPos();
-				BlockPos newPos = buf.readBlockPos();
-				World world = MinecraftClient.getInstance().world;
-				Random random = fabrication$random;
-				if (world != null && world.isClient) {
-					for(int j = 0; j < 128; ++j) {
-						double d = random.nextDouble();
-						float f = (random.nextFloat() - 0.5F) * 0.2F;
-						float g = (random.nextFloat() - 0.5F) * 0.2F;
-						float h = (random.nextFloat() - 0.5F) * 0.2F;
-						double e = MathHelper.lerp(d, newPos.getX(), pos.getX()) + (random.nextDouble() - 0.5) + 0.5;
-						double k = MathHelper.lerp(d, newPos.getY(), pos.getY()) + random.nextDouble() - 0.5;
-						double l = MathHelper.lerp(d, newPos.getZ(), pos.getZ()) + (random.nextDouble() - 0.5) + 0.5;
-						world.addParticle(ParticleTypes.PORTAL, e, k, l, f, g, h);
-					}
-				}
-			} else if (payload.id().getPath().equals("hide_armor") && FabConf.isEnabled("*.hide_armor")) {
-				PacketByteBuf buf = payload.buf();
-				int bits = buf.readVarInt();
-				PlayerEntity p = MinecraftClient.getInstance().player;
-				if (p instanceof GetSuppressedSlots) {
-					((GetSuppressedSlots)p).fabrication$getSuppressedSlots().clear();
-					for (EquipmentSlot es : EquipmentSlot.values()) {
-						if (es.getType() == EquipmentSlot.Type.HUMANOID_ARMOR) {
-							if ((bits & (1 << es.getEntitySlotId())) != 0) {
-								((GetSuppressedSlots)p).fabrication$getSuppressedSlots().add(es);
-							}
-						}
-					}
 				}
 			}
 		}

@@ -2,47 +2,45 @@ package com.unascribed.fabrication.mixin._general.sync;
 
 import com.unascribed.fabrication.EarlyAgnos;
 import com.unascribed.fabrication.FabConf;
-import com.unascribed.fabrication.FabLog;
-import com.unascribed.fabrication.interfaces.ByteBufCustomPayloadReceiver;
-import com.unascribed.fabrication.interfaces.SetCrawling;
-import com.unascribed.fabrication.interfaces.SetItemDespawnAware;
-import com.unascribed.fabrication.util.ByteBufCustomPayload;
-import com.unascribed.fabrication.util.SwappingEnchants;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
-import net.minecraft.server.network.ServerCommonNetworkHandler;
-import net.minecraft.world.World;
-import org.spongepowered.asm.mixin.Mixin;
-
 import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.features.FeatureHideArmor;
 import com.unascribed.fabrication.interfaces.SetFabricationConfigAware;
 import com.unascribed.fabrication.loaders.LoaderFScript;
 import com.unascribed.fabrication.support.OptionalFScript;
-
+import com.unascribed.fabrication.support.injection.FabInject;
+import com.unascribed.fabrication.util.ByteBufCustomPayload;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
+import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
+import net.minecraft.server.network.ServerCommonNetworkHandler;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.GameRules;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerCommonNetworkHandler.class)
-public class MixinServerCommonNetworkHandler implements ByteBufCustomPayloadReceiver {
+public class MixinServerCommonNetworkHandler {
 
-	@Override
-	public void fabrication$onCustomPayload(ByteBufCustomPayload payload) {
+	@FabInject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/c2s/common/CustomPayloadC2SPacket;)V", cancellable=true)
+	public void fabrication$onCustomPayload(CustomPayloadC2SPacket packet, CallbackInfo ci) {
 		Object self = this;
 		if (!(self instanceof ServerPlayNetworkHandler)) return;
 		ServerPlayerEntity player = ((ServerPlayNetworkHandler) self).getPlayer();
+		CustomPayload payload = packet.payload();
 		if (!(payload instanceof ByteBufCustomPayload)) return;
-		Identifier channel = payload.id();
+		Identifier channel = payload.getId().id();
 		if (channel.getNamespace().equals("fabrication")) {
 			if (channel.getPath().equals("config")) {
-				PacketByteBuf recvdData = payload.buf();
+				ci.cancel();
+				PacketByteBuf recvdData = ((ByteBufCustomPayload) payload).buf();
 				int id = recvdData.readVarInt();
 				if (id == 0) {
 					// hello
@@ -74,7 +72,8 @@ public class MixinServerCommonNetworkHandler implements ByteBufCustomPayloadRece
 					}
 				}
 			} else if (channel.getPath().equals("fscript")) {
-				PacketByteBuf recvdData = payload.buf();
+				ci.cancel();
+				PacketByteBuf recvdData = ((ByteBufCustomPayload) payload).buf();
 				int id = recvdData.readVarInt();
 				if(id == 0){
 					// get
@@ -121,26 +120,6 @@ public class MixinServerCommonNetworkHandler implements ByteBufCustomPayloadRece
 					}
 				}
 				// TODO id 4 world local SET
-			} else if (channel.getPath().equals("crawling") && FabConf.isEnabled("*.crawling")) {
-				PacketByteBuf recvdData = payload.buf();
-				boolean crawling = recvdData.readBoolean();
-				if (player instanceof SetCrawling) {
-					((SetCrawling)player).fabrication$setCrawling(crawling);
-				}
-			} else if (channel.getPath().equals("item_despawn") && FabConf.isEnabled("*.despawning_items_blink")) {
-				if (player instanceof SetItemDespawnAware) {
-					FabLog.debug("Enabling item despawn syncing for "+player.getName());
-					((SetItemDespawnAware)player).fabrication$setItemDespawnAware(true);
-				}
-			} else if (channel.getPath().equals("swap_conflicting_enchants") && FabConf.isEnabled("*.swap_conflicting_enchants")) {
-				PacketByteBuf recvdData = payload.buf();
-				if (recvdData.readBoolean()) {
-					ItemStack stack = player.getMainHandStack();
-					World world = player.getWorld();
-					if (stack != null && !stack.isEmpty() && world != null) {
-						SwappingEnchants.swapEnchants(stack, world, player);
-					}
-				}
 			}
 		}
 	}
