@@ -30,8 +30,6 @@ import com.unascribed.fabrication.support.OptionalFScript;
 import com.unascribed.fabrication.util.Cardinal;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientCommandSource;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.EntitySelector;
 import net.minecraft.command.argument.DimensionArgumentType;
@@ -614,21 +612,12 @@ public class FeatureFabricationCommand implements Feature {
 			if (local) FabConf.worldSet(key, value);
 			else FabConf.set(key, value);
 			if (c.getSource() instanceof ServerCommandSource) {
-				FabricationMod.sendConfigUpdate(((ServerCommandSource)c.getSource()).getServer(), key);
+				FabricationMod.sendConfigUpdate(((ServerCommandSource) c.getSource()).getServer(), key);
 			}
 			sendFeedback(c, Text.literal(key+" is now set to "+value+(" (default "+def+")")+(local ? " for this world" : "")), true);
 			if (FabricationMod.isAvailableFeature(key)) {
 				CommandSource commandSource = c.getSource();
-				MinecraftServer server = null;
-				World world = null;
-				if (commandSource instanceof ServerCommandSource) {
-					server = ((ServerCommandSource) commandSource).getServer();
-					world = ((ServerCommandSource) commandSource).getWorld();
-				} else if (commandSource instanceof ClientCommandSource) {
-					server = MinecraftClient.getInstance().getServer();
-					world = MinecraftClient.getInstance().world;
-				}
-				if (FabricationMod.updateFeature(key, server, world)) {
+				if (FabricationMod.updateFeature(key, commandSource)) {
 					return;
 				}
 			}

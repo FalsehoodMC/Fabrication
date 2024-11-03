@@ -1,7 +1,5 @@
 package com.unascribed.fabrication.features;
 
-import java.util.Locale;
-
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.unascribed.fabrication.Agnos;
 import com.unascribed.fabrication.EarlyAgnos;
@@ -20,6 +18,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
+
+import java.util.Locale;
 
 @EligibleIf(configAvailable="*.toggle_stance", envMatches=Env.CLIENT)
 public class FeatureToggleStance implements Feature {
