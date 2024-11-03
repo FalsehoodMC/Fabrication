@@ -22,11 +22,17 @@ import com.google.common.collect.Sets;
 
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientCommandSource;
+import net.minecraft.command.CommandSource;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
@@ -121,6 +127,18 @@ public class FabricationMod implements ModInitializer {
 		return features.containsKey(FabConf.remap(configKey));
 	}
 
+	public static boolean updateFeature(String configKey, CommandSource source) {
+		if (source instanceof ServerCommandSource) return updateFeature(configKey, (ServerCommandSource) source);
+		if (source instanceof ClientCommandSource) return updateFeature(configKey, (ClientCommandSource) source);
+		return false;
+	}
+	public static boolean updateFeature(String configKey, ServerCommandSource source) {
+		return updateFeature(configKey, source.getMinecraftServer(), source.getWorld());
+	}
+	@Environment(EnvType.CLIENT)
+	public static boolean updateFeature(String configKey, ClientCommandSource source) {
+		return updateFeature(configKey, MinecraftClient.getInstance().getServer(), MinecraftClient.getInstance().world);
+	}
 	public static boolean updateFeature(String configKey, MinecraftServer server, World world) {
 		configKey = FabConf.remap(configKey);
 		boolean enabled = FabConf.isEnabled(configKey);
