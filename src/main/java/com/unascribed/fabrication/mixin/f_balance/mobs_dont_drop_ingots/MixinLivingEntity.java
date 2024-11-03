@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 import com.unascribed.fabrication.FabConf;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.registry.Registries;
 import com.unascribed.fabrication.support.FailOn;
 import com.unascribed.fabrication.support.SpecialEligibility;
@@ -41,10 +42,10 @@ public abstract class MixinLivingEntity extends Entity {
 			else if (Items.COPPER_INGOT.equals(current) || Items.NETHERITE_INGOT.equals(current) || Items.GOLD_NUGGET.equals(current) || Items.IRON_NUGGET.equals(current))
 				replacement = Items.AIR;
 			if (replacement != null) {
-				NbtCompound tag = new NbtCompound();
-				stack.encode(this.getRegistryManager(), tag);
-				tag.putString("id", Registries.ITEM.getId(replacement).toString());
-				stack = ItemStack.fromNbtOrEmpty(this.getRegistryManager(), tag);
+				NbtElement tag = stack.encodeAllowEmpty(this.getRegistryManager());
+				if (!(tag instanceof NbtCompound)) return;
+				((NbtCompound) tag).putString("id", Registries.ITEM.getId(replacement).toString());
+				stack = ItemStack.fromNbtOrEmpty(this.getRegistryManager(), (NbtCompound) tag);
 			}
 
 			lootConsumer.accept(stack);

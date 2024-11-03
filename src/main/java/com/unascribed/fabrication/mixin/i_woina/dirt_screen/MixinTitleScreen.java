@@ -33,7 +33,9 @@ public class MixinTitleScreen extends Screen {
 		if (FabConf.isEnabled("*.dirt_screen")) {
 			// TODO: check if we need to mess with atlases
 			RenderSystem.enableBlend();
+			context.setShaderColor(0.25F, 0.25F, 0.25F, 1.0F);
 			context.drawTexture(DIRT, 0, 0, 0, 0, 0, this.width, this.height, 16, 16);
+			context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 			RenderSystem.disableBlend();
 			ci.cancel();
 		}

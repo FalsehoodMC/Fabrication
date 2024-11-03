@@ -13,6 +13,7 @@ import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerFactory;
@@ -122,9 +123,8 @@ public abstract class MixinPigEntity extends Entity {
 			NbtCompound tag = new NbtCompound();
 			tags.putByte("fabrication$chestPigs$size", (byte)fabrication$chestPig.size());
 			for (byte i=0; i<fabrication$chestPig.size();++i) {
-				NbtCompound tagi = new NbtCompound();
-				fabrication$chestPig.getStack(i).encode(this.getRegistryManager(), tagi);
-				tag.put(""+i,tagi);
+				NbtElement tagi = fabrication$chestPig.getStack(i).encodeAllowEmpty(this.getRegistryManager());
+				tag.put(""+i, tagi);
 			}
 			tags.put("fabrication$chestPigs$inv",tag);
 		}
