@@ -47,14 +47,6 @@ public final class Agnos {
 		FabricationEvents.addCommand(r);
 	}
 
-	public static void runForDynamicRegistryReload(String id, DynamicRegistryReloadCallback r) {
-		FabricationEvents.addReloader(id, r);
-	}
-
-	public static void undoRunForDynamicRegistryReload(String id) {
-		FabricationEvents.removeReloader(id);
-	}
-
 	@Environment(EnvType.CLIENT)
 	public static void runForTooltipRender(TooltipRenderCallback r) {
 		FabricationEventsClient.addTooltip(r);

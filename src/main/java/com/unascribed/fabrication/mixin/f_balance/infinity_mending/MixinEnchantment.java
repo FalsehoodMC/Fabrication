@@ -3,40 +3,22 @@ package com.unascribed.fabrication.mixin.f_balance.infinity_mending;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.injection.FabInject;
-import com.unascribed.fabrication.util.EnchantmentHelperHelper;
-import net.minecraft.component.ComponentMap;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.entry.RegistryEntryList;
-import net.minecraft.text.Text;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Mutable;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Enchantment.class)
 @EligibleIf(configAvailable="*.infinity_mending")
 public abstract class MixinEnchantment {
 
-	@Shadow
-	@Final
-	@Mutable
-	private RegistryEntryList<Enchantment> exclusiveSet;
-
-	@FabInject(at=@At("RETURN"), method="<init>")
-	private void modify(Text description, Enchantment.Definition definition, RegistryEntryList<Enchantment> exclusiveSet, ComponentMap effects, CallbackInfo ci) {
-		if (FabConf.isEnabled("*.infinity_mending") && EnchantmentHelperHelper.matches(this, Enchantments.INFINITY)) {
-			List<RegistryEntry<Enchantment>> mutableExlusiveSet = new ArrayList<>(this.exclusiveSet.stream().toList());
-			mutableExlusiveSet.removeIf(entry -> entry.matches(Enchantments.INFINITY::equals));
-			mutableExlusiveSet.removeIf(entry -> entry.matches(Enchantments.MENDING::equals));
-			this.exclusiveSet = RegistryEntryList.of(mutableExlusiveSet);
-		}
+	@FabInject(at=@At(value="INVOKE", target="Lnet/minecraft/registry/entry/RegistryEntryList;contains(Lnet/minecraft/registry/entry/RegistryEntry;)Z", shift=At.Shift.BEFORE, ordinal=0), method="canBeCombined(Lnet/minecraft/registry/entry/RegistryEntry;Lnet/minecraft/registry/entry/RegistryEntry;)Z", cancellable=true)
+	private static void modify(RegistryEntry<Enchantment> first, RegistryEntry<Enchantment> second, CallbackInfoReturnable<Boolean> cir) {
+		if (!FabConf.isEnabled("*.infinity_mending")) return;
+		if (first.matchesKey(Enchantments.INFINITY) && second.matchesKey(Enchantments.MENDING)) cir.setReturnValue(true);
+		if (first.matchesKey(Enchantments.MENDING) && second.matchesKey(Enchantments.INFINITY)) cir.setReturnValue(true);
 	}
 
 }

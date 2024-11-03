@@ -7,6 +7,8 @@ import com.unascribed.fabrication.support.injection.FabInject;
 import com.unascribed.fabrication.util.EnchantmentHelperHelper;
 import net.minecraft.component.ComponentMap;
 import net.minecraft.enchantment.Enchantments;
+import net.minecraft.item.CrossbowItem;
+import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,6 +23,7 @@ import net.minecraft.registry.entry.RegistryEntryList;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Items;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,26 +31,12 @@ import java.util.List;
 @Mixin(Enchantment.class)
 @EligibleIf(anyConfigAvailable={"*.infinity_crossbows", "*.infinity_crossbows_modded"})
 public abstract class MixinEnchantment {
-
-	@Shadow
-	@Final
-	private Enchantment.Definition definition;
-
-	@FabInject(at=@At("RETURN"), method="<init>")
-	private void modify(Text description, Enchantment.Definition definition, RegistryEntryList<Enchantment> exclusiveSet, ComponentMap effects, CallbackInfo ci) {
+	@FabInject(at=@At("HEAD"), method="isAcceptableItem(Lnet/minecraft/item/ItemStack;)Z", cancellable=true)
+	private void isAcceptable(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
 		if (FabConf.isAnyEnabled("*.infinity_crossbows") && EnchantmentHelperHelper.matches(this, Enchantments.INFINITY)) {
-			Object o = this.definition;
-			if (!(o instanceof Enchantment.Definition)) return;
-			AccessorEnchantmentDefinition accessor = (AccessorEnchantmentDefinition) o;
-
-			List<RegistryEntry<Item>> mutableSupportedItems = new ArrayList<>(this.definition.supportedItems().stream().toList());
-			if (FabConf.isAnyEnabled("*.infinity_crossbows_modded")) {
-				mutableSupportedItems.addAll(Registries.ITEM.getOrCreateEntryList(ItemTags.CROSSBOW_ENCHANTABLE).stream().toList());
-			} else {
-				mutableSupportedItems.add(Registries.ITEM.getEntry(Items.CROSSBOW));
+			if (FabConf.isEnabled("*.infinity_crossbows_modded") ? stack.getItem() instanceof CrossbowItem : stack.getItem() == Items.CROSSBOW) {
+				cir.setReturnValue(true);
 			}
-			accessor.setSupportedItems(RegistryEntryList.of(mutableSupportedItems));
 		}
 	}
-
 }

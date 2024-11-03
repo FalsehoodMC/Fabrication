@@ -4,16 +4,12 @@ import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.injection.FabInject;
 import com.unascribed.fabrication.util.EnchantmentHelperHelper;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.component.EnchantmentEffectComponentTypes;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
-import net.minecraft.registry.entry.RegistryEntryList;
-import net.minecraft.text.Text;
-import org.spongepowered.asm.mixin.Final;
+import net.minecraft.item.ItemStack;
+import net.minecraft.server.world.ServerWorld;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Mutable;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
@@ -21,18 +17,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @EligibleIf(configAvailable="*.soul_speed_doesnt_damage_boots")
 public class MixinEnchantment {
 
-	@Shadow
-	@Final
-	@Mutable
-	private ComponentMap effects;
-
-	@FabInject(at=@At("RETURN"), method="<init>")
-	private void modify(Text description, Enchantment.Definition definition, RegistryEntryList<Enchantment> exclusiveSet, ComponentMap effects, CallbackInfo ci) {
-		if (FabConf.isEnabled("*.soul_speed_doesnt_damage_boots") && EnchantmentHelperHelper.matches(this, Enchantments.SOUL_SPEED)) {
-			if (this.effects.contains(EnchantmentEffectComponentTypes.ITEM_DAMAGE)) {
-				this.effects = this.effects.filtered(type -> !EnchantmentEffectComponentTypes.ITEM_DAMAGE.equals(type));
-			}
-		}
+	@FabInject(at=@At("HEAD"), method="modifyItemDamage(Lnet/minecraft/server/world/ServerWorld;ILnet/minecraft/item/ItemStack;Lorg/apache/commons/lang3/mutable/MutableFloat;)V", cancellable=true)
+	private void modify(ServerWorld world, int level, ItemStack stack, MutableFloat itemDamage, CallbackInfo ci) {
+		if (!FabConf.isEnabled("*.soul_speed_doesnt_damage_boots")) return;
+		if (EnchantmentHelperHelper.matches(this, Enchantments.SOUL_SPEED)) ci.cancel();
 	}
 
 }
