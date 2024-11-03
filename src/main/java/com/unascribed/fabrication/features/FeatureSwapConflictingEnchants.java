@@ -8,6 +8,7 @@ import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Feature;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.nbt.NbtCompound;
@@ -40,7 +41,7 @@ public class FeatureSwapConflictingEnchants implements Feature {
 	}
 
 	@Environment(EnvType.CLIENT)
-	private void applyClient(World world) {
+	private void applyClient(World _world) {
 		Agnos.runForTooltipRender((stack, lines) -> {
 			if (!stack.isEmpty() && stack.contains(DataComponentTypes.CUSTOM_DATA)) {
 				if (!FabRefl.getShowInTooltip(stack.getEnchantments())) return;
@@ -59,6 +60,8 @@ public class FeatureSwapConflictingEnchants implements Feature {
 					}
 				}
 				ii++;
+				World world = MinecraftClient.getInstance().world;
+				if (world == null) return;
 				for (String key : lTag.getKeys()) {
 					Optional<RegistryEntry.Reference<Enchantment>> e = world.getRegistryManager().get(RegistryKeys.ENCHANTMENT).getEntry(Identifier.tryParse(key));
 					if (e.isPresent()) {
