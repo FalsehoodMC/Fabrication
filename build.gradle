@@ -354,7 +354,7 @@ class Mapp{
 
 def mcVersions = [ '1.21', '1.21.1' ]
 
-def stability = 'release'
+def stability = 'beta'
 
 def mrLoaders = [ 'fabric', 'quilt' ]
 
