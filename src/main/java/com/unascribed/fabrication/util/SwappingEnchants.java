@@ -3,23 +3,27 @@ package com.unascribed.fabrication.util;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.util.forgery_nonsense.ForgeryArrayList;
-import com.unascribed.fabrication.util.forgery_nonsense.ForgeryHashMap;
 import com.unascribed.fabrication.util.forgery_nonsense.ForgeryIdentifier;
 import com.unascribed.fabrication.util.forgery_nonsense.ForgeryNbt;
 import com.unascribed.fabrication.util.forgery_nonsense.ForgeryPair;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.ItemEnchantmentsComponent;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Pair;
 import net.minecraft.world.World;
 
 import java.util.List;
-import java.util.Map;
 import java.util.function.Predicate;
 
 public class SwappingEnchants {
@@ -28,7 +32,8 @@ public class SwappingEnchants {
 		if (!FabConf.isEnabled("*.swap_conflicting_enchants")) return false;
 		if (!configPredicate.test(user)) return false;
 		List<Pair<String, Integer>> currentConflicts = ForgeryArrayList.get();
-		NbtCompound nbt = self.getNbt();
+		if (!self.contains(DataComponentTypes.CUSTOM_DATA)) return false;
+		NbtCompound nbt = self.get(DataComponentTypes.CUSTOM_DATA).copyNbt();
 		if (nbt == null) return false;
 
 		NbtCompound lTag = nbt.getCompound("fabrication#conflictingEnchants");
@@ -44,32 +49,37 @@ public class SwappingEnchants {
 				toAdd = currentConflicts.get(rmi);
 				currentConflicts.remove(rmi);
 			}
-			Enchantment toAddEnchant = Registries.ENCHANTMENT.get(ForgeryIdentifier.get(toAdd.getLeft()));
-			Map<Enchantment, Integer> currentEnchantments = ForgeryHashMap.get();
-			currentEnchantments.put(toAddEnchant, toAdd.getRight());
+			RegistryEntry<Enchantment> toAddEnchant = world.getRegistryManager().get(RegistryKeys.ENCHANTMENT).getEntry(ForgeryIdentifier.get(toAdd.getLeft())).orElse(null);
+			Object2IntOpenHashMap<RegistryEntry<Enchantment>> currentEnchantments = new Object2IntOpenHashMap<>();
+			currentEnchantments.put(toAddEnchant, toAdd.getRight().intValue());
 			if (self.hasEnchantments()) {
-				for (Map.Entry<Enchantment, Integer> entry : EnchantmentHelper.get(self).entrySet()) {
-					if (entry.getKey().canCombine(toAddEnchant)) {
-						currentEnchantments.put(entry.getKey(), entry.getValue());
+				for (Object2IntMap.Entry<RegistryEntry<Enchantment>> entry : EnchantmentHelper.getEnchantments(self).getEnchantmentEntries()) {
+					if (Enchantment.canBeCombined(entry.getKey(), toAddEnchant)) {
+						currentEnchantments.put(entry.getKey(), entry.getIntValue());
 					} else {
-						tag.putInt(String.valueOf(Registries.ENCHANTMENT.getId(entry.getKey())), entry.getValue());
+						tag.putInt(String.valueOf(world.getRegistryManager().get(RegistryKeys.ENCHANTMENT).getId(entry.getKey().value())), entry.getIntValue());
 					}
 				}
 			}
 			for (Pair<String, Integer> entry : currentConflicts) {
-				Enchantment enchant = Registries.ENCHANTMENT.get(ForgeryIdentifier.get(entry.getLeft()));
-				if (currentEnchantments.keySet().stream().anyMatch(e->!e.canCombine(enchant))) {
+				RegistryEntry<Enchantment> enchant = world.getRegistryManager().get(RegistryKeys.ENCHANTMENT).getEntry(ForgeryIdentifier.get(entry.getLeft())).orElse(null);
+				if (currentEnchantments.keySet().stream().anyMatch(e->!Enchantment.canBeCombined(e, enchant))) {
 					tag.putInt(entry.getLeft(), entry.getRight());
 					continue;
 				}
-				currentEnchantments.put(enchant, entry.getRight());
+				currentEnchantments.put(enchant, entry.getRight().intValue());
 			}
-			EnchantmentHelper.set(currentEnchantments, self);
+			ItemEnchantmentsComponent.Builder builder = new ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT);
+			for (Object2IntMap.Entry<RegistryEntry<Enchantment>> entry : currentEnchantments.object2IntEntrySet()) {
+				builder.add(entry.getKey(), entry.getIntValue());
+			}
+			EnchantmentHelper.set(self, builder.build());
 			if (tag.isEmpty()) {
 				nbt.remove("fabrication#conflictingEnchants");
 			} else {
 				nbt.put("fabrication#conflictingEnchants", tag);
 			}
+			self.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
 
 			world.playSound(null, user.getBlockPos(), SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1, 1);
 			return true;

@@ -4,8 +4,12 @@ import java.util.Collections;
 import java.util.Set;
 
 import com.unascribed.fabrication.FabConf;
-import com.unascribed.fabrication.util.forgery_nonsense.ForgeryNbt;
 import com.unascribed.fabrication.util.forgery_nonsense.ForgeryStatusEffect;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabInject;
@@ -20,21 +24,18 @@ import com.google.common.collect.Sets;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.MiningToolItem;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-@Mixin(MiningToolItem.class)
+@Mixin(Item.class)
 @EligibleIf(configAvailable="*.dimensional_tools")
-public class MixinMiningToolItem {
+public class MixinItem {
 
 	@FabInject(at=@At("HEAD"), method="postMine(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/LivingEntity;)Z",
 			cancellable=true)
@@ -78,37 +79,39 @@ public class MixinMiningToolItem {
 				}
 			}
 			if (factor < 0) {
-				if (!stack.hasNbt()) stack.setNbt(ForgeryNbt.getCompound());
-				int legacyPartialDamage = stack.getNbt().getInt("PartialDamage");
+				if (!stack.contains(DataComponentTypes.CUSTOM_DATA)) stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT);
+				NbtCompound nbt = stack.get(DataComponentTypes.CUSTOM_DATA).copyNbt();
+				int legacyPartialDamage = nbt.getInt("PartialDamage");
 				if (legacyPartialDamage != 0) {
-					stack.getNbt().putDouble("fabrication:PartialDamage", legacyPartialDamage/50D);
-					stack.getNbt().remove("PartialDamage");
+					nbt.putDouble("fabrication:PartialDamage", legacyPartialDamage/50D);
+					nbt.remove("PartialDamage");
 				}
-				double partialDamage = stack.getNbt().getDouble("fabrication:PartialDamage");
+				double partialDamage = nbt.getDouble("fabrication:PartialDamage");
 				if (stack.getDamage() == 0) {
 					// must have been repaired. reset for less jankiness
 					partialDamage = 0;
 				}
 				if (partialDamage <= 0) {
 					partialDamage += 1/(double)(-factor);
-					stack.damage(1, miner, (e) -> {
-						e.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND);
-					});
+					stack.damage(1, miner, EquipmentSlot.MAINHAND);
 				} else if (partialDamage < 1) {
 					partialDamage += 1/(double)(-factor);
 				} else {
 					partialDamage = 0;
 				}
-				stack.getNbt().putDouble("fabrication:PartialDamage", partialDamage);
+				nbt.putDouble("fabrication:PartialDamage", partialDamage);
+				stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
 				ci.setReturnValue(true);
 			} else if (factor > 1) {
 				// BRING OUT THE WHEEL OF PUNISHMENT
 				int ffactor = factor;
-				stack.damage(factor-1, miner, (e) -> {
-					if (ffactor > 30) {
-						e.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND);
-					}
-				});
+				if (world instanceof ServerWorld serverWorld) {
+					stack.damage(factor - 1, serverWorld, miner instanceof ServerPlayerEntity player ? player : null, (item) -> {
+						if (ffactor > 30) {
+							miner.sendEquipmentBreakStatus(item, EquipmentSlot.MAINHAND);
+						}
+					});
+				}
 				world.playSound(null, miner.getPos().x, miner.getPos().y, miner.getPos().z, SoundEvents.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, miner.getSoundCategory(), factor/125f, 2.0f);
 				world.sendEntityStatus(miner, (byte)47);
 				miner.addStatusEffect(ForgeryStatusEffect.get(StatusEffects.MINING_FATIGUE, 40, 3, false, false, false));

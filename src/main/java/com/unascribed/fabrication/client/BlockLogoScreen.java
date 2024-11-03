@@ -180,7 +180,7 @@ public class BlockLogoScreen extends Screen{
 			}
 			rightBar.height = blocks.size()*12+8;
 		}
-		blockLogo.drawLogo(false, 0, delta);
+		blockLogo.drawLogo(drawContext, false, 0, delta);
 		if (didClick) didClick = false;
 		if (didRClick) didRClick = false;
 	}

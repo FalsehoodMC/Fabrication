@@ -28,9 +28,9 @@ public class MixinServerCommonNetworkHandler {
 		ServerPlayerEntity player = ((ServerPlayNetworkHandler) self).getPlayer();
 		CustomPayload payload = packet.payload();
 		if (!(payload instanceof ByteBufCustomPayload)) return;
-		Identifier channel = payload.id();
+		Identifier channel = payload.getId().id();
 		if (channel.getNamespace().equals("fabrication") && channel.getPath().equals("swap_conflicting_enchants")) {
-			PacketByteBuf recvdData = ((ByteBufCustomPayload) payload).buf;
+			PacketByteBuf recvdData = ((ByteBufCustomPayload) payload).buf();
 			if (recvdData.readBoolean()) {
 				ItemStack stack = player.getMainHandStack();
 				World world = player.getWorld();

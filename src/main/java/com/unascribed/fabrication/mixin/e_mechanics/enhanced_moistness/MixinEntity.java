@@ -29,7 +29,7 @@ public abstract class MixinEntity implements MarkWet {
 	private boolean fabrication$checkingOriginalWetness;
 
 	@Shadow
-	public World world;
+	private World world;
 	@Shadow
 	private Vec3d pos;
 

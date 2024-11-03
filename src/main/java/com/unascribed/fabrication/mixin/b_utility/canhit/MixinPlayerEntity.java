@@ -3,6 +3,8 @@ package com.unascribed.fabrication.mixin.b_utility.canhit;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.logic.CanHitUtil;
 import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.FailOn;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.injection.ModifyReturn;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -12,6 +14,7 @@ import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(PlayerEntity.class)
 @EligibleIf(configAvailable="*.canhit")
+@FailOn(invertedSpecialConditions={SpecialEligibility.FORGE, SpecialEligibility.NOT_FORGE}) //TODO CanHitUtil
 public abstract class MixinPlayerEntity {
 
 	@ModifyReturn(target="Lnet/minecraft/entity/Entity;isAttackable()Z", method="attack(Lnet/minecraft/entity/Entity;)V")

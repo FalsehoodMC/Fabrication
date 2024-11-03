@@ -5,10 +5,10 @@ import net.minecraft.util.Identifier;
 public class ForgeryIdentifier {
 	//This exists because forgery is jank
 	public static Identifier get(String s) {
-		return new Identifier(s);
+		return Identifier.of(s);
 	}
 	public static Identifier get(String s1, String s2) {
-		return new Identifier(s1, s2);
+		return Identifier.of(s1, s2);
 	}
 
 }

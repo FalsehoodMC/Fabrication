@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.At;
 @EligibleIf(configAvailable="*.chat_markdown", envMatches=Env.CLIENT)
 public class MixinChatHud {
 
-	@FabModifyVariable(at=@At(value="HEAD"), method="addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;ILnet/minecraft/client/gui/hud/MessageIndicator;Z)V", argsOnly=true)
+	@FabModifyVariable(at=@At(value="HEAD"), method="addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;Lnet/minecraft/client/gui/hud/MessageIndicator;)V", argsOnly=true)
 	public Text consume(Text message) {
 		if (!FabConf.isEnabled("*.chat_markdown")) return message;
 		if (!(message instanceof MutableText && message.getContent() instanceof TranslatableTextContent && "chat.type.text".equals(((TranslatableTextContent)message.getContent()).getKey()))) return message;

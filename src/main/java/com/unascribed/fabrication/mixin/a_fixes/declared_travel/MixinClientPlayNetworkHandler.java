@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @EligibleIf(configAvailable="*.declared_travel", envMatches=Env.CLIENT)
 public class MixinClientPlayNetworkHandler {
 
-	@FabInject(method="onPlayerRespawn(Lnet/minecraft/network/packet/s2c/play/PlayerRespawnS2CPacket;)V", at=@At(value="INVOKE", shift=At.Shift.AFTER, target="Lnet/minecraft/client/network/ClientPlayNetworkHandler;startWorldLoading(Lnet/minecraft/client/network/ClientPlayerEntity;Lnet/minecraft/client/world/ClientWorld;)V"))
+	@FabInject(method="onPlayerRespawn(Lnet/minecraft/network/packet/s2c/play/PlayerRespawnS2CPacket;)V", at=@At(value="INVOKE", shift=At.Shift.AFTER, target="Lnet/minecraft/client/network/ClientPlayNetworkHandler;startWorldLoading(Lnet/minecraft/client/network/ClientPlayerEntity;Lnet/minecraft/client/world/ClientWorld;Lnet/minecraft/client/gui/screen/DownloadingTerrainScreen$WorldEntryReason;)V"))
 	private void fabrication$addDimensionDataToTerrainScreen(PlayerRespawnS2CPacket packet, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.declared_travel")) return;
 		Screen screen = MinecraftClient.getInstance().currentScreen;

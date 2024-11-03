@@ -40,7 +40,7 @@ public abstract class MixinStonecutterScreen extends HandledScreen<StonecutterSc
 			int count = stack.getCount();
 			for(int i = 0; i < pInv.main.size(); ++i) {
 				ItemStack insStack = pInv.main.get(i);
-				if (ItemStack.canCombine(stack, insStack)) {
+				if (ItemStack.areItemsAndComponentsEqual(stack, insStack)) {
 					OptionalInt oi = handler.getSlotIndex(pInv, i);
 					if (!oi.isPresent()) continue;
 					onMouseClick(handler.getSlot(oi.getAsInt()), i, 0, SlotActionType.PICKUP);

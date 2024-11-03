@@ -16,7 +16,7 @@ import net.minecraft.nbt.NbtCompound;
 @Mixin(ThrownItemEntity.class)
 @EligibleIf(configAvailable="*.disable_pearl_stasis")
 public abstract class MixinThrownItemEntity {
-	@FabInject(at=@At("TAIL"), method= "writeCustomDataToNbt(Lnet/minecraft/nbt/NbtCompound;)V")
+	@FabInject(at=@At("TAIL"), method="writeCustomDataToNbt(Lnet/minecraft/nbt/NbtCompound;)V")
 	public void remove_pearl_owner(NbtCompound tag, CallbackInfo ci) {
 		if(((Object)this) instanceof EnderPearlEntity && FabConf.isEnabled("*.disable_pearl_stasis"))
 			tag.remove("Owner");

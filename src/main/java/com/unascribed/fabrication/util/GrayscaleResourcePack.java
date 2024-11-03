@@ -1,12 +1,16 @@
 package com.unascribed.fabrication.util;
 
 import com.google.common.collect.ImmutableSet;
+import com.unascribed.fabrication.support.MixinConfigPlugin;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.resource.InputSupplier;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourcePack;
+import net.minecraft.resource.ResourcePackInfo;
+import net.minecraft.resource.ResourcePackSource;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.resource.metadata.ResourceMetadataReader;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import java.io.IOException;
@@ -35,7 +39,7 @@ public class GrayscaleResourcePack implements ResourcePack {
 	}
 
 	public static InputStream getIS(String name) throws IOException {
-		Optional<Resource> optional = MinecraftClient.getInstance().getResourceManager().getResource(new Identifier(name));
+		Optional<Resource> optional = MinecraftClient.getInstance().getResourceManager().getResource(Identifier.of(name));
 		if (optional.isEmpty()) throw new IOException("Resource doesn't exist");
 		return new Grayscale(optional.get().getInputStream());
 	}
@@ -75,8 +79,13 @@ public class GrayscaleResourcePack implements ResourcePack {
 	}
 
 	@Override
-	public String getName() {
-		return "Fabrication Grayscale";
+	public ResourcePackInfo getInfo() {
+		return new ResourcePackInfo(
+			MixinConfigPlugin.MOD_NAME + " Grayscale",
+			Text.literal(MixinConfigPlugin.MOD_NAME + " Grayscale"),
+			ResourcePackSource.BUILTIN,
+			Optional.empty()
+		);
 	}
 
 	@Override

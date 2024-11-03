@@ -34,7 +34,7 @@ public class MixinDragonEggBlock {
 					PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
 					data.writeBlockPos(pos);
 					data.writeBlockPos(newPos);
-					CustomPayloadS2CPacket pkt = new CustomPayloadS2CPacket(new ByteBufCustomPayload(new Identifier("fabrication", "dragon_egg_trail"), data));
+					CustomPayloadS2CPacket pkt = new CustomPayloadS2CPacket(new ByteBufCustomPayload(Identifier.of("fabrication", "dragon_egg_trail"), data));
 					((ServerPlayerEntity)ent).networkHandler.sendPacket(pkt);
 				}
 			}

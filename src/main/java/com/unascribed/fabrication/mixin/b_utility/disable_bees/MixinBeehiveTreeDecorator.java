@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @EligibleIf(configAvailable="*.disable_bees")
 public class MixinBeehiveTreeDecorator {
 
-	@FabInject(at=@At("HEAD"), method= "generate(Lnet/minecraft/world/gen/treedecorator/TreeDecorator$Generator;)V",
+	@FabInject(at=@At("HEAD"), method="generate(Lnet/minecraft/world/gen/treedecorator/TreeDecorator$Generator;)V",
 			cancellable=true)
 	public void generate(TreeDecorator.Generator generator, CallbackInfo ci) {
 		if (FabConf.isEnabled("*.disable_bees")) {

@@ -15,7 +15,7 @@ public class MixinEntity {
 	private static boolean fabrication$preventFire1() {
 		return FabConf.isEnabled("*.disable_lightning_burn");
 	}
-	@Hijack(method="onStruckByLightning(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/LightningEntity;)V", target="Lnet/minecraft/entity/Entity;setOnFireFor(I)V")
+	@Hijack(method="onStruckByLightning(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/LightningEntity;)V", target="Lnet/minecraft/entity/Entity;setOnFireFor(F)V")
 	private static boolean fabrication$preventFire2() {
 		return FabConf.isEnabled("*.disable_lightning_burn");
 	}

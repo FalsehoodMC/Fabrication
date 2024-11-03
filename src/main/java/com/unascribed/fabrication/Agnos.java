@@ -7,9 +7,10 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
@@ -30,12 +31,16 @@ public final class Agnos {
 		void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, boolean isDedi);
 	}
 
+	public interface DynamicRegistryReloadCallback {
+		void reload(DynamicRegistryManager.Immutable registries);
+	}
+
 	public interface TooltipRenderCallback {
 		void render(ItemStack stack, List<Text> lines);
 	}
 
 	public interface HudRenderCallback {
-		void render(DrawContext drawContext, float tickDelta);
+		void render(DrawContext drawContext, RenderTickCounter tickCounter);
 	}
 
 	public static void runForCommandRegistration(CommandRegistrationCallback r) {

@@ -4,8 +4,10 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import com.unascribed.fabrication.FabConf;
+import net.minecraft.block.enums.NoteBlockInstrument;
 import net.minecraft.entity.Entity;
 import net.minecraft.text.Text;
+import net.minecraft.util.ItemActionResult;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -23,7 +25,6 @@ import com.google.common.math.IntMath;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.NoteBlock;
-import net.minecraft.block.enums.Instrument;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -46,78 +47,81 @@ public abstract class MixinNoteBlock {
 	private static final ImmutableList<String> FABRICATION$NOTES = ImmutableList.of(
 			"F#", "G", "G#", "A", "A#", "B", "C", "C#", "D", "D#", "E", "F"
 			);
-	private static final ImmutableMap<Instrument, String> FABRICATION$INSTRUMENT_NAMES = ImmutableMap.<Instrument, String>builder()
-			.put(Instrument.BASS, "String Bass")
-			.put(Instrument.SNARE, "Snare Drum")
-			.put(Instrument.HAT, "Clicks & Sticks")
-			.put(Instrument.BASEDRUM, "Bass Drum/Kick")
-			.put(Instrument.BELL, "Bells/Glockenspiel")
-			.put(Instrument.FLUTE, "Flute")
-			.put(Instrument.CHIME, "Chimes")
-			.put(Instrument.GUITAR, "Guitar")
-			.put(Instrument.XYLOPHONE, "Xylophone")
-			.put(Instrument.IRON_XYLOPHONE, "Vibraphone")
-			.put(Instrument.COW_BELL, "Cow Bell")
-			.put(Instrument.DIDGERIDOO, "Didgeridoo")
-			.put(Instrument.BIT, "Square Wave")
-			.put(Instrument.BANJO, "Banjo")
-			.put(Instrument.PLING, "Electric Piano")
-			.put(Instrument.HARP, "Piano")
+	private static final ImmutableMap<NoteBlockInstrument, String> FABRICATION$INSTRUMENT_NAMES = ImmutableMap.<NoteBlockInstrument, String>builder()
+			.put(NoteBlockInstrument.BASS, "String Bass")
+			.put(NoteBlockInstrument.SNARE, "Snare Drum")
+			.put(NoteBlockInstrument.HAT, "Clicks & Sticks")
+			.put(NoteBlockInstrument.BASEDRUM, "Bass Drum/Kick")
+			.put(NoteBlockInstrument.BELL, "Bells/Glockenspiel")
+			.put(NoteBlockInstrument.FLUTE, "Flute")
+			.put(NoteBlockInstrument.CHIME, "Chimes")
+			.put(NoteBlockInstrument.GUITAR, "Guitar")
+			.put(NoteBlockInstrument.XYLOPHONE, "Xylophone")
+			.put(NoteBlockInstrument.IRON_XYLOPHONE, "Vibraphone")
+			.put(NoteBlockInstrument.COW_BELL, "Cow Bell")
+			.put(NoteBlockInstrument.DIDGERIDOO, "Didgeridoo")
+			.put(NoteBlockInstrument.BIT, "Square Wave")
+			.put(NoteBlockInstrument.BANJO, "Banjo")
+			.put(NoteBlockInstrument.PLING, "Electric Piano")
+			.put(NoteBlockInstrument.HARP, "Piano")
 			.build();
-	private static final ImmutableMap<Instrument, Integer> FABRICATION$INSTRUMENT_OCTAVES = ImmutableMap.<Instrument, Integer>builder()
+	private static final ImmutableMap<NoteBlockInstrument, Integer> FABRICATION$INSTRUMENT_OCTAVES = ImmutableMap.<NoteBlockInstrument, Integer>builder()
 			// source: own research via ffmpeg showcqt
-			.put(Instrument.SNARE, 3)
-			.put(Instrument.HAT, 5)
+			.put(NoteBlockInstrument.SNARE, 3)
+			.put(NoteBlockInstrument.HAT, 5)
 			// bass drum's frequency range is utter nonsense and slides over time :(
-			.put(Instrument.BASEDRUM, -1)
+			.put(NoteBlockInstrument.BASEDRUM, -1)
 
 			// source: Minecraft Wiki; a few verified via showcqt as a sanity check
-			.put(Instrument.BASS, 1)
-			.put(Instrument.BELL, 5)
-			.put(Instrument.FLUTE, 4)
-			.put(Instrument.CHIME, 5)
-			.put(Instrument.GUITAR, 2)
-			.put(Instrument.XYLOPHONE, 5)
-			.put(Instrument.IRON_XYLOPHONE, 3)
-			.put(Instrument.COW_BELL, 4)
-			.put(Instrument.DIDGERIDOO, 1)
-			.put(Instrument.BIT, 3)
-			.put(Instrument.BANJO, 3)
-			.put(Instrument.PLING, 3)
-			.put(Instrument.HARP, 3)
+			.put(NoteBlockInstrument.BASS, 1)
+			.put(NoteBlockInstrument.BELL, 5)
+			.put(NoteBlockInstrument.FLUTE, 4)
+			.put(NoteBlockInstrument.CHIME, 5)
+			.put(NoteBlockInstrument.GUITAR, 2)
+			.put(NoteBlockInstrument.XYLOPHONE, 5)
+			.put(NoteBlockInstrument.IRON_XYLOPHONE, 3)
+			.put(NoteBlockInstrument.COW_BELL, 4)
+			.put(NoteBlockInstrument.DIDGERIDOO, 1)
+			.put(NoteBlockInstrument.BIT, 3)
+			.put(NoteBlockInstrument.BANJO, 3)
+			.put(NoteBlockInstrument.PLING, 3)
+			.put(NoteBlockInstrument.HARP, 3)
 			.build();
-	private static final ImmutableMap<Instrument, Integer> FABRICATION$INSTRUMENT_OFFSETS = ImmutableMap.<Instrument, Integer>builder()
+	private static final ImmutableMap<NoteBlockInstrument, Integer> FABRICATION$INSTRUMENT_OFFSETS = ImmutableMap.<NoteBlockInstrument, Integer>builder()
 			// source: own research via ffmpeg showcqt
-			.put(Instrument.SNARE, -2) // starts at E rather than F#
-			.put(Instrument.HAT, -9) // starts at A rather than F#
+			.put(NoteBlockInstrument.SNARE, -2) // starts at E rather than F#
+			.put(NoteBlockInstrument.HAT, -9) // starts at A rather than F#
 			.build();
 
-	@FabInject(at=@At("HEAD"), method= "onUse(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;", cancellable=true)
-	public void onUseHead(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, CallbackInfoReturnable<ActionResult> ci) {
-		if (!world.isClient) {
-			if (FabConf.isEnabled("*.exact_note_block_tuning")) {
-				ItemStack stack = player.getStackInHand(hand);
-				if (stack.getItem() == Items.STICK) {
-					int cur = state.get(NoteBlock.NOTE);
-					int nw = Math.min(24, stack.getCount()-1);
-					if (cur != nw) {
-						int dist;
-						if (nw > cur) {
-							dist = nw-cur;
-						} else {
-							dist = nw+(24-cur);
-						}
-						state = state.with(NoteBlock.NOTE, nw);
-						world.setBlockState(pos, state, 3);
-						player.increaseStat(Stats.TUNE_NOTEBLOCK, dist);
+	@FabInject(at=@At("HEAD"), method= "onUseWithItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ItemActionResult;", cancellable=true)
+	public void onUseWithItemHead(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, CallbackInfoReturnable<ItemActionResult> cir) {
+		if (FabConf.isEnabled("*.exact_note_block_tuning")) {
+			if (stack.getItem() == Items.STICK) {
+				int cur = state.get(NoteBlock.NOTE);
+				int nw = Math.min(24, stack.getCount()-1);
+				if (cur != nw) {
+					int dist;
+					if (nw > cur) {
+						dist = nw-cur;
+					} else {
+						dist = nw+(24-cur);
 					}
-					playNote(player, state, world, pos);
-					fabrication$informNote(player, state);
-					ci.setReturnValue(ActionResult.CONSUME);
-					return;
+					state = state.with(NoteBlock.NOTE, nw);
+					world.setBlockState(pos, state, 3);
+					player.increaseStat(Stats.TUNE_NOTEBLOCK, dist);
 				}
+				playNote(player, state, world, pos);
+				fabrication$informNote(player, state);
+				cir.setReturnValue(ItemActionResult.CONSUME);
+				return;
 			}
-			if (FabConf.isEnabled("*.reverse_note_block_tuning")) {
+		}
+	}
+
+	@FabInject(at=@At("HEAD"), method="onUse(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;", cancellable=true)
+	public void onUseHead(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit, CallbackInfoReturnable<ActionResult> ci) {
+		if (!world.isClient) {
+				if (FabConf.isEnabled("*.reverse_note_block_tuning")) {
 				if (player.isSneaking()) {
 					state = cycleBackward(state, NoteBlock.NOTE);
 					world.setBlockState(pos, state, 3);
@@ -131,8 +135,8 @@ public abstract class MixinNoteBlock {
 		}
 	}
 
-	@FabInject(at=@At("RETURN"), method="onUse(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;")
-	public void onUseReturn(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, CallbackInfoReturnable<ActionResult> ci) {
+	@FabInject(at=@At("RETURN"), method="onUse(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;")
+	public void onUseReturn(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit, CallbackInfoReturnable<ActionResult> ci) {
 		fabrication$informNote(player, world.getBlockState(pos));
 	}
 
@@ -144,7 +148,7 @@ public abstract class MixinNoteBlock {
 	private void fabrication$informNote(PlayerEntity player, BlockState state) {
 		if (!player.getWorld().isClient && FabConf.isEnabled("*.note_block_notes")) {
 			int note = state.get(NoteBlock.NOTE);
-			Instrument instrument = state.get(NoteBlock.INSTRUMENT);
+			NoteBlockInstrument instrument = state.get(NoteBlock.INSTRUMENT);
 			char color = FABRICATION$NOTE_COLORS.charAt(note);
 			if (FABRICATION$INSTRUMENT_OFFSETS.containsKey(instrument)) {
 				note += FABRICATION$INSTRUMENT_OFFSETS.get(instrument);

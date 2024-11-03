@@ -9,6 +9,7 @@ import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
@@ -77,7 +78,7 @@ public class FeatureToggleStance implements Feature {
 			if (toggleTime < 40) {
 				Window w = mc.getWindow();
 				float a = FabricationConfigScreen.sCurve5(1-(toggleTime/40f));
-				Identifier tex = new Identifier("fabrication", "textures/stance/"+currentStance.name().toLowerCase(Locale.ROOT)+".png");
+				Identifier tex = Identifier.of("fabrication", "textures/stance/"+currentStance.name().toLowerCase(Locale.ROOT)+".png");
 				RenderSystem.defaultBlendFunc();
 				//GlStateManager.disableAlphaTest();
 				RenderSystem.setShaderTexture(0, tex);

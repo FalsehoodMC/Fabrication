@@ -12,7 +12,6 @@ import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 
 import net.minecraft.client.render.model.ModelLoader;
-import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.util.Identifier;
 
 @Mixin(ModelLoader.class)
@@ -21,11 +20,11 @@ import net.minecraft.util.Identifier;
 public class MixinModelLoader {
 
 	@Shadow
-	private void addModel(ModelIdentifier modelId) {}
+	private void loadInventoryVariantItemModel(Identifier modelId) {}
 
 	@FabInject(at=@At(value="CONSTANT", args="stringValue=special"), method="<init>", require=0)
 	public void construct(CallbackInfo ci) {
-		addModel(new ModelIdentifier(new Identifier("fabrication", "obsidian_tears"), "inventory"));
+		loadInventoryVariantItemModel(Identifier.of("fabrication", "obsidian_tears"));
 	}
 
 }

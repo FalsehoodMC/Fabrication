@@ -2,8 +2,9 @@ package com.unascribed.fabrication.mixin.d_minor_mechanics.protection_on_any_ite
 
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
-import net.minecraft.enchantment.EnchantmentHelper;
+import com.unascribed.fabrication.util.EnchantmentHelperHelper;
 import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageTypes;
@@ -25,7 +26,7 @@ public abstract class MixinItemEntity {
 	@FabInject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", cancellable=true)
 	public void isFireImmune(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
 		if (FabConf.isEnabled("*.protection_on_any_item")) {
-			int lvl = EnchantmentHelper.getLevel(Enchantments.PROTECTION, getStack());
+			int lvl = EnchantmentHelperHelper.getLevel(((Entity)(Object)this).getRegistryManager(), Enchantments.PROTECTION, getStack());
 			if (lvl>3) lvl = 4;
 			switch (lvl){
 				case 4: if (source.isIn(DamageTypeTags.IS_EXPLOSION)) cir.setReturnValue(false);

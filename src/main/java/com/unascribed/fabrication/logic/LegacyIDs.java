@@ -29,7 +29,7 @@ public class LegacyIDs {
 				int id = Integer.parseInt(en.getKey().substring(0, colon));
 				int meta = Integer.parseInt(en.getKey().substring(colon+1));
 				int key = id << 16 | meta;
-				Identifier ident = new Identifier(en.getValue().getAsString());
+				Identifier ident = Identifier.of(en.getValue().getAsString());
 				data.put(key, Registries.ITEM.get(ident));
 				data_id.put(key, ident);
 			}

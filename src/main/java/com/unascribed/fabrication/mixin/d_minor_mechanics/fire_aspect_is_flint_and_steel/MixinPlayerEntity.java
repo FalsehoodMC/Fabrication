@@ -2,13 +2,13 @@ package com.unascribed.fabrication.mixin.d_minor_mechanics.fire_aspect_is_flint_
 
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.injection.FabInject;
+import com.unascribed.fabrication.util.EnchantmentHelperHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
 
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
@@ -30,7 +30,7 @@ public class MixinPlayerEntity {
 		if (FabConf.isEnabled("*.fire_aspect_is_flint_and_steel") && ci.getReturnValue() == ActionResult.PASS) {
 			PlayerEntity self = (PlayerEntity)(Object)this;
 			ItemStack stack = self.getStackInHand(hand);
-			if (EnchantmentHelper.getLevel(Enchantments.FIRE_ASPECT, stack) > 0) {
+			if (EnchantmentHelperHelper.getLevel(e.getRegistryManager(), Enchantments.FIRE_ASPECT, stack) > 0) {
 				ItemStack flintAndSteel = new ItemStack(Items.FLINT_AND_STEEL);
 				try {
 					self.setStackInHand(hand, flintAndSteel);
@@ -40,9 +40,7 @@ public class MixinPlayerEntity {
 						self.getWorld().playSound(null, e.getPos().x, e.getPos().y, e.getPos().z, SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 1, self.getWorld().random.nextFloat() * 0.4f + 0.8f);
 					}
 					if (flintAndSteel.getDamage() > 0) {
-						stack.damage(flintAndSteel.getDamage(), self, (en) -> {
-							en.sendEquipmentBreakStatus(hand == Hand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
-						});
+						stack.damage(flintAndSteel.getDamage(), self, hand == Hand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
 					}
 					ci.setReturnValue(ar);
 				} finally {

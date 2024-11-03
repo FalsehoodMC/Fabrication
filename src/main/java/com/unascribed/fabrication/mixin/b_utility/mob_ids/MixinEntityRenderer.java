@@ -26,7 +26,7 @@ public abstract class MixinEntityRenderer {
 	private boolean fabrication$mobIdsShiftTextDown;
 
 	@Shadow
-	protected abstract void renderLabelIfPresent(Entity entity, Text text, MatrixStack matrices, VertexConsumerProvider vcp, int light);
+	protected abstract void renderLabelIfPresent(Entity entity, Text text, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, float tickDelta);
 
 	@FabInject(at=@At("TAIL"), method="render(Lnet/minecraft/entity/Entity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")
 	public void render(Entity e, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vcp, int light, CallbackInfo ci) {
@@ -38,7 +38,7 @@ public abstract class MixinEntityRenderer {
 			matrices.scale(0.5f, 0.5f, 0.5f);
 			try {
 				fabrication$mobIdsShiftTextDown = true;
-				renderLabelIfPresent(e, Text.literal(e.getUuidAsString()), matrices, vcp, light);
+				renderLabelIfPresent(e, Text.literal(e.getUuidAsString()), matrices, vcp, light, tickDelta);
 			} finally {
 				fabrication$mobIdsShiftTextDown = false;
 			}
@@ -47,8 +47,8 @@ public abstract class MixinEntityRenderer {
 	}
 
 	@FabInject(at=@At(value="INVOKE", target="net/minecraft/client/util/math/MatrixStack.scale(FFF)V", shift=At.Shift.AFTER),
-			method="renderLabelIfPresent(Lnet/minecraft/entity/Entity;Lnet/minecraft/text/Text;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")
-	public void renderLabelIfPresentAdjustPosition(Entity e, Text text, MatrixStack matrices, VertexConsumerProvider vcp, int light, CallbackInfo ci) {
+			method= "renderLabelIfPresent(Lnet/minecraft/entity/Entity;Lnet/minecraft/text/Text;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IF)V")
+	public void renderLabelIfPresentAdjustPosition(Entity e, Text text, MatrixStack matrices, VertexConsumerProvider vcp, int light, float tickDelta, CallbackInfo ci) {
 		if (fabrication$mobIdsShiftTextDown) {
 			matrices.translate(0, 19, 0);
 		}

@@ -9,10 +9,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import com.google.common.collect.Maps;
 
-import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.PersistentState;
 
@@ -52,9 +53,9 @@ public class PingPrivacyPersistentState extends PersistentState {
 		return System.currentTimeMillis()-time < TimeUnit.DAYS.toMillis(7);
 	}
 
-	public static PingPrivacyPersistentState fromNbt(NbtCompound tag) {
+	public static PingPrivacyPersistentState fromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
 		PingPrivacyPersistentState rtrn = new PingPrivacyPersistentState();
-		NbtList li = tag.getList("KnownIPs", NbtType.COMPOUND);
+		NbtList li = tag.getList("KnownIPs", NbtElement.COMPOUND_TYPE);
 		for (int i = 0; i < li.size(); i++) {
 			NbtCompound c = li.getCompound(i);
 			long time = c.getLong("Time");
@@ -75,7 +76,7 @@ public class PingPrivacyPersistentState extends PersistentState {
 	}
 
 	@Override
-	public NbtCompound writeNbt(NbtCompound tag) {
+	public NbtCompound writeNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
 		NbtList li = new NbtList();
 		for (Map.Entry<InetAddress, Long> en : knownIps.entrySet()) {
 			NbtCompound c = new NbtCompound();
@@ -86,5 +87,4 @@ public class PingPrivacyPersistentState extends PersistentState {
 		tag.put("KnownIPs", li);
 		return tag;
 	}
-
 }

@@ -30,8 +30,6 @@ import com.unascribed.fabrication.support.OptionalFScript;
 import com.unascribed.fabrication.util.Cardinal;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientCommandSource;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.EntitySelector;
 import net.minecraft.command.argument.DimensionArgumentType;
@@ -78,7 +76,7 @@ public class FeatureFabricationCommand implements Feature {
 
 	@Override
 	public void apply(MinecraftServer minecraftServer, World world) {
-			Agnos.runForCommandRegistration((dispatcher, registryAccess, dedi) -> {
+		Agnos.runForCommandRegistration((dispatcher, registryAccess, dedi) -> {
 			try {
 				LiteralArgumentBuilder<ServerCommandSource> root = LiteralArgumentBuilder.<ServerCommandSource>literal(MixinConfigPlugin.MOD_NAME_LOWER);
 				addConfig(root, dedi);
@@ -188,7 +186,7 @@ public class FeatureFabricationCommand implements Feature {
 				analyze.requires(scs -> scs.hasPermissionLevel(4));
 				{
 					LiteralArgumentBuilder<ServerCommandSource> biome = CommandManager.literal("biome");
-					registryAccess.createWrapper(RegistryKeys.BIOME).streamEntries().forEach(optBiome -> {
+					registryAccess.getWrapperOrThrow(RegistryKeys.BIOME).streamEntries().forEach(optBiome -> {
 						Optional<RegistryKey<Biome>> optKey = optBiome.getKey();
 						if (optKey.isEmpty()) return;
 						Identifier id = optKey.get().getValue();

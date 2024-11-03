@@ -2,6 +2,7 @@ package com.unascribed.fabrication.mixin.b_utility.canhit;
 
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.injection.FabInject;
+import net.minecraft.nbt.NbtElement;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -10,7 +11,6 @@ import com.unascribed.fabrication.interfaces.SetCanHitList;
 import com.unascribed.fabrication.logic.CanHitUtil;
 import com.unascribed.fabrication.support.EligibleIf;
 
-import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.nbt.NbtCompound;
@@ -50,12 +50,12 @@ public class MixinProjectileEntity implements SetCanHitList {
 	@FabInject(at=@At("TAIL"), method="readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V")
 	public void readCustomDataFromTag(NbtCompound tag, CallbackInfo ci) {
 		if (tag.contains("fabrication:CanHitList")) {
-			fabrication$canHitList = tag.getList("fabrication:CanHitList", NbtType.STRING);
+			fabrication$canHitList = tag.getList("fabrication:CanHitList", NbtElement.STRING_TYPE);
 		} else {
 			fabrication$canHitList = null;
 		}
 		if (tag.contains("fabrication:CanHitList2")) {
-			fabrication$canHitList2 = tag.getList("fabrication:CanHitList2", NbtType.STRING);
+			fabrication$canHitList2 = tag.getList("fabrication:CanHitList2", NbtElement.STRING_TYPE);
 		} else {
 			fabrication$canHitList2 = null;
 		}

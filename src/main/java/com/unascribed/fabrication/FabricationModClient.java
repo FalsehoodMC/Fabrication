@@ -5,6 +5,7 @@ import java.util.concurrent.Executor;
 
 import com.unascribed.fabrication.interfaces.GetServerConfig;
 import com.unascribed.fabrication.logic.WoinaDrops;
+import com.unascribed.fabrication.util.ByteBufCustomPayload;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.client.MinecraftClient;

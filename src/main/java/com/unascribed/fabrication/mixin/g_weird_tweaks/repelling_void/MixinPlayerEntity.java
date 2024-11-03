@@ -93,7 +93,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 				}
 			}
 			dismountVehicle();
-			teleport(pos.x, pos.y, pos.z);
+			requestTeleport(pos.x, pos.y, pos.z);
 			fallDistance = 0;
 			world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1, 0.5f);
 			world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.BLOCK_SHROOMLIGHT_PLACE, SoundCategory.PLAYERS, 1, 0.5f);

@@ -23,12 +23,12 @@ import java.util.function.Predicate;
 public class MixinHopperBlockEntity {
 
 
-	@FabModifyArg(method="getInventoryAt(Lnet/minecraft/world/World;DDD)Lnet/minecraft/inventory/Inventory;", at=@At(value="INVOKE", target="Lnet/minecraft/world/World;getOtherEntities(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Box;Ljava/util/function/Predicate;)Ljava/util/List;"))
+	@FabModifyArg(method="getEntityInventoryAt(Lnet/minecraft/world/World;DDD)Lnet/minecraft/inventory/Inventory;", at=@At(value="INVOKE", target="Lnet/minecraft/world/World;getOtherEntities(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Box;Ljava/util/function/Predicate;)Ljava/util/List;"))
 	private static Predicate addFurnaceCarts(Predicate predicate) {
 		if (!FabConf.isEnabled("*.furnace_minecart_resupplying")) return predicate;
 		return ForgeryFurnaceCartResupplying.INSTANCE.and(predicate);
 	}
-	@FabInject(method="getInventoryAt(Lnet/minecraft/world/World;DDD)Lnet/minecraft/inventory/Inventory;", at=@At(value="INVOKE", target="Ljava/util/List;isEmpty()Z"), cancellable=true)
+	@FabInject(method="getEntityInventoryAt(Lnet/minecraft/world/World;DDD)Lnet/minecraft/inventory/Inventory;", at=@At(value="INVOKE", target="Ljava/util/List;isEmpty()Z"), cancellable=true)
 	private static void checkFurnaceCarts(World world, double x, double y, double z, CallbackInfoReturnable<Inventory> cir) {
 		List<ResupplyingFurnaceCart> furnaceList = ForgeryFurnaceCartResupplying.fabrication$fmr$lastCart.get();
 		if (furnaceList == null) return;

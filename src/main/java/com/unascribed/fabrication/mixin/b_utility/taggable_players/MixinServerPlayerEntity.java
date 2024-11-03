@@ -7,9 +7,9 @@ import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.features.FeatureTaggablePlayers;
 import com.unascribed.fabrication.interfaces.TaggablePlayer;
 import com.unascribed.fabrication.support.EligibleIf;
-import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -78,7 +78,7 @@ public abstract class MixinServerPlayerEntity extends PlayerEntity implements Ta
 	@FabInject(at=@At("TAIL"), method="readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V")
 	public void readCustomDataFromTag(NbtCompound tag, CallbackInfo ci) {
 		fabrication$tags.clear();
-		NbtList li = tag.getList("fabrication:Tags", NbtType.STRING);
+		NbtList li = tag.getList("fabrication:Tags", NbtElement.STRING_TYPE);
 		for (int i = 0; i < li.size(); i++) {
 			String key = li.getString(i);
 			String fullKey = FabConf.remap("*."+key.toLowerCase(Locale.ROOT));

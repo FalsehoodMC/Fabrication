@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableMap;
 import com.unascribed.fabrication.FabLog;
-import net.minecraft.enchantment.EnchantmentHelper;
+import com.unascribed.fabrication.util.EnchantmentHelperHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
@@ -101,11 +101,11 @@ public class ConfigPredicates {
 				);
 		defaultsMap.put(remap("*.feather_falling_five"),
 				(Predicate<LivingEntity>) livingEntity ->
-		EnchantmentHelper.getLevel(Enchantments.FEATHER_FALLING, livingEntity.getEquippedStack(EquipmentSlot.FEET)) >= 5
+		EnchantmentHelperHelper.getLevel(livingEntity.getRegistryManager(), Enchantments.FEATHER_FALLING, livingEntity.getEquippedStack(EquipmentSlot.FEET)) >= 5
 				);
 		defaultsMap.put(remap("*.feather_falling_five_damages_boots"),
 				(Predicate<LivingEntity>) livingEntity ->
-		EnchantmentHelper.getLevel(Enchantments.FEATHER_FALLING, livingEntity.getEquippedStack(EquipmentSlot.FEET)) >= 5
+		EnchantmentHelperHelper.getLevel(livingEntity.getRegistryManager(), Enchantments.FEATHER_FALLING, livingEntity.getEquippedStack(EquipmentSlot.FEET)) >= 5
 				);
 		defaults = ImmutableMap.copyOf(defaultsMap);
 		active = defaults.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> (new AtomicReference<>(e.getValue()))));

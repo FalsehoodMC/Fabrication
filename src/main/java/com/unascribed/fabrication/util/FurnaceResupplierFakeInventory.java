@@ -5,12 +5,14 @@ import com.unascribed.fabrication.FabRefl;
 import net.minecraft.block.entity.FurnaceBlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
+import net.minecraft.server.network.EntityTrackerEntry;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
@@ -21,7 +23,7 @@ public class FurnaceResupplierFakeInventory extends Entity implements SidedInven
 	}
 
 	@Override
-	protected void initDataTracker() {
+	protected void initDataTracker(DataTracker.Builder builder) {
 	}
 
 	@Override
@@ -33,7 +35,7 @@ public class FurnaceResupplierFakeInventory extends Entity implements SidedInven
 	}
 
 	@Override
-	public Packet<ClientPlayPacketListener> createSpawnPacket() {
+	public Packet<ClientPlayPacketListener> createSpawnPacket(EntityTrackerEntry entityTrackerEntry) {
 		return null;
 	}
 

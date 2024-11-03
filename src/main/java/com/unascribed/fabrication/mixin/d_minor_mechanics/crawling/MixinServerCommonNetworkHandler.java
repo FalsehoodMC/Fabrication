@@ -28,9 +28,9 @@ public class MixinServerCommonNetworkHandler {
 		ServerPlayerEntity player = ((ServerPlayNetworkHandler) self).getPlayer();
 		CustomPayload payload = packet.payload();
 		if (!(payload instanceof ByteBufCustomPayload)) return;
-		Identifier channel = payload.id();
+		Identifier channel = payload.getId().id();
 		if (channel.getNamespace().equals("fabrication") && channel.getPath().equals("crawling")) {
-			PacketByteBuf recvdData = ((ByteBufCustomPayload) payload).buf;
+			PacketByteBuf recvdData = ((ByteBufCustomPayload) payload).buf();
 			boolean crawling = recvdData.readBoolean();
 			if (player instanceof SetCrawling) {
 				((SetCrawling)player).fabrication$setCrawling(crawling);

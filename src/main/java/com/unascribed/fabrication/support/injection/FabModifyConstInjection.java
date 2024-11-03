@@ -3,6 +3,7 @@ package com.unascribed.fabrication.support.injection;
 import com.unascribed.fabrication.FabLog;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.spongepowered.asm.mixin.injection.InjectionPoint;
+import org.spongepowered.asm.mixin.injection.code.InjectorTarget;
 import org.spongepowered.asm.mixin.injection.invoke.ModifyConstantInjector;
 import org.spongepowered.asm.mixin.injection.struct.InjectionInfo;
 import org.spongepowered.asm.mixin.injection.struct.InjectionNodes;
@@ -18,7 +19,7 @@ public class FabModifyConstInjection extends ModifyConstantInjector {
 	}
 
 	@Override
-	public void addTargetNode(Target target, List<InjectionNodes.InjectionNode> myNodes, AbstractInsnNode insn, Set<InjectionPoint> nominators) {
+	protected void addTargetNode(InjectorTarget target, List<InjectionNodes.InjectionNode> myNodes, AbstractInsnNode insn, Set<InjectionPoint> nominators) {
 		InjectionNodes.InjectionNode node = target.getInjectionNode(insn);
 		//Meta.KEY = "redirector"
 		if (node != null) {

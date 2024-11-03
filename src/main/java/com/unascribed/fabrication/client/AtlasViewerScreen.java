@@ -29,7 +29,7 @@ import org.joml.Matrix4f;
 
 public class AtlasViewerScreen extends Screen {
 
-	private static final Identifier CHECKER = new Identifier("fabrication", "textures/checker.png");
+	private static final Identifier CHECKER = Identifier.of("fabrication", "textures/checker.png");
 
 	private final Identifier atlas;
 	private float panX = 100;
@@ -66,13 +66,13 @@ public class AtlasViewerScreen extends Screen {
 		RenderSystem.setShader(GameRenderer::getPositionTexProgram);
 		RenderSystem.setShaderTexture(0, CHECKER);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
-		BufferBuilder bb = Tessellator.getInstance().getBuffer();
 		Matrix4f mat = matrices.peek().getPositionMatrix();
-		bb.begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
-			bb.vertex(mat, 0, 0, 0).texture(0, 0).next();
-			bb.vertex(mat, width, 0, 0).texture(width/8, 0).next();
-			bb.vertex(mat, width, height, 0).texture(width/8, height/8).next();
-			bb.vertex(mat, 0, height, 0).texture(0, height/8).next();
+		Tessellator tessellator = Tessellator.getInstance();
+		BufferBuilder bb = tessellator.begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+			bb.vertex(mat, 0, 0, 0).texture(0, 0);
+			bb.vertex(mat, width, 0, 0).texture(width/8, 0);
+			bb.vertex(mat, width, height, 0).texture(width/8, height/8);
+			bb.vertex(mat, 0, height, 0).texture(0, height/8);
 		BufferRenderer.drawWithGlobalProgram(bb.end());
 
 		client.getTextureManager().bindTexture(atlas);
@@ -88,11 +88,11 @@ public class AtlasViewerScreen extends Screen {
 		RenderSystem.defaultBlendFunc();
 		RenderSystem.setShaderColor(1f, 1f, 1f, 0.15f);
 		mat = matrices.peek().getPositionMatrix();
-		bb.begin(DrawMode.QUADS, VertexFormats.POSITION);
-			bb.vertex(mat, 0, 0, 0).next();
-			bb.vertex(mat, atlasWidth, 0, 0).next();
-			bb.vertex(mat, atlasWidth, atlasHeight, 0).next();
-			bb.vertex(mat, 0, atlasHeight, 0).next();
+		bb = tessellator.begin(DrawMode.QUADS, VertexFormats.POSITION);
+			bb.vertex(mat, 0, 0, 0);
+			bb.vertex(mat, atlasWidth, 0, 0);
+			bb.vertex(mat, atlasWidth, atlasHeight, 0);
+			bb.vertex(mat, 0, atlasHeight, 0);
 		BufferRenderer.drawWithGlobalProgram(bb.end());
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, level);
@@ -101,11 +101,11 @@ public class AtlasViewerScreen extends Screen {
 		RenderSystem.setShaderTexture(0, atlas);
 		RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 		mat = matrices.peek().getPositionMatrix();
-		bb.begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
-			bb.vertex(mat, 0, 0, 0).texture(0, 0).next();
-			bb.vertex(mat, atlasWidth, 0, 0).texture(1, 0).next();
-			bb.vertex(mat, atlasWidth, atlasHeight, 0).texture(1, 1).next();
-			bb.vertex(mat, 0, atlasHeight, 0).texture(0, 1).next();
+		bb = tessellator.begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+			bb.vertex(mat, 0, 0, 0).texture(0, 0);
+			bb.vertex(mat, atlasWidth, 0, 0).texture(1, 0);
+			bb.vertex(mat, atlasWidth, atlasHeight, 0).texture(1, 1);
+			bb.vertex(mat, 0, atlasHeight, 0).texture(0, 1);
 		BufferRenderer.drawWithGlobalProgram(bb.end());
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
@@ -124,8 +124,8 @@ public class AtlasViewerScreen extends Screen {
 		RenderSystem.defaultBlendFunc();
 		List<Sprite> sprites = Lists.newArrayList();
 		for (Sprite s : FabRefl.Client.getSprites(sat).values()) {
-			int x = FabRefl.Client.getX(s);
-			int y = FabRefl.Client.getY(s);
+			int x = s.getX();
+			int y = s.getY();
 			int w = s.getContents().getWidth();
 			int h = s.getContents().getHeight();
 			if (mouseX >= x && mouseX < x+w && mouseY >= y && mouseY < y+h) {
@@ -135,17 +135,17 @@ public class AtlasViewerScreen extends Screen {
 		RenderSystem.disableCull();
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		for (Sprite s : sprites) {
-			int x = FabRefl.Client.getX(s);
-			int y = FabRefl.Client.getY(s);
+			int x = s.getX();
+			int y = s.getY();
 			int w = s.getContents().getWidth();
 			int h = s.getContents().getHeight();
 			RenderSystem.setShaderColor(1, 0, 0, 0.2f);
 			mat = matrices.peek().getPositionMatrix();
-			bb.begin(DrawMode.QUADS, VertexFormats.POSITION);
-				bb.vertex(mat, panX+x, panY+y, 0).next();
-				bb.vertex(mat, panX+x+w, panY+y, 0).next();
-				bb.vertex(mat, panX+x+w, panY+y+h, 0).next();
-				bb.vertex(mat, panX+x, panY+y+h, 0).next();
+			bb = tessellator.begin(DrawMode.QUADS, VertexFormats.POSITION);
+				bb.vertex(mat, panX+x, panY+y, 0);
+				bb.vertex(mat, panX+x+w, panY+y, 0);
+				bb.vertex(mat, panX+x+w, panY+y+h, 0);
+				bb.vertex(mat, panX+x, panY+y+h, 0);
 			BufferRenderer.drawWithGlobalProgram(bb.end());
 		}
 		RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
@@ -159,17 +159,17 @@ public class AtlasViewerScreen extends Screen {
 			}
 		} else if (sprites.size() == 1) {
 			Sprite s = sprites.get(0);
-			int x = FabRefl.Client.getX(s);
-			int y = FabRefl.Client.getY(s);
+			int x = s.getX();
+			int y = s.getY();
 			int w = s.getContents().getWidth();
 			int h = s.getContents().getHeight();
-			Identifier tex = new Identifier(s.getContents().getId().getNamespace(), "textures/"+s.getContents().getId().getPath()+".png");
+			Identifier tex = Identifier.of(s.getContents().getId().getNamespace(), "textures/"+s.getContents().getId().getPath()+".png");
 			String src = "??";
 			if (s.getClass() == Sprite.class) {
 				try {
 					Optional<Resource> opt = client.getResourceManager().getResource(tex);
 					if (opt.isPresent()) {
-						src = opt.get().getResourcePackName();
+						src = opt.get().getPack().getInfo().title().getString();
 					}
 				} catch (Throwable t) {
 					t.printStackTrace();
@@ -192,8 +192,8 @@ public class AtlasViewerScreen extends Screen {
 				Text.literal("§c\u26A0 MULTIPLE SPRITES \u26A0")
 			);
 			for (Sprite s : sprites) {
-				int x = FabRefl.Client.getX(s);
-				int y = FabRefl.Client.getY(s);
+				int x = s.getX();
+				int y = s.getY();
 				int w = s.getContents().getWidth();
 				int h = s.getContents().getHeight();
 				li.add(Text.literal(s.getContents().getId().toString()));

@@ -35,7 +35,7 @@ public abstract class MixinCreeperEntity extends HostileEntity {
 					if (helmet.isDamageable()) {
 						helmet.setDamage(helmet.getDamage() + random.nextInt(2));
 						if (helmet.getDamage() >= helmet.getMaxDamage()) {
-							sendEquipmentBreakStatus(EquipmentSlot.HEAD);
+							sendEquipmentBreakStatus(helmet.getItem(), EquipmentSlot.HEAD);
 							equipStack(EquipmentSlot.HEAD, ItemStack.EMPTY);
 						}
 					}

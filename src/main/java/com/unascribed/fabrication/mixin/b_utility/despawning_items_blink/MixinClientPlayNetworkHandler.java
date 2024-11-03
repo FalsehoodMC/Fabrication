@@ -35,18 +35,18 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
 
 	@FabInject(at=@At("TAIL"), method="onGameJoin(Lnet/minecraft/network/packet/s2c/play/GameJoinS2CPacket;)V")
 	public void onGameJoin(GameJoinS2CPacket packet, CallbackInfo ci) {
-		connection.send(new CustomPayloadC2SPacket(new ByteBufCustomPayload(new Identifier("fabrication", "item_despawn"), new PacketByteBuf(Unpooled.buffer()))));
+		connection.send(new CustomPayloadC2SPacket(new ByteBufCustomPayload(Identifier.of("fabrication", "item_despawn"), new PacketByteBuf(Unpooled.buffer()))));
 	}
 
 	@FabInject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/CustomPayload;)V", cancellable=true)
 	public void onCustomPayload(CustomPayload payload, CallbackInfo ci) {
 		if (!(payload instanceof ByteBufCustomPayload)) return;
-		Identifier channel = payload.id();
+		Identifier channel = payload.getId().id();
 		if (channel == null) return;
 		if (channel.getNamespace().equals("fabrication") && channel.getPath().equals("item_despawn")) {
 			if (FabConf.isEnabled("*.despawning_items_blink")) {
 				if (MinecraftClient.getInstance().world != null) {
-					PacketByteBuf buf = ((ByteBufCustomPayload) payload).buf;
+					PacketByteBuf buf = ((ByteBufCustomPayload) payload).buf();
 					Entity e = MinecraftClient.getInstance().world.getEntityById(buf.readInt());
 					if (e instanceof ItemEntity && e instanceof RenderingAgeAccess) {
 						((RenderingAgeAccess)e).fabrication$setRenderingAge(buf.readInt());

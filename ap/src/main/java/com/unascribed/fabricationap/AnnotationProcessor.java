@@ -14,15 +14,13 @@ import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-@SupportedSourceVersion(SourceVersion.RELEASE_8)
+@SupportedSourceVersion(SourceVersion.RELEASE_21)
 @SupportedAnnotationTypes({
 		"com.unascribed.fabrication.support.injection.ModifyReturn",
 		"com.unascribed.fabrication.support.injection.Hijack",
@@ -46,7 +44,6 @@ public class AnnotationProcessor extends AbstractProcessor {
 				Set<String> mixin = new HashSet<>();
 				Set<String> methods = new HashSet<>();
 				Set<String> targets = new HashSet<>();
-				Set<String> fields = new HashSet<>();
 				for (AnnotationMirror am : source.getAnnotationMirrors()) {
 					if (!(
 							"org.spongepowered.asm.mixin.Mixin".equals(am.getAnnotationType().toString())
@@ -65,34 +62,6 @@ public class AnnotationProcessor extends AbstractProcessor {
 							}
 							if (ad.startsWith("com.mrcrayfish") || ad.startsWith("svenhjol")) continue;
 							mixin.add(ad);
-							try {
-								Class<?> cl;
-								try {
-									cl = Class.forName(ad, false, this.getClass().getClassLoader());
-								} catch (ClassNotFoundException ignore) {
-									int dot = ad.lastIndexOf('.');
-									try {
-										cl = Class.forName(ad.substring(0, dot) + "$" + ad.substring(dot + 1), false, this.getClass().getClassLoader());
-									} catch (StringIndexOutOfBoundsException ingore) {
-										continue;
-									}
-								}
-								while (cl != null) {
-									mixin.add(cl.getName());
-									for (Class<?> cla : cl.getInterfaces()) mixin.add(cla.getName());
-									try {
-										for (Method m : cl.getMethods()) mixin.add(m.getDeclaringClass().getName());
-									} catch (VerifyError er) {
-										//doesn't seam to actually matter?
-										//processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Fabrication Annotation Processor VerifyError");
-										//er.printStackTrace();
-									}
-									cl = cl.getSuperclass();
-								}
-							} catch (Exception ex) {
-								processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "failed to reflect class " + ad + "\n" + e);
-								ex.printStackTrace();
-							}
 						}
 					}
 				}
@@ -128,53 +97,23 @@ public class AnnotationProcessor extends AbstractProcessor {
 							if (key.equals("method")){
 								methods.add(o.toString().replace("\"", ""));
 							} else if (key.equals("target")) {
-								String ad = o.toString().replace("\"", "");
-								StringBuilder strb = new StringBuilder();
-								strb.append(ad);
-								Set<String> add = new HashSet<>();
-								int col = ad.indexOf(';');
-								int dot = ad.indexOf('.');
-								if (col == -1 || dot < col && dot != -1) col = dot;
-								try {
-									Class<?> cl = Class.forName(ad.substring(ad.charAt(0) == 'L' ? 1 : 0, col).replace('/', '.'), false, this.getClass().getClassLoader());
-									while (cl != null) {
-										add.add(cl.getName());
-										for (Class<?> cla : cl.getInterfaces()) add.add(cla.getName());
-										for (Field f : cl.getFields()) add.add(f.getDeclaringClass().getName());
-										for (Method m : cl.getMethods()) add.add(m.getDeclaringClass().getName());
-										cl = cl.getSuperclass();
-									}
-								} catch (Exception ex) {
-									processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "failed to reflect class " + ad + "\n" + e);
-									ex.printStackTrace();
-								}
-								for (String s : add){
-									strb.append(' ');
-									strb.append(s);
-								}
-								targets.add(strb.toString());
+								targets.add(o.toString().replace("\"", ""));
 							}
 						}
 					}
 				}
-				for (Set<String> l : new Set[] {mixin, methods, targets}){
-					boolean first = true;
-					for (String s : l){
-						if (first) first = false;
-						else bldr.append('\t');
-						bldr.append(s);
-					}
-					bldr.append('\n');
-				}
+				Main.append(mixin, bldr);
+				Main.append(methods, bldr);
+				Main.append(targets, bldr);
 			}
 		}
 		if (!bldr.isEmpty()) {
 			try {
-				FileWriter fw = new FileWriter("build/tmp/fabToRefMap");
+				FileWriter fw = new FileWriter("build/tmp/fabToRefMapPre");
 				fw.append(bldr);
 				fw.close();
 			} catch (IOException e) {
-				processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "failed to write fabToRefMap \n" + e);
+				processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "failed to write fabToRefMapPre \n" + e);
 				e.printStackTrace();
 			}
 		}

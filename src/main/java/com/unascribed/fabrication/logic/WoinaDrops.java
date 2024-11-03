@@ -10,6 +10,7 @@ import com.unascribed.fabrication.FabConf;
 import net.minecraft.block.MapColor;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.random.Random;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -104,7 +105,7 @@ public class WoinaDrops {
 							@Override
 							public void load(ResourceManager manager) throws IOException {
 								clearGlId();
-								SpriteAtlasTexture atlas = MinecraftClient.getInstance().getBakedModelManager().getAtlas(new Identifier("textures/atlas/blocks.png"));
+								SpriteAtlasTexture atlas = MinecraftClient.getInstance().getBakedModelManager().getAtlas(Identifier.of("textures/atlas/blocks.png"));
 								RenderSystem.bindTexture(atlas.getGlId());
 								int maxLevel = GL11.glGetTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LEVEL);
 								if (maxLevel == 0 || !GL.getCapabilities().GL_ARB_copy_image) {
@@ -141,12 +142,12 @@ public class WoinaDrops {
 								}
 							}
 						};
-						MinecraftClient.getInstance().getTextureManager().registerTexture(new Identifier("fabrication", "textures/atlas/blocks-mip.png"), mippedBlocks);
+						MinecraftClient.getInstance().getTextureManager().registerTexture(Identifier.of("fabrication", "textures/atlas/blocks-mip.png"), mippedBlocks);
 					}
 					RenderLayer defLayer = RenderLayers.getItemLayer(stack, true);
 					RenderLayer layer = defLayer == TexturedRenderLayers.getEntityCutout() ?
-							RenderLayer.getEntityCutout(new Identifier("fabrication", "textures/atlas/blocks-mip.png")) :
-								RenderLayer.getEntityTranslucent(new Identifier("fabrication", "textures/atlas/blocks-mip.png"));
+							RenderLayer.getEntityCutout(Identifier.of("fabrication", "textures/atlas/blocks-mip.png")) :
+								RenderLayer.getEntityTranslucent(Identifier.of("fabrication", "textures/atlas/blocks-mip.png"));
 					VertexConsumer vertices = vertexConsumers.getBuffer(layer);
 					FabRefl.Client.ItemRenderer_renderBakedItemModel(subject, model, stack, light, overlay, matrices, vertices);
 				}
@@ -227,7 +228,7 @@ public class WoinaDrops {
 						}
 
 						vertices.vertex(pos.x, pos.y, pos.z,
-								r, g, b, 1,
+								ColorHelper.Argb.fromFloats(r, g, b, 1),
 								u, v,
 								overlay, light,
 								normal.x, normal.y, normal.z);

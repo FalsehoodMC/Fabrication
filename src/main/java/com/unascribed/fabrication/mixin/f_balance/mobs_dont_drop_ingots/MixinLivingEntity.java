@@ -3,9 +3,12 @@ package com.unascribed.fabrication.mixin.f_balance.mobs_dont_drop_ingots;
 import java.util.function.Consumer;
 
 import com.unascribed.fabrication.FabConf;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.registry.Registries;
 import com.unascribed.fabrication.support.FailOn;
 import com.unascribed.fabrication.support.SpecialEligibility;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabModifyArg;
@@ -21,7 +24,11 @@ import net.minecraft.nbt.NbtCompound;
 @Mixin(LivingEntity.class)
 @EligibleIf(configAvailable="*.mobs_dont_drop_ingots")
 @FailOn(invertedSpecialConditions=SpecialEligibility.NOT_FORGE)
-public class MixinLivingEntity {
+public abstract class MixinLivingEntity extends Entity {
+
+	public MixinLivingEntity(EntityType<?> type, World world) {
+		super(type, world);
+	}
 
 	@FabModifyArg(method="dropLoot(Lnet/minecraft/entity/damage/DamageSource;Z)V", at=@At(value="INVOKE", target="Lnet/minecraft/loot/LootTable;generateLoot(Lnet/minecraft/loot/context/LootContextParameterSet;JLjava/util/function/Consumer;)V"))
 	public Consumer<ItemStack> generateLoot(Consumer<ItemStack> lootConsumer) {
@@ -35,9 +42,9 @@ public class MixinLivingEntity {
 				replacement = Items.AIR;
 			if (replacement != null) {
 				NbtCompound tag = new NbtCompound();
-				stack.writeNbt(tag);
+				stack.encode(this.getRegistryManager(), tag);
 				tag.putString("id", Registries.ITEM.getId(replacement).toString());
-				stack = ItemStack.fromNbt(tag);
+				stack = ItemStack.fromNbtOrEmpty(this.getRegistryManager(), tag);
 			}
 
 			lootConsumer.accept(stack);

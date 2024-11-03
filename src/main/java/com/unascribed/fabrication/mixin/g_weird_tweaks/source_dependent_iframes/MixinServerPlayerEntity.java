@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @EligibleIf(configAvailable="*.source_dependent_iframes")
 public abstract class MixinServerPlayerEntity {
 
-	@FabInject(at=@At("HEAD"), method= "tick()V")
+	@FabInject(at=@At("HEAD"), method="tick()V")
 	private void tickSourceDependentIFrames(CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.source_dependent_iframes")) return;
 		((TickSourceIFrames)this).fabrication$tickSourceDependentIFrames();

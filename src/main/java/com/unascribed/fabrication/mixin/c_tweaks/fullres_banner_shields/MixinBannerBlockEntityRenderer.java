@@ -1,10 +1,14 @@
 package com.unascribed.fabrication.mixin.c_tweaks.fullres_banner_shields;
 
-import java.util.List;
 import java.util.Optional;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.FailOn;
+import com.unascribed.fabrication.support.SpecialEligibility;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.component.type.BannerPatternsComponent;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
@@ -16,7 +20,6 @@ import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.datafixers.util.Pair;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 
@@ -35,27 +38,31 @@ import net.minecraft.util.DyeColor;
 
 @Mixin(BannerBlockEntityRenderer.class)
 @EligibleIf(configAvailable="*.fullres_banner_shields", envMatches=Env.CLIENT)
+@FailOn(invertedSpecialConditions={SpecialEligibility.FORGE, SpecialEligibility.NOT_FORGE})
 public class MixinBannerBlockEntityRenderer {
 
 	@Unique
-	private static final String RENDER_CANVAS = "renderCanvas(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/model/ModelPart;Lnet/minecraft/client/util/SpriteIdentifier;ZLjava/util/List;Z)V";
+	private static final String RENDER_CANVAS = "renderCanvas(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/model/ModelPart;Lnet/minecraft/client/util/SpriteIdentifier;ZLnet/minecraft/util/DyeColor;Lnet/minecraft/component/type/BannerPatternsComponent;Z)V";
 
 	@FabInject(at=@At(value="INVOKE", target="net/minecraft/client/model/ModelPart.render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;II)V",
 			shift=Shift.AFTER, ordinal=0), method=RENDER_CANVAS, cancellable=true)
-	private static void renderCanvasHead(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, ModelPart canvas, SpriteIdentifier baseSprite, boolean isBanner, List<Pair<RegistryEntry<BannerPattern>, DyeColor>> patterns, boolean glint, CallbackInfo ci) {
+	private static void renderCanvasHead(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, ModelPart canvas, SpriteIdentifier baseSprite, boolean isBanner, DyeColor color, BannerPatternsComponent patterns, boolean glint, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.fullres_banner_shields")) return;
 		if (!(vertexConsumers instanceof Immediate)) return;
 		if (!isBanner) {
 			((Immediate)vertexConsumers).draw();
 			RenderSystem.enablePolygonOffset();
 			RenderSystem.polygonOffset(-3, -3);
-			Matrix4f mdl = matrices.peek().getPositionMatrix();
-			Matrix3f nrm = matrices.peek().getNormalMatrix();
-			for (Pair<RegistryEntry<BannerPattern>, DyeColor> pattern : patterns) {
-				float[] col = pattern.getSecond().getColorComponents();
-				Optional<RegistryKey<BannerPattern>> patternKey = pattern.getFirst().getKey();
+			MatrixStack.Entry entry = matrices.peek();
+			Matrix4f mdl = entry.getPositionMatrix();
+			Matrix3f nrm = entry.getNormalMatrix();
+			for (BannerPatternsComponent.Layer layer : patterns.layers()) {
+				int col = layer.color().getEntityColor();
+				Optional<RegistryKey<BannerPattern>> patternKey = layer.pattern().getKey();
 				if (patternKey.isEmpty()) continue;
-				SpriteIdentifier si = TexturedRenderLayers.getBannerPatternTextureId(patternKey.get());
+				Optional<RegistryEntry.Reference<BannerPattern>> patternEntry = MinecraftClient.getInstance().world.getRegistryManager().get(RegistryKeys.BANNER_PATTERN).getEntry(patternKey.get());
+				if (patternEntry.isEmpty()) continue;
+				SpriteIdentifier si = TexturedRenderLayers.getBannerPatternTextureId(patternEntry.get());
 				VertexConsumer vc = si.getVertexConsumer(vertexConsumers, RenderLayer::getEntityNoOutline);
 				Sprite sprite = si.getSprite();
 				float minU = sprite.getMinU();
@@ -73,10 +80,11 @@ public class MixinBannerBlockEntityRenderer {
 				float w = 0.625f;
 				float h = 1.25f;
 				float z = -0.125f;
-				vc.vertex(mdl, x, y, z).color(col[0], col[1], col[2], 1).texture(minU, minV).overlay(overlay).light(light).normal(nrm, 0, 0, -1).next();
-				vc.vertex(mdl, x+w, y, z).color(col[0], col[1], col[2], 1).texture(maxU, minV).overlay(overlay).light(light).normal(nrm, 0, 0, -1).next();
-				vc.vertex(mdl, x+w, y+h, z).color(col[0], col[1], col[2], 1).texture(maxU, maxV).overlay(overlay).light(light).normal(nrm, 0, 0, -1).next();
-				vc.vertex(mdl, x, y+h, z).color(col[0], col[1], col[2], 1).texture(minU, maxV).overlay(overlay).light(light).normal(nrm, 0, 0, -1).next();
+				// TODO? colors
+				vc.vertex(mdl, x, y, z).color(col).texture(minU, minV).overlay(overlay).light(light).normal(entry, 0, 0, -1);
+				vc.vertex(mdl, x+w, y, z).color(col).texture(maxU, minV).overlay(overlay).light(light).normal(entry, 0, 0, -1);
+				vc.vertex(mdl, x+w, y+h, z).color(col).texture(maxU, maxV).overlay(overlay).light(light).normal(entry, 0, 0, -1);
+				vc.vertex(mdl, x, y+h, z).color(col).texture(minU, maxV).overlay(overlay).light(light).normal(entry, 0, 0, -1);
 			}
 			((Immediate)vertexConsumers).draw();
 			RenderSystem.disablePolygonOffset();

@@ -3,6 +3,7 @@ package com.unascribed.fabrication.mixin.b_utility.show_bee_count_on_item;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.injection.FabInject;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.component.DataComponentTypes;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -33,13 +34,16 @@ public abstract class MixinDrawContext {
 	@Shadow
 	public abstract int drawText(TextRenderer textRenderer, @Nullable String text, int x, int y, int color, boolean shadow);
 
+	@Shadow
+	public abstract VertexConsumerProvider.Immediate getVertexConsumers();
+
 	@FabInject(at=@At("TAIL"), method="drawItemInSlot(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V")
 	public void renderGuiItemOverlay(TextRenderer renderer, ItemStack stack, int x, int y, String countLabel, CallbackInfo ci) {
-		if (!(FabConf.isEnabled("*.show_bee_count_on_item") && stack.hasNbt())) return;
-		NbtCompound tag = stack.getNbt().getCompound("BlockEntityTag");
+		if (!(FabConf.isEnabled("*.show_bee_count_on_item") && stack.contains(DataComponentTypes.BLOCK_ENTITY_DATA))) return;
+		NbtCompound tag = stack.get(DataComponentTypes.BLOCK_ENTITY_DATA).copyNbt();
 		if (tag == null || !tag.contains("Bees", NbtElement.LIST_TYPE)) return;
 
-		VertexConsumerProvider.Immediate vc = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
+		VertexConsumerProvider.Immediate vc = this.getVertexConsumers();
 		String count = String.valueOf(((NbtList)tag.get("Bees")).size());
 		matrices.push();
 		matrices.translate(0, 0, 200);

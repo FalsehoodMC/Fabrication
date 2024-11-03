@@ -13,20 +13,17 @@ import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Feature;
 
-import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.ItemStackArgument;
 import net.minecraft.command.argument.ItemStackArgumentType;
-import net.minecraft.command.argument.RegistryEntryArgumentType;
+import net.minecraft.command.argument.RegistryEntryReferenceArgumentType;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -74,31 +71,22 @@ public class FeatureIMore implements Feature {
 				dispatcher.register(CommandManager.literal("fenchant")
 						.requires(requirement)
 						.then(CommandManager.argument("targets", EntityArgumentType.entities())
-								.then(CommandManager.argument("enchantment", RegistryEntryArgumentType.registryEntry(registryAccess, RegistryKeys.ENCHANTMENT))
-										.executes((ctx) -> fenchant(ctx.getSource(), EntityArgumentType.getEntities(ctx, "targets"), RegistryEntryArgumentType.getEnchantment(ctx, "enchantment").value(), 1))
+								.then(CommandManager.argument("enchantment", RegistryEntryReferenceArgumentType.registryEntry(registryAccess, RegistryKeys.ENCHANTMENT))
+										.executes((ctx) -> fenchant(ctx.getSource(), EntityArgumentType.getEntities(ctx, "targets"), RegistryEntryReferenceArgumentType.getEnchantment(ctx, "enchantment"), 1))
 										.then(CommandManager.argument("level", IntegerArgumentType.integer(0))
-												.executes((ctx) -> fenchant(ctx.getSource(), EntityArgumentType.getEntities(ctx, "targets"), RegistryEntryArgumentType.getEnchantment(ctx, "enchantment").value(), IntegerArgumentType.getInteger(ctx, "level")))))));
+												.executes((ctx) -> fenchant(ctx.getSource(), EntityArgumentType.getEntities(ctx, "targets"), RegistryEntryReferenceArgumentType.getEnchantment(ctx, "enchantment"), IntegerArgumentType.getInteger(ctx, "level")))))));
 			});
 		}
 	}
 
-	public int fenchant(ServerCommandSource source, Collection<? extends Entity> targets, Enchantment enchantment, int level) throws CommandSyntaxException {
+	public int fenchant(ServerCommandSource source, Collection<? extends Entity> targets, RegistryEntry.Reference<Enchantment> enchantment, int level) throws CommandSyntaxException {
 		int amt = 0;
 		for (Entity e : targets) {
 			if (e instanceof LivingEntity) {
 				LivingEntity le = (LivingEntity)e;
 				ItemStack stack = le.getMainHandStack();
 				if (!stack.isEmpty()) {
-					NbtCompound tag = stack.getOrCreateNbt();
-					if (!tag.contains("Enchantments", 9)) {
-						tag.put("Enchantments", new NbtList());
-					}
-
-					NbtList ench = tag.getList("Enchantments", NbtType.COMPOUND);
-					NbtCompound c = new NbtCompound();
-					c.putString("id", String.valueOf(Registries.ENCHANTMENT.getId(enchantment)));
-					c.putInt("lvl", level);
-					ench.add(c);
+					stack.addEnchantment(enchantment, level);
 					amt++;
 				} else if (targets.size() == 1) {
 					throw FeatureFabricationCommand.EXCETION_TYPE.create(Text.translatable("commands.enchant.failed.itemless", le.getName()));
@@ -113,9 +101,9 @@ public class FeatureIMore implements Feature {
 		}
 
 		if (targets.size() == 1) {
-			source.sendFeedback(()->Text.translatable("commands.enchant.success.single", enchantment.getName(level), targets.iterator().next().getDisplayName()), true);
+			source.sendFeedback(()->Text.translatable("commands.enchant.success.single", Enchantment.getName(enchantment, level), targets.iterator().next().getDisplayName()), true);
 		} else {
-			source.sendFeedback(()->Text.translatable("commands.enchant.success.multiple", enchantment.getName(level), targets.size()), true);
+			source.sendFeedback(()->Text.translatable("commands.enchant.success.multiple", Enchantment.getName(enchantment, level), targets.size()), true);
 		}
 
 		return amt;

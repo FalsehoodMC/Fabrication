@@ -19,7 +19,7 @@ public class MixinServerHandshakeNetworkHandler {
 	@Shadow @Final
 	private MinecraftServer server;
 
-	@FabModifyArg(at=@At(value="INVOKE", target="Lnet/minecraft/network/ClientConnection;setPacketListener(Lnet/minecraft/network/listener/PacketListener;)V"), method="onHandshake(Lnet/minecraft/network/packet/c2s/handshake/HandshakeC2SPacket;)V")
+	@FabModifyArg(at=@At(value="INVOKE", target="net/minecraft/server/network/ServerQueryNetworkHandler.<init>(Lnet/minecraft/server/ServerMetadata;Lnet/minecraft/network/ClientConnection;)V"), method="onHandshake(Lnet/minecraft/network/packet/c2s/handshake/HandshakeC2SPacket;)V")
 	public PacketListener onRequest(PacketListener listener) {
 		if (listener instanceof SetServerAware) ((SetServerAware) listener).fabrication$pingSetServer(server);
 		return listener;

@@ -1,9 +1,9 @@
 package com.unascribed.fabrication.mixin.g_weird_tweaks.dimensional_tools;
 
 import com.unascribed.fabrication.FabConf;
+import net.minecraft.recipe.input.CraftingRecipeInput;
+import net.minecraft.registry.RegistryWrapper;
 import com.unascribed.fabrication.support.injection.FabInject;
-import net.minecraft.inventory.RecipeInputInventory;
-import net.minecraft.registry.DynamicRegistryManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -11,7 +11,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.unascribed.fabrication.features.FeatureDimensionalTools;
 import com.unascribed.fabrication.support.EligibleIf;
 
-import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.ShapedRecipe;
 
@@ -19,10 +18,10 @@ import net.minecraft.recipe.ShapedRecipe;
 @EligibleIf(configAvailable="*.dimensional_tools")
 public class MixinShapedRecipe {
 
-	@FabInject(at=@At("RETURN"), method="craft(Lnet/minecraft/inventory/RecipeInputInventory;Lnet/minecraft/registry/DynamicRegistryManager;)Lnet/minecraft/item/ItemStack;")
-	public void craft(RecipeInputInventory inv, DynamicRegistryManager dynamicRegistryManager, CallbackInfoReturnable<ItemStack> ci) {
+	@FabInject(at=@At("RETURN"), method="craft(Lnet/minecraft/recipe/input/CraftingRecipeInput;Lnet/minecraft/registry/RegistryWrapper$WrapperLookup;)Lnet/minecraft/item/ItemStack;")
+	public void craft(CraftingRecipeInput inv, RegistryWrapper.WrapperLookup wrapperLookup, CallbackInfoReturnable<ItemStack> cir) {
 		if (!FabConf.isEnabled("*.dimensional_tools")) return;
-		FeatureDimensionalTools.handleCraft(inv, ci.getReturnValue());
+		FeatureDimensionalTools.handleCraft(inv, cir.getReturnValue());
 	}
 
 }

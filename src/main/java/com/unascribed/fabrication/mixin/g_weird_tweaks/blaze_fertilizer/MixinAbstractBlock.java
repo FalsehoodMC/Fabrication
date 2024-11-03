@@ -2,6 +2,7 @@ package com.unascribed.fabrication.mixin.g_weird_tweaks.blaze_fertilizer;
 
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.injection.FabInject;
+import net.minecraft.util.ItemActionResult;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -17,7 +18,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -27,10 +27,9 @@ import net.minecraft.world.World;
 @EligibleIf(configAvailable="*.blaze_fertilizer")
 public abstract class MixinAbstractBlock {
 
-	@FabInject(method="onUse(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;",
+	@FabInject(method="onUseWithItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ItemActionResult;",
 			at=@At("HEAD"), cancellable=true)
-	public void onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, CallbackInfoReturnable<ActionResult> cir) {
-		ItemStack items = player.getStackInHand(hand);
+	public void onUse(ItemStack items, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, CallbackInfoReturnable<ItemActionResult> cir) {
 		if (FabConf.isEnabled("*.blaze_fertilizer") && world instanceof ServerWorld && items.getItem().equals(Items.BLAZE_POWDER)
 				&& state.getBlock().equals(Blocks.NETHER_WART) && state.get(NetherWartBlock.AGE) < 3) {
 			world.setBlockState(hit.getBlockPos(), state.with(NetherWartBlock.AGE, Math.min(world.random.nextInt(3) + state.get(NetherWartBlock.AGE), 3)), 2);
@@ -38,7 +37,7 @@ public abstract class MixinAbstractBlock {
 			if (!player.isCreative()) {
 				items.decrement(1);
 			}
-			cir.setReturnValue(ActionResult.SUCCESS);
+			cir.setReturnValue(ItemActionResult.SUCCESS);
 		}
 	}
 }

@@ -15,8 +15,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @EligibleIf(configAvailable="*.old_tooltip", envMatches=Env.CLIENT, specialConditions=SpecialEligibility.FORGE)
 public abstract class MixinTooltipBackgroundRendererForge {
 
-	@FabInject(method="renderTooltipBackground(Lnet/minecraft/client/gui/GuiGraphics;IIIIIIIII)V", at=@At("HEAD"), cancellable=true, remap=false)
-	private static void oldTooltip(DrawContext context, int x, int y, int width, int height, int z, int backgroundTop, int backgroundBottom, int borderTop, int borderBottom, CallbackInfo ci) {
+	@FabInject(method="render(Lnet/minecraft/client/gui/DrawContext;IIIII)V", at=@At("HEAD"), cancellable=true)
+	private static void oldTooltip(DrawContext context, int x, int y, int width, int height, int z, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.old_tooltip")) return;
 		context.fillGradient(x-3, y-3, x+width+3, y+height+3, z, -1073741824, -1073741824);
 		ci.cancel();

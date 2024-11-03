@@ -6,7 +6,6 @@ import com.unascribed.fabrication.interfaces.SetCrawling;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
 import com.unascribed.fabrication.support.Feature;
-
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.util.ByteBufCustomPayload;
 import io.netty.buffer.Unpooled;
@@ -53,7 +52,7 @@ public class FeatureCrawling implements Feature {
 		FeatureCrawling.forced = forced;
 		PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
 		data.writeBoolean(state);
-		MinecraftClient.getInstance().getNetworkHandler().getConnection().send(new CustomPayloadC2SPacket(new ByteBufCustomPayload(new Identifier("fabrication", "crawling"), data)));
+		MinecraftClient.getInstance().getNetworkHandler().getConnection().send(new CustomPayloadC2SPacket(new ByteBufCustomPayload(Identifier.of("fabrication", "crawling"), data)));
 		((SetCrawling)MinecraftClient.getInstance().player).fabrication$setCrawling(state);
 	}
 

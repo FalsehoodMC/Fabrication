@@ -17,7 +17,7 @@ import net.minecraft.world.World;
 @EligibleIf(configAvailable="*.static_dragon_egg")
 public class MixinDragonEggBlock {
 
-	@FabInject(method= "teleport(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V",
+	@FabInject(method="teleport(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V",
 			at=@At("HEAD"), cancellable=true)
 	public void stopTeleport(BlockState state, World world, BlockPos pos, CallbackInfo ci) {
 		if (FabConf.isEnabled("*.static_dragon_egg"))

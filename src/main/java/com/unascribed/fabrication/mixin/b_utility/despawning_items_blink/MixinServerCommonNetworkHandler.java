@@ -28,7 +28,7 @@ public class MixinServerCommonNetworkHandler {
 		ServerPlayerEntity player = ((ServerPlayNetworkHandler) self).getPlayer();
 		CustomPayload payload = packet.payload();
 		if (!(payload instanceof ByteBufCustomPayload)) return;
-		Identifier channel = payload.id();
+		Identifier channel = payload.getId().id();
 		if (channel.getNamespace().equals("fabrication") && channel.getPath().equals("item_despawn")) {
 			if (player instanceof SetItemDespawnAware) {
 				FabLog.debug("Enabling item despawn syncing for "+player.getName());

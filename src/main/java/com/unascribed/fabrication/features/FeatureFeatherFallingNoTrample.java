@@ -2,7 +2,7 @@ package com.unascribed.fabrication.features;
 
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.feature.SimplePredicateFeature;
-import net.minecraft.enchantment.EnchantmentHelper;
+import com.unascribed.fabrication.util.EnchantmentHelperHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
 
@@ -18,7 +18,7 @@ public class FeatureFeatherFallingNoTrample extends SimplePredicateFeature {
 
 	public FeatureFeatherFallingNoTrample() {
 		super("*.no_trample",
-				(Predicate<LivingEntity>) livingEntity -> EnchantmentHelper.getEquipmentLevel(Enchantments.FEATHER_FALLING, livingEntity)>=1
+				(Predicate<LivingEntity>) livingEntity -> EnchantmentHelperHelper.getEquipmentLevel(Enchantments.FEATHER_FALLING, livingEntity)>=1
 		);
 	}
 }

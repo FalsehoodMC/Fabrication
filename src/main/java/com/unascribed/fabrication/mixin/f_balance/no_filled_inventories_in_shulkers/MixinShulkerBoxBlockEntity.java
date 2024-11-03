@@ -23,12 +23,10 @@ public class MixinShulkerBoxBlockEntity {
 		if (!FabConf.isEnabled("*.no_filled_inventories_in_shulkers")) return;
 		if (ItemNbtScanner.hasItemInvNBT(stack)) {
 			cir.setReturnValue(false);
-			cir.cancel();
 			return;
 		}
-		if ((Block.getBlockFromItem(stack.getItem()) instanceof ShulkerBoxBlock)) {
+		if (Block.getBlockFromItem(stack.getItem()) instanceof ShulkerBoxBlock) {
 			cir.setReturnValue(true);
-			cir.cancel();
 		}
 	}
 }

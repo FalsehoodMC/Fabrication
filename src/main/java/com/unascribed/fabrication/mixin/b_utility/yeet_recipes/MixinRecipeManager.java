@@ -14,8 +14,10 @@ import com.unascribed.fabrication.loaders.LoaderYeetRecipes;
 import com.unascribed.fabrication.support.EligibleIf;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 
-import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeManager;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.resource.ResourceManager;
@@ -27,11 +29,17 @@ import net.minecraft.util.profiler.Profiler;
 public class MixinRecipeManager {
 
 	@Shadow
-	private Map<RecipeType<?>, Map<Identifier, Recipe<?>>> recipes;
+	private Map<Identifier, RecipeEntry<?>> recipesById;
+
+	@Shadow
+	private Multimap<RecipeType<?>, RecipeEntry<?>> recipesByType;
 
 	@FabInject(at=@At("TAIL"), method="apply(Ljava/util/Map;Lnet/minecraft/resource/ResourceManager;Lnet/minecraft/util/profiler/Profiler;)V")
 	public void apply(Map<Identifier, JsonElement> map, ResourceManager rm, Profiler profiler, CallbackInfo ci) {
-		recipes = Maps.transformValues(recipes, m -> Maps.filterKeys(m, k -> !FabConf.isEnabled("*.yeet_recipes") || !LoaderYeetRecipes.recipesToYeet.contains(k)));
+		if (FabConf.isEnabled("*.yeet_recipes")) {
+			recipesById = Maps.filterKeys(recipesById, id -> !LoaderYeetRecipes.recipesToYeet.contains(id));
+			recipesByType = Multimaps.filterEntries(recipesByType, entry -> !LoaderYeetRecipes.recipesToYeet.contains(entry.getValue().id()));
+		}
 	}
 
 }

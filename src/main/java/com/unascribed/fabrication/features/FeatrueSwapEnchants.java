@@ -30,7 +30,7 @@ public class FeatrueSwapEnchants implements Feature {
 				if (pressed) {
 					PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
 					data.writeBoolean(pressed);
-					MinecraftClient.getInstance().getNetworkHandler().getConnection().send(new CustomPayloadC2SPacket(new ByteBufCustomPayload(new Identifier("fabrication", "swap_conflicting_enchants"), data)));
+					MinecraftClient.getInstance().getNetworkHandler().getConnection().send(new CustomPayloadC2SPacket(new ByteBufCustomPayload(Identifier.of("fabrication", "swap_conflicting_enchants"), data)));
 
 				}
 				super.setPressed(pressed);

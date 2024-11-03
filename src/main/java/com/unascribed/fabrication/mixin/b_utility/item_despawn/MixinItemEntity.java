@@ -1,13 +1,17 @@
 package com.unascribed.fabrication.mixin.b_utility.item_despawn;
 
 import java.util.Map;
-import java.util.UUID;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.FailOn;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.injection.FabInject;
 import com.unascribed.fabrication.support.injection.FabModifyConst;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.EnchantmentTags;
 import net.minecraft.registry.tag.TagKey;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -44,6 +48,7 @@ import net.minecraft.world.World;
 
 @Mixin(ItemEntity.class)
 @EligibleIf(configAvailable="*.item_despawn")
+@FailOn(invertedSpecialConditions={SpecialEligibility.FORGE, SpecialEligibility.NOT_FORGE}) //TODO LoaderItemDespawn
 public abstract class MixinItemEntity extends Entity implements SetFromPlayerDeath {
 
 	public MixinItemEntity(EntityType<?> type, World world) {
@@ -73,7 +78,7 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 		int worldBottom = getWorld().getBottomY();
 		if (getPos().y < worldBottom-32) {
 			if (fabrication$invincible) {
-				teleport(getPos().x, worldBottom+1, getPos().z);
+				requestTeleport(getPos().x, worldBottom+1, getPos().z);
 				setVelocity(0,0,0);
 				if (!getWorld().isClient) {
 					((ServerWorld)getWorld()).getChunkManager().sendToNearbyPlayers(this, new EntityPositionS2CPacket(this));
@@ -125,8 +130,8 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 		}
 		if (!time.priority) {
 			if (debug) System.out.println("Not priority, check enchantments");
-			for (Enchantment e : EnchantmentHelper.get(stack).keySet()) {
-				if (e.isCursed()) {
+			for (RegistryEntry<Enchantment> e : EnchantmentHelper.getEnchantments(stack).getEnchantments()) {
+				if (e.isIn(EnchantmentTags.CURSE)) {
 					if (LoaderItemDespawn.curseDespawn.overshadows(time)) {
 						if (debug) System.out.println("Found a curse; curseDespawn overshadows: "+LoaderItemDespawn.curseDespawn);
 						time = LoaderItemDespawn.curseDespawn;
@@ -136,14 +141,14 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 						if (debug) System.out.println("Found an enchantment; normalEnchDespawn overshadows: "+LoaderItemDespawn.normalEnchDespawn);
 						time = LoaderItemDespawn.normalEnchDespawn;
 					}
-					if (e.isTreasure()) {
+					if (e.isIn(EnchantmentTags.TREASURE)) {
 						if (LoaderItemDespawn.treasureDespawn.overshadows(time)) {
 							if (debug) System.out.println("Found a treasure enchantment; treasureDespawn overshadows: "+LoaderItemDespawn.treasureDespawn);
 							time = LoaderItemDespawn.treasureDespawn;
 						}
 					}
 				}
-				ParsedTime enchTime = LoaderItemDespawn.enchDespawns.get(Resolvable.mapKey(e, Registries.ENCHANTMENT));
+				ParsedTime enchTime = LoaderItemDespawn.enchDespawns.get(Resolvable.mapKey(e.getIdAsString(), getRegistryManager().get(RegistryKeys.ENCHANTMENT)));
 				if (enchTime != null && enchTime.overshadows(time)) {
 					if (debug) System.out.println("Found a specific enchantment; it overshadows: "+enchTime);
 					time = enchTime;
@@ -168,15 +173,15 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 					}
 				}
 			}
-			if (stack.hasNbt()) {
-				if (stack.hasCustomName() && LoaderItemDespawn.renamedDespawn.overshadows(time)) {
-					if (debug) System.out.println("Item is renamed; renamedDespawn overshadows: "+LoaderItemDespawn.renamedDespawn);
-					time = LoaderItemDespawn.renamedDespawn;
-				}
+			if (stack.contains(DataComponentTypes.CUSTOM_NAME) && LoaderItemDespawn.renamedDespawn.overshadows(time)) {
+				if (debug) System.out.println("Item is renamed; renamedDespawn overshadows: "+LoaderItemDespawn.renamedDespawn);
+				time = LoaderItemDespawn.renamedDespawn;
+			}
+			if (stack.contains(DataComponentTypes.CUSTOM_DATA)) {
 				for (Map.Entry<String, ParsedTime> en : LoaderItemDespawn.nbtBools.entrySet()) {
-					if (stack.getNbt().getBoolean(en.getKey())) {
+					if (stack.get(DataComponentTypes.CUSTOM_DATA).getNbt().getBoolean(en.getKey())) {
 						if (en.getValue().overshadows(time)) {
-							if (debug) System.out.println("Found an NBT tag; it overshadows: "+en.getValue());
+							if (debug) System.out.println("Found an NBT tag; it overshadows: " + en.getValue());
 							time = en.getValue();
 						}
 					}

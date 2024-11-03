@@ -12,8 +12,8 @@ import net.minecraft.util.math.BlockPointer;
 import net.minecraft.util.math.BlockPos;
 
 //"""forgery reasons""" #657
-public class BlazeFertilizerDispencerBehavior extends ItemDispenserBehavior {
-	public static BlazeFertilizerDispencerBehavior INSTANCE = new BlazeFertilizerDispencerBehavior();
+public class BlazeFertilizerDispenserBehavior extends ItemDispenserBehavior {
+	public static BlazeFertilizerDispenserBehavior INSTANCE = new BlazeFertilizerDispenserBehavior();
 	@Override
 	protected ItemStack dispenseSilently(BlockPointer pointer, ItemStack stack) {
 		BlockPos pos = pointer.pos().offset(pointer.state().get(DispenserBlock.FACING));

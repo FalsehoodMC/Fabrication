@@ -1,37 +1,35 @@
 package com.unascribed.fabrication.mixin._general.sync;
 
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.mojang.brigadier.ParseResults;
+import com.unascribed.fabrication.client.FScriptScreen;
+import com.unascribed.fabrication.interfaces.GetServerConfig;
 import com.unascribed.fabrication.support.ConfigValues;
+import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.Env;
+import com.unascribed.fabrication.support.injection.FabInject;
 import com.unascribed.fabrication.util.ByteBufCustomPayload;
+import io.netty.buffer.Unpooled;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientCommonNetworkHandler;
 import net.minecraft.client.network.ClientConnectionState;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.command.CommandSource;
+import net.minecraft.network.ClientConnection;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
+import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
+import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.unascribed.fabrication.client.FScriptScreen;
-import com.unascribed.fabrication.interfaces.GetServerConfig;
-import com.unascribed.fabrication.support.EligibleIf;
-import com.unascribed.fabrication.support.Env;
-
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
-import io.netty.buffer.Unpooled;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.network.ClientConnection;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
-import net.minecraft.util.Identifier;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 @Mixin(ClientPlayNetworkHandler.class)
 @EligibleIf(envMatches=Env.CLIENT)
@@ -47,6 +45,7 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
 	private final Map<String, String> fabrication$serverFailedConfig = Maps.newHashMap();
 	private final Set<String> fabrication$serverBanned = Sets.newHashSet();
 	private String fabrication$serverVersion;
+	private final Random fabrication$random = new Random();
 
 	protected MixinClientPlayNetworkHandler(MinecraftClient client, ClientConnection connection, ClientConnectionState connectionState) {
 		super(client, connection, connectionState);
@@ -57,20 +56,20 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
 		PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
 		data.writeVarInt(0);
 		data.writeVarInt(1);
-		connection.send(new CustomPayloadC2SPacket(new ByteBufCustomPayload(new Identifier("fabrication", "config"), data)));
+		connection.send(new CustomPayloadC2SPacket(new ByteBufCustomPayload(Identifier.of("fabrication", "config"), data)));
 	}
 
 	@FabInject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/CustomPayload;)V", cancellable=true)
 	public void onCustomPayload(CustomPayload payload, CallbackInfo ci) {
 		if (!(payload instanceof ByteBufCustomPayload)) return;
 
-		if (payload.id().getNamespace().equals("fabrication")) {
-			if (payload.id().getPath().equals("config") || payload.id().getPath().equals("config2")) {
+		if (payload.getId().id().getNamespace().equals("fabrication")) {
+			if (payload.getId().id().getPath().equals("config") || payload.getId().id().getPath().equals("config2")) {
 				try {
 					fabrication$hasHandshook = true;
-					PacketByteBuf buf = ((ByteBufCustomPayload) payload).buf;
+					PacketByteBuf buf = ((ByteBufCustomPayload) payload).buf();
 					int reqVer = 0;
-					if (payload.id().getPath().equals("config2")) {
+					if (payload.getId().id().getPath().equals("config2")) {
 						reqVer = buf.readVarInt();
 					}
 					int trileanKeys = buf.readVarInt();
@@ -120,9 +119,9 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
 					e.printStackTrace();
 					throw e;
 				}
-			}else if (payload.id().getPath().equals("fscript")){
+			}else if (payload.getId().id().getPath().equals("fscript")){
 				try{
-					PacketByteBuf buf = ((ByteBufCustomPayload) payload).buf;
+					PacketByteBuf buf = ((ByteBufCustomPayload) payload).buf();
 					int code = buf.readVarInt();
 					if (code == 0){
 						if (client.currentScreen instanceof FScriptScreen){

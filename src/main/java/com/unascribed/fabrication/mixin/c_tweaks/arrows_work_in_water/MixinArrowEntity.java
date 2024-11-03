@@ -15,8 +15,8 @@ import net.minecraft.world.World;
 @EligibleIf(configAvailable="*.arrows_work_in_water")
 public abstract class MixinArrowEntity extends PersistentProjectileEntity {
 
-	protected MixinArrowEntity(EntityType<? extends PersistentProjectileEntity> type, World world, ItemStack stack) {
-		super(type, world, stack);
+	protected MixinArrowEntity(EntityType<? extends PersistentProjectileEntity> entityType, World world) {
+		super(entityType, world);
 	}
 
 	@Override

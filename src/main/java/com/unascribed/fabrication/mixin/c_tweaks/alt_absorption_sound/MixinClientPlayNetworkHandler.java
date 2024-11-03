@@ -1,5 +1,6 @@
 package com.unascribed.fabrication.mixin.c_tweaks.alt_absorption_sound;
 
+
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.support.EligibleIf;
@@ -23,9 +24,9 @@ public class MixinClientPlayNetworkHandler {
 	@FabInject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/CustomPayload;)V", cancellable=true)
 	public void onCustomPayload(CustomPayload payload, CallbackInfo ci) {
 		if (!(payload instanceof ByteBufCustomPayload)) return;
-		if (payload.id().getNamespace().equals("fabrication") && payload.id().getPath().equals("play_absorp_sound")) {
+		if (payload.getId().id().getNamespace().equals("fabrication") && payload.getId().id().getPath().equals("play_absorp_sound")) {
 			if (FabConf.isEnabled("*.alt_absorption_sound")) {
-				int id = ((ByteBufCustomPayload) payload).buf.readInt();
+				int id = ((ByteBufCustomPayload) payload).buf().readInt();
 				MinecraftClient.getInstance().send(() -> {
 					World world = MinecraftClient.getInstance().world;
 					if (world != null) {

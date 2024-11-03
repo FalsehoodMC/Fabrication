@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.At;
 @FailOn(modLoaded="forge:obfuscate")
 public class MixinSkullBlockEntityRenderer {
 
-	@FabModifyArg(at=@At(value="INVOKE", target="Lnet/minecraft/client/render/block/entity/SkullBlockEntityModel;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;IIFFFF)V"),
+	@FabModifyArg(at=@At(value="INVOKE", target="Lnet/minecraft/client/render/block/entity/SkullBlockEntityModel;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;II)V"),
 			method="renderSkull(Lnet/minecraft/util/math/Direction;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/client/render/block/entity/SkullBlockEntityModel;Lnet/minecraft/client/render/RenderLayer;)V",
 			index=3)
 	private static int fabrication$blinkSkull(int old){

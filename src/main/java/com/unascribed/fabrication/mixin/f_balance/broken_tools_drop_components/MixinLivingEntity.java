@@ -3,11 +3,17 @@ package com.unascribed.fabrication.mixin.f_balance.broken_tools_drop_components;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.injection.FabInject;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -33,7 +39,6 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.Hand;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -45,24 +50,21 @@ public abstract class MixinLivingEntity extends Entity {
 		super(type, world);
 	}
 
-	@FabInject(at=@At("HEAD"), method="sendEquipmentBreakStatus(Lnet/minecraft/entity/EquipmentSlot;)V")
-	public void sendEquipmentBreakStatus(EquipmentSlot slot, CallbackInfo ci) {
+	@FabInject(at=@At("HEAD"), method= "sendEquipmentBreakStatus(Lnet/minecraft/item/Item;Lnet/minecraft/entity/EquipmentSlot;)V")
+	public void sendEquipmentBreakStatus(Item item, EquipmentSlot slot, CallbackInfo ci) {
 		shatter(slot, ((LivingEntity)(Object)this).getEquippedStack(slot));
-	}
-
-	@FabInject(at=@At("HEAD"), method="sendToolBreakStatus(Lnet/minecraft/util/Hand;)V")
-	public void sendToolBreakStatus(Hand hand, CallbackInfo ci) {
-		shatter(hand == Hand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND, ((LivingEntity)(Object)this).getStackInHand(hand));
 	}
 
 	@Unique
 	private void shatter(EquipmentSlot slot, ItemStack stack) {
 		if (!FabConf.isEnabled("*.broken_tools_drop_components")) return;
 		Item item = stack.getItem();
-		if (LoaderGearComponents.ignoreVanishing && EnchantmentHelper.hasVanishingCurse(stack)) return;
-		if (stack.hasNbt() && stack.getNbt().getBoolean("fabrication:ShatteredAlready")) return;
-		if (!stack.hasNbt()) stack.setNbt(new NbtCompound());
-		stack.getNbt().putBoolean("fabrication:ShatteredAlready", true);
+		Optional<RegistryEntry.Reference<Enchantment>> vanishing = this.getRegistryManager().get(RegistryKeys.ENCHANTMENT).getEntry(Enchantments.VANISHING_CURSE);
+		if (LoaderGearComponents.ignoreVanishing && (vanishing.isEmpty() || stack.getEnchantments().getEnchantments().contains(vanishing.get()))) return;
+		if (stack.contains(DataComponentTypes.CUSTOM_DATA) && stack.get(DataComponentTypes.CUSTOM_DATA).getNbt().getBoolean("fabrication:ShatteredAlready")) return;
+		NbtCompound nbt = stack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).copyNbt();
+		nbt.putBoolean("fabrication:ShatteredAlready", true);
+		stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
 		List<ItemStack> enchantables = Lists.newArrayList();
 		for (ItemMaterialValue imv : LoaderGearComponents.items.get(Resolvable.mapKey(Registries.ITEM.getId(item), Registries.ITEM))) {
 			double dropChance = 1;
@@ -130,10 +132,10 @@ public abstract class MixinLivingEntity extends Entity {
 			}
 		}
 		if (enchantables.size() == 1) {
-			EnchantmentHelper.set(EnchantmentHelper.get(stack), enchantables.get(0));
+			EnchantmentHelper.set(stack, enchantables.getFirst().getEnchantments());
 		} else if (!enchantables.isEmpty()) {
-			for (Map.Entry<Enchantment, Integer> en : EnchantmentHelper.get(stack).entrySet()) {
-				int lvl = en.getValue();
+			for (Object2IntMap.Entry<RegistryEntry<Enchantment>> en : stack.getEnchantments().getEnchantmentEntries()) {
+				int lvl = en.getIntValue();
 				int[] values;
 				if (lvl == 1 || getWorld().random.nextInt(3) == 0) {
 					values = new int[] {lvl};

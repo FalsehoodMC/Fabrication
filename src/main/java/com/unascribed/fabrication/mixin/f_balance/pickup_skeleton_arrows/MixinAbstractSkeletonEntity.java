@@ -15,8 +15,8 @@ import net.minecraft.item.ItemStack;
 @Mixin(AbstractSkeletonEntity.class)
 @EligibleIf(configAvailable="*.pickup_skeleton_arrows")
 public abstract class MixinAbstractSkeletonEntity {
-	@FabInject(at=@At("RETURN"), method="createArrowProjectile(Lnet/minecraft/item/ItemStack;F)Lnet/minecraft/entity/projectile/PersistentProjectileEntity;", cancellable=true)
-	public void createArrowProjectile(ItemStack arrow, float damageModifier, CallbackInfoReturnable<PersistentProjectileEntity> cir) {
+	@FabInject(at=@At("RETURN"), method="createArrowProjectile(Lnet/minecraft/item/ItemStack;FLnet/minecraft/item/ItemStack;)Lnet/minecraft/entity/projectile/PersistentProjectileEntity;", cancellable=true)
+	public void createArrowProjectile(ItemStack arrow, float damageModifier, ItemStack shotFrom, CallbackInfoReturnable<PersistentProjectileEntity> cir) {
 		if(!FabConf.isEnabled("*.pickup_skeleton_arrows")) return;
 
 		PersistentProjectileEntity arrowEntity = cir.getReturnValue();

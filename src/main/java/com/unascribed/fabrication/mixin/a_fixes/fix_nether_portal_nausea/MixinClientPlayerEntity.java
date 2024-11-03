@@ -31,7 +31,7 @@ public abstract class MixinClientPlayerEntity extends PlayerEntity implements Po
 	private void fixPortalNausea(CallbackInfo ci){
 		if (!FabConf.isEnabled("*.fix_nether_portal_nausea")) return;
 		fabrication$lastClientPortalTicks = fabrication$nextClientPortalTicks;
-		if (inNetherPortal) {
+		if (portalManager != null && portalManager.isInPortal()) {
 			if (fabrication$nextClientPortalTicks < 1.0F){
 				fabrication$nextClientPortalTicks += 0.0125F;
 			}else if (fabrication$nextClientPortalTicks >= 1.0F){

@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.mixin.e_mechanics.obsidian_tears;
 
 import com.unascribed.fabrication.FabConf;
+import net.minecraft.component.DataComponentTypes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabInject;
@@ -22,7 +23,7 @@ public class MixinPotionItem {
 	@FabInject(at=@At("HEAD"), method="finishUsing(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/LivingEntity;)Lnet/minecraft/item/ItemStack;")
 	public void finishUsing(ItemStack stack, World world, LivingEntity quaffer, CallbackInfoReturnable<ItemStack> ci) {
 		if (!FabConf.isEnabled("*.obsidian_tears")) return;
-		if (quaffer instanceof ServerPlayerEntity && !world.isClient && stack.hasNbt() && stack.getNbt().getBoolean("fabrication:ObsidianTears")) {
+		if (quaffer instanceof ServerPlayerEntity && !world.isClient && stack.contains(DataComponentTypes.CUSTOM_DATA) && stack.get(DataComponentTypes.CUSTOM_DATA).getNbt().getBoolean("fabrication:ObsidianTears")) {
 			ObsidianTears.setSpawnPoint((ServerPlayerEntity)quaffer, stack);
 		}
 	}

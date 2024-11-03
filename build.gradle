@@ -4,17 +4,16 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath 'com.modrinth.minotaur:Minotaur:2.4.3'
+		classpath 'com.modrinth.minotaur:Minotaur:2.8.7'
 		classpath 'gradle.plugin.com.matthewprenger:CurseGradle:1.4.0'
-		classpath "com.github.breadmoirai:github-release:2.4.1"
+		classpath "com.github.breadmoirai:github-release:2.5.1"
 	}
 }
 
 import java.nio.file.Files
 
 plugins {
-	id 'fabric-loom' version '1.0-SNAPSHOT'
-	id 'io.github.juuxel.loom-quiltflower' version '1.6.0'
+	id 'fabric-loom' version '1.7-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -28,12 +27,12 @@ if (System.getenv("GITHUB_TOKEN")) {
 	apply plugin: "com.github.breadmoirai.github-release"
 }
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+sourceCompatibility = JavaVersion.VERSION_21
+targetCompatibility = JavaVersion.VERSION_21
 
 archivesBaseName = project.archives_base_name
 def origVersion = project.version
-version = project.version+"+1.20.4"
+version = project.version+"+1.21"
 group = project.maven_group
 
 repositories {
@@ -79,24 +78,24 @@ dependencies {
 	modImplementation fabricApi.module('fabric-api-base', project.fabric_version)
 	//Required by pridelib/modmenu
 	modImplementation fabricApi.module('fabric-resource-loader-v0', project.fabric_version)
-	modImplementation('io.github.queerbric:pridelib:1.1.2+1.19') {
+	modImplementation('io.github.queerbric:pridelib:1.2.1+1.21') {
 		transitive = false
 	}
 	//ModMenu dep
 	modImplementation fabricApi.module('fabric-lifecycle-events-v1', project.fabric_version)
 	modImplementation fabricApi.module('fabric-key-binding-api-v1', project.fabric_version)
-	modImplementation('com.terraformersmc:modmenu:9.0.0-pre.1') {
+	modImplementation('com.terraformersmc:modmenu:11.0.2') {
 		transitive = false
 	}
-	modImplementation 'com.unascribed:ears-api:1.4.5'
-	modImplementation('tf.ssf.sfort:fscript:3.2.3') {
+	modImplementation 'com.unascribed:ears-api:1.4.6'
+	modImplementation('tf.ssf.sfort:fscript:3.2.4') {
 		transitive = false
 	}
-	modImplementation(include('com.unascribed:lib39-deferral:1.5.0-pre2.2+1.19.3'))
+	modImplementation(include('com.unascribed:lib39-deferral:1.5.0-experimental6.1+1.20.1'))
 	modRuntimeOnly fabricApi.module('fabric-screen-api-v1', project.fabric_version)
 
 	annotationProcessor project(':ap')
-	implementation 'com.google.code.gson:gson:2.8.9'
+	implementation 'com.google.code.gson:gson:2.11.0'
 }
 
 loom.accessWidenerPath = file('src/main/resources/fabrication.accesswidener')
@@ -149,155 +148,158 @@ jar {
 				'processLoadingcom.unascribed.fabrication.mixin.e_mechanics.obsidian_tears.MixinModelLoaderForge',
 				'method_27884com.unascribed.fabrication.mixin.f_balance.disable_elytra.MixinModelPredicateProviderRegistry'
 		)
-		def lge = project.getExtensions().getByType(net.fabricmc.loom.api.LoomGradleExtensionAPI.class)
-		def mappings = lge.getMappingsProvider().getMappings()
-		Map<String, Mapp> toInter = new HashMap<>()
-		List<String> fabRefl = Files.readAllLines(file('build/tmp/fabReflToMap').toPath())
+        def lge = net.fabricmc.loom.LoomGradleExtension.get(project)
+        try (def serviceManager = new net.fabricmc.loom.util.service.ScopedSharedServiceManager()) {
+            def mappings = lge.getMappingConfiguration().getMappingsService(serviceManager).getMappingTree()
+            project(":ap").tasks.run.exec()
+            Map<String, Mapp> toInter = new HashMap<>()
+            List<String> fabRefl = Files.readAllLines(file('build/tmp/fabReflToMap').toPath())
 
-		for (String f : fabRefl) {
-			if (f == null) continue
-			Mapp.Target toTarget = new Mapp.Target(f)
-			if (toInter.containsKey('FabRefl')) toInter.get('FabRefl').target.add(toTarget)
-			else toInter.put('FabRefl', new Mapp(new String[]{}, new String[]{}, new Mapp.Target[]{toTarget}))
+            for (String f : fabRefl) {
+                if (f == null) continue
+                Mapp.Target toTarget = new Mapp.Target(f)
+                if (toInter.containsKey('FabRefl')) toInter.get('FabRefl').target.add(toTarget)
+                else toInter.put('FabRefl', new Mapp(new String[]{}, new String[]{}, new Mapp.Target[]{toTarget}))
 
-		}
+            }
 
-		List<String> toParse = Files.readAllLines(file('build/tmp/fabToRefMap').toPath())
-		for (int i=0; i+3<toParse.size(); i++){
-			String toInterKey = toParse.get(i)
-			Mapp toAdd = new Mapp(toParse.get(++i).split('\t'), toParse.get(++i).split('\t'), toParse.get(++i).split('\t'))
-			if (toInter.containsKey(toInterKey)) toInter.get(toInterKey).add(toAdd)
-			else toInter.put(toInterKey, toAdd)
-		}
-		Map<String, String> fieldMap = new HashMap<>()
-		Map<String, String> targetMap = new HashMap<>()
-		Map<String, String> methodMap = new HashMap<>()
-		Map<String, String> classMap = new HashMap<>()
+            List<String> toParse = Files.readAllLines(file('build/tmp/fabToRefMap').toPath())
+            for (int i = 0; i + 3 < toParse.size(); i++) {
+                String toInterKey = toParse.get(i)
+                Mapp toAdd = new Mapp(toParse.get(++i).split('\t'), toParse.get(++i).split('\t'), toParse.get(++i).split('\t'))
+                if (toInter.containsKey(toInterKey)) toInter.get(toInterKey).add(toAdd)
+                else toInter.put(toInterKey, toAdd)
+            }
+            Map<String, String> fieldMap = new HashMap<>()
+            Map<String, String> targetMap = new HashMap<>()
+            Map<String, String> methodMap = new HashMap<>()
+            Map<String, String> classMap = new HashMap<>()
 
-		for (def map : toInter.values()){
-			for (def cl : mappings.classes){
-                String clName = cl.getName('named')
-                String clNameRez = cl.getName('intermediary')
-                String dottedClName = clName.replace('/', '.')
-				if (map.mixin.contains(dottedClName)) {
-					for (def clMethod : cl.methods) {
-						for (String mthd : map.method) {
-							int col = mthd.indexOf(';')
-							int dot = mthd.indexOf('.')
-							if (col == -1 || dot < col && dot != -1) col = dot
-							int brc = mthd.indexOf('(')
-							if (brc == -1) continue
-							String desc = mthd.substring(brc)
-							String name = mthd.substring(col == -1 || brc<col ? 0 : col+1, brc)
-							if ((name.equals(clMethod.getName('named')) || name.equals(clMethod.getName('intermediary'))) && (desc.equals(clMethod.getDesc('named')) || desc.equals(clMethod.getDesc('intermediary')))) {
-								methodMap.put(clName+';'+name+desc, clMethod.getName('intermediary') + clMethod.getDesc('intermediary'))
-							}
-						}
-					}
-				}
-				for (Mapp.Target mapt : map.target) {
-					String target = mapt.self
-					int col = target.indexOf(';')
-					int dot = target.indexOf('.')
-					if (col == -1 || dot < col && dot != -1) col = dot
-					if (mapt.applicable.contains(dottedClName)){
-						classMap.put(clName, clNameRez)
-						int brc = target.indexOf('(')
-						if (brc == -1) {
-							int cindx = target.lastIndexOf(':')
-							String name = target.substring(col+1, cindx == -1 ? target.length() : cindx)
-							for (def clField : cl.fields) {
-								if (clField.getName('named').equals(name) || clField.getName('intermediary').equals(name)){
-									fieldMap.put(target, clField.getName('intermediary')+":"+clField.getDesc('intermediary'))
-								}
-							}
-							continue
-						}
-						String desc = target.substring(brc)
-						String name = target.substring(col+1, brc)
-						for (def clMethod : cl.methods) {
-							if ((clMethod.getName('named').equals(name) || clMethod.getName('intermediary').equals(name)) && (clMethod.getDesc('named').equals(desc) || clMethod.getDesc('intermediary').equals(desc))){
-								targetMap.put(target, clMethod.getName('intermediary')+clMethod.getDesc('intermediary'))
-							}
-						}
-					}
-				}
-			}
-            //basic <init> pass because #656
-            {
-                for (Mapp.Target mapt : map.target) {
-                    String target = mapt.self
-                    int col = target.indexOf(';')
-                    int dot = target.indexOf('.')
-                    if (col == -1 || dot < col && dot != -1) col = dot
-                    int brc = target.indexOf('(')
-                    if (brc == -1) {
-                        continue
+            for (def map : toInter.values()) {
+                for (def cl : mappings.getClasses()) {
+                    String clName = cl.getName('named')
+                    String clNameRez = cl.getName('intermediary')
+                    String dottedClName = clName.replace('/', '.')
+                    if (map.mixin.contains(dottedClName)) {
+                        for (def clMethod : cl.methods) {
+                            for (String mthd : map.method) {
+                                int col = mthd.indexOf(';')
+                                int dot = mthd.indexOf('.')
+                                if (col == -1 || dot < col && dot != -1) col = dot
+                                int brc = mthd.indexOf('(')
+                                if (brc == -1) continue
+                                String desc = mthd.substring(brc)
+                                String name = mthd.substring(col == -1 || brc < col ? 0 : col + 1, brc)
+                                if ((name.equals(clMethod.getName('named')) || name.equals(clMethod.getName('intermediary'))) && (desc.equals(clMethod.getDesc('named')) || desc.equals(clMethod.getDesc('intermediary')))) {
+                                    methodMap.put(clName + ';' + name + desc, clMethod.getName('intermediary') + clMethod.getDesc('intermediary'))
+                                }
+                            }
+                        }
                     }
-                    String desc = target.substring(brc)
-                    String name = target.substring(col+1, brc)
-                    if (!"<init>".equals(name)) continue
-                    //TODO map desc
-                    if (!"()V".equals(desc)) continue
-                    String claz = target.substring(0, col)
-                    for (def cl : mappings.classes) {
-                        String clName = cl.getName('named')
-                        if (claz.endsWith(clName)) {
-                            targetMap.put(target, "<init>()V")
+                    for (Mapp.Target mapt : map.target) {
+                        String target = mapt.self
+                        int col = target.indexOf(';')
+                        int dot = target.indexOf('.')
+                        if (col == -1 || dot < col && dot != -1) col = dot
+                        if (mapt.applicable.contains(dottedClName)) {
+                            classMap.put(clName, clNameRez)
+                            int brc = target.indexOf('(')
+                            if (brc == -1) {
+                                int cindx = target.lastIndexOf(':')
+                                String name = target.substring(col + 1, cindx == -1 ? target.length() : cindx)
+                                for (def clField : cl.fields) {
+                                    if (clField.getName('named').equals(name) || clField.getName('intermediary').equals(name)) {
+                                        fieldMap.put(target, clField.getName('intermediary') + ":" + clField.getDesc('intermediary'))
+                                    }
+                                }
+                                continue
+                            }
+                            String desc = target.substring(brc)
+                            String name = target.substring(col + 1, brc)
+                            for (def clMethod : cl.methods) {
+                                if ((clMethod.getName('named').equals(name) || clMethod.getName('intermediary').equals(name)) && (clMethod.getDesc('named').equals(desc) || clMethod.getDesc('intermediary').equals(desc))) {
+                                    targetMap.put(target, clMethod.getName('intermediary') + clMethod.getDesc('intermediary'))
+                                }
+                            }
+                        }
+                    }
+                }
+                //basic <init> pass because #656
+                {
+                    for (Mapp.Target mapt : map.target) {
+                        String target = mapt.self
+                        int col = target.indexOf(';')
+                        int dot = target.indexOf('.')
+                        if (col == -1 || dot < col && dot != -1) col = dot
+                        int brc = target.indexOf('(')
+                        if (brc == -1) {
+                            continue
+                        }
+                        String desc = target.substring(brc)
+                        String name = target.substring(col + 1, brc)
+                        if (!"<init>".equals(name)) continue
+                        //TODO map desc
+                        if (!"()V".equals(desc)) continue
+                        String claz = target.substring(0, col)
+                        for (def cl : mappings.classes) {
+                            String clName = cl.getName('named')
+                            if (claz.endsWith(clName)) {
+                                targetMap.put(target, "<init>()V")
+                            }
                         }
                     }
                 }
             }
-		}
-		StringBuilder bldrRel = new StringBuilder()
-		Map<String, String> bldrAbs = new HashMap<>()
-		for (Map.Entry<String, Mapp> intr : toInter){
-			for (Mapp.Target tar : intr.value.target){
-				String s = tar.self
-				String ad = targetMap.get(s)
-				if (ad == null) ad = fieldMap.get(s)
-				if (ad != null) {
-					int col = s.indexOf(';')
-					int dot = s.indexOf('.')
-					if (col == -1 || dot < col && dot != -1) col = dot
-					bldrAbs.put(s, 'L'+classMap.get(s.substring(s.charAt(0) == 'L' as char ? 1 : 0, col))+';'+ad)
-				} else if (!s.isBlank() && !expectedFailThatFailsAutoFilter.contains(s+intr.key)
-					&& !s.startsWith("Ljava/lang/") && !s.startsWith("com/mojang/blaze3d/")
-				) {
-					logger.log(LogLevel.ERROR, "Failed to map "+s+" for "+intr.key)
-				}
-			}
-			boolean frst = true
-			StringBuilder bldrRelIntern = new StringBuilder()
-			for (String s : intr.value.method) {
-				boolean missedMthd = true
-				for (String c : intr.value.mixin) {
-					String set = methodMap.get(c.replace('.', '/')+';'+s)
-					if (set != null){
-						if (frst) frst = false;
-						else bldrRelIntern.append('\t')
-						bldrRelIntern.append(s).append(' ').append(set)
-						missedMthd = false
-						break
-					}
-				}
-				if (missedMthd && !s.isBlank() && !expectedFailThatFailsAutoFilter.contains(s+intr.key) && !s.equals("<init>")) {
-					logger.log(LogLevel.ERROR, "Failed to map "+s+" for "+intr.key)
-				}
-			}
-			if (!bldrRelIntern.isEmpty()) {
-				if (!bldrRel.isEmpty()) bldrRel.append('\n')
-				bldrRel.append(intr.key)
-				bldrRel.append('\n')
-				bldrRel.append(bldrRelIntern)
-			}
-		}
-		file('build/tmp/fabRelRefMap.txt').text = bldrRel.toString()
-		bldrRel = new StringBuilder()
-		for (Map.Entry<String, String> entry : bldrAbs) {
-			bldrRel.append(entry.key).append(' ').append(entry.value).append('\n')
-		}
-		file('build/tmp/fabAbsRefMap.txt').text = bldrRel.toString()
+            StringBuilder bldrRel = new StringBuilder()
+            Map<String, String> bldrAbs = new HashMap<>()
+            for (Map.Entry<String, Mapp> intr : toInter) {
+                for (Mapp.Target tar : intr.value.target) {
+                    String s = tar.self
+                    String ad = targetMap.get(s)
+                    if (ad == null) ad = fieldMap.get(s)
+                    if (ad != null) {
+                        int col = s.indexOf(';')
+                        int dot = s.indexOf('.')
+                        if (col == -1 || dot < col && dot != -1) col = dot
+                        bldrAbs.put(s, 'L' + classMap.get(s.substring(s.charAt(0) == 'L' as char ? 1 : 0, col)) + ';' + ad)
+                    } else if (!s.isBlank() && !expectedFailThatFailsAutoFilter.contains(s + intr.key)
+                            && !s.startsWith("Ljava/lang/") && !s.startsWith("Ljava/util/") && !s.startsWith("com/mojang/blaze3d/")
+                    ) {
+                        logger.log(LogLevel.ERROR, "Failed to map " + s + " for " + intr.key)
+                    }
+                }
+                boolean frst = true
+                StringBuilder bldrRelIntern = new StringBuilder()
+                for (String s : intr.value.method) {
+                    boolean missedMthd = true
+                    for (String c : intr.value.mixin) {
+                        String set = methodMap.get(c.replace('.', '/') + ';' + s)
+                        if (set != null) {
+                            if (frst) frst = false;
+                            else bldrRelIntern.append('\t')
+                            bldrRelIntern.append(s).append(' ').append(set)
+                            missedMthd = false
+                            break
+                        }
+                    }
+                    if (missedMthd && !s.isBlank() && !expectedFailThatFailsAutoFilter.contains(s + intr.key) && !s.equals("<init>")) {
+                        logger.log(LogLevel.ERROR, "Failed to map " + s + " for " + intr.key)
+                    }
+                }
+                if (!bldrRelIntern.isEmpty()) {
+                    if (!bldrRel.isEmpty()) bldrRel.append('\n')
+                    bldrRel.append(intr.key)
+                    bldrRel.append('\n')
+                    bldrRel.append(bldrRelIntern)
+                }
+            }
+            file('build/tmp/fabRelRefMap.txt').text = bldrRel.toString()
+            bldrRel = new StringBuilder()
+            for (Map.Entry<String, String> entry : bldrAbs) {
+                bldrRel.append(entry.key).append(' ').append(entry.value).append('\n')
+            }
+            file('build/tmp/fabAbsRefMap.txt').text = bldrRel.toString()
+        }
 	}
 
 	from 'LICENSE'
@@ -350,7 +352,7 @@ class Mapp{
 	public List<Target> target
 }
 
-def mcVersions = [ '1.20.3', '1.20.4' ]
+def mcVersions = [ '1.21', '1.21.1' ]
 
 def stability = 'release'
 

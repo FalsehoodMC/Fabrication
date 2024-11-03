@@ -2,47 +2,45 @@ package com.unascribed.fabrication.mixin._general.sync;
 
 import com.unascribed.fabrication.EarlyAgnos;
 import com.unascribed.fabrication.FabConf;
-import com.unascribed.fabrication.support.injection.FabInject;
-import com.unascribed.fabrication.util.ByteBufCustomPayload;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
-import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
-import net.minecraft.server.network.ServerCommonNetworkHandler;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
 import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.FeaturesFile;
 import com.unascribed.fabrication.features.FeatureHideArmor;
 import com.unascribed.fabrication.interfaces.SetFabricationConfigAware;
 import com.unascribed.fabrication.loaders.LoaderFScript;
 import com.unascribed.fabrication.support.OptionalFScript;
-
+import com.unascribed.fabrication.support.injection.FabInject;
+import com.unascribed.fabrication.util.ByteBufCustomPayload;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
+import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
+import net.minecraft.server.network.ServerCommonNetworkHandler;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.GameRules;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerCommonNetworkHandler.class)
 public class MixinServerCommonNetworkHandler {
 
 	@FabInject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/c2s/common/CustomPayloadC2SPacket;)V", cancellable=true)
-	public void onCustomPayload(CustomPayloadC2SPacket packet, CallbackInfo ci) {
+	public void fabrication$onCustomPayload(CustomPayloadC2SPacket packet, CallbackInfo ci) {
 		Object self = this;
 		if (!(self instanceof ServerPlayNetworkHandler)) return;
 		ServerPlayerEntity player = ((ServerPlayNetworkHandler) self).getPlayer();
 		CustomPayload payload = packet.payload();
 		if (!(payload instanceof ByteBufCustomPayload)) return;
-		Identifier channel = payload.id();
+		Identifier channel = payload.getId().id();
 		if (channel.getNamespace().equals("fabrication")) {
 			if (channel.getPath().equals("config")) {
 				ci.cancel();
-				PacketByteBuf recvdData = ((ByteBufCustomPayload) payload).buf;
+				PacketByteBuf recvdData = ((ByteBufCustomPayload) payload).buf();
 				int id = recvdData.readVarInt();
 				if (id == 0) {
 					// hello
@@ -75,7 +73,7 @@ public class MixinServerCommonNetworkHandler {
 				}
 			} else if (channel.getPath().equals("fscript")) {
 				ci.cancel();
-				PacketByteBuf recvdData = ((ByteBufCustomPayload) payload).buf;
+				PacketByteBuf recvdData = ((ByteBufCustomPayload) payload).buf();
 				int id = recvdData.readVarInt();
 				if(id == 0){
 					// get
@@ -84,7 +82,7 @@ public class MixinServerCommonNetworkHandler {
 						PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
 						data.writeVarInt(0);
 						data.writeString(LoaderFScript.get(key));
-						player.networkHandler.sendPacket(new CustomPayloadS2CPacket(new ByteBufCustomPayload(new Identifier("fabrication", "fscript"), data)));
+						player.networkHandler.sendPacket(new CustomPayloadS2CPacket(new ByteBufCustomPayload(Identifier.of("fabrication", "fscript"), data)));
 					}
 				}else if (id == 1) {
 					// set

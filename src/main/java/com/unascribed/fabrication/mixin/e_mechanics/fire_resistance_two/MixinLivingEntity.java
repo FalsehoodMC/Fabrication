@@ -11,6 +11,7 @@ import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 
@@ -22,10 +23,10 @@ public abstract class MixinLivingEntity extends Entity {
 		super(type, world);
 	}
 
-	@ModifyReturn(method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", target="Lnet/minecraft/entity/LivingEntity;hasStatusEffect(Lnet/minecraft/entity/effect/StatusEffect;)Z")
-	private static boolean fabrication$fireResistTwo(boolean hasEffect, LivingEntity self, StatusEffect effect, LivingEntity selfAgain, DamageSource source) {
+	@ModifyReturn(method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", target="Lnet/minecraft/entity/LivingEntity;hasStatusEffect(Lnet/minecraft/registry/entry/RegistryEntry;)Z")
+	private static boolean fabrication$fireResistTwo(boolean hasEffect, LivingEntity self, RegistryEntry<StatusEffect> effect, LivingEntity selfAgain, DamageSource source) {
 		if (!FabConf.isEnabled("*.fire_resistance_two")) return hasEffect;
-		if (hasEffect && effect == StatusEffects.FIRE_RESISTANCE && source.isOf(DamageTypes.LAVA)) {
+		if (hasEffect && effect.matches(StatusEffects.FIRE_RESISTANCE) && source.isOf(DamageTypes.LAVA)) {
 			StatusEffectInstance instance = self.getStatusEffect(StatusEffects.FIRE_RESISTANCE);
 			return instance == null || instance.getAmplifier() >= 1;
 		}

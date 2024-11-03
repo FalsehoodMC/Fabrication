@@ -18,11 +18,14 @@ import com.google.common.collect.Sets;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.inventory.RecipeInputInventory;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
+import net.minecraft.recipe.input.CraftingRecipeInput;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableTextContent;
@@ -56,10 +59,10 @@ public class FeatureDimensionalTools implements Feature {
 	@Environment(EnvType.CLIENT)
 	private void applyClient() {
 		Agnos.runForTooltipRender((stack, lines) -> {
-			if (active && !stack.isEmpty() && (stack.hasNbt() && stack.getNbt().contains("fabrication:PartialDamage"))) {
+			if (active && !stack.isEmpty() && (stack.contains(DataComponentTypes.CUSTOM_DATA) && stack.get(DataComponentTypes.CUSTOM_DATA).getNbt().contains("fabrication:PartialDamage"))) {
 				for (int i = 0; i < lines.size(); i++) {
 					Object t = lines.get(i);
-					double part = stack.getNbt().getDouble("fabrication:PartialDamage");
+					double part = stack.get(DataComponentTypes.CUSTOM_DATA).getNbt().getDouble("fabrication:PartialDamage");
 					if (t instanceof MutableText && ((MutableText) t).getContent() instanceof TranslatableTextContent) {
 						if (((TranslatableTextContent) ((MutableText) t).getContent()).getKey().equals("item.durability")) {
 							lines.set(i, Text.translatable("item.durability",
@@ -82,12 +85,12 @@ public class FeatureDimensionalTools implements Feature {
 		return "*.dimensional_tools";
 	}
 
-	public static void handleCraft(RecipeInputInventory inv, ItemStack stack) {
+	public static void handleCraft(CraftingRecipeInput inv, ItemStack stack) {
 		if (LoaderDimensionalTools.isSubstitutable(stack.getItem())) {
 			int count = 0;
 			Multiset<MohsIdentifier> dimensions = null;
-			for (int i = 0; i < inv.size(); i++) {
-				ItemStack ing = inv.getStack(i);
+			for (int i = 0; i < inv.getSize(); i++) {
+				ItemStack ing = inv.getStackInSlot(i);
 				if (!ing.isEmpty()) {
 					Set<MohsIdentifier> assoc = LoaderDimensionalTools.getAssociatedDimensionsForIngredient(ing);
 					if (assoc.isEmpty()) return;
@@ -112,12 +115,14 @@ public class FeatureDimensionalTools implements Feature {
 							s = s.replace(sub.find, sub.replace);
 						}
 					}
-					stack.setCustomName(Text.literal("§f"+s));
+					stack.set(DataComponentTypes.CUSTOM_NAME, Text.literal("§f"+s));
 					NbtList li = new NbtList();
 					for (MohsIdentifier dim : finalDimensions) {
 						li.add(NbtString.of(dim.toString()));
 					}
-					stack.getNbt().put("fabrication:HonoraryDimensions", li);
+					NbtCompound nbt = stack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).copyNbt();
+					nbt.put("fabrication:HonoraryDimensions", li);
+					stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
 				}
 			}
 		}

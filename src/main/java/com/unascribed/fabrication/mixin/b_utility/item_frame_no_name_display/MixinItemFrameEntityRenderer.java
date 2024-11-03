@@ -16,7 +16,7 @@ import net.minecraft.entity.decoration.ItemFrameEntity;
 @EligibleIf(configAvailable="*.item_frame_no_name_display", envMatches = Env.CLIENT)
 public class MixinItemFrameEntityRenderer {
 
-	@FabInject(at=@At("HEAD"), method= "hasLabel(Lnet/minecraft/entity/decoration/ItemFrameEntity;)Z", cancellable=true)
+	@FabInject(at=@At("HEAD"), method="hasLabel(Lnet/minecraft/entity/decoration/ItemFrameEntity;)Z", cancellable=true)
 	public void hasLabel(ItemFrameEntity itemFrameEntity, CallbackInfoReturnable<Boolean> cir) {
 		if (FabConf.isEnabled("*.item_frame_no_name_display")) {
 			cir.setReturnValue(false);

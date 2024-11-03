@@ -12,10 +12,12 @@ import com.unascribed.fabrication.FabLog;
 import com.unascribed.fabrication.FabricationMod;
 import com.unascribed.fabrication.QDIni;
 import com.unascribed.fabrication.support.ConfigLoader;
-import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.block.Block;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -61,7 +63,7 @@ public class LoaderDimensionalTools implements ConfigLoader {
 		public static MohsIdentifier parse(String s) {
 			boolean hard = s.endsWith("!");
 			if (hard) s = s.substring(0, s.length()-1);
-			return new MohsIdentifier(hard, new Identifier(s));
+			return new MohsIdentifier(hard, Identifier.of(s));
 		}
 
 		public MohsIdentifier asSoft() {
@@ -179,19 +181,20 @@ public class LoaderDimensionalTools implements ConfigLoader {
 
 	public static Set<MohsIdentifier> getAssociatedDimensionsForTool(ItemStack stack) {
 		Set<MohsIdentifier> dims = processTags(toolAssociations.get(Registries.ITEM.getId(stack.getItem())), toolTagAssociations, Registries.ITEM.getKey(), stack.getItem().getRegistryEntry());
-		if (stack.hasNbt()) {
-			if (stack.getNbt().getBoolean("fabrication:ActLikeGold")) {
+		if (stack.contains(DataComponentTypes.CUSTOM_DATA)) {
+			NbtCompound nbt = stack.get(DataComponentTypes.CUSTOM_DATA).getNbt();
+			if (nbt.getBoolean("fabrication:ActLikeGold")) {
 				dims = Sets.newHashSet(dims);
 				dims.add(new MohsIdentifier(true, DimensionTypes.THE_NETHER_ID));
 			}
-			if (stack.getNbt().contains("fabrication:HonoraryDimensions", NbtType.LIST)) {
+			if (nbt.contains("fabrication:HonoraryDimensions", NbtElement.LIST_TYPE)) {
 				dims = Sets.newHashSet(dims);
-				NbtList li = stack.getNbt().getList("fabrication:HonoraryDimensions", NbtType.STRING);
+				NbtList li = nbt.getList("fabrication:HonoraryDimensions", NbtElement.STRING_TYPE);
 				for (int i = 0; i < li.size(); i++) {
 					try {
 						dims.add(MohsIdentifier.parse(li.getString(i)));
 					} catch (InvalidIdentifierException e) {
-						FabLog.warn("Bad honorary dimension "+li.getString(i)+" in stack "+Registries.ITEM.getId(stack.getItem())+stack.getNbt());
+						FabLog.warn("Bad honorary dimension "+li.getString(i)+" in stack "+Registries.ITEM.getId(stack.getItem())+nbt);
 					}
 				}
 			}

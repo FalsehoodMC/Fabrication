@@ -24,7 +24,7 @@ import net.minecraft.world.World;
 @Mixin(SpiderEntity.class)
 @EligibleIf(anyConfigAvailable={"*.spiders_cant_climb_glazed_terracotta", "*.spiders_cant_climb_while_wet"})
 public abstract class MixinSpiderEntity extends HostileEntity {
-	private static final TagKey<Block> fabrication$spidersCantClimb = TagKey.of(RegistryKeys.BLOCK, new Identifier("fabrication", "spiders_cant_climb"));
+	private static final TagKey<Block> fabrication$spidersCantClimb = TagKey.of(RegistryKeys.BLOCK, Identifier.of("fabrication", "spiders_cant_climb"));
 
 	protected MixinSpiderEntity(EntityType<? extends HostileEntity> entityType, World world) {
 		super(entityType, world);

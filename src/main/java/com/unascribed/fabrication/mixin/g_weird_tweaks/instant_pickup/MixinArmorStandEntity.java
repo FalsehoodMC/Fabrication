@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.mixin.g_weird_tweaks.instant_pickup;
 
 import com.unascribed.fabrication.FabConf;
+import net.minecraft.server.world.ServerWorld;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabInject;
@@ -26,8 +27,8 @@ public abstract class MixinArmorStandEntity extends LivingEntity {
 
 	// grr...
 
-	@FabInject(at=@At("TAIL"), method="onBreak(Lnet/minecraft/entity/damage/DamageSource;)V")
-	private void onBreak(DamageSource src, CallbackInfo ci) {
+	@FabInject(at=@At("TAIL"), method="onBreak(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/damage/DamageSource;)V")
+	private void onBreak(ServerWorld world, DamageSource src, CallbackInfo ci) {
 		if (FabConf.isEnabled("*.instant_pickup") && src.getSource() instanceof PlayerEntity) {
 			InstantPickup.slurp(getWorld(), getBoundingBox().expand(0.25), (PlayerEntity)src.getSource());
 		}

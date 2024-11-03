@@ -30,9 +30,7 @@ public class MixinLivingEntity {
 		ItemStack boots = self.getEquippedStack(EquipmentSlot.FEET);
 		if (source.isIn(DamageTypeTags.IS_FALL) && fabrication$featherFallingPredicate.test(self)) {
 			if (FabConf.isEnabled("*.feather_falling_five_damages_boots") && fabrication$featherFallingBootsPredicate.test(self) && !boots.isEmpty() && amount >= 2) {
-				boots.damage((int)(amount/2), self, (e) -> {
-					e.sendEquipmentBreakStatus(EquipmentSlot.FEET);
-				});
+				boots.damage((int)(amount/2), self, EquipmentSlot.FEET);
 			}
 			cir.setReturnValue(false);
 		}

@@ -18,13 +18,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(targets="net.minecraft.block.dispenser.DispenserBehavior$17")
+@Mixin(targets="net.minecraft.block.dispenser.DispenserBehavior$6")
 @EligibleIf(configAvailable="*.obsidian_tears")
 @FailOn(invertedSpecialConditions=SpecialEligibility.NOT_FORGE)
-public abstract class MixinGlassBottleDispenserBehavior extends FallibleItemDispenserBehavior {
+public abstract class MixinGlassBottleDispenserBehavior {
 
 	@Shadow
-	protected abstract ItemStack tryPutFilledBottle(BlockPointer pointer, ItemStack emptyBottleStack, ItemStack filledBottleStack);
+	protected abstract ItemStack replace(BlockPointer pointer, ItemStack emptyBottleStack, ItemStack filledBottleStack);
 
 	@FabInject(at=@At("HEAD"), method="dispenseSilently(Lnet/minecraft/util/math/BlockPointer;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;",
 			cancellable=true)
@@ -33,8 +33,8 @@ public abstract class MixinGlassBottleDispenserBehavior extends FallibleItemDisp
 		BlockPos pos = pointer.pos().offset(pointer.state().get(DispenserBlock.FACING));
 		BlockState state = w.getBlockState(pos);
 		if (state.getBlock() == Blocks.CRYING_OBSIDIAN) {
-			setSuccess(true);
-			ci.setReturnValue(tryPutFilledBottle(pointer, stack, ObsidianTears.createStack(pointer.world(), pos)));
+			((FallibleItemDispenserBehavior) (Object) this).setSuccess(true);
+			ci.setReturnValue(replace(pointer, stack, ObsidianTears.createStack(pointer.world(), pos)));
 		}
 	}
 

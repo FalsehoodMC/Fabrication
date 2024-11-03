@@ -8,21 +8,22 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
-@Mixin(AnimalEntity.class)
+@Mixin(LivingEntity.class)
 @EligibleIf(configAvailable="*.old_sheep_shear")
-public abstract class MixinAnimalEntity extends PassiveEntity {
+public abstract class MixinLivingEntity extends Entity {
 
-	protected MixinAnimalEntity(EntityType<? extends PassiveEntity> entityType, World world) {
+	protected MixinLivingEntity(EntityType<? extends PassiveEntity> entityType, World world) {
 		super(entityType, world);
 	}
 

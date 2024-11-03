@@ -17,7 +17,7 @@ import net.minecraft.entity.mob.CreeperEntity;
 @EligibleIf(configAvailable="*.chaining_creepers")
 public abstract class MixinLivingEntity {
 
-	@FabInject(method= "damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", at=@At("HEAD"), cancellable=true)
+	@FabInject(method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", at=@At("HEAD"), cancellable=true)
 	public void lightCreepersOnExplosion(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
 		Object self = this;
 		if (!(FabConf.isEnabled("*.chaining_creepers") && self instanceof CreeperEntity && source.isIn(DamageTypeTags.IS_EXPLOSION))) return;

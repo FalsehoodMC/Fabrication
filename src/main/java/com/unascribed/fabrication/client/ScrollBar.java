@@ -18,7 +18,7 @@ public class ScrollBar {
 	}
 
 	public float getScaledScroll(MinecraftClient client) {
-		return  (float) (Math.floor(((height < displayHeight ? 0 : MathHelper.lerp(client.getTickDelta(), lastScroll, scroll)) * client.getWindow().getScaleFactor())) / client.getWindow().getScaleFactor());
+		return  (float) (Math.floor(((height < displayHeight ? 0 : MathHelper.lerp(client.getRenderTickCounter().getTickDelta(true), lastScroll, scroll)) * client.getWindow().getScaleFactor())) / client.getWindow().getScaleFactor());
 	}
 
 	public void scroll(double amount) {

@@ -4,6 +4,8 @@ import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.FailOn;
 import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.injection.FabInject;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -21,11 +23,11 @@ import net.minecraft.item.Items;
 @FailOn(invertedSpecialConditions=SpecialEligibility.NOT_FORGE)
 public class MixinDispenserBlock {
 
-	@FabInject(at=@At("HEAD"), method="getBehaviorForItem(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/block/dispenser/DispenserBehavior;",
+	@FabInject(at=@At("HEAD"), method="getBehaviorForItem(Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/block/dispenser/DispenserBehavior;",
 			cancellable=true)
-	public void getBehaviorForItem(ItemStack stack, CallbackInfoReturnable<DispenserBehavior> ci) {
+	public void getBehaviorForItem(World world, ItemStack stack, CallbackInfoReturnable<DispenserBehavior> ci) {
 		if (!FabConf.isEnabled("*.obsidian_tears")) return;
-		if (stack.getItem() == Items.POTION && stack.hasNbt() && stack.getNbt().getBoolean("fabrication:ObsidianTears")) {
+		if (stack.getItem() == Items.POTION && stack.contains(DataComponentTypes.CUSTOM_DATA) && stack.get(DataComponentTypes.CUSTOM_DATA).getNbt().getBoolean("fabrication:ObsidianTears")) {
 			ci.setReturnValue(ObsidianTears.DISPENSER_BEHAVIOR);
 		}
 	}

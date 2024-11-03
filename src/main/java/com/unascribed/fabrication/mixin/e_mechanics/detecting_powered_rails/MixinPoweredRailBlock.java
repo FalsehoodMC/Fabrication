@@ -41,7 +41,7 @@ public abstract class MixinPoweredRailBlock extends AbstractRailBlock {
 	@Override
 	public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
 		if (!FabConf.isEnabled("*.detecting_powered_rails")) return 0;
-		return Blocks.DETECTOR_RAIL.getComparatorOutput(Blocks.DETECTOR_RAIL.getDefaultState().with(DetectorRailBlock.POWERED, true), world, pos);
+		return Blocks.DETECTOR_RAIL.getDefaultState().with(DetectorRailBlock.POWERED, true).getComparatorOutput(world, pos);
 	}
 
 	@Override

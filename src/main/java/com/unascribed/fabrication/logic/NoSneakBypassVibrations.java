@@ -11,7 +11,7 @@ import net.minecraft.world.event.Vibrations;
 public class NoSneakBypassVibrations {
 	//Hijack is completely unnecessary, however fakeMixin is a FabInject feature. (tbf also very nice for capture of Entity)
 	//Has to be fakeMixin because forgery
-	@Hijack(method="canAccept(Lnet/minecraft/world/event/GameEvent;Lnet/minecraft/world/event/GameEvent$Emitter;)Z", target="Lnet/minecraft/entity/Entity;bypassesSteppingEffects()Z")
+	@Hijack(method="canAccept(Lnet/minecraft/registry/entry/RegistryEntry;Lnet/minecraft/world/event/GameEvent$Emitter;)Z", target="Lnet/minecraft/entity/Entity;bypassesSteppingEffects()Z")
 	public static HijackReturn fabrication$getActualBypassesStepping(Entity entity) {
 		if (entity instanceof SetActualBypassState) {
 			((SetActualBypassState)entity).fabrication$setActualBypassesStepOn();

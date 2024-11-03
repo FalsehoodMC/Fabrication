@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 @EligibleIf(configAvailable="*.open_inventories_in_nether_portal", envMatches=Env.CLIENT)
 public class MixinClientPlayerEntity {
 
-	@ModifyReturn(method="updateNausea()V", target="Lnet/minecraft/client/gui/screen/Screen;shouldPause()Z")
+	@ModifyReturn(method="tickNausea(Z)V", target="Lnet/minecraft/client/gui/screen/Screen;shouldPause()Z")
 	private static boolean fabrication$preventClosingScreen(boolean old) {
 		return FabConf.isEnabled("*.open_inventories_in_nether_portal") || old;
 	}

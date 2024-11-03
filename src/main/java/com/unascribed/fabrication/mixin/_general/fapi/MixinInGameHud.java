@@ -7,7 +7,7 @@ import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.injection.FabInject;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.render.RenderTickCounter;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -16,9 +16,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @EligibleIf(specialConditions=SpecialEligibility.NOT_FORGE, envMatches=Env.CLIENT)
 public class MixinInGameHud {
 
-		@FabInject(method="render(Lnet/minecraft/client/gui/DrawContext;F)V", at=@At(value="TAIL"))
-		public void render(DrawContext drawContext, float tickDelta, CallbackInfo callbackInfo) {
-			FabricationEventsClient.hud(drawContext, tickDelta);
+		@FabInject(method= "render(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/RenderTickCounter;)V", at=@At(value="TAIL"))
+		public void render(DrawContext drawContext, RenderTickCounter tickCounter, CallbackInfo callbackInfo) {
+			FabricationEventsClient.hud(drawContext, tickCounter);
 		}
 
 }

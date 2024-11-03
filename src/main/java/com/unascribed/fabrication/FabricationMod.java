@@ -36,10 +36,9 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.PlayerAssociatedNetworkHandler;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerChunkLoadingManager;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.world.ThreadedAnvilChunkStorage;
-import net.minecraft.server.world.ThreadedAnvilChunkStorage.EntityTracker;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -96,9 +95,9 @@ public class FabricationMod implements ModInitializer {
 		}
 		if (EarlyAgnos.getCurrentEnv() == Env.CLIENT) {
 			FabricationClientCommands.registerCommands();
-			LEVELUP_LONG = SoundEvent.of(new Identifier("fabrication", "levelup_long"));
-			OOF = SoundEvent.of(new Identifier("fabrication", "oof"));
-			ABSORPTION_HURT = SoundEvent.of(new Identifier("fabrication", "absorption_hurt"));
+			LEVELUP_LONG = SoundEvent.of(Identifier.of("fabrication", "levelup_long"));
+			OOF = SoundEvent.of(Identifier.of("fabrication", "oof"));
+			ABSORPTION_HURT = SoundEvent.of(Identifier.of("fabrication", "absorption_hurt"));
 			FabricationDefaultResources.apply();
 		}
 
@@ -120,9 +119,9 @@ public class FabricationMod implements ModInitializer {
 
 	public static Identifier createIdWithCustomDefault(String namespace, String pathOrId) {
 		if (pathOrId.contains(":")) {
-			return new Identifier(pathOrId);
+			return Identifier.of(pathOrId);
 		}
-		return new Identifier(namespace, pathOrId);
+		return Identifier.of(namespace, pathOrId);
 	}
 
 	public static boolean isAvailableFeature(String configKey) {
@@ -160,9 +159,9 @@ public class FabricationMod implements ModInitializer {
 
 	public static Set<PlayerAssociatedNetworkHandler> getTrackers(Entity entity) {
 		ServerChunkManager cm = ((ServerWorld)entity.getWorld()).getChunkManager();
-		ThreadedAnvilChunkStorage tacs = cm.threadedAnvilChunkStorage;
-		Int2ObjectMap<EntityTracker> entityTrackers = FabRefl.getEntityTrackers(tacs);
-		EntityTracker tracker = entityTrackers.get(entity.getId());
+		ServerChunkLoadingManager sclm = cm.chunkLoadingManager;
+		Int2ObjectMap<ServerChunkLoadingManager.EntityTracker> entityTrackers = FabRefl.getEntityTrackers(sclm);
+		ServerChunkLoadingManager.EntityTracker tracker = entityTrackers.get(entity.getId());
 		if (tracker == null) return Collections.emptySet();
 		return FabRefl.getPlayersTracking(tracker);
 	}
@@ -236,7 +235,7 @@ public class FabricationMod implements ModInitializer {
 		for (String k : FabConf.getAllBanned()) {
 			data.writeString(k);
 		}
-		CustomPayloadS2CPacket pkt = new CustomPayloadS2CPacket(new ByteBufCustomPayload(new Identifier("fabrication", reqVer > 0 ? "config2" :"config"), data));
+		CustomPayloadS2CPacket pkt = new CustomPayloadS2CPacket(new ByteBufCustomPayload(Identifier.of("fabrication", reqVer > 0 ? "config2" :"config"), data));
 		spe.networkHandler.sendPacket(pkt);
 	}
 

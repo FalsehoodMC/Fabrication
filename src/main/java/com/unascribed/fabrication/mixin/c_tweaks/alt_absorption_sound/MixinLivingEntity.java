@@ -71,7 +71,7 @@ public abstract class MixinLivingEntity extends Entity implements DidJustAbsorp 
 		if (fabrication$didJustAbsorp()) {
 			PacketByteBuf data = new PacketByteBuf(Unpooled.buffer(4));
 			data.writeInt(getId());
-			CustomPayloadS2CPacket fabPkt = new CustomPayloadS2CPacket(new ByteBufCustomPayload(new Identifier("fabrication", "play_absorp_sound"), data));
+			CustomPayloadS2CPacket fabPkt = new CustomPayloadS2CPacket(new ByteBufCustomPayload(Identifier.of("fabrication", "play_absorp_sound"), data));
 			SoundEvent defHurtSound = getHurtSound(src);
 			PlaySoundFromEntityS2CPacket vanPkt = defHurtSound == null ? null : new PlaySoundFromEntityS2CPacket(Registries.SOUND_EVENT.getEntry(defHurtSound), getSoundCategory(), this, getSoundVolume(), getSoundPitch(), this.random.nextLong());
 			for (PlayerAssociatedNetworkHandler etl : FabricationMod.getTrackers(this)) {

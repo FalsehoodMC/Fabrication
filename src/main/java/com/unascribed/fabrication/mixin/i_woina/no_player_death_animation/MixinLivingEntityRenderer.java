@@ -15,7 +15,7 @@ import net.minecraft.entity.player.PlayerEntity;
 @EligibleIf(configAvailable="*.no_player_death_animation", envMatches=Env.CLIENT)
 public abstract class MixinLivingEntityRenderer {
 
-	@ModifyGetField(method="setupTransforms(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/client/util/math/MatrixStack;FFF)V", target="net/minecraft/entity/LivingEntity.deathTime:I")
+	@ModifyGetField(method="setupTransforms(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/client/util/math/MatrixStack;FFFF)V", target="net/minecraft/entity/LivingEntity.deathTime:I")
 	private static int fabrication$oldPlayerDeathTime(int old, LivingEntity instance){
 		if (FabConf.isEnabled("*.no_player_death_animation") && instance instanceof PlayerEntity) return 0;
 		return old;

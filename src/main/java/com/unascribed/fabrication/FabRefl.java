@@ -10,19 +10,19 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.unascribed.fabrication.support.FabReflField;
 import com.unascribed.fabrication.support.injection.FabRefMap;
 import net.minecraft.client.util.SelectionManager;
-import net.minecraft.entity.attribute.EntityAttributeModifier;
+import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.registry.RegistryEntryLookup;
 import net.minecraft.entity.vehicle.FurnaceMinecartEntity;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.server.command.GameModeCommand;
 import net.minecraft.server.network.PlayerAssociatedNetworkHandler;
+import net.minecraft.server.world.ServerChunkLoadingManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.biome.GenerationSettings;
@@ -56,9 +56,7 @@ import net.minecraft.client.texture.NativeImage.Format;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.command.EntitySelector;
 import net.minecraft.command.argument.ItemStackArgument;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.ai.TargetPredicate;
@@ -70,8 +68,6 @@ import net.minecraft.resource.ResourcePackProvider;
 import net.minecraft.server.command.GiveCommand;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ThreadedAnvilChunkStorage;
-import net.minecraft.server.world.ThreadedAnvilChunkStorage.EntityTracker;
 import net.minecraft.util.Identifier;
 
 public class FabRefl {
@@ -82,24 +78,24 @@ public class FabRefl {
 	// on an invokeExact or the calltime signature will be wrong and the JVM will get confused.
 
 	@FabReflField
-	private static final String eam_name_field = "Lnet/minecraft/entity/attribute/EntityAttributeModifier;name";
-	private static final MethodHandle eam_name = unreflectGetter("EntityAttributeModifier", () -> EntityAttributeModifier.class, eam_name_field)
-		.requiredBy("*.old_armor_scale", "*.old_armor").get();
-	public static String EntityAttributeModifier_name(EntityAttributeModifier subject) {
-		try {
-			return (String) checkHandle(eam_name).invokeExact(subject);
-		} catch (Throwable t) {
-			throw rethrow(t);
-		}
-	}
-
-	@FabReflField
 	private static final String sw_properties_field = "net/minecraft/server/world/ServerWorld;worldProperties";
 	private static final MethodHandle sw_properties = unreflectGetter("ServerWorld", () -> ServerWorld.class, sw_properties_field)
 			.requiredBy("*.legacy_command_syntax").get();
 	public static ServerWorldProperties getWorldProperties(ServerWorld subject) {
 		try {
 			return (ServerWorldProperties)checkHandle(sw_properties).invokeExact(subject);
+		} catch (Throwable t) {
+			throw rethrow(t);
+		}
+	}
+
+	@FabReflField
+	private static final String iec_showInTooltip_field = "net/minecraft/component/type/ItemEnchantmentsComponent;showInTooltip";
+	private static final MethodHandle iec_showInTooltip = unreflectGetter("ItemEnchantmentsComponent", () -> ItemEnchantmentsComponent.class, iec_showInTooltip_field)
+		.requiredBy("*.swap_conflicting_enchants").get();
+	public static boolean getShowInTooltip(ItemEnchantmentsComponent subject) {
+		try {
+			return (boolean)checkHandle(iec_showInTooltip).invokeExact(subject);
 		} catch (Throwable t) {
 			throw rethrow(t);
 		}
@@ -130,34 +126,22 @@ public class FabRefl {
 	}
 
 	@FabReflField
-	private static final String es_basePredicate_field = "net/minecraft/command/EntitySelector;basePredicate";
-	private static final MethodHandle es_basePredicate = unreflectGetter("EntitySelector", () -> EntitySelector.class, es_basePredicate_field)
-			.requiredBy("*.canhit").get();
-	public static Predicate<Entity> getBasePredicate(EntitySelector subject) {
+	private static final String tacs_entityTrackers_field = "net/minecraft/server/world/ServerChunkLoadingManager;entityTrackers";
+	private static final MethodHandle tacs_entityTrackers = unreflectGetter("ServerChunkLoadingManager", () -> ServerChunkLoadingManager.class, tacs_entityTrackers_field)
+			.requiredBy("*.sync_attacker_yaw", "*.despawning_items_blink").get();
+	public static Int2ObjectMap<ServerChunkLoadingManager.EntityTracker> getEntityTrackers(ServerChunkLoadingManager subject) {
 		try {
-			return (Predicate<Entity>)checkHandle(es_basePredicate).invokeExact(subject);
+			return (Int2ObjectMap<ServerChunkLoadingManager.EntityTracker>)checkHandle(tacs_entityTrackers).invokeExact(subject);
 		} catch (Throwable t) {
 			throw rethrow(t);
 		}
 	}
 
 	@FabReflField
-	private static final String tacs_entityTrackers_field = "net/minecraft/server/world/ThreadedAnvilChunkStorage;entityTrackers";
-	private static final MethodHandle tacs_entityTrackers = unreflectGetter("ThreadedAnvilChunkStorage", () -> ThreadedAnvilChunkStorage.class, tacs_entityTrackers_field)
+	private static final String et_playersTracking_field = "net/minecraft/server/world/ServerChunkLoadingManager$EntityTracker;listeners";
+	private static final MethodHandle et_playersTracking = unreflectGetter("ServerChunkLoadingManager$EntityTracker", () -> ServerChunkLoadingManager.EntityTracker.class, et_playersTracking_field)
 			.requiredBy("*.sync_attacker_yaw", "*.despawning_items_blink").get();
-	public static Int2ObjectMap<EntityTracker> getEntityTrackers(ThreadedAnvilChunkStorage subject) {
-		try {
-			return (Int2ObjectMap<EntityTracker>)checkHandle(tacs_entityTrackers).invokeExact(subject);
-		} catch (Throwable t) {
-			throw rethrow(t);
-		}
-	}
-
-	@FabReflField
-	private static final String et_playersTracking_field = "net/minecraft/server/world/ThreadedAnvilChunkStorage$EntityTracker;listeners";
-	private static final MethodHandle et_playersTracking = unreflectGetter("EntityTracker", () -> EntityTracker.class, et_playersTracking_field)
-			.requiredBy("*.sync_attacker_yaw", "*.despawning_items_blink").get();
-	public static Set<PlayerAssociatedNetworkHandler> getPlayersTracking(EntityTracker subject) {
+	public static Set<PlayerAssociatedNetworkHandler> getPlayersTracking(ServerChunkLoadingManager.EntityTracker subject) {
 		try {
 			return (Set<PlayerAssociatedNetworkHandler>)checkHandle(et_playersTracking).invokeExact(subject);
 		} catch (Throwable t) {
@@ -279,28 +263,6 @@ public class FabRefl {
 		}
 	}
 	@FabReflField
-	private static final String e_setSprinting_field = "Lnet/minecraft/entity/Entity;setSprinting(Z)V";
-	private static final MethodHandle e_setSprinting = unreflectMethod("Entity", () -> Entity.class, e_setSprinting_field, void.class, boolean.class)
-		.requiredBy("*.no_sprint").get();
-	public static void setSprinting(Entity context, boolean on) {
-		try {
-			checkHandle(e_setSprinting).invokeExact(context, on);
-		} catch (Throwable t) {
-			throw rethrow(t);
-		}
-	}
-	@FabReflField
-	private static final String e_isSwimming_field = "Lnet/minecraft/entity/Entity;isSwimming()Z";
-	private static final MethodHandle e_isSwimming = unreflectMethod("Entity", () -> Entity.class, e_isSwimming_field, boolean.class)
-		.requiredBy("*.no_sprint").get();
-	public static boolean isSwimming(Entity context) {
-		try {
-			return (boolean) checkHandle(e_isSwimming).invokeExact(context);
-		} catch (Throwable t) {
-			throw rethrow(t);
-		}
-	}
-	@FabReflField
 	private static final String gc_execute_field = "Lnet/minecraft/server/command/GiveCommand;execute(Lnet/minecraft/server/command/ServerCommandSource;Lnet/minecraft/command/argument/ItemStackArgument;Ljava/util/Collection;I)I";
 	private static final MethodHandle gc_execute = unreflectMethod("GiveCommand", () -> GiveCommand.class, gc_execute_field,
 			int.class,
@@ -342,44 +304,8 @@ public class FabRefl {
 		}
 	}
 
-	@FabReflField
-	private static final String is_hideFlags_mthd = "Lnet/minecraft/item/ItemStack;getHideFlags()I";
-	private static final MethodHandle is_hideFlags = unreflectMethod("ItemStack", () -> ItemStack.class, is_hideFlags_mthd, int.class)
-		.requiredBy("*.swap_conflicting_enchants").get();
-	public static int ItemStack_getHideFlags(ItemStack subject) {
-		try {
-			return (int) checkHandle(is_hideFlags).invokeExact(subject);
-		} catch (Throwable t) {
-			throw rethrow(t);
-		}
-	}
-
 	@Environment(EnvType.CLIENT)
 	public static final class Client {
-		@FabReflField
-		private static final String sprite_x_field = "net/minecraft/client/texture/Sprite;x";
-		private static final MethodHandle sprite_x = unreflectGetter("Sprite", () -> Sprite.class, sprite_x_field)
-				.requiredBy("*.old_lava", "atlas_viewer").get();
-		public static int getX(Sprite subject) {
-			try {
-				return (int)checkHandle(sprite_x).invokeExact(subject);
-			} catch (Throwable t) {
-				throw rethrow(t);
-			}
-		}
-
-		@FabReflField
-		private static final String sprite_y_field = "net/minecraft/client/texture/Sprite;y";
-		private static final MethodHandle sprite_y = unreflectGetter("Sprite", () -> Sprite.class, sprite_y_field)
-				.requiredBy("*.old_lava", "atlas_viewer").get();
-		public static int getY(Sprite subject) {
-			try {
-				return (int)checkHandle(sprite_y).invokeExact(subject);
-			} catch (Throwable t) {
-				throw rethrow(t);
-			}
-		}
-
 		@FabReflField
 		private static final String sat_sprites_field = "net/minecraft/client/texture/SpriteAtlasTexture;sprites";
 		private static final MethodHandle sat_sprites = unreflectGetter("SpriteAtlasTexture", () -> SpriteAtlasTexture.class, sat_sprites_field)

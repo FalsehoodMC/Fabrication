@@ -1,7 +1,6 @@
 package com.unascribed.fabrication.mixin.i_woina.no_sprint;
 
 import com.unascribed.fabrication.FabConf;
-import com.unascribed.fabrication.FabRefl;
 import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.injection.FabInject;
@@ -20,8 +19,8 @@ public abstract class MixinEntity {
 	@FabInject(at=@At("RETURN"), method="updateSwimming()V")
 	public void setSprinting(CallbackInfo ci) {
 		Entity entity = (Entity)(Object)this;
-		if (!FabRefl.isSwimming(entity) && FabConf.isEnabled("*.no_sprint") && fabrication$noSprintPredicate.test(entity)) {
-			FabRefl.setSprinting(entity, false);
+		if (!entity.isSwimming() && FabConf.isEnabled("*.no_sprint") && fabrication$noSprintPredicate.test(entity)) {
+			entity.setSprinting(false);
 		}
 	}
 }

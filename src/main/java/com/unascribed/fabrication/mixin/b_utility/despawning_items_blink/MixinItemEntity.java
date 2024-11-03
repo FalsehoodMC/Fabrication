@@ -29,7 +29,7 @@ public abstract class MixinItemEntity extends Entity implements RenderingAgeAcce
 		super(type, world);
 	}
 
-	private static final Identifier FABRICATION$ITEM_DESPAWN = new Identifier("fabrication", "item_despawn");
+	private static final Identifier FABRICATION$ITEM_DESPAWN = Identifier.of("fabrication", "item_despawn");
 
 	@Shadow
 	private int itemAge;

@@ -5,20 +5,19 @@ import com.unascribed.fabrication.interfaces.SetOwner;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.FailOn;
 import com.unascribed.fabrication.support.injection.FabInject;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.EnchantmentLevelEntry;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.EnchantedBookItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.EnchantmentTags;
 import net.minecraft.screen.GrindstoneScreenHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.Map;
 
 @Mixin(targets="net.minecraft.screen.GrindstoneScreenHandler$4")
 @EligibleIf(configAvailable="*.grindstone_disenchanting", modLoaded="pollen")
@@ -42,9 +41,9 @@ public class MixinGrindstoneScreenHandlerResultSlotPollen implements SetOwner<Gr
 			if (bookStack.getItem() != Items.ENCHANTED_BOOK) {
 				bookStack = new ItemStack(Items.ENCHANTED_BOOK);
 			}
-			for (Map.Entry<Enchantment, Integer> en : EnchantmentHelper.get(disenchantStack).entrySet()) {
-				if (en.getKey().isCursed()) continue;
-				EnchantedBookItem.addEnchantment(bookStack, new EnchantmentLevelEntry(en.getKey(), en.getValue()));
+			for (Object2IntMap.Entry<RegistryEntry<Enchantment>> en : EnchantmentHelper.getEnchantments(disenchantStack).getEnchantmentEntries()) {
+				if (en.getKey().isIn(EnchantmentTags.CURSE)) continue;
+				bookStack.addEnchantment(en.getKey(), en.getIntValue());
 			}
 			((AccessorGrindstoneScreenHandler)fabrication$owner).fabrication$getContext().run((world, pos) -> world.syncWorldEvent(1042, pos, 0));
 			fabrication$owner.getSlot(0).setStack(ItemStack.EMPTY);

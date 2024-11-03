@@ -171,7 +171,7 @@ public class FeatureHideArmor implements Feature {
 				bits |= 1 << es.getEntitySlotId();
 			}
 			data.writeVarInt(bits);
-			CustomPayloadS2CPacket pkt = new CustomPayloadS2CPacket(new ByteBufCustomPayload(new Identifier("fabrication", "hide_armor"), data));
+			CustomPayloadS2CPacket pkt = new CustomPayloadS2CPacket(new ByteBufCustomPayload(Identifier.of("fabrication", "hide_armor"), data));
 			ent.networkHandler.sendPacket(pkt);
 		}
 	}

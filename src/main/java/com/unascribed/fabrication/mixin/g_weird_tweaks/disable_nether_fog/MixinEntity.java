@@ -14,7 +14,7 @@ import com.unascribed.fabrication.support.EligibleIf;
 @EligibleIf(configAvailable="*.disable_nether_fog", envMatches=Env.CLIENT)
 public class MixinEntity {
 
-	@FabInject(at=@At("HEAD"), method= "useThickFog(II)Z", cancellable=true)
+	@FabInject(at=@At("HEAD"), method="useThickFog(II)Z", cancellable=true)
 	public void useThickFog(int camX, int camY, CallbackInfoReturnable<Boolean> cir) {
 		if (FabConf.isEnabled("*.disable_nether_fog"))
 			cir.setReturnValue(false);

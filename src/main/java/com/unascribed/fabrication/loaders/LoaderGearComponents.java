@@ -148,7 +148,7 @@ public class LoaderGearComponents implements ConfigLoader {
 				Supplier<Item> ingotGetter = resolver(namespace, ingotId);
 				materials.put(name, new MaterialData(npi, nuggetGetter, ingotGetter));
 			} else if (!k.startsWith("@")) {
-				Resolvable<Item> r = Resolvable.of(new Identifier(k), Registries.ITEM);
+				Resolvable<Item> r = Resolvable.of(Identifier.of(k), Registries.ITEM);
 				for (String s : SPACE_SPLITTER.split(v)) {
 					Matcher m = MATERIAL_VALUE_PATTERN.matcher(s);
 					if (m.matches()) {

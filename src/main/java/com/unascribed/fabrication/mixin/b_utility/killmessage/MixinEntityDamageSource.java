@@ -5,7 +5,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.unascribed.fabrication.FabConf;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.text.MutableText;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -16,8 +18,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.unascribed.fabrication.interfaces.GetKillMessage;
 import com.unascribed.fabrication.support.EligibleIf;
 
-import net.fabricmc.fabric.api.util.NbtType;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
@@ -32,7 +32,7 @@ public abstract class MixinEntityDamageSource {
 	@FabInject(at=@At("HEAD"), method="getDeathMessage(Lnet/minecraft/entity/LivingEntity;)Lnet/minecraft/text/Text;", cancellable=true)
 	public void getDeathMessage(LivingEntity victim, CallbackInfoReturnable<Text> rtrn) {
 		if (!FabConf.isEnabled("*.killmessage")) return;
-		Entity attacker = victim.getPrimeAdversary();
+		LivingEntity attacker = victim.getPrimeAdversary();
 		if (attacker instanceof GetKillMessage) {
 			Iterator<ItemStack> iter = attacker.getHandItems().iterator();
 			ItemStack held;
@@ -42,8 +42,8 @@ public abstract class MixinEntityDamageSource {
 				held = ItemStack.EMPTY;
 			}
 			String msg = null;
-			if (held.hasNbt() && held.getNbt().contains("KillMessage", NbtType.STRING)) {
-				msg = held.getNbt().getString("KillMessage");
+			if (held.contains(DataComponentTypes.CUSTOM_DATA) && held.get(DataComponentTypes.CUSTOM_DATA).getNbt().contains("KillMessage", NbtElement.STRING_TYPE)) {
+				msg = held.get(DataComponentTypes.CUSTOM_DATA).getNbt().getString("KillMessage");
 			}
 			if (msg == null) {
 				msg = ((GetKillMessage)attacker).fabrication$getKillMessage();

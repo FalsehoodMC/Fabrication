@@ -52,19 +52,19 @@ public class LoaderItemDespawn implements ConfigLoader {
 		for (String k : config.keySet()) {
 			ParsedTime time = ParsedTime.getFrom(config, k);
 			if (time instanceof ParsedTime.Unset) continue;
-			if (k.startsWith("@enchantments.")) {
+			/*if (k.startsWith("@enchantments.")) {
 				String id = k.substring(14);
 				if (!id.startsWith("@")) {
-					enchDespawns.put(Resolvable.of(new Identifier(id), Registries.ENCHANTMENT), time);
+					enchDespawns.put(Resolvable.of(id, Registries.ENCHANTMENT), time);
 				}
-			} else if (k.startsWith("@tags.")) {
+			} else*/ if (k.startsWith("@tags.")) {
 				String id = k.substring(6);
-				tagDespawns.put(new Identifier(id), time);
+				tagDespawns.put(Identifier.of(id), time);
 			} else if (k.startsWith("@nbtbools.")) {
 				String key = k.substring(10);
 				nbtBools.put(key, time);
 			} else if (!k.startsWith("@")) {
-				itemDespawns.put(Resolvable.of(new Identifier(k), Registries.ITEM), time);
+				itemDespawns.put(Resolvable.of(Identifier.of(k), Registries.ITEM), time);
 			}
 		}
 		ParsedTime.clearCache();

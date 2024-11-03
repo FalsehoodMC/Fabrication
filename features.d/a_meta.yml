@@ -61,6 +61,9 @@ feature_parity:
 		Fabrication is maintained on a few minecraft versions.
 		However the wiki only shows the latest version, here's a list of how the wiki would change going backwards.
 
+		#### 1.20.4
+		- Added fix_charm_amethyst_dupe (the issue is on all versions, it's unreasonable for this to exist in Fabrication, so it was dropped in 1.21)
+
 		#### 1.19.3:
 		- Added sync_attacker_yaw.
 

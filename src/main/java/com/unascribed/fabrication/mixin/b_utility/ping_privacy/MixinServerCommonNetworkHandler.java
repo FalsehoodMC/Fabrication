@@ -24,9 +24,9 @@ import java.net.SocketAddress;
 public class MixinServerCommonNetworkHandler {
 
 	@Shadow @Final
-	private MinecraftServer server;
+	protected MinecraftServer server;
 	@Shadow @Final
-	public ClientConnection connection;
+	protected ClientConnection connection;
 
 	@FabInject(at=@At("HEAD"), method="send(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/PacketCallbacks;)V")
 	public void sendPacket(Packet<?> packet, PacketCallbacks callbacks, CallbackInfo ci) {

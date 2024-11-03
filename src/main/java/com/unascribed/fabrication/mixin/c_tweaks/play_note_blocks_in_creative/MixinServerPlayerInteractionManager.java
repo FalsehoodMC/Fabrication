@@ -32,7 +32,7 @@ public class MixinServerPlayerInteractionManager {
 		BlockState bs = world.getBlockState(pos);
 		if (bs.getBlock() == Blocks.NOTE_BLOCK) {
 			if (player.isSneaky()) {
-				Blocks.NOTE_BLOCK.onBlockBreakStart(bs, world, pos, player);
+				bs.onBlockBreakStart(world, pos, player);
 				ci.setReturnValue(false);
 			}
 		}

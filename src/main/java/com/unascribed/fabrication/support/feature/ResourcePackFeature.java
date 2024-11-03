@@ -12,15 +12,18 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.resource.ResourcePack;
+import net.minecraft.resource.ResourcePackInfo;
+import net.minecraft.resource.ResourcePackPosition;
 import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.resource.ResourcePackProfile.InsertionPosition;
 import net.minecraft.resource.ResourcePackProvider;
 import net.minecraft.resource.ResourcePackSource;
 import net.minecraft.resource.ResourceType;
-import net.minecraft.text.Text;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.text.Text;
 import net.minecraft.world.World;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -54,17 +57,25 @@ public abstract class ResourcePackFeature implements Feature, ResourcePackProvid
 	@Override
 	public void register(Consumer<ResourcePackProfile> consumer) {
 		if (active) {
-			consumer.accept(ResourcePackProfile.create(MixinConfigPlugin.MOD_NAME + " " + path, Text.literal("Internal " + MixinConfigPlugin.MOD_NAME + " resources"), true,
+			consumer.accept(ResourcePackProfile.create(
+				new ResourcePackInfo(
+					MixinConfigPlugin.MOD_NAME + " " + path,
+					Text.literal("Internal " + MixinConfigPlugin.MOD_NAME + " resources"),
+					ResourcePackSource.BUILTIN,
+					Optional.empty()
+				),
 				new ResourcePackProfile.PackFactory() {
 					@Override
-					public ResourcePack open(String name) {
+					public ResourcePack open(ResourcePackInfo info) {
 						return new FabricationResourcePack(path);
 					}
+
 					@Override
-					public ResourcePack openWithOverlays(String name, ResourcePackProfile.Metadata metadata) {
-						return open(name);
+					public ResourcePack openWithOverlays(ResourcePackInfo info, ResourcePackProfile.Metadata metadata) {
+						return open(info);
 					}
-				}, ResourceType.CLIENT_RESOURCES, InsertionPosition.TOP, ResourcePackSource.BUILTIN));
+				}, ResourceType.CLIENT_RESOURCES, new ResourcePackPosition(true, InsertionPosition.TOP, false)
+			));
 		}
 	}
 

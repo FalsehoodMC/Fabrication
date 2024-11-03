@@ -83,7 +83,7 @@ public class FScriptScreen extends ScriptingScreen {
 				data.writeVarInt(1);
 				data.writeString(fabrication$key);
 				data.writeString(this.unloadScript());
-				client.getNetworkHandler().sendPacket(new CustomPayloadC2SPacket(new ByteBufCustomPayload(new Identifier("fabrication", "fscript"), data)));
+				client.getNetworkHandler().sendPacket(new CustomPayloadC2SPacket(new ByteBufCustomPayload(Identifier.of("fabrication", "fscript"), data)));
 			}
 		}
 		x -= 50;
@@ -95,7 +95,7 @@ public class FScriptScreen extends ScriptingScreen {
 				PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
 				data.writeVarInt(2);
 				data.writeString(fabrication$key);
-				client.getNetworkHandler().sendPacket(new CustomPayloadC2SPacket(new ByteBufCustomPayload(new Identifier("fabrication", "fscript"), data)));
+				client.getNetworkHandler().sendPacket(new CustomPayloadC2SPacket(new ByteBufCustomPayload(Identifier.of("fabrication", "fscript"), data)));
 			}
 		}
 		x -= 50;
@@ -113,7 +113,7 @@ public class FScriptScreen extends ScriptingScreen {
 				PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
 				data.writeVarInt(0);
 				data.writeString(fabrication$key);
-				client.getNetworkHandler().sendPacket(new CustomPayloadC2SPacket(new ByteBufCustomPayload(new Identifier("fabrication", "fscript"), data)));
+				client.getNetworkHandler().sendPacket(new CustomPayloadC2SPacket(new ByteBufCustomPayload(Identifier.of("fabrication", "fscript"), data)));
 				fabrication$requestedScript = true;
 			}
 		}

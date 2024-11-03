@@ -85,12 +85,13 @@ public class FabricationConfigScreen extends Screen {
 		CLIENT_ONLY, REQUIRES_FABRIC_API, SHOW_SOURCE_SECTION, HIGHLIGHT_QUERY_MATCH
 	}
 	private final Map<String, String> SECTION_DESCRIPTIONS = Maps.newHashMap();
-	private static final Identifier ID_LOCK = new Identifier("fabrication", "lock.png");
-	private static final Identifier ID_FSCRIPT = new Identifier("fabrication", "fscript.png");
-	private static final Identifier BG = new Identifier("fabrication", "bg.png");
-	private static final Identifier BG_DARK = new Identifier("fabrication", "bg-dark.png");
-	private static final Identifier BG_GRAD = new Identifier("fabrication", "bg-grad.png");
-	private static final Identifier BG_GRAD_DARK = new Identifier("fabrication", "bg-grad-dark.png");
+	private static final Identifier ID_LOCK = Identifier.of("fabrication", "lock.png");
+	private static final Identifier ID_FSCRIPT = Identifier.of("fabrication", "fscript.png");
+	private static final Identifier BG = Identifier.of("fabrication", "bg.png");
+	private static final Identifier BG_DARK = Identifier.of("fabrication", "bg-dark.png");
+	private static final Identifier BG_GRAD = Identifier.of("fabrication", "bg-grad.png");
+	private static final Identifier BG_GRAD_DARK = Identifier.of("fabrication", "bg-grad-dark.png");
+	private static final Identifier INWORLD_MENU_BACKGROUND_TEXTURE = Identifier.ofVanilla("textures/gui/inworld_menu_background.png");
 
 	private static long serverLaunchId = -1;
 
@@ -293,7 +294,7 @@ public class FabricationConfigScreen extends Screen {
 							projection.push();
 							projection.translate(width * x, height * y, 0);
 							RenderSystem.setProjectionMatrix(projection.peek().getPositionMatrix(), VertexSorter.BY_Z);
-							parent.renderBackgroundTexture(drawContext);
+							Screen.renderBackgroundTexture(drawContext, this.client.world == null ? MENU_BACKGROUND_TEXTURE : INWORLD_MENU_BACKGROUND_TEXTURE, x, y, 0.0F, 0.0F, width, height);
 							projection.pop();
 						}
 					}
@@ -327,7 +328,7 @@ public class FabricationConfigScreen extends Screen {
 		float cutoffV = cutoffY/(float)height;
 		Identifier bg = FabConf.isEnabled("general.dark_mode") ? BG_DARK : BG;
 		Identifier bgGrad = FabConf.isEnabled("general.dark_mode") ? BG_GRAD_DARK : BG_GRAD;
-		BufferBuilder bb = Tessellator.getInstance().getBuffer();
+		Tessellator tessellator = Tessellator.getInstance();
 		Matrix4f mat = drawContext.getMatrices().peek().getPositionMatrix();
 
 		RenderSystem.enableBlend();
@@ -343,11 +344,11 @@ public class FabricationConfigScreen extends Screen {
 
 		int startX = cutoffX == 0 ? -width : cutoffX;
 
-		bb.begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
-		bb.vertex(mat, startX, cutoffY, 0).texture(0, cutoffV).next();
-		bb.vertex(mat, width*2, cutoffY, 0).texture(1, cutoffV).next();
-		bb.vertex(mat, width*2, height, 0).texture(1, 1).next();
-		bb.vertex(mat, startX, height, 0).texture(0, 1).next();
+		BufferBuilder bb = tessellator.begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+		bb.vertex(mat, startX, cutoffY, 0).texture(0, cutoffV);
+		bb.vertex(mat, width*2, cutoffY, 0).texture(1, cutoffV);
+		bb.vertex(mat, width*2, height, 0).texture(1, 1);
+		bb.vertex(mat, startX, height, 0).texture(0, 1);
 		BufferRenderer.drawWithGlobalProgram(bb.end());
 		float ratio = 502/1080f;
 
@@ -371,14 +372,14 @@ public class FabricationConfigScreen extends Screen {
 			if (prideFlag != null) {
 				prideFlag.render(drawContext, brk, top, w, bottom-top);
 			} else {
-				bb.begin(DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+				bb = tessellator.begin(DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 				float r = MathHelper.lerp(flagCutoffV, 0.298f, 0.475f);
 				float g = MathHelper.lerp(flagCutoffV, 0.686f, 0.333f);
 				float b = MathHelper.lerp(flagCutoffV, 0.314f, 0.282f);
-				bb.vertex(mat, brk, top, 0).color(r, g, b, 1).next();
-				bb.vertex(mat, brk2, top, 0).color(r, g, b, 1).next();
-				bb.vertex(mat, brk2, bottom, 0).color(0.475f, 0.333f, 0.282f, 1).next();
-				bb.vertex(mat, brk, bottom, 0).color(0.475f, 0.333f, 0.282f, 1).next();
+				bb.vertex(mat, brk, top, 0).color(r, g, b, 1);
+				bb.vertex(mat, brk2, top, 0).color(r, g, b, 1);
+				bb.vertex(mat, brk2, bottom, 0).color(0.475f, 0.333f, 0.282f, 1);
+				bb.vertex(mat, brk, bottom, 0).color(0.475f, 0.333f, 0.282f, 1);
 				BufferRenderer.drawWithGlobalProgram(bb.end());
 			}
 		}
@@ -388,21 +389,21 @@ public class FabricationConfigScreen extends Screen {
 		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 		RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-		bb.begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
-		bb.vertex(mat, Math.max(cutoffX, border), cutoffY, 0).texture(0, cutoffV).next();
-		bb.vertex(mat, brk, cutoffY, 0).texture(0, cutoffV).next();
-		bb.vertex(mat, brk, height, 0).texture(0, 1).next();
-		bb.vertex(mat, Math.max(cutoffX, border), height, 0).texture(0, 1).next();
+		bb = tessellator.begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+		bb.vertex(mat, Math.max(cutoffX, border), cutoffY, 0).texture(0, cutoffV);
+		bb.vertex(mat, brk, cutoffY, 0).texture(0, cutoffV);
+		bb.vertex(mat, brk, height, 0).texture(0, 1);
+		bb.vertex(mat, Math.max(cutoffX, border), height, 0).texture(0, 1);
 
-		bb.vertex(mat, brk, cutoffY, 0).texture(0, cutoffV).next();
-		bb.vertex(mat, brk2, cutoffY, 0).texture(1, cutoffV).next();
-		bb.vertex(mat, brk2, height, 0).texture(1, 1).next();
-		bb.vertex(mat, brk, height, 0).texture(0, 1).next();
+		bb.vertex(mat, brk, cutoffY, 0).texture(0, cutoffV);
+		bb.vertex(mat, brk2, cutoffY, 0).texture(1, cutoffV);
+		bb.vertex(mat, brk2, height, 0).texture(1, 1);
+		bb.vertex(mat, brk, height, 0).texture(0, 1);
 
-		bb.vertex(mat, brk2, cutoffY, 0).texture(1, cutoffV).next();
-		bb.vertex(mat, width-border, cutoffY, 0).texture(1, cutoffV).next();
-		bb.vertex(mat, width-border, height, 0).texture(1, 1).next();
-		bb.vertex(mat, brk2, height, 0).texture(1, 1).next();
+		bb.vertex(mat, brk2, cutoffY, 0).texture(1, cutoffV);
+		bb.vertex(mat, width-border, cutoffY, 0).texture(1, cutoffV);
+		bb.vertex(mat, width-border, height, 0).texture(1, 1);
+		bb.vertex(mat, brk2, height, 0).texture(1, 1);
 
 		BufferRenderer.drawWithGlobalProgram(bb.end());
 
@@ -410,11 +411,11 @@ public class FabricationConfigScreen extends Screen {
 		if (a > 0) {
 			RenderSystem.setShaderColor(1, 1, 1, a);
 			RenderSystem.setShaderTexture(0, bgGrad);
-			bb.begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
-			bb.vertex(mat, startX, cutoffY, 0).texture(0, cutoffV).next();
-			bb.vertex(mat, width*2, cutoffY, 0).texture(1, cutoffV).next();
-			bb.vertex(mat, width*2, height, 0).texture(1, 1).next();
-			bb.vertex(mat, startX, height, 0).texture(0, 1).next();
+			bb = tessellator.begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+			bb.vertex(mat, startX, cutoffY, 0).texture(0, cutoffV);
+			bb.vertex(mat, width*2, cutoffY, 0).texture(1, cutoffV);
+			bb.vertex(mat, width*2, height, 0).texture(1, 1);
+			bb.vertex(mat, startX, height, 0).texture(0, 1);
 			BufferRenderer.drawWithGlobalProgram(bb.end());
 		}
 
@@ -457,7 +458,7 @@ public class FabricationConfigScreen extends Screen {
 		}
 
 		drawContext.fill(-width, -height, 130, height, 0x44000000);
-		float scroll = sidebarHeight < height ? 0 : lastSidebarScroll+((sidebarScroll-lastSidebarScroll)*client.getTickDelta());
+		float scroll = sidebarHeight < height ? 0 : lastSidebarScroll+((sidebarScroll-lastSidebarScroll)*client.getRenderTickCounter().getTickDelta(true));
 		scroll = (float) (Math.floor((scroll*client.getWindow().getScaleFactor()))/client.getWindow().getScaleFactor());
 		float y = 8-scroll;
 		int newHeight = 8;
@@ -484,7 +485,7 @@ public class FabricationConfigScreen extends Screen {
 				size = 12;
 				icoY = -4;
 			}
-			Identifier id = new Identifier("fabrication", "category/"+s+".png");
+			Identifier id = Identifier.of("fabrication", "category/"+s+".png");
 			RenderSystem.enableBlend();
 			RenderSystem.defaultBlendFunc();
 			client.getTextureManager().bindTexture(id);
@@ -547,13 +548,13 @@ public class FabricationConfigScreen extends Screen {
 				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
 				RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-				BufferBuilder bb = Tessellator.getInstance().getBuffer();
+				Tessellator tessellator = Tessellator.getInstance();
 				Matrix4f mat = matrices.peek().getPositionMatrix();
-				bb.begin(DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-				bb.vertex(mat, 0, y-thisHeight-8, 0).color(1, 1, 1, 0.2f).next();
-				bb.vertex(mat, 130*selectA, y-thisHeight-8, 0).color(1, 1, 1, 0.2f+((1-selectA)*0.8f)).next();
-				bb.vertex(mat, 130*selectA, y, 0).color(1, 1, 1, 0.2f+((1-selectA)*0.8f)).next();
-				bb.vertex(mat, 0, y, 0).color(1, 1, 1, 0.2f).next();
+				BufferBuilder bb = tessellator.begin(DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+				bb.vertex(mat, 0, y-thisHeight-8, 0).color(1, 1, 1, 0.2f);
+				bb.vertex(mat, 130*selectA, y-thisHeight-8, 0).color(1, 1, 1, 0.2f+((1-selectA)*0.8f));
+				bb.vertex(mat, 130*selectA, y, 0).color(1, 1, 1, 0.2f+((1-selectA)*0.8f));
+				bb.vertex(mat, 0, y, 0).color(1, 1, 1, 0.2f);
 				BufferRenderer.drawWithGlobalProgram(bb.end());
 			}
 			y += 8;
@@ -782,7 +783,7 @@ public class FabricationConfigScreen extends Screen {
 		matrices.translate(-60, -(choiceY+16), 0);
 		float lastScrollOfs = (selected ? lastSelectedSectionScroll : lastPrevSelectedSectionScroll);
 		float scrollOfs = (selected ? selectedSectionScroll : prevSelectedSectionScroll);
-		float scroll = (selected ? selectedSectionHeight : prevSelectedSectionHeight) < height-36 ? 0 : lastScrollOfs+((scrollOfs-lastScrollOfs)*client.getTickDelta());
+		float scroll = (selected ? selectedSectionHeight : prevSelectedSectionHeight) < height-36 ? 0 : lastScrollOfs+((scrollOfs-lastScrollOfs)*client.getRenderTickCounter().getTickDelta(true));
 		int startY = 16-(int)(scroll);
 		int y = startY;
 		if (section == null) {
@@ -802,7 +803,7 @@ public class FabricationConfigScreen extends Screen {
 		} else {
 			RenderSystem.enableBlend();
 			RenderSystem.defaultBlendFunc();
-			Identifier tex = new Identifier("fabrication", "category/"+section+".png");
+			Identifier tex = Identifier.of("fabrication", "category/"+section+".png");
 			RenderSystem.setShaderTexture(0, tex);
 			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
@@ -942,7 +943,7 @@ public class FabricationConfigScreen extends Screen {
 		y += drawWrappedText(drawContext, 200, 2, title, width-200, 0xFFFFFFFF, false) + 6;
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
-		RenderSystem.setShaderTexture(0, new Identifier("fabrication", "coffee_bean.png"));
+		RenderSystem.setShaderTexture(0, Identifier.of("fabrication", "coffee_bean.png"));
 		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 		int x = 0;
@@ -984,7 +985,7 @@ public class FabricationConfigScreen extends Screen {
 				setValue(key, p.name().toLowerCase(Locale.ROOT));
 			}
 			color(p.getColor(), profSel ? 1f : hovered == p ? 0.6f : 0.3f);
-			drawContext.drawTexture(new Identifier("fabrication", "coffee_bean.png"), 134+x, 0, 0, 0, 0, 16, 16, 16, 16);
+			drawContext.drawTexture(Identifier.of("fabrication", "coffee_bean.png"), 134+x, 0, 0, 0, 0, 16, 16, 16, 16);
 			color(-1);
 			x += 18;
 		}
@@ -1028,7 +1029,7 @@ public class FabricationConfigScreen extends Screen {
 			knownDisabled.remove(key);
 		}
 		if (time > 0) {
-			time -= client.getLastFrameDuration();
+			time -= client.getRenderTickCounter().getLastFrameDuration();
 			if (time <= 0) {
 				optionAnimationTime.remove(key);
 				time = 0;
@@ -1037,7 +1038,7 @@ public class FabricationConfigScreen extends Screen {
 			}
 		}
 		if (disabledTime > 0) {
-			disabledTime -= client.getLastFrameDuration();
+			disabledTime -= client.getRenderTickCounter().getLastFrameDuration();
 			if (disabledTime <= 0) {
 				disabledAnimationTime.remove(key);
 				disabledTime = 0;
@@ -1046,7 +1047,7 @@ public class FabricationConfigScreen extends Screen {
 			}
 		}
 		if (becomeBanTime > 0) {
-			becomeBanTime -= client.getLastFrameDuration();
+			becomeBanTime -= client.getRenderTickCounter().getLastFrameDuration();
 			if (becomeBanTime <= 0) {
 				becomeBanAnimationTime.remove(key);
 				becomeBanTime = 0;
@@ -1109,7 +1110,7 @@ public class FabricationConfigScreen extends Screen {
 		matrices.pop();
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
-		Identifier tex =  new Identifier("fabrication", "configvalue.png");
+		Identifier tex =  Identifier.of("fabrication", "configvalue.png");
 		RenderSystem.setShaderTexture(0, tex);
 		RenderSystem.setShaderColor(1, 1, 1, 0.5f+((1-da)*0.5f));
 		if (noUnset) {
@@ -1196,7 +1197,7 @@ public class FabricationConfigScreen extends Screen {
 		String section = null;
 		if (showSourceSection && key.contains(".")) {
 			section = key.substring(0, key.indexOf('.'));
-			Identifier id = new Identifier("fabrication", "category/"+section+".png");
+			Identifier id = Identifier.of("fabrication", "category/"+section+".png");
 			RenderSystem.setShaderTexture(0, id);
 			RenderSystem.setShaderColor(1, 1, 1, 1);
 			drawContext.drawTexture(id, startX-2, 0, 0, 0, 12, 12, 12, 12);
@@ -1442,7 +1443,7 @@ public class FabricationConfigScreen extends Screen {
 		public DrawableSave(File file) {
 			this.file = file;
 			File iconFile = new File(file, "icon.png");
-			this.icon = new Identifier("fabrication", "worlds/" + this.hashCode());
+			this.icon = Identifier.of("fabrication", "worlds/" + this.hashCode());
 			if (iconFile.isFile()) {
 				try {
 					FileInputStream inputStream = new FileInputStream(iconFile);
@@ -1663,7 +1664,7 @@ public class FabricationConfigScreen extends Screen {
 			data.writeVarInt(1);
 			data.writeString(key);
 			data.writeString(value);
-			client.getNetworkHandler().sendPacket(new CustomPayloadC2SPacket(new ByteBufCustomPayload(new Identifier("fabrication", "config"), data)));
+			client.getNetworkHandler().sendPacket(new CustomPayloadC2SPacket(new ByteBufCustomPayload(Identifier.of("fabrication", "config"), data)));
 		} else if (editingWorldPath && FabConf.hasWorldPath()) {
 			FabConf.worldSet(key, value);
 			if (FabricationMod.isAvailableFeature(key)) {
@@ -1720,7 +1721,7 @@ public class FabricationConfigScreen extends Screen {
 			MatrixStack matrices = drawContext.getMatrices();
 			matrices.push();
 			drawContext.fill(innerX-3, innerY-3, innerX+maxWidth+3, innerY+totalHeight+3, 0xAA000000);
-			VertexConsumerProvider.Immediate vcp = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
+			VertexConsumerProvider.Immediate vcp = drawContext.getVertexConsumers();
 			matrices.translate(0, 0, 400);
 
 			for (int i = 0; i < lines.size(); ++i) {

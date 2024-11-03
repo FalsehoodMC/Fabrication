@@ -14,7 +14,7 @@ import com.unascribed.fabrication.support.Env;
 
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.particle.DefaultParticleType;
+import net.minecraft.particle.SimpleParticleType;
 import net.minecraft.util.math.Direction;
 
 @Mixin(NoteParticle.Factory.class)
@@ -22,8 +22,8 @@ import net.minecraft.util.math.Direction;
 @FailOn(invertedSpecialConditions=SpecialEligibility.NOT_FORGE)
 public class MixinNoteParticleFactory {
 
-	@FabInject(at=@At("RETURN"), method="createParticle(Lnet/minecraft/particle/DefaultParticleType;Lnet/minecraft/client/world/ClientWorld;DDDDDD)Lnet/minecraft/client/particle/Particle;")
-	public void createParticle(DefaultParticleType type, ClientWorld world, double x, double y, double z, double vX, double vY, double vZ, CallbackInfoReturnable<Particle> ci) {
+	@FabInject(at=@At("RETURN"), method="createParticle(Lnet/minecraft/particle/SimpleParticleType;Lnet/minecraft/client/world/ClientWorld;DDDDDD)Lnet/minecraft/client/particle/Particle;")
+	public void createParticle(SimpleParticleType type, ClientWorld world, double x, double y, double z, double vX, double vY, double vZ, CallbackInfoReturnable<Particle> ci) {
 		Direction dir = Direction.byId((int)vZ+1);
 		Particle p = ci.getReturnValue();
 		if (p instanceof SetVelocity) {

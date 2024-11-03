@@ -12,8 +12,11 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.resource.InputSupplier;
 import net.minecraft.resource.ResourcePack;
+import net.minecraft.resource.ResourcePackInfo;
+import net.minecraft.resource.ResourcePackSource;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.resource.metadata.ResourceMetadataReader;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import java.io.File;
@@ -24,6 +27,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -102,7 +106,7 @@ public class FabricationResourcePack implements ResourcePack {
 					String name = en.nextElement().getName();
 					int i = name.indexOf(dirPathStr);
 					if (i != -1) {
-						Identifier id = new Identifier("fabrication", name.substring(i+prePath.length()));
+						Identifier id = Identifier.of("fabrication", name.substring(i+prePath.length()));
 						consumer.accept(id, open(type, id));
 					}
 				}
@@ -120,7 +124,7 @@ public class FabricationResourcePack implements ResourcePack {
 							String name = file.getPath();
 							int ix = name.indexOf(dirPathStr);
 							if (ix != -1) {
-								Identifier id = new Identifier("fabrication", name.substring(ix + prePath.length()));
+								Identifier id = Identifier.of("fabrication", name.substring(ix + prePath.length()));
 								consumer.accept(id, open(type, id));
 							}
 						}
@@ -145,8 +149,13 @@ public class FabricationResourcePack implements ResourcePack {
 	}
 
 	@Override
-	public String getName() {
-		return MixinConfigPlugin.MOD_NAME;
+	public ResourcePackInfo getInfo() {
+		return new ResourcePackInfo(
+			MixinConfigPlugin.MOD_NAME,
+			Text.literal(MixinConfigPlugin.MOD_NAME),
+			ResourcePackSource.BUILTIN,
+			Optional.empty()
+		);
 	}
 
 	@Override

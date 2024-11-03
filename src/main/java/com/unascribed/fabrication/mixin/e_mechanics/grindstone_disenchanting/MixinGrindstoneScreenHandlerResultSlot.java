@@ -1,10 +1,9 @@
 package com.unascribed.fabrication.mixin.e_mechanics.grindstone_disenchanting;
 
-import java.util.Map;
-
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.FailOn;
 import com.unascribed.fabrication.support.injection.FabInject;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,11 +15,11 @@ import com.unascribed.fabrication.support.EligibleIf;
 
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.EnchantmentLevelEntry;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.EnchantedBookItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.EnchantmentTags;
 import net.minecraft.screen.GrindstoneScreenHandler;
 import net.minecraft.world.World;
 
@@ -44,12 +43,12 @@ public class MixinGrindstoneScreenHandlerResultSlot implements SetOwner<Grindsto
 		fabrication$storedResultBook = null;
 		if (FabConf.isEnabled("*.grindstone_disenchanting") && fabrication$owner.getSlot(1).getStack().getItem() == Items.BOOK) {
 			fabrication$storedResultBook = fabrication$owner.getSlot(1).getStack();
-			for (Map.Entry<Enchantment, Integer> en : EnchantmentHelper.get(fabrication$owner.getSlot(0).getStack()).entrySet()) {
-				if (en.getKey().isCursed()) continue;
+			for (Object2IntMap.Entry<RegistryEntry<Enchantment>> en : EnchantmentHelper.getEnchantments(fabrication$owner.getSlot(0).getStack()).getEnchantmentEntries()) {
+				if (en.getKey().isIn(EnchantmentTags.CURSE)) continue;
 				if (fabrication$storedResultBook.getItem() != Items.ENCHANTED_BOOK) {
 					fabrication$storedResultBook = new ItemStack(Items.ENCHANTED_BOOK);
 				}
-				EnchantedBookItem.addEnchantment(fabrication$storedResultBook, new EnchantmentLevelEntry(en.getKey(), en.getValue()));
+				fabrication$storedResultBook.addEnchantment(en.getKey(), en.getIntValue());
 			}
 		}
 	}

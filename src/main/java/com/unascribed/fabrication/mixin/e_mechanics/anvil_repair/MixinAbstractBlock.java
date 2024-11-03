@@ -8,31 +8,32 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.unascribed.fabrication.support.EligibleIf;
 
+import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.AnvilBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.ItemActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-@Mixin(AnvilBlock.class)
+@Mixin(AbstractBlock.class)
 @EligibleIf(configAvailable="*.anvil_repair")
-public class MixinAnvilBlock {
+public class MixinAbstractBlock {
 
-	@FabInject(at=@At("HEAD"), method="onUse(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;",
+	@FabInject(at=@At("HEAD"), method="onUseWithItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ItemActionResult;",
 			cancellable=true)
-	public void onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, CallbackInfoReturnable<ActionResult> ci) {
+	public void onUse(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, CallbackInfoReturnable<ItemActionResult> cir) {
+		if (!((Object) this instanceof AnvilBlock)) return;
 		if (!FabConf.isEnabled("*.anvil_repair")) return;
 		if (!world.isClient) {
 			ItemStack held = player.getStackInHand(hand);
-			if (held.getItem() == Item.fromBlock(Blocks.IRON_BLOCK)) {
+			if (held.isOf(Blocks.IRON_BLOCK.asItem())) {
 				BlockState bs = world.getBlockState(pos);
 				boolean consume = false;
 				if (bs.getBlock() == Blocks.DAMAGED_ANVIL) {
@@ -47,7 +48,7 @@ public class MixinAnvilBlock {
 					if (!player.getAbilities().creativeMode) {
 						held.decrement(1);
 					}
-					ci.setReturnValue(ActionResult.SUCCESS);
+					cir.setReturnValue(ItemActionResult.SUCCESS);
 				}
 			}
 		}

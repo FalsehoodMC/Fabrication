@@ -123,7 +123,7 @@ public abstract class MixinPigEntity extends Entity {
 			tags.putByte("fabrication$chestPigs$size", (byte)fabrication$chestPig.size());
 			for (byte i=0; i<fabrication$chestPig.size();++i) {
 				NbtCompound tagi = new NbtCompound();
-				fabrication$chestPig.getStack(i).writeNbt(tagi);
+				fabrication$chestPig.getStack(i).encode(this.getRegistryManager(), tagi);
 				tag.put(""+i,tagi);
 			}
 			tags.put("fabrication$chestPigs$inv",tag);
@@ -142,7 +142,7 @@ public abstract class MixinPigEntity extends Entity {
 			case 54:
 				fabrication$chestPig = new SimpleInventory(size);
 				for (byte i=0; i<size; ++i){
-					fabrication$chestPig.setStack(i, ItemStack.fromNbt(tag.getCompound(""+i)));
+					fabrication$chestPig.setStack(i, ItemStack.fromNbtOrEmpty(this.getRegistryManager(), tag.getCompound(""+i)));
 				}
 				break;
 			default:
