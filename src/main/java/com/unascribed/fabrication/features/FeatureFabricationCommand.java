@@ -603,26 +603,17 @@ public class FeatureFabricationCommand implements Feature {
 		String oldValue = FabConf.getRawValue(key);
 		boolean def = FabConf.getDefault(key);
 		if (!local && value.equals(oldValue) || local && FabConf.doesWorldContainValue(key, value)) {
-			sendFeedback(c, new LiteralText(key+" is already set to "+value+(" (default "+def+")")), false);
+			sendFeedback(c, new LiteralText(key + " is already set to " + value + (" (default " + def + ")")), false);
 		} else {
 			if (local) FabConf.worldSet(key, value);
 			else FabConf.set(key, value);
 			if (c.getSource() instanceof ServerCommandSource) {
-				FabricationMod.sendConfigUpdate(((ServerCommandSource)c.getSource()).getServer(), key);
+				FabricationMod.sendConfigUpdate(((ServerCommandSource) c.getSource()).getServer(), key);
 			}
-			sendFeedback(c, new LiteralText(key+" is now set to "+value+(" (default "+def+")")+(local ? " for this world" : "")), true);
+			sendFeedback(c, new LiteralText(key + " is now set to " + value + (" (default " + def + ")") + (local ? " for this world" : "")), true);
 			if (FabricationMod.isAvailableFeature(key)) {
 				CommandSource commandSource = c.getSource();
-				MinecraftServer server = null;
-				World world = null;
-				if (commandSource instanceof ServerCommandSource) {
-					server = ((ServerCommandSource) commandSource).getServer();
-					world = ((ServerCommandSource) commandSource).getWorld();
-				} else if (commandSource instanceof ClientCommandSource) {
-					server = MinecraftClient.getInstance().getServer();
-					world = MinecraftClient.getInstance().world;
-				}
-				if (FabricationMod.updateFeature(key, server, world)) {
+				if (FabricationMod.updateFeature(key, commandSource)) {
 					return;
 				}
 			}
