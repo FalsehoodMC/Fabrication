@@ -12,6 +12,3 @@ accessible class net/minecraft/command/argument/ItemStringReader$Reader
 accessible class net/minecraft/entity/ai/brain/task/CrossbowAttackTask$CrossbowState
 accessible class net/minecraft/entity/ai/goal/CrossbowAttackGoal$Stage
 accessible class net/minecraft/server/world/ServerChunkLoadingManager$EntityTracker
-accessible class net/minecraft/enchantment/EnchantmentHelper$Consumer
-
-extendable class net/minecraft/loot/condition/EntityPropertiesLootCondition
