@@ -844,7 +844,7 @@ public class FabricationConfigScreen extends Screen {
 					pen = (en) -> emptyQuery || (queryPattern.matcher(en.name).find() || queryPattern.matcher(en.shortName).find() || queryPattern.matcher(en.desc).find());
 				}
 				if (isFScriptLoaded && searchingScriptable) pen = ((Predicate<FeatureEntry>) en -> en.fscript != null).and(pen);
-				y = drawConfigValues(drawContext, y, mouseX, mouseY, pen, SHOW_SOURCE_SECTION, emptyQuery ? null : HIGHLIGHT_QUERY_MATCH);
+				y = drawConfigValues(drawContext, y, mouseX, mouseY, ((Predicate<FeatureEntry>) en -> !en.key.startsWith("general.category.")).and(pen), SHOW_SOURCE_SECTION, emptyQuery ? null : HIGHLIGHT_QUERY_MATCH);
 			} else {
 				String name = FeaturesFile.get(section).name;
 				if (y > 0) {
