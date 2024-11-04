@@ -63,13 +63,13 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
 	public void onCustomPayload(CustomPayload payload, CallbackInfo ci) {
 		if (!(payload instanceof ByteBufCustomPayload)) return;
 
-		if (payload.getId().id().getNamespace().equals("fabrication")) {
-			if (payload.getId().id().getPath().equals("config") || payload.getId().id().getPath().equals("config2")) {
+		if (((ByteBufCustomPayload) payload).id().getNamespace().equals("fabrication")) {
+			if (((ByteBufCustomPayload) payload).id().getPath().equals("config") || ((ByteBufCustomPayload) payload).id().getPath().equals("config2")) {
 				try {
 					fabrication$hasHandshook = true;
 					PacketByteBuf buf = ((ByteBufCustomPayload) payload).buf();
 					int reqVer = 0;
-					if (payload.getId().id().getPath().equals("config2")) {
+					if (((ByteBufCustomPayload) payload).id().getPath().equals("config2")) {
 						reqVer = buf.readVarInt();
 					}
 					int trileanKeys = buf.readVarInt();
@@ -119,7 +119,7 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
 					e.printStackTrace();
 					throw e;
 				}
-			}else if (payload.getId().id().getPath().equals("fscript")){
+			}else if (((ByteBufCustomPayload) payload).id().getPath().equals("fscript")){
 				try{
 					PacketByteBuf buf = ((ByteBufCustomPayload) payload).buf();
 					int code = buf.readVarInt();

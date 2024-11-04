@@ -41,7 +41,7 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
 	@FabInject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/CustomPayload;)V", cancellable=true)
 	public void onCustomPayload(CustomPayload payload, CallbackInfo ci) {
 		if (!(payload instanceof ByteBufCustomPayload)) return;
-		Identifier channel = payload.getId().id();
+		Identifier channel = ((ByteBufCustomPayload) payload).id();
 		if (channel == null) return;
 		if (channel.getNamespace().equals("fabrication") && channel.getPath().equals("item_despawn")) {
 			if (FabConf.isEnabled("*.despawning_items_blink")) {

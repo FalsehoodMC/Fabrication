@@ -24,7 +24,7 @@ public class MixinClientPlayNetworkHandler {
 	@FabInject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/CustomPayload;)V", cancellable=true)
 	public void onCustomPayload(CustomPayload payload, CallbackInfo ci) {
 		if (!(payload instanceof ByteBufCustomPayload)) return;
-		if (payload.getId().id().getNamespace().equals("fabrication") && payload.getId().id().getPath().equals("play_absorp_sound")) {
+		if (((ByteBufCustomPayload) payload).id().getNamespace().equals("fabrication") && ((ByteBufCustomPayload) payload).id().getPath().equals("play_absorp_sound")) {
 			if (FabConf.isEnabled("*.alt_absorption_sound")) {
 				int id = ((ByteBufCustomPayload) payload).buf().readInt();
 				MinecraftClient.getInstance().send(() -> {

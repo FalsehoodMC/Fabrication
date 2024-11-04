@@ -15,7 +15,6 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
 import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
-import net.minecraft.server.network.ServerCommonNetworkHandler;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -26,8 +25,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(ServerCommonNetworkHandler.class)
-public class MixinServerCommonNetworkHandler {
+@Mixin(ServerPlayNetworkHandler.class)
+public class MixinServerPlayNetworkHandler {
 
 	@FabInject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/c2s/common/CustomPayloadC2SPacket;)V", cancellable=true)
 	public void fabrication$onCustomPayload(CustomPayloadC2SPacket packet, CallbackInfo ci) {
@@ -36,7 +35,7 @@ public class MixinServerCommonNetworkHandler {
 		ServerPlayerEntity player = ((ServerPlayNetworkHandler) self).getPlayer();
 		CustomPayload payload = packet.payload();
 		if (!(payload instanceof ByteBufCustomPayload)) return;
-		Identifier channel = payload.getId().id();
+		Identifier channel = ((ByteBufCustomPayload) payload).id();
 		if (channel.getNamespace().equals("fabrication")) {
 			if (channel.getPath().equals("config")) {
 				ci.cancel();

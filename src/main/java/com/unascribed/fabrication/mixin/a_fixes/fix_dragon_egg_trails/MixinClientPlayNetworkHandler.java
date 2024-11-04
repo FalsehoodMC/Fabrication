@@ -26,7 +26,7 @@ public class MixinClientPlayNetworkHandler {
 	@FabInject(at=@At("HEAD"), method="onCustomPayload(Lnet/minecraft/network/packet/CustomPayload;)V", cancellable=true)
 	public void onCustomPayload(CustomPayload packet, CallbackInfo ci) {
 		if (!(packet instanceof ByteBufCustomPayload)) return;
-		if (packet.getId().id().getNamespace().equals("fabrication") && packet.getId().id().getPath().equals("dragon_egg_trail")) {
+		if (((ByteBufCustomPayload) packet).id().getNamespace().equals("fabrication") && ((ByteBufCustomPayload) packet).id().getPath().equals("dragon_egg_trail")) {
 			PacketByteBuf buf = ((ByteBufCustomPayload) packet).buf();
 			BlockPos pos = buf.readBlockPos();
 			BlockPos newPos = buf.readBlockPos();
