@@ -19,9 +19,7 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.Window;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
 
 @EligibleIf(configAvailable="*.toggle_stance", envMatches=Env.CLIENT)
 public class FeatureToggleStance implements Feature {
@@ -52,7 +50,7 @@ public class FeatureToggleStance implements Feature {
 	public static int lastAge = 0;
 
 	@Override
-	public void apply(MinecraftServer minecraftServer, World world) {
+	public void apply() {
 		keybind = new KeyBinding("["+ MixinConfigPlugin.MOD_NAME+"] Toggle Stance", InputUtil.UNKNOWN_KEY.getCode(), "key.categories.movement") {
 			@Override
 			public void setPressed(boolean pressed) {
@@ -100,7 +98,7 @@ public class FeatureToggleStance implements Feature {
 	}
 
 	@Override
-	public boolean undo(MinecraftServer minecraftServer, World world) {
+	public boolean undo() {
 		return false;
 	}
 
