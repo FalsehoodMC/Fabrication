@@ -28,12 +28,10 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.minecraft.world.World;
 
 @EligibleIf(configAvailable="*.i_and_more")
 public class FeatureIMore implements Feature {
@@ -42,7 +40,7 @@ public class FeatureIMore implements Feature {
 	private boolean registered = false;
 
 	@Override
-	public void apply(MinecraftServer minecraftServer, World world) {
+	public void apply() {
 		applied = true;
 		if (!registered) {
 			registered = true;
@@ -160,7 +158,7 @@ public class FeatureIMore implements Feature {
 	}
 
 	@Override
-	public boolean undo(MinecraftServer minecraftServer, World world) {
+	public boolean undo() {
 		applied = false;
 		return true;
 	}
