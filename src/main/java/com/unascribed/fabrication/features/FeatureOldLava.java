@@ -17,9 +17,7 @@ import net.minecraft.client.texture.SpriteContents;
 import net.minecraft.client.texture.SpriteDimensions;
 import net.minecraft.client.texture.SpriteLoader;
 import net.minecraft.resource.metadata.ResourceMetadata;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -79,15 +77,15 @@ public class FeatureOldLava implements Feature {
 	}
 
 	@Override
-	public void apply(MinecraftServer minecraftServer, World world) {
+	public void apply() {
 		if (MinecraftClient.getInstance().getResourceManager() != null) {
 			MinecraftClient.getInstance().reloadResources();
 		}
 	}
 
 	@Override
-	public boolean undo(MinecraftServer minecraftServer, World world) {
-		apply(minecraftServer, world);
+	public boolean undo() {
+		apply();
 		return true;
 	}
 

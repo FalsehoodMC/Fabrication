@@ -64,7 +64,7 @@ public class MixinServerCommonNetworkHandler {
 							if (id == 1) FabConf.set(key, value);
 							else FabConf.worldSet(key, value);
 							if (FabricationMod.isAvailableFeature(key)) {
-								FabricationMod.updateFeature(key, player.getServer(), player.getWorld());
+								FabricationMod.updateFeature(key);
 							}
 							FabricationMod.sendConfigUpdate(player.server, key);
 							fabrication$sendCommandFeedback(
