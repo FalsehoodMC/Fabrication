@@ -13,7 +13,6 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.fabricmc.loader.api.metadata.Person;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
@@ -21,7 +20,6 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.util.Formatting;
-import net.minecraft.world.World;
 
 @EligibleIf(configAvailable="*.mods_command", specialConditions=SpecialEligibility.NOT_FORGE)
 public class FeatureModsCommandFabric implements Feature {
@@ -29,7 +27,7 @@ public class FeatureModsCommandFabric implements Feature {
 	private boolean applied = false;
 
 	@Override
-	public void apply(MinecraftServer minecraftServer, World world) {
+	public void apply() {
 		if (applied) return;
 		applied = true;
 		Agnos.runForCommandRegistration((dispatcher, dedi) -> {
@@ -62,7 +60,7 @@ public class FeatureModsCommandFabric implements Feature {
 	}
 
 	@Override
-	public boolean undo(MinecraftServer minecraftServer, World world) {
+	public boolean undo() {
 		return true;
 	}
 

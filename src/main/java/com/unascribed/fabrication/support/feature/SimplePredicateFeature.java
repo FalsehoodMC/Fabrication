@@ -2,8 +2,6 @@ package com.unascribed.fabrication.support.feature;
 
 import com.unascribed.fabrication.support.ConfigPredicates;
 import com.unascribed.fabrication.support.Feature;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.World;
 
 import java.util.function.Predicate;
 
@@ -17,12 +15,12 @@ public abstract class SimplePredicateFeature implements Feature {
 	}
 
 	@Override
-	public void apply(MinecraftServer minecraftServer, World world) {
+	public void apply() {
 		ConfigPredicates.put(key, predicate);
 	}
 
 	@Override
-	public boolean undo(MinecraftServer minecraftServer, World world) {
+	public boolean undo() {
 		ConfigPredicates.remove(key);
 		return true;
 	}
