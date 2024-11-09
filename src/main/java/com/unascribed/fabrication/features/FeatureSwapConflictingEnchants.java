@@ -14,7 +14,6 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextContent;
@@ -31,17 +30,17 @@ public class FeatureSwapConflictingEnchants implements Feature {
 	private boolean applied = false;
 
 	@Override
-	public void apply(MinecraftServer minecraftServer, World world) {
+	public void apply() {
 		if (!applied) {
 			applied = true;
 			if (EarlyAgnos.getCurrentEnv() == Env.CLIENT) {
-				applyClient(world);
+				applyClient();
 			}
 		}
 	}
 
 	@Environment(EnvType.CLIENT)
-	private void applyClient(World _world) {
+	private void applyClient() {
 		Agnos.runForTooltipRender((stack, lines) -> {
 			if (!stack.isEmpty() && stack.contains(DataComponentTypes.CUSTOM_DATA)) {
 				if (!FabRefl.getShowInTooltip(stack.getEnchantments())) return;
@@ -77,7 +76,7 @@ public class FeatureSwapConflictingEnchants implements Feature {
 	}
 
 	@Override
-	public boolean undo(MinecraftServer minecraftServer, World world) {
+	public boolean undo() {
 		return true;
 	}
 

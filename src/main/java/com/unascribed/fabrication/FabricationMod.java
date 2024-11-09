@@ -75,7 +75,7 @@ public class FabricationMod implements ModInitializer {
 				String key = FabConf.remap(r.getConfigKey());
 				if (key == null || FabConf.isEnabled(key)) {
 					try {
-						r.apply(null, null);
+						r.apply();
 						if (key != null) {
 							enabledFeatures.add(key);
 						}
@@ -128,28 +128,16 @@ public class FabricationMod implements ModInitializer {
 		return features.containsKey(FabConf.remap(configKey));
 	}
 
-	public static boolean updateFeature(String configKey, CommandSource source) {
-		if (source instanceof ServerCommandSource) return updateFeature(configKey, (ServerCommandSource) source);
-		if (source instanceof ClientCommandSource) return updateFeature(configKey, (ClientCommandSource) source);
-		return false;
-	}
-	public static boolean updateFeature(String configKey, ServerCommandSource source) {
-		return updateFeature(configKey, source.getServer(), source.getWorld());
-	}
-	@Environment(EnvType.CLIENT)
-	public static boolean updateFeature(String configKey, ClientCommandSource source) {
-		return updateFeature(configKey, MinecraftClient.getInstance().getServer(), MinecraftClient.getInstance().world);
-	}
-	public static boolean updateFeature(String configKey, MinecraftServer server, World world) {
+	public static boolean updateFeature(String configKey) {
 		configKey = FabConf.remap(configKey);
 		boolean enabled = FabConf.isEnabled(configKey);
 		if (enabledFeatures.contains(configKey) == enabled) return true;
 		if (enabled) {
-			features.get(configKey).apply(server, world);
+			features.get(configKey).apply();
 			enabledFeatures.add(configKey);
 			return true;
 		} else {
-			boolean b = features.get(configKey).undo(server, world);
+			boolean b = features.get(configKey).undo();
 			if (b) {
 				enabledFeatures.remove(configKey);
 			}

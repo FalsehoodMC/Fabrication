@@ -12,9 +12,7 @@ import net.minecraft.resource.ResourcePackPosition;
 import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.resource.ResourcePackSource;
 import net.minecraft.resource.featuretoggle.FeatureSet;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.Text;
-import net.minecraft.world.World;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -49,10 +47,10 @@ public class FeatureFoliageCreepers extends ResourcePackFeature {
 		));
 	}
 	@Override
-	public void apply(MinecraftServer minecraftServer, World world) {
+	public void apply() {
 	}
 	@Override
-	public boolean undo(MinecraftServer minecraftServer, World world) {
+	public boolean undo() {
 		return true;
 	}
 }

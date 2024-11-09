@@ -39,7 +39,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -75,7 +74,7 @@ import java.util.function.Predicate;
 public class FeatureFabricationCommand implements Feature {
 
 	@Override
-	public void apply(MinecraftServer minecraftServer, World world) {
+	public void apply() {
 		Agnos.runForCommandRegistration((dispatcher, registryAccess, dedi) -> {
 			try {
 				LiteralArgumentBuilder<ServerCommandSource> root = LiteralArgumentBuilder.<ServerCommandSource>literal(MixinConfigPlugin.MOD_NAME_LOWER);
@@ -616,8 +615,7 @@ public class FeatureFabricationCommand implements Feature {
 			}
 			sendFeedback(c, Text.literal(key+" is now set to "+value+(" (default "+def+")")+(local ? " for this world" : "")), true);
 			if (FabricationMod.isAvailableFeature(key)) {
-				CommandSource commandSource = c.getSource();
-				if (FabricationMod.updateFeature(key, commandSource)) {
+				if (FabricationMod.updateFeature(key)) {
 					return;
 				}
 			}
@@ -633,7 +631,7 @@ public class FeatureFabricationCommand implements Feature {
 	}
 
 	@Override
-	public boolean undo(MinecraftServer minecraftServer, World world) {
+	public boolean undo() {
 		return false;
 	}
 
