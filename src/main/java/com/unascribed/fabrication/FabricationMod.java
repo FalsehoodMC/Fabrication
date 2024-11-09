@@ -1,12 +1,8 @@
 package com.unascribed.fabrication;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Predicate;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.unascribed.fabrication.interfaces.SetFabricationConfigAware;
 import com.unascribed.fabrication.support.ConfigLoader;
 import com.unascribed.fabrication.support.ConfigValues;
@@ -15,24 +11,13 @@ import com.unascribed.fabrication.support.FabricationDefaultResources;
 import com.unascribed.fabrication.support.Feature;
 import com.unascribed.fabrication.support.MixinConfigPlugin;
 import com.unascribed.fabrication.support.OptionalFScript;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientCommandSource;
-import net.minecraft.command.CommandSource;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
@@ -44,6 +29,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Predicate;
 
 public class FabricationMod implements ModInitializer {
 
@@ -74,7 +66,7 @@ public class FabricationMod implements ModInitializer {
 				String key = FabConf.remap(r.getConfigKey());
 				if (key == null || FabConf.isEnabled(key)) {
 					try {
-						r.apply(null, null);
+						r.apply();
 						if (key != null) {
 							enabledFeatures.add(key);
 						}
@@ -127,28 +119,16 @@ public class FabricationMod implements ModInitializer {
 		return features.containsKey(FabConf.remap(configKey));
 	}
 
-	public static boolean updateFeature(String configKey, CommandSource source) {
-		if (source instanceof ServerCommandSource) return updateFeature(configKey, (ServerCommandSource) source);
-		if (source instanceof ClientCommandSource) return updateFeature(configKey, (ClientCommandSource) source);
-		return false;
-	}
-	public static boolean updateFeature(String configKey, ServerCommandSource source) {
-		return updateFeature(configKey, source.getMinecraftServer(), source.getWorld());
-	}
-	@Environment(EnvType.CLIENT)
-	public static boolean updateFeature(String configKey, ClientCommandSource source) {
-		return updateFeature(configKey, MinecraftClient.getInstance().getServer(), MinecraftClient.getInstance().world);
-	}
-	public static boolean updateFeature(String configKey, MinecraftServer server, World world) {
+	public static boolean updateFeature(String configKey) {
 		configKey = FabConf.remap(configKey);
 		boolean enabled = FabConf.isEnabled(configKey);
 		if (enabledFeatures.contains(configKey) == enabled) return true;
 		if (enabled) {
-			features.get(configKey).apply(server, world);
+			features.get(configKey).apply();
 			enabledFeatures.add(configKey);
 			return true;
 		} else {
-			boolean b = features.get(configKey).undo(server, world);
+			boolean b = features.get(configKey).undo();
 			if (b) {
 				enabledFeatures.remove(configKey);
 			}

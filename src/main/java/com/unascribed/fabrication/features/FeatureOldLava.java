@@ -15,9 +15,7 @@ import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.Sprite.Info;
 import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
 
 @EligibleIf(anyConfigAvailable={"*.old_lava", "*.old_lava_scaling"}, envMatches=Env.CLIENT)
 public class FeatureOldLava implements Feature {
@@ -72,15 +70,15 @@ public class FeatureOldLava implements Feature {
 	}
 
 	@Override
-	public void apply(MinecraftServer minecraftServer, World world) {
+	public void apply() {
 		if (MinecraftClient.getInstance().getResourceManager() != null) {
 			MinecraftClient.getInstance().reloadResources();
 		}
 	}
 
 	@Override
-	public boolean undo(MinecraftServer minecraftServer, World world) {
-		apply(minecraftServer, world);
+	public boolean undo() {
+		apply();
 		return true;
 	}
 

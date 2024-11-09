@@ -1653,12 +1653,12 @@ public class FabricationConfigScreen extends Screen {
 		} else if (editingWorldPath && FabConf.hasWorldPath()) {
 			FabConf.worldSet(key, value);
 			if (FabricationMod.isAvailableFeature(key)) {
-				FabricationMod.updateFeature(key, client.getServer(), client.world);
+				FabricationMod.updateFeature(key);
 			}
 		} else {
 			FabConf.set(key, value);
 			if (FabricationMod.isAvailableFeature(key)) {
-				FabricationMod.updateFeature(key, client.getServer(), client.world);
+				FabricationMod.updateFeature(key);
 			}
 		}
 	}

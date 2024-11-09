@@ -22,11 +22,9 @@ import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Language;
-import net.minecraft.world.World;
 
 @EligibleIf(configAvailable="*.dimensional_tools")
 public class FeatureDimensionalTools implements Feature {
@@ -41,7 +39,7 @@ public class FeatureDimensionalTools implements Feature {
 	private boolean active = false;
 
 	@Override
-	public void apply(MinecraftServer minecraftServer, World world) {
+	public void apply() {
 		active = true;
 		if (!applied) {
 			applied = true;
@@ -70,7 +68,7 @@ public class FeatureDimensionalTools implements Feature {
 	}
 
 	@Override
-	public boolean undo(MinecraftServer minecraftServer, World world) {
+	public boolean undo() {
 		active = false;
 		return true;
 	}
