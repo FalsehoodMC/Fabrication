@@ -48,7 +48,6 @@ import net.minecraft.world.World;
 
 @Mixin(ItemEntity.class)
 @EligibleIf(configAvailable="*.item_despawn")
-@FailOn(invertedSpecialConditions={SpecialEligibility.FORGE, SpecialEligibility.NOT_FORGE}) //TODO LoaderItemDespawn
 public abstract class MixinItemEntity extends Entity implements SetFromPlayerDeath {
 
 	public MixinItemEntity(EntityType<?> type, World world) {
@@ -148,7 +147,7 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 						}
 					}
 				}
-				ParsedTime enchTime = LoaderItemDespawn.enchDespawns.get(Resolvable.mapKey(e.getIdAsString(), getRegistryManager().get(RegistryKeys.ENCHANTMENT)));
+				ParsedTime enchTime = LoaderItemDespawn.enchDespawns.get(e.getIdAsString());
 				if (enchTime != null && enchTime.overshadows(time)) {
 					if (debug) System.out.println("Found a specific enchantment; it overshadows: "+enchTime);
 					time = enchTime;

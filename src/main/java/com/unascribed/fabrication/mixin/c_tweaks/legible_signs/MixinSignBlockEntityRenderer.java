@@ -19,7 +19,6 @@ import net.minecraft.util.DyeColor;
 
 @Mixin(SignBlockEntityRenderer.class)
 @EligibleIf(configAvailable="*.legible_signs", envMatches=Env.CLIENT)
-@FailOn(invertedSpecialConditions={SpecialEligibility.FORGE, SpecialEligibility.NOT_FORGE})
 public class MixinSignBlockEntityRenderer {
 
 	@FabInject(at=@At("HEAD"), method="getColor(Lnet/minecraft/block/entity/SignText;)I", cancellable = true)
@@ -38,11 +37,9 @@ public class MixinSignBlockEntityRenderer {
 				case BROWN:
 					res = dc.getSignColor();
 					break;
-				default: {
-					// TODO?
-					int rgb = dc.getSignColor();
-					res = Math.round(ColorHelper.Argb.getGreen(rgb)*255.0F) << 16 | Math.round(ColorHelper.Argb.getBlue(rgb)*255.0F) << 8 | Math.round(ColorHelper.Argb.getRed(rgb)*255);
-				}
+				default:
+					res = dc.getEntityColor();
+					break;
 			}
 			cir.setReturnValue(res);
 		}

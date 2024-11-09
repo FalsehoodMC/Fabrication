@@ -10,13 +10,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.unascribed.fabrication.support.FabReflField;
 import com.unascribed.fabrication.support.injection.FabRefMap;
 import net.minecraft.client.util.SelectionManager;
+import net.minecraft.command.EntitySelector;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
+import net.minecraft.entity.Entity;
 import net.minecraft.registry.RegistryEntryLookup;
 import net.minecraft.entity.vehicle.FurnaceMinecartEntity;
 import net.minecraft.recipe.Ingredient;
@@ -120,6 +123,18 @@ public class FabRefl {
 	public static void setAttackable(TargetPredicate subject, boolean value) {
 		try {
 			checkHandle(tp_set_attackable).invokeExact(subject, value);
+		} catch (Throwable t) {
+			throw rethrow(t);
+		}
+	}
+
+	@FabReflField
+	private static final String es_basePredicate_field = "net/minecraft/command/EntitySelector;predicates";
+	private static final MethodHandle es_basePredicate = unreflectGetter("EntitySelector", () -> EntitySelector.class, es_basePredicate_field)
+		.requiredBy("*.canhit").get();
+	public static List<Predicate<Entity>> getBasePredicate(EntitySelector subject) {
+		try {
+			return (List<Predicate<Entity>>)checkHandle(es_basePredicate).invokeExact(subject);
 		} catch (Throwable t) {
 			throw rethrow(t);
 		}

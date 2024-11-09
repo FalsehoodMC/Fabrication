@@ -38,7 +38,6 @@ import net.minecraft.util.DyeColor;
 
 @Mixin(BannerBlockEntityRenderer.class)
 @EligibleIf(configAvailable="*.fullres_banner_shields", envMatches=Env.CLIENT)
-@FailOn(invertedSpecialConditions={SpecialEligibility.FORGE, SpecialEligibility.NOT_FORGE})
 public class MixinBannerBlockEntityRenderer {
 
 	@Unique

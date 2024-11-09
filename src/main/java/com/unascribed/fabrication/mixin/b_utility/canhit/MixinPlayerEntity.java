@@ -14,7 +14,6 @@ import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(PlayerEntity.class)
 @EligibleIf(configAvailable="*.canhit")
-@FailOn(invertedSpecialConditions={SpecialEligibility.FORGE, SpecialEligibility.NOT_FORGE}) //TODO CanHitUtil
 public abstract class MixinPlayerEntity {
 
 	@ModifyReturn(target="Lnet/minecraft/entity/Entity;isAttackable()Z", method="attack(Lnet/minecraft/entity/Entity;)V")

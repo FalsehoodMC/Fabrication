@@ -1,9 +1,15 @@
 package com.unascribed.fabrication.logic;
 
 import java.util.UUID;
+import java.util.function.Predicate;
 
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.unascribed.fabrication.FabConf;
 
+import com.unascribed.fabrication.FabRefl;
+import net.minecraft.command.EntitySelector;
+import net.minecraft.command.EntitySelectorReader;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -16,38 +22,38 @@ public class CanHitUtil {
 
 	public static boolean canHit(NbtList list, Entity entity) {
 		if (list == null) return true;
-//		try {
-		for (int i = 0; i < list.size(); i++) {
-			String s = list.getString(i);
-			if (s.contains("-")) {
-				try {
-					UUID id = UUID.fromString(s);
-					if (entity.getUuid().equals(id)) {
+		try {
+			for (int i = 0; i < list.size(); i++) {
+				String s = list.getString(i);
+				if (s.contains("-")) {
+					try {
+						UUID id = UUID.fromString(s);
+						if (entity.getUuid().equals(id)) {
+							return true;
+						}
+						continue;
+					} catch (IllegalArgumentException ex) {
+					}
+				}
+				if (s.startsWith("@")) {
+					EntitySelector ep = new EntitySelectorReader(new StringReader(s), true).read();
+					for (Predicate<Entity> predicate : FabRefl.getBasePredicate(ep)) {
+						if (!predicate.test(entity)) return false;
+					}
+					return true;
+				} else {
+					boolean needed = true;
+					if (s.startsWith("!")) {
+						s = s.substring(1);
+						needed = false;
+					}
+					final String id = s.contains(":") ? s : "minecraft:" + s;
+					if (EntityType.getId(entity.getType()).toString().equals(id) == needed) {
 						return true;
 					}
-					continue;
-				} catch (IllegalArgumentException ex) {}
-			}
-			if (s.startsWith("@")) {
-				// TODO: EntitySelector.basePredicate no longer exists
-//					EntitySelector ep = new EntitySelectorReader(new StringReader(s), true).read();
-//					Predicate<Entity> predicate = FabRefl.getBasePredicate(ep);
-//					if (predicate.test(entity)) {
-//						return true;
-//					}
-			} else {
-				boolean needed = true;
-				if (s.startsWith("!")) {
-					s = s.substring(1);
-					needed = false;
-				}
-				final String id = s.contains(":") ? s : "minecraft:"+s;
-				if (EntityType.getId(entity.getType()).toString().equals(id) == needed) {
-					return true;
 				}
 			}
-		}
-//		} catch (CommandSyntaxException e) {}
+		} catch (CommandSyntaxException e) {}
 		return false;
 	}
 

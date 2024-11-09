@@ -18,7 +18,7 @@ import net.minecraft.util.Identifier;
 public class LoaderItemDespawn implements ConfigLoader {
 
 	public static final Map<Resolvable<Item>, ParsedTime> itemDespawns = Maps.newHashMap();
-	public static final Map<Resolvable<Enchantment>, ParsedTime> enchDespawns = Maps.newHashMap();
+	public static final Map<String, ParsedTime> enchDespawns = Maps.newHashMap();
 	public static final Map<Identifier, ParsedTime> tagDespawns = Maps.newHashMap();
 	public static final Map<String, ParsedTime> nbtBools = Maps.newHashMap();
 
@@ -52,12 +52,12 @@ public class LoaderItemDespawn implements ConfigLoader {
 		for (String k : config.keySet()) {
 			ParsedTime time = ParsedTime.getFrom(config, k);
 			if (time instanceof ParsedTime.Unset) continue;
-			/*if (k.startsWith("@enchantments.")) {
+			if (k.startsWith("@enchantments.")) {
 				String id = k.substring(14);
 				if (!id.startsWith("@")) {
-					enchDespawns.put(Resolvable.of(id, Registries.ENCHANTMENT), time);
+					enchDespawns.put(id, time);
 				}
-			} else*/ if (k.startsWith("@tags.")) {
+			} else if (k.startsWith("@tags.")) {
 				String id = k.substring(6);
 				tagDespawns.put(Identifier.of(id), time);
 			} else if (k.startsWith("@nbtbools.")) {
