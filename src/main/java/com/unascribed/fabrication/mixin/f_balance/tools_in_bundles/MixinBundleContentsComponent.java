@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(BundleContentsComponent.class)
 @EligibleIf(configAvailable="*.tools_in_bundles")
 public class MixinBundleContentsComponent {
-	@FabInject(at=@At("TAIL"), method="getOccupancy(Lnet/minecraft/item/ItemStack;)Lorg/apache/commons/lang3/math/Fraction;")
+	@FabInject(at=@At("TAIL"), method="getOccupancy(Lnet/minecraft/item/ItemStack;)Lorg/apache/commons/lang3/math/Fraction;", cancellable=true)
 	private static void getOccupancy(ItemStack stack, CallbackInfoReturnable<Fraction> cir) {
 		if (FabConf.isEnabled("*.tools_in_bundles") && stack.getMaxCount() == 1) {
 			cir.setReturnValue(BundleHelper.ONE_EIGHTH);
