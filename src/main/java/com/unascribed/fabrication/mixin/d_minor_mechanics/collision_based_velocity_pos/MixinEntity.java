@@ -1,4 +1,4 @@
-package com.unascribed.fabrication.mixin.d_minor_mechanics.collision_based_landing_pos;
+package com.unascribed.fabrication.mixin.d_minor_mechanics.collision_based_velocity_pos;
 
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.ConfigPredicates;
@@ -22,17 +22,17 @@ import java.util.function.Predicate;
 import java.util.stream.StreamSupport;
 
 @Mixin(Entity.class)
-@EligibleIf(configAvailable="*.collision_based_landing_pos")
+@EligibleIf(configAvailable="*.collision_based_velocity_pos")
 public abstract class MixinEntity {
 
-	private static final Predicate<Entity> fabrication$collisionBasedLandingPos = ConfigPredicates.getFinalPredicate("*.collision_based_landing_pos");
+	private static final Predicate<Entity> fabrication$collisionBasedVelocityPos = ConfigPredicates.getFinalPredicate("*.collision_based_velocity_pos");
 
-	@FabInject(method="getLandingPos()Lnet/minecraft/util/math/BlockPos;", at=@At(value="RETURN"), cancellable=true)
+	@FabInject(method="getVelocityAffectingPos()Lnet/minecraft/util/math/BlockPos;", at=@At(value="RETURN"), cancellable=true)
 	public void getLandingPos(CallbackInfoReturnable<BlockPos> cir) {
-		if (!FabConf.isEnabled("*.collision_based_landing_pos")) return;
+		if (!FabConf.isEnabled("*.collision_based_velocity_pos")) return;
 		Entity self = (Entity)(Object)this;
 		World world = self.world;
-		if (!fabrication$collisionBasedLandingPos.test(self)) return;
+		if (!fabrication$collisionBasedVelocityPos.test(self)) return;
 		VoxelShape inp = world.getBlockState(cir.getReturnValue()).getCollisionShape(world, cir.getReturnValue());
 		if (!inp.isEmpty()) return;
 		Box boundingBox = self.getBoundingBox();
