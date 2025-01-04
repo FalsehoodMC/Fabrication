@@ -4,7 +4,7 @@ import com.unascribed.fabrication.EarlyAgnos;
 import com.unascribed.fabrication.FabLog;
 
 public class OptionalPrideFlag {
-	private static boolean ok = EarlyAgnos.isModLoaded("pridelib");
+	private static boolean ok = EarlyAgnos.isModLoaded("pride");
 	private static boolean first = true;
 	public static PrideFlagRenderer get() {
 		if (ok) try {
