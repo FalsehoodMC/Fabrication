@@ -48,16 +48,18 @@ public abstract class MixinBackgroundRenderer {
 			green *= fog;
 			blue *= fog;
 			RenderSystem.clearColor(red, green, blue, 0);
-		} else {
-			fabrication$voidFog = MathHelper.lerp(.1f, fabrication$voidFog, 1);
+		} else if (fabrication$voidFog != 1f) {
+			if (fabrication$voidFog >= .99f) fabrication$voidFog = 1f;
+			else fabrication$voidFog = MathHelper.lerp(.1f, fabrication$voidFog, 1f);
 		}
 	}
+
 	@FabInject(method="applyFog(Lnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/BackgroundRenderer$FogType;FZF)V", at=@At("TAIL"))
-	private static void fabrication$voidFogDistance(Camera camera, BackgroundRenderer.FogType fogType, float viewDistance, boolean thickFog, float tickDelta, CallbackInfo ci) {
+	private static void fabrication$voidFogDist(Camera camera, BackgroundRenderer.FogType fogType, float viewDistance, boolean thickFog, float tickDelta, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.void_fog")) return;
-		if (fogType != BackgroundRenderer.FogType.FOG_TERRAIN) return;;
+		if (fogType != BackgroundRenderer.FogType.FOG_TERRAIN) return;
 		float fog = fabrication$voidFog;
-		if (fog < 1.0) {
+		if (fog < 1f) {
 			if (fog < 0f) {
 				fog = 0f;
 			}
