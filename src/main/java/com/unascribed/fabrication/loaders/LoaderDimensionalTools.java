@@ -14,6 +14,7 @@ import com.unascribed.fabrication.QDIni;
 import com.unascribed.fabrication.support.ConfigLoader;
 import net.minecraft.block.Block;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -182,7 +183,7 @@ public class LoaderDimensionalTools implements ConfigLoader {
 	public static Set<MohsIdentifier> getAssociatedDimensionsForTool(ItemStack stack) {
 		Set<MohsIdentifier> dims = processTags(toolAssociations.get(Registries.ITEM.getId(stack.getItem())), toolTagAssociations, Registries.ITEM.getKey(), stack.getItem().getRegistryEntry());
 		if (stack.contains(DataComponentTypes.CUSTOM_DATA)) {
-			NbtCompound nbt = stack.get(DataComponentTypes.CUSTOM_DATA).getNbt();
+			NbtCompound nbt = stack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).getNbt();
 			if (nbt.getBoolean("fabrication:ActLikeGold")) {
 				dims = Sets.newHashSet(dims);
 				dims.add(new MohsIdentifier(true, DimensionTypes.THE_NETHER_ID));

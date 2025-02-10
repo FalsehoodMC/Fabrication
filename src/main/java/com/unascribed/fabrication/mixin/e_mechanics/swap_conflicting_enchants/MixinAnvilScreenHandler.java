@@ -45,7 +45,7 @@ public abstract class MixinAnvilScreenHandler extends ForgingScreenHandler {
 	@ModifyReturn(method="updateResult()V", target="Lnet/minecraft/enchantment/EnchantmentHelper;getEnchantments(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/component/type/ItemEnchantmentsComponent;")
 	private ItemEnchantmentsComponent fabrication$loadConflictingEnchants(ItemEnchantmentsComponent old, ItemStack stack) {
 		if (FabConf.isEnabled("*.swap_conflicting_enchants") && stack.contains(DataComponentTypes.CUSTOM_DATA)) {
-			NbtCompound tag = stack.get(DataComponentTypes.CUSTOM_DATA).getNbt().getCompound("fabrication#conflictingEnchants");
+			NbtCompound tag = stack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).getNbt().getCompound("fabrication#conflictingEnchants");
 			if (tag != null && !tag.isEmpty()) {
 				Registry<Enchantment> registry = this.player.getRegistryManager().get(RegistryKeys.ENCHANTMENT);
 				ItemEnchantmentsComponent.Builder builder = new ItemEnchantmentsComponent.Builder(old);

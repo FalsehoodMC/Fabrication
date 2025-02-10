@@ -16,8 +16,8 @@ public class BundleHelper {
 		if (isTool && ItemNbtScanner.hasItemInvNBT(stack)) {
 			return false;
 		}
-		if (!bundle.contains(DataComponentTypes.BUNDLE_CONTENTS)) return false;
 		BundleContentsComponent component = bundle.get(DataComponentTypes.BUNDLE_CONTENTS);
+		if (component == null) return false;
 		if (component.isEmpty()) return true;
 		boolean containsTool = component.stream().anyMatch(is -> is.getMaxCount() == 1);
 		return containsTool == isTool;

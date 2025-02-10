@@ -27,8 +27,7 @@ public abstract class MixinLivingEntity {
 			at=@At(value="INVOKE", target="Lnet/minecraft/entity/LivingEntity;damageShield(F)V"))
 	public void brittleShield(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
 		if (!(FabConf.isEnabled("*.brittle_shields") && source.isIn(DamageTypeTags.IS_EXPLOSION))) return;
-		if (activeItemStack.contains(DataComponentTypes.MAX_DAMAGE)) {
-			damageShield(activeItemStack.get(DataComponentTypes.MAX_DAMAGE));
-		}
+		Integer i = activeItemStack.get(DataComponentTypes.MAX_DAMAGE);
+		damageShield(i == null ? 1 : i);
 	}
 }

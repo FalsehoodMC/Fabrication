@@ -10,6 +10,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryKeys;
@@ -44,7 +45,7 @@ public class FeatureSwapConflictingEnchants implements Feature {
 		Agnos.runForTooltipRender((stack, lines) -> {
 			if (!stack.isEmpty() && stack.contains(DataComponentTypes.CUSTOM_DATA)) {
 				if (!FabRefl.getShowInTooltip(stack.getEnchantments())) return;
-				NbtCompound lTag = stack.get(DataComponentTypes.CUSTOM_DATA).getNbt().getCompound("fabrication#conflictingEnchants");
+				NbtCompound lTag = stack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).getNbt().getCompound("fabrication#conflictingEnchants");
 				if (lTag == null || lTag.isEmpty()) return;
 				int ii=0;
 				for (int i=0;i<lines.size();i++) {

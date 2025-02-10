@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 import com.unascribed.fabrication.FabConf;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.text.MutableText;
@@ -42,8 +43,8 @@ public abstract class MixinEntityDamageSource {
 				held = ItemStack.EMPTY;
 			}
 			String msg = null;
-			if (held.contains(DataComponentTypes.CUSTOM_DATA) && held.get(DataComponentTypes.CUSTOM_DATA).getNbt().contains("KillMessage", NbtElement.STRING_TYPE)) {
-				msg = held.get(DataComponentTypes.CUSTOM_DATA).getNbt().getString("KillMessage");
+			if (held.contains(DataComponentTypes.CUSTOM_DATA) && held.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).getNbt().contains("KillMessage", NbtElement.STRING_TYPE)) {
+				msg = held.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).getNbt().getString("KillMessage");
 			}
 			if (msg == null) {
 				msg = ((GetKillMessage)attacker).fabrication$getKillMessage();

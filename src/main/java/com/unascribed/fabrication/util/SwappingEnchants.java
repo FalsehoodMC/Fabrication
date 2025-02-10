@@ -32,8 +32,9 @@ public class SwappingEnchants {
 		if (!FabConf.isEnabled("*.swap_conflicting_enchants")) return false;
 		if (!configPredicate.test(user)) return false;
 		List<Pair<String, Integer>> currentConflicts = ForgeryArrayList.get();
-		if (!self.contains(DataComponentTypes.CUSTOM_DATA)) return false;
-		NbtCompound nbt = self.get(DataComponentTypes.CUSTOM_DATA).copyNbt();
+		NbtComponent component = self.get(DataComponentTypes.CUSTOM_DATA);
+		if (component == null) return false;
+		NbtCompound nbt = component.copyNbt();
 		if (nbt == null) return false;
 
 		NbtCompound lTag = nbt.getCompound("fabrication#conflictingEnchants");

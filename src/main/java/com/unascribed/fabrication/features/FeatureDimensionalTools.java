@@ -57,10 +57,10 @@ public class FeatureDimensionalTools implements Feature {
 	@Environment(EnvType.CLIENT)
 	private void applyClient() {
 		Agnos.runForTooltipRender((stack, lines) -> {
-			if (active && !stack.isEmpty() && (stack.contains(DataComponentTypes.CUSTOM_DATA) && stack.get(DataComponentTypes.CUSTOM_DATA).getNbt().contains("fabrication:PartialDamage"))) {
+			if (active && !stack.isEmpty() && (stack.contains(DataComponentTypes.CUSTOM_DATA) && stack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).getNbt().contains("fabrication:PartialDamage"))) {
 				for (int i = 0; i < lines.size(); i++) {
 					Object t = lines.get(i);
-					double part = stack.get(DataComponentTypes.CUSTOM_DATA).getNbt().getDouble("fabrication:PartialDamage");
+					double part = stack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).getNbt().getDouble("fabrication:PartialDamage");
 					if (t instanceof MutableText && ((MutableText) t).getContent() instanceof TranslatableTextContent) {
 						if (((TranslatableTextContent) ((MutableText) t).getContent()).getKey().equals("item.durability")) {
 							lines.set(i, Text.translatable("item.durability",

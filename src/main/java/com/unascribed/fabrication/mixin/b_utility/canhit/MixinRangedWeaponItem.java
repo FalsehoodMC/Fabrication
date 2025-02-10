@@ -3,6 +3,7 @@ package com.unascribed.fabrication.mixin.b_utility.canhit;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.injection.FabInject;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.RangedWeaponItem;
@@ -36,8 +37,8 @@ public class MixinRangedWeaponItem {
 			locals=LocalCapture.CAPTURE_FAILHARD)
 	public void shootAll$bow(ServerWorld world, LivingEntity shooter, Hand hand, ItemStack bowStack, List<ItemStack> projectiles, float speed, float divergence, boolean critical, LivingEntity target, CallbackInfo ci, float f, float g, float h, float i, int j, ItemStack arrowStack, float k, ProjectileEntity arrow) {
 		if (!FabConf.isEnabled("*.canhit") || !(bowStack.getItem() instanceof BowItem) || CanHitUtil.isExempt(shooter)) return;
-		NbtList canHitList = bowStack.contains(DataComponentTypes.CUSTOM_DATA) && bowStack.get(DataComponentTypes.CUSTOM_DATA).getNbt().contains("CanHit") ? bowStack.get(DataComponentTypes.CUSTOM_DATA).getNbt().getList("CanHit", NbtElement.STRING_TYPE) : null;
-		NbtList canHitList2 = arrowStack.contains(DataComponentTypes.CUSTOM_DATA) && arrowStack.get(DataComponentTypes.CUSTOM_DATA).getNbt().contains("CanHit") ? arrowStack.get(DataComponentTypes.CUSTOM_DATA).getNbt().getList("CanHit", NbtElement.STRING_TYPE) : null;
+		NbtList canHitList = bowStack.contains(DataComponentTypes.CUSTOM_DATA) && bowStack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).getNbt().contains("CanHit") ? bowStack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).getNbt().getList("CanHit", NbtElement.STRING_TYPE) : null;
+		NbtList canHitList2 = arrowStack.contains(DataComponentTypes.CUSTOM_DATA) && arrowStack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).getNbt().contains("CanHit") ? arrowStack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).getNbt().getList("CanHit", NbtElement.STRING_TYPE) : null;
 		if (arrow instanceof SetCanHitList) {
 			((SetCanHitList)arrow).fabrication$setCanHitLists(canHitList, canHitList2);
 			if (arrow instanceof PersistentProjectileEntity && canHitList2 != null && ((PersistentProjectileEntity)arrow).pickupType == PickupPermission.ALLOWED) {
@@ -51,8 +52,8 @@ public class MixinRangedWeaponItem {
 		locals=LocalCapture.CAPTURE_FAILHARD)
 	public void shootAll$crossbow(ServerWorld world, LivingEntity shooter, Hand hand, ItemStack crossbow, List<ItemStack> projectiles, float speed, float divergence, boolean critical, LivingEntity target, CallbackInfo ci, float f, float g, float h, float i, int j, ItemStack projectile, float k, ProjectileEntity proj) {
 		if (!FabConf.isEnabled("*.canhit") || !(crossbow.getItem() instanceof CrossbowItem) || CanHitUtil.isExempt(shooter)) return;
-		NbtList canHitList = crossbow.contains(DataComponentTypes.CUSTOM_DATA) && crossbow.get(DataComponentTypes.CUSTOM_DATA).getNbt().contains("CanHit") ? crossbow.get(DataComponentTypes.CUSTOM_DATA).getNbt().getList("CanHit", NbtElement.STRING_TYPE) : null;
-		NbtList canHitList2 = projectile.contains(DataComponentTypes.CUSTOM_DATA) && projectile.get(DataComponentTypes.CUSTOM_DATA).getNbt().contains("CanHit") ? projectile.get(DataComponentTypes.CUSTOM_DATA).getNbt().getList("CanHit", NbtElement.STRING_TYPE) : null;
+		NbtList canHitList = crossbow.contains(DataComponentTypes.CUSTOM_DATA) && crossbow.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).getNbt().contains("CanHit") ? crossbow.get(DataComponentTypes.CUSTOM_DATA).getNbt().getList("CanHit", NbtElement.STRING_TYPE) : null;
+		NbtList canHitList2 = projectile.contains(DataComponentTypes.CUSTOM_DATA) && projectile.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).getNbt().contains("CanHit") ? projectile.get(DataComponentTypes.CUSTOM_DATA).getNbt().getList("CanHit", NbtElement.STRING_TYPE) : null;
 		if (proj instanceof SetCanHitList) {
 			((SetCanHitList)proj).fabrication$setCanHitLists(canHitList, canHitList2);
 			if (canHitList2 != null && proj instanceof PersistentProjectileEntity && ((PersistentProjectileEntity)proj).pickupType == PickupPermission.ALLOWED) {

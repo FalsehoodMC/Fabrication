@@ -11,6 +11,7 @@ import com.unascribed.fabrication.FabRefl;
 import net.minecraft.command.EntitySelector;
 import net.minecraft.command.EntitySelectorReader;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -58,8 +59,8 @@ public class CanHitUtil {
 	}
 
 	public static boolean canHit(ItemStack stack, Entity entity) {
-		if (stack.contains(DataComponentTypes.CUSTOM_DATA) && stack.get(DataComponentTypes.CUSTOM_DATA).getNbt().contains("CanHit", NbtElement.LIST_TYPE)) {
-			NbtList canhit = stack.get(DataComponentTypes.CUSTOM_DATA).getNbt().getList("CanHit", NbtElement.STRING_TYPE);
+		if (stack.contains(DataComponentTypes.CUSTOM_DATA) && stack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).getNbt().contains("CanHit", NbtElement.LIST_TYPE)) {
+			NbtList canhit = stack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).getNbt().getList("CanHit", NbtElement.STRING_TYPE);
 			return canHit(canhit, entity);
 		}
 		return true;

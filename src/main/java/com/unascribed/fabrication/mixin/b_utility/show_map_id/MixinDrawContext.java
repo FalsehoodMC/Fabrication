@@ -3,6 +3,7 @@ package com.unascribed.fabrication.mixin.b_utility.show_map_id;
 import com.unascribed.fabrication.FabConf;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.MapIdComponent;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -38,7 +39,9 @@ public abstract class MixinDrawContext {
 	public void renderGuiItemOverlay(TextRenderer renderer, ItemStack stack, int x, int y, String countLabel, CallbackInfo ci) {
 		if (FabConf.isEnabled("*.show_map_id") && stack.getItem() == Items.FILLED_MAP){
 			VertexConsumerProvider.Immediate vc = this.getVertexConsumers();
-			String id = String.valueOf(stack.get(DataComponentTypes.MAP_ID).id());
+			MapIdComponent component = stack.get(DataComponentTypes.MAP_ID);
+			if (component == null) return;
+			String id = String.valueOf(component.id());
 			matrices.push();
 			matrices.translate(0, 0, 200);
 			drawText(renderer, id, (x + 19 - 2 - renderer.getWidth(id)), y, 16777215, true);

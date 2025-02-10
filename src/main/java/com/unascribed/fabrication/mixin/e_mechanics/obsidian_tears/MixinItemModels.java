@@ -5,6 +5,7 @@ import com.unascribed.fabrication.support.FailOn;
 import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.injection.FabInject;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -38,7 +39,7 @@ public abstract class MixinItemModels {
 			cancellable=true, require=0)
 	public void getModel(ItemStack stack, CallbackInfoReturnable<BakedModel> ci) {
 		if (!FabConf.isEnabled("*.obsidian_tears")) return;
-		if (stack.getItem() == Items.POTION && stack.contains(DataComponentTypes.CUSTOM_DATA) && stack.get(DataComponentTypes.CUSTOM_DATA).getNbt().getBoolean("fabrication:ObsidianTears") && fabrication$obsidianTearsModel != null) {
+		if (stack.getItem() == Items.POTION && stack.contains(DataComponentTypes.CUSTOM_DATA) && stack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).getNbt().getBoolean("fabrication:ObsidianTears") && fabrication$obsidianTearsModel != null) {
 			ci.setReturnValue(fabrication$obsidianTearsModel);
 		}
 	}

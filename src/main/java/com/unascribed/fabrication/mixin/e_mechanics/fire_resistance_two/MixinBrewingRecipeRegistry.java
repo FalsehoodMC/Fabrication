@@ -26,14 +26,14 @@ public abstract class MixinBrewingRecipeRegistry {
 	@FabInject(method="hasRecipe(Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemStack;)Z", at=@At("HEAD"), cancellable=true)
 	private void fabrication$fireResistTwoRecipe(ItemStack input, ItemStack ingredient, CallbackInfoReturnable<Boolean> cir) {
 		if (!FabConf.isEnabled("*.fire_resistance_two")) return;
-		if (ingredient.isOf(Items.GLOWSTONE_DUST) && input.contains(DataComponentTypes.POTION_CONTENTS) && input.get(DataComponentTypes.POTION_CONTENTS).matches(Potions.FIRE_RESISTANCE)) {
+		if (ingredient.isOf(Items.GLOWSTONE_DUST) && input.contains(DataComponentTypes.POTION_CONTENTS) && input.getOrDefault(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT).matches(Potions.FIRE_RESISTANCE)) {
 			cir.setReturnValue(true);
 		}
 	}
 	@FabInject(method="craft(Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;", at=@At("HEAD"), cancellable=true)
 	private void fabrication$fireResistTwoCraft(ItemStack ingredient, ItemStack input, CallbackInfoReturnable<ItemStack> cir) {
 		if (!FabConf.isEnabled("*.fire_resistance_two")) return;
-		if (ingredient.isOf(Items.GLOWSTONE_DUST) && input.contains(DataComponentTypes.POTION_CONTENTS) && input.get(DataComponentTypes.POTION_CONTENTS).matches(Potions.FIRE_RESISTANCE)) {
+		if (ingredient.isOf(Items.GLOWSTONE_DUST) && input.contains(DataComponentTypes.POTION_CONTENTS) && input.getOrDefault(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT).matches(Potions.FIRE_RESISTANCE)) {
 			ItemStack ret = Items.POTION.getDefaultStack();
 			ret.set(DataComponentTypes.POTION_CONTENTS, new PotionContentsComponent(Optional.empty(), Optional.of(StatusEffects.FIRE_RESISTANCE.value().getColor()), List.of(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 3600, 1))));
 			ret.set(DataComponentTypes.CUSTOM_NAME, Text.of("Potion of Lava Resistance"));

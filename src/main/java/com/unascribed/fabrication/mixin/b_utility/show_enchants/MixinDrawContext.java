@@ -51,9 +51,9 @@ public abstract class MixinDrawContext {
 	@FabInject(at=@At("TAIL"), method="drawItemInSlot(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V")
 	public void renderGuiItemOverlay(TextRenderer renderer, ItemStack stack, int x, int y, String countLabel, CallbackInfo ci) {
 		if (stack == null) return;
-		if (FabConf.isEnabled("*.books_show_enchants") && stack.getItem() == Items.ENCHANTED_BOOK && stack.contains(DataComponentTypes.STORED_ENCHANTMENTS)) {
+		if (FabConf.isEnabled("*.books_show_enchants") && stack.getItem() == Items.ENCHANTED_BOOK) {
 			ItemEnchantmentsComponent enchants = stack.get(DataComponentTypes.STORED_ENCHANTMENTS);
-			if (enchants.isEmpty()) return;
+			if (enchants == null || enchants.isEmpty()) return;
 			List<RegistryEntry<Enchantment>> valid = Lists.newArrayList(enchants.getEnchantments());
 			int j = (int)((System.currentTimeMillis()/1000)%valid.size());
 			RegistryEntry<Enchantment> display = valid.get(j);

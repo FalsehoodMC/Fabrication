@@ -6,6 +6,7 @@ import java.util.UUID;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.injection.FabInject;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.nbt.NbtElement;
@@ -34,10 +35,10 @@ public class MixinItemStackClient {
 	public void getTooltip(Item.TooltipContext context, PlayerEntity player, TooltipType tooltipType, CallbackInfoReturnable<List<Text>> ci, List<Text> list) {
 		if (!FabConf.isEnabled("*.canhit")) return;
 		ItemStack self = (ItemStack)(Object)this;
-		if (self.contains(DataComponentTypes.CUSTOM_DATA) && self.get(DataComponentTypes.CUSTOM_DATA).getNbt().contains("CanHit", NbtElement.LIST_TYPE) && !self.get(DataComponentTypes.CUSTOM_DATA).getNbt().getBoolean("HideCanHit")) {
+		if (self.contains(DataComponentTypes.CUSTOM_DATA) && self.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).getNbt().contains("CanHit", NbtElement.LIST_TYPE) && !self.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).getNbt().getBoolean("HideCanHit")) {
 			list.add(Text.empty());
 			list.add(Text.literal("Can hit:").formatted(Formatting.GRAY));
-			NbtList canhit = self.get(DataComponentTypes.CUSTOM_DATA).getNbt().getList("CanHit", NbtElement.STRING_TYPE);
+			NbtList canhit = self.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).getNbt().getList("CanHit", NbtElement.STRING_TYPE);
 			if (canhit.isEmpty()) {
 				list.add(Text.literal("Nothing").formatted(Formatting.GRAY));
 			}

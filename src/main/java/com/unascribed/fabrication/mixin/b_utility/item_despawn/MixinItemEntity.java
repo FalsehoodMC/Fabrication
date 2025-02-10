@@ -8,6 +8,7 @@ import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.injection.FabInject;
 import com.unascribed.fabrication.support.injection.FabModifyConst;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -178,7 +179,7 @@ public abstract class MixinItemEntity extends Entity implements SetFromPlayerDea
 			}
 			if (stack.contains(DataComponentTypes.CUSTOM_DATA)) {
 				for (Map.Entry<String, ParsedTime> en : LoaderItemDespawn.nbtBools.entrySet()) {
-					if (stack.get(DataComponentTypes.CUSTOM_DATA).getNbt().getBoolean(en.getKey())) {
+					if (stack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).getNbt().getBoolean(en.getKey())) {
 						if (en.getValue().overshadows(time)) {
 							if (debug) System.out.println("Found an NBT tag; it overshadows: " + en.getValue());
 							time = en.getValue();

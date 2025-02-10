@@ -2,6 +2,7 @@ package com.unascribed.fabrication.mixin.a_fixes.adventure_tags_in_survival;
 
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.injection.FabInject;
+import net.minecraft.component.type.NbtComponent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -39,7 +40,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 		if (!FabConf.isEnabled("*.adventure_tags_in_survival") || mode.isCreative() || mode.isBlockBreakingRestricted()) return;
 		ItemStack stack = getMainHandStack();
 		if (!stack.isEmpty()) {
-			if (stack.contains(DataComponentTypes.CUSTOM_DATA) && stack.get(DataComponentTypes.CUSTOM_DATA).getNbt().contains("CanDestroy")) {
+			if (stack.contains(DataComponentTypes.CUSTOM_DATA) && stack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).getNbt().contains("CanDestroy")) {
 				ci.setReturnValue(!stack.canBreak(new CachedBlockPosition(world, pos, false)));
 			}
 		}
@@ -52,7 +53,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 		// however, this *is* used for buckets, spawn eggs, etc, and may be used by other mods
 		if (!FabConf.isEnabled("*.adventure_tags_in_survival") || abilities.creativeMode || !abilities.allowModifyWorld) return;
 		if (!stack.isEmpty()) {
-			if (stack.contains(DataComponentTypes.CUSTOM_DATA) && stack.get(DataComponentTypes.CUSTOM_DATA).getNbt().contains("CanPlaceOn")) {
+			if (stack.contains(DataComponentTypes.CUSTOM_DATA) && stack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).getNbt().contains("CanPlaceOn")) {
 				World world = getWorld();
 				ci.setReturnValue(stack.canPlaceOn(new CachedBlockPosition(world, pos.offset(dir.getOpposite()), false)));
 			}

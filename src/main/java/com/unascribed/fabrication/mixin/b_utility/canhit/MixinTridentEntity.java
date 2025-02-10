@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.mixin.b_utility.canhit;
 
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.nbt.NbtElement;
@@ -26,8 +27,8 @@ public abstract class MixinTridentEntity extends PersistentProjectileEntity impl
 	@Override
 	public NbtList fabrication$getCanHitList() {
 		ItemStack tridentStack = getItemStack();
-		return tridentStack.contains(DataComponentTypes.CUSTOM_DATA) && tridentStack.get(DataComponentTypes.CUSTOM_DATA).getNbt().contains("CanHit") && !CanHitUtil.isExempt(this.getOwner()) ?
-				tridentStack.get(DataComponentTypes.CUSTOM_DATA).getNbt().getList("CanHit", NbtElement.STRING_TYPE) : null;
+		return tridentStack.contains(DataComponentTypes.CUSTOM_DATA) && tridentStack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).getNbt().contains("CanHit") && !CanHitUtil.isExempt(this.getOwner()) ?
+				tridentStack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).getNbt().getList("CanHit", NbtElement.STRING_TYPE) : null;
 	}
 
 }
