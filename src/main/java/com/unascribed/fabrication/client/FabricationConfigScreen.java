@@ -1609,7 +1609,9 @@ public class FabricationConfigScreen extends Screen {
 
 	private String getRawValue(String key) {
 		if (configuringServer) {
-			return getValue(key).toString().toLowerCase(Locale.ROOT);
+			String k = ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerStringConfig().get(key);
+			if (k == null) return null;
+			return k.toLowerCase(Locale.ROOT);
 		} else {
 			return FabConf.getRawValue(key);
 		}
