@@ -53,7 +53,8 @@ public class MixinItemEntityRendererVanilla {
 			method="renderStack(Lnet/minecraft/client/render/item/ItemRenderer;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/BakedModel;ZLnet/minecraft/util/math/random/Random;)V", index=6)
 	private static int blink(int old){
 		if (!FabConf.isEnabled("*.blinking_drops")) return old;
-		return WoinaDrops.modifyOverlay(captureItemHash.get(), old);
+		Integer i = captureItemHash.get();
+		return i == null ? old : WoinaDrops.modifyOverlay(captureItemHash.get(), old);
 	}
 
 }
