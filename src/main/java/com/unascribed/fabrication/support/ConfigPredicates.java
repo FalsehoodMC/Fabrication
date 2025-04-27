@@ -2,6 +2,7 @@ package com.unascribed.fabrication.support;
 
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
@@ -14,8 +15,10 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import static com.unascribed.fabrication.FabConf.remap;
@@ -74,6 +77,12 @@ public class ConfigPredicates {
 
 	static{
 		Map<String, Predicate<?>> defaultsMap = new HashMap<>();
+		defaultsMap.put(remap("*.shield_stagger"),
+			(Predicate<List<?>>) l -> ((DamageSource)l.get(1)).isIn(DamageTypeTags.IS_EXPLOSION));
+		defaultsMap.put(remap("*.faulty_shields"),
+			(Predicate<List<?>>) l -> ((DamageSource)l.get(1)).isIn(DamageTypeTags.IS_PROJECTILE));
+		defaultsMap.put(remap("*.brittle_shields"),
+			(Predicate<List<?>>) l -> ((DamageSource)l.get(1)).isIn(DamageTypeTags.IS_EXPLOSION));
 		defaultsMap.put(remap("*.no_sprint"),
 			(Predicate<Entity>) entity -> !entity.isSubmergedInWater());
 		defaultsMap.put(remap("*.swap_conflicting_enchants"),
