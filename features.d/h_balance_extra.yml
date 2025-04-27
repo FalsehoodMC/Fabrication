@@ -133,6 +133,9 @@ balance.extra.static_dragon_egg:
 balance.extra.brittle_shields:
 	name: Brittle Shields
 	since: 2.3.0
+	fscript: living_entity
+	extra_fscript: damage_source+~damage_source:DAMAGE_SOURCE+Damage Source
+	fscript_default: ~damage_source:is_explosive
 	sides: server_only
 	desc:
 		Causes explosions to always break shields.
@@ -140,6 +143,9 @@ balance.extra.brittle_shields:
 balance.extra.faulty_shields:
 	name: Faulty Shields
 	since: 3.0.0
+	fscript: living_entity
+	extra_fscript: damage_source+~damage_source:DAMAGE_SOURCE+Damage Source
+	fscript_default: ~damage_source:projectile
 	sides: server_only
 	desc:
 		Shields half non-projectile damage instead of blocking it.
@@ -250,6 +256,16 @@ balance.extra.chest_pigs:
 
 		Shift-right click to open the chest.
 		Shift-right click with a chest in hand to attach it.
+
+balance.extra.shield_stagger:
+	name: Explosions Stagger Shield
+	since: 3.6.0
+	fscript: server_player_entity
+	extra_fscript: damage_source+~damage_source:DAMAGE_SOURCE+Damage Source
+	fscript_default: ~damage_source:is_explosive
+	sides: server_only
+	desc:
+		Blocking explosions causes a 6s cooldown.
 
 # kate: space-indent off
 # vim: noai:noet
