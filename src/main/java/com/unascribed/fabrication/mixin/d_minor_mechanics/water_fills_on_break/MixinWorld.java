@@ -2,6 +2,7 @@ package com.unascribed.fabrication.mixin.d_minor_mechanics.water_fills_on_break;
 
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.injection.FabInject;
+import net.minecraft.fluid.FlowableFluid;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -23,8 +24,9 @@ public class MixinWorld {
 	public void removeBlock(BlockPos pos, boolean move, CallbackInfoReturnable<Boolean> ci) {
 		if (FabConf.isAnyEnabled("*.water_fills_on_break")) {
 			World self = (World)(Object)this;
-			if (WaterFillsOnBreak.shouldFill(self, pos)) {
-				ci.setReturnValue(self.setBlockState(pos, Fluids.WATER.getDefaultState().getBlockState(), 3 | (move ? 64 : 0)));
+			FlowableFluid fluid = WaterFillsOnBreak.shouldFill(self, pos);
+			if (fluid != null) {
+				ci.setReturnValue(self.setBlockState(pos, fluid.getStill(false).getBlockState(), 3 | (move ? 64 : 0)));
 			}
 		}
 	}
@@ -33,8 +35,9 @@ public class MixinWorld {
 	public void breakBlock(BlockPos pos, boolean drop, @Nullable Entity breakingEntity, int maxUpdateDepth, CallbackInfoReturnable<Boolean> ci) {
 		if (FabConf.isAnyEnabled("*.water_fills_on_break") && ci.getReturnValueZ()) {
 			World self = (World)(Object)this;
-			if (WaterFillsOnBreak.shouldFill(self, pos)) {
-				ci.setReturnValue(self.setBlockState(pos, Fluids.WATER.getDefaultState().getBlockState(), 3));
+			FlowableFluid fluid = WaterFillsOnBreak.shouldFill(self, pos);
+			if (fluid != null) {
+				ci.setReturnValue(self.setBlockState(pos, fluid.getStill(false).getBlockState(), 3));
 			}
 		}
 	}

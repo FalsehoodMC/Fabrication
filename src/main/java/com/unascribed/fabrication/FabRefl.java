@@ -20,6 +20,7 @@ import com.unascribed.fabrication.support.injection.FabRefMap;
 import net.minecraft.client.util.SelectionManager;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.entity.vehicle.FurnaceMinecartEntity;
+import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.server.command.GameModeCommand;
 import net.minecraft.server.world.ServerWorld;
@@ -284,6 +285,16 @@ public class FabRefl {
 	public static BlockPos getLandingPos(Entity context) {
 		try {
 			return (BlockPos) checkHandle(e_getLandingPos).invokeExact(context);
+		} catch (Throwable t) {
+			throw rethrow(t);
+		}
+	}
+	private static final String ff_isInfinate_field = "Lnet/minecraft/fluid/FlowableFluid;isInfinite()Z";
+	private static final MethodHandle ff_isInfinate = unreflectMethod("FlowableFluid", () -> FlowableFluid.class, ff_isInfinate_field, boolean.class)
+		.requiredBy("*.water_fills_on_break", "*.water_fills_on_break_strict").get();
+	public static boolean isInfinate(FlowableFluid context) {
+		try {
+			return (boolean) checkHandle(ff_isInfinate).invokeExact(context);
 		} catch (Throwable t) {
 			throw rethrow(t);
 		}
