@@ -4,10 +4,10 @@ import java.util.regex.Pattern;
 
 public class Markdown {
 
-	public static final Pattern strike = Pattern.compile("~~(.+)~~");
-	public static final Pattern under = Pattern.compile("~(.+)~");
-	public static final Pattern bold = Pattern.compile("__(.+)__|\\*\\*(.+)\\*\\*");
-	public static final Pattern italic = Pattern.compile("_(.+)_|\\*(.+)\\*");
+	public static final Pattern strike = Pattern.compile("~~(.+?)~~");
+	public static final Pattern under = Pattern.compile("~(.+?)~");
+	public static final Pattern bold = Pattern.compile("__(.+?)__|\\*\\*(.+?)\\*\\*");
+	public static final Pattern italic = Pattern.compile("_(.+?)_|\\*(.+?)\\*");
 	public static final Pattern dedup = Pattern.compile("(§r)+");
 
 	public static String convert(String in){
