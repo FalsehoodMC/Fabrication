@@ -22,12 +22,14 @@ import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.registry.RegistryEntryLookup;
 import net.minecraft.entity.vehicle.FurnaceMinecartEntity;
+import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.server.command.GameModeCommand;
 import net.minecraft.server.network.PlayerAssociatedNetworkHandler;
 import net.minecraft.server.world.ServerChunkLoadingManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.GameMode;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.GenerationSettings;
 import net.minecraft.world.gen.feature.PlacedFeature;
 import net.minecraft.world.level.ServerWorldProperties;
@@ -278,6 +280,17 @@ public class FabRefl {
 		}
 	}
 	@FabReflField
+	private static final String ff_isInfinate_field = "Lnet/minecraft/fluid/FlowableFluid;isInfinite(Lnet/minecraft/world/World;)Z";
+	private static final MethodHandle ff_isInfinate = unreflectMethod("FlowableFluid", () -> FlowableFluid.class, ff_isInfinate_field, boolean.class, World.class)
+		.requiredBy("*.water_fills_on_break", "*.water_fills_on_break_strict").get();
+	public static boolean isInfinate(FlowableFluid context, World world) {
+		try {
+			return (boolean) checkHandle(ff_isInfinate).invokeExact(context, world);
+		} catch (Throwable t) {
+			throw rethrow(t);
+		}
+	}
+
 	private static final String gc_execute_field = "Lnet/minecraft/server/command/GiveCommand;execute(Lnet/minecraft/server/command/ServerCommandSource;Lnet/minecraft/command/argument/ItemStackArgument;Ljava/util/Collection;I)I";
 	private static final MethodHandle gc_execute = unreflectMethod("GiveCommand", () -> GiveCommand.class, gc_execute_field,
 			int.class,
