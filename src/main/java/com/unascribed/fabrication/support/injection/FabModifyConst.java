@@ -11,6 +11,8 @@ import java.lang.annotation.Target;
 
 @Target({ ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
+///REMOVE, causes conflicts #780
+@Deprecated()
 public @interface FabModifyConst {
 	String[] method() default {};
 
