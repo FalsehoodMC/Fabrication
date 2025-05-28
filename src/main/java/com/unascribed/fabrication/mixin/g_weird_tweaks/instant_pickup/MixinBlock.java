@@ -1,6 +1,7 @@
 package com.unascribed.fabrication.mixin.g_weird_tweaks.instant_pickup;
 
 import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,7 +21,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 
 @Mixin(Block.class)
-@EligibleIf(configAvailable="*.instant_pickup")
+@EligibleIf(configAvailable="*.instant_pickup", specialConditions=SpecialEligibility.NOT_FORGE)
 public class MixinBlock {
 
 	@FabInject(at=@At("TAIL"), method="dropStacks(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/entity/BlockEntity;Lnet/minecraft/entity/Entity;Lnet/minecraft/item/ItemStack;)V")
