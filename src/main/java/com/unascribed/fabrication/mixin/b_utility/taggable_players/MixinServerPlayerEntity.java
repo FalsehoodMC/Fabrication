@@ -12,6 +12,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
+import net.minecraft.network.packet.c2s.common.SyncedClientOptions;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -72,8 +73,8 @@ public abstract class MixinServerPlayerEntity extends PlayerEntity implements Ta
 		return fabrication$tagsOverride.get(tag);
 	}
 
-	@FabInject(at=@At("TAIL"), method="<init>(Lnet/minecraft/server/MinecraftServer;Lnet/minecraft/server/world/ServerWorld;Lcom/mojang/authlib/GameProfile;)V")
-	public void fabrication$genOverride(MinecraftServer server, ServerWorld world, GameProfile profile, CallbackInfo ci) {
+	@FabInject(at=@At("TAIL"), method="<init>(Lnet/minecraft/server/MinecraftServer;Lnet/minecraft/server/world/ServerWorld;Lcom/mojang/authlib/GameProfile;Lnet/minecraft/network/packet/c2s/common/SyncedClientOptions;)V")
+	public void fabrication$genOverride(MinecraftServer server, ServerWorld world, GameProfile profile, SyncedClientOptions clientOptions, CallbackInfo ci) {
 		Map<String, Boolean> mapName = FeatureTaggablePlayers.playerNameOverrideMap.get(profile.getName());
 		Map<String, Boolean> mapUuid = FeatureTaggablePlayers.playerUUIDOverrideMap.get(profile.getId());
 		if (mapUuid != null || mapName != null) {
