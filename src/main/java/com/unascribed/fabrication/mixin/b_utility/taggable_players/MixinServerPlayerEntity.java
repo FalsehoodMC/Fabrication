@@ -12,7 +12,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,8 +22,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import com.unascribed.fabrication.support.injection.FabInject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 @Mixin(ServerPlayerEntity.class)
@@ -29,6 +33,7 @@ import java.util.Set;
 public abstract class MixinServerPlayerEntity extends PlayerEntity implements TaggablePlayer {
 
 	private final Set<String> fabrication$tags = new HashSet<>();
+	private Map<String, Boolean> fabrication$tagsOverride = null;
 
 	public MixinServerPlayerEntity(World world, BlockPos pos, float yaw, GameProfile gameProfile) {
 		super(world, pos, yaw, gameProfile);
@@ -55,7 +60,28 @@ public abstract class MixinServerPlayerEntity extends PlayerEntity implements Ta
 
 	@Override
 	public boolean fabrication$hasTag(String tag) {
+		if (fabrication$tagsOverride != null) {
+			Boolean b = fabrication$tagsOverride.get(tag);
+			if (b != null) return b;
+		}
 		return fabrication$tags.contains(tag);
+	}
+	@Override
+	public Boolean fabrication$getTagOverride(String tag) {
+		if (fabrication$tagsOverride == null) return null;
+		return fabrication$tagsOverride.get(tag);
+	}
+
+	@FabInject(at=@At("TAIL"), method="<init>(Lnet/minecraft/server/MinecraftServer;Lnet/minecraft/server/world/ServerWorld;Lcom/mojang/authlib/GameProfile;)V")
+	public void fabrication$genOverride(MinecraftServer server, ServerWorld world, GameProfile profile, CallbackInfo ci) {
+		Map<String, Boolean> mapName = FeatureTaggablePlayers.playerNameOverrideMap.get(profile.getName());
+		Map<String, Boolean> mapUuid = FeatureTaggablePlayers.playerUUIDOverrideMap.get(profile.getId());
+		if (mapUuid != null || mapName != null) {
+			Map<String, Boolean> map = new HashMap<>();
+			if (mapName != null) map.putAll(mapName);
+			if (mapUuid != null) map.putAll(mapUuid);
+			fabrication$tagsOverride = map;
+		}
 	}
 
 	@FabInject(at=@At("HEAD"), method="copyFrom(Lnet/minecraft/server/network/ServerPlayerEntity;Z)V")
