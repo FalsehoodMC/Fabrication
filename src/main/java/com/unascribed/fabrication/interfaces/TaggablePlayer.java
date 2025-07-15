@@ -8,5 +8,6 @@ public interface TaggablePlayer {
 	void fabrication$clearTags();
 	void fabrication$setTag(String tag, boolean enabled);
 	boolean fabrication$hasTag(String tag);
+	Boolean fabrication$getTagOverride(String tag);
 
 }
