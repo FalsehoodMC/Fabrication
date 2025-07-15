@@ -3,6 +3,7 @@ package com.unascribed.fabrication.logic;
 import com.unascribed.fabrication.FabRefl;
 
 import com.unascribed.fabrication.support.ConfigPredicates;
+import com.unascribed.fabrication.util.FakePlayerChecker;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
@@ -17,6 +18,7 @@ public class InstantPickup {
 
 	private static final Predicate<PlayerEntity> fabrication$instantPickupPredicate = ConfigPredicates.getFinalPredicate("*.instant_pickup");
 	public static void slurp(World world, Box box, PlayerEntity breaker) {
+		if (FakePlayerChecker.isFakePlayer(breaker)) return;
 		if (!fabrication$instantPickupPredicate.test(breaker)) return;
 		for (ItemEntity ie : world.getEntitiesByType(EntityType.ITEM, box, (e) -> ((Entity)e).age == 0)) {
 			if (!ie.isAlive()) continue;
