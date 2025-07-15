@@ -76,6 +76,7 @@ weird_tweaks.instant_pickup:
 	name: Instant Pickup
 	since: 1.3.2
 	sides: server_only
+	fscript: player_entity
 	media: https://unascribed.com/fabrication/instant_pickup.mp4
 	desc:
 		Drops from blocks and entities are instantly placed in your inventory if there's room. This
