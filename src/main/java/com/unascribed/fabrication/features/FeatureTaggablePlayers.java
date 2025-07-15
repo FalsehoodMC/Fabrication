@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Predicate;
 
 @EligibleIf(configAvailable="*.taggable_players")
@@ -28,6 +29,9 @@ public class FeatureTaggablePlayers implements Feature {
 	public static final ImmutableMap<String, Integer> validTags;
 	public static final ImmutableSet<String> listTags;
 	public static Map<String, Integer> activeTags = new HashMap<>();
+	public static final Map<String, Map<String, Boolean>> playerNameOverrideMap = new HashMap<>();
+	public static final Map<UUID, Map<String, Boolean>> playerUUIDOverrideMap = new HashMap<>();
+
 
 	static {
 		Map<String, Integer> tags = new HashMap<>();
