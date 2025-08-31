@@ -45,7 +45,7 @@ public class MixinServerPlayNetworkHandler {
 				if (id == 0) {
 					// hello
 					int reqVer = 0;
-					if (recvdData.isReadable(4)) reqVer = recvdData.readVarInt();
+					if (recvdData.isReadable(1)) reqVer = recvdData.readVarInt();
 					if (player instanceof SetFabricationConfigAware) {
 						((SetFabricationConfigAware) player).fabrication$setReqVer(reqVer);
 						FabricationMod.sendConfigUpdate(player.server, null, player, reqVer);
