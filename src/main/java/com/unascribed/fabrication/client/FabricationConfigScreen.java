@@ -1613,8 +1613,14 @@ public class FabricationConfigScreen extends Screen {
 
 	private String getRawValue(String key) {
 		if (configuringServer) {
-			String k = ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerStringConfig().get(key);
-			if (k == null) return null;
+			String k;
+			ConfigValues.ResolvedFeature f = ((GetServerConfig)client.getNetworkHandler()).fabrication$getServerTrileanConfig().get(key);
+			if (f == null) {
+				k = ((GetServerConfig) client.getNetworkHandler()).fabrication$getServerStringConfig().get(key);
+				if (k == null) return null;
+			} else {
+				k = f.toString();
+			}
 			return k.toLowerCase(Locale.ROOT);
 		} else {
 			return FabConf.getRawValue(key);
@@ -1636,13 +1642,13 @@ public class FabricationConfigScreen extends Screen {
 		String oldValue = getRawValue(key);
 		//TODO count banned world values
 		if (!FabConf.isRuntimeConfigurable(key) && !(configuringServer && FeaturesFile.get(key).sides == Sides.CLIENT_ONLY) && !editingWorldPath) {
-			if (value.equals("banned")) {
+			if ("banned".equals(value)) {
 				if (newlyUnbannedKeys.contains(key)) {
 					newlyUnbannedKeys.remove(key);
 				} else {
 					newlyBannedKeys.add(key);
 				}
-			} else if (oldValue.equals("banned")) {
+			} else if ("banned".equals(oldValue)) {
 				if (newlyBannedKeys.contains(key)) {
 					newlyBannedKeys.remove(key);
 				} else {
