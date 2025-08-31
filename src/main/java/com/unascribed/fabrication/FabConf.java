@@ -334,7 +334,7 @@ public class FabConf {
 		return worldConfig.get(configKey).toString().equals(configVal.toUpperCase(Locale.ROOT));
 	}
 	public static ConfigValues.ResolvedFeature getResolvedValue(String configKey) {
-		return getResolvedValue(configKey, true);
+		return getResolvedValue(configKey, false);
 	}
 	public static ConfigValues.ResolvedFeature getResolvedValue(String configKey, boolean includeWorld) {
 		if (isBanned(configKey)) return ConfigValues.ResolvedFeature.BANNED;
