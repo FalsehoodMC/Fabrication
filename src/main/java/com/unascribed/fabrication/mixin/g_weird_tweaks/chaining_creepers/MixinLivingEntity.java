@@ -20,6 +20,7 @@ public abstract class MixinLivingEntity {
 	public void lightCreepersOnExplosion(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
 		Object self = this;
 		if (!(FabConf.isEnabled("*.chaining_creepers") && self instanceof CreeperEntity && source.isExplosive())) return;
+		if (((CreeperEntity) self).getHealth() < 3f && amount >= 3f) return;
 		((CreeperEntity)self).ignite();
 		cir.setReturnValue(false);
 	}
