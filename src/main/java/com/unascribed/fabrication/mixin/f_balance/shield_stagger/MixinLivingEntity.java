@@ -25,7 +25,7 @@ public abstract class MixinLivingEntity {
 	protected ItemStack activeItemStack;
 	private static final Predicate<List<?>> fabrication$shieldStaggerPredicate = ConfigPredicates.getFinalPredicate("*.shield_stagger");
 	@FabInject(method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z",
-			at=@At(value="INVOKE", target="Lnet/minecraft/entity/LivingEntity;damageShield(F)V"))
+			at=@At(value="INVOKE", target="Lnet/minecraft/entity/LivingEntity;damageShield(F)V", shift=At.Shift.AFTER))
 	public void brittleShield(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
 		if (!(FabConf.isEnabled("*.shield_stagger") && fabrication$shieldStaggerPredicate.test(ImmutableList.of(this, source)))) return;
 		Object self = this;
