@@ -135,7 +135,7 @@ weird_tweaks.chaining_creepers:
 	sides: server_only
 	desc:
 		Creepers explode after taking explosion damage.
-		(They will not explode if the explosion damage is at least 3 and their bellow 3 HP).
+		(They will die normally if the explosion damage is at least 3 and their bellow 3 HP).
 
 weird_tweaks.crunchy_cake:
 	name: Crunchy Cake
