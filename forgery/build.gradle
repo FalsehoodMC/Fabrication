@@ -5,7 +5,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '6.+', changing: true
         classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
     }
 }
@@ -17,16 +17,16 @@ group = 'com.unascribed'
 archivesBaseName = 'forgery'
 
 sourceCompatibility = compileJava.sourceCompatibility = '8'
-targetCompatibility = compileJava.targetCompatibility = '17'
+targetCompatibility = compileJava.targetCompatibility = '21'
 
 minecraft {
-    mappings channel: 'official', version: '1.20.4'
+    mappings channel: 'official', version: '1.21.1'
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.20.4-49.0.3'
+    minecraft 'net.minecraftforge:forge:1.21.1-52.1.0'
 }
 
 jar.finalizedBy('reobfJar') 

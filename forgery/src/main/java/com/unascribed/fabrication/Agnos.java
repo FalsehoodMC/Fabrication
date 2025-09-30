@@ -1,6 +1,5 @@
 package com.unascribed.fabrication;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -12,7 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.RenderGuiOverlayEvent;
+import net.minecraftforge.client.event.CustomizeGuiOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
@@ -50,7 +49,7 @@ public final class Agnos {
 
 	@OnlyIn(Dist.CLIENT)
 	public static void runForHudRender(HudRenderCallback r) {
-		MinecraftForge.EVENT_BUS.addListener((RenderGuiOverlayEvent.Post e) -> {
+		MinecraftForge.EVENT_BUS.addListener((CustomizeGuiOverlayEvent e) -> {
 			r.render(e.getGuiGraphics(), e.getPartialTick());
 		});
 	}

@@ -1,9 +1,7 @@
 plugins {
-	id 'com.github.johnrengelman.shadow' version '7.1.1'
+	id 'com.gradleup.shadow' version '9.2.2'
 	id 'java'
 }
-
-archivesBaseName = "out"
 
 configurations {
 	shadow
@@ -23,6 +21,7 @@ dependencies {
 }
 
 task shadowHack(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+	archiveBaseName = "out"
 	from file("in.jar")
 	configurations = [project.configurations.shadow]
 	relocate 'io.github.queerbric', 'com.unascribed.fabrication.repackage.io.github.queerbric'
