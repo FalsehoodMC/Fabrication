@@ -66,7 +66,7 @@ public abstract class MixinLivingEntity extends Entity implements DidJustAbsorp 
 	public void playHurtSound(DamageSource src, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.alt_absorption_sound")) return;
 		Object self = this;
-		if (fabrication$didJustAbsorp()) {
+		if (fabrication$didJustAbsorp() && !((Entity)self).isSilent()) {
 			PacketByteBuf data = new PacketByteBuf(Unpooled.buffer(4));
 			data.writeInt(getId());
 			CustomPayloadS2CPacket fabPkt = new CustomPayloadS2CPacket(new Identifier("fabrication", "play_absorp_sound"), data);
