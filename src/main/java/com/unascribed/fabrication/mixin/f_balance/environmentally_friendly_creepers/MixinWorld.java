@@ -6,6 +6,8 @@ import com.unascribed.fabrication.support.FailOn;
 import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.injection.Hijack;
 import com.unascribed.fabrication.support.injection.HijackReturn;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.mob.CreeperEntity;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,8 +19,8 @@ public class MixinWorld {
 
 	@Hijack(target="Lnet/minecraft/world/GameRules;getBoolean(Lnet/minecraft/world/GameRules$Key;)Z",
 			method="createExplosion(Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/damage/DamageSource;Lnet/minecraft/world/explosion/ExplosionBehavior;DDDFZLnet/minecraft/world/World$ExplosionSourceType;ZLnet/minecraft/particle/ParticleEffect;Lnet/minecraft/particle/ParticleEffect;Lnet/minecraft/sound/SoundEvent;)Lnet/minecraft/world/explosion/Explosion;")
-	private static HijackReturn fabrication$nonMobGriefingDestructionType(GameRules rules, GameRules.Key<GameRules.BooleanRule> gamerule) {
-		return FabConf.isEnabled("*.environmentally_friendly_creepers") && gamerule == GameRules.DO_MOB_GRIEFING ? HijackReturn.FALSE : null;
+	private static HijackReturn fabrication$nonMobGriefingDestructionType(GameRules rules, GameRules.Key<GameRules.BooleanRule> gamerule, World self, Entity entity) {
+		return FabConf.isEnabled("*.environmentally_friendly_creepers") && entity instanceof CreeperEntity && gamerule == GameRules.DO_MOB_GRIEFING ? HijackReturn.FALSE : null;
 	}
 
 }
