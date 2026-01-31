@@ -39,15 +39,13 @@ public abstract class MixinLivingEntity extends Entity implements DidJustAbsorp 
 	}
 
 	@Unique
-	private float fabrication$absorptionAmountBeforeDamage;
+	private float fabrication$absorptionAmountBeforeDamage = 0, fabrication$healthAmountBeforeDamage = 0;
 
 	@Shadow
 	protected float lastDamageTaken;
 
 	@Shadow
-	public abstract float getAbsorptionAmount();
-	@Shadow
-	protected abstract SoundEvent getHurtSound(DamageSource src);
+	public abstract SoundEvent getHurtSound(DamageSource src);
 	@Shadow
 	protected abstract float getSoundVolume();
 	@Shadow
@@ -55,20 +53,27 @@ public abstract class MixinLivingEntity extends Entity implements DidJustAbsorp 
 
 	@FabInject(at=@At("HEAD"), method="damage(Lnet/minecraft/entity/damage/DamageSource;F)Z")
 	public void damage(DamageSource ds, float amount, CallbackInfoReturnable<Boolean> cir) {
-		fabrication$absorptionAmountBeforeDamage = getAbsorptionAmount();
+		LivingEntity self = (LivingEntity) (Object) this;
+		fabrication$absorptionAmountBeforeDamage = self.getAbsorptionAmount();
+		fabrication$healthAmountBeforeDamage = self.getHealth();
 	}
 
 	@Override
 	public boolean fabrication$didJustAbsorp() {
-		return getAbsorptionAmount() < fabrication$absorptionAmountBeforeDamage && fabrication$absorptionAmountBeforeDamage >= lastDamageTaken;
+		if (fabrication$absorptionAmountBeforeDamage < lastDamageTaken) return false;
+		LivingEntity self = (LivingEntity) (Object) this;
+		float abs = self.getAbsorptionAmount();
+		if (abs <= 0f) return false;
+		//issue 798
+		return abs < fabrication$absorptionAmountBeforeDamage || (abs-lastDamageTaken)==abs && self.getHealth() == fabrication$healthAmountBeforeDamage;
 	}
 
 	@FabInject(at=@At("HEAD"), method="playHurtSound(Lnet/minecraft/entity/damage/DamageSource;)V",
 			cancellable=true)
 	public void playHurtSound(DamageSource src, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.alt_absorption_sound")) return;
-		Object self = this;
-		if (fabrication$didJustAbsorp()) {
+		LivingEntity self = (LivingEntity) (Object) this;
+		if (fabrication$didJustAbsorp() && !self.isSilent()) {
 			PacketByteBuf data = new PacketByteBuf(Unpooled.buffer(4));
 			data.writeInt(getId());
 			CustomPayloadS2CPacket fabPkt = new CustomPayloadS2CPacket(new ByteBufCustomPayload(Identifier.of("fabrication", "play_absorp_sound"), data));
