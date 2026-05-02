@@ -1,442 +1,70 @@
-buildscript {
-	repositories {
-		gradlePluginPortal()
-		mavenCentral()
-	}
-	dependencies {
-		classpath 'com.modrinth.minotaur:Minotaur:2.4.3'
-		classpath 'gradle.plugin.com.matthewprenger:CurseGradle:1.4.0'
-		classpath "com.github.breadmoirai:github-release:2.4.1"
-	}
-}
-
-import java.nio.file.Files
-
 plugins {
-	id 'fabric-loom' version '0.11-SNAPSHOT'
-	id 'io.github.juuxel.loom-quiltflower' version '1.6.0'
-	id 'maven-publish'
+    id 'dev.architectury.loom' version '1.10.455' apply false
+    id 'architectury-plugin' version '3.4-SNAPSHOT'
+    id 'com.gradleup.shadow' version '8.3.6' apply false
 }
 
-if (System.getenv("MODRINTH_TOKEN")) {
-	apply plugin: "com.modrinth.minotaur"
-}
-if (System.getenv("CURSE_TOKEN")) {
-	apply plugin: "com.matthewprenger.cursegradle"
-}
-if (System.getenv("GITHUB_TOKEN")) {
-	apply plugin: "com.github.breadmoirai.github-release"
+architectury {
+    minecraft = project.minecraft_version
 }
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
-
-archivesBaseName = project.archives_base_name
-def origVersion = project.version
-version = project.version+"+1.18"
-group = project.maven_group
-
-repositories {
-	maven {
-		url 'https://repo.sleeping.town'
-		content {
-			includeGroup 'com.unascribed'
-		}
-	}
-	maven {
-		url 'https://maven.terraformersmc.com/releases'
-		content {
-			includeGroup 'com.terraformersmc'
-		}
-	}
-	maven {
-		url 'https://maven.ssf.tf/'
-		content {
-			includeGroup 'tf.ssf.sfort'
-		}
-	}
-	maven {
-		url 'https://maven.gegy.dev/releases'
-		content {
-			includeGroup 'io.github.queerbric'
-		}
-	}
-	maven {
-		url 'https://repo.fabricmc.net'
-		content {
-			includeGroup 'net.fabricmc'
-			includeGroup 'net.fabricmc.api'
-		}
-	}
+allprojects {
+    group = rootProject.maven_group
+    version = rootProject.mod_version
 }
 
-dependencies {
-	//to change the versions see the gradle.properties file
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+subprojects {
+    apply plugin: 'dev.architectury.loom'
+    apply plugin: 'architectury-plugin'
+    apply plugin: 'maven-publish'
 
-	modImplementation fabricApi.module('fabric-api-base', project.fabric_version)
+    base {
+        // Set up a suffixed format for the mod jar names, e.g. `example-fabric`.
+        archivesName = "$rootProject.archives_name-$project.name"
+    }
 
-	//Required by pridelib/modmenu
-	modImplementation fabricApi.module('fabric-resource-loader-v0', project.fabric_version)
-	modImplementation('io.github.queerbric:pridelib:1.1.0+1.17') {
-		transitive = false
-	}
-	modImplementation('com.terraformersmc:modmenu:3.1.0') {
-		transitive = false
-	}
-	modImplementation 'com.unascribed:ears-api:1.4.5'
-	modImplementation('tf.ssf.sfort:fscript:3.2.0+1.18.1') {
-		transitive = false
-	}
-	modImplementation(include('com.unascribed:lib39-deferral:1.1.1'))
-	modRuntimeOnly fabricApi.module('fabric-screen-api-v1', project.fabric_version)
+    repositories {
+        // Add repositories to retrieve artifacts from in here.
+        // You should only use this when depending on other mods because
+        // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
+        // See https://docs.gradle.org/current/userguide/declaring_repositories.html
+        // for more information about repositories.
+    }
 
-	annotationProcessor project(':ap')
-	implementation 'com.google.code.gson:gson:2.8.9'
-}
+    dependencies {
+        minecraft "net.minecraft:minecraft:$rootProject.minecraft_version"
+        mappings "net.fabricmc:yarn:$rootProject.yarn_mappings:v2"
+    }
 
-loom.accessWidenerPath = file('src/main/resources/fabrication.accesswidener')
+    java {
+        // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+        // if it is present.
+        // If you remove this line, sources will not be generated.
+        withSourcesJar()
 
-apply plugin: FabFeaturesPlugin
-apply plugin: FabPagesPlugin
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
 
-processResources {
-	inputs.property 'version', project.version
+    tasks.withType(JavaCompile).configureEach {
+        it.options.release = 17
+    }
 
-	filesMatching('fabric.mod.json') {
-		expand 'version': project.version
-	}
-	dependsOn(fabGenFeatures)
-}
-
-sourceSets {
-	dummy {
-		compileClasspath += configurations.compileClasspath
-	}
-	main {
-		compileClasspath += dummy.output
-	}
-}
-
-// ensure that the encoding is set to UTF-8, no matter what the system default is
-// this fixes some edge cases with special characters not displaying correctly
-// see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
-tasks.withType(JavaCompile) {
-	options.encoding = 'UTF-8'
-}
-
-jar {
-	doFirst {
-		StringBuilder bldr = new StringBuilder();
-		File dir = file('build/classes/java/main');
-		dir.eachFileRecurse(groovy.io.FileType.FILES, {
-			if (it.name.endsWith('.class')) {
-				bldr.append(it.getAbsolutePath().substring(dir.getAbsolutePath().length()+1))
-				bldr.append('\n')
-			}
-		})
-		file('build/tmp/classes.txt').text = bldr.toString();
-		Set<String> expectedFailThatFailsAutoFilter = Set.of(
-				'lambda$static$12com.unascribed.fabrication.mixin.f_balance.disable_elytra.MixinModelPredicateProviderRegistry',
-				'handleAttackEntity(Lnet/minecraft/class_1657;Lnet/minecraft/class_1937;Lnet/minecraft/class_1268;Lnet/minecraft/class_1297;Lnet/minecraft/class_3966;)Lnet/minecraft/class_1269;com.unascribed.fabrication.mixin.a_fixes.fix_charm_amethyst_dupe.MixinClearItemFrames',
-				'handleUseEntity(Lnet/minecraft/class_1657;Lnet/minecraft/class_1937;Lnet/minecraft/class_1268;Lnet/minecraft/class_1297;Lnet/minecraft/class_3966;)Lnet/minecraft/class_1269;com.unascribed.fabrication.mixin.a_fixes.fix_charm_amethyst_dupe.MixinClearItemFrames',
-				'processLoading;com.unascribed.fabrication.mixin.e_mechanics.obsidian_tears.MixinModelLoaderForge',
-				'fireRenderEntityItemcom.unascribed.fabrication.mixin.i_woina.drops.MixinItemEntityRendererObfuscate',
-				'processLoadingcom.unascribed.fabrication.mixin.e_mechanics.obsidian_tears.MixinModelLoaderForge',
-				'method_27884com.unascribed.fabrication.mixin.f_balance.disable_elytra.MixinModelPredicateProviderRegistry'
-		)
-		def lge = project.getExtensions().getByType(net.fabricmc.loom.api.LoomGradleExtensionAPI.class)
-		def mappings = lge.getMappingsProvider().getMappings()
-		Map<String, Mapp> toInter = new HashMap<>()
-		List<String> fabRefl = Files.readAllLines(file('build/tmp/fabReflToMap').toPath())
-
-		for (String f : fabRefl) {
-			if (f == null) continue
-			Mapp.Target toTarget = new Mapp.Target(f)
-			if (toInter.containsKey('FabRefl')) toInter.get('FabRefl').target.add(toTarget)
-			else toInter.put('FabRefl', new Mapp(new String[]{}, new String[]{}, new Mapp.Target[]{toTarget}))
-
-		}
-
-		List<String> toParse = Files.readAllLines(file('build/tmp/fabToRefMap').toPath())
-		for (int i=0; i+3<toParse.size(); i++){
-			String toInterKey = toParse.get(i)
-			Mapp toAdd = new Mapp(toParse.get(++i).split('\t'), toParse.get(++i).split('\t'), toParse.get(++i).split('\t'))
-			if (toInter.containsKey(toInterKey)) toInter.get(toInterKey).add(toAdd)
-			else toInter.put(toInterKey, toAdd)
-		}
-		Map<String, String> fieldMap = new HashMap<>()
-		Map<String, String> targetMap = new HashMap<>()
-		Map<String, String> methodMap = new HashMap<>()
-		Map<String, String> classMap = new HashMap<>()
-
-		for (def map : toInter.values()){
-			for (def cl : mappings.classes){
-                String clName = cl.getName('named')
-                String clNameRez = cl.getName('intermediary')
-                String dottedClName = clName.replace('/', '.')
-				if (map.mixin.contains(dottedClName)) {
-					for (def clMethod : cl.methods) {
-						for (String mthd : map.method) {
-							int col = mthd.indexOf(';')
-							int dot = mthd.indexOf('.')
-							if (col == -1 || dot < col && dot != -1) col = dot
-							int brc = mthd.indexOf('(')
-							if (brc == -1) continue
-							String desc = mthd.substring(brc)
-							String name = mthd.substring(col == -1 || brc<col ? 0 : col+1, brc)
-							if ((name.equals(clMethod.getName('named')) || name.equals(clMethod.getName('intermediary'))) && (desc.equals(clMethod.getDesc('named')) || desc.equals(clMethod.getDesc('intermediary')))) {
-								methodMap.put(clName+';'+name+desc, clMethod.getName('intermediary') + clMethod.getDesc('intermediary'))
-							}
-						}
-					}
-				}
-				for (Mapp.Target mapt : map.target) {
-					String target = mapt.self
-					int col = target.indexOf(';')
-					int dot = target.indexOf('.')
-					if (col == -1 || dot < col && dot != -1) col = dot
-					if (mapt.applicable.contains(dottedClName)){
-						classMap.put(clName, clNameRez)
-						int brc = target.indexOf('(')
-						if (brc == -1) {
-							int cindx = target.lastIndexOf(':')
-							String name = target.substring(col+1, cindx == -1 ? target.length() : cindx)
-							for (def clField : cl.fields) {
-								if (clField.getName('named').equals(name) || clField.getName('intermediary').equals(name)){
-									fieldMap.put(target, clField.getName('intermediary')+":"+clField.getDesc('intermediary'))
-								}
-							}
-							continue
-						}
-						String desc = target.substring(brc)
-						String name = target.substring(col+1, brc)
-						for (def clMethod : cl.methods) {
-							if ((clMethod.getName('named').equals(name) || clMethod.getName('intermediary').equals(name)) && (clMethod.getDesc('named').equals(desc) || clMethod.getDesc('intermediary').equals(desc))){
-								targetMap.put(target, clMethod.getName('intermediary')+clMethod.getDesc('intermediary'))
-							}
-						}
-					}
-				}
-			}
-            //basic <init> pass because #656
-            {
-                for (Mapp.Target mapt : map.target) {
-                    String target = mapt.self
-                    int col = target.indexOf(';')
-                    int dot = target.indexOf('.')
-                    if (col == -1 || dot < col && dot != -1) col = dot
-                    int brc = target.indexOf('(')
-                    if (brc == -1) {
-                        continue
-                    }
-                    String desc = target.substring(brc)
-                    String name = target.substring(col+1, brc)
-                    if (!"<init>".equals(name)) continue
-                    //TODO map desc
-                    if (!"()V".equals(desc)) continue
-                    String claz = target.substring(0, col)
-                    for (def cl : mappings.classes) {
-                        String clName = cl.getName('named')
-                        if (claz.endsWith(clName)) {
-                            targetMap.put(target, "<init>()V")
-                        }
-                    }
-                }
+    // Configure Maven publishing.
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                artifactId = base.archivesName.get()
+                from components.java
             }
-		}
-		StringBuilder bldrRel = new StringBuilder()
-		Map<String, String> bldrAbs = new HashMap<>()
-		for (Map.Entry<String, Mapp> intr : toInter){
-			for (Mapp.Target tar : intr.value.target){
-				String s = tar.self
-				String ad = targetMap.get(s)
-				if (ad == null) ad = fieldMap.get(s)
-				if (ad != null) {
-					int col = s.indexOf(';')
-					int dot = s.indexOf('.')
-					if (col == -1 || dot < col && dot != -1) col = dot
-					bldrAbs.put(s, 'L'+classMap.get(s.substring(s.charAt(0) == 'L' as char ? 1 : 0, col))+';'+ad)
-				} else if (!s.isBlank() && !expectedFailThatFailsAutoFilter.contains(s+intr.key)
-					&& !s.startsWith("Ljava/lang/") && !s.startsWith("com/mojang/blaze3d/")
-				) {
-					logger.log(LogLevel.ERROR, "Failed to map "+s+" for "+intr.key)
-				}
-			}
-			boolean frst = true
-			StringBuilder bldrRelIntern = new StringBuilder()
-			for (String s : intr.value.method) {
-				boolean missedMthd = true
-				for (String c : intr.value.mixin) {
-					String set = methodMap.get(c.replace('.', '/')+';'+s)
-					if (set != null){
-						if (frst) frst = false;
-						else bldrRelIntern.append('\t')
-						bldrRelIntern.append(s).append(' ').append(set)
-						missedMthd = false
-						break
-					}
-				}
-				if (missedMthd && !s.isBlank() && !expectedFailThatFailsAutoFilter.contains(s+intr.key) && !s.equals("<init>")) {
-					logger.log(LogLevel.ERROR, "Failed to map "+s+" for "+intr.key)
-				}
-			}
-			if (!bldrRelIntern.isEmpty()) {
-				if (!bldrRel.isEmpty()) bldrRel.append('\n')
-				bldrRel.append(intr.key)
-				bldrRel.append('\n')
-				bldrRel.append(bldrRelIntern)
-			}
-		}
-		file('build/tmp/fabRelRefMap.txt').text = bldrRel.toString()
-		bldrRel = new StringBuilder()
-		for (Map.Entry<String, String> entry : bldrAbs) {
-			bldrRel.append(entry.key).append(' ').append(entry.value).append('\n')
-		}
-		file('build/tmp/fabAbsRefMap.txt').text = bldrRel.toString()
-	}
+        }
 
-	from 'LICENSE'
-	from 'build/tmp/classes.txt'
-	from 'build/tmp/fabRelRefMap.txt'
-	from 'build/tmp/fabAbsRefMap.txt'
-}
-
-class Mapp{
-	static class Target{
-		Target(String target){
-			int i = target.indexOf(' ');
-			if (i == -1){
-				this.self = target
-				this.applicable = new ArrayList<>()
-			} else {
-				this.self = target.substring(0, i)
-				this.applicable = target.substring(i).split(' ')
-			}
-		}
-		public String self
-		public List<String> applicable
-	}
-	void add(Mapp map){
-		this.mixin.addAll(map.mixin)
-		this.method.addAll(map.method)
-		this.target.addAll(map.target)
-	}
-	void add(String[] mixin, String[] method, String[] target){
-		for (String s : mixin) this.mixin.add(s)
-		for (String s : method) this.method.add(s)
-		for (String s : target) this.target.add(new Target(s))
-	}
-	void add(Target[] target){
-		for (Target s : target) this.target.add(s)
-	}
-	Mapp(String[] mixin, String[] method, String[] target){
-		this.mixin = mixin
-		this.method = method
-		this.target = new ArrayList<>()
-		for (String s : target) this.target.add(new Target(s))
-	}
-	Mapp(String[] mixin, String[] method, Target[] target){
-		this.mixin = mixin;
-		this.method = method;
-		this.target = target;
-	}
-	public List<String> mixin
-	public List<String> method
-	public List<Target> target
-}
-
-def mcVersions = [ '1.18.2' ]
-
-def stability = 'release'
-
-def mrLoaders = [ 'fabric', 'quilt' ]
-
-def curseLoaders = [ 'Fabric', 'Quilt' ]
-def curseProject = '414445'
-
-def mcmodcnClassID = '3548'
-def mcmodcnLoaders = '2,11'
-
-def artifact = remapJar.archivePath
-
-if (System.getenv("PUBLISH_FORGERY")) {
-	stability = 'beta'
-
-	mrLoaders = [ 'forge' ]
-
-	curseProject = '434087'
-	curseLoaders = [ 'Forge' ]
-
-	mcmodcnClassID = '3547'
-	mcmodcnLoaders = '1'
-
-	artifact = file(remapJar.archivePath.getPath().reverse().replaceFirst("fabrication".reverse(), "forgery".reverse()).reverse())
-}
-
-if (System.getenv("MODRINTH_TOKEN")) {
-	modrinth {
-		token = System.getenv("MODRINTH_TOKEN")
-		projectId = 'fabrication'
-		versionNumber = project.version
-		versionName = 'v'+origVersion
-		versionType = stability
-		changelog = file('changelog.md').text
-		uploadFile = artifact
-		gameVersions = mcVersions
-		loaders = mrLoaders
-		detectLoaders = false
-	}
-}
-
-if (System.getenv("CURSE_TOKEN")) {
-	curseforge {
-		apiKey = System.getenv("CURSE_TOKEN")
-		project {
-			id = curseProject
-			releaseType = stability
-
-			changelog = file('changelog.md')
-			changelogType = 'markdown'
-
-			for (def s : mcVersions) addGameVersion s
-			for (def s : curseLoaders) addGameVersion s
-
-			mainArtifact(artifact) {
-				displayName = '['+project.minecraft_version+'] v'+origVersion
-			}
-		}
-		options {
-			javaIntegration = false
-			forgeGradleIntegration = false
-			javaVersionAutoDetect = false
-		}
-	}
-}
-
-if (System.getenv("GITHUB_TOKEN")) {
-	githubRelease {
-		token System.getenv("GITHUB_TOKEN")
-		owner "unascribed"
-		repo "Fabrication"
-		tagName 'v'+origVersion
-		releaseName 'v'+origVersion
-		targetCommitish "3.0/1.18"
-		body file('changelog.md').text
-		draft false
-		prerelease false
-		releaseAssets artifact
-		allowUploadToExisting true
-	}
-	tasks.githubRelease.dependsOn remapJar
-}
-
-if (System.getenv("MCMODCN_COOKIE")) {
-	task mcmodcn(type: Exec) {
-		dependsOn remapJar
-
-		commandLine './mcmodcn-upload.sh', mcmodcnClassID, mcVersions[mcVersions.size()-1], mcmodcnLoaders, '', artifact.getPath()
-	}
+        // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+        repositories {
+            // Add repositories to publish to here.
+            // Notice: This block does NOT have the same function as the block in the top level.
+            // The repositories here will be used for publishing your artifact, not for
+            // retrieving dependencies.
+        }
+    }
 }

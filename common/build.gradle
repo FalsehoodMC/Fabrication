@@ -1,0 +1,67 @@
+apply plugin: FabFeaturesPlugin
+apply plugin: FabPagesPlugin
+
+architectury {
+    common rootProject.enabled_platforms.split(',')
+}
+
+repositories {
+    maven {
+        url 'https://repo.sleeping.town'
+        content {
+            includeGroup 'com.unascribed'
+        }
+    }
+    maven {
+        url 'https://maven.terraformersmc.com/releases'
+        content {
+            includeGroup 'com.terraformersmc'
+        }
+    }
+    maven {
+        url 'https://maven.ssf.tf/'
+        content {
+            includeGroup 'tf.ssf.sfort'
+        }
+    }
+    maven {
+        url 'https://maven.gegy.dev/releases'
+        content {
+            includeGroup 'io.github.queerbric'
+        }
+    }
+    maven {
+        url 'https://repo.fabricmc.net'
+        content {
+            includeGroup 'net.fabricmc'
+            includeGroup 'net.fabricmc.api'
+        }
+    }
+}
+
+dependencies {
+    // We depend on Fabric Loader here to use the Fabric @Environment annotations,
+    // which get remapped to the correct annotations on each platform.
+    // Do NOT use other classes from Fabric Loader.
+    modImplementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
+
+    modImplementation('io.github.queerbric:pridelib:1.1.0+1.17') {
+        transitive = false
+    }
+    modImplementation('com.terraformersmc:modmenu:3.1.0') {
+        transitive = false
+    }
+    modImplementation 'com.unascribed:ears-api:1.4.5'
+    modImplementation('tf.ssf.sfort:fscript:3.2.0+1.18.1') {
+        transitive = false
+    }
+    modImplementation(include('com.unascribed:lib39-deferral:1.1.1'))
+
+
+
+    tasks.withType(JavaCompile) {
+        options.compilerArgs.add("-AfabricationAPPath=${project.getBuildDir()}")
+    }
+    annotationProcessor project(':common:ap')
+    implementation 'com.google.code.gson:gson:2.10'
+}

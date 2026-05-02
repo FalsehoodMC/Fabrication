@@ -1,0 +1,25 @@
+package com.unascribed.fabrication.mixin.f_balance.ender_dragon_always_spawn_egg;
+
+import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.injection.FabInject;
+import net.minecraft.entity.boss.dragon.EnderDragonEntity;
+import net.minecraft.entity.boss.dragon.EnderDragonFight;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+@Mixin(EnderDragonFight.class)
+@EligibleIf(configAvailable="*.ender_dragon_always_spawn_egg")
+public class MixinEnderDragonFight {
+	@Shadow
+	private boolean previouslyKilled;
+
+	@FabInject(method="dragonKilled(Lnet/minecraft/entity/boss/dragon/EnderDragonEntity;)V", at=@At(value="INVOKE", target="Lnet/minecraft/entity/boss/dragon/EnderDragonFight;generateNewEndGateway()V"))
+	public void dragonKilled(EnderDragonEntity dragon, CallbackInfo ci){
+		if (FabConf.isEnabled("*.ender_dragon_always_spawn_egg")){
+			previouslyKilled = false;
+		}
+	}
+}

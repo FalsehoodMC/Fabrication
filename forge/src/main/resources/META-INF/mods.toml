@@ -1,0 +1,12 @@
+modLoader = "javafml"
+loaderVersion = "[32,)"
+license = "MIT"
+
+[[mods]]
+modId = "fabrication"
+version = "${version}"
+displayName = "Forgery"
+authors = ["unascribed","SFort"]
+description = '''
+A huge collection of vanilla tweaks and small features.
+'''

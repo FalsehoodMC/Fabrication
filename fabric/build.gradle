@@ -1,0 +1,275 @@
+import java.nio.file.Files
+
+plugins {
+    id 'com.gradleup.shadow'
+}
+
+architectury {
+    platformSetupLoomIde()
+    fabric()
+}
+
+configurations {
+    common {
+        canBeResolved = true
+        canBeConsumed = false
+    }
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentFabric.extendsFrom common
+
+    // Files in this configuration will be bundled into your mod using the Shadow plugin.
+    // Don't use the `shadow` configuration from the plugin itself as it's meant for excluding files.
+    shadowBundle {
+        canBeResolved = true
+        canBeConsumed = false
+    }
+}
+
+dependencies {
+    modImplementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
+
+    common(project(path: ':common', configuration: 'namedElements')) { transitive = false }
+    shadowBundle project(path: ':common', configuration: 'transformProductionFabric')
+}
+
+loom.accessWidenerPath = file('src/main/resources/fabrication.accesswidener')
+
+processResources {
+    inputs.property 'version', project.version
+
+    filesMatching('fabric.mod.json') {
+        expand version: inputs.properties.version
+    }
+}
+
+shadowJar {
+    configurations = [project.configurations.shadowBundle]
+    archiveClassifier = 'dev-shadow'
+}
+
+remapJar {
+    inputFile.set shadowJar.archiveFile
+}
+
+//TODO
+jar {
+    doFirst {
+        StringBuilder bldr = new StringBuilder();
+        File dir = file('build/classes/java/main');
+        dir.eachFileRecurse(groovy.io.FileType.FILES, {
+            if (it.name.endsWith('.class')) {
+                bldr.append(it.getAbsolutePath().substring(dir.getAbsolutePath().length()+1))
+                bldr.append('\n')
+            }
+        })
+        file('build/tmp/classes.txt').text = bldr.toString();
+        Set<String> expectedFailThatFailsAutoFilter = Set.of(
+                'lambda$static$12com.unascribed.fabrication.mixin.f_balance.disable_elytra.MixinModelPredicateProviderRegistry',
+                'handleAttackEntity(Lnet/minecraft/class_1657;Lnet/minecraft/class_1937;Lnet/minecraft/class_1268;Lnet/minecraft/class_1297;Lnet/minecraft/class_3966;)Lnet/minecraft/class_1269;com.unascribed.fabrication.mixin.a_fixes.fix_charm_amethyst_dupe.MixinClearItemFrames',
+                'handleUseEntity(Lnet/minecraft/class_1657;Lnet/minecraft/class_1937;Lnet/minecraft/class_1268;Lnet/minecraft/class_1297;Lnet/minecraft/class_3966;)Lnet/minecraft/class_1269;com.unascribed.fabrication.mixin.a_fixes.fix_charm_amethyst_dupe.MixinClearItemFrames',
+                'processLoading;com.unascribed.fabrication.mixin.e_mechanics.obsidian_tears.MixinModelLoaderForge',
+                'fireRenderEntityItemcom.unascribed.fabrication.mixin.i_woina.drops.MixinItemEntityRendererObfuscate',
+                'processLoadingcom.unascribed.fabrication.mixin.e_mechanics.obsidian_tears.MixinModelLoaderForge',
+                'method_27884com.unascribed.fabrication.mixin.f_balance.disable_elytra.MixinModelPredicateProviderRegistry'
+        )
+        def lge = project.getExtensions().getByType(net.fabricmc.loom.api.LoomGradleExtensionAPI.class)
+        def mappings = lge.getMappingsProvider().getMappings()
+        Map<String, Mapp> toInter = new HashMap<>()
+        List<String> fabRefl = Files.readAllLines(file('build/tmp/fabReflToMap').toPath())
+
+        for (String f : fabRefl) {
+            if (f == null) continue
+            Mapp.Target toTarget = new Mapp.Target(f)
+            if (toInter.containsKey('FabRefl')) toInter.get('FabRefl').target.add(toTarget)
+            else toInter.put('FabRefl', new Mapp(new String[]{}, new String[]{}, new Mapp.Target[]{toTarget}))
+
+        }
+
+        List<String> toParse = Files.readAllLines(file('build/tmp/fabToRefMap').toPath())
+        for (int i=0; i+3<toParse.size(); i++){
+            String toInterKey = toParse.get(i)
+            Mapp toAdd = new Mapp(toParse.get(++i).split('\t'), toParse.get(++i).split('\t'), toParse.get(++i).split('\t'))
+            if (toInter.containsKey(toInterKey)) toInter.get(toInterKey).add(toAdd)
+            else toInter.put(toInterKey, toAdd)
+        }
+        Map<String, String> fieldMap = new HashMap<>()
+        Map<String, String> targetMap = new HashMap<>()
+        Map<String, String> methodMap = new HashMap<>()
+        Map<String, String> classMap = new HashMap<>()
+
+        for (def map : toInter.values()){
+            for (def cl : mappings.classes){
+                String clName = cl.getName('named')
+                String clNameRez = cl.getName('intermediary')
+                String dottedClName = clName.replace('/', '.')
+                if (map.mixin.contains(dottedClName)) {
+                    for (def clMethod : cl.methods) {
+                        for (String mthd : map.method) {
+                            int col = mthd.indexOf(';')
+                            int dot = mthd.indexOf('.')
+                            if (col == -1 || dot < col && dot != -1) col = dot
+                            int brc = mthd.indexOf('(')
+                            if (brc == -1) continue
+                            String desc = mthd.substring(brc)
+                            String name = mthd.substring(col == -1 || brc<col ? 0 : col+1, brc)
+                            if ((name.equals(clMethod.getName('named')) || name.equals(clMethod.getName('intermediary'))) && (desc.equals(clMethod.getDesc('named')) || desc.equals(clMethod.getDesc('intermediary')))) {
+                                methodMap.put(clName+';'+name+desc, clMethod.getName('intermediary') + clMethod.getDesc('intermediary'))
+                            }
+                        }
+                    }
+                }
+                for (Mapp.Target mapt : map.target) {
+                    String target = mapt.self
+                    int col = target.indexOf(';')
+                    int dot = target.indexOf('.')
+                    if (col == -1 || dot < col && dot != -1) col = dot
+                    if (mapt.applicable.contains(dottedClName)){
+                        classMap.put(clName, clNameRez)
+                        int brc = target.indexOf('(')
+                        if (brc == -1) {
+                            int cindx = target.lastIndexOf(':')
+                            String name = target.substring(col+1, cindx == -1 ? target.length() : cindx)
+                            for (def clField : cl.fields) {
+                                if (clField.getName('named').equals(name) || clField.getName('intermediary').equals(name)){
+                                    fieldMap.put(target, clField.getName('intermediary')+":"+clField.getDesc('intermediary'))
+                                }
+                            }
+                            continue
+                        }
+                        String desc = target.substring(brc)
+                        String name = target.substring(col+1, brc)
+                        for (def clMethod : cl.methods) {
+                            if ((clMethod.getName('named').equals(name) || clMethod.getName('intermediary').equals(name)) && (clMethod.getDesc('named').equals(desc) || clMethod.getDesc('intermediary').equals(desc))){
+                                targetMap.put(target, clMethod.getName('intermediary')+clMethod.getDesc('intermediary'))
+                            }
+                        }
+                    }
+                }
+            }
+            //basic <init> pass because #656
+            {
+                for (Mapp.Target mapt : map.target) {
+                    String target = mapt.self
+                    int col = target.indexOf(';')
+                    int dot = target.indexOf('.')
+                    if (col == -1 || dot < col && dot != -1) col = dot
+                    int brc = target.indexOf('(')
+                    if (brc == -1) {
+                        continue
+                    }
+                    String desc = target.substring(brc)
+                    String name = target.substring(col+1, brc)
+                    if (!"<init>".equals(name)) continue
+                    //TODO map desc
+                    if (!"()V".equals(desc)) continue
+                    String claz = target.substring(0, col)
+                    for (def cl : mappings.classes) {
+                        String clName = cl.getName('named')
+                        if (claz.endsWith(clName)) {
+                            targetMap.put(target, "<init>()V")
+                        }
+                    }
+                }
+            }
+        }
+        StringBuilder bldrRel = new StringBuilder()
+        Map<String, String> bldrAbs = new HashMap<>()
+        for (Map.Entry<String, Mapp> intr : toInter){
+            for (Mapp.Target tar : intr.value.target){
+                String s = tar.self
+                String ad = targetMap.get(s)
+                if (ad == null) ad = fieldMap.get(s)
+                if (ad != null) {
+                    int col = s.indexOf(';')
+                    int dot = s.indexOf('.')
+                    if (col == -1 || dot < col && dot != -1) col = dot
+                    bldrAbs.put(s, 'L'+classMap.get(s.substring(s.charAt(0) == 'L' as char ? 1 : 0, col))+';'+ad)
+                } else if (!s.isBlank() && !expectedFailThatFailsAutoFilter.contains(s+intr.key)
+                        && !s.startsWith("Ljava/lang/") && !s.startsWith("com/mojang/blaze3d/")
+                ) {
+                    logger.log(LogLevel.ERROR, "Failed to map "+s+" for "+intr.key)
+                }
+            }
+            boolean frst = true
+            StringBuilder bldrRelIntern = new StringBuilder()
+            for (String s : intr.value.method) {
+                boolean missedMthd = true
+                for (String c : intr.value.mixin) {
+                    String set = methodMap.get(c.replace('.', '/')+';'+s)
+                    if (set != null){
+                        if (frst) frst = false;
+                        else bldrRelIntern.append('\t')
+                        bldrRelIntern.append(s).append(' ').append(set)
+                        missedMthd = false
+                        break
+                    }
+                }
+                if (missedMthd && !s.isBlank() && !expectedFailThatFailsAutoFilter.contains(s+intr.key) && !s.equals("<init>")) {
+                    logger.log(LogLevel.ERROR, "Failed to map "+s+" for "+intr.key)
+                }
+            }
+            if (!bldrRelIntern.isEmpty()) {
+                if (!bldrRel.isEmpty()) bldrRel.append('\n')
+                bldrRel.append(intr.key)
+                bldrRel.append('\n')
+                bldrRel.append(bldrRelIntern)
+            }
+        }
+        file('build/tmp/fabRelRefMap.txt').text = bldrRel.toString()
+        bldrRel = new StringBuilder()
+        for (Map.Entry<String, String> entry : bldrAbs) {
+            bldrRel.append(entry.key).append(' ').append(entry.value).append('\n')
+        }
+        file('build/tmp/fabAbsRefMap.txt').text = bldrRel.toString()
+    }
+
+    from 'LICENSE'
+    from 'build/tmp/classes.txt'
+    from 'build/tmp/fabRelRefMap.txt'
+    from 'build/tmp/fabAbsRefMap.txt'
+}
+
+class Mapp{
+    static class Target{
+        Target(String target){
+            int i = target.indexOf(' ');
+            if (i == -1){
+                this.self = target
+                this.applicable = new ArrayList<>()
+            } else {
+                this.self = target.substring(0, i)
+                this.applicable = target.substring(i).split(' ')
+            }
+        }
+        public String self
+        public List<String> applicable
+    }
+    void add(Mapp map){
+        this.mixin.addAll(map.mixin)
+        this.method.addAll(map.method)
+        this.target.addAll(map.target)
+    }
+    void add(String[] mixin, String[] method, String[] target){
+        for (String s : mixin) this.mixin.add(s)
+        for (String s : method) this.method.add(s)
+        for (String s : target) this.target.add(new Target(s))
+    }
+    void add(Target[] target){
+        for (Target s : target) this.target.add(s)
+    }
+    Mapp(String[] mixin, String[] method, String[] target){
+        this.mixin = mixin
+        this.method = method
+        this.target = new ArrayList<>()
+        for (String s : target) this.target.add(new Target(s))
+    }
+    Mapp(String[] mixin, String[] method, Target[] target){
+        this.mixin = mixin;
+        this.method = method;
+        this.target = target;
+    }
+    public List<String> mixin
+    public List<String> method
+    public List<Target> target
+}

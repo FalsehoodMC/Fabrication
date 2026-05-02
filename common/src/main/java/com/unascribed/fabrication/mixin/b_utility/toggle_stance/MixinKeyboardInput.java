@@ -1,0 +1,24 @@
+package com.unascribed.fabrication.mixin.b_utility.toggle_stance;
+
+import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.features.FeatureToggleStance;
+import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.Env;
+import com.unascribed.fabrication.support.injection.FabInject;
+import net.minecraft.client.input.KeyboardInput;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+@Mixin(KeyboardInput.class)
+@EligibleIf(configAvailable="*.toggle_stance", envMatches=Env.CLIENT)
+public class MixinKeyboardInput {
+
+	@FabInject(at=@At("TAIL"), method="tick(Z)V")
+	public void tick(boolean slowDown, CallbackInfo ci) {
+		if (FabConf.isEnabled("*.toggle_stance") && FeatureToggleStance.currentStance.sneaking) {
+			((KeyboardInput)(Object)this).sneaking = true;
+		}
+	}
+
+}

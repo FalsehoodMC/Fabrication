@@ -1,0 +1,39 @@
+package com.unascribed.fabrication.mixin.a_fixes.boundless_levels;
+
+import com.google.common.primitives.Ints;
+import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.Env;
+import com.unascribed.fabrication.support.injection.FabInject;
+import com.unascribed.fabrication.util.RomanNumeral;
+import net.minecraft.client.resource.language.TranslationStorage;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+@Mixin(TranslationStorage.class)
+@EligibleIf(configAvailable="*.boundless_levels", envMatches=Env.CLIENT)
+public class MixinTranslationStorage {
+
+	@FabInject(at=@At("HEAD"), method="get(Ljava/lang/String;)Ljava/lang/String;", cancellable=true)
+	public void get(String key, CallbackInfoReturnable<String> ci) {
+		if (!FabConf.isEnabled("*.boundless_levels")) return;
+		if (key.startsWith("enchantment.level.")) {
+			Integer i = Ints.tryParse(key.substring(18));
+			if (i != null) {
+				ci.setReturnValue(RomanNumeral.format(i));
+			}
+		}
+		if (key.startsWith("potion.potency.")) {
+			Integer i = Ints.tryParse(key.substring(15));
+			if (i != null) {
+				if (i == 0) {
+					ci.setReturnValue("");
+				} else {
+					ci.setReturnValue(RomanNumeral.format(i+1));
+				}
+			}
+		}
+	}
+
+}

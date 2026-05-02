@@ -1,10 +1,17 @@
 pluginManagement {
-	repositories {
-		maven { url 'https://repo.sleeping.town' }
-		maven { url 'https://maven.fabricmc.net/' }
-		maven { url 'https://server.bbkr.space/artifactory/libs-release/' }
-		gradlePluginPortal()
-	}
+    repositories {
+        maven { url = 'https://maven.fabricmc.net/' }
+        maven { url = 'https://maven.architectury.dev/' }
+        maven { url 'https://repo.sleeping.town' }
+        maven { url = 'https://files.minecraftforge.net/maven/' }
+        maven { url 'https://server.bbkr.space/artifactory/libs-release/' }
+        gradlePluginPortal()
+    }
 }
-include 'ap'
 
+rootProject.name = 'fabrication'
+
+include 'common'
+include 'fabric'
+include 'forge'
+include 'common:ap'

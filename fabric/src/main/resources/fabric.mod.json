@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "id": "fabrication",
+  "version": "${version}",
+
+  "name": "Fabrication",
+  "description": "A huge collection of vanilla tweaks and small features.",
+  "authors": [
+    "unascribed",
+    "SFort"
+  ],
+  "contact": {
+    "homepage": "https://unascribed.com/fabrication",
+    "source": "https://github.com/unascribed/Fabrication",
+    "issues": "https://github.com/unascribed/Fabrication/issues"
+  },
+
+  "license": "MIT",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.unascribed.fabrication.FabricationMod"],
+    "client": ["com.unascribed.fabrication.FabricationModClient"],
+    "modmenu": ["com.unascribed.fabrication.ModMenuInitializer"],
+    "fscript": ["com.unascribed.fabrication.FScriptInitializer"],
+    "lib39:gl_compat_voter": ["com.unascribed.fabrication.client.FabricationGLCompatVoter"]
+  },
+  "mixins": ["fabrication.mixins.json"],
+  "accessWidener": "fabrication.accesswidener",
+  "icon": "assets/fabrication/icon.png",
+
+  "depends": {
+    "fabricloader": ">=0.12.0",
+    "minecraft": "^1.18.2",
+    "lib39-deferral": ">=1.1.1"
+  },
+  "suggests": {
+  },
+  "conflicts": {
+    "modmenu": "<2.0.2"
+  }
+}

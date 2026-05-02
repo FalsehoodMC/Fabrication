@@ -1,0 +1,44 @@
+package com.unascribed.fabrication.mixin.a_fixes.ghast_charging;
+
+import com.unascribed.fabrication.FabConf;
+import com.unascribed.fabrication.interfaces.GhastAttackTime;
+import com.unascribed.fabrication.support.EligibleIf;
+import com.unascribed.fabrication.support.Env;
+import com.unascribed.fabrication.support.injection.FabInject;
+import net.minecraft.entity.mob.GhastEntity;
+import net.minecraft.entity.mob.MobEntity;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+// MobEntity is our best injection point because GhastEntity doesn't override tick
+@Mixin(MobEntity.class)
+@EligibleIf(configAvailable="*.ghast_charging", envMatches=Env.CLIENT)
+public class MixinMobEntityClient implements GhastAttackTime {
+
+	@Unique
+	private int fabrication$ghastAttackTime;
+
+	@FabInject(at=@At("TAIL"), method="tick()V")
+	public void tick(CallbackInfo ci) {
+		if (!FabConf.isEnabled("*.ghast_charging")) return;
+		Object self = this;
+		if (self instanceof GhastEntity) {
+			GhastEntity g = (GhastEntity)self;
+			if (g.isShooting()) {
+				if (g.isAlive()) {
+					fabrication$ghastAttackTime++;
+				}
+			} else {
+				fabrication$ghastAttackTime = 0;
+			}
+		}
+	}
+
+	@Override
+	public int getAttackTime() {
+		return fabrication$ghastAttackTime;
+	}
+
+}
