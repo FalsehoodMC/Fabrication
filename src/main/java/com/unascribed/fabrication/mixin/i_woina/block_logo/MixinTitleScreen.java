@@ -3,6 +3,8 @@ package com.unascribed.fabrication.mixin.i_woina.block_logo;
 import com.unascribed.fabrication.FabConf;
 import com.unascribed.fabrication.support.EligibleIf;
 import com.unascribed.fabrication.support.Env;
+import com.unascribed.fabrication.support.FailOn;
+import com.unascribed.fabrication.support.SpecialEligibility;
 import com.unascribed.fabrication.support.injection.FabInject;
 import com.unascribed.fabrication.support.injection.Hijack;
 import com.unascribed.fabrication.util.BlockLogoRenderer;
@@ -20,6 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(TitleScreen.class)
 @EligibleIf(configAvailable="*.block_logo", envMatches=Env.CLIENT)
+@FailOn(invertedSpecialConditions=SpecialEligibility.NEVER)
 public class MixinTitleScreen extends Screen {
 
 	protected MixinTitleScreen(Text title) {
@@ -36,6 +39,7 @@ public class MixinTitleScreen extends Screen {
 	@Shadow
 	private long backgroundFadeStart;
 
+	//TODO https://github.com/FalsehoodMC/Fabrication/issues/808
 	@Hijack(method="render(Lnet/minecraft/client/gui/DrawContext;IIF)V", target="Lnet/minecraft/client/gui/LogoDrawer;draw(Lnet/minecraft/client/gui/DrawContext;IF)V")
 	public boolean fabrication$drawBlockLogo() {
 		if (FabConf.isEnabled("*.block_logo")) {
@@ -48,7 +52,7 @@ public class MixinTitleScreen extends Screen {
 	@FabInject(at=@At("HEAD"), method="render(Lnet/minecraft/client/gui/DrawContext;IIF)V")
 	public void renderHead(DrawContext matrices, int mouseX, int mouseY, float tickDelta, CallbackInfo ci) {
 		if (!FabConf.isEnabled("*.block_logo")) return;
-		FabConf.addFailure("*.block_logo", "Not Ported");
+		//TODO
 		/*
 		fabrication$splashText = splashText;
 		splashText = null;
