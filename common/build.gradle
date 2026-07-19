@@ -39,6 +39,13 @@ repositories {
     }
 }
 
+afterEvaluate {
+    configurations {
+        // put mc on the ap classpath (hacky)
+        annotationProcessor.extendsFrom configurations.minecraftNamedRuntime
+    }
+}
+
 dependencies {
     // We depend on Fabric Loader here to use the Fabric @Environment annotations,
     // which get remapped to the correct annotations on each platform.
@@ -57,11 +64,12 @@ dependencies {
     }
     modImplementation(include('com.unascribed:lib39-deferral:1.1.1'))
 
-
-
-    tasks.withType(JavaCompile) {
-        options.compilerArgs.add("-AfabricationAPPath=${project.getBuildDir()}")
-    }
     annotationProcessor project(':common:ap')
     implementation 'com.google.code.gson:gson:2.10'
+}
+
+tasks.withType(JavaCompile) {
+    doFirst {
+        options.compilerArgs.add("-AfabricationAPPath=${project.getBuildDir()}")
+    }
 }
