@@ -29,7 +29,9 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 		if (!FabConf.isEnabled("*.use_player_list_name_in_tag")) return;
 		Object self = this;
 		if (self instanceof AbstractClientPlayerEntity) {
-			PlayerListEntry ple = MinecraftClient.getInstance().getNetworkHandler().getPlayerListEntry(getUuid());
+			net.minecraft.client.network.ClientPlayNetworkHandler networkHandler = MinecraftClient.getInstance().getNetworkHandler();
+			if (networkHandler== null) return;
+			PlayerListEntry ple = networkHandler.getPlayerListEntry(getUuid());
 			if (ple != null && ple.getDisplayName() != null) {
 				ci.setReturnValue(ple.getDisplayName());
 			}
